@@ -306,7 +306,6 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.IsEncrypted() == true);
     NL_TEST_ASSERT(inSuite, header.MICTagLength() == 16);
 
-
     // Let's try encrypting using original session, and decrypting using deserialized
     {
         CryptoContext session1;

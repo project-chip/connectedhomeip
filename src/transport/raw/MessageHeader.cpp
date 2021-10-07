@@ -87,8 +87,6 @@ constexpr uint8_t kMsgFlagsMask = 0x07;
 /// Shift to convert to/from a masked version 8bit value to a 4bit version.
 constexpr int kVersionShift = 4;
 
-
-
 } // namespace
 
 uint16_t PacketHeader::EncodeSizeBytes() const
@@ -153,7 +151,6 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     err = reader.Read8(&securityFlags).StatusCode();
     SuccessOrExit(err);
     mSecFlags.SetRaw(securityFlags);
-
 
     err = reader.Read16(&mSessionId).StatusCode();
     SuccessOrExit(err);
@@ -292,7 +289,6 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
 
     uint8_t msgFlags = (kMsgHeaderVersion << kVersionShift) | (messageFlags.Raw() & kMsgFlagsMask);
     uint8_t secFlags = securityFlags.Raw();
-
 
     uint8_t * p = data;
     Write8(p, msgFlags);

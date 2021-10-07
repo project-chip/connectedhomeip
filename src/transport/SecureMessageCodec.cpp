@@ -52,7 +52,6 @@ CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
         .SetMessageCounter(messageCounter) //
         .SetSessionId(state->GetPeerSessionId());
 
-
     // TODO set Session Type (Unicast or Group)
     // packetHeader.SetSessionType(Header::SessionType::kUnicastSession);
 

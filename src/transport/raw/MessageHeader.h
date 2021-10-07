@@ -28,6 +28,7 @@
 
 #include <type_traits>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/GroupId.h>
 #include <lib/core/Optional.h>
@@ -36,7 +37,6 @@
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
-#include <crypto/CHIPCryptoPAL.h>
 
 namespace chip {
 
@@ -53,7 +53,7 @@ namespace Header {
 enum class SessionType
 {
     kUnicastSession = 0,
-    kGroupSession = 1,
+    kGroupSession   = 1,
 };
 
 /**
@@ -78,25 +78,23 @@ enum class ExFlagValues : uint8_t
 enum class MsgFlagValues : uint8_t
 {
     /// Header flag specifying that a source node id is included in the header.
-    kSourceNodeIdPresent = 0b00000100,
-    kDestinationNodeIdAbsent = 0b00000000,
-    kDestinationNodeIdPresent = 0b00000001,
+    kSourceNodeIdPresent       = 0b00000100,
+    kDestinationNodeIdAbsent   = 0b00000000,
+    kDestinationNodeIdPresent  = 0b00000001,
     kDestinationGroupIdPresent = 0b00000010,
-    kDSIZReserved = 0b00000011,
+    kDSIZReserved              = 0b00000011,
 
 };
 
 enum class SecFlagValues : uint8_t
 {
-    kPrivacyFlag            = 0b10000000,
-    kControlMsgFlag         = 0b01000000,
-    kMsgExtensionFlag       = 0b00100000,
-    kSessiontTypeUnicast    = 0b00000000,
-    kSessiontTypeGroup      = 0b00000001,
+    kPrivacyFlag         = 0b10000000,
+    kControlMsgFlag      = 0b01000000,
+    kMsgExtensionFlag    = 0b00100000,
+    kSessiontTypeUnicast = 0b00000000,
+    kSessiontTypeGroup   = 0b00000001,
 
 };
-
-
 
 using MsgFlags = BitFlags<MsgFlagValues>;
 using SecFlags = BitFlags<SecFlagValues>;
@@ -157,7 +155,7 @@ public:
 
     bool IsEncrypted() const { return mSessionId != kMsgSessionIdUnsecured; }
 
-    uint16_t MICTagLength() const { return (IsEncrypted()) ? chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES : 0;}
+    uint16_t MICTagLength() const { return (IsEncrypted()) ? chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES : 0; }
 
     /** Check if it's a secure session control message. */
     bool IsSecureSessionControlMsg() const { return mSecFlags.Has(Header::SecFlagValues::kControlMsgFlag); }
@@ -351,7 +349,6 @@ private:
     /// Flags read from the message.
     Header::MsgFlags mMsgFlags;
     Header::SecFlags mSecFlags;
-
 };
 
 /**
