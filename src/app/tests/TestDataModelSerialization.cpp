@@ -167,7 +167,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
         t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.d = buf;
@@ -198,7 +198,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
         NL_TEST_ASSERT(apSuite, t.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_A);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
@@ -235,7 +235,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         t.c.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B;
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_B;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c.d = buf;
@@ -268,7 +268,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         NL_TEST_ASSERT(apSuite, t.c.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_B);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
@@ -362,7 +362,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         NL_TEST_ASSERT(apSuite, t.c.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_B);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
@@ -534,7 +534,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
         t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.d = buf;
@@ -577,7 +577,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
         NL_TEST_ASSERT(apSuite, t.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_A);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
@@ -612,7 +612,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
         t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.d = buf;
@@ -653,7 +653,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
         NL_TEST_ASSERT(apSuite, t.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_A);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
@@ -692,7 +692,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
             t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
             t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
             t.d = buf;
@@ -747,7 +747,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
             t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
             t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
             t.d = buf;
