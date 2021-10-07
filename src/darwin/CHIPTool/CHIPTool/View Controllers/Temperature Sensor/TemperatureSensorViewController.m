@@ -182,8 +182,7 @@
     int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue];
     int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue];
 
-    NSLog(
-        @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds));
+    NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds));
 
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
