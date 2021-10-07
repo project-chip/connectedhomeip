@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/data-model/DecodableList.h>
@@ -39,6 +40,9 @@ namespace DeviceTemperatureConfiguration {
 
 } // namespace DeviceTemperatureConfiguration
 namespace Identify {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IdentifyEffectIdentifier
 enum class IdentifyEffectIdentifier : uint8_t
 {
@@ -49,11 +53,23 @@ enum class IdentifyEffectIdentifier : uint8_t
     IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT  = 0xFE,
     IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT    = 0xFF,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IdentifyEffectIdentifier             = EmberAfIdentifyEffectIdentifier;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IdentifyEffectVariant
 enum class IdentifyEffectVariant : uint8_t
 {
     IDENTIFY_EFFECT_VARIANT_DEFAULT = 0x00,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IdentifyEffectVariant                = EmberAfIdentifyEffectVariant;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IdentifyIdentifyType
 enum class IdentifyIdentifyType : uint8_t
 {
@@ -64,6 +80,9 @@ enum class IdentifyIdentifyType : uint8_t
     IDENTIFY_IDENTIFY_TYPE_DISPLAY       = 0x04,
     IDENTIFY_IDENTIFY_TYPE_ACTUATOR      = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IdentifyIdentifyType                 = EmberAfIdentifyIdentifyType;
+#endif
 
 namespace Commands {
 namespace Identify {
@@ -1177,6 +1196,9 @@ public:
 } // namespace Commands
 } // namespace Scenes
 namespace OnOff {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OnOffDelayedAllOffEffectVariant
 enum class OnOffDelayedAllOffEffectVariant : uint8_t
 {
@@ -1184,17 +1206,32 @@ enum class OnOffDelayedAllOffEffectVariant : uint8_t
     ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE                                                           = 0x01,
     ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OnOffDelayedAllOffEffectVariant      = EmberAfOnOffDelayedAllOffEffectVariant;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OnOffDyingLightEffectVariant
 enum class OnOffDyingLightEffectVariant : uint8_t
 {
     ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND = 0x00,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OnOffDyingLightEffectVariant         = EmberAfOnOffDyingLightEffectVariant;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OnOffEffectIdentifier
 enum class OnOffEffectIdentifier : uint8_t
 {
     ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF = 0x00,
     ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT     = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OnOffEffectIdentifier                = EmberAfOnOffEffectIdentifier;
+#endif
 
 namespace Commands {
 namespace Off {
@@ -1484,18 +1521,30 @@ namespace OnOffSwitchConfiguration {
 
 } // namespace OnOffSwitchConfiguration
 namespace LevelControl {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MoveMode
 enum class MoveMode : uint8_t
 {
     MOVE_MODE_UP   = 0x00,
     MOVE_MODE_DOWN = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MoveMode                             = EmberAfMoveMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for StepMode
 enum class StepMode : uint8_t
 {
     STEP_MODE_UP   = 0x00,
     STEP_MODE_DOWN = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using StepMode                             = EmberAfStepMode;
+#endif
 
 namespace Commands {
 namespace MoveToLevel {
@@ -2696,6 +2745,9 @@ public:
 } // namespace Commands
 } // namespace PowerProfile
 namespace ApplianceControl {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ApplianceStatus
 enum class ApplianceStatus : uint8_t
 {
@@ -2715,6 +2767,12 @@ enum class ApplianceStatus : uint8_t
     APPLIANCE_STATUS_SUPERCOOLING                = 0x0E,
     APPLIANCE_STATUS_SUPERHEATING                = 0x0F,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ApplianceStatus                      = EmberAfApplianceStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for CommandIdentification
 enum class CommandIdentification : uint8_t
 {
@@ -2730,6 +2788,12 @@ enum class CommandIdentification : uint8_t
     COMMAND_IDENTIFICATION_ENABLE_ENERGY_CONTROL  = 0x0A,
     COMMAND_IDENTIFICATION_DISABLE_ENERGY_CONTROL = 0x0B,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using CommandIdentification                = EmberAfCommandIdentification;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WarningEvent
 enum class WarningEvent : uint8_t
 {
@@ -2739,6 +2803,9 @@ enum class WarningEvent : uint8_t
     WARNING_EVENT_WARNING4_OVERALL_POWER_BACK_BELOW_THE_POWER_THRESHOLD_LEVEL                                    = 0x03,
     WARNING_EVENT_WARNING5_OVERALL_POWER_WILL_BE_POTENTIALLY_ABOVE_AVAILABLE_POWER_LEVEL_IF_THE_APPLIANCE_STARTS = 0x04,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WarningEvent                         = EmberAfWarningEvent;
+#endif
 
 namespace Commands {
 namespace ExecutionOfACommand {
@@ -3239,6 +3306,9 @@ public:
 } // namespace Commands
 } // namespace Basic
 namespace OtaSoftwareUpdateProvider {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAApplyUpdateAction
 enum class OTAApplyUpdateAction : uint8_t
 {
@@ -3246,6 +3316,12 @@ enum class OTAApplyUpdateAction : uint8_t
     OTA_APPLY_UPDATE_ACTION_AWAIT_NEXT_ACTION = 0x01,
     OTA_APPLY_UPDATE_ACTION_DISCONTINUE       = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OTAApplyUpdateAction                 = EmberAfOTAApplyUpdateAction;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTADownloadProtocol
 enum class OTADownloadProtocol : uint8_t
 {
@@ -3254,6 +3330,12 @@ enum class OTADownloadProtocol : uint8_t
     OTA_DOWNLOAD_PROTOCOL_HTTPS            = 0x02,
     OTA_DOWNLOAD_PROTOCOL_VENDOR_SPECIFIC  = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OTADownloadProtocol                  = EmberAfOTADownloadProtocol;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAQueryStatus
 enum class OTAQueryStatus : uint8_t
 {
@@ -3261,6 +3343,9 @@ enum class OTAQueryStatus : uint8_t
     OTA_QUERY_STATUS_BUSY             = 0x01,
     OTA_QUERY_STATUS_NOT_AVAILABLE    = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OTAQueryStatus                       = EmberAfOTAQueryStatus;
+#endif
 
 namespace Commands {
 namespace QueryImage {
@@ -3457,6 +3542,9 @@ public:
 } // namespace Commands
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
@@ -3464,6 +3552,9 @@ enum class OTAAnnouncementReason : uint8_t
     OTA_ANNOUNCEMENT_REASON_UPDATE_AVAILABLE        = 0x01,
     OTA_ANNOUNCEMENT_REASON_URGENT_UPDATE_AVAILABLE = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OTAAnnouncementReason                = EmberAfOTAAnnouncementReason;
+#endif
 
 namespace Commands {
 namespace AnnounceOtaProvider {
@@ -3509,6 +3600,9 @@ namespace PowerSource {
 
 } // namespace PowerSource
 namespace GeneralCommissioning {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for GeneralCommissioningError
 enum class GeneralCommissioningError : uint8_t
 {
@@ -3516,6 +3610,12 @@ enum class GeneralCommissioningError : uint8_t
     GENERAL_COMMISSIONING_ERROR_VALUE_OUTSIDE_RANGE    = 0x01,
     GENERAL_COMMISSIONING_ERROR_INVALID_AUTHENTICATION = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using GeneralCommissioningError            = EmberAfGeneralCommissioningError;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RegulatoryLocationType
 enum class RegulatoryLocationType : uint8_t
 {
@@ -3523,6 +3623,9 @@ enum class RegulatoryLocationType : uint8_t
     REGULATORY_LOCATION_TYPE_OUTDOOR        = 0x01,
     REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using RegulatoryLocationType               = EmberAfRegulatoryLocationType;
+#endif
 
 namespace BasicCommissioningInfoType {
 enum class Fields
@@ -3735,6 +3838,9 @@ public:
 } // namespace Commands
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NetworkCommissioningError
 enum class NetworkCommissioningError : uint8_t
 {
@@ -3759,6 +3865,9 @@ enum class NetworkCommissioningError : uint8_t
     NETWORK_COMMISSIONING_ERROR_LABEL15                  = 0x12,
     NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR            = 0x13,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NetworkCommissioningError            = EmberAfNetworkCommissioningError;
+#endif
 
 namespace ThreadInterfaceScanResult {
 enum class Fields
@@ -4369,6 +4478,9 @@ public:
 } // namespace Commands
 } // namespace NetworkCommissioning
 namespace DiagnosticLogs {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for LogsIntent
 enum class LogsIntent : uint8_t
 {
@@ -4376,6 +4488,12 @@ enum class LogsIntent : uint8_t
     LOGS_INTENT_NETWORK_DIAG     = 0x01,
     LOGS_INTENT_CRASH_LOGS       = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using LogsIntent                           = EmberAfLogsIntent;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for LogsStatus
 enum class LogsStatus : uint8_t
 {
@@ -4385,12 +4503,21 @@ enum class LogsStatus : uint8_t
     LOGS_STATUS_BUSY      = 0x03,
     LOGS_STATUS_DENIED    = 0x04,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using LogsStatus                           = EmberAfLogsStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for LogsTransferProtocol
 enum class LogsTransferProtocol : uint8_t
 {
     LOGS_TRANSFER_PROTOCOL_RESPONSE_PAYLOAD = 0x00,
     LOGS_TRANSFER_PROTOCOL_BDX              = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using LogsTransferProtocol                 = EmberAfLogsTransferProtocol;
+#endif
 
 namespace Commands {
 namespace RetrieveLogsRequest {
@@ -4467,6 +4594,9 @@ public:
 } // namespace Commands
 } // namespace DiagnosticLogs
 namespace GeneralDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for BootReasonType
 enum class BootReasonType : uint8_t
 {
@@ -4478,6 +4608,12 @@ enum class BootReasonType : uint8_t
     BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED = 0x05,
     BOOT_REASON_TYPE_SOFTWARE_RESET            = 0x06,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using BootReasonType                       = EmberAfBootReasonType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HardwareFaultType
 enum class HardwareFaultType : uint8_t
 {
@@ -4493,6 +4629,12 @@ enum class HardwareFaultType : uint8_t
     HARDWARE_FAULT_TYPE_NON_VOLATILE_MEMORY_ERROR = 0x09,
     HARDWARE_FAULT_TYPE_TAMPER_DETECTED           = 0x0A,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using HardwareFaultType                    = EmberAfHardwareFaultType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for InterfaceType
 enum class InterfaceType : uint8_t
 {
@@ -4502,6 +4644,12 @@ enum class InterfaceType : uint8_t
     INTERFACE_TYPE_CELLULAR    = 0x03,
     INTERFACE_TYPE_THREAD      = 0x04,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using InterfaceType                        = EmberAfInterfaceType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NetworkFaultType
 enum class NetworkFaultType : uint8_t
 {
@@ -4510,6 +4658,12 @@ enum class NetworkFaultType : uint8_t
     NETWORK_FAULT_TYPE_NETWORK_JAMMED    = 0x02,
     NETWORK_FAULT_TYPE_CONNECTION_FAILED = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NetworkFaultType                     = EmberAfNetworkFaultType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RadioFaultType
 enum class RadioFaultType : uint8_t
 {
@@ -4521,6 +4675,9 @@ enum class RadioFaultType : uint8_t
     RADIO_FAULT_TYPE_BLE_FAULT      = 0x05,
     RADIO_FAULT_TYPE_ETHERNET_FAULT = 0x06,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using RadioFaultType                       = EmberAfRadioFaultType;
+#endif
 
 namespace NetworkInterfaceType {
 enum class Fields
@@ -4609,6 +4766,9 @@ public:
 } // namespace Commands
 } // namespace SoftwareDiagnostics
 namespace ThreadNetworkDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
 {
@@ -4617,6 +4777,12 @@ enum class NetworkFault : uint8_t
     NETWORK_FAULT_HARDWARE_FAILURE = 0x02,
     NETWORK_FAULT_NETWORK_JAMMED   = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NetworkFault                         = EmberAfNetworkFault;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RoutingRole
 enum class RoutingRole : uint8_t
 {
@@ -4628,6 +4794,9 @@ enum class RoutingRole : uint8_t
     ROUTING_ROLE_ROUTER            = 0x05,
     ROUTING_ROLE_LEADER            = 0x06,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using RoutingRole                          = EmberAfRoutingRole;
+#endif
 
 namespace NeighborTable {
 enum class Fields
@@ -4798,6 +4967,9 @@ public:
 } // namespace Commands
 } // namespace ThreadNetworkDiagnostics
 namespace WiFiNetworkDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SecurityType
 enum class SecurityType : uint8_t
 {
@@ -4808,6 +4980,12 @@ enum class SecurityType : uint8_t
     SECURITY_TYPE_WPA2        = 0x04,
     SECURITY_TYPE_WPA3        = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SecurityType                         = EmberAfSecurityType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WiFiVersionType
 enum class WiFiVersionType : uint8_t
 {
@@ -4818,6 +4996,9 @@ enum class WiFiVersionType : uint8_t
     WI_FI_VERSION_TYPE_802__11AC = 0x04,
     WI_FI_VERSION_TYPE_802__11AX = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WiFiVersionType                      = EmberAfWiFiVersionType;
+#endif
 
 namespace Commands {
 namespace ResetCounts {
@@ -4847,6 +5028,9 @@ public:
 } // namespace Commands
 } // namespace WiFiNetworkDiagnostics
 namespace EthernetNetworkDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PHYRateType
 enum class PHYRateType : uint8_t
 {
@@ -4861,6 +5045,9 @@ enum class PHYRateType : uint8_t
     PHY_RATE_TYPE_200_G  = 0x08,
     PHY_RATE_TYPE_400_G  = 0x09,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using PHYRateType                          = EmberAfPHYRateType;
+#endif
 
 namespace Commands {
 namespace ResetCounts {
@@ -4994,6 +5181,9 @@ namespace Switch {
 
 } // namespace Switch
 namespace AdministratorCommissioning {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
@@ -5001,6 +5191,9 @@ enum class StatusCode : uint8_t
     STATUS_CODE_BUSY          = 0x01,
     STATUS_CODE_GENERAL_ERROR = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using StatusCode                           = EmberAfStatusCode;
+#endif
 
 namespace Commands {
 namespace OpenCommissioningWindow {
@@ -5101,6 +5294,9 @@ public:
 } // namespace Commands
 } // namespace AdministratorCommissioning
 namespace OperationalCredentials {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NodeOperationalCertStatus
 enum class NodeOperationalCertStatus : uint8_t
 {
@@ -5115,6 +5311,9 @@ enum class NodeOperationalCertStatus : uint8_t
     NODE_OPERATIONAL_CERT_STATUS_LABEL_CONFLICT         = 0x0A,
     NODE_OPERATIONAL_CERT_STATUS_INVALID_FABRIC_INDEX   = 0x0B,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NodeOperationalCertStatus            = EmberAfNodeOperationalCertStatus;
+#endif
 
 namespace FabricDescriptor {
 enum class Fields
@@ -5587,6 +5786,9 @@ namespace ShadeConfiguration {
 
 } // namespace ShadeConfiguration
 namespace DoorLock {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockOperationEventCode
 enum class DoorLockOperationEventCode : uint8_t
 {
@@ -5606,6 +5808,12 @@ enum class DoorLockOperationEventCode : uint8_t
     DOOR_LOCK_OPERATION_EVENT_CODE_MANUAL_LOCK              = 0x0D,
     DOOR_LOCK_OPERATION_EVENT_CODE_MANUAL_UNLOCK            = 0x0E,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockOperationEventCode           = EmberAfDoorLockOperationEventCode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockProgrammingEventCode
 enum class DoorLockProgrammingEventCode : uint8_t
 {
@@ -5617,6 +5825,12 @@ enum class DoorLockProgrammingEventCode : uint8_t
     DOOR_LOCK_PROGRAMMING_EVENT_CODE_ID_ADDED                = 0x05,
     DOOR_LOCK_PROGRAMMING_EVENT_CODE_ID_DELETED              = 0x06,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockProgrammingEventCode         = EmberAfDoorLockProgrammingEventCode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockSetPinOrIdStatus
 enum class DoorLockSetPinOrIdStatus : uint8_t
 {
@@ -5625,6 +5839,12 @@ enum class DoorLockSetPinOrIdStatus : uint8_t
     DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL          = 0x02,
     DOOR_LOCK_SET_PIN_OR_ID_STATUS_DUPLICATE_CODE_ERROR = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockSetPinOrIdStatus             = EmberAfDoorLockSetPinOrIdStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockUserStatus
 enum class DoorLockUserStatus : uint8_t
 {
@@ -5633,6 +5853,12 @@ enum class DoorLockUserStatus : uint8_t
     DOOR_LOCK_USER_STATUS_OCCUPIED_DISABLED = 0x03,
     DOOR_LOCK_USER_STATUS_NOT_SUPPORTED     = 0xFF,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockUserStatus                   = EmberAfDoorLockUserStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockUserType
 enum class DoorLockUserType : uint8_t
 {
@@ -5643,6 +5869,9 @@ enum class DoorLockUserType : uint8_t
     DOOR_LOCK_USER_TYPE_NON_ACCESS_USER        = 0x04,
     DOOR_LOCK_USER_TYPE_NOT_SUPPORTED          = 0xFF,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockUserType                     = EmberAfDoorLockUserType;
+#endif
 
 namespace Commands {
 namespace LockDoor {
@@ -7350,6 +7579,9 @@ public:
 } // namespace Commands
 } // namespace DoorLock
 namespace WindowCovering {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WcEndProductType
 enum class WcEndProductType : uint8_t
 {
@@ -7379,6 +7611,12 @@ enum class WcEndProductType : uint8_t
     WC_END_PRODUCT_TYPE_SLIDING_SHUTTER              = 0x17,
     WC_END_PRODUCT_TYPE_UNKNOWN                      = 0xFF,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WcEndProductType                     = EmberAfWcEndProductType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WcType
 enum class WcType : uint8_t
 {
@@ -7394,6 +7632,9 @@ enum class WcType : uint8_t
     WC_TYPE_PROJECTOR_SCREEN            = 0x09,
     WC_TYPE_UNKNOWN                     = 0xFF,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WcType                               = EmberAfWcType;
+#endif
 
 namespace Commands {
 namespace UpOrOpen {
@@ -7646,6 +7887,9 @@ public:
 } // namespace Commands
 } // namespace BarrierControl
 namespace PumpConfigurationAndControl {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PumpControlMode
 enum class PumpControlMode : uint8_t
 {
@@ -7656,6 +7900,12 @@ enum class PumpControlMode : uint8_t
     PUMP_CONTROL_MODE_CONSTANT_TEMPERATURE  = 0x05,
     PUMP_CONTROL_MODE_AUTOMATIC             = 0x07,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using PumpControlMode                      = EmberAfPumpControlMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PumpOperationMode
 enum class PumpOperationMode : uint8_t
 {
@@ -7664,9 +7914,15 @@ enum class PumpOperationMode : uint8_t
     PUMP_OPERATION_MODE_MAXIMUM = 0x02,
     PUMP_OPERATION_MODE_LOCAL   = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using PumpOperationMode                    = EmberAfPumpOperationMode;
+#endif
 
 } // namespace PumpConfigurationAndControl
 namespace Thermostat {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SetpointAdjustMode
 enum class SetpointAdjustMode : uint8_t
 {
@@ -7674,6 +7930,9 @@ enum class SetpointAdjustMode : uint8_t
     SETPOINT_ADJUST_MODE_COOL_SETPOINT           = 0x01,
     SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SetpointAdjustMode                   = EmberAfSetpointAdjustMode;
+#endif
 
 namespace Commands {
 namespace SetpointRaiseLower {
@@ -7915,6 +8174,9 @@ namespace ThermostatUserInterfaceConfiguration {
 
 } // namespace ThermostatUserInterfaceConfiguration
 namespace ColorControl {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorLoopAction
 enum class ColorLoopAction : uint8_t
 {
@@ -7922,12 +8184,24 @@ enum class ColorLoopAction : uint8_t
     COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE = 0x01,
     COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE          = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ColorLoopAction                      = EmberAfColorLoopAction;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorLoopDirection
 enum class ColorLoopDirection : uint8_t
 {
     COLOR_LOOP_DIRECTION_DECREMENT_HUE = 0x00,
     COLOR_LOOP_DIRECTION_INCREMENT_HUE = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ColorLoopDirection                   = EmberAfColorLoopDirection;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorMode
 enum class ColorMode : uint8_t
 {
@@ -7935,6 +8209,12 @@ enum class ColorMode : uint8_t
     COLOR_MODE_CURRENT_X_AND_CURRENT_Y            = 0x01,
     COLOR_MODE_COLOR_TEMPERATURE                  = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ColorMode                            = EmberAfColorMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HueDirection
 enum class HueDirection : uint8_t
 {
@@ -7943,6 +8223,12 @@ enum class HueDirection : uint8_t
     HUE_DIRECTION_UP                = 0x02,
     HUE_DIRECTION_DOWN              = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using HueDirection                         = EmberAfHueDirection;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HueMoveMode
 enum class HueMoveMode : uint8_t
 {
@@ -7950,12 +8236,24 @@ enum class HueMoveMode : uint8_t
     HUE_MOVE_MODE_UP   = 0x01,
     HUE_MOVE_MODE_DOWN = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using HueMoveMode                          = EmberAfHueMoveMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HueStepMode
 enum class HueStepMode : uint8_t
 {
     HUE_STEP_MODE_UP   = 0x01,
     HUE_STEP_MODE_DOWN = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using HueStepMode                          = EmberAfHueStepMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SaturationMoveMode
 enum class SaturationMoveMode : uint8_t
 {
@@ -7963,12 +8261,21 @@ enum class SaturationMoveMode : uint8_t
     SATURATION_MOVE_MODE_UP   = 0x01,
     SATURATION_MOVE_MODE_DOWN = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SaturationMoveMode                   = EmberAfSaturationMoveMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SaturationStepMode
 enum class SaturationStepMode : uint8_t
 {
     SATURATION_STEP_MODE_UP   = 0x01,
     SATURATION_STEP_MODE_DOWN = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SaturationStepMode                   = EmberAfSaturationStepMode;
+#endif
 
 namespace Commands {
 namespace MoveToHue {
@@ -8836,6 +9143,9 @@ namespace SodiumConcentrationMeasurement {
 
 } // namespace SodiumConcentrationMeasurement
 namespace IasZone {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasEnrollResponseCode
 enum class IasEnrollResponseCode : uint8_t
 {
@@ -8844,6 +9154,12 @@ enum class IasEnrollResponseCode : uint8_t
     IAS_ENROLL_RESPONSE_CODE_NO_ENROLL_PERMIT = 0x02,
     IAS_ENROLL_RESPONSE_CODE_TOO_MANY_ZONES   = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasEnrollResponseCode                = EmberAfIasEnrollResponseCode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasZoneType
 enum class IasZoneType : uint16_t
 {
@@ -8864,6 +9180,9 @@ enum class IasZoneType : uint16_t
     IAS_ZONE_TYPE_SECURITY_REPEATER         = 0x229,
     IAS_ZONE_TYPE_INVALID_ZONE_TYPE         = 0xFFFF,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasZoneType                          = EmberAfIasZoneType;
+#endif
 
 namespace Commands {
 namespace ZoneEnrollResponse {
@@ -9071,6 +9390,9 @@ public:
 } // namespace Commands
 } // namespace IasZone
 namespace IasAce {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceAlarmStatus
 enum class IasAceAlarmStatus : uint8_t
 {
@@ -9082,6 +9404,12 @@ enum class IasAceAlarmStatus : uint8_t
     IAS_ACE_ALARM_STATUS_FIRE_PANIC      = 0x05,
     IAS_ACE_ALARM_STATUS_EMERGENCY_PANIC = 0x06,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceAlarmStatus                    = EmberAfIasAceAlarmStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceArmMode
 enum class IasAceArmMode : uint8_t
 {
@@ -9090,6 +9418,12 @@ enum class IasAceArmMode : uint8_t
     IAS_ACE_ARM_MODE_ARM_NIGHT_SLEEP_ZONES_ONLY = 0x02,
     IAS_ACE_ARM_MODE_ARM_ALL_ZONES              = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceArmMode                        = EmberAfIasAceArmMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceArmNotification
 enum class IasAceArmNotification : uint8_t
 {
@@ -9101,12 +9435,24 @@ enum class IasAceArmNotification : uint8_t
     IAS_ACE_ARM_NOTIFICATION_NOT_READY_TO_ARM             = 0x05,
     IAS_ACE_ARM_NOTIFICATION_ALREADY_DISARMED             = 0x06,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceArmNotification                = EmberAfIasAceArmNotification;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceAudibleNotification
 enum class IasAceAudibleNotification : uint8_t
 {
     IAS_ACE_AUDIBLE_NOTIFICATION_MUTE          = 0x00,
     IAS_ACE_AUDIBLE_NOTIFICATION_DEFAULT_SOUND = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceAudibleNotification            = EmberAfIasAceAudibleNotification;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceBypassResult
 enum class IasAceBypassResult : uint8_t
 {
@@ -9117,6 +9463,12 @@ enum class IasAceBypassResult : uint8_t
     IAS_ACE_BYPASS_RESULT_UNKNOWN_ZONE_ID         = 0x04,
     IAS_ACE_BYPASS_RESULT_INVALID_ARM_DISARM_CODE = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceBypassResult                   = EmberAfIasAceBypassResult;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAcePanelStatus
 enum class IasAcePanelStatus : uint8_t
 {
@@ -9132,6 +9484,12 @@ enum class IasAcePanelStatus : uint8_t
     IAS_ACE_PANEL_STATUS_ARMING_NIGHT     = 0x09,
     IAS_ACE_PANEL_STATUS_ARMING_AWAY      = 0x0A,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAcePanelStatus                    = EmberAfIasAcePanelStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasZoneType
 enum class IasZoneType : uint16_t
 {
@@ -9152,6 +9510,9 @@ enum class IasZoneType : uint16_t
     IAS_ZONE_TYPE_SECURITY_REPEATER         = 0x229,
     IAS_ZONE_TYPE_INVALID_ZONE_TYPE         = 0xFFFF,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasZoneType                          = EmberAfIasZoneType;
+#endif
 
 namespace IasAceZoneStatusResult {
 enum class Fields
@@ -9873,17 +10234,29 @@ namespace WakeOnLan {
 
 } // namespace WakeOnLan
 namespace TvChannel {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for TvChannelErrorType
 enum class TvChannelErrorType : uint8_t
 {
     TV_CHANNEL_ERROR_TYPE_MULTIPLE_MATCHES = 0x00,
     TV_CHANNEL_ERROR_TYPE_NO_MATCHES       = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using TvChannelErrorType                   = EmberAfTvChannelErrorType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for TvChannelLineupInfoType
 enum class TvChannelLineupInfoType : uint8_t
 {
     TV_CHANNEL_LINEUP_INFO_TYPE_MSO = 0x00,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using TvChannelLineupInfoType              = EmberAfTvChannelLineupInfoType;
+#endif
 
 namespace TvChannelInfo {
 enum class Fields
@@ -10058,6 +10431,9 @@ public:
 } // namespace Commands
 } // namespace TvChannel
 namespace TargetNavigator {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NavigateTargetStatus
 enum class NavigateTargetStatus : uint8_t
 {
@@ -10065,6 +10441,9 @@ enum class NavigateTargetStatus : uint8_t
     NAVIGATE_TARGET_STATUS_APP_NOT_AVAILABLE = 0x01,
     NAVIGATE_TARGET_STATUS_SYSTEM_BUSY       = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NavigateTargetStatus                 = EmberAfNavigateTargetStatus;
+#endif
 
 namespace NavigateTargetTargetInfo {
 enum class Fields
@@ -10153,6 +10532,9 @@ public:
 } // namespace Commands
 } // namespace TargetNavigator
 namespace MediaPlayback {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MediaPlaybackState
 enum class MediaPlaybackState : uint8_t
 {
@@ -10161,6 +10543,12 @@ enum class MediaPlaybackState : uint8_t
     MEDIA_PLAYBACK_STATE_NOT_PLAYING = 0x02,
     MEDIA_PLAYBACK_STATE_BUFFERING   = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MediaPlaybackState                   = EmberAfMediaPlaybackState;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MediaPlaybackStatus
 enum class MediaPlaybackStatus : uint8_t
 {
@@ -10171,6 +10559,9 @@ enum class MediaPlaybackStatus : uint8_t
     MEDIA_PLAYBACK_STATUS_SPEED_OUT_OF_RANGE        = 0x04,
     MEDIA_PLAYBACK_STATUS_SEEK_OUT_OF_RANGE         = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MediaPlaybackStatus                  = EmberAfMediaPlaybackStatus;
+#endif
 
 namespace MediaPlaybackPosition {
 enum class Fields
@@ -10781,6 +11172,9 @@ public:
 } // namespace Commands
 } // namespace MediaPlayback
 namespace MediaInput {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MediaInputType
 enum class MediaInputType : uint8_t
 {
@@ -10797,6 +11191,9 @@ enum class MediaInputType : uint8_t
     MEDIA_INPUT_TYPE_USB       = 0x0A,
     MEDIA_INPUT_TYPE_OTHER     = 0x0B,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MediaInputType                       = EmberAfMediaInputType;
+#endif
 
 namespace MediaInputInfo {
 enum class Fields
@@ -10963,6 +11360,9 @@ public:
 } // namespace Commands
 } // namespace LowPower
 namespace KeypadInput {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for KeypadInputCecKeyCode
 enum class KeypadInputCecKeyCode : uint8_t
 {
@@ -11053,6 +11453,12 @@ enum class KeypadInputCecKeyCode : uint8_t
     KEYPAD_INPUT_CEC_KEY_CODE_F5                           = 0x75,
     KEYPAD_INPUT_CEC_KEY_CODE_DATA                         = 0x76,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using KeypadInputCecKeyCode                = EmberAfKeypadInputCecKeyCode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for KeypadInputStatus
 enum class KeypadInputStatus : uint8_t
 {
@@ -11060,6 +11466,9 @@ enum class KeypadInputStatus : uint8_t
     KEYPAD_INPUT_STATUS_UNSUPPORTED_KEY              = 0x01,
     KEYPAD_INPUT_STATUS_INVALID_KEY_IN_CURRENT_STATE = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using KeypadInputStatus                    = EmberAfKeypadInputStatus;
+#endif
 
 namespace Commands {
 namespace SendKey {
@@ -11121,12 +11530,21 @@ public:
 } // namespace Commands
 } // namespace KeypadInput
 namespace ContentLauncher {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ContentLaunchMetricType
 enum class ContentLaunchMetricType : uint8_t
 {
     CONTENT_LAUNCH_METRIC_TYPE_PIXELS     = 0x00,
     CONTENT_LAUNCH_METRIC_TYPE_PERCENTAGE = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ContentLaunchMetricType              = EmberAfContentLaunchMetricType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ContentLaunchParameterEnum
 enum class ContentLaunchParameterEnum : uint8_t
 {
@@ -11142,6 +11560,12 @@ enum class ContentLaunchParameterEnum : uint8_t
     CONTENT_LAUNCH_PARAMETER_ENUM_SPORTS_TEAM = 0x09,
     CONTENT_LAUNCH_PARAMETER_ENUM_VIDEO       = 0x0A,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ContentLaunchParameterEnum           = EmberAfContentLaunchParameterEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ContentLaunchStatus
 enum class ContentLaunchStatus : uint8_t
 {
@@ -11149,12 +11573,21 @@ enum class ContentLaunchStatus : uint8_t
     CONTENT_LAUNCH_STATUS_URL_NOT_AVAILABLE = 0x01,
     CONTENT_LAUNCH_STATUS_AUTH_FAILED       = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ContentLaunchStatus                  = EmberAfContentLaunchStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ContentLaunchStreamingType
 enum class ContentLaunchStreamingType : uint8_t
 {
     CONTENT_LAUNCH_STREAMING_TYPE_DASH = 0x00,
     CONTENT_LAUNCH_STREAMING_TYPE_HLS  = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ContentLaunchStreamingType           = EmberAfContentLaunchStreamingType;
+#endif
 
 namespace ContentLaunchAdditionalInfo {
 enum class Fields
@@ -11405,6 +11838,9 @@ public:
 } // namespace Commands
 } // namespace ContentLauncher
 namespace AudioOutput {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for AudioOutputType
 enum class AudioOutputType : uint8_t
 {
@@ -11415,6 +11851,9 @@ enum class AudioOutputType : uint8_t
     AUDIO_OUTPUT_TYPE_INTERNAL  = 0x04,
     AUDIO_OUTPUT_TYPE_OTHER     = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using AudioOutputType                      = EmberAfAudioOutputType;
+#endif
 
 namespace AudioOutputInfo {
 enum class Fields
@@ -11502,6 +11941,9 @@ public:
 } // namespace Commands
 } // namespace AudioOutput
 namespace ApplicationLauncher {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ApplicationLauncherStatus
 enum class ApplicationLauncherStatus : uint8_t
 {
@@ -11509,6 +11951,9 @@ enum class ApplicationLauncherStatus : uint8_t
     APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE = 0x01,
     APPLICATION_LAUNCHER_STATUS_SYSTEM_BUSY       = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ApplicationLauncherStatus            = EmberAfApplicationLauncherStatus;
+#endif
 
 namespace ApplicationLauncherApp {
 enum class Fields
@@ -11600,6 +12045,9 @@ public:
 } // namespace Commands
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ApplicationBasicStatus
 enum class ApplicationBasicStatus : uint8_t
 {
@@ -11608,6 +12056,9 @@ enum class ApplicationBasicStatus : uint8_t
     APPLICATION_BASIC_STATUS_ACTIVE_HIDDEN            = 0x02,
     APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_NOT_FOCUS = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ApplicationBasicStatus               = EmberAfApplicationBasicStatus;
+#endif
 
 namespace Commands {
 namespace ChangeStatus {
@@ -11733,6 +12184,9 @@ public:
 } // namespace Commands
 } // namespace AccountLogin
 namespace TestCluster {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
 {
@@ -11741,6 +12195,9 @@ enum class SimpleEnum : uint8_t
     SIMPLE_ENUM_VALUE_B     = 0x02,
     SIMPLE_ENUM_VALUE_C     = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SimpleEnum                           = EmberAfSimpleEnum;
+#endif
 
 namespace SimpleStruct {
 enum class Fields
@@ -12202,6 +12659,9 @@ public:
 } // namespace Commands
 } // namespace TestCluster
 namespace Messaging {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for EventId
 enum class EventId : uint8_t
 {
@@ -12287,18 +12747,36 @@ enum class EventId : uint8_t
     EVENT_ID_MANUFACTURER_SPECIFIC_H               = 0xE7,
     EVENT_ID_MANUFACTURER_SPECIFIC_I               = 0xE8,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using EventId                              = EmberAfEventId;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlConfirmation
 enum class MessagingControlConfirmation : uint8_t
 {
     MESSAGING_CONTROL_CONFIRMATION_NOT_REQUIRED = 0x00,
     MESSAGING_CONTROL_CONFIRMATION_REQUIRED     = 0x80,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MessagingControlConfirmation         = EmberAfMessagingControlConfirmation;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlEnhancedConfirmation
 enum class MessagingControlEnhancedConfirmation : uint8_t
 {
     MESSAGING_CONTROL_ENHANCED_CONFIRMATION_NOT_REQUIRED = 0x00,
     MESSAGING_CONTROL_ENHANCED_CONFIRMATION_REQUIRED     = 0x20,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MessagingControlEnhancedConfirmation = EmberAfMessagingControlEnhancedConfirmation;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlImportance
 enum class MessagingControlImportance : uint8_t
 {
@@ -12307,6 +12785,12 @@ enum class MessagingControlImportance : uint8_t
     MESSAGING_CONTROL_IMPORTANCE_HIGH     = 0x08,
     MESSAGING_CONTROL_IMPORTANCE_CRITICAL = 0x0C,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MessagingControlImportance           = EmberAfMessagingControlImportance;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlTransmission
 enum class MessagingControlTransmission : uint8_t
 {
@@ -12315,6 +12799,9 @@ enum class MessagingControlTransmission : uint8_t
     MESSAGING_CONTROL_TRANSMISSION_ANONYMOUS            = 0x02,
     MESSAGING_CONTROL_TRANSMISSION_RESERVED             = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MessagingControlTransmission         = EmberAfMessagingControlTransmission;
+#endif
 
 namespace Commands {
 namespace DisplayMessage {
@@ -12560,6 +13047,9 @@ namespace MeterIdentification {
 
 } // namespace MeterIdentification
 namespace ApplianceEventsAndAlert {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for EventIdentification
 enum class EventIdentification : uint8_t
 {
@@ -12569,6 +13059,9 @@ enum class EventIdentification : uint8_t
     EVENT_IDENTIFICATION_SWITCHING_OFF       = 0x06,
     EVENT_IDENTIFICATION_WRONG_DATA          = 0x07,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using EventIdentification                  = EmberAfEventIdentification;
+#endif
 
 namespace Commands {
 namespace GetAlerts {
@@ -13100,12 +13593,18 @@ public:
 } // namespace Commands
 } // namespace Binding
 namespace GroupKeyManagement {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for GroupKeySecurityPolicy
 enum class GroupKeySecurityPolicy : uint8_t
 {
     GROUP_KEY_SECURITY_POLICY_STANDARD    = 0x00,
     GROUP_KEY_SECURITY_POLICY_LOW_LATENCY = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using GroupKeySecurityPolicy               = EmberAfGroupKeySecurityPolicy;
+#endif
 
 namespace GroupKey {
 enum class Fields
