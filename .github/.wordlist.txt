@@ -898,6 +898,7 @@ uart
 UART
 UDP
 UDPEndPoint
+udpPort
 ug
 ui
 uint
