@@ -32,7 +32,7 @@ namespace Controller {
 
 PythonInteractionModelDelegate gPythonInteractionModelDelegate;
 
-void PythonInteractionModelDelegate::OnResponse(const app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
+void PythonInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
                                                 TLV::TLVReader * aData)
 {
     CommandStatus status{ Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
@@ -40,7 +40,8 @@ void PythonInteractionModelDelegate::OnResponse(const app::CommandSender * apCom
                           aPath.mEndpointId,
                           aPath.mClusterId,
                           aPath.mCommandId,
-                          1 };
+                          1 }; // This indicates the index of the command if multiple command/status payloads are present in the
+                               // message. For now, we don't support this in the IM layer, so just always set this to 1.
     if (commandResponseStatusFunct != nullptr)
     {
         commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));

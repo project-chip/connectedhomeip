@@ -60,15 +60,14 @@ public:
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
-         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait till it receives
-         * an OnDone call to destroy the object.
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
          *
-         * @param[in] apCommandSender: The command sender object that initialized the command transaction continue to exist after
-         * this call completes.
+         * @param[in] apCommandSender: The command sender object that initiated the command transaction.
          * @param[in] aPath: The command path field in invoke command response.
          * @param[in] aData: The command data, will be nullptr if the server returns a StatusElement.
          */
-        virtual void OnResponse(const CommandSender * apCommandSender, const ConcreteCommandPath & aPath, TLV::TLVReader * aData) {}
+        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, TLV::TLVReader * aData) {}
 
         /**
          * OnError will be called when an error occurr *after* a successful call to SendCommandRequest(). The following
@@ -76,17 +75,17 @@ public:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
-         * - CHIP_ERROR_IM: An invoke response containing a status code denoting an error was received.
+         * - CHIP_ERROR_IM_STATUS_CODE_RECEIVED: An invoke response containing a status code denoting an error was received.
          *                  When the protocol ID in the received status is IM, aInteractionModelStatus will contain the IM status
-         * code. Otherwise, aInteractionModelStatus will always be set to IM::Status::Failure.
+         *                  code. Otherwise, aInteractionModelStatus will always be set to IM::Status::Failure.
          * - CHIP_ERROR*: All other cases.
          *
-         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait till it receives
-         * an OnDone call to destroy and free the object.
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy and free the object.
          *
          * @param[in] apCommandSender: The command sender object that initialized the command transaction.
          * @param[in] aInteractionModelStatus: Contains an IM status code. This SHALL never be IM::Success, and will contain a valid
-         * server-side emitted error if aProtocolError == CHIP_ERROR_IM.
+         * server-side emitted error if aProtocolError == CHIP_ERROR_IM_STATUS_CODE_RECEIVED.
          * @param[in] aError: A system error code that conveys the overall error code.
          */
         virtual void OnError(const CommandSender * apCommandSender, Protocols::InteractionModel::Status aInteractionModelStatus,
@@ -100,15 +99,20 @@ public:
          * This function will:
          *      - Always be called exactly *once* for a given CommandSender instance.
          *      - Be called even in error circumstances.
-         *      - Only called after a successful call to SendCommandRequest as been made.
+         *      - Only be called after a successful call to SendCommandRequest as been made.
          *
-         * This function is marked as must be implemented to make application aware of releasing the object.
+         * This function must be implemented to destroy the CommandSender object.
          *
          * @param[in] apCommandSender: The command sender object of the terminated invoke command transaction.
          */
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
+    /*
+     * Constructor.
+     *
+     * The callback passed in has to outlive this CommandSender object.
+     */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr);
 
     // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
@@ -120,8 +124,11 @@ public:
     // whether it was successful or not, the OnDone callback will be invoked to indicate completion of work on this
     // object and to indicate to the application that it can destory and free this object.
     //
-    // Applications can however, destruct this object at any time after this call as well and it will safely clean-up
-    // all underlying resources.
+    // Applications can however, destroy this object at any time after this call, except while handling
+    // an OnResponse or OnError callback, and it will safely clean-up.
+    //
+    // If this call returns failure, the callback's OnDone will never be called; the client is responsible
+    // for destroying this object on failure.
     //
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.

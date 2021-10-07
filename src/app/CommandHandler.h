@@ -58,8 +58,19 @@ public:
         virtual void OnDone(CommandHandler * apCommandObj) = 0;
     };
 
+    /*
+     * Constructor.
+     *
+     * The callback passed in has to outlive this CommandHandler object.
+     */
     CommandHandler(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback);
 
+    /*
+     * Main entrypoint for this class to handle an invoke request.
+     *
+     * This function will always call the OnDone function above on the registered callback
+     * before returning.
+     */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                       System::PacketBufferHandle && payload);
     CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,

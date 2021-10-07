@@ -18,13 +18,10 @@ class DeviceControllerInteractionModelDelegate : public chip::app::InteractionMo
                                                  public chip::app::CommandSender::Callback
 {
 public:
-    void OnResponse(const app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
-                    TLV::TLVReader * aData) override;
+    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData) override;
     void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aInteractionModelStatus,
                  CHIP_ERROR aProtocolError) override;
     void OnDone(app::CommandSender * apCommandSender) override;
-
-    app::CommandSender * NewCommandSender();
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::Status status) override;

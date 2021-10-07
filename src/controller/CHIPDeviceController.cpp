@@ -1658,7 +1658,7 @@ void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNod
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-void DeviceControllerInteractionModelDelegate::OnResponse(const app::CommandSender * apCommandSender,
+void DeviceControllerInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender,
                                                           const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData)
 {
     // Generally IM has more detailed errors than ember library, here we always use the, the actual handling of the
@@ -1668,8 +1668,7 @@ void DeviceControllerInteractionModelDelegate::OnResponse(const app::CommandSend
     // instead of IM status code.
     if (aData != nullptr)
     {
-        // TODO: We are using const_cast, this line will be removed by implementing #8971
-        chip::app::DispatchSingleClusterResponseCommand(aPath, *aData, const_cast<chip::app::CommandSender *>(apCommandSender));
+        chip::app::DispatchSingleClusterResponseCommand(aPath, *aData, apCommandSender);
     }
     else
     {
@@ -1680,11 +1679,13 @@ void DeviceControllerInteractionModelDelegate::OnResponse(const app::CommandSend
 void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender,
                                                        Protocols::InteractionModel::Status aProtocolCode, CHIP_ERROR aError)
 {
-    // Generally IM has more detailed errors than ember library, here we always use EMBER_ZCL_STATUS_FAILURE before #6308 is landed
-    // and the app can take care of these error codes, the actual handling of the commands should implement full IMDelegate.
-    // #6308: By implement app side IM delegate, we should be able to accept detailed error codes.
-    // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
-    // instead of IM status code.
+    // The IMDefaultResponseCallback started out life as an Ember function, so it only accepted
+    // Ember status codes. Consequently, let's convert the IM code over to a meaningful Ember status before dispatching.
+    //
+    // This however, results in loss (aError is completely discarded). When full cluster-specific status codes are implemented as
+    // well, this will be an even bigger problem.
+    //
+    // For now, #10331 tracks this issue.
     IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aProtocolCode));
 }
 

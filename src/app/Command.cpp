@@ -38,12 +38,12 @@ Command::Command(Messaging::ExchangeManager * apExchangeMgr)
     mpExchangeMgr = apExchangeMgr;
 }
 
-CHIP_ERROR Command::AllocateBuffers()
+CHIP_ERROR Command::AllocateBuffer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandList::Builder commandListBuilder;
 
-    if (!mBuffersAllocated)
+    if (!mBufferAllocated)
     {
         mCommandMessageWriter.Reset();
 
@@ -60,7 +60,7 @@ CHIP_ERROR Command::AllocateBuffers()
 
         mCommandIndex = 0;
 
-        mBuffersAllocated = true;
+        mBufferAllocated = true;
     }
 
 exit:
@@ -120,7 +120,7 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams,
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandDataElement::Builder commandDataElement;
 
-    err = AllocateBuffers();
+    err = AllocateBuffer();
     SuccessOrExit(err);
 
     //
@@ -209,7 +209,7 @@ void Command::Abort()
 {
     //
     // If the exchange context hasn't already been gracefully closed
-    // (signaled by setting it to null, then we need to forcibly
+    // (signaled by setting it to null), then we need to forcibly
     // tear it down.
     //
     if (mpExchangeCtx != nullptr)
@@ -252,11 +252,6 @@ void Command::MoveToState(const CommandState aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
-}
-
-void Command::ClearState(void)
-{
-    MoveToState(CommandState::Idle);
 }
 
 } // namespace app

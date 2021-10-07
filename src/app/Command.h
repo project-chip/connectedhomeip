@@ -63,8 +63,6 @@ public:
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
-    Command(Messaging::ExchangeManager * apExchangeMgr);
-
     /*
      * Destructor - as part of destruction, it will abort the exchange context
      * if a valid one still exists.
@@ -99,7 +97,15 @@ public:
     virtual CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) = 0;
 
 protected:
-    CHIP_ERROR AllocateBuffers();
+    Command(Messaging::ExchangeManager * apExchangeMgr);
+
+    /*
+     * Allocates a packet buffer used for encoding an invoke request/response payload.
+     *
+     * This can be called multiple times safely, as it will only allocate the buffer once for the lifetime
+     * of this object.
+     */
+    CHIP_ERROR AllocateBuffer();
 
     /*
      * The actual closure of the exchange happens automatically in the exchange layer.
@@ -111,7 +117,6 @@ protected:
     void MoveToState(const CommandState aTargetState);
     CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
     CHIP_ERROR ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandDataElement::Builder aCommandDataElement);
-    void ClearState();
     const char * GetStateStr() const;
 
     InvokeCommand::Builder mInvokeCommandBuilder;
@@ -132,7 +137,7 @@ private:
 
     friend class TestCommandInteraction;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
-    bool mBuffersAllocated                 = false;
+    bool mBufferAllocated                  = false;
 };
 } // namespace app
 } // namespace chip

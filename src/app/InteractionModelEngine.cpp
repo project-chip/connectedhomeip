@@ -61,6 +61,19 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
+    //
+    // Since modifying the pool during iteration is generally frowned upon,
+    // I've chosen to just destroy the object but not necessarily de-allocate it.
+    //
+    // This poses a problem when shutting down and restarting the stack, since the
+    // IMEngine is a statically constructed singleton, and this lingering state will
+    // cause issues.
+    //
+    // This doesn't pose a problem right now because there shouldn't be any actual objects
+    // left here due to the synchronous nature of command handling.
+    //
+    // Filed #10332 to track this.
+    //
     mCommandHandlerObjs.ForEachActiveObject([](CommandHandler * obj) -> bool {
         obj->~CommandHandler();
         return true;
@@ -185,7 +198,6 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
     }
     else
     {
-        apExchangeContext->Abort();
         return CHIP_NO_ERROR;
     }
 }

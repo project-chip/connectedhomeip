@@ -95,8 +95,7 @@ void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInte
 class PythonInteractionModelDelegate : public chip::Controller::DeviceControllerInteractionModelDelegate
 {
 public:
-    void OnResponse(const app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
-                    TLV::TLVReader * aData) override;
+    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData) override;
     void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aProtocolCode,
                  CHIP_ERROR aError) override;
 

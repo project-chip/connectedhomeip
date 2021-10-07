@@ -44,16 +44,6 @@ enum
     kCsTag_CommandId  = 3,
 };
 
-struct Type
-{
-    chip::EndpointId endpointId;
-    chip::ClusterId clusterId;
-    chip::CommandId commandId;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-};
-
 class Parser : public chip::app::Parser
 {
 public:

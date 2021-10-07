@@ -174,7 +174,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnResponse(const chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
+    void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
                     chip::TLV::TLVReader * aData) override
     {
         printf("Command Response Success with EndpointId %d, ClusterId %d, CommandId %d", aPath.mEndpointId, aPath.mClusterId,
@@ -193,7 +193,7 @@ public:
     void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aProtocolCode,
                  CHIP_ERROR aError) override
     {
-        gCommandRespCount += (aError == CHIP_ERROR_IM);
+        gCommandRespCount += (aError == CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
         gLastCommandResult = TestCommandResult::kFailure;
         printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }

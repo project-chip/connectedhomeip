@@ -51,7 +51,7 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+    CommandSenderHandle sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 

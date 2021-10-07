@@ -116,7 +116,6 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
 {
-    printf("++EC = %d\n", ++mExchgCount);
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
@@ -281,9 +280,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         // If rcvd msg is not from initiator then this exchange is created as Initiator.
         // Note that if matchingUMH is not null then rcvd msg if from initiator.
         // TODO: Figure out which channel to use for the received message
-
-        printf("++EC = %d\n", ++mExchgCount);
-
         ExchangeContext * ec =
             mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), delegate);
 

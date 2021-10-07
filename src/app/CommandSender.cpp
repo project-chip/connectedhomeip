@@ -173,22 +173,17 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
                 else
                 {
                     mpCallback->OnError(this, static_cast<Protocols::InteractionModel::Status>(statusElement.protocolCode),
-                                        CHIP_ERROR_IM);
+                                        CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
                 }
             }
             else
             {
-                mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_IM);
+                mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
             }
         }
     }
 
 exit:
-    if (err != CHIP_NO_ERROR && mpCallback != nullptr)
-    {
-        mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, err);
-    }
-
     return err;
 }
 

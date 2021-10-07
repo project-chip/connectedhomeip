@@ -2199,13 +2199,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_NO_SHARED_TRUSTED_ROOT                      CHIP_CORE_ERROR(0xc9)
 
 /*
- * @def CHIP_ERROR_IM
+ * @def CHIP_ERROR_IM_STATUS_CODE_RECEIVED
  *
  * @brief
- *   General error code when a interaction model error is received, usually
- * comes with a interaction model status code beside.
+ *   Indicates an IM status code was received. Usually accompanied with
+ *   the actual IM status code.
  */
-#define CHIP_ERROR_IM                                          CHIP_CORE_ERROR(0xca)
+#define CHIP_ERROR_IM_STATUS_CODE_RECEIVED                     CHIP_CORE_ERROR(0xca)
 
 /**
  *  @}

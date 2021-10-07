@@ -65,6 +65,7 @@ bool isCommandDispatched = false;
 
 using TestContext = chip::Test::MessagingContext;
 TestContext sContext;
+bool sendResponse = true;
 
 namespace {
 constexpr EndpointId kTestEndpointId                      = 1;
@@ -75,8 +76,6 @@ constexpr CommandId kTestNonExistCommandId                = 0;
 } // namespace
 
 namespace app {
-
-bool sendResponse = true;
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
@@ -119,7 +118,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
 class MockCommandSenderCallback : public CommandSender::Callback
 {
 public:
-    void OnResponse(const chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
+    void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
                     chip::TLV::TLVReader * aData) override
     {
         IgnoreUnusedVariable(apCommandSender);
@@ -299,12 +298,8 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
 
 void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
-    chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
-                                                       2, // GroupId
-                                                       3, // ClusterId
-                                                       4, // CommandId
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     app::CommandSender commandSender(&mockCommandSenderDelegate, gExchangeManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
