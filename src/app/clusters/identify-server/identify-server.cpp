@@ -146,10 +146,11 @@ static inline void identify_deactivate(Identify * identify)
     }
 }
 
-void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
+void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    if (attributeId == Clusters::Identify::Attributes::IdentifyTime::Id)
+    if (attributePath.mAttributeId == Clusters::Identify::Attributes::IdentifyTime::Id)
     {
+        EndpointId endpoint = attributePath.mEndpointId;
         Identify * identify = inst(endpoint);
         uint16_t identifyTime;
 
