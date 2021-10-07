@@ -22,18 +22,24 @@ namespace Clusters {
 {{#first}}
 namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
+
 {{/first}}
 {{#if clusterRef}}
 {{#if (canHaveSimpleAccessors type)}}
-EmberAfStatus Get{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}})
+namespace {{asUpperCamelCase label}} {
+
+EmberAfStatus Get(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}})
 {
-    return emberAfReadServerAttribute(endpoint, {{asUpperCamelCase parent.label}}::Id, Ids::{{asUpperCamelCase label}}, (uint8_t *) {{asLowerCamelCase label}}, sizeof(*{{asLowerCamelCase label}}));
+    return emberAfReadServerAttribute(endpoint, {{asUpperCamelCase parent.label}}::Id, {{asUpperCamelCase label}}::Id, (uint8_t *) {{asLowerCamelCase label}}, sizeof(*{{asLowerCamelCase label}}));
 
 }
-EmberAfStatus Set{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}})
+EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}})
 {
-    return emberAfWriteServerAttribute(endpoint, {{asUpperCamelCase parent.label}}::Id, Ids::{{asUpperCamelCase label}}, (uint8_t *) &{{asLowerCamelCase label}}, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, {{asUpperCamelCase parent.label}}::Id, {{asUpperCamelCase label}}::Id, (uint8_t *) &{{asLowerCamelCase label}}, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
 }
+
+} // namespace {{asUpperCamelCase label}}
+
 {{/if}}
 {{/if}}
 {{#last}}

@@ -137,16 +137,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_{{asUpperCamelCase parent.na
 }
 
 {{#if isReportableAttribute}}
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
 {{#if isList}}
     chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>(On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse, nullptr);
-    return cluster.ConfigureAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}}).AsInteger();
+    return cluster.SubscribeAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval).AsInteger();
 {{else}}
-    return cluster.ConfigureAttribute{{asUpperCamelCase name}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}}).AsInteger();
+    return cluster.SubscribeAttribute{{asUpperCamelCase name}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval).AsInteger();
 {{/if}}
 }
 {{/if}}

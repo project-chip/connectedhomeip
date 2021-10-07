@@ -28,7 +28,9 @@
 #include <lib/core/NodeId.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/RandUtils.h>
@@ -38,7 +40,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
@@ -210,18 +212,22 @@ CHIP_ERROR InitCommissioner()
 {
     NodeId localId = chip::kPlaceholderNodeId;
 
-    chip::Controller::CommissionerInitParams params;
+    chip::Controller::FactoryInitParams factoryParams;
+    chip::Controller::SetupParams params;
 
-    params.storageDelegate                = &gServerStorage;
-    params.mDeviceAddressUpdateDelegate   = nullptr;
+    factoryParams.storageDelegate = &gServerStorage;
+    // use a different listen port for the commissioner.
+    factoryParams.listenPort              = LinuxDeviceOptions::GetInstance().securedCommissionerPort;
+    params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
 
-    // use a different listen port for the commissioner.
-    ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(LinuxDeviceOptions::GetInstance().securedCommissionerPort));
     // No need to explicitly set the UDC port since we will use default
     ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort));
+
+    // Initialize device attestation verifier
+    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -246,7 +252,9 @@ CHIP_ERROR InitCommissioner()
     params.controllerICAC   = icacSpan;
     params.controllerNOC    = nocSpan;
 
-    ReturnErrorOnFailure(gCommissioner.Init(params));
+    auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
+    ReturnErrorOnFailure(factory.Init(factoryParams));
+    ReturnErrorOnFailure(factory.SetupCommissioner(params, gCommissioner));
 
     return CHIP_NO_ERROR;
 }

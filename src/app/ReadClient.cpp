@@ -83,6 +83,7 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
     mpExchangeMgr              = nullptr;
     mpExchangeCtx              = nullptr;
     mInitialReport             = true;
+    mPeerNodeId                = kUndefinedNodeId;
     MoveToState(ClientState::Uninitialized);
 }
 
@@ -176,6 +177,9 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
+
+    mPeerNodeId = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
+
     MoveToState(ClientState::AwaitingInitialReport);
 
 exit:
@@ -327,6 +331,7 @@ CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apEx
 {
     mpExchangeCtx  = apExchangeContext;
     CHIP_ERROR err = ProcessReportData(std::move(aPayload));
+    mpExchangeCtx  = nullptr;
     if (err != CHIP_NO_ERROR)
     {
         ShutdownInternal(err);
@@ -554,13 +559,15 @@ void ReadClient::CancelLivenessCheckTimer()
 void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState)
 {
     ReadClient * const client = reinterpret_cast<ReadClient *>(apAppState);
-    ChipLogError(DataManagement, "Subscription Liveness timeout, shutting down");
     if (client->IsFree())
     {
         ChipLogError(DataManagement,
                      "ReadClient::OnLivenessTimeoutCallback invoked on a free client! This is a bug in CHIP stack!");
         return;
     }
+
+    ChipLogError(DataManagement, "Subscription Liveness timeout with peer node 0x%" PRIx64 ", shutting down ", client->mPeerNodeId);
+    client->mpExchangeCtx = nullptr;
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
     client->ShutdownInternal(CHIP_ERROR_TIMEOUT);
@@ -647,6 +654,8 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
+
+    mPeerNodeId = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
     MoveToState(ClientState::AwaitingInitialReport);
 
 exit:

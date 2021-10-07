@@ -67,8 +67,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 // Magic values expected in first 2 bytes of valid BLE transport capabilities request or response:
-#define CAPABILITIES_MSG_CHECK_BYTE_1 'n'
-#define CAPABILITIES_MSG_CHECK_BYTE_2 'l'
+#define CAPABILITIES_MSG_CHECK_BYTE_1 0b01100101
+#define CAPABILITIES_MSG_CHECK_BYTE_2 0b01101100
 
 namespace chip {
 namespace Ble {
@@ -288,6 +288,7 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionD
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = NULL;
 #endif
+    mBleEndPoint = NULL;
 
     return CHIP_NO_ERROR;
 }
@@ -373,17 +374,18 @@ CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
     return err;
 }
 
-CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(uint16_t connDiscriminator)
+CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(uint16_t connDiscriminator, void * appState,
+                                                     BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
+                                                     BleConnectionDelegate::OnConnectionErrorFunct onError)
 {
-
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mConnectionDelegate->OnConnectionComplete = OnConnectionComplete;
-    mConnectionDelegate->OnConnectionError    = OnConnectionError;
-    // TODO: We are passing the same parameter two times, should take a look at it to see if we can remove one of them.
-    mConnectionDelegate->NewConnection(this, this, connDiscriminator);
+    mConnectionDelegate->OnConnectionComplete = onSuccess;
+    mConnectionDelegate->OnConnectionError    = onError;
+
+    mConnectionDelegate->NewConnection(this, appState == nullptr ? this : appState, connDiscriminator);
 
     return CHIP_NO_ERROR;
 }
@@ -425,6 +427,7 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = *retEndPoint;
 #endif
+    mBleEndPoint = *retEndPoint;
 
     return CHIP_NO_ERROR;
 }

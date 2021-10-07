@@ -133,10 +133,9 @@ public:
 protected:
     struct StateFlags
     {
-        bool isThreadProvisioned     = false;
-        bool isThreadEnabled         = false;
-        bool haveBLEConnections      = false;
-        bool haveServiceConnectivity = false;
+        bool isThreadProvisioned = false;
+        bool isThreadEnabled     = false;
+        bool haveBLEConnections  = false;
     };
 
     Cover & GetCover();

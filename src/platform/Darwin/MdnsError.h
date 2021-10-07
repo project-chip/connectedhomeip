@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include "MdnsImpl.h"
 
 namespace chip {

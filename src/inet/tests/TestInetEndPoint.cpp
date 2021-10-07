@@ -181,31 +181,6 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
 }
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-// Test Inet ParseHostPortAndInterface
-static void TestParseHost(nlTestSuite * inSuite, void * inContext)
-{
-    char correctHostNames[7][30] = {
-        "10.0.0.1", "10.0.0.1:3000", "www.google.com", "www.google.com:3000", "[fd00:0:1:1::1]:3000", "[fd00:0:1:1::1]:300%wpan0",
-        "%wpan0"
-    };
-    char invalidHostNames[4][30] = { "[fd00::1]5", "[fd00:0:1:1::1:3000", "10.0.0.1:1234567", "10.0.0.1:er31" };
-    const char * host;
-    const char * intf;
-    uint16_t port, hostlen, intflen;
-    CHIP_ERROR err;
-
-    for (char * correctHostName : correctHostNames)
-    {
-        err = ParseHostPortAndInterface(correctHostName, uint16_t(strlen(correctHostName)), host, hostlen, port, intf, intflen);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    }
-    for (char * invalidHostName : invalidHostNames)
-    {
-        err = ParseHostPortAndInterface(invalidHostName, uint16_t(strlen(invalidHostName)), host, hostlen, port, intf, intflen);
-        NL_TEST_ASSERT(inSuite, err == INET_ERROR_INVALID_HOST_NAME);
-    }
-}
-
 static void TestInetError(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -413,10 +388,12 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // TODO: err is not validated EXCEPT the last call
     for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS + 1; i++)
         err = gInet.NewUDPEndPoint(&testUDPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
 
+    // TODO: err is not validated EXCEPT the last call
     for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS + 1; i++)
         err = gInet.NewTCPEndPoint(&testTCPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
@@ -440,12 +417,20 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 
     // Release UDP endpoints
     for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
-        testUDPEP[i]->Free();
+    {
+        if (testUDPEP[i] != nullptr)
+        {
+            testUDPEP[i]->Free();
+        }
+    }
 
     // Release TCP endpoints
     for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
     {
-        testTCPEP[i]->Free();
+        if (testTCPEP[i] != nullptr)
+        {
+            testTCPEP[i]->Free();
+        }
     }
 }
 #endif
@@ -459,7 +444,6 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
                                  NL_TEST_DEF("InetEndPoint::ResolveHostAddress", TestResolveHostAddress),
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-                                 NL_TEST_DEF("InetEndPoint::TestParseHost", TestParseHost),
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),

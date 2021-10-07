@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include <stdio.h>
 
 #include <lib/mdns/minimal/Server.h>

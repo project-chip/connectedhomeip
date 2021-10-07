@@ -37,7 +37,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
 {
     if (clusterId == OnOff::Id)
     {
-        if (attributeId != OnOff::Attributes::Ids::OnOff)
+        if (attributeId != OnOff::Attributes::OnOff::Id)
         {
             ChipLogError(Zcl, "ON OFF attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
                          ChipLogValueMEI(attributeId), type, *value, size);

@@ -569,18 +569,22 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags       = BitFlags<Flags>(CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0);
     mGAPConns    = 0;
 
-    ble::BLE & ble_interface = ble::BLE::Instance();
+    if (!mInitialized)
+    {
+        ble::BLE & ble_interface = ble::BLE::Instance();
 
-    ble_interface.gap().setEventHandler(&sMbedGapEventHandler);
-    ReturnErrorOnFailure(sCHIPService.init(ble_interface));
+        ble_interface.gap().setEventHandler(&sMbedGapEventHandler);
+        ReturnErrorOnFailure(sCHIPService.init(ble_interface));
 
-    ble_interface.onEventsToProcess(FunctionPointerWithContext<ble::BLE::OnEventsToProcessCallbackContext *>{
-        [](ble::BLE::OnEventsToProcessCallbackContext * context) { PlatformMgr().ScheduleWork(DoBLEProcessing, 0); } });
+        ble_interface.onEventsToProcess(FunctionPointerWithContext<ble::BLE::OnEventsToProcessCallbackContext *>{
+            [](ble::BLE::OnEventsToProcessCallbackContext * context) { PlatformMgr().ScheduleWork(DoBLEProcessing, 0); } });
 
-    mbed_err = ble_interface.init([](ble::BLE::InitializationCompleteCallbackContext * context) {
-        BLEMgrImpl().HandleInitComplete(context->error == BLE_ERROR_NONE);
-    });
-    VerifyOrReturnError(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+        mbed_err = ble_interface.init([](ble::BLE::InitializationCompleteCallbackContext * context) {
+            BLEMgrImpl().HandleInitComplete(context->error == BLE_ERROR_NONE);
+        });
+        VerifyOrReturnError(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+        mInitialized = true;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -621,7 +625,7 @@ void BLEManagerImpl::HandleInitComplete(bool no_error)
         /*const Passkey_t passkey        */ nullptr,
         /*bool signing                   */ true,
         /*const char *dbFilepath         */ nullptr);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     mbed_err = security_mgr.setPairingRequestAuthorisation(true);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
@@ -640,6 +644,7 @@ exit:
         ChipLogError(DeviceLayer, "BLEManager init error: %s ", ErrorStr(err));
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service.");
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+        mInitialized = false;
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
@@ -787,7 +792,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     mbed_err = gap.startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     ChipLogDetail(DeviceLayer, "Advertising started, type: 0x%x (%sconnectable), interval: [%lu:%lu] ms, device name: %s)",
                   adv_params.getType().value(), connectable ? "" : "non-", adv_params.getMinPrimaryInterval().valueInMs(),
@@ -814,7 +819,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         return err;
     }
     mbed_err = gap.stopAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:
     if (mbed_err != BLE_ERROR_NONE)
@@ -1028,7 +1033,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                   conId, att_handle, pBuf->DataLength());
 
     mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:
     if (mbed_err != BLE_ERROR_NONE)

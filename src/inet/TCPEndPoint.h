@@ -29,6 +29,7 @@
 
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 
 #include <system/SystemPacketBuffer.h>
 
@@ -72,23 +73,18 @@ public:
      *  Objects are initialized in the "ready" state, proceed to subsequent
      *  states corresponding to a simplification of the states of the TCP
      *  transport state machine.
-     *
-     * @note
-     *  The \c kBasisState_Closed state enumeration is mapped to \c kState_Ready for historical binary-compatibility reasons. The
-     *  existing \c kState_Closed exists to identify separately the distinction between "not opened yet" and "previously opened now
-     *  closed" that existed previously in the \c kState_Ready and \c kState_Closed states.
      */
     enum
     {
-        kState_Ready           = kBasisState_Closed, /**< Endpoint initialized, but not bound. */
-        kState_Bound           = 1,                  /**< Endpoint bound, but not listening. */
-        kState_Listening       = 2,                  /**< Endpoint receiving connections. */
-        kState_Connecting      = 3,                  /**< Endpoint attempting to connect. */
-        kState_Connected       = 4,                  /**< Endpoint connected, ready for tx/rx. */
-        kState_SendShutdown    = 5,                  /**< Endpoint initiated its half-close. */
-        kState_ReceiveShutdown = 6,                  /**< Endpoint responded to half-close. */
-        kState_Closing         = 7,                  /**< Endpoint closing bidirectionally. */
-        kState_Closed          = 8                   /**< Endpoint closed, ready for release. */
+        kState_Ready           = 0, /**< Endpoint initialized, but not bound. */
+        kState_Bound           = 1, /**< Endpoint bound, but not listening. */
+        kState_Listening       = 2, /**< Endpoint receiving connections. */
+        kState_Connecting      = 3, /**< Endpoint attempting to connect. */
+        kState_Connected       = 4, /**< Endpoint connected, ready for tx/rx. */
+        kState_SendShutdown    = 5, /**< Endpoint initiated its half-close. */
+        kState_ReceiveShutdown = 6, /**< Endpoint responded to half-close. */
+        kState_Closing         = 7, /**< Endpoint closing bidirectionally. */
+        kState_Closed          = 8  /**< Endpoint closed, ready for release. */
     } State;
 
     TCPEndPoint() = default;

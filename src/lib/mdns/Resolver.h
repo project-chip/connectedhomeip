@@ -244,32 +244,61 @@ public:
     virtual void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) = 0;
 };
 
-/// Interface for resolving CHIP services
+/**
+ * Interface for resolving CHIP DNS-SD services
+ */
 class Resolver
 {
 public:
     virtual ~Resolver() {}
 
-    /// Ensures that the resolver is started.
-    /// Must be called before any ResolveNodeId calls.
-    ///
-    /// Unsual name to allow base MDNS classes to implement both Advertiser and Resolver interfaces.
-    virtual CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
-    virtual void ShutdownResolver()                                                    = 0;
+    /**
+     * Initializes the resolver.
+     *
+     * The method must be called before other methods of this class.
+     * If the resolver has already been initialized, the method exits immediately with no error.
+     */
+    virtual CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) = 0;
 
-    /// Registers a resolver delegate if none has been registered before
-    virtual CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) = 0;
+    /**
+     * Shuts down the resolver if it has been initialized before.
+     */
+    virtual void Shutdown() = 0;
 
-    /// Requests resolution of a node ID to its address
+    /**
+     * Registers a resolver delegate. If nullptr is passed, the previously registered delegate
+     * is unregistered.
+     */
+    virtual void SetResolverDelegate(ResolverDelegate * delegate) = 0;
+
+    /**
+     * Requests resolution of the given operational node service.
+     *
+     * When the operation succeeds or fails, and a resolver delegate has been registered,
+     * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
+     * `OnNodeIdResolutionFailed` method, respectively.
+     */
     virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
 
-    // Finds all nodes with the given filter that are currently in commissioning mode.
+    /**
+     * Finds all commissionable nodes matching the given filter.
+     *
+     * Whenever a new matching node is found and a resolver delegate has been registered,
+     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+     */
     virtual CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
-    // Finds all nodes with the given filter that are currently acting as Commissioners.
+    /**
+     * Finds all commissioner nodes matching the given filter.
+     *
+     * Whenever a new matching node is found and a resolver delegate has been registered,
+     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+     */
     virtual CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
-    /// Provides the system-wide implementation of the service resolver
+    /**
+     * Provides the system-wide implementation of the service resolver
+     */
     static Resolver & Instance();
 };
 

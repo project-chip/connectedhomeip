@@ -14,10 +14,11 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
+import chip.platform.BleCallback
 import com.google.chip.chiptool.ChipClient
-import kotlinx.coroutines.CancellableContinuation
 import java.util.UUID
 import kotlin.coroutines.resume
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -26,8 +27,11 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 
 @ExperimentalCoroutinesApi
-class BluetoothManager {
+class BluetoothManager : BleCallback {
   private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+  private var bleGatt: BluetoothGatt? = null
+  var connectionId = 0
+    private set
 
   private fun getServiceData(discriminator: Int): ByteArray {
     val opcode = 0
@@ -38,7 +42,7 @@ class BluetoothManager {
         .toByteArray()
   }
 
-  suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
+  suspend fun getBluetoothDevice(context: Context, discriminator: Int): BluetoothDevice? {
 
     if (! bluetoothAdapter.isEnabled) {
       bluetoothAdapter.enable();
@@ -89,8 +93,12 @@ class BluetoothManager {
       val bluetoothGattCallback = getBluetoothGattCallback(context, continuation)
 
       Log.i(TAG, "Connecting")
-      val gatt = device.connectGatt(context, false, bluetoothGattCallback)
-      continuation.invokeOnCancellation { gatt.disconnect() }
+      bleGatt = device.connectGatt(context, false, bluetoothGattCallback)
+
+      connectionId = ChipClient.getAndroidChipPlatform(context).bleManager.addConnection(bleGatt)
+      ChipClient.getAndroidChipPlatform(context).bleManager.setBleCallback(this)
+
+      continuation.invokeOnCancellation { bleGatt?.disconnect() }
     }
   }
 
@@ -99,7 +107,7 @@ class BluetoothManager {
     continuation: CancellableContinuation<BluetoothGatt?>
   ): BluetoothGattCallback {
     return object : BluetoothGattCallback() {
-      private val wrappedCallback = ChipClient.getDeviceController(context).callback
+      private val wrappedCallback = ChipClient.getAndroidChipPlatform(context).bleManager.callback;
       private val coroutineContinuation = continuation
 
       override fun onConnectionStateChange(
@@ -108,6 +116,7 @@ class BluetoothManager {
           newState: Int
       ) {
         super.onConnectionStateChange(gatt, status, newState)
+        Log.i(TAG, "${gatt?.device?.name}.onConnectionStateChange status = $status, newState=$newState")
         wrappedCallback.onConnectionStateChange(gatt, status, newState)
 
         if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
@@ -117,17 +126,17 @@ class BluetoothManager {
       }
 
       override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+        Log.d(TAG, "${gatt?.device?.name}.onServicesDiscovered status = $status")
         wrappedCallback.onServicesDiscovered(gatt, status)
 
         Log.i("$TAG|onServicesDiscovered", "Services Discovered")
-        gatt?.requestMtu(131);
+        gatt?.requestMtu(247);
       }
 
       override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
+        Log.d(TAG, "${gatt?.device?.name}.onMtuChanged: connecting to CHIP device")
         super.onMtuChanged(gatt, mtu, status)
         wrappedCallback.onMtuChanged(gatt, mtu, status)
-
-        Log.d(TAG, "MTU changed: connecting to CHIP device")
         if (coroutineContinuation.isActive) {
           coroutineContinuation.resume(gatt)
         }
@@ -192,5 +201,16 @@ class BluetoothManager {
   companion object {
     private const val TAG = "chip.BluetoothManager"
     private const val CHIP_UUID = "0000FFF6-0000-1000-8000-00805F9B34FB"
+  }
+
+  override fun onCloseBleComplete(connId: Int) {
+    connectionId = 0
+    Log.d(TAG, "onCloseBleComplete")
+  }
+
+  override fun onNotifyChipConnectionClosed(connId: Int) {
+    bleGatt?.close();
+    connectionId = 0
+    Log.d(TAG, "onNotifyChipConnectionClosed")
   }
 }

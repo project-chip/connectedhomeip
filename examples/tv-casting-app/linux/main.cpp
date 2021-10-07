@@ -19,6 +19,10 @@
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -28,6 +32,7 @@
 
 using namespace chip;
 using namespace chip::Controller;
+using namespace chip::Credentials;
 using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
@@ -186,6 +191,12 @@ int main(int argc, char * argv[])
 
     SuccessOrExit(err = chip::Platform::MemoryInit());
     SuccessOrExit(err = chip::DeviceLayer::PlatformMgr().InitChipStack());
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    // Initialize device attestation verifier
+    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
 
     if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
     {

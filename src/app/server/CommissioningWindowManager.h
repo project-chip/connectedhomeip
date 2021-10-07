@@ -62,6 +62,7 @@ public:
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablishmentStarted() override;
     void OnSessionEstablished() override;
 
     void Cleanup();

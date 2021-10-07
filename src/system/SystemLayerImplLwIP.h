@@ -49,14 +49,12 @@ public:
 
 public:
     // Platform implementation.
-    CHIP_ERROR DispatchEvents(void); // XXX called only in a test → PlatformEventing::DispatchEvents → PlatformMgr().RunEventLoop()
     CHIP_ERROR HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
     CHIP_ERROR HandlePlatformTimer(void);
 
 private:
     friend class PlatformEventing;
 
-    CHIP_ERROR DispatchEvent(Event aEvent);
     CHIP_ERROR StartPlatformTimer(uint32_t aDelayMilliseconds);
 
     Timer::MutexedList mTimerList;

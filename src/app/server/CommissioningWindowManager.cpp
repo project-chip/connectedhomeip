@@ -33,6 +33,12 @@ void HandleCommissioningWindowTimeout(chip::System::Layer * aSystemLayer, void *
     commissionMgr->CloseCommissioningWindow();
 }
 
+void HandleSessionEstablishmentTimeout(chip::System::Layer * aSystemLayer, void * aAppState)
+{
+    chip::CommissioningWindowManager * commissionMgr = static_cast<chip::CommissioningWindowManager *>(aAppState);
+    commissionMgr->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+}
+
 void OnPlatformEventWrapper(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     chip::CommissioningWindowManager * commissionMgr = reinterpret_cast<chip::CommissioningWindowManager *>(arg);
@@ -85,9 +91,13 @@ void CommissioningWindowManager::Cleanup()
 
 void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 {
+    DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
     mFailedCommissioningAttempts++;
     ChipLogError(AppServer, "Commissioning failed (attempt %d): %s", mFailedCommissioningAttempts, ErrorStr(err));
 
+#if CONFIG_NETWORK_LAYER_BLE
+    mServer->getBleLayerObject()->mBleEndPoint->ReleaseBleConnection();
+#endif
     if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
         // If the number of commissioning attempts have not exceeded maximum retries, let's reopen
@@ -107,8 +117,16 @@ void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
     }
 }
 
+void CommissioningWindowManager::OnSessionEstablishmentStarted()
+{
+    // As per specifications, section 5.5: Commissioning Flows
+    constexpr uint16_t kPASESessionEstablishmentTimeoutSeconds = 60;
+    DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeoutSeconds * 1000, HandleSessionEstablishmentTimeout, this);
+}
+
 void CommissioningWindowManager::OnSessionEstablished()
 {
+    DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
     CHIP_ERROR err = mServer->GetSecureSessionManager().NewPairing(
         Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
         &mPairingSession, CryptoContext::SessionRole::kResponder, 0);

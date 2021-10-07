@@ -23,6 +23,7 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
+    "TestAttributeValueEncoder.cpp",
     "TestCHIPDeviceCallbacksMgr.cpp",
     "TestClusterInfo.cpp",
     "TestCommandPathParams.cpp",

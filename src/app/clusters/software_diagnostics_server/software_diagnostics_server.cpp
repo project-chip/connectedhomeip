@@ -16,10 +16,12 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -29,6 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::SoftwareDiagnostics;
 using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
 using chip::DeviceLayer::PlatformManager;
 
@@ -40,15 +43,15 @@ public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
     SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) override;
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), TLV::TLVWriter * aWriter);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), AttributeValueEncoder & aEncoder);
 };
 
 SoftwareDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead)
+CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
 {
     if (aClusterInfo.mClusterId != SoftwareDiagnostics::Id)
     {
@@ -56,20 +59,18 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::T
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
-    case Ids::CurrentHeapFree: {
-        return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aWriter);
+    case CurrentHeapFree::Id: {
+        return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aEncoder);
     }
-    case Ids::CurrentHeapUsed: {
-        return ReadIfSupported(&PlatformManager::GetCurrentHeapUsed, aWriter);
+    case CurrentHeapUsed::Id: {
+        return ReadIfSupported(&PlatformManager::GetCurrentHeapUsed, aEncoder);
     }
-    case Ids::CurrentHeapHighWatermark: {
-        return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aWriter);
+    case CurrentHeapHighWatermark::Id: {
+        return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aEncoder);
     }
     default: {
-        *aDataRead = false;
         break;
     }
     }
@@ -77,7 +78,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::T
 }
 
 CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &),
-                                                         TLV::TLVWriter * aWriter)
+                                                         AttributeValueEncoder & aEncoder)
 {
     uint64_t data;
     CHIP_ERROR err = (DeviceLayer::PlatformMgr().*getter)(data);
@@ -90,18 +91,20 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMan
         return err;
     }
 
-    return aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), data);
+    return aEncoder.Encode(data);
 }
 } // anonymous namespace
 
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                              Commands::ResetWatermarks::DecodableType & commandData)
 {
     uint64_t currentHeapUsed;
 
-    EmberAfStatus status = SoftwareDiagnostics::Attributes::GetCurrentHeapUsed(endpoint, &currentHeapUsed);
+    EmberAfStatus status = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Get(endpoint, &currentHeapUsed);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to get the value of the CurrentHeapUsed attribute"));
 
-    status = SoftwareDiagnostics::Attributes::SetCurrentHeapHighWatermark(endpoint, currentHeapUsed);
+    status = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Set(endpoint, currentHeapUsed);
     VerifyOrExit(
         status == EMBER_ZCL_STATUS_SUCCESS,
         ChipLogError(

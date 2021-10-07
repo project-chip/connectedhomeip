@@ -135,8 +135,21 @@ function asReadType(type)
 
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
-  'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/Off', 'Level Control', 'Color Control', 'IAS Zone',
-  'Pump Configuration and Control', 'Ethernet Network Diagnostics', 'Software Diagnostics'
+  'Basic',
+  'Identify',
+  'Groups',
+  'Scenes',
+  'Occupancy Sensing',
+  'On/Off',
+  'Level Control',
+  'Color Control',
+  'IAS Zone',
+  'Pump Configuration and Control',
+  'Ethernet Network Diagnostics',
+  'Software Diagnostics',
+  'Thread Network Diagnostics',
+  'General Diagnostics',
+  'WiFi Network Diagnostics',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
@@ -335,16 +348,113 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
+/*
+ * @brief
+ *
+ * This function converts a given ZAP type to a Cluster Object
+ * type used by the Matter SDK.
+ *
+ * Args:
+ *
+ * type:            ZAP type specified in the XML
+ * isDecodable:     Whether to emit an Encodable or Decodable cluster
+ *                  object type.
+ *
+ * These types can be found in src/app/data-model/.
+ *
+ */
+function zapTypeToClusterObjectType(type, isDecodable)
+{
+  if (StringHelper.isOctetString(type)) {
+    return 'chip::ByteSpan';
+  }
+
+  if (StringHelper.isCharString(type)) {
+    return 'Span<const char>';
+  }
+
+  switch (type) {
+  case 'BOOLEAN':
+    return 'bool';
+  case 'INT8S':
+    return 'int8_t';
+  case 'INT16S':
+    return 'int16_t';
+  case 'INT24S':
+    return 'int24_t';
+  case 'INT32S':
+    return 'int32_t';
+  case 'INT64S':
+    return 'int64_t';
+  case 'INT8U':
+    return 'uint8_t';
+  case 'INT16U':
+    return 'uint16_t';
+  case 'INT24U':
+    return 'uint24_t';
+  case 'INT32U':
+    return 'uint32_t';
+  case 'INT64U':
+    return 'uint64_t';
+  }
+
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
+      case 'bool':
+      case 'int8_t':
+      case 'uint8_t':
+      case 'int16_t':
+      case 'uint16_t':
+      case 'int24_t':
+      case 'uint24_t':
+      case 'int32_t':
+      case 'uint32_t':
+      case 'int64_t':
+      case 'uint64_t':
+        return zclType;
+      default:
+        if (isDecodable) {
+          return type + '::DecodableType'
+        } else {
+          return type + '::Type'
+        }
+      }
+    })
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
+  return templateUtil.templatePromise(this.global, promise)
+}
+
+function zapTypeToEncodableClusterObjectType(type)
+{
+  return zapTypeToClusterObjectType.call(this, type, false)
+}
+
+function zapTypeToDecodableClusterObjectType(type)
+{
+  return zapTypeToClusterObjectType.call(this, type, true)
+}
+
 //
 // Module exports
 //
-exports.asPrintFormat                     = asPrintFormat;
-exports.asReadType                        = asReadType;
-exports.asReadTypeLength                  = asReadTypeLength;
-exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list        = chip_endpoint_cluster_list
-exports.asTypeLiteralSuffix               = asTypeLiteralSuffix;
-exports.asLowerCamelCase                  = asLowerCamelCase;
-exports.asUpperCamelCase                  = asUpperCamelCase;
-exports.hasSpecificAttributes             = hasSpecificAttributes;
-exports.asMEI                             = asMEI;
+exports.asPrintFormat                       = asPrintFormat;
+exports.asReadType                          = asReadType;
+exports.asReadTypeLength                    = asReadTypeLength;
+exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
+exports.asTypeLiteralSuffix                 = asTypeLiteralSuffix;
+exports.asLowerCamelCase                    = asLowerCamelCase;
+exports.asUpperCamelCase                    = asUpperCamelCase;
+exports.hasSpecificAttributes               = hasSpecificAttributes;
+exports.asMEI                               = asMEI;
+exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
+exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;

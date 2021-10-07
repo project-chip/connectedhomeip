@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <inet/Inet.h>
 #include <lib/mdns/minimal/Server.h>
 
 namespace MdnsExample {
@@ -37,13 +38,17 @@ public:
     {
         if (mState == State::kIpV4)
         {
-            *id    = INET_NULL_INTERFACEID;
-            *type  = chip::Inet::kIPAddressType_IPv4;
+#if INET_CONFIG_ENABLE_IPV4
+            *id   = INET_NULL_INTERFACEID;
+            *type = chip::Inet::kIPAddressType_IPv4;
+#endif
             mState = State::kIpV6;
 
             SkipToFirstValidInterface();
 
+#if INET_CONFIG_ENABLE_IPV4
             return true;
+#endif
         }
 
         if (!mIterator.HasCurrent())

@@ -33,13 +33,13 @@ public:
     {
         if (mExchangeManager != nullptr)
         {
-            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
+            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
         }
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             Ble::BleLayer * bleLayer, SessionManager * sessionManager,
-                                             Transport::FabricTable * fabrics, SessionIDAllocator * idAllocator);
+                                             Ble::BleLayer * bleLayer, SessionManager * sessionManager, FabricTable * fabrics,
+                                             SessionIDAllocator * idAllocator);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -65,7 +65,7 @@ private:
     SessionManager * mSessionManager = nullptr;
     Ble::BleLayer * mBleLayer        = nullptr;
 
-    Transport::FabricTable * mFabrics = nullptr;
+    FabricTable * mFabrics = nullptr;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
 

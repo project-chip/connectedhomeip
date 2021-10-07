@@ -18,6 +18,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -459,6 +460,14 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
 CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 {
     // TODO: Remove Weave legacy APIs
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
+
+CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                               app::AttributeValueEncoder & encoder)
+{
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 

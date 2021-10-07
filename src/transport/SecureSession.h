@@ -21,8 +21,8 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
 #include <transport/CryptoContext.h>
-#include <transport/FabricTable.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>

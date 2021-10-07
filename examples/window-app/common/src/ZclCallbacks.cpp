@@ -25,7 +25,9 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -56,8 +58,8 @@ void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::Cluster
             break;
 
         case ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID:
-            Attributes::GetTargetPositionLiftPercent100ths(endpoint, &target);
-            Attributes::GetCurrentPositionLiftPercent100ths(endpoint, &current);
+            Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &target);
+            Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, &current);
             if (current > target)
             {
                 app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
@@ -69,8 +71,8 @@ void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::Cluster
             break;
 
         case ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID:
-            Attributes::GetTargetPositionTiltPercent100ths(endpoint, &target);
-            Attributes::GetCurrentPositionTiltPercent100ths(endpoint, &current);
+            Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &target);
+            Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, &current);
             if (current > target)
             {
                 app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));
@@ -94,7 +96,9 @@ void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::Cluster
 /**
  * @brief  Cluster StopMotion Command callback (from client)
  */
-bool emberAfWindowCoveringClusterStopMotionCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::CommandHandler * commandObj,
+                                                    const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
+                                                    Commands::StopMotion::DecodableType & commandData)
 {
     ChipLogProgress(Zcl, "StopMotion command received");
     WindowApp::Instance().PostEvent(WindowApp::Event(WindowApp::EventId::StopMotion, endpoint));

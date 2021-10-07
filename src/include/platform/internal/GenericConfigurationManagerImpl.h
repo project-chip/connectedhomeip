@@ -77,13 +77,6 @@ public:
     CHIP_ERROR _GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
     CHIP_ERROR _GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
     CHIP_ERROR _GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen);
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-    CHIP_ERROR _StoreDeviceId(uint64_t deviceId);
-    CHIP_ERROR _StoreDeviceCertificate(const uint8_t * cert, size_t certLen);
-    CHIP_ERROR _StoreDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen);
-    CHIP_ERROR _StoreDevicePrivateKey(const uint8_t * key, size_t keyLen);
-    CHIP_ERROR _ClearOperationalDeviceCredentials(void);
-#endif
     CHIP_ERROR _GetManufacturerDeviceId(uint64_t & deviceId);
     CHIP_ERROR _StoreManufacturerDeviceId(uint64_t deviceId);
     CHIP_ERROR _GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
@@ -138,10 +131,6 @@ public:
     bool _IsPairedToAccount();
     bool _IsFullyProvisioned();
     CHIP_ERROR _ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize);
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-    bool _OperationalDeviceCredentialsProvisioned();
-    void _UseManufacturerCredentialsAsOperational(bool val);
-#endif
     void _LogDeviceConfig();
 
 protected:
@@ -150,8 +139,7 @@ protected:
         kIsServiceProvisioned                    = 0x01,
         kIsMemberOfFabric                        = 0x02,
         kIsPairedToAccount                       = 0x04,
-        kOperationalDeviceCredentialsProvisioned = 0x08,
-        kUseManufacturerCredentialsAsOperational = 0x10,
+        kUseManufacturerCredentialsAsOperational = 0x08,
     };
 
     BitFlags<Flags> mFlags;
@@ -162,10 +150,6 @@ protected:
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-    bool UseManufacturerCredentialsAsOperational();
-#endif
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.

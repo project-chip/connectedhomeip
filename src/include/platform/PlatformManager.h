@@ -157,6 +157,14 @@ public:
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
 
+    /**
+     * General Diagnostics methods.
+     */
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
+    CHIP_ERROR GetUpTime(uint64_t & upTime);
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR GetBootReasons(uint8_t & bootReasons);
+
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
 #endif
@@ -244,6 +252,18 @@ public:
     StackLock() { PlatformMgr().LockChipStack(); }
 
     ~StackLock() { PlatformMgr().UnlockChipStack(); }
+};
+
+/**
+ * @brief
+ * RAII unlocking for PlatformManager to simplify management of
+ * LockChipStack()/UnlockChipStack calls.
+ */
+class StackUnlock
+{
+public:
+    StackUnlock() { PlatformMgr().UnlockChipStack(); }
+    ~StackUnlock() { PlatformMgr().LockChipStack(); }
 };
 
 } // namespace DeviceLayer
@@ -401,6 +421,26 @@ inline CHIP_ERROR PlatformManager::GetCurrentHeapUsed(uint64_t & currentHeapUsed
 inline CHIP_ERROR PlatformManager::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     return static_cast<ImplClass *>(this)->_GetCurrentHeapHighWatermark(currentHeapHighWatermark);
+}
+
+inline CHIP_ERROR PlatformManager::GetRebootCount(uint16_t & rebootCount)
+{
+    return static_cast<ImplClass *>(this)->_GetRebootCount(rebootCount);
+}
+
+inline CHIP_ERROR PlatformManager::GetUpTime(uint64_t & upTime)
+{
+    return static_cast<ImplClass *>(this)->_GetUpTime(upTime);
+}
+
+inline CHIP_ERROR PlatformManager::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return static_cast<ImplClass *>(this)->_GetTotalOperationalHours(totalOperationalHours);
+}
+
+inline CHIP_ERROR PlatformManager::GetBootReasons(uint8_t & bootReasons)
+{
+    return static_cast<ImplClass *>(this)->_GetBootReasons(bootReasons);
 }
 
 } // namespace DeviceLayer

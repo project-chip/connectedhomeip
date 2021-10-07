@@ -202,7 +202,7 @@ class DeviceMgrCmd(Cmd):
         "resolve",
         "zcl",
         "zclread",
-        "zclconfigure",
+        "zclsubscribe",
 
         "discover",
 
@@ -585,7 +585,6 @@ class DeviceMgrCmd(Cmd):
                     address = "{}:{}".format(
                         *address) if address else "unknown"
                     print("Current address: " + address)
-                    self.devCtrl.CommissioningComplete(int(args[1]))
             else:
                 self.do_help("resolve")
         except exceptions.ChipStackException as ex:
@@ -806,10 +805,10 @@ class DeviceMgrCmd(Cmd):
             print("An exception occurred during processing input:")
             print(str(ex))
 
-    def do_zclconfigure(self, line):
+    def do_zclsubscribe(self, line):
         """
-        To configure ZCL attribute reporting:
-        zclconfigure <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval> <change>
+        To subscribe ZCL attribute reporting:
+        zclsubscribe <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval>
         """
         try:
             args = shlex.split(line)
@@ -822,13 +821,13 @@ class DeviceMgrCmd(Cmd):
                 cluster_attrs = all_attrs.get(args[1], {})
                 print('\n'.join([key for key in cluster_attrs.keys(
                 ) if cluster_attrs[key].get("reportable", False)]))
-            elif len(args) == 7:
+            elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLConfigureAttribute(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), int(args[5]), int(args[6]))
+                self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), int(args[5]))
             else:
-                self.do_help("zclconfigure")
+                self.do_help("zclsubscribe")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during configuring reporting of ZCL attribute:")
             print(str(ex))
@@ -858,7 +857,7 @@ class DeviceMgrCmd(Cmd):
 
         Options:
           -t  Timeout (in seconds)     
-          -o  Option  [OriginalSetupCode = 0, TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
+          -o  Option  [TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
           -d  Discriminator Value
           -i  Iteration
 
@@ -875,12 +874,16 @@ class DeviceMgrCmd(Cmd):
             parser.add_argument(
                 "-t", type=int, default=0, dest='timeout')
             parser.add_argument(
-                "-o", type=int, default=0, dest='option')
+                "-o", type=int, default=1, dest='option')
             parser.add_argument(
                 "-i", type=int, default=0, dest='iteration')
             parser.add_argument(
                 "-d", type=int, default=0, dest='discriminator')
             args = parser.parse_args(arglist[1:])
+
+            if args.option < 1 or args.option > 2:
+                print("Invalid option specified!")
+                raise ValueError("Invalid option specified")
 
             self.devCtrl.OpenCommissioningWindow(
                 int(arglist[0]), args.timeout, args.iteration, args.discriminator, args.option)
