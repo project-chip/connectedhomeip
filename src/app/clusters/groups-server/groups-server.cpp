@@ -249,18 +249,14 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
     uint8_t listLen = 0;
     CHIP_ERROR err  = CHIP_NO_ERROR;
 
-    emberAfGroupsClusterPrint("RX: GetGroupMembership 0x%x,", groupCount);
-    for (i = 0; i < groupCount; i++)
-    {
-        emberAfGroupsClusterPrint(" [0x%2x]", emberAfGetInt16u(groupList + (i << 1), 0, 2));
-    }
-    emberAfGroupsClusterPrintln("");
+    emberAfGroupsClusterPrintln("RX: GetGroupMembership");
 
     // For all networks, Get Group Membership commands may be sent either
     // unicast or broadcast (removing the ZLL-specific limitation to unicast).
 
     // When Group Count is zero, respond with a list of all active groups.
     // Otherwise, respond with a list of matches.
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/10335
     if (groupCount == 0)
     {
         for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
@@ -278,9 +274,10 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
     }
     else
     {
-        for (i = 0; i < groupCount; i++)
+        auto iter = groupList.begin();
+        while (iter.Next())
         {
-            GroupId groupId = emberAfGetInt16u(groupList + (i << 1), 0, 2);
+            GroupId groupId = iter.GetValue();
             for (j = 0; j < EMBER_BINDING_TABLE_SIZE; j++)
             {
                 EmberBindingTableEntry entry;
@@ -297,6 +294,14 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
                 }
             }
         }
+        err = iter.GetStatus();
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        status = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        err    = CHIP_NO_ERROR;
+        goto exit;
     }
 
     // Only send a response if the Group Count was zero or if one or more active
