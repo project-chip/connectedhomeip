@@ -39,7 +39,9 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/data-model/DecodableList.h>
 #include <app/util/af-types.h>
 #include <lib/support/Span.h>
 #include <stdint.h>
@@ -81,9 +83,11 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 #define emberAfPluginScenesServerDecrNumSceneEntriesInUse() (--emberAfPluginScenesServerEntriesInUse)
 #endif // Use tokens
 
-bool emberAfPluginScenesServerParseAddScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
-                                            chip::GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
-                                            const chip::CharSpan & sceneName, uint8_t * extensionFieldSets);
+bool emberAfPluginScenesServerParseAddScene(
+    chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, chip::GroupId groupId, uint8_t sceneId,
+    uint16_t transitionTime, const chip::CharSpan & sceneName,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::DecodableType> &
+        extensionFieldSets);
 bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
                                              chip::GroupId groupId, uint8_t sceneId);
 
