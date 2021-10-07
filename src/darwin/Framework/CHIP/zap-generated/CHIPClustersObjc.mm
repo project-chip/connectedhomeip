@@ -1774,7 +1774,7 @@ using chip::Callback::Cancelable;
         });
 }
 
-- (void)lockDoor:(NSString *)pin responseHandler:(ResponseHandler)responseHandler
+- (void)lockDoor:(NSData *)pin responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDoorLockClusterLockDoorResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1798,7 +1798,7 @@ using chip::Callback::Cancelable;
 - (void)setPin:(uint16_t)userId
          userStatus:(uint8_t)userStatus
            userType:(uint8_t)userType
-                pin:(NSString *)pin
+                pin:(NSData *)pin
     responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDoorLockClusterSetPinResponseCallbackBridge(
@@ -1810,7 +1810,7 @@ using chip::Callback::Cancelable;
 - (void)setRfid:(uint16_t)userId
          userStatus:(uint8_t)userStatus
            userType:(uint8_t)userType
-                 id:(NSString *)id
+                 id:(NSData *)id
     responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDoorLockClusterSetRfidResponseCallbackBridge(
@@ -1855,7 +1855,7 @@ using chip::Callback::Cancelable;
         });
 }
 
-- (void)unlockDoor:(NSString *)pin responseHandler:(ResponseHandler)responseHandler
+- (void)unlockDoor:(NSData *)pin responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1863,7 +1863,7 @@ using chip::Callback::Cancelable;
         });
 }
 
-- (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(NSString *)pin responseHandler:(ResponseHandler)responseHandler
+- (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(NSData *)pin responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

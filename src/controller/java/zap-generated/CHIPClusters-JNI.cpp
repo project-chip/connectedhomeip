@@ -1725,7 +1725,7 @@ public:
     };
 
     static void CallbackFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
-                           uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+                           uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1733,8 +1733,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetLogRecordResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString pinStr(env, "");
+        jbyteArray pinArr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1744,13 +1743,20 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err =
-            JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJIIIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJIIII[B)V", &javaMethod);
         SuccessOrExit(err);
+
+        pinArr = env->NewByteArray(pin.size());
+        VerifyOrExit(pinArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+        env->SetByteArrayRegion(pinArr, 0, pin.size(), reinterpret_cast<const jbyte *>(pin.data()));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(logEntryId), static_cast<jlong>(timestamp),
                             static_cast<jint>(eventType), static_cast<jint>(source), static_cast<jint>(eventIdOrAlarmCode),
-                            static_cast<jint>(userId), pinStr.jniValue());
+                            static_cast<jint>(userId), pinArr);
+
+        env->DeleteLocalRef(pinArr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1798,7 +1804,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
+    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1806,8 +1812,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetPinResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString pinStr(env, "");
+        jbyteArray pinArr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1817,11 +1822,19 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(III[B)V", &javaMethod);
         SuccessOrExit(err);
 
+        pinArr = env->NewByteArray(pin.size());
+        VerifyOrExit(pinArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+        env->SetByteArrayRegion(pinArr, 0, pin.size(), reinterpret_cast<const jbyte *>(pin.data()));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userStatus),
-                            static_cast<jint>(userType), pinStr.jniValue());
+                            static_cast<jint>(userType), pinArr);
+
+        env->DeleteLocalRef(pinArr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1869,7 +1882,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1877,8 +1890,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetRfidResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString rfidStr(env, "");
+        jbyteArray rfidArr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1888,11 +1900,19 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(III[B)V", &javaMethod);
         SuccessOrExit(err);
 
+        rfidArr = env->NewByteArray(rfid.size());
+        VerifyOrExit(rfidArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+        env->SetByteArrayRegion(rfidArr, 0, rfid.size(), reinterpret_cast<const jbyte *>(rfid.data()));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userStatus),
-                            static_cast<jint>(userType), rfidStr.jniValue());
+                            static_cast<jint>(userType), rfidArr);
+
+        env->DeleteLocalRef(rfidArr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -15779,13 +15799,13 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring pin)
+JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray pin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
-    JniUtfString pinStr(env, pin);
+    JniByteArray pinArr(env, pin);
     CHIPDoorLockClusterLockDoorResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -15798,7 +15818,7 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong cl
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->LockDoor(onSuccess->Cancel(), onFailure->Cancel(),
-                               chip::ByteSpan((const uint8_t *) pin, strlen(pinStr.c_str())));
+                               chip::ByteSpan((const uint8_t *) pinArr.data(), pinArr.size()));
     SuccessOrExit(err);
 
 exit:
@@ -15875,13 +15895,13 @@ exit:
     }
 }
 JNI_METHOD(void, DoorLockCluster, setPin)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userStatus, jint userType, jstring pin)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userStatus, jint userType, jbyteArray pin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
-    JniUtfString pinStr(env, pin);
+    JniByteArray pinArr(env, pin);
     CHIPDoorLockClusterSetPinResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -15894,7 +15914,7 @@ JNI_METHOD(void, DoorLockCluster, setPin)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-                             chip::ByteSpan((const uint8_t *) pin, strlen(pinStr.c_str())));
+                             chip::ByteSpan((const uint8_t *) pinArr.data(), pinArr.size()));
     SuccessOrExit(err);
 
 exit:
@@ -15923,13 +15943,13 @@ exit:
     }
 }
 JNI_METHOD(void, DoorLockCluster, setRfid)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userStatus, jint userType, jstring id)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userStatus, jint userType, jbyteArray id)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
-    JniUtfString idStr(env, id);
+    JniByteArray idArr(env, id);
     CHIPDoorLockClusterSetRfidResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -15942,7 +15962,7 @@ JNI_METHOD(void, DoorLockCluster, setRfid)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-                              chip::ByteSpan((const uint8_t *) id, strlen(idStr.c_str())));
+                              chip::ByteSpan((const uint8_t *) idArr.data(), idArr.size()));
     SuccessOrExit(err);
 
 exit:
@@ -16112,13 +16132,13 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, DoorLockCluster, unlockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring pin)
+JNI_METHOD(void, DoorLockCluster, unlockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray pin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
-    JniUtfString pinStr(env, pin);
+    JniByteArray pinArr(env, pin);
     CHIPDoorLockClusterUnlockDoorResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -16131,7 +16151,7 @@ JNI_METHOD(void, DoorLockCluster, unlockDoor)(JNIEnv * env, jobject self, jlong 
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->UnlockDoor(onSuccess->Cancel(), onFailure->Cancel(),
-                                 chip::ByteSpan((const uint8_t *) pin, strlen(pinStr.c_str())));
+                                 chip::ByteSpan((const uint8_t *) pinArr.data(), pinArr.size()));
     SuccessOrExit(err);
 
 exit:
@@ -16160,13 +16180,13 @@ exit:
     }
 }
 JNI_METHOD(void, DoorLockCluster, unlockWithTimeout)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint timeoutInSeconds, jstring pin)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint timeoutInSeconds, jbyteArray pin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
-    JniUtfString pinStr(env, pin);
+    JniByteArray pinArr(env, pin);
     CHIPDoorLockClusterUnlockWithTimeoutResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -16179,7 +16199,7 @@ JNI_METHOD(void, DoorLockCluster, unlockWithTimeout)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->UnlockWithTimeout(onSuccess->Cancel(), onFailure->Cancel(), timeoutInSeconds,
-                                        chip::ByteSpan((const uint8_t *) pin, strlen(pinStr.c_str())));
+                                        chip::ByteSpan((const uint8_t *) pinArr.data(), pinArr.size()));
     SuccessOrExit(err);
 
 exit:

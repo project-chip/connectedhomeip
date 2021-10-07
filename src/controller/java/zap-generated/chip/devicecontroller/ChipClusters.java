@@ -1954,7 +1954,7 @@ public class ChipClusters {
       getYeardaySchedule(chipClusterPtr, callback, scheduleId, userId);
     }
 
-    public void lockDoor(LockDoorResponseCallback callback, String pin) {
+    public void lockDoor(LockDoorResponseCallback callback, byte[] pin) {
       lockDoor(chipClusterPtr, callback, pin);
     }
 
@@ -1974,12 +1974,12 @@ public class ChipClusters {
     }
 
     public void setPin(
-        SetPinResponseCallback callback, int userId, int userStatus, int userType, String pin) {
+        SetPinResponseCallback callback, int userId, int userStatus, int userType, byte[] pin) {
       setPin(chipClusterPtr, callback, userId, userStatus, userType, pin);
     }
 
     public void setRfid(
-        SetRfidResponseCallback callback, int userId, int userStatus, int userType, String id) {
+        SetRfidResponseCallback callback, int userId, int userStatus, int userType, byte[] id) {
       setRfid(chipClusterPtr, callback, userId, userStatus, userType, id);
     }
 
@@ -2018,12 +2018,12 @@ public class ChipClusters {
           chipClusterPtr, callback, scheduleId, userId, localStartTime, localEndTime);
     }
 
-    public void unlockDoor(UnlockDoorResponseCallback callback, String pin) {
+    public void unlockDoor(UnlockDoorResponseCallback callback, byte[] pin) {
       unlockDoor(chipClusterPtr, callback, pin);
     }
 
     public void unlockWithTimeout(
-        UnlockWithTimeoutResponseCallback callback, int timeoutInSeconds, String pin) {
+        UnlockWithTimeoutResponseCallback callback, int timeoutInSeconds, byte[] pin) {
       unlockWithTimeout(chipClusterPtr, callback, timeoutInSeconds, pin);
     }
 
@@ -2078,7 +2078,7 @@ public class ChipClusters {
         int userId);
 
     private native void lockDoor(
-        long chipClusterPtr, LockDoorResponseCallback callback, String pin);
+        long chipClusterPtr, LockDoorResponseCallback callback, byte[] pin);
 
     private native void setHolidaySchedule(
         long chipClusterPtr,
@@ -2094,7 +2094,7 @@ public class ChipClusters {
         int userId,
         int userStatus,
         int userType,
-        String pin);
+        byte[] pin);
 
     private native void setRfid(
         long chipClusterPtr,
@@ -2102,7 +2102,7 @@ public class ChipClusters {
         int userId,
         int userStatus,
         int userType,
-        String id);
+        byte[] id);
 
     private native void setUserType(
         long chipClusterPtr, SetUserTypeResponseCallback callback, int userId, int userType);
@@ -2127,13 +2127,13 @@ public class ChipClusters {
         long localEndTime);
 
     private native void unlockDoor(
-        long chipClusterPtr, UnlockDoorResponseCallback callback, String pin);
+        long chipClusterPtr, UnlockDoorResponseCallback callback, byte[] pin);
 
     private native void unlockWithTimeout(
         long chipClusterPtr,
         UnlockWithTimeoutResponseCallback callback,
         int timeoutInSeconds,
-        String pin);
+        byte[] pin);
 
     public interface ClearAllPinsResponseCallback {
       void onSuccess(int status);
@@ -2196,19 +2196,19 @@ public class ChipClusters {
           int source,
           int eventIdOrAlarmCode,
           int userId,
-          String pin);
+          byte[] pin);
 
       void onError(Exception error);
     }
 
     public interface GetPinResponseCallback {
-      void onSuccess(int userId, int userStatus, int userType, String pin);
+      void onSuccess(int userId, int userStatus, int userType, byte[] pin);
 
       void onError(Exception error);
     }
 
     public interface GetRfidResponseCallback {
-      void onSuccess(int userId, int userStatus, int userType, String rfid);
+      void onSuccess(int userId, int userStatus, int userType, byte[] rfid);
 
       void onError(Exception error);
     }

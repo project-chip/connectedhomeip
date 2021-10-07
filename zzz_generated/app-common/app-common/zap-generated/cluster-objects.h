@@ -5658,7 +5658,7 @@ public:
     static constexpr CommandId GetCommandId() { return LockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    Span<const char> pin;
+    chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -5669,7 +5669,7 @@ public:
     static constexpr CommandId GetCommandId() { return LockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    Span<const char> pin;
+    chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LockDoor
@@ -5714,7 +5714,7 @@ public:
     static constexpr CommandId GetCommandId() { return UnlockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    Span<const char> pin;
+    chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -5725,7 +5725,7 @@ public:
     static constexpr CommandId GetCommandId() { return UnlockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    Span<const char> pin;
+    chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnlockDoor
@@ -5828,7 +5828,7 @@ public:
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
     uint16_t timeoutInSeconds;
-    Span<const char> pin;
+    chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -5840,7 +5840,7 @@ public:
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
     uint16_t timeoutInSeconds;
-    Span<const char> pin;
+    chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnlockWithTimeout
@@ -5925,7 +5925,7 @@ public:
     uint8_t source;
     uint8_t eventIdOrAlarmCode;
     uint16_t userId;
-    Span<const char> pin;
+    chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -5942,7 +5942,7 @@ public:
     uint8_t source;
     uint8_t eventIdOrAlarmCode;
     uint16_t userId;
-    Span<const char> pin;
+    chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetLogRecordResponse
@@ -5965,7 +5965,7 @@ public:
     uint16_t userId;
     DoorLockUserStatus userStatus;
     DoorLockUserType userType;
-    Span<const char> pin;
+    chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -5979,7 +5979,7 @@ public:
     uint16_t userId;
     DoorLockUserStatus userStatus;
     DoorLockUserType userType;
-    Span<const char> pin;
+    chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetPin
@@ -6058,7 +6058,7 @@ public:
     uint16_t userId;
     DoorLockUserStatus userStatus;
     DoorLockUserType userType;
-    Span<const char> pin;
+    chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -6072,7 +6072,7 @@ public:
     uint16_t userId;
     DoorLockUserStatus userStatus;
     DoorLockUserType userType;
-    Span<const char> pin;
+    chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetPinResponse
@@ -7036,7 +7036,7 @@ public:
     uint16_t userId;
     DoorLockUserStatus userStatus;
     DoorLockUserType userType;
-    Span<const char> id;
+    chip::ByteSpan id;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -7050,7 +7050,7 @@ public:
     uint16_t userId;
     DoorLockUserStatus userStatus;
     DoorLockUserType userType;
-    Span<const char> id;
+    chip::ByteSpan id;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetRfid
@@ -7129,7 +7129,7 @@ public:
     uint16_t userId;
     DoorLockUserStatus userStatus;
     DoorLockUserType userType;
-    Span<const char> rfid;
+    chip::ByteSpan rfid;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -7143,7 +7143,7 @@ public:
     uint16_t userId;
     DoorLockUserStatus userStatus;
     DoorLockUserType userType;
-    Span<const char> rfid;
+    chip::ByteSpan rfid;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetRfidResponse
@@ -7276,7 +7276,7 @@ public:
     uint8_t source;
     DoorLockOperationEventCode eventCode;
     uint16_t userId;
-    Span<const char> pin;
+    chip::ByteSpan pin;
     uint32_t timeStamp;
     Span<const char> data;
 
@@ -7292,7 +7292,7 @@ public:
     uint8_t source;
     DoorLockOperationEventCode eventCode;
     uint16_t userId;
-    Span<const char> pin;
+    chip::ByteSpan pin;
     uint32_t timeStamp;
     Span<const char> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -7321,7 +7321,7 @@ public:
     uint8_t source;
     DoorLockProgrammingEventCode eventCode;
     uint16_t userId;
-    Span<const char> pin;
+    chip::ByteSpan pin;
     DoorLockUserType userType;
     DoorLockUserStatus userStatus;
     uint32_t timeStamp;
@@ -7339,7 +7339,7 @@ public:
     uint8_t source;
     DoorLockProgrammingEventCode eventCode;
     uint16_t userId;
-    Span<const char> pin;
+    chip::ByteSpan pin;
     DoorLockUserType userType;
     DoorLockUserStatus userStatus;
     uint32_t timeStamp;
