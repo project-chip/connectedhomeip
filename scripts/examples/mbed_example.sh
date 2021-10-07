@@ -34,29 +34,29 @@ PROFILE=release
 
 for i in "$@"; do
     case $i in
-        -a=* | --app=*)
-            APP="${i#*=}"
-            shift
-            ;;
-        -b=* | --board=*)
-            TARGET_BOARD="${i#*=}"
-            shift
-            ;;
-        -t=* | --toolchain=*)
-            TOOLCHAIN="${i#*=}"
-            shift
-            ;;
-        -p=* | --profile=*)
-            PROFILE="${i#*=}"
-            shift
-            ;;
-        -c=* | --command=*)
-            COMMAND="${i#*=}"
-            shift
-            ;;
-        *)
-            # unknown option
-            ;;
+    -a=* | --app=*)
+        APP="${i#*=}"
+        shift
+        ;;
+    -b=* | --board=*)
+        TARGET_BOARD="${i#*=}"
+        shift
+        ;;
+    -t=* | --toolchain=*)
+        TOOLCHAIN="${i#*=}"
+        shift
+        ;;
+    -p=* | --profile=*)
+        PROFILE="${i#*=}"
+        shift
+        ;;
+    -c=* | --command=*)
+        COMMAND="${i#*=}"
+        shift
+        ;;
+    *)
+        # unknown option
+        ;;
     esac
 done
 
@@ -85,8 +85,7 @@ if [[ ! " ${SUPPORTED_PROFILES[@]} " =~ " ${PROFILE} " ]]; then
     exit 1
 fi
 
-set -e
-pwd
+set -e # Exit immediately if a command exits with a non-zero status.
 
 # Activate Matter environment
 source "$CHIP_ROOT"/scripts/activate.sh
