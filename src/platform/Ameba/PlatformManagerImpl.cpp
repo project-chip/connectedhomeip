@@ -74,7 +74,25 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
+
 }
 
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+{
+    currentHeapFree = xPortGetFreeHeapSize();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+{
+    currentHeapUsed = xPortGetTotalHeapSize() - xPortGetFreeHeapSize();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+    currentHeapHighWatermark = xPortGetTotalHeapSize() - xPortGetMinimumEverFreeHeapSize();
+    return CHIP_NO_ERROR;
+}
 } // namespace DeviceLayer
 } // namespace chip
