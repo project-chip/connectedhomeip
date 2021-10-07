@@ -16,33 +16,17 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
+#include "AppMain.h"
 
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/Command.h>
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/server/Mdns.h>
-#include <app/util/af-types.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/RandUtils.h>
-
-#include "AppMain.h"
-
-#include <cassert>
-#include <iostream>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::Inet;
-using namespace chip::Transport;
-using namespace chip::DeviceLayer;
 
 bool emberAfBasicClusterMfgSpecificPingCallback(Command * commandObj)
 {
