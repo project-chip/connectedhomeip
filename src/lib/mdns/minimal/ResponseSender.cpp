@@ -161,16 +161,18 @@ CHIP_ERROR ResponseSender::FlushReply()
 
     if (mResponseBuilder.HasResponseRecords())
     {
+        char srcAddressString[chip::Inet::kMaxIPAddressStringLength];
+        VerifyOrDie(mSendState.GetSourceAddress().ToString(srcAddressString) != nullptr);
 
         if (mSendState.SendUnicast())
         {
-            ChipLogProgress(Discovery, "Directly sending mDns reply to peer on port %d", mSendState.GetSourcePort());
+            ChipLogProgress(Discovery, "Directly sending mDns reply to peer %s on port %d", srcAddressString, mSendState.GetSourcePort());
             ReturnErrorOnFailure(mServer->DirectSend(mResponseBuilder.ReleasePacket(), mSendState.GetSourceAddress(),
                                                      mSendState.GetSourcePort(), mSendState.GetSourceInterfaceId()));
         }
         else
         {
-            ChipLogProgress(Discovery, "Broadcasting mDns reply");
+            ChipLogProgress(Discovery, "Broadcasting mDns reply for query from %s", srcAddressString);
             ReturnErrorOnFailure(
                 mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort, mSendState.GetSourceInterfaceId()));
         }

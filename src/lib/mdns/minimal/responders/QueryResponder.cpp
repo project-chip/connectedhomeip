@@ -139,8 +139,6 @@ void QueryResponderBase::MarkAdditionalRepliesFor(QueryResponderIterator it)
 
 void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate)
 {
-    ChipLogProgress(Discovery, "Replying to DNS-SD service listing request");
-
     // reply to dns-sd service list request
     for (size_t i = 0; i < mResponderInfoSize; i++)
     {
