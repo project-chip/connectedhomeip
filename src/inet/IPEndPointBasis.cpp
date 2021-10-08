@@ -792,6 +792,11 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     msgIOV.iov_base = aBuffer->Start();
     msgIOV.iov_len  = aBuffer->DataLength();
 
+#if defined(IP_PKTINFO) || defined(IPV6_PKTINFO)
+    uint8_t controlData[256];
+    memset(controlData, 0, sizeof(controlData));
+#endif // defined(IP_PKTINFO) || defined(IPV6_PKTINFO)
+
     struct msghdr msgHeader;
     memset(&msgHeader, 0, sizeof(msgHeader));
     msgHeader.msg_iov    = &msgIOV;
@@ -837,8 +842,6 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     if (intfId != INET_NULL_INTERFACEID || aPktInfo->SrcAddress.Type() != kIPAddressType_Any)
     {
 #if defined(IP_PKTINFO) || defined(IPV6_PKTINFO)
-        uint8_t controlData[256];
-        memset(controlData, 0, sizeof(controlData));
         msgHeader.msg_control    = controlData;
         msgHeader.msg_controllen = sizeof(controlData);
 
