@@ -108,6 +108,8 @@ protected:
     CHIP_ERROR _RemoveInvalidSrpServices();
 
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
+    CHIP_ERROR _ClearSrpHost(const char * aHostName);
+    CHIP_ERROR _SetSrpDnsCallbacks(DnsAsyncReturnCallback aInitCallback, DnsAsyncReturnCallback aErrorCallback, void * aContext);
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
     CHIP_ERROR _DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext);
     CHIP_ERROR _DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback, void * aContext);
@@ -165,9 +167,7 @@ private:
             otSrpClientService mService;
             bool mIsInvalid;
             uint8_t mServiceBuffer[kServiceBufferSize];
-#if OPENTHREAD_API_VERSION >= 132
             const char * mSubTypes[kSubTypeMaxNumber + 1]; // extra entry for null terminator
-#endif
             otDnsTxtEntry mTxtEntries[kTxtMaxNumber];
 
             bool IsUsed() const { return mService.mInstanceName != nullptr; }
@@ -177,6 +177,9 @@ private:
         char mHostName[kMaxHostNameSize + 1];
         otIp6Address mHostAddress;
         Service mServices[kMaxServicesNumber];
+        bool mIsInitialized;
+        DnsAsyncReturnCallback mInitializedCallback;
+        void * mCallbackContext;
     };
 
     SrpClient mSrpClient;

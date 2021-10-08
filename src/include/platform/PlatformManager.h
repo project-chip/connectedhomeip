@@ -33,6 +33,10 @@
 
 namespace chip {
 
+namespace Mdns {
+class DiscoveryImplPlatform;
+}
+
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -176,6 +180,7 @@ private:
     friend class PlatformManagerImpl;
     friend class ConnectivityManagerImpl;
     friend class ConfigurationManagerImpl;
+    friend class Mdns::DiscoveryImplPlatform;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;

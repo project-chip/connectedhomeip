@@ -92,6 +92,7 @@ CHIP_ERROR CheckExpected(CallType type, const MdnsService * service)
 
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
 {
+    initCallback(context, CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
 }
 
