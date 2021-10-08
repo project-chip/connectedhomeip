@@ -46,6 +46,7 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 using namespace chip;
 
@@ -119,10 +120,6 @@ app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 
 // Returns endpoint index within a given cluster
 static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask, uint16_t manufacturerCode);
-
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-void emberAfPluginDescriptorServerInitCallback(void);
-#endif
 
 //------------------------------------------------------------------------------
 
@@ -992,7 +989,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
         // Rebuild descriptor attributes on all endpoints
-        emberAfPluginDescriptorServerInitCallback();
+        MatterDescriptorPluginServerInitCallback();
 #endif
     }
 

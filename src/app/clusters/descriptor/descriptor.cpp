@@ -232,7 +232,7 @@ EmberAfStatus writePartsAttribute(EndpointId endpoint)
     return writeAttribute(endpoint, attributeId, (uint8_t *) &partsCount);
 }
 
-void emberAfPluginDescriptorServerInitCallback(void)
+void MatterDescriptorPluginServerInitCallback(void)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 

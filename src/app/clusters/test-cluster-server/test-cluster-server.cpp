@@ -127,29 +127,6 @@ EmberAfStatus writeTestListStructOctetAttribute(EndpointId endpoint)
 }
 } // namespace
 
-void emberAfPluginTestClusterServerInitCallback(void)
-{
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-
-    for (uint8_t index = 0; index < emberAfEndpointCount(); index++)
-    {
-        EndpointId endpoint = emberAfEndpointFromIndex(index);
-        if (!emberAfContainsCluster(endpoint, ZCL_TEST_CLUSTER_ID))
-        {
-            continue;
-        }
-
-        status = writeTestListInt8uAttribute(endpoint);
-        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list int8u", status));
-
-        status = writeTestListOctetAttribute(endpoint);
-        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list octet", status));
-
-        status = writeTestListStructOctetAttribute(endpoint);
-        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list strut octet", status));
-    }
-}
-
 bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
                                            const Commands::Test::DecodableType & commandData)
 {
@@ -206,4 +183,31 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(app::CommandHandler * apC
 
     return sendNumericResponse(commandPath.mEndpointId, apCommandObj, Commands::TestAddArgumentsResponse::Id,
                                static_cast<uint8_t>(arg1 + arg2));
+}
+
+// -----------------------------------------------------------------------------
+// Plugin initialization
+
+void MatterTestClusterPluginServerInitCallback(void)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    for (uint8_t index = 0; index < emberAfEndpointCount(); index++)
+    {
+        EndpointId endpoint = emberAfEndpointFromIndex(index);
+        if (!emberAfContainsCluster(endpoint, ZCL_TEST_CLUSTER_ID))
+        {
+            continue;
+        }
+
+        status = writeTestListInt8uAttribute(endpoint);
+        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list int8u", status));
+
+        status = writeTestListOctetAttribute(endpoint);
+        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list octet", status));
+
+        status = writeTestListStructOctetAttribute(endpoint);
+        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS,
+                       ChipLogError(Zcl, kErrorStr, endpoint, "test list struct octet", status));
+    }
 }
