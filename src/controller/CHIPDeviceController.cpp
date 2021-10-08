@@ -1916,7 +1916,8 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         GeneralCommissioningCluster genCom;
         // TODO: should get the endpoint information from the descriptor cluster.
         genCom.Associate(device, 0);
-        uint16_t commissioningExpirySeconds = 5;
+        // TODO(cecille): Make this a parameter
+        uint16_t commissioningExpirySeconds = 60;
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
     }
     break;
