@@ -162,7 +162,7 @@ static void printUserTables(void)
 }
 
 // Returns status byte for use in SetPinResponse and SetRfidResponse commands.
-static uint8_t setUser(uint16_t userId, uint8_t userStatus, uint8_t userType, ByteSpan & code,
+static uint8_t setUser(uint16_t userId, uint8_t userStatus, uint8_t userType, const ByteSpan & code,
                        EmberAfPluginDoorLockServerUser * userTable, uint8_t userTableSize)
 {
     bool success = false;
@@ -624,7 +624,7 @@ static void printSuccessOrFailure(bool success)
  * Note that the "pin" parameter is a Zigbee string, so the first byte is the
  * length of the remaining bytes
  */
-static bool verifyPin(ByteSpan & pin, uint8_t * userId)
+static bool verifyPin(const ByteSpan & pin, uint8_t * userId)
 {
     bool pinRequired = false;
     EmberAfStatus status;
