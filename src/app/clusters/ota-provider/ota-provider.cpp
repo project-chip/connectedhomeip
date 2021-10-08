@@ -165,11 +165,20 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
  * @param metadataForProvider Optional, max 512 octets. A TLV-encoded Vendor-specific payload.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint16_t vendorId,
-    uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported, uint8_t * location,
-    bool requestorCanConsent, chip::ByteSpan metadataForProvider, Commands::QueryImage::DecodableType & commandData)
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandler * commandObj,
+                                                               const app::ConcreteCommandPath & commandPath,
+                                                               const Commands::QueryImage::DecodableType & commandData)
 {
+    auto & vendorId            = commandData.vendorId;
+    auto & productId           = commandData.productId;
+    auto & hardwareVersion     = commandData.hardwareVersion;
+    auto & softwareVersion     = commandData.softwareVersion;
+    auto & protocolsSupported  = commandData.protocolsSupported;
+    auto & requestorCanConsent = commandData.requestorCanConsent;
+    auto & metadataForProvider = commandData.metadataForProvider;
+
+    EndpointId endpoint = commandPath.mEndpointId;
+
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
