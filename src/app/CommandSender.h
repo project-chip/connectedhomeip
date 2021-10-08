@@ -153,7 +153,8 @@ private:
 
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 
-    Callback * mpCallback = nullptr;
+    Callback * mpCallback                      = nullptr;
+    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
 };
 
 } // namespace app

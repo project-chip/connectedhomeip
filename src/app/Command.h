@@ -36,7 +36,6 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
@@ -97,7 +96,7 @@ public:
     virtual CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) = 0;
 
 protected:
-    Command(Messaging::ExchangeManager * apExchangeMgr);
+    Command();
 
     /*
      * Allocates a packet buffer used for encoding an invoke request/response payload.
@@ -120,7 +119,6 @@ protected:
     const char * GetStateStr() const;
 
     InvokeCommand::Builder mInvokeCommandBuilder;
-    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     uint8_t mCommandIndex                      = 0;
     CommandState mState                        = CommandState::Idle;

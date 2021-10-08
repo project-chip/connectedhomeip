@@ -26,7 +26,7 @@
 #include "Command.h"
 #include "CommandSender.h"
 #include "InteractionModelEngine.h"
-#include "messaging/ExchangeMgr.h"
+#include "messaging/ExchangeContext.h"
 
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
@@ -36,9 +36,7 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
-CommandHandler::CommandHandler(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback) :
-    Command(apExchangeMgr), mpCallback(apCallback)
-{}
+CommandHandler::CommandHandler(Callback * apCallback) : mpCallback(apCallback) {}
 
 CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                                   System::PacketBufferHandle && payload)
