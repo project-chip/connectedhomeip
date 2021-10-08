@@ -1986,7 +1986,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeClusterRevision(Callb
 }
 
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePHYRate(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback, uint8_t pHYRate)
+                                                                        Callback::Cancelable * onFailureCallback, uint8_t PHYRate)
 {
     app::WriteClientHandle handle;
     chip::app::AttributePathParams attributePath;
@@ -1997,7 +1997,7 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePHYRate(Callback
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, pHYRate));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, PHYRate));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }

@@ -334,6 +334,19 @@ function hasSpecificAttributes(options)
 function asLowerCamelCase(label)
 {
   let str = string.toCamelCase(label, true);
+  // Check for the case when were:
+  // 1. A single word (that's the regexp at the beginning, which matches the
+  //    word-splitting regexp in string.toCamelCase).
+  // 2. Starting with multiple capital letters in a row.
+  // 3. But not _all_ capital letters (which we purposefully
+  //    convert to all-lowercase).
+  //
+  // and if all those conditions hold, preserve the leading capital letters by
+  // uppercasing the first one, which got lowercased.
+  if (!/ |_|-|\//.test(label) && label.length > 1 && label.substring(0, 2).toUpperCase() == label.substring(0, 2)
+      && label.toUpperCase() != label) {
+    str = str[0].toUpperCase() + str.substring(1);
+  }
   return str.replace(/[\.:]/g, '');
 }
 
