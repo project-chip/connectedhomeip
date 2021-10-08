@@ -46,6 +46,31 @@ namespace app {
 class CommandHandler : public Command
 {
 public:
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+
+        /*
+         * Method that signals to a registered callback that this object
+         * has completed doing useful work and is now safe for release/destruction.
+         */
+        virtual void OnDone(CommandHandler * apCommandObj) = 0;
+    };
+
+    /*
+     * Constructor.
+     *
+     * The callback passed in has to outlive this CommandHandler object.
+     */
+    CommandHandler(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback);
+
+    /*
+     * Main entrypoint for this class to handle an invoke request.
+     *
+     * This function will always call the OnDone function above on the registered callback
+     * before returning.
+     */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                       System::PacketBufferHandle && payload);
     CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,
@@ -74,10 +99,18 @@ public:
     }
 
 private:
+    //
+    // Called internally to signal the completion of all work on this object, gracefully close the
+    // exchange (by calling into the base class) and finally, signal to a registerd callback that it's
+    // safe to release this object.
+    //
+    void Close();
+
     friend class TestCommandInteraction;
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
     CHIP_ERROR PrepareResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommand);
+    Callback * mpCallback = nullptr;
 };
 } // namespace app
 } // namespace chip

@@ -1658,55 +1658,40 @@ void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNod
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
-    const app::CommandSender * apCommandSender, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-    const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-    chip::CommandId aCommandId, uint8_t aCommandIndex)
+void DeviceControllerInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender,
+                                                          const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData)
 {
     // Generally IM has more detailed errors than ember library, here we always use the, the actual handling of the
     // commands should implement full IMDelegate.
     // #6308 By implement app side IM delegate, we should be able to accept detailed error codes.
     // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
     // instead of IM status code.
-    IMDefaultResponseCallback(apCommandSender,
-                              (aProtocolCode == 0 && aGeneralCode == Protocols::SecureChannel::GeneralStatusCode::kSuccess)
-                                  ? EMBER_ZCL_STATUS_SUCCESS
-                                  : EMBER_ZCL_STATUS_FAILURE);
-
-    return CHIP_NO_ERROR;
+    if (aData != nullptr)
+    {
+        chip::app::DispatchSingleClusterResponseCommand(aPath, *aData, apCommandSender);
+    }
+    else
+    {
+        IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_SUCCESS);
+    }
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProtocolError(const app::CommandSender * apCommandSender,
-                                                                                  uint8_t aCommandIndex)
+void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender,
+                                                       Protocols::InteractionModel::Status aProtocolCode, CHIP_ERROR aError)
 {
-    // Generally IM has more detailed errors than ember library, here we always use EMBER_ZCL_STATUS_FAILURE before #6308 is landed
-    // and the app can take care of these error codes, the actual handling of the commands should implement full IMDelegate.
-    // #6308: By implement app side IM delegate, we should be able to accept detailed error codes.
-    // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
-    // instead of IM status code.
-    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_FAILURE);
-
-    return CHIP_NO_ERROR;
+    // The IMDefaultResponseCallback started out life as an Ember function, so it only accepted
+    // Ember status codes. Consequently, let's convert the IM code over to a meaningful Ember status before dispatching.
+    //
+    // This however, results in loss (aError is completely discarded). When full cluster-specific status codes are implemented as
+    // well, this will be an even bigger problem.
+    //
+    // For now, #10331 tracks this issue.
+    IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aProtocolCode));
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseError(const app::CommandSender * apCommandSender,
-                                                                          CHIP_ERROR aError)
+void DeviceControllerInteractionModelDelegate::OnDone(app::CommandSender * apCommandSender)
 {
-    // Generally IM has more detailed errors than ember library, here we always use EMBER_ZCL_STATUS_FAILURE before #6308 is landed
-    // and the app can take care of these error codes, the actual handling of the commands should implement full IMDelegate.
-    // #6308: By implement app side IM delegate, we should be able to accept detailed error codes.
-    // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
-    // instead of IM status code.
-    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_FAILURE);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(const app::CommandSender * apCommandSender)
-{
-    // No thing is needed in this case. The success callback is called in CommandResponseStatus, and failure callback is called in
-    // CommandResponseStatus, CommandResponseProtocolError and CommandResponseError.
-    return CHIP_NO_ERROR;
+    return chip::Platform::Delete(apCommandSender);
 }
 
 void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,

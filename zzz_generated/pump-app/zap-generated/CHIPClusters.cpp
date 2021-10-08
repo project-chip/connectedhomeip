@@ -22,11 +22,14 @@
 #include <cstdint>
 
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/basic-types.h>
+#include <controller/CommandSenderAllocator.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>

@@ -26,6 +26,8 @@
 #include "Command.h"
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
+#include "protocols/Protocols.h"
+#include "protocols/interaction_model/Constants.h"
 
 #include <protocols/secure_channel/Constants.h>
 
@@ -34,37 +36,34 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
+CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr) :
+    Command(apExchangeMgr), mpCallback(apCallback)
+{}
+
 CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
                                              uint32_t timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
 
-    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == CommandState::AddedCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = FinalizeCommandsMessage(commandPacket);
+    err = Finalize(commandPacket);
     SuccessOrExit(err);
-
-    // Discard any existing exchange context. Effectively we can only have one exchange per CommandSender
-    // at any one time.
-    AbortExistingExchangeContext();
 
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     mpExchangeCtx->SetResponseTimeout(timeout);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(commandPacket),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
-    MoveToState(CommandState::Sending);
+
+    MoveToState(CommandState::CommandSent);
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        AbortExistingExchangeContext();
-    }
-
     return err;
 }
 
@@ -77,24 +76,19 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse),
                  err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId);
-    SuccessOrExit(err);
+    SuccessOrExit(err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId));
 
 exit:
-
-    if (mpDelegate != nullptr)
+    if (mpCallback != nullptr)
     {
         if (err != CHIP_NO_ERROR)
         {
-            mpDelegate->CommandResponseError(this, err);
-        }
-        else
-        {
-            mpDelegate->CommandResponseProcessed(this);
+            mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, err);
         }
     }
 
-    ShutdownInternal();
+    Close();
+
     return err;
 }
 
@@ -103,65 +97,93 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(apExchangeContext));
 
-    if (mpDelegate != nullptr)
+    if (mpCallback != nullptr)
     {
-        mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
+        mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_TIMEOUT);
     }
 
-    ShutdownInternal();
+    Close();
+}
+
+void CommandSender::Close()
+{
+    MoveToState(CommandState::AwaitingDestruction);
+
+    Command::Close();
+
+    if (mpCallback)
+    {
+        mpCallback->OnDone(this);
+    }
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandPath::Parser commandPath;
-    chip::TLV::TLVReader commandDataReader;
     chip::ClusterId clusterId;
     chip::CommandId commandId;
     chip::EndpointId endpointId;
-    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
-    uint32_t protocolId                                     = 0;
-    uint16_t protocolCode                                   = 0;
-    StatusElement::Parser statusElementParser;
 
-    mCommandIndex++;
-    err = aCommandElement.GetCommandPath(&commandPath);
-    SuccessOrExit(err);
-
-    err = commandPath.GetClusterId(&clusterId);
-    SuccessOrExit(err);
-
-    err = commandPath.GetCommandId(&commandId);
-    SuccessOrExit(err);
-
-    err = commandPath.GetEndpointId(&endpointId);
-    SuccessOrExit(err);
-
-    err = aCommandElement.GetStatusElement(&statusElementParser);
-    if (CHIP_NO_ERROR == err)
     {
-        err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
+        CommandPath::Parser commandPath;
+
+        err = aCommandElement.GetCommandPath(&commandPath);
         SuccessOrExit(err);
-        if (mpDelegate != nullptr)
-        {
-            mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId,
-                                              mCommandIndex);
-        }
+
+        err = commandPath.GetClusterId(&clusterId);
+        SuccessOrExit(err);
+
+        err = commandPath.GetCommandId(&commandId);
+        SuccessOrExit(err);
+
+        err = commandPath.GetEndpointId(&endpointId);
+        SuccessOrExit(err);
     }
-    else if (CHIP_END_OF_TLV == err)
+
     {
-        // TODO(Spec#3258): The endpoint id in response command is not clear, so we cannot do "ClientClusterCommandExists" check.
-        err = aCommandElement.GetData(&commandDataReader);
+        bool hasDataResponse = false;
+        chip::TLV::TLVReader commandDataReader;
+
+        // Default to success when an invoke response is received.
+        StatusElement::Type statusElement{ chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                           chip::Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
+                                           to_underlying(Protocols::InteractionModel::Status::Success) };
+        StatusElement::Parser statusElementParser;
+        err = aCommandElement.GetStatusElement(&statusElementParser);
+        if (CHIP_NO_ERROR == err)
+        {
+            err = statusElementParser.DecodeStatusElement(statusElement);
+        }
+        else if (CHIP_END_OF_TLV == err)
+        {
+            hasDataResponse = true;
+            err             = aCommandElement.GetData(&commandDataReader);
+        }
         SuccessOrExit(err);
-        // TODO(#4503): Should call callbacks of cluster that sends the command.
-        DispatchSingleClusterResponseCommand(ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader, this);
+
+        if (mpCallback != nullptr)
+        {
+            if (statusElement.protocolId == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm())
+            {
+                if (statusElement.protocolCode == to_underlying(Protocols::InteractionModel::Status::Success))
+                {
+                    mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId),
+                                           hasDataResponse ? &commandDataReader : nullptr);
+                }
+                else
+                {
+                    mpCallback->OnError(this, static_cast<Protocols::InteractionModel::Status>(statusElement.protocolCode),
+                                        CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+                }
+            }
+            else
+            {
+                mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+            }
+        }
     }
 
 exit:
-    if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
-    {
-        mpDelegate->CommandResponseProtocolError(this, mCommandIndex);
-    }
     return err;
 }
 
