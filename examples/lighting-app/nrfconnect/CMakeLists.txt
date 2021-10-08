@@ -179,6 +179,19 @@ pw_proto_library(lighting_service
     pw_protobuf.common_protos
 )
 
+pw_proto_library(ot_cli_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/ot_cli_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/ot_cli_service.options
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    ot_cli_service
+  DEPS
+    pw_protobuf.common_protos
+)
+
 pw_proto_library(thread_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/thread_service.proto
