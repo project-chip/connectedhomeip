@@ -180,6 +180,7 @@ void TestUserDirectedCommissioningClientMessage(nlTestSuite * inSuite, void * in
     // check the packet header fields
     PacketHeader packetHeader;
     packetHeader.DecodeAndConsume(payloadBuf);
+    NL_TEST_ASSERT(inSuite, !packetHeader.IsEncrypted());
 
     // check the payload header fields
     PayloadHeader payloadHeader;

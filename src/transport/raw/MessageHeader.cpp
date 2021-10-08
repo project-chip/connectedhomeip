@@ -87,6 +87,9 @@ constexpr uint8_t kMsgFlagsMask = 0x07;
 /// Shift to convert to/from a masked version 8bit value to a 4bit version.
 constexpr int kVersionShift = 4;
 
+// Mask to extract sessionType
+constexpr uint8_t kSessionTypeMask = 0x03;
+
 } // namespace
 
 uint16_t PacketHeader::EncodeSizeBytes() const
@@ -140,7 +143,6 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     uint16_t octets_read;
 
     uint8_t msgFlags;
-    uint8_t securityFlags;
     err = reader.Read8(&msgFlags).StatusCode();
     SuccessOrExit(err);
     version = ((msgFlags & kVersionMask) >> kVersionShift);
@@ -148,9 +150,12 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
 
     mMsgFlags.SetRaw(msgFlags);
 
+    uint8_t securityFlags;
     err = reader.Read8(&securityFlags).StatusCode();
     SuccessOrExit(err);
     mSecFlags.SetRaw(securityFlags);
+
+    mSessionType = static_cast<Header::SessionType>(securityFlags & kSessionTypeMask);
 
     err = reader.Read16(&mSessionId).StatusCode();
     SuccessOrExit(err);
@@ -169,6 +174,14 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     {
         mSourceNodeId.ClearValue();
     }
+
+    if (!IsSessionTypeValid())
+    {
+        // Reserved.
+        err = CHIP_ERROR_INTERNAL;
+        SuccessOrExit(err);
+    }
+
     if (mMsgFlags.HasAll(Header::MsgFlagValues::kDestinationNodeIdPresent, Header::MsgFlagValues::kDestinationGroupIdPresent))
     {
         // Reserved.
@@ -177,6 +190,11 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     }
     else if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationNodeIdPresent))
     {
+        if (mSessionType != Header::SessionType::kUnicastSession)
+        {
+            err = CHIP_ERROR_INTERNAL;
+            SuccessOrExit(err);
+        }
         uint64_t destinationNodeId;
         err = reader.Read64(&destinationNodeId).StatusCode();
         SuccessOrExit(err);
@@ -185,6 +203,11 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     }
     else if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationGroupIdPresent))
     {
+        if (mSessionType != Header::SessionType::kGroupSession)
+        {
+            err = CHIP_ERROR_INTERNAL;
+            SuccessOrExit(err);
+        }
         uint16_t destinationGroupId;
         err = reader.Read16(&destinationGroupId).StatusCode();
         SuccessOrExit(err);
@@ -278,17 +301,18 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
 {
     VerifyOrReturnError(size >= EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!(mDestinationNodeId.HasValue() && mDestinationGroupId.HasValue()), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(encode_size != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsSessionTypeValid(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(!(IsGroupSession() && !mDestinationGroupId.HasValue()), CHIP_ERROR_INTERNAL);
 
     Header::MsgFlags messageFlags = mMsgFlags;
     messageFlags.Set(Header::MsgFlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
         .Set(Header::MsgFlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue())
         .Set(Header::MsgFlagValues::kDestinationGroupIdPresent, mDestinationGroupId.HasValue());
 
-    Header::SecFlags securityFlags = mSecFlags;
-    securityFlags.Set(Header::SecFlagValues::kSessiontTypeGroup, mDestinationGroupId.HasValue());
-
     uint8_t msgFlags = (kMsgHeaderVersion << kVersionShift) | (messageFlags.Raw() & kMsgFlagsMask);
-    uint8_t secFlags = securityFlags.Raw();
+    uint8_t secFlags = mSecFlags.Raw();
+    secFlags |= static_cast<uint8_t>(mSessionType);
 
     uint8_t * p = data;
     Write8(p, msgFlags);

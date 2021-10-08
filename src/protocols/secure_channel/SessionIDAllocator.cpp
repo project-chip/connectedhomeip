@@ -35,6 +35,7 @@ CHIP_ERROR SessionIDAllocator::Allocate(uint16_t & id)
 
 void SessionIDAllocator::Free(uint16_t id)
 {
+    // As per spec 4.4.1.3 Session ID of 0 is reserved for Unsecure communication
     if (mNextAvailable > 1 && (mNextAvailable - 1) == id)
     {
         mNextAvailable--;

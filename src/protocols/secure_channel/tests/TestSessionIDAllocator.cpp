@@ -32,12 +32,12 @@ void TestSessionIDAllocator_Allocate(nlTestSuite * inSuite, void * inContext)
 
     uint16_t id;
 
-    for (uint16_t i = 0; i < 16; i++)
+    for (uint16_t i = 1; i < 16; i++)
     {
         CHIP_ERROR err = allocator.Allocate(id);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, id == i + 1);
-        NL_TEST_ASSERT(inSuite, allocator.Peek() == i + 2);
+        NL_TEST_ASSERT(inSuite, id == i);
+        NL_TEST_ASSERT(inSuite, allocator.Peek() == i + 1);
     }
 }
 
@@ -49,12 +49,12 @@ void TestSessionIDAllocator_Free(nlTestSuite * inSuite, void * inContext)
 
     uint16_t id;
 
-    for (uint16_t i = 0; i < 16; i++)
+    for (uint16_t i = 1; i < 17; i++)
     {
         CHIP_ERROR err = allocator.Allocate(id);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, id == i + 1);
-        NL_TEST_ASSERT(inSuite, allocator.Peek() == i + 2);
+        NL_TEST_ASSERT(inSuite, id == i);
+        NL_TEST_ASSERT(inSuite, allocator.Peek() == i + 1);
     }
 
     // Free an intermediate ID
@@ -76,12 +76,12 @@ void TestSessionIDAllocator_Reserve(nlTestSuite * inSuite, void * inContext)
 
     uint16_t id;
 
-    for (uint16_t i = 0; i < 16; i++)
+    for (uint16_t i = 1; i < 16; i++)
     {
         CHIP_ERROR err = allocator.Allocate(id);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, id == i + 1);
-        NL_TEST_ASSERT(inSuite, allocator.Peek() == i + 2);
+        NL_TEST_ASSERT(inSuite, id == i);
+        NL_TEST_ASSERT(inSuite, allocator.Peek() == i + 1);
     }
 
     allocator.Reserve(100);

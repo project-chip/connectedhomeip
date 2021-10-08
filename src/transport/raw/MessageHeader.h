@@ -44,7 +44,7 @@ static constexpr size_t kMaxTagLen = 16;
 
 static constexpr size_t kMaxAppMessageLen = 1200;
 
-static constexpr uint16_t kMsgSessionIdUnsecured = 0x0000;
+static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
 
 typedef int PacketHeaderFlags;
 
@@ -75,39 +75,45 @@ enum class ExFlagValues : uint8_t
     kExchangeFlag_VendorIdPresent = 0x10,
 };
 
+// Message flags 8-bit value of the form
+//  |  4 bits | 1 | 1 | 2 bits |
+//  +---------+-------+--------|
+//  | version | - | S | DSIZ
+//                  |   |
+//                  |   +---------------- Destination Id field
+//                  +-------------------- Source node Id present
+
 enum class MsgFlagValues : uint8_t
 {
     /// Header flag specifying that a source node id is included in the header.
     kSourceNodeIdPresent       = 0b00000100,
-    kDestinationNodeIdAbsent   = 0b00000000,
     kDestinationNodeIdPresent  = 0b00000001,
     kDestinationGroupIdPresent = 0b00000010,
     kDSIZReserved              = 0b00000011,
 
 };
 
+// Security flags 8-bit value of the form
+//  | 1 | 1 | 1  | 3 | 2 bits |
+//  +---------+-------+--------|
+//  | P | C | MX | - | SessionType
+//
+// With :
+// P  = Privacy flag
+// C  = Control Msg flag
+// MX = Message Extension
+
 enum class SecFlagValues : uint8_t
 {
-    kPrivacyFlag         = 0b10000000,
-    kControlMsgFlag      = 0b01000000,
-    kMsgExtensionFlag    = 0b00100000,
-    kSessiontTypeUnicast = 0b00000000,
-    kSessiontTypeGroup   = 0b00000001,
-
+    kPrivacyFlag      = 0b10000000,
+    kControlMsgFlag   = 0b01000000,
+    kMsgExtensionFlag = 0b00100000,
 };
 
 using MsgFlags = BitFlags<MsgFlagValues>;
 using SecFlags = BitFlags<SecFlagValues>;
 
 using ExFlags = BitFlags<ExFlagValues>;
-
-// Header is a 16-bit value of the form
-//  |  4 bit  | 4 bit |8 bit Security Flags|
-//  +---------+-------+--------------------|
-//  | version | Flags | P | C | MX |Reserved| Session Type |
-//                      |   |
-//                      |   +----------------Control message (TODO: Implement this)
-//                      +--------------------Privacy enhancements (TODO: Implement this)
 
 } // namespace Header
 
@@ -150,10 +156,25 @@ public:
     const Optional<GroupId> & GetDestinationGroupId() const { return mDestinationGroupId; }
 
     uint16_t GetSessionId() const { return mSessionId; }
+    Header::SessionType GetSessionType() const { return mSessionType; }
 
-    bool HasSessionId() const { return mSessionId != kMsgSessionIdUnsecured; }
+    bool IsGroupSession() const { return mSessionType == Header::SessionType::kGroupSession; }
+    bool IsUnicastSession() const { return mSessionType == Header::SessionType::kUnicastSession; }
 
-    bool IsEncrypted() const { return mSessionId != kMsgSessionIdUnsecured; }
+    bool IsSessionTypeValid() const
+    {
+        switch (mSessionType)
+        {
+        case Header::SessionType::kUnicastSession:
+            return true;
+        case Header::SessionType::kGroupSession:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool IsEncrypted() const { return !((mSessionId == kMsgUnicastSessionIdUnsecured) && IsUnicastSession()); }
 
     uint16_t MICTagLength() const { return (IsEncrypted()) ? chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES : 0; }
 
@@ -244,6 +265,13 @@ public:
     PacketHeader & SetMessageCounter(uint32_t id)
     {
         mMessageCounter = id;
+        return *this;
+    }
+
+    PacketHeader & SetUnsecured()
+    {
+        mSessionId   = kMsgUnicastSessionIdUnsecured;
+        mSessionType = Header::SessionType::kUnicastSession;
         return *this;
     }
 
@@ -342,7 +370,7 @@ private:
     Optional<GroupId> mDestinationGroupId;
 
     /// Session ID
-    uint16_t mSessionId = kMsgSessionIdUnsecured;
+    uint16_t mSessionId = kMsgUnicastSessionIdUnsecured;
 
     Header::SessionType mSessionType = Header::SessionType::kUnicastSession;
 

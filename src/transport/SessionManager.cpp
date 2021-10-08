@@ -326,7 +326,7 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
 
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
-    if (packetHeader.HasSessionId())
+    if (packetHeader.IsEncrypted())
     {
         SecureMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
