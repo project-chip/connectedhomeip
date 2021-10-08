@@ -14,5 +14,4 @@ RUN set -x \
     && git submodule update --init --progress \
     && : # last line
 
-ENV AMEBA_BUILD=${AMEBA_DIR}/ambd_sdk_with_chip_non_NDA/project/realtek_amebaD_va0_example/GCC-RELEASE
-ENV AMEBA_MATTER=/root/chip
+ENV AMEBA_PATH=${AMEBA_DIR}/ambd_sdk_with_chip_non_NDA
