@@ -83,7 +83,7 @@ source "$CHIP_ROOT"/scripts/activate.sh
 BUILD_DIRECTORY=build-"$TARGET_BOARD"/"$PROFILE"/
 
 if [[ "$COMMAND" == *"build"* ]]; then
-    echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
+    echo "Build unit tests app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 
     # Config directory setup
     MBED_CONFIG_PATH=./config/"$TARGET_BOARD"/"$PROFILE"/"$TOOLCHAIN"/
@@ -111,7 +111,7 @@ fi
 
 if [[ "$COMMAND" == *"flash"* ]]; then
 
-    echo "Flash Unit Tests app to $TARGET_BOARD target [$TOOLCHAIN toolchain, $PROFILE profile]"
+    echo "Flash unit tests app to $TARGET_BOARD target [$TOOLCHAIN toolchain, $PROFILE profile]"
 
     # Flash scripts path setup
     MBED_FLASH_SCRIPTS_PATH=$CHIP_ROOT/config/mbed/scripts
