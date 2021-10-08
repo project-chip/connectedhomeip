@@ -55,19 +55,16 @@ class AmebaBuilder(Builder):
         self.app = app
 
     def generate(self):
-        cmd = '$AMEBA_BUILD/build.sh ninja %s' % (self.identifier)
+        cmd = '''
+        export AMEBA_BUILD="$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE"
+        export AMEBA_MATTER="%s"
+        $AMEBA_BUILD/build.sh ninja %s''' % (self.root, self.output_dir)
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
     def _build(self):
         self._Execute(['ninja', '-C', self.output_dir],
                       title='Building ' + self.identifier)
-        cmd = '''
-            cp $AMEBA_BUILD/project_lp/asdk/image/km0_boot_all.bin %s/out/%s/asdk/image/km0_boot_all.bin
-            cp $AMEBA_BUILD/project_hp/asdk/image/km4_boot_all.bin %s/out/%s/asdk/image/km4_boot_all.bin
-            ''' % (self.root, self.identifier, self.root, self.identifier)
-        self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
-
     def build_outputs(self):
         return {
             self.app.AppNamePrefix + '.axf':

@@ -21,29 +21,23 @@ The CHIP demo application is supported on
 
 ## Building the Example Application
 
-Building the example application requires
-[Ameba SDK](https://github.com/pankore/ambd_sdk_with_chip_non_NDA). Make sure
-the Ameba SDK and CHIP SDK are saved under the same directory.
+-   Pull docker image:
 
--   To download Ameba SDK
+          $ docker pull pankore/chip-build-ameba:latest
+          
+-   Run docker container:
 
-          $ mkdir ${path-to-connectedhomeip}/../
-          $ cd ${path-to-connectedhomeip}/../
-          $ git clone https://github.com/pankore/ambd_sdk_with_chip_non_NDA.git
+          $ docker run -it -v ${CHIP_DIR}:/root/chip pankore/chip-build-ameba:latest
 
--   To setup building environment
+-   Setup build environment:
 
-          $ cd ${path-to-connectedhomeip}
           $ source ./scripts/bootstrap.sh
-          $ source ./scripts/activate.sh
 
--   To build the demo application
+-   To build the demo application:
 
-          $ cd ${path-to-connectedhomeip}/examples/all-clusters-app/Ameba
-          $ ./build.sh
+          $ ./scripts/build/build_examples.py --target ameba-amebad-all-clusters build
 
-    The output image files are stored in `project_lp/asdk/image` and
-    `project_hp/asdk/image` folders under Ameba SDK.
+    The output image files are stored in `out/ameba-amebad-all-clusters/asdk/image` folder.
 
 -   After building the application, **Ameba Image Tool** is used to flash it to
     Ameba board.
