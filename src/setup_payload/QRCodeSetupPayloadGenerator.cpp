@@ -71,7 +71,7 @@ static CHIP_ERROR populateTLVBits(uint8_t * bits, size_t & offset, const uint8_t
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR writeTag(TLV::TLVWriter & writer, uint64_t tag, OptionalQRCodeInfo & info)
+CHIP_ERROR writeTag(TLV::TLVWriter & writer, TLV::Tag tag, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -91,7 +91,7 @@ CHIP_ERROR writeTag(TLV::TLVWriter & writer, uint64_t tag, OptionalQRCodeInfo & 
     return err;
 }
 
-CHIP_ERROR writeTag(TLV::TLVWriter & writer, uint64_t tag, OptionalQRCodeInfoExtension & info)
+CHIP_ERROR writeTag(TLV::TLVWriter & writer, TLV::Tag tag, OptionalQRCodeInfoExtension & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
