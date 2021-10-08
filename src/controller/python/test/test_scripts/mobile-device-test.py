@@ -83,6 +83,13 @@ def main():
                                    nodeid=1),
               "Failed to finish key exchange")
 
+    logger.info("Testing closing sessions")
+    FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
+
+    logger.info("Testing resolve")
+    FailIfNot(test.TestResolve(nodeid=1),
+              "Failed to resolve nodeid")
+
     logger.info("Testing network commissioning")
     FailIfNot(test.TestNetworkCommissioning(nodeid=1,
                                             endpoint=ENDPOINT_ID,
@@ -123,12 +130,6 @@ def main():
     FailIfNot(test.TestSubscription(nodeid=1, endpoint=LIGHTING_ENDPOINT_ID),
               "Failed to subscribe attributes.")
 
-    logger.info("Testing closing sessions")
-    FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
-
-    logger.info("Testing resolve")
-    FailIfNot(test.TestResolve(nodeid=1),
-              "Failed to resolve nodeid")
 
     logger.info("Testing on off cluster over resolved connection")
     FailIfNot(test.TestOnOffCluster(nodeid=1,
