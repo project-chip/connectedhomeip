@@ -221,10 +221,23 @@ void Command::Abort()
 
 void Command::Close()
 {
+    //
+    // Shortly after this call to close and when handling an inbound message, it's entirely possible
+    // for this object (courtesy of its derived class) to be destroyed
+    // *before* the call unwinds all the way back to ExchangeContext::HandleMessage.
+    //
+    // As part of tearing down the exchange, there is logic there to invoke the delegate to notify
+    // it of impending closure - which is this object, which just got destroyed!
+    //
+    // So prevent a use-after-free, set delegate to null.
+    //
+    // For more details, see #10344.
+    //
     if (mpExchangeCtx != nullptr)
     {
         mpExchangeCtx->SetDelegate(nullptr);
     }
+
     mpExchangeCtx = nullptr;
 }
 
