@@ -237,7 +237,7 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
 
     if (mExchangeMgr != nullptr)
     {
-       mExchangeMgr->Shutdown();
+        mExchangeMgr->Shutdown();
     }
     if (mSessionMgr != nullptr)
     {
