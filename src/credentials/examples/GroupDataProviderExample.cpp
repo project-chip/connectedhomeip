@@ -376,7 +376,7 @@ public:
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
         Fabric * fabric = GetExistingFabric(fabric_index);
-        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Search for existing mapping
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
@@ -398,7 +398,7 @@ public:
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
         Fabric * fabric = GetExistingFabric(fabric_index);
-        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Remove all mappings from fabric
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
@@ -538,7 +538,7 @@ public:
         Fabric * fabric   = GetExistingFabricOrAllocateNew(fabric_index);
         KeysEntry * entry = nullptr;
 
-        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Search for existing, or unused entry
         for (uint16_t i = 0; fabric && i < kKeyEntriesMax; ++i)
@@ -574,7 +574,7 @@ public:
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
         Fabric * fabric = GetExistingFabric(fabric_index);
-        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Search for existing keys
         for (uint16_t i = 0; fabric && i < kKeyEntriesMax; ++i)
@@ -596,7 +596,7 @@ public:
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
         Fabric * fabric = GetExistingFabric(fabric_index);
-        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Search for existing keys
         for (uint16_t i = 0; fabric && i < kKeyEntriesMax; ++i)
@@ -623,7 +623,7 @@ public:
     CHIP_ERROR RemoveFabric(chip::FabricIndex fabric_index) override
     {
         Fabric * fabric = GetExistingFabric(fabric_index);
-        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
         // Remove group states
         for (size_t i = 0; i < kMaxNumGroupStates; ++i)
         {
@@ -632,7 +632,9 @@ public:
                 RemoveGroupState(i);
             }
         }
-        // Release fabric entry
+        // Release other resources associated with the fabric entry, such as mapped
+        // endpoints (i.e. through the Groups cluster) and group key sets, both of which
+        // live in the `Fabric` data structure of this implementation.
         fabric->Clear();
         return CHIP_NO_ERROR;
     }
