@@ -30,15 +30,12 @@
 #include <stdio.h>
 
 #include <app/AppBuildConfig.h>
-#include <app/data-model/Decode.h>
-#include <app/data-model/Encode.h>
 
 using namespace chip;
 using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-
 CHIP_ERROR CommandPath::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

@@ -61,13 +61,11 @@ Messaging::ExchangeManager * gExchangeManager;
 secure_channel::MessageCounterManager gMessageCounterManager;
 FabricIndex gFabricIndex = 0;
 bool isCommandDispatched = false;
-} // namespace
 
 using TestContext = chip::Test::MessagingContext;
 TestContext sContext;
 bool sendResponse = true;
 
-namespace {
 constexpr EndpointId kTestEndpointId                      = 1;
 constexpr ClusterId kTestClusterId                        = 3;
 constexpr CommandId kTestCommandId                        = 4;

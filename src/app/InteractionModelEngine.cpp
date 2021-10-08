@@ -192,14 +192,11 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
                                                           System::PacketBufferHandle && aPayload)
 {
     CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(mpExchangeMgr, this);
-    if (commandHandler)
+    if (commandHandler == nullptr)
     {
-        return commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        return CHIP_ERROR_NO_MEMORY;
     }
-    else
-    {
-        return CHIP_NO_ERROR;
-    }
+    return commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
 }
 
 CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,

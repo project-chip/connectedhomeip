@@ -83,7 +83,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy and free the object.
          *
-         * @param[in] apCommandSender: The command sender object that initialized the command transaction.
+         * @param[in] apCommandSender: The command sender object that initialize the command transaction.
          * @param[in] aInteractionModelStatus: Contains an IM status code. This SHALL never be IM::Success, and will contain a valid
          * server-side emitted error if aProtocolError == CHIP_ERROR_IM_STATUS_CODE_RECEIVED.
          * @param[in] aError: A system error code that conveys the overall error code.
@@ -124,7 +124,7 @@ public:
     // whether it was successful or not, the OnDone callback will be invoked to indicate completion of work on this
     // object and to indicate to the application that it can destory and free this object.
     //
-    // Applications can however, destroy this object at any time after this call, except while handling
+    // Applications can, however, destroy this object at any time after this call, except while handling
     // an OnResponse or OnError callback, and it will safely clean-up.
     //
     // If this call returns failure, the callback's OnDone will never be called; the client is responsible

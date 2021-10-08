@@ -60,8 +60,6 @@ using namespace chip::Inet;
 using namespace chip::System;
 using namespace chip::Callback;
 
-using namespace chip::app;
-
 namespace chip {
 namespace Controller {
 CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
