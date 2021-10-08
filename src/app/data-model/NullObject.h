@@ -18,31 +18,25 @@
 
 #pragma once
 
-#include <memory>
-
-#include <app/CommandSender.h>
-#include <lib/support/CHIPMem.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
+#include <lib/core/CHIPTLV.h>
 
 namespace chip {
-namespace Controller {
+namespace app {
+namespace DataModel {
 
-template <typename T>
-class PlatformDeleter
+//
+// This type exists purely as a means to
+// achieve normalization and consistency in templated APIs
+// where it is possible to accept a valid, data model type as
+// well as not have one either. In the latter case, this type
+// can be used to convey 'no type'.
+//
+struct NullObjectType
 {
-public:
-    void operator()(T * object) const
-    {
-        if (object)
-        {
-            chip::Platform::Delete(object);
-        }
-    }
 };
 
-template <typename T>
-using PlatformAllocatedObjectHandle = std::unique_ptr<T, PlatformDeleter<T>>;
-
-using CommandSenderHandle = PlatformAllocatedObjectHandle<app::CommandSender>;
-
-} // namespace Controller
+} // namespace DataModel
+} // namespace app
 } // namespace chip

@@ -90,7 +90,7 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        ReturnErrorOnFailure(PrepareResponse(aRequestCommandPath, CommandData::CommandId));
+        ReturnErrorOnFailure(PrepareResponse(aRequestCommandPath, CommandData::GetCommandId()));
         TLV::TLVWriter * writer = GetCommandDataElementTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataElement::kCsTag_Data), aData));
