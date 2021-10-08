@@ -63,7 +63,8 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
-    if (current_os != "zephyr" && current_os != "mbed" && chip_device_platform != "efr32") {
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "efr32") {
       deps += [
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
