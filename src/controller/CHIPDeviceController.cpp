@@ -1836,8 +1836,8 @@ CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
     case CommissioningStage::kDeviceAttestation:
         return CommissioningStage::kCheckCertificates;
     case CommissioningStage::kCheckCertificates:
-        return CommissioningStage::kNetworkEnable; // TODO : for softAP, this needs to be network setup
-    case CommissioningStage::kNetworkEnable:
+        // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
+        // operational network because the provisioning of certificates will trigger the device to start operational advertising.
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
         return CommissioningStage::kFindOperational; // TODO : once case is working, need to add stages to find and reconnect
                                                      // here.
@@ -1852,6 +1852,7 @@ CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
     // Currently unimplemented.
     case CommissioningStage::kConfigACL:
     case CommissioningStage::kNetworkSetup:
+    case CommissioningStage::kNetworkEnable:
     case CommissioningStage::kScanNetworks:
         return CommissioningStage::kError;
     // Neither of these have a next stage so return kError;
@@ -1980,18 +1981,8 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         break;
     case CommissioningStage::kNetworkEnable: {
         ChipLogProgress(Controller, "Enabling Network");
-        // TODO: For ethernet, we actually need a scan stage to get the ethernet netif name. Right now, default to using a magic
-        // value to enable without checks.
-        NetworkCommissioningCluster netCom;
-        // TODO: should get the endpoint information from the descriptor cluster.
-        netCom.Associate(device, 0);
-        // TODO: Once network credential sending is implemented, attempting to set wifi credential on an ethernet only device
-        // will cause an error to be sent back. At that point, we should scan and we shoud see the proper ethernet network ID
-        // returned in the scan results. For now, we use magic.
-        char magicNetworkEnableCode[] = "ETH0";
-        netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(),
-                             ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
-                             breadcrumb, kCommandTimeoutMs);
+        // For on-network, this is a NO-OP becuase we now start operational advertising once credentials are provisioned.
+        // This is a placeholder for thread and wifi networks once that is implemented.
     }
     break;
     case CommissioningStage::kFindOperational: {

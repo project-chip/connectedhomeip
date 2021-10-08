@@ -3534,13 +3534,13 @@ namespace Attributes {
 
 namespace PHYRate {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * pHYRate)
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * PHYRate)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) pHYRate, sizeof(*pHYRate));
+    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) PHYRate, sizeof(*PHYRate));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t pHYRate)
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t PHYRate)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) &pHYRate,
+    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) &PHYRate,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 

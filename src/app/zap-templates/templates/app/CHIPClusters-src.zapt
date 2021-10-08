@@ -12,6 +12,7 @@
 #include <app/CommandSender.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <controller/CommandSenderAllocator.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -62,7 +63,13 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
     // {{asLowerCamelCase label}}: {{asLowerCamelCase type}}
+{{#if (isCharString type)}}
+    {{! The server expects to get a UTF-8 string, but we have ByteSpan.  Do
+        some conversion to get the right thing to happen. }}
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char({{asLowerCamelCase label}}.data()), {{asLowerCamelCase label}}.size())));
+{{else}}
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
+{{/if}}
 {{else}}
     // Command takes no arguments.
 {{/chip_cluster_command_arguments}}

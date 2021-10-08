@@ -103,6 +103,25 @@ enum class CommissioningFlow : uint8_t
     kCustom,             ///< Commissioning steps should be retrieved from the distributed compliance ledger
 };
 
+/**
+ * A parent struct to hold onboarding payload contents without optional info,
+ * for compatibility with devices that don't support std::string or STL.
+ */
+struct PayloadContents
+{
+    uint8_t version                                  = 0;
+    uint16_t vendorID                                = 0;
+    uint16_t productID                               = 0;
+    CommissioningFlow commissioningFlow              = CommissioningFlow::kStandard;
+    RendezvousInformationFlags rendezvousInformation = RendezvousInformationFlag::kNone;
+    uint16_t discriminator                           = 0;
+    uint32_t setUpPINCode                            = 0;
+
+    bool isValidQRCodePayload() const;
+    bool isValidManualCode() const;
+    bool operator==(PayloadContents & input) const;
+};
+
 enum optionalQRCodeInfoType
 {
     optionalQRCodeInfoTypeUnknown,
@@ -146,21 +165,13 @@ struct OptionalQRCodeInfoExtension : OptionalQRCodeInfo
 bool IsCHIPTag(uint8_t tag);
 bool IsVendorTag(uint8_t tag);
 
-class SetupPayload
+class SetupPayload : public PayloadContents
 {
 
     friend class QRCodeSetupPayloadGenerator;
     friend class QRCodeSetupPayloadParser;
 
 public:
-    uint8_t version                                  = 0;
-    uint16_t vendorID                                = 0;
-    uint16_t productID                               = 0;
-    CommissioningFlow commissioningFlow              = CommissioningFlow::kStandard;
-    RendezvousInformationFlags rendezvousInformation = RendezvousInformationFlag::kNone;
-    uint16_t discriminator                           = 0;
-    uint32_t setUpPINCode                            = 0;
-
     /** @brief A function to add an optional vendor data
      * @param tag 7 bit [0-127] tag number
      * @param data String representation of data to add
@@ -209,8 +220,6 @@ public:
      **/
     CHIP_ERROR removeSerialNumber();
 
-    bool isValidQRCodePayload();
-    bool isValidManualCode();
     bool operator==(SetupPayload & input);
 
 private:

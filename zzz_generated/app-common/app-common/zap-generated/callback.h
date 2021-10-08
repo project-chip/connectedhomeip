@@ -16102,7 +16102,7 @@ bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
  */
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
                                             const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                            uint8_t * PIN,
+                                            chip::ByteSpan PIN,
                                             chip::app::Clusters::DoorLock::Commands::LockDoor::DecodableType & fields);
 /**
  * @brief Door Lock Cluster LockDoorResponse Command callback (from server)
@@ -16114,7 +16114,7 @@ bool emberAfDoorLockClusterLockDoorResponseCallback(chip::EndpointId endpoint, c
  */
 bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::CommandHandler * commandObj,
                                               const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                              uint8_t * PIN,
+                                              chip::ByteSpan PIN,
                                               chip::app::Clusters::DoorLock::Commands::UnlockDoor::DecodableType & fields);
 /**
  * @brief Door Lock Cluster UnlockDoorResponse Command callback (from server)
@@ -16136,7 +16136,8 @@ bool emberAfDoorLockClusterToggleResponseCallback(chip::EndpointId endpoint, chi
  */
 bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t timeoutInSeconds, uint8_t * pin, chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & fields);
+    uint16_t timeoutInSeconds, chip::ByteSpan pin,
+    chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & fields);
 /**
  * @brief Door Lock Cluster UnlockWithTimeoutResponse Command callback (from server)
  */
@@ -16154,13 +16155,13 @@ bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::CommandHandler * comm
  */
 bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                         uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
-                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin);
+                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin);
 /**
  * @brief Door Lock Cluster SetPin Command callback (from client)
  */
 bool emberAfDoorLockClusterSetPinCallback(chip::app::CommandHandler * commandObj,
                                           const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                          uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin,
+                                          uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin,
                                           chip::app::Clusters::DoorLock::Commands::SetPin::DecodableType & fields);
 /**
  * @brief Door Lock Cluster SetPinResponse Command callback (from server)
@@ -16176,7 +16177,7 @@ bool emberAfDoorLockClusterGetPinCallback(chip::app::CommandHandler * commandObj
  * @brief Door Lock Cluster GetPinResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetPinResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint16_t userId,
-                                                  uint8_t userStatus, uint8_t userType, uint8_t * pin);
+                                                  uint8_t userStatus, uint8_t userType, chip::ByteSpan pin);
 /**
  * @brief Door Lock Cluster ClearPin Command callback (from client)
  */
@@ -16359,7 +16360,7 @@ bool emberAfDoorLockClusterGetUserTypeResponseCallback(chip::EndpointId endpoint
  */
 bool emberAfDoorLockClusterSetRfidCallback(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                           uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * id,
+                                           uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan id,
                                            chip::app::Clusters::DoorLock::Commands::SetRfid::DecodableType & fields);
 /**
  * @brief Door Lock Cluster SetRfidResponse Command callback (from server)
@@ -16377,7 +16378,7 @@ bool emberAfDoorLockClusterGetRfidCallback(chip::app::CommandHandler * commandOb
  * @brief Door Lock Cluster GetRfidResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetRfidResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                   uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid);
+                                                   uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid);
 /**
  * @brief Door Lock Cluster ClearRfid Command callback (from client)
  */
@@ -16405,15 +16406,15 @@ bool emberAfDoorLockClusterClearAllRfidsResponseCallback(chip::EndpointId endpoi
  * @brief Door Lock Cluster OperationEventNotification Command callback (from server)
  */
 bool emberAfDoorLockClusterOperationEventNotificationCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t source, uint8_t eventCode, uint16_t userId, uint8_t * pin,
-                                                              uint32_t timeStamp, uint8_t * data);
+                                                              uint8_t source, uint8_t eventCode, uint16_t userId,
+                                                              chip::ByteSpan pin, uint32_t timeStamp, uint8_t * data);
 /**
  * @brief Door Lock Cluster ProgrammingEventNotification Command callback (from server)
  */
 bool emberAfDoorLockClusterProgrammingEventNotificationCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                uint8_t source, uint8_t eventCode, uint16_t userId, uint8_t * pin,
-                                                                uint8_t userType, uint8_t userStatus, uint32_t timeStamp,
-                                                                uint8_t * data);
+                                                                uint8_t source, uint8_t eventCode, uint16_t userId,
+                                                                chip::ByteSpan pin, uint8_t userType, uint8_t userStatus,
+                                                                uint32_t timeStamp, uint8_t * data);
 /**
  * @brief Window Covering Cluster UpOrOpen Command callback (from client)
  */

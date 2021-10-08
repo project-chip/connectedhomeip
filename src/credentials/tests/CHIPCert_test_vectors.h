@@ -170,6 +170,9 @@ extern const uint8_t sTestCert_Node01_01_SubjectKeyId_Len;
 extern const uint8_t sTestCert_Node01_01_AuthorityKeyId[];
 extern const uint8_t sTestCert_Node01_01_AuthorityKeyId_Len;
 
+extern const uint8_t sTestCert_Node01_01_Err01_Chip[];
+extern const uint32_t sTestCert_Node01_01_Err01_Chip_Len;
+
 extern const uint8_t sTestCert_Node01_02_Chip[];
 extern const uint32_t sTestCert_Node01_02_Chip_Len;
 extern const uint8_t sTestCert_Node01_02_DER[];

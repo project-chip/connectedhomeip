@@ -27,6 +27,7 @@
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/basic-types.h>
 #include <controller/CommandSenderAllocator.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -174,10 +175,11 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
     // softwareVersion: int32u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), softwareVersion));
-    // protocolsSupported: oTADownloadProtocol
+    // protocolsSupported: OTADownloadProtocol
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
     // location: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(location.data()), location.size())));
     // requestorCanConsent: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
     // metadataForProvider: octetString
