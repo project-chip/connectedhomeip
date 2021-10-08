@@ -46,10 +46,26 @@ static CHIP_ERROR ResetUDC(bool printHeader)
 
     if (printHeader)
     {
-        streamer_printf(sout, "resetudc:        ");
+        streamer_printf(sout, "udc-reset:        ");
     }
 
     gCommissioner->GetUserDirectedCommissioningServer()->ResetUDCClientProcessingStates();
+
+    streamer_printf(sout, "done\r\n");
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR PrintUDC(bool printHeader)
+{
+    streamer_t * sout = streamer_get();
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "udc-print:        \r\n");
+    }
+
+    gCommissioner->GetUserDirectedCommissioningServer()->PrintUDCClients();
 
     streamer_printf(sout, "done\r\n");
 
@@ -132,13 +148,12 @@ class PairingCommand : public chip::Controller::DevicePairingDelegate, public ch
     CHIP_ERROR UpdateNetworkAddress();
 };
 
-NodeId gRemoteId   = kTestDeviceNodeId;
-uint64_t gFabricId = 0;
+NodeId gRemoteId = kTestDeviceNodeId;
 PairingCommand gPairingCommand;
 
 CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
-    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", gRemoteId, gFabricId);
+    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " ...", gRemoteId);
     return gCommissioner->UpdateDevice(gRemoteId);
 }
 
@@ -197,8 +212,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     }
 }
 
-static CHIP_ERROR pairOnNetwork(bool printHeader, uint64_t fabric, uint32_t pincode, uint16_t disc,
-                                chip::Transport::PeerAddress address)
+static CHIP_ERROR pairOnNetwork(bool printHeader, uint32_t pincode, uint16_t disc, chip::Transport::PeerAddress address)
 {
     streamer_t * sout = streamer_get();
 
@@ -217,6 +231,40 @@ static CHIP_ERROR pairOnNetwork(bool printHeader, uint64_t fabric, uint32_t pinc
 
     return CHIP_NO_ERROR;
 }
+
+static CHIP_ERROR pairUDC(bool printHeader, uint32_t pincode, size_t index)
+{
+    streamer_t * sout = streamer_get();
+
+    if (printHeader)
+    {
+        streamer_printf(sout, "udc-commission %ld %ld\r\n", pincode, index);
+    }
+
+    UDCClientState * state = gCommissioner->GetUserDirectedCommissioningServer()->GetUDCClients().GetUDCClientState(index);
+    if (state == nullptr)
+    {
+        streamer_printf(sout, "udc client[%d] null \r\n", index);
+    }
+    else
+    {
+        Transport::PeerAddress peerAddress = state->GetPeerAddress();
+
+        state->SetUDCClientProcessingState(UDCClientProcessingState::kCommissioningNode);
+
+        RendezvousParameters params = RendezvousParameters()
+                                          .SetSetupPINCode(pincode)
+                                          .SetDiscriminator(state->GetLongDiscriminator())
+                                          .SetPeerAddress(peerAddress);
+
+        gCommissioner->RegisterDeviceAddressUpdateDelegate(&gPairingCommand);
+        gCommissioner->RegisterPairingDelegate(&gPairingCommand);
+        gCommissioner->PairDevice(gRemoteId, params);
+
+        streamer_printf(sout, "done\r\n");
+    }
+    return CHIP_NO_ERROR;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 static CHIP_ERROR PrintAllCommands()
@@ -225,18 +273,22 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout, "  help                       Usage: discover <subcommand>\r\n");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     streamer_printf(
-        sout, "  resetudc                   Clear all pending UDC sessions from this UDC server. Usage: commission resetudc\r\n");
+        sout, "  udc-reset                   Clear all pending UDC sessions from this UDC server. Usage: discover udc-reset\r\n");
+    streamer_printf(
+        sout, "  udc-print                   Print all pending UDC sessions from this UDC server. Usage: discover udc-print\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    streamer_printf(sout, "  commissionable                   Discover all commissionable nodes. Usage: commission discover\r\n");
-    streamer_printf(
-        sout,
-        "  commissionable-instance <name>   Discover all commissionable node with given instance name. Usage: commission "
-        "commissionable-instance DC514873944A5CFF\r\n");
     streamer_printf(sout,
-                    "  display                    Display all discovered commissionable nodes. Usage: commission display\r\n");
+                    "  udc-commission <pincode> <udc-entry>     Commission given udc-entry using given pincode. Usage: discover "
+                    "udc-commission 34567890 0\r\n");
     streamer_printf(sout,
-                    "  onnetwork <fabric> <pincode> <disc> <IP> <port>   Pair given device. Usage: commission onnetwork 2222 "
+                    "  commissionable                   Discover all commissionable nodes. Usage: discover commissionable\r\n");
+    streamer_printf(sout,
+                    "  commissionable-instance <name>   Discover all commissionable node with given instance name. Usage: discover "
+                    "commissionable-instance DC514873944A5CFF\r\n");
+    streamer_printf(sout, "  display                    Display all discovered commissionable nodes. Usage: discover display\r\n");
+    streamer_printf(sout,
+                    "  onnetwork <pincode> <disc> <IP> <port>   Pair given device. Usage: discover onnetwork "
                     "20202021 3840 127.0.0.1 5540\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "\r\n");
@@ -253,9 +305,13 @@ static CHIP_ERROR DiscoverHandler(int argc, char ** argv)
         return PrintAllCommands();
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-    else if (strcmp(argv[0], "resetudc") == 0)
+    else if (strcmp(argv[0], "udc-reset") == 0)
     {
         return error = ResetUDC(true);
+    }
+    else if (strcmp(argv[0], "udc-print") == 0)
+    {
+        return error = PrintUDC(true);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -273,22 +329,33 @@ static CHIP_ERROR DiscoverHandler(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "onnetwork") == 0)
     {
-        // onnetwork fabric pincode disc IP port
-        if (argc < 6)
+        // onnetwork pincode disc IP port
+        if (argc < 5)
         {
             return PrintAllCommands();
         }
         char * eptr;
-        gFabricId        = (uint64_t) strtol(argv[1], &eptr, 10);
-        uint32_t pincode = (uint32_t) strtol(argv[2], &eptr, 10);
-        uint16_t disc    = (uint16_t) strtol(argv[3], &eptr, 10);
+        uint32_t pincode = (uint32_t) strtol(argv[1], &eptr, 10);
+        uint16_t disc    = (uint16_t) strtol(argv[2], &eptr, 10);
 
         chip::Inet::IPAddress address;
-        chip::Inet::IPAddress::FromString(argv[4], address);
+        chip::Inet::IPAddress::FromString(argv[3], address);
 
-        uint16_t port = (uint16_t) strtol(argv[5], &eptr, 10);
+        uint16_t port = (uint16_t) strtol(argv[4], &eptr, 10);
 
-        return error = pairOnNetwork(true, gFabricId, pincode, disc, chip::Transport::PeerAddress::UDP(address, port));
+        return error = pairOnNetwork(true, pincode, disc, chip::Transport::PeerAddress::UDP(address, port));
+    }
+    else if (strcmp(argv[0], "udc-commission") == 0)
+    {
+        // udc-commission pincode index
+        if (argc < 3)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+        uint32_t pincode = (uint32_t) strtol(argv[1], &eptr, 10);
+        size_t index     = (size_t) strtol(argv[2], &eptr, 10);
+        return error     = pairUDC(true, pincode, index);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else

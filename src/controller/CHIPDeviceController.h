@@ -531,7 +531,7 @@ public:
      * @param nodeData DNS-SD node information for the client requesting commissioning
      *
      */
-    void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) override;
+    void OnUserDirectedCommissioningRequest(UDCClientState state) override;
 
     /**
      * @brief

@@ -82,7 +82,7 @@ public:
      * @param nodeData DNS-SD node information for the client requesting commissioning
      *
      */
-    virtual void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) = 0;
+    virtual void OnUserDirectedCommissioningRequest(UDCClientState state) = 0;
 
     virtual ~UserConfirmationProvider() = default;
 };
@@ -184,6 +184,12 @@ public:
      *
      */
     UDCClients<kMaxUDCClients> GetUDCClients() { return mUdcClients; }
+
+    /**
+     * Print the cache of UDC Clients
+     *
+     */
+    void PrintUDCClients();
 
 private:
     InstanceNameResolver * mInstanceNameResolver         = nullptr;

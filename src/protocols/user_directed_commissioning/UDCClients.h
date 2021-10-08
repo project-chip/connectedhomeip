@@ -92,6 +92,30 @@ public:
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
+    UDCClientState * GetUDCClientState(size_t index)
+    {
+        if (index >= kMaxClientCount)
+        {
+            return nullptr;
+        }
+
+        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        UDCClientState state       = mStates[index];
+        if (!state.IsInitialized(currentTime))
+        {
+            return nullptr;
+        }
+        return &mStates[index];
+    }
+
+    /**
+     * Get a UDC Client state given a Peer address.
+     *
+     * @param address is the connection to find (based on address)
+     *
+     * @return the state found, nullptr if not found
+     */
+    CHECK_RETURN_VALUE
     UDCClientState * FindUDCClientState(const PeerAddress & address)
     {
         const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
