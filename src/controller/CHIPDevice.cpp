@@ -371,6 +371,20 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, CommissioningWindowOption
     return OpenCommissioningWindow(timeout, kPBKDFMinimumIterations, option, salt, setupPayload);
 }
 
+void Device::UpdateSession(bool connected)
+{
+    SessionHandle session =
+        SessionHandle(mDeviceId, mCASESession.GetLocalSessionId(), mCASESession.GetPeerSessionId(), mFabricIndex);
+    if (connected)
+    {
+        OnNewConnection(session);
+    }
+    else
+    {
+        OnConnectionExpired(session);
+    }
+}
+
 CHIP_ERROR Device::CloseSession()
 {
     ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);

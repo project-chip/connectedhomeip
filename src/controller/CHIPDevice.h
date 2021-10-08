@@ -333,6 +333,10 @@ public:
     CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
                                    uint32_t & outPasscodeId);
 
+    // TODO: This is a workaround for OperationalDeviceProxy class to call OnNewConnection/OnConnectionExpired. Once
+    // https://github.com/project-chip/connectedhomeip/issues/10423 is complete, this function can be removed.
+    void UpdateSession(bool connected);
+
     /**
      *  In case there exists an open session to the device, mark it as expired.
      */

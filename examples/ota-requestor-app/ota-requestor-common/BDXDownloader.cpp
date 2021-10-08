@@ -79,7 +79,7 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         // TODO: something more elegant than appending to a local file
         // TODO: while convenient, we should not do a synchronous block write in our example application - this is bad practice
         std::ofstream otaFile(outFilePath, std::ifstream::out | std::ifstream::ate | std::ifstream::app);
-        otaFile.write(reinterpret_cast<const char *>(event.blockdata.Data), event.blockdata.Length);
+        otaFile.write(reinterpret_cast<const char *>(event.blockdata.Data), static_cast<std::streamsize>(event.blockdata.Length));
 
         if (event.blockdata.IsEof)
         {
