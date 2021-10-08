@@ -223,6 +223,7 @@ using MutableByteSpan = Span<uint8_t>;
 template <size_t N>
 using FixedByteSpan = FixedSpan<const uint8_t, N>;
 
+using CharSpan        = Span<const char>;
 using MutableCharSpan = Span<char>;
 
 inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
