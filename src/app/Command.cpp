@@ -221,6 +221,10 @@ void Command::Abort()
 
 void Command::Close()
 {
+    if (mpExchangeCtx != nullptr)
+    {
+        mpExchangeCtx->SetDelegate(nullptr);
+    }
     mpExchangeCtx = nullptr;
 }
 
