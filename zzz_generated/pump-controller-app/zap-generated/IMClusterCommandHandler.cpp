@@ -80,7 +80,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             {
                 wasHandled = emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
                     apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.commissioningTimeout,
-                    commandData.pAKEVerifier, commandData.discriminator, commandData.iterations, commandData.salt,
+                    commandData.PAKEVerifier, commandData.discriminator, commandData.iterations, commandData.salt,
                     commandData.passcodeID, commandData);
             }
             break;
@@ -376,8 +376,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.nOCValue, commandData.iCACValue,
-                    commandData.iPKValue, commandData.caseAdminNode, commandData.adminVendorId, commandData);
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.NOCValue, commandData.ICACValue,
+                    commandData.IPKValue, commandData.caseAdminNode, commandData.adminVendorId, commandData);
             }
             break;
         }
@@ -417,7 +417,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.cSRNonce, commandData);
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.CSRNonce, commandData);
             }
             break;
         }
@@ -458,7 +458,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.nOCValue, commandData.iCACValue, commandData);
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.NOCValue, commandData.ICACValue, commandData);
             }
             break;
         }
