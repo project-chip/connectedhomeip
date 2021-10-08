@@ -130,7 +130,6 @@ def main():
     FailIfNot(test.TestSubscription(nodeid=1, endpoint=LIGHTING_ENDPOINT_ID),
               "Failed to subscribe attributes.")
 
-
     logger.info("Testing on off cluster over resolved connection")
     FailIfNot(test.TestOnOffCluster(nodeid=1,
                                     endpoint=LIGHTING_ENDPOINT_ID,
