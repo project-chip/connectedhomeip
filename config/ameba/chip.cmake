@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.6)
 project(chip-gn)
 
 set(chip_dir "${ameba_matter_root}")
-set(chip_dir_output "${chip_dir}/examples/all-clusters-app/ameba/build/chip")
+set(chip_dir_output "${matter_output_path}/chip")
 set(chip_c_flags "")
 set(chip_cpp_flags "")
 set(chip-gn chip-gn)
@@ -92,9 +92,6 @@ set(import_str "import(\"//args.gni\")\n" )
 string(APPEND CHIP_GN_ARGS "${import_str}")
 string(APPEND CHIP_GN_ARGS "target_cflags_c = [${chip_c_flags}]\n")
 string(APPEND CHIP_GN_ARGS "target_cflags_cc = [${chip_cpp_flags}]\n")
-#string(APPEND CHIP_GN_ARGS "ameba_ar = ${CMAKE_AR}\n")
-#string(APPEND CHIP_GN_ARGS "ameba_cc = ${CMAKE_C_COMPILER}\n")
-#string(APPEND CHIP_GN_ARGS "ameba_cxx = ${CMAKE_CXX_COMPILER}\n")
 string(APPEND CHIP_GN_ARGS "ameba_ar = \"arm-none-eabi-ar\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cc = \"arm-none-eabi-gcc\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cxx = \"arm-none-eabi-c++\"\n")
@@ -117,5 +114,3 @@ ExternalProject_Add(
     USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD     TRUE
 )
-
-
