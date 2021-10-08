@@ -145,8 +145,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         ChipLogProgress(DataManagement,
                         "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=%" PRIu32
                         " Status=0x%" PRIx16,
-                        static_cast<uint16_t>(endpointId), ChipLogValueMEI(clusterId), static_cast<uint32_t>(commandId),
-                        static_cast<uint16_t>(generalCode));
+                        endpointId, ChipLogValueMEI(clusterId), commandId, generalCode);
         if (mpDelegate != nullptr)
         {
             mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId,
@@ -160,7 +159,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         SuccessOrExit(err);
         ChipLogProgress(DataManagement,
                         "Received Command Response, Endpoint=%" PRIu16 " Cluster=0x" ChipLogFormatMEI " Command=%" PRIu32,
-                        static_cast<uint16_t>(endpointId), ChipLogValueMEI(clusterId), static_cast<uint32_t>(commandId));
+                        endpointId, ChipLogValueMEI(clusterId), commandId);
         // TODO(#4503): Should call callbacks of cluster that sends the command.
         DispatchSingleClusterResponseCommand(ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader, this);
     }

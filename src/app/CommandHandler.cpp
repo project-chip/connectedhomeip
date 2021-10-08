@@ -104,13 +104,13 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     {
         ChipLogDetail(DataManagement,
                       "Received command without data for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=%" PRIu32,
-                      static_cast<uint16_t>(endpointId), ChipLogValueMEI(clusterId), static_cast<uint32_t>(commandId));
+                      endpointId, ChipLogValueMEI(clusterId), commandId);
         err = CHIP_NO_ERROR;
     }
     if (CHIP_NO_ERROR == err)
     {
         ChipLogDetail(DataManagement, "Received command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=%" PRIu32,
-                      static_cast<uint16_t>(endpointId), ChipLogValueMEI(clusterId), static_cast<uint32_t>(commandId));
+                      endpointId, ChipLogValueMEI(clusterId), commandId);
         DispatchSingleClusterCommand(ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader, this);
     }
 
