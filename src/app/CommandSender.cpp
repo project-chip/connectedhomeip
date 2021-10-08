@@ -145,7 +145,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         ChipLogProgress(DataManagement,
                         "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=%" PRIu32
                         " Status=0x%" PRIx16,
-                        endpointId, ChipLogValueMEI(clusterId), commandId, generalCode);
+                        endpointId, ChipLogValueMEI(clusterId), commandId, static_cast<uint16_t>(generalCode));
         if (mpDelegate != nullptr)
         {
             mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId,
