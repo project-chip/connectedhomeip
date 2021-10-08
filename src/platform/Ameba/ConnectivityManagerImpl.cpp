@@ -690,9 +690,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 
 void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(void)
 {
-    u8 *ip = LwIP_GetIP(&xnetif[0]);
-    u8 *gw = LwIP_GetGW(&xnetif[0]);
-    u8 *msk = LwIP_GetMASK(&xnetif[0]);
+    uint8_t *ip = LwIP_GetIP(&xnetif[0]);
+    uint8_t *gw = LwIP_GetGW(&xnetif[0]);
+    uint8_t *msk = LwIP_GetMASK(&xnetif[0]);
 #if CHIP_PROGRESS_LOGGING
     {
         ChipLogProgress(DeviceLayer, "\n\r\tIP              => %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
@@ -729,8 +729,8 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(void)
 {
 #if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1
 #if LWIP_IPV6
-	u8 *ipv6_0 = LwIP_GetIPv6_linklocal(&xnetif[0]);
-	u8 *ipv6_1 = LwIP_GetIPv6_global(&xnetif[0]);
+	uint8_t *ipv6_0 = LwIP_GetIPv6_linklocal(&xnetif[0]);
+	uint8_t *ipv6_1 = LwIP_GetIPv6_global(&xnetif[0]);
 #endif
 #endif
 #if CHIP_PROGRESS_LOGGING
