@@ -27,7 +27,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnOperationalDevic
 {
 
     // Secure session already established
-    if (mState == State::SecureConnected)
+    if (mDevice.IsSecureConnected())
     {
         onConnection->mCall(onConnection->mContext, this);
         return CHIP_NO_ERROR;
@@ -139,8 +139,10 @@ void OperationalDeviceProxy::OnDeviceConnectedFn(void * context, Controller::Dev
 {
     VerifyOrReturn(context != nullptr, ChipLogError(OperationalDeviceProxy, "%s: invalid context", __FUNCTION__));
     OperationalDeviceProxy * operationalDevice = reinterpret_cast<OperationalDeviceProxy *>(context);
-    // TODO: The state update should be updated when the delegate to ExchangeMgr informs of connection changes
-    operationalDevice->mState = State::SecureConnected;
+
+    VerifyOrReturn(device != nullptr, ChipLogError(OperationalDeviceProxy, "%s: invalid device", __FUNCTION__));
+    device->UpdateSession(true);
+
     operationalDevice->DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, false);
     operationalDevice->DequeueConnectionSuccessCallbacks(true);
 }
@@ -149,6 +151,9 @@ void OperationalDeviceProxy::OnDeviceConnectionFailureFn(void * context, NodeId 
 {
     VerifyOrReturn(context != nullptr, ChipLogError(OperationalDeviceProxy, "%s: invalid context", __FUNCTION__));
     OperationalDeviceProxy * operationalDevice = reinterpret_cast<OperationalDeviceProxy *>(context);
+
+    operationalDevice->GetDevice().UpdateSession(false);
+
     operationalDevice->DequeueConnectionSuccessCallbacks(false);
     operationalDevice->DequeueConnectionFailureCallbacks(error, true);
 }
