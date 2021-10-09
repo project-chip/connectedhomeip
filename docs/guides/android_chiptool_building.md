@@ -81,22 +81,22 @@ This is the simplest option. In the command line, run the following command from
 the top CHIP directory:
 
 ```shell
-./scripts/build/build_examples.py --platform android --board arm64 build
+./scripts/build/build_examples.py --target android-arm64-chip-tool build
 ```
 
 See the table above for other values of `TARGET_CPU`.
 
 The debug Android package `app-debug.apk` will be generated at
-`out/android-$TARGET_CPU-chip_tool/outputs/apk/debug/`, and can be installed
+`out/android-$TARGET_CPU-chip-tool/outputs/apk/debug/`, and can be installed
 with
 
 ```shell
-adb install out/android-$TARGET_CPU-chip_tool/outputs/apk/debug/app-debug.apk
+adb install out/android-$TARGET_CPU-chip-tool/outputs/apk/debug/app-debug.apk
 ```
 
-You can use Android Studio to edit the Android CHIPTool app itself, but you will
-not be able to edit CHIP Android code from `src/controller/java`, or other CHIP
-C++ code within Android Studio.
+You can use Android Studio to edit the Android CHIPTool app itself and run it
+after build_examples.py, but you will not be able to edit CHIP Android code 
+from `src/controller/java`, or other CHIP C++ code within Android Studio.
 
 <a name="building-studio"></a>
 
@@ -113,9 +113,10 @@ allows us to directly edit core CHIP code in-IDE.
 
     See the table above for other values of `TARGET_CPU`.
 
-2. Modify the `matterBuildSrcDir` variable in
-   [src/android/CHIPTool/build.gradle](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/build.gradle)
-   to point to the appropriate output directory (e.g. `out/android_arm64`).
+2. Modify the `matterSdkSourceBuild` variable to true and `matterBuildSrcDir` point 
+to the appropriate output directory (e.g. `../../../../out/android_arm64`) in 
+[src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
+   
 
 3. Open the project in Android Studio and run **Sync Project with Gradle
    Files**.
