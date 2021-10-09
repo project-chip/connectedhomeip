@@ -480,7 +480,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
     {
         uint8_t resumptionId[Params::resumptionIdLen];
 
-        //to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
+        // to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
         (&memset)(resumptionId, 4, Params::resumptionIdLen);
         ReturnErrorOnFailure(
             writer.Put(Params::NumToTag(Params::resumptionIdTag), ByteSpan(resumptionId, Params::resumptionIdLen)));
@@ -489,7 +489,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
     if (Params::initiatorResumeMICLen != 0)
     {
         uint8_t initiatorResumeMIC[Params::initiatorResumeMICLen];
-        //to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
+        // to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
         (&memset)(initiatorResumeMIC, 5, Params::initiatorResumeMICLen);
         ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::initiatorResumeMICTag),
                                         ByteSpan(initiatorResumeMIC, Params::initiatorResumeMICLen)));
