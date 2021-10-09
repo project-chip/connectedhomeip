@@ -1,15 +1,17 @@
-# Building Android CHIPTool
+# Building Android
 
-Android CHIPTool is an application for Android for commissioning and controlling
-CHIP accessory devices.
+There are following Apps on Android
 
-CHIPTool offers the following features:
-
--   Scan a CHIP QR code and display payload information to the user
--   Read the NFC tag containing CHIP onboarding information
--   Commission a CHIP device
--   Send echo requests to the CHIP echo server
--   Send on/off cluster requests to a CHIP device
+- CHIPTool
+    - Android CHIPTool is an application for Android for commissioning and controlling
+CHIP accessory devices. It offers the following features:
+        -   Scan a CHIP QR code and display payload information to the user
+        -   Read the NFC tag containing CHIP onboarding information
+        -   Commission a CHIP device
+        -   Send echo requests to the CHIP echo server
+        -   Send on/off cluster requests to a CHIP device
+- CHIPTest
+    - Android CHIPTest is an application for Android for running CHIP's unit tests
 
 <hr>
 
@@ -26,8 +28,8 @@ CHIPTool offers the following features:
 
 ## Source files
 
-You can find source files of the Android CHIPTool application in the
-`src/android/CHIPTool` directory.
+You can find source files of the Android applications in the
+`src/android/` directory.
 
 <hr>
 
@@ -75,7 +77,10 @@ Complete the following steps to prepare the CHIP build:
 
 <a name="building-scripts"></a>
 
-## Building Android CHIPTool from scripts
+## Building Android CHIPTool 
+
+<a name="chiptool_scripts_build"></a>
+### From scripts
 
 This is the simplest option. In the command line, run the following command from
 the top CHIP directory:
@@ -100,7 +105,7 @@ after build_examples.py, but you will not be able to edit CHIP Android code from
 
 <a name="building-studio"></a>
 
-## Building Android CHIPTool from Android Studio
+### From Android Studio
 
 This option allows Android Studio to build the core CHIP code from source, which
 allows us to directly edit core CHIP code in-IDE.
@@ -143,3 +148,20 @@ or
 ```shell
 (cd src/android/CHIPTool && ./gradlew installDebug)
 ```
+
+## Building Android CHIPTest
+
+### From scripts
+
+The steps are simliar with [CHIPTool scripts build](#chiptool_scripts_build)
+
+```shell
+./scripts/build/build_examples.py --target android-arm64-chip-test build
+```
+
+You can modify the `matterUTestLib` variable to the test lib in
+   [src/android/CHIPTest/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTest/gradle.properties) to change target to test.
+
+### From Android Studio
+
+Not supported yet
