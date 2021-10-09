@@ -81,7 +81,7 @@ This is the simplest option. In the command line, run the following command from
 the top CHIP directory:
 
 ```shell
-./scripts/build/build_examples.py --platform android --board arm64 build
+./scripts/build/build_examples.py --target android-arm64-chip-tool build
 ```
 
 See the table above for other values of `TARGET_CPU`.
