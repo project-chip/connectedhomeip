@@ -137,6 +137,7 @@ ChipImResponder
 ChipLight
 ChipMessageLayer
 CHIPTool
+CHIPTest
 chmod
 chrpath
 cipd
@@ -532,6 +533,8 @@ matterBuildSrcDir
 matterc
 matterd
 MatterLock
+matterSdkSourceBuild
+matterUTestLib
 MaxInterval
 MaxRtrAdvInterval
 mbedTLS
