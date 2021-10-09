@@ -2,16 +2,15 @@
 
 There are following Apps on Android
 
-- CHIPTool
-    - Android CHIPTool is an application for Android for commissioning and controlling
-CHIP accessory devices. It offers the following features:
-        -   Scan a CHIP QR code and display payload information to the user
-        -   Read the NFC tag containing CHIP onboarding information
-        -   Commission a CHIP device
-        -   Send echo requests to the CHIP echo server
-        -   Send on/off cluster requests to a CHIP device
-- CHIPTest
-    - Android CHIPTest is an application for Android for running CHIP's unit tests
+-   CHIPTool - Android CHIPTool is an application for Android for commissioning
+    and controlling CHIP accessory devices. It offers the following features: -
+    Scan a CHIP QR code and display payload information to the user - Read the
+    NFC tag containing CHIP onboarding information - Commission a CHIP device -
+    Send echo requests to the CHIP echo server - Send on/off cluster requests to
+    a CHIP device
+-   CHIPTest
+    -   Android CHIPTest is an application for Android for running CHIP's unit
+        tests
 
 <hr>
 
@@ -28,8 +27,8 @@ CHIP accessory devices. It offers the following features:
 
 ## Source files
 
-You can find source files of the Android applications in the
-`src/android/` directory.
+You can find source files of the Android applications in the `src/android/`
+directory.
 
 <hr>
 
@@ -77,9 +76,10 @@ Complete the following steps to prepare the CHIP build:
 
 <a name="building-scripts"></a>
 
-## Building Android CHIPTool 
+## Building Android CHIPTool
 
 <a name="chiptool_scripts_build"></a>
+
 ### From scripts
 
 This is the simplest option. In the command line, run the following command from
@@ -153,14 +153,15 @@ or
 
 ### From scripts
 
-The steps are simliar with [CHIPTool scripts build](#chiptool_scripts_build)
+The steps are similar with [CHIPTool scripts build](#chiptool_scripts_build)
 
 ```shell
 ./scripts/build/build_examples.py --target android-arm64-chip-test build
 ```
 
 You can modify the `matterUTestLib` variable to the test lib in
-   [src/android/CHIPTest/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTest/gradle.properties) to change target to test.
+[src/android/CHIPTest/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTest/gradle.properties)
+to change target to test.
 
 ### From Android Studio
 
