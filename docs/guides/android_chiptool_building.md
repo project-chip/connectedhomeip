@@ -95,8 +95,8 @@ adb install out/android-$TARGET_CPU-chip-tool/outputs/apk/debug/app-debug.apk
 ```
 
 You can use Android Studio to edit the Android CHIPTool app itself and run it
-after build_examples.py, but you will not be able to edit CHIP Android code 
-from `src/controller/java`, or other CHIP C++ code within Android Studio.
+after build_examples.py, but you will not be able to edit CHIP Android code from
+`src/controller/java`, or other CHIP C++ code within Android Studio.
 
 <a name="building-studio"></a>
 
@@ -113,15 +113,15 @@ allows us to directly edit core CHIP code in-IDE.
 
     See the table above for other values of `TARGET_CPU`.
 
-2. Modify the `matterSdkSourceBuild` variable to true and `matterBuildSrcDir` point 
-to the appropriate output directory (e.g. `../../../../out/android_arm64`) in 
-[src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
-   
+2. Modify the `matterSdkSourceBuild` variable to true and `matterBuildSrcDir`
+   point to the appropriate output directory (e.g.
+   `../../../../out/android_arm64`) in
+   [src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
 
-3. Open the project in Android Studio and run **Sync Project with Gradle
+3) Open the project in Android Studio and run **Sync Project with Gradle
    Files**.
 
-4. Use one of the following options to build an Android package:
+4) Use one of the following options to build an Android package:
 
     - Click **Make Project** in Android Studio.
     - Run the following command in the command line:
