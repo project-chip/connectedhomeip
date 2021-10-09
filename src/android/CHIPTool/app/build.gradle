@@ -47,7 +47,7 @@ android {
         }
     }
 
-    if (matterSdkSourceBuild && !matterBuildSrcDir.isEmpty()) {
+    if (matterSdkSourceBuild.toBoolean() && !matterBuildSrcDir.isEmpty()) {
         externalNativeBuild {
             cmake {
                 path file(matterBuildSrcDir + '/CMakeLists.txt')
@@ -69,7 +69,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-    if (matterSdkSourceBuild && !matterBuildSrcDir.isEmpty()) {
+    if (matterSdkSourceBuild.toBoolean() && !matterBuildSrcDir.isEmpty()) {
         implementation project(':chip-library')
     } else {
         // local in-source-tree copy of the dependencies. Useful for IDE compilation

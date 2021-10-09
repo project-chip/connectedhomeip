@@ -154,13 +154,14 @@ class AndroidBuilder(Builder):
     def _build(self):
         if self.board.IsIde():
             # App compilation IDE
+            # TODO: Android Gradle with module and -PbuildDir= will caused issue, remove -PbuildDir=
             self._Execute([
                 '%s/src/android/%s/gradlew' % (self.root,
                                                self.app.AppName()), '-p',
                 '%s/src/android/%s' % (self.root, self.app.AppName()),
                 '-PmatterBuildSrcDir=%s' % self.output_dir,
                 '-PmatterSdkSourceBuild=true',
-                '-PbuildDir=%s' % self.output_dir, 'assembleDebug'
+                'assembleDebug'
             ],
                 title='Building APP ' + self.identifier)
         else:
