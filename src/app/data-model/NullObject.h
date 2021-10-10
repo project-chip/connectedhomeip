@@ -20,7 +20,6 @@
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
-#include <lib/core/CHIPTLV.h>
 
 namespace chip {
 namespace app {
@@ -29,7 +28,7 @@ namespace DataModel {
 //
 // This type exists purely as a means to
 // achieve normalization and consistency in templated APIs
-// where it is possible to accept a valid, data model type as
+// where it is possible to accept a valid data model type as
 // well as not have one either. In the latter case, this type
 // can be used to convey 'no type'.
 //

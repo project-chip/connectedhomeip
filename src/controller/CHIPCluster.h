@@ -29,13 +29,14 @@
 #include "app/ConcreteCommandPath.h"
 #include <app/util/error-mapping.h>
 #include <controller/CHIPDevice.h>
+#include <controller/InvokeInteraction.h>
 
 namespace chip {
 namespace Controller {
 
 template <typename T>
-using CommandResponseSuccessCallback = void(void * context, T & responseObject);
-using CommandResponseFailureCallback = void(void * context, uint8_t status);
+using CommandResponseSuccessCallback = void(void * context, const T & responseObject);
+using CommandResponseFailureCallback = void(void * context, EmberAfStatus status);
 
 class DLL_EXPORT ClusterBase
 {
@@ -55,7 +56,7 @@ public:
      * failure.
      */
     template <typename RequestDataT, typename ResponseDataT>
-    CHIP_ERROR InvokeCommand(RequestDataT & requestData, void * context, CommandResponseSuccessCallback<ResponseDataT> successCb,
+    CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context, CommandResponseSuccessCallback<ResponseDataT> successCb,
                              CommandResponseFailureCallback failureCb)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -69,7 +70,7 @@ public:
             failureCb(context, app::ToEmberAfStatus(aIMStatus));
         };
 
-        return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
+        return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
                                     onSuccessCb, onFailureCb);
     }
 

@@ -124,12 +124,12 @@ public:
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
-     * @param [in] aData the data for the response.
+     * @param [in] aData the data for the request.
      */
     template <typename CommandDataT>
-    CHIP_ERROR AddRequestData(const CommandPathParams & commandPath, const CommandDataT & aData)
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
     {
-        ReturnErrorOnFailure(PrepareCommand(commandPath));
+        ReturnErrorOnFailure(PrepareCommand(aCommandPath));
         TLV::TLVWriter * writer = GetCommandDataElementTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataElement::kCsTag_Data), aData));

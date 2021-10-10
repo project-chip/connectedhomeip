@@ -25,7 +25,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
-#include <controller/CommandResponseDecoder.h>
+#include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVUtilities.hpp>
@@ -179,8 +179,7 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestSimpleArgumentRequest::Type,
-                                           TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
+    chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
         gExchangeManager, sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
 
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled);
@@ -209,8 +208,7 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
 
     responseDirective = kSendSuccessStatusCode;
 
-    chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestSimpleArgumentRequest::Type,
-                                           chip::app::DataModel::NullObjectType>(gExchangeManager, sessionHandle, kTestEndpointId,
+    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId,
                                                                                  request, onSuccessCb, onFailureCb);
 
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled);
@@ -239,8 +237,7 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
 
     responseDirective = kSendError;
 
-    chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestSimpleArgumentRequest::Type,
-                                           chip::app::DataModel::NullObjectType>(gExchangeManager, sessionHandle, kTestEndpointId,
+    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId,
                                                                                  request, onSuccessCb, onFailureCb);
 
     NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && onFailureWasCalled);
@@ -263,7 +260,7 @@ int Finalize(void * aContext);
 // clang-format off
 nlTestSuite sSuite =
 {
-        "TestReadInteraction",
+        "TestCommands",
         &sTests[0],
         Initialize,
         Finalize
