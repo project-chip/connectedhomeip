@@ -26,23 +26,13 @@
 namespace chip {
 namespace Controller {
 
-template <typename T>
-class PlatformDeleter
+class CommandSenderPlatformDeleter
 {
 public:
-    void operator()(T * object) const
-    {
-        if (object)
-        {
-            chip::Platform::Delete(object);
-        }
-    }
+    void operator()(app::CommandSender * commandSender) const { chip::Platform::Delete(commandSender); }
 };
 
-template <typename T>
-using PlatformAllocatedObjectHandle = std::unique_ptr<T, PlatformDeleter<T>>;
-
-using CommandSenderHandle = PlatformAllocatedObjectHandle<app::CommandSender>;
+using CommandSenderHandle = std::unique_ptr<app::CommandSender, CommandSenderPlatformDeleter>;
 
 } // namespace Controller
 } // namespace chip
