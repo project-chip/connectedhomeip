@@ -114,6 +114,7 @@ static void TestMemAlloc_UniquePtr(nlTestSuite * inSuite, void * inContext)
     {
         auto ptr = MakeUnique<Cls>(&constructorCalled, &destructorCalled);
         NL_TEST_ASSERT(inSuite, constructorCalled == 1);
+        NL_TEST_ASSERT(inSuite, destructorCalled == 0);
         IgnoreUnusedVariable(ptr);
     }
 
