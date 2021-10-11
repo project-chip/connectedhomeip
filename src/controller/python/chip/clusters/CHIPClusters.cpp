@@ -404,14 +404,14 @@ chip::ChipError::StorageType chip_ime_AppendCommand_AdministratorCommissioning_O
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_AdministratorCommissioning_OpenCommissioningWindow(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t commissioningTimeout,
-    const uint8_t * pAKEVerifier, uint32_t pAKEVerifier_Len, uint16_t discriminator, uint32_t iterations, const uint8_t * salt,
+    const uint8_t * PAKEVerifier, uint32_t PAKEVerifier_Len, uint16_t discriminator, uint32_t iterations, const uint8_t * salt,
     uint32_t salt_Len, uint16_t passcodeID)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::AdministratorCommissioningCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .OpenCommissioningWindow(nullptr, nullptr, commissioningTimeout, chip::ByteSpan(pAKEVerifier, pAKEVerifier_Len),
+        .OpenCommissioningWindow(nullptr, nullptr, commissioningTimeout, chip::ByteSpan(PAKEVerifier, PAKEVerifier_Len),
                                  discriminator, iterations, chip::ByteSpan(salt, salt_Len), passcodeID)
         .AsInteger();
 }
@@ -978,7 +978,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_BinaryInputBasic_PresentValu
     return cluster.ReadAttributePresentValue(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_BinaryInputBasic_PresentValue(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_BinaryInputBasic_PresentValue(chip::Controller::Device * device,
                                                                                        chip::EndpointId ZCLendpointId,
                                                                                        uint16_t minInterval, uint16_t maxInterval)
 {
@@ -986,7 +986,7 @@ chip::ChipError::StorageType chip_ime_ConfigureAttribute_BinaryInputBasic_Presen
     chip::Controller::BinaryInputBasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributePresentValue(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+        .SubscribeAttributePresentValue(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
                                         maxInterval)
         .AsInteger();
 }
@@ -1011,7 +1011,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_BinaryInputBasic_StatusFlags
     return cluster.ReadAttributeStatusFlags(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_BinaryInputBasic_StatusFlags(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_BinaryInputBasic_StatusFlags(chip::Controller::Device * device,
                                                                                       chip::EndpointId ZCLendpointId,
                                                                                       uint16_t minInterval, uint16_t maxInterval)
 {
@@ -1019,7 +1019,7 @@ chip::ChipError::StorageType chip_ime_ConfigureAttribute_BinaryInputBasic_Status
     chip::Controller::BinaryInputBasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeStatusFlags(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
+        .SubscribeAttributeStatusFlags(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -1412,9 +1412,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepColorTemper
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepHue(chip::Controller::Device * device,
                                                                          chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                         uint8_t stepMode, uint8_t stepSize,
-                                                                         uint16_t transitionTime, uint8_t optionsMask,
-                                                                         uint8_t optionsOverride)
+                                                                         uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
+                                                                         uint8_t optionsMask, uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ColorControlCluster cluster;
@@ -1424,7 +1423,7 @@ chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepHue(chip::C
 chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepSaturation(chip::Controller::Device * device,
                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
                                                                                 uint8_t stepMode, uint8_t stepSize,
-                                                                                uint16_t transitionTime, uint8_t optionsMask,
+                                                                                uint8_t transitionTime, uint8_t optionsMask,
                                                                                 uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
@@ -1452,17 +1451,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ColorControl_CurrentHue(chip
     return cluster.ReadAttributeCurrentHue(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_ColorControl_CurrentHue(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_ColorControl_CurrentHue(chip::Controller::Device * device,
                                                                                  chip::EndpointId ZCLendpointId,
-                                                                                 uint16_t minInterval, uint16_t maxInterval,
-                                                                                 uint8_t change)
+                                                                                 uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentHue(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval,
-                                      change)
+        .SubscribeAttributeCurrentHue(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -1476,17 +1473,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ColorControl_CurrentSaturati
     return cluster.ReadAttributeCurrentSaturation(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_ColorControl_CurrentSaturation(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_ColorControl_CurrentSaturation(chip::Controller::Device * device,
                                                                                         chip::EndpointId ZCLendpointId,
-                                                                                        uint16_t minInterval, uint16_t maxInterval,
-                                                                                        uint8_t change)
+                                                                                        uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentSaturation(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                             maxInterval, change)
+        .SubscribeAttributeCurrentSaturation(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                             maxInterval)
         .AsInteger();
 }
 
@@ -1510,16 +1506,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ColorControl_CurrentX(chip::
     return cluster.ReadAttributeCurrentX(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_ColorControl_CurrentX(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_ColorControl_CurrentX(chip::Controller::Device * device,
                                                                                chip::EndpointId ZCLendpointId, uint16_t minInterval,
-                                                                               uint16_t maxInterval, uint16_t change)
+                                                                               uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentX(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval,
-                                    change)
+        .SubscribeAttributeCurrentX(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -1533,16 +1528,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ColorControl_CurrentY(chip::
     return cluster.ReadAttributeCurrentY(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_ColorControl_CurrentY(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_ColorControl_CurrentY(chip::Controller::Device * device,
                                                                                chip::EndpointId ZCLendpointId, uint16_t minInterval,
-                                                                               uint16_t maxInterval, uint16_t change)
+                                                                               uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentY(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval,
-                                    change)
+        .SubscribeAttributeCurrentY(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -1577,17 +1571,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ColorControl_ColorTemperatur
     return cluster.ReadAttributeColorTemperature(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_ColorControl_ColorTemperature(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_ColorControl_ColorTemperature(chip::Controller::Device * device,
                                                                                        chip::EndpointId ZCLendpointId,
-                                                                                       uint16_t minInterval, uint16_t maxInterval,
-                                                                                       uint16_t change)
+                                                                                       uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeColorTemperature(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                            maxInterval, change)
+        .SubscribeAttributeColorTemperature(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                            maxInterval)
         .AsInteger();
 }
 
@@ -2541,7 +2534,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_DoorLock_LockState(chip::Con
     return cluster.ReadAttributeLockState(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_DoorLock_LockState(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_DoorLock_LockState(chip::Controller::Device * device,
                                                                             chip::EndpointId ZCLendpointId, uint16_t minInterval,
                                                                             uint16_t maxInterval)
 {
@@ -2549,7 +2542,7 @@ chip::ChipError::StorageType chip_ime_ConfigureAttribute_DoorLock_LockState(chip
     chip::Controller::DoorLockCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeLockState(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
+        .SubscribeAttributeLockState(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -2719,6 +2712,26 @@ chip::ChipError::StorageType chip_ime_AppendCommand_EthernetNetworkDiagnostics_R
     return cluster.ResetCounts(nullptr, nullptr).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PHYRate(chip::Controller::Device * device,
+                                                                                       chip::EndpointId ZCLendpointId,
+                                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePHYRate(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FullDuplex(chip::Controller::Device * device,
+                                                                                          chip::EndpointId ZCLendpointId,
+                                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeFullDuplex(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount(chip::Controller::Device * device,
                                                                                              chip::EndpointId ZCLendpointId,
                                                                                              chip::GroupId /* ZCLgroupId */)
@@ -2767,6 +2780,26 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_O
     chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeOverrunCount(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CarrierDetect(chip::Controller::Device * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCarrierDetect(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_TimeSinceReset(chip::Controller::Device * device,
+                                                                                              chip::EndpointId ZCLendpointId,
+                                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTimeSinceReset(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision(chip::Controller::Device * device,
@@ -2948,6 +2981,37 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_RebootCou
     return cluster.ReadAttributeRebootCount(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_UpTime(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId,
+                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeUpTime(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_TotalOperationalHours(chip::Controller::Device * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTotalOperationalHours(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_BootReasons(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId,
+                                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBootReasons(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision(chip::Controller::Device * device,
                                                                                        chip::EndpointId ZCLendpointId,
                                                                                        chip::GroupId /* ZCLgroupId */)
@@ -3092,6 +3156,15 @@ chip::ChipError::StorageType chip_ime_AppendCommand_Identify_IdentifyQuery(chip:
     cluster.Associate(device, ZCLendpointId);
     return cluster.IdentifyQuery(nullptr, nullptr).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_Identify_TriggerEffect(chip::Controller::Device * device,
+                                                                           chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                           uint8_t effectIdentifier, uint8_t effectVariant)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IdentifyCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TriggerEffect(nullptr, nullptr, effectIdentifier, effectVariant).AsInteger();
+}
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_IdentifyTime(chip::Controller::Device * device,
                                                                           chip::EndpointId ZCLendpointId,
@@ -3113,6 +3186,16 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_Identify_IdentifyTime(chip:
     return cluster.WriteAttributeIdentifyTime(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
         .AsInteger();
 }
+chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_IdentifyType(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId,
+                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IdentifyCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeIdentifyType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_ClusterRevision(chip::Controller::Device * device,
                                                                              chip::EndpointId ZCLendpointId,
                                                                              chip::GroupId /* ZCLgroupId */)
@@ -3235,17 +3318,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_LevelControl_CurrentLevel(ch
     return cluster.ReadAttributeCurrentLevel(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_LevelControl_CurrentLevel(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_LevelControl_CurrentLevel(chip::Controller::Device * device,
                                                                                    chip::EndpointId ZCLendpointId,
-                                                                                   uint16_t minInterval, uint16_t maxInterval,
-                                                                                   uint8_t change)
+                                                                                   uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::LevelControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentLevel(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                        maxInterval, change)
+        .SubscribeAttributeCurrentLevel(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                        maxInterval)
         .AsInteger();
 }
 
@@ -3671,23 +3753,23 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_Ap
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_NotifyUpdateApplied(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * updateToken,
-    uint32_t updateToken_Len, uint32_t currentVersion)
+    uint32_t updateToken_Len, uint32_t softwareVersion)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.NotifyUpdateApplied(nullptr, nullptr, chip::ByteSpan(updateToken, updateToken_Len), currentVersion).AsInteger();
+    return cluster.NotifyUpdateApplied(nullptr, nullptr, chip::ByteSpan(updateToken, updateToken_Len), softwareVersion).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t vendorId, uint16_t productId,
-    uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion, uint8_t protocolsSupported, const uint8_t * location,
-    uint32_t location_Len, bool requestorCanConsent, const uint8_t * metadataForProvider, uint32_t metadataForProvider_Len)
+    uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported, const uint8_t * location, uint32_t location_Len,
+    bool requestorCanConsent, const uint8_t * metadataForProvider, uint32_t metadataForProvider_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .QueryImage(nullptr, nullptr, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
+        .QueryImage(nullptr, nullptr, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
                     chip::ByteSpan(location, location_Len), requestorCanConsent,
                     chip::ByteSpan(metadataForProvider, metadataForProvider_Len))
         .AsInteger();
@@ -3707,15 +3789,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_Cl
 // Cluster OtaSoftwareUpdateRequestor
 
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * serverLocation,
-    uint32_t serverLocation_Len, uint16_t vendorId, uint8_t announcementReason, const uint8_t * metadataForNode,
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * providerLocation,
+    uint32_t providerLocation_Len, uint16_t vendorId, uint8_t announcementReason, const uint8_t * metadataForNode,
     uint32_t metadataForNode_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .AnnounceOtaProvider(nullptr, nullptr, chip::ByteSpan(serverLocation, serverLocation_Len), vendorId, announcementReason,
+        .AnnounceOtaProvider(nullptr, nullptr, chip::ByteSpan(providerLocation, providerLocation_Len), vendorId, announcementReason,
                              chip::ByteSpan(metadataForNode, metadataForNode_Len))
         .AsInteger();
 }
@@ -3775,7 +3857,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OccupancySensing_Occupancy(c
     return cluster.ReadAttributeOccupancy(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_OccupancySensing_Occupancy(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_OccupancySensing_Occupancy(chip::Controller::Device * device,
                                                                                     chip::EndpointId ZCLendpointId,
                                                                                     uint16_t minInterval, uint16_t maxInterval)
 {
@@ -3783,7 +3865,7 @@ chip::ChipError::StorageType chip_ime_ConfigureAttribute_OccupancySensing_Occupa
     chip::Controller::OccupancySensingCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeOccupancy(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
+        .SubscribeAttributeOccupancy(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -3882,7 +3964,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OnOff_OnOff(chip::Controller
     return cluster.ReadAttributeOnOff(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_OnOff_OnOff(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_OnOff_OnOff(chip::Controller::Device * device,
                                                                      chip::EndpointId ZCLendpointId, uint16_t minInterval,
                                                                      uint16_t maxInterval)
 {
@@ -3890,7 +3972,7 @@ chip::ChipError::StorageType chip_ime_ConfigureAttribute_OnOff_OnOff(chip::Contr
     chip::Controller::OnOffCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeOnOff(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
+        .SubscribeAttributeOnOff(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -4028,16 +4110,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OnOffSwitchConfiguration_Clu
 
 chip::ChipError::StorageType
 chip_ime_AppendCommand_OperationalCredentials_AddNOC(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                     chip::GroupId, const uint8_t * nOCValue, uint32_t nOCValue_Len,
-                                                     const uint8_t * iCACValue, uint32_t iCACValue_Len, const uint8_t * iPKValue,
-                                                     uint32_t iPKValue_Len, chip::NodeId caseAdminNode, uint16_t adminVendorId)
+                                                     chip::GroupId, const uint8_t * NOCValue, uint32_t NOCValue_Len,
+                                                     const uint8_t * ICACValue, uint32_t ICACValue_Len, const uint8_t * IPKValue,
+                                                     uint32_t IPKValue_Len, chip::NodeId caseAdminNode, uint16_t adminVendorId)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .AddNOC(nullptr, nullptr, chip::ByteSpan(nOCValue, nOCValue_Len), chip::ByteSpan(iCACValue, iCACValue_Len),
-                chip::ByteSpan(iPKValue, iPKValue_Len), caseAdminNode, adminVendorId)
+        .AddNOC(nullptr, nullptr, chip::ByteSpan(NOCValue, NOCValue_Len), chip::ByteSpan(ICACValue, ICACValue_Len),
+                chip::ByteSpan(IPKValue, IPKValue_Len), caseAdminNode, adminVendorId)
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate(
@@ -4070,13 +4152,13 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_Certi
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(chip::Controller::Device * device,
                                                                                         chip::EndpointId ZCLendpointId,
-                                                                                        chip::GroupId, const uint8_t * cSRNonce,
-                                                                                        uint32_t cSRNonce_Len)
+                                                                                        chip::GroupId, const uint8_t * CSRNonce,
+                                                                                        uint32_t CSRNonce_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.OpCSRRequest(nullptr, nullptr, chip::ByteSpan(cSRNonce, cSRNonce_Len)).AsInteger();
+    return cluster.OpCSRRequest(nullptr, nullptr, chip::ByteSpan(CSRNonce, CSRNonce_Len)).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(chip::Controller::Device * device,
                                                                                         chip::EndpointId ZCLendpointId,
@@ -4109,13 +4191,13 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_Updat
 }
 chip::ChipError::StorageType
 chip_ime_AppendCommand_OperationalCredentials_UpdateNOC(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                        chip::GroupId, const uint8_t * nOCValue, uint32_t nOCValue_Len,
-                                                        const uint8_t * iCACValue, uint32_t iCACValue_Len)
+                                                        chip::GroupId, const uint8_t * NOCValue, uint32_t NOCValue_Len,
+                                                        const uint8_t * ICACValue, uint32_t ICACValue_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.UpdateNOC(nullptr, nullptr, chip::ByteSpan(nOCValue, nOCValue_Len), chip::ByteSpan(iCACValue, iCACValue_Len))
+    return cluster.UpdateNOC(nullptr, nullptr, chip::ByteSpan(NOCValue, NOCValue_Len), chip::ByteSpan(ICACValue, ICACValue_Len))
         .AsInteger();
 }
 
@@ -4293,17 +4375,17 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_PressureMeasurement_Measured
     return cluster.ReadAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_PressureMeasurement_MeasuredValue(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_PressureMeasurement_MeasuredValue(chip::Controller::Device * device,
                                                                                            chip::EndpointId ZCLendpointId,
                                                                                            uint16_t minInterval,
-                                                                                           uint16_t maxInterval, int16_t change)
+                                                                                           uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::PressureMeasurementCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                         maxInterval, change)
+        .SubscribeAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                         maxInterval)
         .AsInteger();
 }
 
@@ -4400,17 +4482,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_PumpConfigurationAndControl_
     return cluster.ReadAttributeCapacity(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_PumpConfigurationAndControl_Capacity(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Capacity(chip::Controller::Device * device,
                                                                                               chip::EndpointId ZCLendpointId,
                                                                                               uint16_t minInterval,
-                                                                                              uint16_t maxInterval, int16_t change)
+                                                                                              uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::PumpConfigurationAndControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCapacity(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval,
-                                    change)
+        .SubscribeAttributeCapacity(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -4457,15 +4538,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_RelativeHumidityMeasurement_
     return cluster.ReadAttributeMeasuredValue(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_RelativeHumidityMeasurement_MeasuredValue(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_MeasuredValue(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::RelativeHumidityMeasurementCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeMeasuredValue(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                         maxInterval, change)
+        .SubscribeAttributeMeasuredValue(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                         maxInterval)
         .AsInteger();
 }
 
@@ -4644,6 +4725,26 @@ chip::ChipError::StorageType chip_ime_AppendCommand_SoftwareDiagnostics_ResetWat
     return cluster.ResetWatermarks(nullptr, nullptr).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapFree(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::SoftwareDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentHeapFree(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapUsed(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::SoftwareDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentHeapUsed(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark(chip::Controller::Device * device,
                                                                                                  chip::EndpointId ZCLendpointId,
                                                                                                  chip::GroupId /* ZCLgroupId */)
@@ -4688,17 +4789,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Switch_CurrentPosition(chip:
     return cluster.ReadAttributeCurrentPosition(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_Switch_CurrentPosition(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_Switch_CurrentPosition(chip::Controller::Device * device,
                                                                                 chip::EndpointId ZCLendpointId,
-                                                                                uint16_t minInterval, uint16_t maxInterval,
-                                                                                uint8_t change)
+                                                                                uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::SwitchCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentPosition(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                           maxInterval, change)
+        .SubscribeAttributeCurrentPosition(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                           maxInterval)
         .AsInteger();
 }
 
@@ -4837,17 +4937,17 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_TemperatureMeasurement_Measu
     return cluster.ReadAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_TemperatureMeasurement_MeasuredValue(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_TemperatureMeasurement_MeasuredValue(chip::Controller::Device * device,
                                                                                               chip::EndpointId ZCLendpointId,
                                                                                               uint16_t minInterval,
-                                                                                              uint16_t maxInterval, int16_t change)
+                                                                                              uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::TemperatureMeasurementCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                         maxInterval, change)
+        .SubscribeAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                         maxInterval)
         .AsInteger();
 }
 
@@ -5458,17 +5558,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_LocalTemperature(
     return cluster.ReadAttributeLocalTemperature(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_Thermostat_LocalTemperature(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_Thermostat_LocalTemperature(chip::Controller::Device * device,
                                                                                      chip::EndpointId ZCLendpointId,
-                                                                                     uint16_t minInterval, uint16_t maxInterval,
-                                                                                     int16_t change)
+                                                                                     uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThermostatCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeLocalTemperature(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                            maxInterval, change)
+        .SubscribeAttributeLocalTemperature(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                            maxInterval)
         .AsInteger();
 }
 
@@ -6562,6 +6661,90 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Rssi(
     return cluster.ReadAttributeRssi(gInt8sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconLostCount(chip::Controller::Device * device,
+                                                                                           chip::EndpointId ZCLendpointId,
+                                                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBeaconLostCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconRxCount(chip::Controller::Device * device,
+                                                                                         chip::EndpointId ZCLendpointId,
+                                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBeaconRxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastRxCount(chip::Controller::Device * device,
+                                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePacketMulticastRxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastTxCount(chip::Controller::Device * device,
+                                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePacketMulticastTxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastRxCount(chip::Controller::Device * device,
+                                                                                                chip::EndpointId ZCLendpointId,
+                                                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePacketUnicastRxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastTxCount(chip::Controller::Device * device,
+                                                                                                chip::EndpointId ZCLendpointId,
+                                                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePacketUnicastTxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_CurrentMaxRate(chip::Controller::Device * device,
+                                                                                          chip::EndpointId ZCLendpointId,
+                                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentMaxRate(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_OverrunCount(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOverrunCount(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ClusterRevision(chip::Controller::Device * device,
                                                                                            chip::EndpointId ZCLendpointId,
                                                                                            chip::GroupId /* ZCLgroupId */)
@@ -6691,15 +6874,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_CurrentPositi
         .AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLiftPercentage(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_WindowCovering_CurrentPositionLiftPercentage(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentPositionLiftPercentage(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                         minInterval, maxInterval, change)
+        .SubscribeAttributeCurrentPositionLiftPercentage(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                                         minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -6714,15 +6897,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_CurrentPositi
         .AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTiltPercentage(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_WindowCovering_CurrentPositionTiltPercentage(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentPositionTiltPercentage(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                         minInterval, maxInterval, change)
+        .SubscribeAttributeCurrentPositionTiltPercentage(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                                         minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -6736,7 +6919,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_OperationalSt
     return cluster.ReadAttributeOperationalStatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_OperationalStatus(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_WindowCovering_OperationalStatus(chip::Controller::Device * device,
                                                                                           chip::EndpointId ZCLendpointId,
                                                                                           uint16_t minInterval,
                                                                                           uint16_t maxInterval)
@@ -6745,7 +6928,7 @@ chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_Operatio
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeOperationalStatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+        .SubscribeAttributeOperationalStatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
                                              maxInterval)
         .AsInteger();
 }
@@ -6760,15 +6943,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_TargetPositio
         .AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_TargetPositionLiftPercent100ths(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_WindowCovering_TargetPositionLiftPercent100ths(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeTargetPositionLiftPercent100ths(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                           minInterval, maxInterval, change)
+        .SubscribeAttributeTargetPositionLiftPercent100ths(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                                           minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -6782,15 +6965,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_TargetPositio
         .AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_TargetPositionTiltPercent100ths(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_WindowCovering_TargetPositionTiltPercent100ths(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeTargetPositionTiltPercent100ths(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                           minInterval, maxInterval, change)
+        .SubscribeAttributeTargetPositionTiltPercent100ths(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                                           minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -6815,15 +6998,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_CurrentPositi
         .AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLiftPercent100ths(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_WindowCovering_CurrentPositionLiftPercent100ths(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentPositionLiftPercent100ths(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                            minInterval, maxInterval, change)
+        .SubscribeAttributeCurrentPositionLiftPercent100ths(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                                            minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -6838,15 +7021,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_CurrentPositi
         .AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTiltPercent100ths(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_WindowCovering_CurrentPositionTiltPercent100ths(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeCurrentPositionTiltPercent100ths(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                            minInterval, maxInterval, change)
+        .SubscribeAttributeCurrentPositionTiltPercent100ths(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                                            minInterval, maxInterval)
         .AsInteger();
 }
 
@@ -6923,7 +7106,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_SafetyStatus(
     return cluster.ReadAttributeSafetyStatus(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_SafetyStatus(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_WindowCovering_SafetyStatus(chip::Controller::Device * device,
                                                                                      chip::EndpointId ZCLendpointId,
                                                                                      uint16_t minInterval, uint16_t maxInterval)
 {
@@ -6931,7 +7114,7 @@ chip::ChipError::StorageType chip_ime_ConfigureAttribute_WindowCovering_SafetySt
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .ConfigureAttributeSafetyStatus(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+        .SubscribeAttributeSafetyStatus(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
                                         maxInterval)
         .AsInteger();
 }

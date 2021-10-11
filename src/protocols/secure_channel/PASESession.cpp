@@ -179,7 +179,7 @@ CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & seriali
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Init(uint16_t mySessionId, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -191,8 +191,8 @@ CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstabl
 
     mDelegate = delegate;
 
-    ChipLogDetail(SecureChannel, "Assigned local session key ID %d", myKeyId);
-    SetLocalSessionId(myKeyId);
+    ChipLogDetail(SecureChannel, "Assigned local session key ID %d", mySessionId);
+    SetLocalSessionId(mySessionId);
     mSetupPINCode    = setupCode;
     mComputeVerifier = true;
 
@@ -221,8 +221,8 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, uint32_t p
     {
         ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPIN), sizeof(setupPIN)));
 
-        // Use only kSetupPINCodeFieldLengthInBits bits out of the code
-        setupPIN &= ((1 << kSetupPINCodeFieldLengthInBits) - 1);
+        // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
+        setupPIN = (setupPIN % 99999998) + 1;
     }
 
     return PASESession::ComputePASEVerifier(setupPIN, pbkdf2IterCount, salt, verifier);
@@ -247,14 +247,14 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const ByteSpan & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t myKeyId,
-                                       SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt,
+                                       uint16_t mySessionId, SessionEstablishmentDelegate * delegate)
 {
     // Return early on error here, as we have not initalized any state yet
     ReturnErrorCodeIf(salt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(salt.data() == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR err = Init(myKeyId, mySetUpPINCode, delegate);
+    CHIP_ERROR err = Init(mySessionId, mySetUpPINCode, delegate);
     // From here onwards, let's go to exit on error, as some state might have already
     // been initialized
     SuccessOrExit(err);
@@ -290,9 +290,9 @@ exit:
 }
 
 CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       uint16_t passcodeID, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+                                       uint16_t passcodeID, uint16_t mySessionId, SessionEstablishmentDelegate * delegate)
 {
-    ReturnErrorOnFailure(WaitForPairing(0, pbkdf2IterCount, salt, myKeyId, delegate));
+    ReturnErrorOnFailure(WaitForPairing(0, pbkdf2IterCount, salt, mySessionId, delegate));
 
     memmove(&mPASEVerifier, &verifier, sizeof(verifier));
     mComputeVerifier = false;
@@ -301,11 +301,11 @@ CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t p
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
+CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
                              Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
 {
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CHIP_ERROR err = Init(myKeyId, peerSetUpPINCode, delegate);
+    CHIP_ERROR err = Init(mySessionId, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
 
     mExchangeCtxt = exchangeCtxt;
@@ -315,6 +315,8 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
+
+    mDelegate->OnSessionEstablishmentStarted();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -361,8 +363,8 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mPasscodeID, true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mPasscodeID));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
     // TODO - Add optional MRP parameter support to PASE
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
@@ -411,7 +413,6 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     SuccessOrExit(err = tlvReader.Get(initiatorSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", initiatorSessionId);
-    // TODO - Update <Set/Get><Local/Peer>KeyId() functions to <Set/Get><Local/Peer>SessionId()
     SetPeerSessionId(initiatorSessionId);
 
     SuccessOrExit(err = tlvReader.Next());
@@ -427,11 +428,13 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
     SuccessOrExit(err);
 
+    mDelegate->OnSessionEstablishmentStarted();
+
 exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        SendStatusReport(kProtocolCodeInvalidParam);
+        SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
     }
     return err;
 }
@@ -453,13 +456,13 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     // The initiator random value is being sent back in the response as required by the specifications
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), initiatorRandom));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId()));
 
     if (!initiatorHasPBKDFParams)
     {
         TLV::TLVType pbkdfParamContainer;
         ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Structure, pbkdfParamContainer));
-        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mIterationCount, true));
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mIterationCount));
         ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mSalt, mSaltLength));
         ReturnErrorOnFailure(tlvWriter.EndContainer(pbkdfParamContainer));
     }
@@ -556,7 +559,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        SendStatusReport(kProtocolCodeInvalidParam);
+        SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
     }
     return err;
 }
@@ -659,7 +662,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        SendStatusReport(kProtocolCodeInvalidParam);
+        SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
     }
     return err;
 }
@@ -734,7 +737,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        SendStatusReport(kProtocolCodeInvalidParam);
+        SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
     }
     return err;
 }
@@ -769,7 +772,7 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
 
     // Send confirmation to peer that we succeeded so they can start using the session.
-    SendStatusReport(kProtocolCodeSuccess);
+    SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
     mPairingComplete = true;
 
@@ -783,67 +786,36 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        SendStatusReport(kProtocolCodeInvalidParam);
+        SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
     }
     return err;
 }
 
-void PASESession::SendStatusReport(uint16_t protocolCode)
+void PASESession::OnSuccessStatusReport()
 {
-    // TODO - Move SendStatusReport to a common part of the code.
-    // This could be reused for all secure channel protocol state machinies.
-    GeneralStatusCode generalCode =
-        (protocolCode == kProtocolCodeSuccess) ? GeneralStatusCode::kSuccess : GeneralStatusCode::kFailure;
-    uint32_t protocolId = Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm();
+    mPairingComplete = true;
 
-    ChipLogDetail(SecureChannel, "Sending status report");
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
-    StatusReport statusReport(generalCode, protocolId, protocolCode);
-
-    Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(statusReport.Size()));
-    statusReport.WriteToBuffer(bbuf);
-
-    System::PacketBufferHandle msg = bbuf.Finalize();
-    VerifyOrReturn(!msg.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
-
-    VerifyOrReturn(mExchangeCtxt->SendMessage(MsgType::StatusReport, std::move(msg)) == CHIP_NO_ERROR,
-                   ChipLogError(SecureChannel, "Failed to send status report message"));
+    // Call delegate to indicate pairing completion
+    mDelegate->OnSessionEstablished();
 }
 
-CHIP_ERROR PASESession::HandleStatusReport(System::PacketBufferHandle && msg)
+CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
 {
-    StatusReport report;
-    CHIP_ERROR err = report.Parse(std::move(msg));
-    ReturnErrorOnFailure(err);
-    VerifyOrReturnError(report.GetProtocolId() == Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm(),
-                        CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (report.GetGeneralCode() == GeneralStatusCode::kSuccess && report.GetProtocolCode() == kProtocolCodeSuccess)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    switch (protocolCode)
     {
-        mPairingComplete = true;
+    case kProtocolCodeInvalidParam:
+        err = CHIP_ERROR_INVALID_PASE_PARAMETER;
+        break;
 
-        // Forget our exchange, as no additional messages are expected from the peer
-        mExchangeCtxt = nullptr;
-
-        // Call delegate to indicate pairing completion
-        mDelegate->OnSessionEstablished();
-    }
-    else
-    {
-        switch (report.GetProtocolCode())
-        {
-        case kProtocolCodeInvalidParam:
-            err = CHIP_ERROR_INVALID_PASE_PARAMETER;
-            break;
-
-        default:
-            err = CHIP_ERROR_INTERNAL;
-            break;
-        };
-        ChipLogError(SecureChannel, "Received error (protocol code %d) during pairing process. %s", report.GetProtocolCode(),
-                     ErrorStr(err));
-    }
-
+    default:
+        err = CHIP_ERROR_INTERNAL;
+        break;
+    };
+    ChipLogError(SecureChannel, "Received error (protocol code %d) during PASE process. %s", protocolCode, ErrorStr(err));
     return err;
 }
 
@@ -904,7 +876,7 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
         break;
 
     case MsgType::StatusReport:
-        err = HandleStatusReport(std::move(msg));
+        err = HandleStatusReport(std::move(msg), mNextExpectedMsg == MsgType::StatusReport);
         break;
 
     default:

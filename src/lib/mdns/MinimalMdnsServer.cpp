@@ -58,15 +58,13 @@ public:
     }
 
 private:
+#if INET_CONFIG_ENABLE_IPV4
     enum class State
     {
         kIpV4,
         kIpV6,
     };
-#if INET_CONFIG_ENABLE_IPV4
     State mState = State::kIpV4;
-#else
-    State mState = State::kIpV6;
 #endif
     chip::Inet::InterfaceIterator mIterator;
 

@@ -96,6 +96,21 @@ public:
         mDataLen = new_size;
     }
 
+    // Allow creating ByteSpans from ZCL octet strings, so we don't have to
+    // reinvent it various places.
+    template <class U,
+              typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<uint8_t, std::remove_const_t<U>>::value>>
+    static Span fromZclString(U * bytes)
+    {
+        size_t length = bytes[0];
+        // Treat 0xFF (aka "null string") as zero-length.
+        if (length == 0xFF)
+        {
+            length = 0;
+        }
+        return Span(&bytes[1], length);
+    }
+
 private:
     pointer mDataBuf;
     size_t mDataLen;

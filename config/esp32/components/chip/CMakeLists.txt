@@ -30,12 +30,13 @@ if(NOT CHIP_ROOT)
 endif()
 
 set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs)
-if(${IDF_TARGET} STREQUAL "esp32h2")
-    list(APPEND CHIP_REQURIE_COMPONENTS openthread)
-endif()
 
 if (CONFIG_ENABLE_CHIP_SHELL)
     list(APPEND CHIP_REQURIE_COMPONENTS console)
+endif()
+
+if (CONFIG_OPENTHREAD_ENABLED)
+    list(APPEND CHIP_REQURIE_COMPONENTS openthread)
 endif()
 
 idf_component_register(SRCS chip.c chip.cpp
@@ -210,9 +211,9 @@ endif()
 idf_component_get_property(main_lib main COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
-target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group 
+target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
-                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}> 
+                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}>
                                                 -Wl,--end-group)
 
 # Make the component dependent on our CHIP build

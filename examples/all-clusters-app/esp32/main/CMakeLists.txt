@@ -29,7 +29,9 @@ set(PRIV_INCLUDE_DIRS_LIST
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/all-clusters-app/zap-generated"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
@@ -105,6 +107,10 @@ endif()
 
 if("${CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM}" STREQUAL "y")
     list(APPEND PRIV_REQUIRES_LIST led_strip)
+endif()
+
+if (CONFIG_OPENTHREAD_ENABLED)
+    list(APPEND PRIV_REQUIRES_LIST openthread)
 endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}

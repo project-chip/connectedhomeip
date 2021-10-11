@@ -287,7 +287,7 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
 
     // Start listening for incoming connections.
     mTCP              = tcp_listen(mTCP);
-    mLwIPEndPointType = kLwIPEndPointType_TCP;
+    mLwIPEndPointType = LwIPEndPointType::TCP;
 
     tcp_arg(mTCP, this);
 
@@ -1627,7 +1627,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
                 // Discard the reference to the PCB to ensure there is no further interaction with it
                 // after this point.
                 mTCP              = NULL;
-                mLwIPEndPointType = kLwIPEndPointType_Unknown;
+                mLwIPEndPointType = LwIPEndPointType::Unknown;
             }
         }
 
@@ -1639,7 +1639,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
             // Discard the reference to the PCB to ensure there is no further interaction with it
             // after this point.
             mTCP              = NULL;
-            mLwIPEndPointType = kLwIPEndPointType_Unknown;
+            mLwIPEndPointType = LwIPEndPointType::Unknown;
         }
     }
 
@@ -1651,7 +1651,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // If the socket hasn't been closed already...
-    if (mSocket != INET_INVALID_SOCKET_FD)
+    if (mSocket != kInvalidSocketFd)
     {
         // If entering the Closed state
         // OR if entering the Closing state, and there's no unsent data in the send queue
@@ -1670,7 +1670,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 
             static_cast<System::LayerSockets *>(Layer().SystemLayer())->StopWatchingSocket(&mWatch);
             close(mSocket);
-            mSocket = INET_INVALID_SOCKET_FD;
+            mSocket = kInvalidSocketFd;
         }
     }
 
@@ -1961,7 +1961,7 @@ CHIP_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
         }
         else
         {
-            mLwIPEndPointType = kLwIPEndPointType_TCP;
+            mLwIPEndPointType = LwIPEndPointType::TCP;
         }
     }
     else
@@ -2001,7 +2001,7 @@ CHIP_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
         }
         else
         {
-            mLwIPEndPointType = kLwIPEndPointType_TCP;
+            mLwIPEndPointType = LwIPEndPointType::TCP;
         }
     }
     else
@@ -2251,7 +2251,7 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
             // Put the new end point into the Connected state.
             conEP->State             = kState_Connected;
             conEP->mTCP              = tpcb;
-            conEP->mLwIPEndPointType = kLwIPEndPointType_TCP;
+            conEP->mLwIPEndPointType = LwIPEndPointType::TCP;
             conEP->Retain();
 
             // Setup LwIP callback functions for the new PCB.
@@ -2344,7 +2344,7 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
         // of this is that the mTCP field is shared state between the two threads and thus must only be
         // accessed with the LwIP lock held.
         ep->mTCP              = NULL;
-        ep->mLwIPEndPointType = kLwIPEndPointType_Unknown;
+        ep->mLwIPEndPointType = LwIPEndPointType::Unknown;
 
         // Post callback to HandleError.
         CHIP_ERROR err = chip::System::MapErrorLwIP(lwipErr);
@@ -2412,7 +2412,7 @@ CHIP_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
 
 CHIP_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
 {
-    if (mSocket == INET_INVALID_SOCKET_FD)
+    if (mSocket == kInvalidSocketFd)
     {
         int family;
         if (addrType == kIPAddressType_IPv6)

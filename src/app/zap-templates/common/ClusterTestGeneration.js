@@ -76,7 +76,7 @@ function setDefaultType(test)
     break;
 
   case 'subscribeAttribute':
-    test.commandName          = 'Configure';
+    test.commandName          = 'Subscribe';
     test.isAttribute          = true;
     test.isSubscribeAttribute = true;
     break;
@@ -342,14 +342,6 @@ function isTestOnlyCluster(name)
   return name == DelayCommands.name;
 }
 
-function chip_tests_with_command_attribute_info(options)
-{
-  const promise = assertCommandOrAttribute(this).then(item => {
-    return [ item ];
-  });
-  return asBlocks.call(this, promise, options);
-}
-
 function chip_tests_item_parameters(options)
 {
   const commandValues = this.arguments.values;
@@ -425,20 +417,11 @@ function chip_tests_item_response_parameters(options)
   return asBlocks.call(this, promise, options);
 }
 
-function chip_tests_WaitForAttributeReport_attribute_info(options)
-{
-  const waitfor = Object.assign(JSON.parse(JSON.stringify(this.waitfor)), { command : 'readAttribute', isAttribute : true });
-  setDefaults(waitfor, this.parent);
-  return templateUtil.collectBlocks([ waitfor ], options, this);
-}
-
 //
 // Module exports
 //
-exports.chip_tests                                       = chip_tests;
-exports.chip_tests_items                                 = chip_tests_items;
-exports.chip_tests_item_parameters                       = chip_tests_item_parameters;
-exports.chip_tests_item_response_parameters              = chip_tests_item_response_parameters;
-exports.isTestOnlyCluster                                = isTestOnlyCluster;
-exports.chip_tests_with_command_attribute_info           = chip_tests_with_command_attribute_info;
-exports.chip_tests_WaitForAttributeReport_attribute_info = chip_tests_WaitForAttributeReport_attribute_info;
+exports.chip_tests                          = chip_tests;
+exports.chip_tests_items                    = chip_tests_items;
+exports.chip_tests_item_parameters          = chip_tests_item_parameters;
+exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
+exports.isTestOnlyCluster                   = isTestOnlyCluster;

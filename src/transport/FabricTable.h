@@ -22,7 +22,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <credentials/CHIPOperationalCredentials.h>
+#include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #if CHIP_CRYPTO_HSM
@@ -32,16 +32,13 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
-#include <transport/raw/MessageHeader.h>
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
 #define CASE_OPS_KEY 0xCA5EECC0
 #endif
 
 namespace chip {
-namespace Transport {
 
-static constexpr FabricIndex kUndefinedFabricIndex    = 0;
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
 static constexpr FabricIndex kMaxValidFabricIndex     = std::min(UINT8_MAX, CHIP_CONFIG_MAX_DEVICE_ADMINS);
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
@@ -51,14 +48,8 @@ static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 constexpr char kFabricTableKeyPrefix[] = "Fabric";
 constexpr char kFabricTableCountKey[]  = "NumFabrics";
 
-struct AccessControlList
-{
-    uint32_t placeholder;
-};
-
 /**
  * Defines state of a pairing established by a fabric.
- * ACL data can be mutated throughout the lifetime of the fabric pairing.
  * Node ID is only settable using the device operational credentials.
  *
  * Information contained within the state:
@@ -67,7 +58,6 @@ struct AccessControlList
  *   - Vendor Id
  *   - Fabric Id
  *   - Device operational credentials
- *   - Access control list
  */
 class DLL_EXPORT FabricInfo
 {
@@ -122,10 +112,6 @@ public:
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert) { return SetCert(mRootCert, cert); }
     CHIP_ERROR SetICACert(const chip::ByteSpan & cert) { return SetCert(mICACert, cert); }
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
-
-    const AccessControlList & GetACL() const { return mACL; }
-    AccessControlList & GetACL() { return mACL; }
-    void SetACL(const AccessControlList & acl) { mACL = acl; }
 
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
 
@@ -207,8 +193,6 @@ private:
     FabricIndex mFabric                                 = kUndefinedFabricIndex;
     uint16_t mVendorId                                  = kUndefinedVendorId;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
-
-    AccessControlList mACL;
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
     Crypto::P256KeypairHSM * mOperationalKey = nullptr;
@@ -403,5 +387,4 @@ private:
     uint8_t mFabricCount                  = 0;
 };
 
-} // namespace Transport
 } // namespace chip

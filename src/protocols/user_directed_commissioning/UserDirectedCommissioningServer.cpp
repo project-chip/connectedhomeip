@@ -24,6 +24,7 @@
  */
 
 #include "UserDirectedCommissioning.h"
+#include <lib/core/CHIPSafeCasts.h>
 
 namespace chip {
 namespace Protocols {

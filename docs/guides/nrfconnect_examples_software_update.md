@@ -66,12 +66,12 @@ Complete the following steps to perform DFU using mcumgr:
 3.  Observe that the LED on the device is flashing (short flash on), which means
     that the Bluetooth LE advertising has started. See the user interface
     section in the example documentation to check the LED number.
-4.  Upload the firmware image to the device by running the following command in
-    your example directory:
+4.  Upload the application firmware image to the device by running the following
+    command in your example directory:
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/app_update.bin
+        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/app_update.bin -n 0
 
-    The operation can take few minutes. Wait until the progress bar reaches
+    The operation can take a few minutes. Wait until the progress bar reaches
     100%.
 
 5.  Obtain the list of images present in the device memory by running following
@@ -118,10 +118,78 @@ Complete the following steps to perform DFU using mcumgr:
             hash: cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1
         Split status: N/A (0)
 
-7.  Reset the device with the following command to let the bootloader swap
+> **_NOTE:_** If you are using the nRF5340DK board, that supports multi-image
+> device firmware upgrade, complete Steps 7-9. If not using one, go straight to
+> the step 10.
+
+7.  Upload the network core firmware image to the device by running the
+    following command in your example directory:
+
+        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/net_core_app_update.bin -n 1
+
+    The operation can take a few minutes. Wait until the progress bar reaches
+    100%.
+
+8.  Obtain the list of images present in the device memory by running following
+    command:
+
+        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image list
+
+    The displayed output contains the old application image in slot 0 that is
+    currently active, the new application image in slot 1 in pending state, and
+    the new network image which is in slot 1 and not active yet (flags field
+    empty):
+
+        Images:
+        image=0 slot=0
+            version: 0.0.0
+            bootable: true
+            flags: active confirmed
+            hash: 7bb0e909a846e833465cbb44c581cf045413a5446c6953a30a3dcc2c3ad51764
+        image=0 slot=1
+            version: 0.0.0
+            bootable: true
+            flags: pending
+            hash: cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1
+        image=1 slot=1
+            version: 0.0.0
+            bootable: true
+            flags:
+            hash: d9e31e73cb7a959c26411250c2b3028f3510ae88a4549ae3f2f097c3e7530f48
+        Split status: N/A (0)
+
+9.  Swap the firmware images by calling the following method with `image-hash`
+    replaced by the image present in the slot 1 hash (for example,
+    `d9e31e73cb7a959c26411250c2b3028f3510ae88a4549ae3f2f097c3e7530f48`):
+
+        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image test image-hash
+
+    You can observe that the `flags:` field in the image for slot 1 changes
+    value to `pending`:
+
+        Images:
+        image=0 slot=0
+            version: 0.0.0
+            bootable: true
+            flags: active confirmed
+            hash: 7bb0e909a846e833465cbb44c581cf045413a5446c6953a30a3dcc2c3ad51764
+        image=0 slot=1
+            version: 0.0.0
+            bootable: true
+            flags: pending
+            hash: cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1
+        image=1 slot=1
+            version: 0.0.0
+            bootable: true
+            flags: pending
+            hash: d9e31e73cb7a959c26411250c2b3028f3510ae88a4549ae3f2f097c3e7530f48
+        Split status: N/A (0)
+
+10. Reset the device with the following command to let the bootloader swap
     images:
 
         $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' reset
+
 
     The device is reset and the following notifications appear in its console:
 

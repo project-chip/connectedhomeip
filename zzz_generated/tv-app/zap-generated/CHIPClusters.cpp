@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -60,7 +61,7 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GeneralCommissioning::Commands::Ids::ArmFailSafe,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GeneralCommissioning::Commands::ArmFailSafe::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -106,7 +107,7 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelab
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         GeneralCommissioning::Commands::Ids::CommissioningComplete,
+                                         GeneralCommissioning::Commands::CommissioningComplete::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -147,7 +148,7 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         GeneralCommissioning::Commands::Ids::SetRegulatoryConfig,
+                                         GeneralCommissioning::Commands::SetRegulatoryConfig::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -158,7 +159,8 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
     // location: regulatoryLocationType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
     // countryCode: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), countryCode));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(countryCode.data()), countryCode.size())));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
@@ -251,7 +253,7 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::Ids::DisableNetwork,
+                                         NetworkCommissioning::Commands::DisableNetwork::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -297,8 +299,7 @@ CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onS
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::Ids::EnableNetwork,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, NetworkCommissioning::Commands::EnableNetwork::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -345,7 +346,7 @@ CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callba
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::Ids::GetLastNetworkCommissioningResult,
+                                         NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -387,8 +388,7 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::Ids::RemoveNetwork,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, NetworkCommissioning::Commands::RemoveNetwork::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -434,7 +434,7 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, NetworkCommissioning::Commands::Ids::ScanNetworks,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, NetworkCommissioning::Commands::ScanNetworks::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -480,7 +480,7 @@ CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::C
 
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 chip::ByteSpan nOCValue, chip::ByteSpan iCACValue, chip::ByteSpan iPKValue,
+                                                 chip::ByteSpan NOCValue, chip::ByteSpan ICACValue, chip::ByteSpan IPKValue,
                                                  chip::NodeId caseAdminNode, uint16_t adminVendorId)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -494,7 +494,7 @@ CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OperationalCredentials::Commands::Ids::AddNOC,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OperationalCredentials::Commands::AddNOC::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -502,12 +502,12 @@ CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSucces
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // nOCValue: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nOCValue));
-    // iCACValue: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), iCACValue));
-    // iPKValue: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), iPKValue));
+    // NOCValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), NOCValue));
+    // ICACValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), ICACValue));
+    // IPKValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), IPKValue));
     // caseAdminNode: nodeId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), caseAdminNode));
     // adminVendorId: int16u
@@ -545,7 +545,7 @@ CHIP_ERROR OperationalCredentialsCluster::AddTrustedRootCertificate(Callback::Ca
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OperationalCredentials::Commands::Ids::AddTrustedRootCertificate,
+                                         OperationalCredentials::Commands::AddTrustedRootCertificate::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -588,7 +588,7 @@ CHIP_ERROR OperationalCredentialsCluster::AttestationRequest(Callback::Cancelabl
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OperationalCredentials::Commands::Ids::AttestationRequest,
+                                         OperationalCredentials::Commands::AttestationRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -630,7 +630,7 @@ CHIP_ERROR OperationalCredentialsCluster::CertificateChainRequest(Callback::Canc
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OperationalCredentials::Commands::Ids::CertificateChainRequest,
+                                         OperationalCredentials::Commands::CertificateChainRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -658,7 +658,7 @@ exit:
 }
 
 CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan cSRNonce)
+                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan CSRNonce)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -672,7 +672,7 @@ CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * on
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OperationalCredentials::Commands::Ids::OpCSRRequest,
+                                         OperationalCredentials::Commands::OpCSRRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -680,8 +680,8 @@ CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * on
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // cSRNonce: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), cSRNonce));
+    // CSRNonce: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), CSRNonce));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -714,7 +714,7 @@ CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * on
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OperationalCredentials::Commands::Ids::RemoveFabric,
+                                         OperationalCredentials::Commands::RemoveFabric::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -756,7 +756,7 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OperationalCredentials::Commands::Ids::UpdateFabricLabel,
+                                         OperationalCredentials::Commands::UpdateFabricLabel::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -765,7 +765,8 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // label: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), label));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(label.data()), label.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 

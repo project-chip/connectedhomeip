@@ -45,8 +45,8 @@
 #include <openthread/srp_client.h>
 #endif
 
+#include <app/AttributeAccessInterface.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -809,12 +809,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts(void)
+{
+    // Reset MAC counters
+    otLinkResetCounters(mOTInst);
+    otThreadResetMleCounters(mOTInst);
+    otThreadResetIp6Counters(mOTInst);
+}
 /*
  * @brief Get runtime value from the thread network based on the given attribute ID.
- *        The info is written in the TLVWriter for the zcl read command reply.
+ *        The info is encoded via the AttributeValueEncoder.
  *
- * @param  attributeId: Id of the attribute for the requested info.
- *         * aWriter: Pointer to a TLVWriter were to write the obtained info.
+ * @param attributeId Id of the attribute for the requested info.
+ * @param aEncoder Encoder to encode the attribute value.
  *
  * @return CHIP_NO_ERROR = Succes.
  *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
@@ -823,62 +831,61 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
  *         All other errors should be treated as a read error and reported as such.
  */
 template <class ImplClass>
-CHIP_ERROR
-GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                                 TLV::TLVWriter * aWriter)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(
+    AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
 
     switch (attributeId)
     {
-    case ThreadNetworkDiagnostics::Attributes::Ids::Channel: {
+    case ThreadNetworkDiagnostics::Attributes::Channel::Id: {
         uint16_t channel = otLinkGetChannel(mOTInst);
-        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), channel);
+        err              = encoder.Encode(channel);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RoutingRole: {
+    case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
         otDeviceRole role = otThreadGetDeviceRole(mOTInst);
-        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), role);
+        err               = encoder.Encode(role);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::NetworkName: {
+    case ThreadNetworkDiagnostics::Attributes::NetworkName::Id: {
         const char * networkName = otThreadGetNetworkName(mOTInst);
-        aWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), networkName, strlen(networkName));
+        err                      = encoder.Encode(Span<const char>(networkName, strlen(networkName)));
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::PanId: {
+    case ThreadNetworkDiagnostics::Attributes::PanId::Id: {
         uint16_t panId = otLinkGetPanId(mOTInst);
-        err            = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), panId);
+        err            = encoder.Encode(panId);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::ExtendedPanId: {
+    case ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id: {
         const otExtendedPanId * pExtendedPanid = otThreadGetExtendedPanId(mOTInst);
-        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), Encoding::BigEndian::Get64(pExtendedPanid->m8));
+        err                                    = encoder.Encode(Encoding::BigEndian::Get64(pExtendedPanid->m8));
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::MeshLocalPrefix: {
+    case ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id: {
         uint8_t meshLocaPrefix[OT_MESH_LOCAL_PREFIX_SIZE + 1] = { 0 }; // + 1  to encode prefix Len in the octstr
 
         const otMeshLocalPrefix * pMeshLocalPrefix = otThreadGetMeshLocalPrefix(mOTInst);
         meshLocaPrefix[0]                          = OT_IP6_PREFIX_BITSIZE;
 
         memcpy(&meshLocaPrefix[1], pMeshLocalPrefix->m8, OT_MESH_LOCAL_PREFIX_SIZE);
-        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), ByteSpan(meshLocaPrefix));
+        err = encoder.Encode(ByteSpan(meshLocaPrefix));
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::OverrunCount: {
+    case ThreadNetworkDiagnostics::Attributes::OverrunCount::Id: {
         // TO DO
         err = CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::NeighborTableList: {
+    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
         // List and structure not yet functionnal
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         // TO DO When list is functionnal.
@@ -906,295 +913,295 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RouteTableList: {
+    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
         // List not yet functionnal
         err = CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::PartitionId: {
+    case ThreadNetworkDiagnostics::Attributes::PartitionId::Id: {
         uint32_t partitionId = otThreadGetPartitionId(mOTInst);
-        err                  = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), partitionId);
+        err                  = encoder.Encode(partitionId);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::Weighting: {
+    case ThreadNetworkDiagnostics::Attributes::Weighting::Id: {
         uint8_t weight = otThreadGetLeaderWeight(mOTInst);
-        err            = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), weight);
+        err            = encoder.Encode(weight);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::DataVersion: {
+    case ThreadNetworkDiagnostics::Attributes::DataVersion::Id: {
         uint8_t dataVersion = otNetDataGetVersion(mOTInst);
-        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), dataVersion);
+        err                 = encoder.Encode(dataVersion);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::StableDataVersion: {
+    case ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id: {
         uint8_t stableVersion = otNetDataGetStableVersion(mOTInst);
-        err                   = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), stableVersion);
+        err                   = encoder.Encode(stableVersion);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::LeaderRouterId: {
+    case ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id: {
         uint8_t leaderRouterId = otThreadGetLeaderRouterId(mOTInst);
-        err                    = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), leaderRouterId);
+        err                    = encoder.Encode(leaderRouterId);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::DetachedRoleCount: {
+    case ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id: {
         uint16_t detachedRole = otThreadGetMleCounters(mOTInst)->mDetachedRole;
-        err                   = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), detachedRole);
+        err                   = encoder.Encode(detachedRole);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::ChildRoleCount: {
+    case ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id: {
         uint16_t childRole = otThreadGetMleCounters(mOTInst)->mChildRole;
-        err                = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), childRole);
+        err                = encoder.Encode(childRole);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RouterRoleCount: {
+    case ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id: {
         uint16_t routerRole = otThreadGetMleCounters(mOTInst)->mRouterRole;
-        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), routerRole);
+        err                 = encoder.Encode(routerRole);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::LeaderRoleCount: {
+    case ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id: {
         uint16_t leaderRole = otThreadGetMleCounters(mOTInst)->mLeaderRole;
-        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), leaderRole);
+        err                 = encoder.Encode(leaderRole);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::AttachAttemptCount: {
+    case ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id: {
         uint16_t attachAttempts = otThreadGetMleCounters(mOTInst)->mAttachAttempts;
-        err                     = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), attachAttempts);
+        err                     = encoder.Encode(attachAttempts);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::PartitionIdChangeCount: {
+    case ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id: {
         uint16_t partitionIdChanges = otThreadGetMleCounters(mOTInst)->mPartitionIdChanges;
-        err                         = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), partitionIdChanges);
+        err                         = encoder.Encode(partitionIdChanges);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::BetterPartitionAttachAttemptCount: {
+    case ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id: {
         uint16_t betterPartitionAttachAttempts = otThreadGetMleCounters(mOTInst)->mBetterPartitionAttachAttempts;
-        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), betterPartitionAttachAttempts);
+        err                                    = encoder.Encode(betterPartitionAttachAttempts);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::ParentChangeCount: {
+    case ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id: {
         uint16_t parentChanges = otThreadGetMleCounters(mOTInst)->mParentChanges;
-        err                    = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), parentChanges);
+        err                    = encoder.Encode(parentChanges);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxTotalCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id: {
         uint32_t txTotal = otLinkGetCounters(mOTInst)->mTxTotal;
-        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txTotal);
+        err              = encoder.Encode(txTotal);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxUnicastCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id: {
         uint32_t txUnicast = otLinkGetCounters(mOTInst)->mTxUnicast;
-        err                = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txUnicast);
+        err                = encoder.Encode(txUnicast);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxBroadcastCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id: {
         uint32_t txBroadcast = otLinkGetCounters(mOTInst)->mTxBroadcast;
-        err                  = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txBroadcast);
+        err                  = encoder.Encode(txBroadcast);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxAckRequestedCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::Id: {
         uint32_t txAckRequested = otLinkGetCounters(mOTInst)->mTxAckRequested;
-        err                     = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txAckRequested);
+        err                     = encoder.Encode(txAckRequested);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxAckedCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxAckedCount::Id: {
         uint32_t txAcked = otLinkGetCounters(mOTInst)->mTxAcked;
-        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txAcked);
+        err              = encoder.Encode(txAcked);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxNoAckRequestedCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::Id: {
         uint32_t txNoAckRequested = otLinkGetCounters(mOTInst)->mTxNoAckRequested;
-        err                       = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txNoAckRequested);
+        err                       = encoder.Encode(txNoAckRequested);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxDataCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxDataCount::Id: {
         uint32_t txData = otLinkGetCounters(mOTInst)->mTxData;
-        err             = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txData);
+        err             = encoder.Encode(txData);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxDataPollCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id: {
         uint32_t txDataPoll = otLinkGetCounters(mOTInst)->mTxDataPoll;
-        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txDataPoll);
+        err                 = encoder.Encode(txDataPoll);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxBeaconCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id: {
         uint32_t txBeacon = otLinkGetCounters(mOTInst)->mTxBeacon;
-        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txBeacon);
+        err               = encoder.Encode(txBeacon);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxBeaconRequestCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::Id: {
         uint32_t txBeaconRequest = otLinkGetCounters(mOTInst)->mTxBeaconRequest;
-        err                      = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txBeaconRequest);
+        err                      = encoder.Encode(txBeaconRequest);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxOtherCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id: {
         uint32_t txOther = otLinkGetCounters(mOTInst)->mTxOther;
-        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txOther);
+        err              = encoder.Encode(txOther);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxRetryCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id: {
         uint32_t txRetry = otLinkGetCounters(mOTInst)->mTxRetry;
-        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txRetry);
+        err              = encoder.Encode(txRetry);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxDirectMaxRetryExpiryCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::Id: {
         uint32_t txDirectMaxRetryExpiry = otLinkGetCounters(mOTInst)->mTxDirectMaxRetryExpiry;
-        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txDirectMaxRetryExpiry);
+        err                             = encoder.Encode(txDirectMaxRetryExpiry);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxIndirectMaxRetryExpiryCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::Id: {
         uint32_t txIndirectMaxRetryExpiry = otLinkGetCounters(mOTInst)->mTxIndirectMaxRetryExpiry;
-        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txIndirectMaxRetryExpiry);
+        err                               = encoder.Encode(txIndirectMaxRetryExpiry);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxErrCcaCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id: {
         uint32_t txErrCca = otLinkGetCounters(mOTInst)->mTxErrCca;
-        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txErrCca);
+        err               = encoder.Encode(txErrCca);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxErrAbortCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id: {
         uint32_t TxErrAbort = otLinkGetCounters(mOTInst)->mTxErrAbort;
-        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), TxErrAbort);
+        err                 = encoder.Encode(TxErrAbort);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::TxErrBusyChannelCount: {
+    case ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::Id: {
         uint32_t TxErrBusyChannel = otLinkGetCounters(mOTInst)->mTxErrBusyChannel;
-        err                       = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), TxErrBusyChannel);
+        err                       = encoder.Encode(TxErrBusyChannel);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxTotalCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id: {
         uint32_t rxTotal = otLinkGetCounters(mOTInst)->mRxTotal;
-        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxTotal);
+        err              = encoder.Encode(rxTotal);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxUnicastCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id: {
         uint32_t rxUnicast = otLinkGetCounters(mOTInst)->mRxUnicast;
-        err                = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxUnicast);
+        err                = encoder.Encode(rxUnicast);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxBroadcastCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id: {
         uint32_t rxBroadcast = otLinkGetCounters(mOTInst)->mRxBroadcast;
-        err                  = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxBroadcast);
+        err                  = encoder.Encode(rxBroadcast);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxDataCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxDataCount::Id: {
         uint32_t rxData = otLinkGetCounters(mOTInst)->mRxData;
-        err             = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxData);
+        err             = encoder.Encode(rxData);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxDataPollCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id: {
         uint32_t rxDataPoll = otLinkGetCounters(mOTInst)->mRxDataPoll;
-        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxDataPoll);
+        err                 = encoder.Encode(rxDataPoll);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxBeaconCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id: {
         uint32_t rxBeacon = otLinkGetCounters(mOTInst)->mRxBeacon;
-        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxBeacon);
+        err               = encoder.Encode(rxBeacon);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxBeaconRequestCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::Id: {
         uint32_t rxBeaconRequest = otLinkGetCounters(mOTInst)->mRxBeaconRequest;
-        err                      = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxBeaconRequest);
+        err                      = encoder.Encode(rxBeaconRequest);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxOtherCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id: {
         uint32_t rxOther = otLinkGetCounters(mOTInst)->mRxOther;
-        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxOther);
+        err              = encoder.Encode(rxOther);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxAddressFilteredCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::Id: {
         uint32_t rxAddressFiltered = otLinkGetCounters(mOTInst)->mRxAddressFiltered;
-        err                        = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxAddressFiltered);
+        err                        = encoder.Encode(rxAddressFiltered);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxDestAddrFilteredCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::Id: {
         uint32_t rxDestAddrFiltered = otLinkGetCounters(mOTInst)->mRxDestAddrFiltered;
-        err                         = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxDestAddrFiltered);
+        err                         = encoder.Encode(rxDestAddrFiltered);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxDuplicatedCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id: {
         uint32_t rxDuplicated = otLinkGetCounters(mOTInst)->mRxDuplicated;
-        err                   = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxDuplicated);
+        err                   = encoder.Encode(rxDuplicated);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrNoFrameCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id: {
         uint32_t rxErrNoFrame = otLinkGetCounters(mOTInst)->mRxErrNoFrame;
-        err                   = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrNoFrame);
+        err                   = encoder.Encode(rxErrNoFrame);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrUnknownNeighborCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::Id: {
         uint32_t rxErrUnknownNeighbor = otLinkGetCounters(mOTInst)->mRxErrUnknownNeighbor;
-        err                           = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrUnknownNeighbor);
+        err                           = encoder.Encode(rxErrUnknownNeighbor);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrInvalidSrcAddrCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::Id: {
         uint32_t rxErrInvalidSrcAddr = otLinkGetCounters(mOTInst)->mRxErrInvalidSrcAddr;
-        err                          = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrInvalidSrcAddr);
+        err                          = encoder.Encode(rxErrInvalidSrcAddr);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrSecCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id: {
         uint32_t rxErrSec = otLinkGetCounters(mOTInst)->mRxErrSec;
-        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrSec);
+        err               = encoder.Encode(rxErrSec);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrFcsCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id: {
         uint32_t rxErrFcs = otLinkGetCounters(mOTInst)->mRxErrFcs;
-        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrFcs);
+        err               = encoder.Encode(rxErrFcs);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrOtherCount: {
+    case ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id: {
         uint32_t rxErrOther = otLinkGetCounters(mOTInst)->mRxErrOther;
-        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrOther);
+        err                 = encoder.Encode(rxErrOther);
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::ActiveTimestamp: {
+    case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id: {
         err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {
@@ -1202,12 +1209,12 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
             uint64_t activeTimestamp = activeDataset.mPendingTimestamp;
-            err                      = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), activeTimestamp);
+            err                      = encoder.Encode(activeTimestamp);
         }
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::PendingTimestamp: {
+    case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id: {
         err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {
@@ -1215,12 +1222,12 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
             uint64_t pendingTimestamp = activeDataset.mPendingTimestamp;
-            err                       = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), pendingTimestamp);
+            err                       = encoder.Encode(pendingTimestamp);
         }
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::Delay: {
+    case ThreadNetworkDiagnostics::Attributes::Delay::Id: {
         err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {
@@ -1228,12 +1235,12 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
             uint32_t delay = activeDataset.mDelay;
-            err            = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), delay);
+            err            = encoder.Encode(delay);
         }
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::SecurityPolicy: {
+    case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id: {
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         // Stuct type nopt yet supported
         // if (otDatasetIsCommissioned(mOTInst))
@@ -1246,7 +1253,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::ChannelMask: {
+    case ThreadNetworkDiagnostics::Attributes::ChannelMask::Id: {
         err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {
@@ -1264,12 +1271,12 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
 
             uint8_t buffer[sizeof(uint32_t)] = { 0 };
             Encoding::BigEndian::Put32(buffer, bitSwappedChannelMask);
-            err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), ByteSpan(buffer));
+            err = encoder.Encode(ByteSpan(buffer));
         }
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::OperationalDatasetComponents: {
+    case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id: {
         // Structure not yet supported
         // if (otDatasetIsCommissioned(mOTInst))
         // {
@@ -1287,7 +1294,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::Ids::ActiveNetworkFaultsList: {
+    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
         // List not yet supported
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         break;
@@ -1732,7 +1739,24 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveAllSrpServices()
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_InvalidateAllSrpServices()
+{
+    Impl()->LockThreadStack();
+
+    for (typename SrpClient::Service & service : mSrpClient.mServices)
+    {
+        if (service.IsUsed())
+        {
+            service.mIsInvalid = true;
+        }
+    }
+
+    Impl()->UnlockThreadStack();
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSrpServices()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -1740,11 +1764,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveAllSrpSer
 
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
-        if (!service.IsUsed())
-            continue;
-
-        error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
-        SuccessOrExit(error);
+        if (service.IsUsed() && service.mIsInvalid)
+        {
+            ChipLogProgress(DeviceLayer, "removing srp service: %s.%s", service.mService.mInstanceName, service.mService.mName);
+            error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
+            SuccessOrExit(error);
+        }
     }
 
 exit:

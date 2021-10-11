@@ -63,6 +63,13 @@ constexpr size_t kMax_Salt_Length = 16;
 constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
 constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
+constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
+constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
+
+// TODO: Remove AES-256 from CryptoPAL since not required by V1 spec
+constexpr size_t kAES_CCM256_Key_Length   = 256u / 8u;
+constexpr size_t kAES_CCM256_Block_Length = kAES_CCM256_Key_Length;
+
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.
@@ -477,7 +484,9 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @brief A function that implements AES-CCM encryption
  *
  * This implements the CHIP_Crypto_AEAD_GenerateEncrypt() cryptographic primitive
- * from the specification.
+ * from the specification. For an empty plaintext, the user of the API can provide
+ * an empty string, or a nullptr, and provide plaintext_length as 0. The output buffer,
+ * ciphertext can also be an empty string, or a nullptr for this case.
  *
  * @param plaintext Plaintext to encrypt
  * @param plaintext_length Length of plain_text
@@ -500,7 +509,9 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @brief A function that implements AES-CCM decryption
  *
  * This implements the CHIP_Crypto_AEAD_DecryptVerify() cryptographic primitive
- * from the specification.
+ * from the specification. For an empty ciphertext, the user of the API can provide
+ * an empty string, or a nullptr, and provide ciphertext_length as 0. The output buffer,
+ * plaintext can also be an empty string, or a nullptr for this case.
  *
  * @param ciphertext Ciphertext to decrypt
  * @param ciphertext_length Length of ciphertext

@@ -26,9 +26,6 @@
 // Include module header
 #include <system/SystemTimer.h>
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 // Include local headers
 #include <string.h>
 
@@ -90,7 +87,7 @@ Timer * Timer::New(System::Layer & systemLayer, uint32_t delayMilliseconds, Time
     {
         timer->AppState     = appState;
         timer->mSystemLayer = &systemLayer;
-        timer->mAwakenTime  = Clock::GetMonotonicMilliseconds() + static_cast<Clock::MonotonicMilliseconds>(delayMilliseconds);
+        timer->mAwakenTime  = Clock::AddOffset(SystemClock().GetMonotonicMilliseconds(), delayMilliseconds);
         if (!__sync_bool_compare_and_swap(&timer->mOnComplete, nullptr, onComplete))
         {
             chipDie();

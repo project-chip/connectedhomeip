@@ -115,6 +115,16 @@ static_library("support") {
     "verhoeff/Verhoeff36.cpp",
   ]
 
+  # added JNI helper on android
+  if (current_os == "android") {
+    sources += [
+      "CHIPJNIError.h",
+      "JniReferences.cpp",
+      "JniReferences.h",
+      "JniTypeWrappers.h",
+    ]
+  }
+
   libs = []
 
   cflags = [ "-Wconversion" ]

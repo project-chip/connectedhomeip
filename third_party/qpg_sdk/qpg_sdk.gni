@@ -60,7 +60,7 @@ template("qpg_sdk") {
       "${qpg_sdk_root}/${qpg_target_ic}/comps/qvCHIP/inc",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/Portable/GCC/ARM_CM3",
+      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/portable/GCC/ARM_CM3",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls",
       "${mbedtls_root}/repo/include",
       "${openthread_root}/include",
@@ -69,7 +69,8 @@ template("qpg_sdk") {
     lib_dirs = []
 
     libs += [
-      "${qpg_sdk_root}/${qpg_target_ic}/lib/libCHIP_${qpg_target_ic}.a",
+      "${qpg_sdk_root}/${qpg_target_ic}/lib/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a",
+      "${qpg_sdk_root}/${qpg_target_ic}/lib/libQorvoStack_${qpg_target_ic}.a",
       "${qpg_sdk_root}/${qpg_target_ic}/lib/libmbedtls_alt_${qpg_target_ic}.a",
     ]
 
@@ -177,7 +178,6 @@ template("qpg_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/x509write_crt.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
       "${chip_root}/third_party/mbedtls/repo/library/xtea.c",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/Portable/GCC/ARM_CM3/portmacro.h",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/FreeRTOS.h",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/deprecated_definitions.h",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/list.h",
@@ -189,6 +189,7 @@ template("qpg_sdk") {
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/stack_macros.h",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/task.h",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/timers.h",
+      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config/FreeRTOSConfig.h",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config/hooks.c",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls/${qpg_target_ic}-mbedtls-config.h",

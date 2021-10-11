@@ -36,7 +36,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/Constants.h>
-#include <transport/FabricTable.h>
+#include <transport/PairingSession.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
 
@@ -68,7 +68,7 @@ SessionManager::SessionManager() : mState(State::kNotReady) {}
 
 SessionManager::~SessionManager() {}
 
-CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
+CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                                 Transport::MessageCounterManagerInterface * messageCounterManager)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
@@ -77,7 +77,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mState                 = State::kInitialized;
     mSystemLayer           = systemLayer;
     mTransportMgr          = transportMgr;
-    mFabrics               = fabrics;
     mMessageCounterManager = messageCounterManager;
 
     mGlobalEncryptedMessageCounter.Init();
@@ -98,7 +97,6 @@ void SessionManager::Shutdown()
     mState        = State::kNotReady;
     mSystemLayer  = nullptr;
     mTransportMgr = nullptr;
-    mFabrics      = nullptr;
     mCB           = nullptr;
 }
 
@@ -123,7 +121,7 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader &
         }
 
         MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
-        ReturnErrorOnFailure(SecureMessageCodec::Encode(state, payloadHeader, packetHeader, message, counter));
+        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(state, payloadHeader, packetHeader, message, counter));
 
 #if CHIP_PROGRESS_LOGGING
         destination = state->GetPeerNodeId();
@@ -184,7 +182,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
                         " at monotonic time: %" PRId64 " msec",
                         "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(state->GetPeerNodeId()),
-                        System::Clock::GetMonotonicMilliseconds());
+                        System::SystemClock().GetMonotonicMilliseconds());
     }
     else
     {
@@ -196,7 +194,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
                         " at monotonic time: %" PRId64 " msec",
                         "plaintext", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(kUndefinedNodeId),
-                        System::Clock::GetMonotonicMilliseconds());
+                        System::SystemClock().GetMonotonicMilliseconds());
     }
 
     PacketBufferHandle msgBuf = preparedMessage.CastToWritable();
@@ -352,7 +350,6 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
     CHIP_ERROR err = session->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
-        ChipLogDetail(Inet, "Received a duplicate message with MessageCounter: %" PRIu32, packetHeader.GetMessageCounter());
         isDuplicate = SessionManagerDelegate::DuplicateMessage::Yes;
         err         = CHIP_NO_ERROR;
     }
@@ -399,6 +396,10 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
     }
 
+    // Decrypt and verify the message before message counter verification or any further processing.
+    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decrypt(state, payloadHeader, packetHeader, msg),
+                 ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding"));
+
     // Verify message counter
     if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
     {
@@ -433,7 +434,6 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
         err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
         if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
         {
-            ChipLogDetail(Inet, "Received a duplicate message with MessageCounter: %" PRIu32, packetHeader.GetMessageCounter());
             isDuplicate = SessionManagerDelegate::DuplicateMessage::Yes;
             err         = CHIP_NO_ERROR;
         }
@@ -445,10 +445,6 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
     }
 
     mPeerConnections.MarkConnectionActive(state);
-
-    // Decode the message
-    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
-                 ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
 
     if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {

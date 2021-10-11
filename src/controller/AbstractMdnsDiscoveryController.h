@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -25,8 +26,6 @@
 namespace chip {
 
 namespace Controller {
-
-constexpr uint16_t kMdnsPort = 5353;
 
 /**
  * @brief
@@ -52,6 +51,7 @@ protected:
     const Mdns::DiscoveredNodeData * GetDiscoveredNode(int idx);
     virtual DiscoveredNodeList GetDiscoveredNodes() = 0;
     chip::Mdns::Resolver * mResolver;
+    DeviceDiscoveryDelegate * mDeviceDiscoveryDelegate = nullptr;
 };
 
 } // namespace Controller

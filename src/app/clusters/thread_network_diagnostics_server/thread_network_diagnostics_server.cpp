@@ -16,10 +16,12 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -33,6 +35,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ThreadNetworkDiagnostics;
 using namespace chip::app::Clusters::ThreadNetworkDiagnostics::Attributes;
 using namespace chip::DeviceLayer;
 
@@ -44,12 +47,12 @@ public:
     // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
     ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) override;
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
 };
 
 ThreadDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead)
+CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
 {
     if (aClusterInfo.mClusterId != ThreadNetworkDiagnostics::Id)
     {
@@ -57,30 +60,36 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLV
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aClusterInfo.mFieldId, aWriter);
+    CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aClusterInfo.mFieldId, aEncoder);
 
-    *aDataRead = true;
-
-    // If it isn't a run time assigned attribute, e.j ClusterRevision, or if
-    // not implemented, use standard read.
-    // Clear error and no data read
+    // If it isn't a run time assigned attribute, e.g. ClusterRevision, or if
+    // not implemented, clear the error so we fall back to the standard read
+    // path.
+    //
+    // TODO: This is probably broken in practice.  The standard read path is not
+    // going to produce useful values for these things.  We need to either have
+    // fallbacks in the connectivity manager that encode some sort of default
+    // values or error out on reads we can't actually handle.
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE || err == CHIP_ERROR_NOT_IMPLEMENTED)
     {
-        err        = CHIP_NO_ERROR;
-        *aDataRead = false;
+        err = CHIP_NO_ERROR;
     }
 
     return err;
 }
 } // anonymous namespace
 
-bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
+                                                               const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                               Commands::ResetCounts::DecodableType & commandData)
 {
-    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::SetOverrunCount(endpoint, 0);
+    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to reset OverrunCount attribute");
     }
+
+    ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
 
     emberAfSendImmediateDefaultResponse(status);
     return true;

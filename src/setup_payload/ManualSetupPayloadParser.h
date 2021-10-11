@@ -43,6 +43,12 @@ private:
 public:
     ManualSetupPayloadParser(std::string decimalRepresentation) : mDecimalStringRepresentation(std::move(decimalRepresentation)) {}
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
+
+    static CHIP_ERROR CheckDecimalStringValidity(std::string decimalString, std::string & decimalStringWithoutCheckDigit);
+    static CHIP_ERROR CheckCodeLengthValidity(const std::string & decimalString, bool isLongCode);
+    static CHIP_ERROR ToNumber(const std::string & decimalString, uint32_t & dest);
+    static CHIP_ERROR ReadDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint32_t & dest,
+                                                  size_t numberOfCharsToRead);
 };
 
 } // namespace chip

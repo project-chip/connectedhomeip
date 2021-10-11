@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2021 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 package chip.devicecontroller;
 
 /** Exception thrown from CHIPDeviceController. */
-public class ChipDeviceControllerException extends Exception {
+public class ChipDeviceControllerException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   public int errorCode;

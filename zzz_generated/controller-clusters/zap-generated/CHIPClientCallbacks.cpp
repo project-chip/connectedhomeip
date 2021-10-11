@@ -1822,7 +1822,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(EndpointId endpoin
 
 bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t logEntryId,
                                                         uint32_t timestamp, uint8_t eventType, uint8_t source,
-                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
 {
     ChipLogProgress(Zcl, "GetLogRecordResponse:");
     ChipLogProgress(Zcl, "  logEntryId: %" PRIu16 "", logEntryId);
@@ -1831,8 +1831,7 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app
     ChipLogProgress(Zcl, "  source: %" PRIu8 "", source);
     ChipLogProgress(Zcl, "  eventIdOrAlarmCode: %" PRIu8 "", eventIdOrAlarmCode);
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  pin: %.*s", pin.size(), pin.data());
+    ChipLogProgress(Zcl, "  pin: %zu", pin.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetLogRecordResponseCallback");
 
@@ -1843,14 +1842,13 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app
 }
 
 bool emberAfDoorLockClusterGetPinResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                  uint8_t userStatus, uint8_t userType, uint8_t * pin)
+                                                  uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
 {
     ChipLogProgress(Zcl, "GetPinResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  pin: %.*s", pin.size(), pin.data());
+    ChipLogProgress(Zcl, "  pin: %zu", pin.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetPinResponseCallback");
 
@@ -1861,14 +1859,13 @@ bool emberAfDoorLockClusterGetPinResponseCallback(EndpointId endpoint, app::Comm
 }
 
 bool emberAfDoorLockClusterGetRfidResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                   uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+                                                   uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid)
 {
     ChipLogProgress(Zcl, "GetRfidResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  rfid: %.*s", rfid.size(), rfid.data());
+    ChipLogProgress(Zcl, "  rfid: %zu", rfid.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetRfidResponseCallback");
 
@@ -2494,8 +2491,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(E
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                        uint8_t status, uint32_t delayedActionTime,
                                                                        uint8_t * imageURI, uint32_t softwareVersion,
-                                                                       chip::ByteSpan updateToken, bool userConsentNeeded,
-                                                                       chip::ByteSpan metadataForRequestor)
+                                                                       uint8_t * softwareVersionString, chip::ByteSpan updateToken,
+                                                                       bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
 {
     ChipLogProgress(Zcl, "QueryImageResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2503,6 +2500,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(EndpointI
     // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
     // ChipLogProgress(Zcl, "  imageURI: %.*s", imageURI.size(), imageURI.data());
     ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", softwareVersion);
+    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
+    // ChipLogProgress(Zcl, "  softwareVersionString: %.*s", softwareVersionString.size(), softwareVersionString.data());
     ChipLogProgress(Zcl, "  updateToken: %zu", updateToken.size());
     ChipLogProgress(Zcl, "  userConsentNeeded: %d", userConsentNeeded);
     ChipLogProgress(Zcl, "  metadataForRequestor: %zu", metadataForRequestor.size());
@@ -2511,8 +2510,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(EndpointI
 
     Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> * cb =
         Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded,
-              metadataForRequestor);
+    cb->mCall(cb->mContext, status, delayedActionTime, imageURI, softwareVersion, softwareVersionString, updateToken,
+              userConsentNeeded, metadataForRequestor);
     return true;
 }
 

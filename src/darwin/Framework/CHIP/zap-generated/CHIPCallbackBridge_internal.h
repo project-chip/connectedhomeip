@@ -570,7 +570,7 @@ public:
         CHIPCallbackBridge<DoorLockClusterGetLogRecordResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
-                            uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin);
+                            uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin);
 };
 
 class CHIPDoorLockClusterGetPinResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterGetPinResponseCallback>
@@ -580,7 +580,7 @@ public:
                                                     bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterGetPinResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin);
+    static void OnSuccessFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin);
 };
 
 class CHIPDoorLockClusterGetRfidResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterGetRfidResponseCallback>
@@ -590,7 +590,7 @@ public:
                                                      bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterGetRfidResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid);
+    static void OnSuccessFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid);
 };
 
 class CHIPDoorLockClusterGetUserTypeResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterGetUserTypeResponseCallback>
@@ -1061,8 +1061,8 @@ public:
                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI,
-                            uint32_t softwareVersion, chip::ByteSpan updateToken, bool userConsentNeeded,
-                            chip::ByteSpan metadataForRequestor);
+                            uint32_t softwareVersion, uint8_t * softwareVersionString, chip::ByteSpan updateToken,
+                            bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 };
 
 class CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge

@@ -24,6 +24,7 @@
 
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
 
 #include "enums.h"
 
@@ -128,7 +129,7 @@ typedef struct _ConfigureReportingRecord
 // Struct for ConfigureReportingStatusRecord
 typedef struct _ConfigureReportingStatusRecord
 {
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     uint8_t direction;
     chip::AttributeId attributeId;
 } ConfigureReportingStatusRecord;
@@ -322,7 +323,7 @@ typedef struct _PowerProfileRecord
 typedef struct _ReadAttributeStatusRecord
 {
     chip::AttributeId attributeId;
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     uint8_t attributeType;
     uint8_t * attributeLocation;
 } ReadAttributeStatusRecord;
@@ -337,7 +338,7 @@ typedef struct _ReadReportingConfigurationAttributeRecord
 // Struct for ReadReportingConfigurationRecord
 typedef struct _ReadReportingConfigurationRecord
 {
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     uint8_t direction;
     chip::AttributeId attributeId;
     uint8_t attributeType;
@@ -488,7 +489,7 @@ typedef struct _WriteAttributeRecord
 // Struct for WriteAttributeStatusRecord
 typedef struct _WriteAttributeStatusRecord
 {
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     chip::AttributeId attributeId;
 } WriteAttributeStatusRecord;
 
@@ -505,7 +506,7 @@ typedef struct _WriteStructuredAttributeRecord
 // Struct for WriteStructuredAttributeStatusRecord
 typedef struct _WriteStructuredAttributeStatusRecord
 {
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     chip::AttributeId attributeId;
     uint8_t indicator;
     /* TYPE WARNING: array array defaults to */ uint8_t * indicies;

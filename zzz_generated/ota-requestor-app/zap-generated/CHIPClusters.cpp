@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -61,7 +62,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancel
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OtaSoftwareUpdateProvider::Commands::Ids::ApplyUpdateRequest,
+                                         OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -92,7 +93,7 @@ exit:
 
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback,
-                                                                 chip::ByteSpan updateToken, uint32_t currentVersion)
+                                                                 chip::ByteSpan updateToken, uint32_t softwareVersion)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -106,7 +107,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cance
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OtaSoftwareUpdateProvider::Commands::Ids::NotifyUpdateApplied,
+                                         OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -116,8 +117,8 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cance
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // updateToken: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
-    // currentVersion: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
+    // softwareVersion: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), softwareVersion));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -137,10 +138,9 @@ exit:
 
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint16_t vendorId,
-                                                        uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
-                                                        uint32_t currentVersion, uint8_t protocolsSupported,
-                                                        chip::ByteSpan location, bool requestorCanConsent,
-                                                        chip::ByteSpan metadataForProvider)
+                                                        uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion,
+                                                        uint8_t protocolsSupported, chip::ByteSpan location,
+                                                        bool requestorCanConsent, chip::ByteSpan metadataForProvider)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -154,7 +154,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OtaSoftwareUpdateProvider::Commands::Ids::QueryImage,
+                                         OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -166,16 +166,15 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
     // productId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), productId));
-    // imageType: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), imageType));
     // hardwareVersion: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
-    // currentVersion: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
-    // protocolsSupported: oTADownloadProtocol
+    // softwareVersion: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), softwareVersion));
+    // protocolsSupported: OTADownloadProtocol
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
     // location: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(location.data()), location.size())));
     // requestorCanConsent: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
     // metadataForProvider: octetString

@@ -10,13 +10,15 @@ namespace Clusters {
 
 namespace Globals {
 namespace Attributes {
-namespace Ids {
+
 {{#zcl_attributes_server}}
 {{#unless clusterRef}}
-static constexpr AttributeId {{asUpperCamelCase label}} = {{asMEI manufacturerCode code}};
+namespace {{asUpperCamelCase label}} {
+static constexpr AttributeId Id = {{asMEI manufacturerCode code}};
+} // namespace {{asUpperCamelCase label}}
+
 {{/unless}}
 {{/zcl_attributes_server}}
-} // namespace Ids
 } // namespace Attributes
 } // namespace Globals
 
@@ -27,13 +29,18 @@ static constexpr AttributeId {{asUpperCamelCase label}} = {{asMEI manufacturerCo
 {{#first}}
 namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
-namespace Ids {
+
 {{/first}}
+{{#unless clusterRef}}
+namespace {{asUpperCamelCase label}} = Globals::Attributes::{{asUpperCamelCase label}};
+{{/unless}}
 {{#if clusterRef}}
-static constexpr AttributeId {{asUpperCamelCase label}} = {{asMEI manufacturerCode code}};
+namespace {{asUpperCamelCase label}} {
+static constexpr AttributeId Id = {{asMEI manufacturerCode code}};
+} // namespace {{asUpperCamelCase label}}
 {{/if}}
+
 {{#last}}
-} // namespace Ids
 } // namespace Attributes
 } // namespace {{asUpperCamelCase parent.label}}
 

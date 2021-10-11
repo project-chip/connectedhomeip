@@ -47,12 +47,12 @@ namespace {
 
 void TestRealClock(nlTestSuite * inSuite, void * inContext)
 {
-    Clock::MonotonicMilliseconds oldMilli = Clock::GetMonotonicMilliseconds();
-    Clock::MonotonicMilliseconds newMilli = Clock::GetMonotonicMilliseconds();
+    Clock::MonotonicMilliseconds oldMilli = SystemClock().GetMonotonicMilliseconds();
+    Clock::MonotonicMilliseconds newMilli = SystemClock().GetMonotonicMilliseconds();
     NL_TEST_ASSERT(inSuite, newMilli >= oldMilli);
 
-    Clock::MonotonicMicroseconds oldMicro = Clock::GetMonotonicMicroseconds();
-    Clock::MonotonicMicroseconds newMicro = Clock::GetMonotonicMicroseconds();
+    Clock::MonotonicMicroseconds oldMicro = SystemClock().GetMonotonicMicroseconds();
+    Clock::MonotonicMicroseconds newMicro = SystemClock().GetMonotonicMicroseconds();
     NL_TEST_ASSERT(inSuite, newMicro >= oldMicro);
 
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME &&                                                                                  \
@@ -70,10 +70,10 @@ void TestRealClock(nlTestSuite * inSuite, void * inContext)
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
-    newMilli = Clock::GetMonotonicMilliseconds();
+    newMilli = SystemClock().GetMonotonicMilliseconds();
     NL_TEST_ASSERT(inSuite, newMilli > oldMilli);
 
-    newMicro = Clock::GetMonotonicMicroseconds();
+    newMicro = SystemClock().GetMonotonicMicroseconds();
     NL_TEST_ASSERT(inSuite, newMicro > oldMicro);
 
 #endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME && (CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME ||
@@ -91,17 +91,17 @@ void TestMockClock(nlTestSuite * inSuite, void * inContext)
     };
     MockClock clock;
 
-    ClockBase * savedRealClock = Internal::gClockBase;
-    Internal::gClockBase       = &clock;
+    ClockBase * savedRealClock = &SystemClock();
+    SetSystemClockForTesting(&clock);
 
-    NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMilliseconds() == 0);
-    NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMicroseconds() == 0);
+    NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMilliseconds() == 0);
+    NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMicroseconds() == 0);
 
     clock.mTime = 1234;
-    NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMilliseconds() == 1234);
-    NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMicroseconds() == 1234 * chip::kMicrosecondsPerMillisecond);
+    NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMilliseconds() == 1234);
+    NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMicroseconds() == 1234 * chip::kMicrosecondsPerMillisecond);
 
-    Internal::gClockBase = savedRealClock;
+    SetSystemClockForTesting(savedRealClock);
 }
 
 } // namespace

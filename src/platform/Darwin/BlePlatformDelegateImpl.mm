@@ -114,7 +114,16 @@ namespace DeviceLayer {
             return true;
         }
 
-        uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const { return 0; }
+        uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const
+        {
+            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+
+            // The negotiated mtu length is a property of the peripheral.
+            uint16_t mtuLength = [[peripheral valueForKey:@"mtuLength"] unsignedShortValue];
+            ChipLogProgress(Ble, "ATT MTU = %u", mtuLength);
+
+            return mtuLength;
+        }
 
         bool BlePlatformDelegateImpl::SendIndication(
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBufferHandle pBuf)

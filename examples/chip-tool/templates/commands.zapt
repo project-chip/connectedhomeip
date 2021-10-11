@@ -175,10 +175,6 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
 {{> clusters_header}}
 
 {{#chip_client_clusters}}
-constexpr chip::ClusterId k{{asUpperCamelCase name}}ClusterId = {{asHex code 4}};
-{{/chip_client_clusters}}
-
-{{#chip_client_clusters}}
 {{> cluster_header}}
 
 {{#chip_cluster_commands}}
@@ -319,9 +315,6 @@ public:
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        {{#if isAnalog}}
-        AddArgument("change", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mChange);
-        {{/if}}
         ModelCommand::AddArguments();
     }
 
@@ -345,7 +338,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval{{#if isAnalog}}, mChange{{/if}});
+        return cluster.SubscribeAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
     }
 
 private:
@@ -354,9 +347,6 @@ private:
     chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    {{#if isAnalog}}
-    {{chipType}} mChange;
-    {{/if}}
 };
 
 {{/if}}
