@@ -29,10 +29,10 @@ static_library("server") {
   sources = [
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",
-    "EchoHandler.cpp",
-    "EchoHandler.h",
     "Dnssd.cpp",
     "Dnssd.h",
+    "EchoHandler.cpp",
+    "EchoHandler.h",
     "OnboardingCodesUtil.cpp",
     "OnboardingCodesUtil.h",
     "Server.cpp",

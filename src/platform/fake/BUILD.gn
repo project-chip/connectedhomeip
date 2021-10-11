@@ -25,9 +25,9 @@ static_library("fake") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DnssdImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "DnssdImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
   ]
