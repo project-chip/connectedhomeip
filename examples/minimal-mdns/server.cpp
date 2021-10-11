@@ -187,10 +187,12 @@ int main(int argc, char ** args)
     mdns::Minimal::Server<10 /* endpoints */> mdnsServer;
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
-    mdns::Minimal::QNamePart tcpServiceName[] = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
+    mdns::Minimal::QNamePart tcpServiceName[]       = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
+                                                  Dnssd::kLocalDomain };
     mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, Dnssd::kOperationalServiceName,
                                                         Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
-    mdns::Minimal::QNamePart udpServiceName[] = { Dnssd::kCommissionableServiceName, Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+    mdns::Minimal::QNamePart udpServiceName[]       = { Dnssd::kCommissionableServiceName, Dnssd::kCommissionProtocol,
+                                                  Dnssd::kLocalDomain };
     mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, Dnssd::kCommissionableServiceName,
                                                         Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
 

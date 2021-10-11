@@ -122,7 +122,7 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
 
     // encode our client message
     char nameBuffer[Dnssd::kMaxInstanceNameSize + 1] = "Chris";
-    System::PacketBufferHandle payloadBuf           = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+    System::PacketBufferHandle payloadBuf            = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
     udcClient.EncodeUDCMessage(std::move(payloadBuf));
 
     // prepare peerAddress for handleMessage
@@ -171,7 +171,7 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
 void TestUserDirectedCommissioningClientMessage(nlTestSuite * inSuite, void * inContext)
 {
     char nameBuffer[Dnssd::kMaxInstanceNameSize + 1] = "Chris";
-    System::PacketBufferHandle payloadBuf           = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+    System::PacketBufferHandle payloadBuf            = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
     UserDirectedCommissioningClient udcClient;
 
     // obtain the UDC message
@@ -193,7 +193,7 @@ void TestUserDirectedCommissioningClientMessage(nlTestSuite * inSuite, void * in
     // check the payload
     char instanceName[chip::Dnssd::kMaxInstanceNameSize + 1];
     size_t instanceNameLength = (payloadBuf->DataLength() > (chip::Dnssd::kMaxInstanceNameSize)) ? chip::Dnssd::kMaxInstanceNameSize
-                                                                                                : payloadBuf->DataLength();
+                                                                                                 : payloadBuf->DataLength();
     payloadBuf->Read(Uint8::from_char(instanceName), instanceNameLength);
     instanceName[instanceNameLength] = '\0';
     ChipLogProgress(Inet, "UDC instance=%s", instanceName);

@@ -83,7 +83,7 @@ private:
     bool mIsCommissionerPublishing       = false;
     uint64_t mCommissionInstanceName;
 
-    bool mDnssdInitialized                = false;
+    bool mDnssdInitialized               = false;
     ResolverDelegate * mResolverDelegate = nullptr;
 
     static DiscoveryImplPlatform sManager;

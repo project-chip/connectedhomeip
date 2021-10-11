@@ -159,7 +159,7 @@ private:
 
         static constexpr size_t kServiceBufferSize = Dnssd::kDnssdInstanceNameMaxSize + 1 + // add null-terminator
             Dnssd::kDnssdTypeAndProtocolMaxSize + 1 +                                       // add null-terminator
-            kSubTypeTotalLength + kSubTypeMaxNumber +                                     // add null-terminator for each subtype
+            kSubTypeTotalLength + kSubTypeMaxNumber +                                       // add null-terminator for each subtype
             kTxtTotalValueLength;
 
         struct Service
@@ -195,8 +195,8 @@ private:
         std::max(Dnssd::CommissionAdvertisingParameters::kTxtMaxNumber, Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber);
     static constexpr size_t kTotalDnsServiceTxtValueSize = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
                                                                     Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
-    static constexpr size_t kTotalDnsServiceTxtKeySize =
-        std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalKeySize, Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
+    static constexpr size_t kTotalDnsServiceTxtKeySize   = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalKeySize,
+                                                                  Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
 #else
     // Thread only supports operational discovery.
     static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
@@ -224,7 +224,8 @@ private:
     static void OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
     static void OnDnsResolveResult(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
     static CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
-                                                  chip::Dnssd::DnssdService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries);
+                                                  chip::Dnssd::DnssdService & mdnsService,
+                                                  DnsServiceTxtEntries & serviceTxtEntries);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 

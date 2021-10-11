@@ -10,8 +10,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 
-using chip::Dnssd::MdDnssdServicensService;
 using chip::Dnssd::DnssdServiceProtocol;
+using chip::Dnssd::MdDnssdServicensService;
 using chip::Dnssd::TextEntry;
 
 static void HandleResolve(void * context, DnssdService * result, CHIP_ERROR error)
@@ -72,7 +72,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
 
     NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service) == CHIP_NO_ERROR);
     ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
-                   HandleBrowse, suite);
+                    HandleBrowse, suite);
 }
 
 static void ErrorCallback(void * context, CHIP_ERROR error)
