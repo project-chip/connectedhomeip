@@ -51,7 +51,7 @@ namespace {{name}} {
         {{/if}}
         {{/zcl_struct_items}}
 
-        CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
+        CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
         {{#unless struct_contains_array}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
         {{/unless}}
@@ -102,7 +102,7 @@ public:
     {{/if}}
     {{/zcl_command_arguments}}
 
-    CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
 };
 
 struct DecodableType {

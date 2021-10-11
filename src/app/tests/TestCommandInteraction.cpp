@@ -413,7 +413,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestS
 struct Fields
 {
     static constexpr chip::CommandId CommandId = 4;
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, uint64_t aTag) const
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     {
         TLV::TLVType outerContainerType;
         ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outerContainerType));

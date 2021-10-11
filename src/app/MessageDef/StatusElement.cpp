@@ -190,7 +190,7 @@ CHIP_ERROR StatusElement::Builder::Init(chip::TLV::TLVWriter * const apWriter, c
 StatusElement::Builder & StatusElement::Builder::EncodeStatusElement(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                                                      const uint32_t aProtocolId, const uint16_t aProtocolCode)
 {
-    uint64_t tag = chip::TLV::AnonymousTag;
+    Tag tag = chip::TLV::AnonymousTag;
 
     SuccessOrExit(mError);
 

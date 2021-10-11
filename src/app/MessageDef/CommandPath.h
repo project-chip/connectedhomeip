@@ -185,7 +185,7 @@ public:
     CommandPath::Builder & EndOfCommandPath();
 
 private:
-    CHIP_ERROR _Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag);
+    CHIP_ERROR _Init(TLV::TLVWriter * const apWriter, const TLV::Tag aTag);
 };
 }; // namespace CommandPath
 
