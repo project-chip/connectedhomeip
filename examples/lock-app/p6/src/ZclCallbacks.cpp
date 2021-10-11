@@ -24,37 +24,21 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
+using namespace ::chip::app::Clusters;
 
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
-    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
+    if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
-        P6_LOG("Unknown cluster ID: %ld", clusterId);
-        return;
-    }
-
-    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
-    {
-        P6_LOG("Unknown attribute ID: %ld", attributeId);
-        return;
-    }
-
-    if (*value)
-    {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::Action::kLock);
-    }
-    else
-    {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::Action::kUnlock);
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock,
+                                     *value ? BoltLockManager::Action::kLock : BoltLockManager::Action::kUnlock);
     }
 }
 

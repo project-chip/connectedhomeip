@@ -49,6 +49,7 @@
 #include <app/util/time-util.h>
 
 #include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <lib/support/CodeUtils.h>
 
@@ -875,9 +876,9 @@ void emberAfPluginDoorLockServerRelockEventHandler(void)
     emberAfDoorLockClusterPrintln("Door automatically relocked: 0x%X", status);
 }
 
-void emberAfDoorLockClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
+void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    if (endpoint == DOOR_LOCK_SERVER_ENDPOINT && attributeId == ZCL_LOCK_STATE_ATTRIBUTE_ID)
+    if (attributePath.mEndpointId == DOOR_LOCK_SERVER_ENDPOINT && attributePath.mAttributeId == ZCL_LOCK_STATE_ATTRIBUTE_ID)
     {
         uint8_t lockState;
         EmberAfStatus status = emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID,

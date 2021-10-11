@@ -334,58 +334,37 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
 }
 
 // This function is used to call the per-cluster attribute changed callback
-void emAfClusterAttributeChangedCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                         uint8_t clientServerMask, uint16_t manufacturerCode)
+void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask)
 {
-    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, clientServerMask, manufacturerCode);
+    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask,
+                                                             EMBER_AF_NULL_MANUFACTURER_CODE);
     if (cluster != NULL)
     {
-        if (manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)
+        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
+        if (f != NULL)
         {
-            EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
-            if (f != NULL)
-            {
-                // emberAfPushEndpointNetworkIndex(endpoint);
-                ((EmberAfClusterAttributeChangedCallback) f)(endpoint, attributeId);
-                // emberAfPopNetworkIndex();
-            }
-        }
-        else
-        {
-            EmberAfGenericClusterFunction f =
-                emberAfFindClusterFunction(cluster, CLUSTER_MASK_MANUFACTURER_SPECIFIC_ATTRIBUTE_CHANGED_FUNCTION);
-            if (f != NULL)
-            {
-                // emberAfPushEndpointNetworkIndex(endpoint);
-                ((EmberAfManufacturerSpecificClusterAttributeChangedCallback) f)(endpoint, attributeId, manufacturerCode);
-                // emberAfPopNetworkIndex();
-            }
+            ((EmberAfClusterAttributeChangedCallback) f)(attributePath);
         }
     }
 }
 
 // This function is used to call the per-cluster pre-attribute changed callback
-EmberAfStatus emAfClusterPreAttributeChangedCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                     uint8_t clientServerMask, uint16_t manufacturerCode,
+EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, clientServerMask, manufacturerCode);
+    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask,
+                                                             EMBER_AF_NULL_MANUFACTURER_CODE);
     if (cluster == NULL)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
     else
     {
-        EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-        if (manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)
+        EmberAfStatus status            = EMBER_ZCL_STATUS_SUCCESS;
+        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
+        if (f != NULL)
         {
-            EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
-            if (f != NULL)
-            {
-                // emberAfPushEndpointNetworkIndex(endpoint);
-                status = ((EmberAfClusterPreAttributeChangedCallback) f)(endpoint, attributeId, attributeType, size, value);
-                // emberAfPopNetworkIndex();
-            }
+            status = ((EmberAfClusterPreAttributeChangedCallback) f)(attributePath, attributeType, size, value);
         }
         return status;
     }
