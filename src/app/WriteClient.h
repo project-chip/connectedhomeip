@@ -21,7 +21,7 @@
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/AttributeDataList.h>
-#include <app/MessageDef/AttributeStatusElement.h>
+#include <app/MessageDef/AttributeStatusIB.h>
 #include <app/MessageDef/WriteRequest.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -124,7 +124,7 @@ private:
 
     void MoveToState(const State aTargetState);
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
-    CHIP_ERROR ProcessAttributeStatusElement(AttributeStatusElement::Parser & aAttributeStatusElement);
+    CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
     CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
                                       AttributeDataElement::Builder aAttributeDataElement);
     void ClearExistingExchangeContext();

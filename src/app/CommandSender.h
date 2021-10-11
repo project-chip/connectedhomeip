@@ -39,7 +39,7 @@
 
 #include <app/Command.h>
 #include <app/MessageDef/CommandPath.h>
-#include <app/MessageDef/StatusElement.h>
+#include <app/MessageDef/StatusIB.h>
 
 #define COMMON_STATUS_SUCCESS 0
 
@@ -65,7 +65,7 @@ public:
          *
          * @param[in] apCommandSender: The command sender object that initiated the command transaction.
          * @param[in] aPath: The command path field in invoke command response.
-         * @param[in] aData: The command data, will be nullptr if the server returns a StatusElement.
+         * @param[in] aData: The command data, will be nullptr if the server returns a StatusIB.
          */
         virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, TLV::TLVReader * aData) {}
 

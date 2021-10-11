@@ -157,7 +157,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const ConcreteCommandPath & aCommandPat
                                          const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusElement::Builder statusElementBuilder;
+    StatusIB::Builder statusIBBuilder;
 
     chip::app::CommandPathParams commandPathParams = { aCommandPath.mEndpointId,
                                                        0, // GroupId
@@ -167,18 +167,17 @@ CHIP_ERROR CommandHandler::AddStatusCode(const ConcreteCommandPath & aCommandPat
     err = PrepareCommand(commandPathParams, false /* aStartDataStruct */);
     SuccessOrExit(err);
 
-    statusElementBuilder =
-        mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
+    statusIBBuilder = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusIBBuilder();
 
     //
     // TODO: Most of the callers are incorrectly passing SecureChannel as the protocol ID, when in fact, the status code provided
     // above is always an IM code. Instead of fixing all the callers (which is a fairly sizeable change), we'll embark on fixing
     // this more completely when we fix #9530.
     //
-    statusElementBuilder
-        .EncodeStatusElement(aGeneralCode, Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
-        .EndOfStatusElement();
-    err = statusElementBuilder.GetError();
+    statusIBBuilder
+        .EncodeStatusIB(aGeneralCode, Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
+        .EndOfStatusIB();
+    err = statusIBBuilder.GetError();
     SuccessOrExit(err);
 
     err = FinishCommand(false /* aEndDataStruct */);
