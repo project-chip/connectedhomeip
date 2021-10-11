@@ -184,7 +184,7 @@ public:
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put
      */
     template <class T>
-    CHIP_ERROR EncodeScalarAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const T & value)
+    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const T & value)
     {
         chip::TLV::TLVWriter * writer = nullptr;
 
