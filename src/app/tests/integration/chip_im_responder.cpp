@@ -25,6 +25,7 @@
  */
 
 #include "MockEvents.h"
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/EventManagement.h>
@@ -110,15 +111,14 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     // Nothing todo.
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     uint64_t version = 0;
-    VerifyOrExit(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(apWriter != nullptr, /* no op */);
 
-    err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), kTestFieldValue1);
+    err = AttributeValueEncoder(apWriter).Encode(kTestFieldValue1);
     SuccessOrExit(err);
     err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 

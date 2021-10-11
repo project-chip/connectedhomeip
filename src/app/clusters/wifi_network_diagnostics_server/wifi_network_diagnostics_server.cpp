@@ -42,7 +42,7 @@ public:
     // Register for the WiFiNetworkDiagnostics cluster on all endpoints.
     WiFiDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
@@ -69,15 +69,15 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityMan
 
 WiFiDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != WiFiNetworkDiagnostics::Id)
+    if (aPath.mClusterId != WiFiNetworkDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case Attributes::SecurityType::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiSecurityType, aEncoder);

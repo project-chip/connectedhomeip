@@ -64,7 +64,8 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 CHIP_ERROR
 Engine::RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo)
 {
-    CHIP_ERROR err                                            = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
     AttributeDataElement::Builder attributeDataElementBuilder = aAttributeDataList.CreateAttributeDataElementBuilder();
     AttributePath::Builder attributePathBuilder               = attributeDataElementBuilder.CreateAttributePathBuilder();
     attributePathBuilder.NodeId(aClusterInfo.mNodeId)
@@ -78,7 +79,7 @@ Engine::RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, Clu
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
                   aClusterInfo.mFieldId);
 
-    err = ReadSingleClusterData(aClusterInfo, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
+    err = ReadSingleClusterData(path, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
     SuccessOrExit(err);
     attributeDataElementBuilder.MoreClusterData(false);
     attributeDataElementBuilder.EndOfAttributeDataElement();
