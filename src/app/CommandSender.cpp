@@ -37,7 +37,7 @@ namespace chip {
 namespace app {
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr) :
-    Command(apExchangeMgr), mpCallback(apCallback)
+    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr)
 {}
 
 CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
