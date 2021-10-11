@@ -172,24 +172,24 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AttributeStatusList::Builder attributeStatusListBuilder = writeResponseBuilder.CreateAttributeStatusListBuilder();
     NL_TEST_ASSERT(apSuite, attributeStatusListBuilder.GetError() == CHIP_NO_ERROR);
-    AttributeStatusElement::Builder attributeStatusElementBuilder = attributeStatusListBuilder.CreateAttributeStatusBuilder();
-    NL_TEST_ASSERT(apSuite, attributeStatusElementBuilder.GetError() == CHIP_NO_ERROR);
+    AttributeStatusIB::Builder attributeStatusIBBuilder = attributeStatusListBuilder.CreateAttributeStatusBuilder();
+    NL_TEST_ASSERT(apSuite, attributeStatusIBBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributeStatusElementBuilder.CreateAttributePathBuilder();
+    AttributePath::Builder attributePathBuilder = attributeStatusIBBuilder.CreateAttributePathBuilder();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    StatusElement::Builder statusElementBuilder = attributeStatusElementBuilder.CreateStatusElementBuilder();
-    NL_TEST_ASSERT(apSuite, statusElementBuilder.GetError() == CHIP_NO_ERROR);
-    statusElementBuilder.EncodeStatusElement(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3)
-        .EndOfStatusElement();
-    err = statusElementBuilder.GetError();
+    StatusIB::Builder StatusIBBuilder = attributeStatusIBBuilder.CreateStatusIBBuilder();
+    NL_TEST_ASSERT(apSuite, StatusIBBuilder.GetError() == CHIP_NO_ERROR);
+    StatusIBBuilder.EncodeStatusIB(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3)
+        .EndOfStatusIB();
+    err = StatusIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    attributeStatusElementBuilder.EndOfAttributeStatusElement();
-    NL_TEST_ASSERT(apSuite, attributeStatusElementBuilder.GetError() == CHIP_NO_ERROR);
+    attributeStatusIBBuilder.EndOfAttributeStatusIB();
+    NL_TEST_ASSERT(apSuite, attributeStatusIBBuilder.GetError() == CHIP_NO_ERROR);
 
     attributeStatusListBuilder.EndOfAttributeStatusList();
     NL_TEST_ASSERT(apSuite, attributeStatusListBuilder.GetError() == CHIP_NO_ERROR);

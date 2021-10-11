@@ -203,9 +203,9 @@ exit:
 }
 
 CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                                AttributeStatusElement::Builder aAttributeStatusElement)
+                                                AttributeStatusIB::Builder aAttributeStatusIB)
 {
-    AttributePath::Builder attributePath = aAttributeStatusElement.CreateAttributePathBuilder();
+    AttributePath::Builder attributePath = aAttributeStatusIB.CreateAttributePathBuilder();
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
     {
         attributePath.FieldId(aAttributePathParams.mFieldId);
@@ -229,23 +229,23 @@ CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAtt
                                                 const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusElement::Builder statusElementBuilder;
-    AttributeStatusElement::Builder attributeStatusElement =
+    StatusIB::Builder StatusIBBuilder;
+    AttributeStatusIB::Builder attributeStatusIB =
         mWriteResponseBuilder.GetAttributeStatusListBuilder().CreateAttributeStatusBuilder();
-    err = attributeStatusElement.GetError();
+    err = attributeStatusIB.GetError();
     SuccessOrExit(err);
 
-    err = ConstructAttributePath(aAttributePathParams, attributeStatusElement);
+    err = ConstructAttributePath(aAttributePathParams, attributeStatusIB);
     SuccessOrExit(err);
 
-    statusElementBuilder = attributeStatusElement.CreateStatusElementBuilder();
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
-        .EndOfStatusElement();
-    err = statusElementBuilder.GetError();
+    StatusIBBuilder = attributeStatusIB.CreateStatusIBBuilder();
+    StatusIBBuilder.EncodeStatusIB(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
+        .EndOfStatusIB();
+    err = StatusIBBuilder.GetError();
     SuccessOrExit(err);
 
-    attributeStatusElement.EndOfAttributeStatusElement();
-    err = attributeStatusElement.GetError();
+    attributeStatusIB.EndOfAttributeStatusIB();
+    err = attributeStatusIB.GetError();
     SuccessOrExit(err);
     MoveToState(State::AddAttributeStatusCode);
 

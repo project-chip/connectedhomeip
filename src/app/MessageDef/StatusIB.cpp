@@ -17,11 +17,11 @@
  */
 /**
  *    @file
- *      This file defines StatusElement parser and builder in CHIP interaction model
+ *      This file defines StatusIB parser and builder in CHIP interaction model
  *
  */
 
-#include "StatusElement.h"
+#include "StatusIB.h"
 
 #include "MessageDefHelper.h"
 
@@ -36,7 +36,7 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR StatusElement::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR StatusIB::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -50,7 +50,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR StatusElement::Parser::DecodeStatusElement(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode,
+CHIP_ERROR StatusIB::Parser::DecodeStatusIB(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode,
                                                       uint32_t * apProtocolId, uint16_t * apProtocolCode) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -83,13 +83,13 @@ exit:
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR StatusElement::Parser::CheckSchemaValidity() const
+CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
 
-    PRETTY_PRINT("StatusElement =");
+    PRETTY_PRINT("StatusIB =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -147,7 +147,7 @@ CHIP_ERROR StatusElement::Parser::CheckSchemaValidity() const
         }
         else
         {
-            PRETTY_PRINT("\tExtra element in StatusElement");
+            PRETTY_PRINT("\tExtra element in StatusIB");
         }
     }
 
@@ -177,17 +177,17 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR StatusElement::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR StatusIB::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return ListBuilder::Init(apWriter);
 }
 
-CHIP_ERROR StatusElement::Builder::Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
+CHIP_ERROR StatusIB::Builder::Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
 {
     return ListBuilder::Init(apWriter, aContextTagToUse);
 }
 
-StatusElement::Builder & StatusElement::Builder::EncodeStatusElement(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                                                      const uint32_t aProtocolId, const uint16_t aProtocolCode)
 {
     Tag tag = chip::TLV::AnonymousTag;
@@ -207,7 +207,7 @@ exit:
     return *this;
 }
 
-StatusElement::Builder & StatusElement::Builder::EndOfStatusElement()
+StatusIB::Builder & StatusIB::Builder::EndOfStatusIB()
 {
     EndOfContainer();
     return *this;

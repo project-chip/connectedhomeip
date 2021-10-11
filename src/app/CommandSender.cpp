@@ -145,14 +145,14 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         chip::TLV::TLVReader commandDataReader;
 
         // Default to success when an invoke response is received.
-        StatusElement::Type statusElement{ chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+        StatusIB::Type StatusIB{ chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                            chip::Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
                                            to_underlying(Protocols::InteractionModel::Status::Success) };
-        StatusElement::Parser statusElementParser;
-        err = aCommandElement.GetStatusElement(&statusElementParser);
+        StatusIB::Parser StatusIBParser;
+        err = aCommandElement.GetStatusIB(&StatusIBParser);
         if (CHIP_NO_ERROR == err)
         {
-            err = statusElementParser.DecodeStatusElement(statusElement);
+            err = StatusIBParser.DecodeStatusIB(StatusIB);
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -163,16 +163,16 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
 
         if (mpCallback != nullptr)
         {
-            if (statusElement.protocolId == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm())
+            if (StatusIB.protocolId == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm())
             {
-                if (statusElement.protocolCode == to_underlying(Protocols::InteractionModel::Status::Success))
+                if (StatusIB.protocolCode == to_underlying(Protocols::InteractionModel::Status::Success))
                 {
                     mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId),
                                            hasDataResponse ? &commandDataReader : nullptr);
                 }
                 else
                 {
-                    mpCallback->OnError(this, static_cast<Protocols::InteractionModel::Status>(statusElement.protocolCode),
+                    mpCallback->OnError(this, static_cast<Protocols::InteractionModel::Status>(StatusIB.protocolCode),
                                         CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
                 }
             }

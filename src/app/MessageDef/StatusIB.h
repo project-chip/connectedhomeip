@@ -17,7 +17,7 @@
  */
 /**
  *    @file
- *      This file defines StatusElement parser and builder in CHIP interaction model
+ *      This file defines StatusIB parser and builder in CHIP interaction model
  *
  */
 
@@ -36,7 +36,7 @@
 
 namespace chip {
 namespace app {
-namespace StatusElement {
+namespace StatusIB {
 enum
 {
     kCsTag_GeneralCode  = 1,
@@ -58,7 +58,7 @@ public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this StatusElement
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this StatusIB
      *
      *  @return #CHIP_NO_ERROR on success
      */
@@ -92,12 +92,12 @@ public:
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
-    CHIP_ERROR DecodeStatusElement(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode, uint32_t * apProtocolId,
+    CHIP_ERROR DecodeStatusIB(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode, uint32_t * apProtocolId,
                                    uint16_t * apProtocolCode) const;
 
-    inline CHIP_ERROR DecodeStatusElement(Type & aStatusElement)
+    inline CHIP_ERROR DecodeStatusIB(Type & aStatusIB)
     {
-        return DecodeStatusElement(&aStatusElement.generalCode, &aStatusElement.protocolId, &aStatusElement.protocolCode);
+        return DecodeStatusIB(&aStatusIB.generalCode, &aStatusIB.protocolId, &aStatusIB.protocolCode);
     };
 };
 
@@ -105,7 +105,7 @@ class Builder : public ListBuilder
 {
 public:
     /**
-     *  @brief Initialize a StatusElement::Builder for writing into a TLV stream
+     *  @brief Initialize a StatusIB::Builder for writing into a TLV stream
      *
      *  @param [in] apWriter    A pointer to TLVWriter
      *
@@ -114,7 +114,7 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     * Init the StatusElement container with an particular context tag.
+     * Init the StatusIB container with an particular context tag.
      * Required to implement arrays of arrays, and to test ListBuilder.
      *
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
@@ -135,22 +135,22 @@ public:
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
-    StatusElement::Builder & EncodeStatusElement(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+    StatusIB::Builder & EncodeStatusIB(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                                  const uint32_t aProtocolId, const uint16_t aProtocolCode);
 
-    inline StatusElement::Builder & EncodeStatusElement(const Type & aStatusElement)
+    inline StatusIB::Builder & EncodeStatusIB(const Type & aStatusIB)
     {
-        return EncodeStatusElement(aStatusElement.generalCode, aStatusElement.protocolId, aStatusElement.protocolCode);
+        return EncodeStatusIB(aStatusIB.generalCode, aStatusIB.protocolId, aStatusIB.protocolCode);
     }
 
     /**
-     *  @brief Mark the end of this StatusElement
+     *  @brief Mark the end of this StatusIB
      *
      *  @return A reference to *this
      */
-    StatusElement::Builder & EndOfStatusElement();
+    StatusIB::Builder & EndOfStatusIB();
 };
-}; // namespace StatusElement
+}; // namespace StatusIB
 
 }; // namespace app
 }; // namespace chip
