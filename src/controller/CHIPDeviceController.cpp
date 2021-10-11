@@ -2031,4 +2031,3 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
 } // namespace Controller
 } // namespace chip
-
