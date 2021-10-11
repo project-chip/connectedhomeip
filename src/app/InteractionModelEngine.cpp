@@ -142,6 +142,21 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
     return err;
 }
 
+CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    for (auto & readClient : mReadClients)
+    {
+        if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.IsMatchingClient(aSubscriptionId))
+        {
+            readClient.Shutdown();
+        }
+    }
+
+    return err;
+}
+
 CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier)
 {
     apWriteClient.SetWriteClient(nullptr);

@@ -110,6 +110,13 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
+
+    /**
+     * Tears down a active subscription. Will do nothing and return CHIP_NO_ERROR if no subscription found.
+     *
+     * @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR ShutdownSubscription(uint64_t aSubscriptionId);
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
      *  see WriteClient documentation for lifetime handling.

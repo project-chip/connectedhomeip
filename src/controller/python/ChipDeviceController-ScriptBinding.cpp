@@ -167,6 +167,8 @@ ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::Devic
 uint64_t pychip_GetCommandSenderHandle(chip::Controller::Device * device);
 // CHIP Stack objects
 ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
+
+chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(uint64_t subscriptionId);
 }
 
 ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
@@ -587,4 +589,9 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
     }
     PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
     return CHIP_NO_ERROR.AsInteger();
+}
+
+chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(uint64_t subscriptionId)
+{
+    return chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscription(subscriptionId).AsInteger();
 }
