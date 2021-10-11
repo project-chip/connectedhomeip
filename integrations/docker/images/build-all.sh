@@ -26,3 +26,4 @@ find "$(git rev-parse --show-toplevel)"/integrations/docker/images/ -name Docker
     ./build.sh "$@"
     popd >/dev/null
 done
+docker image prune --force
