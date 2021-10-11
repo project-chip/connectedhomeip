@@ -33,10 +33,10 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 #endif
 
+#include <esp_wifi.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
-#include <esp_wifi.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
