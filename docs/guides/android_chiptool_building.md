@@ -70,8 +70,8 @@ Complete the following steps to prepare the CHIP build:
     source scripts/bootstrap.sh
     ```
 
-3. Choose how you want to build the Android CHIPTool. There are two ways: from
-   script, or from source within Android Studio.
+3. Choose how you want to build the Android CHIPTool. There are **two** ways:
+   from script, or from source within Android Studio.
 
 <a name="building-scripts"></a>
 
@@ -81,7 +81,7 @@ This is the simplest option. In the command line, run the following command from
 the top CHIP directory:
 
 ```shell
-./scripts/build/build_examples.py --platform android --board arm64 build
+./scripts/build/build_examples.py --target android-arm64-chip-tool build
 ```
 
 See the table above for other values of `TARGET_CPU`.
@@ -114,7 +114,7 @@ allows us to directly edit core CHIP code in-IDE.
     See the table above for other values of `TARGET_CPU`.
 
 2. Modify the `matterBuildSrcDir` variable in
-   [src/android/CHIPTool/build.gradle](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/build.gradle)
+   [src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
    to point to the appropriate output directory (e.g. `out/android_arm64`).
 
 3. Open the project in Android Studio and run **Sync Project with Gradle
