@@ -89,7 +89,7 @@ def getSpecificTemplatesTargets():
 
 def getTargets():
     targets = []
-    #targets.extend(getGlobalTemplatesTargets())
+    # targets.extend(getGlobalTemplatesTargets())
     targets.extend(getSpecificTemplatesTargets())
     return targets
 
