@@ -10,8 +10,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 
-using chip::Dnssd::DnssdServiceProtocol;
 using chip::Dnssd::DnssdService;
+using chip::Dnssd::DnssdServiceProtocol;
 using chip::Dnssd::TextEntry;
 
 static void HandleResolve(void * context, DnssdService * result, CHIP_ERROR error)
