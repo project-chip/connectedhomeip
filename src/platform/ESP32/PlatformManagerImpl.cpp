@@ -86,7 +86,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
     esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
     mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
- 
+
     // Initialize the ESP WiFi layer.
     cfg = WIFI_INIT_CONFIG_DEFAULT();
     err = esp_wifi_init(&cfg);
