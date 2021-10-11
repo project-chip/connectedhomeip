@@ -100,7 +100,7 @@ public:
 
     uint16_t identifyTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -128,7 +128,7 @@ public:
 
     uint16_t timeout;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -153,7 +153,7 @@ public:
     static constexpr CommandId GetCommandId() { return IdentifyQuery::Id; }
     static constexpr ClusterId GetClusterId() { return Identify::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -182,7 +182,7 @@ public:
     IdentifyEffectIdentifier effectIdentifier;
     IdentifyEffectVariant effectVariant;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -218,7 +218,7 @@ public:
     uint16_t groupId;
     Span<const char> groupName;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -249,7 +249,7 @@ public:
     uint8_t status;
     uint16_t groupId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -278,7 +278,7 @@ public:
 
     uint16_t groupId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -310,7 +310,7 @@ public:
     uint16_t groupId;
     Span<const char> groupName;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -342,7 +342,7 @@ public:
     uint8_t groupCount;
     DataModel::List<uint16_t> groupList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -375,7 +375,7 @@ public:
     uint8_t groupCount;
     DataModel::List<uint16_t> groupList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -405,7 +405,7 @@ public:
 
     uint16_t groupId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -435,7 +435,7 @@ public:
     uint8_t status;
     uint16_t groupId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -461,7 +461,7 @@ public:
     static constexpr CommandId GetCommandId() { return RemoveAllGroups::Id; }
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -490,7 +490,7 @@ public:
     uint16_t groupId;
     Span<const char> groupName;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -523,7 +523,7 @@ public:
     uint8_t length;
     uint8_t value;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -555,7 +555,7 @@ public:
     Span<const char> sceneName;
     DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -591,7 +591,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -623,7 +623,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -662,7 +662,7 @@ public:
     Span<const char> sceneName;
     DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -697,7 +697,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -730,7 +730,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -760,7 +760,7 @@ public:
 
     uint16_t groupId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -790,7 +790,7 @@ public:
     uint8_t status;
     uint16_t groupId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -821,7 +821,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -854,7 +854,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -888,7 +888,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -918,7 +918,7 @@ public:
 
     uint16_t groupId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -954,7 +954,7 @@ public:
     uint8_t sceneCount;
     DataModel::List<uint8_t> sceneList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -994,7 +994,7 @@ public:
     Span<const char> sceneName;
     DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1030,7 +1030,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1062,7 +1062,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1101,7 +1101,7 @@ public:
     Span<const char> sceneName;
     DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1142,7 +1142,7 @@ public:
     uint16_t groupIdTo;
     uint8_t sceneIdTo;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1178,7 +1178,7 @@ public:
     uint16_t groupIdFrom;
     uint8_t sceneIdFrom;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1246,7 +1246,7 @@ public:
     static constexpr CommandId GetCommandId() { return Off::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1270,7 +1270,7 @@ public:
     static constexpr CommandId GetCommandId() { return SampleMfgSpecificOffWithTransition::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1294,7 +1294,7 @@ public:
     static constexpr CommandId GetCommandId() { return On::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1318,7 +1318,7 @@ public:
     static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1342,7 +1342,7 @@ public:
     static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition2::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1366,7 +1366,7 @@ public:
     static constexpr CommandId GetCommandId() { return Toggle::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1390,7 +1390,7 @@ public:
     static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1414,7 +1414,7 @@ public:
     static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition2::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1443,7 +1443,7 @@ public:
     OnOffEffectIdentifier effectId;
     OnOffDelayedAllOffEffectVariant effectVariant;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1469,7 +1469,7 @@ public:
     static constexpr CommandId GetCommandId() { return OnWithRecallGlobalScene::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1500,7 +1500,7 @@ public:
     uint16_t onTime;
     uint16_t offWaitTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1568,7 +1568,7 @@ public:
     uint8_t optionMask;
     uint8_t optionOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1605,7 +1605,7 @@ public:
     uint8_t optionMask;
     uint8_t optionOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1644,7 +1644,7 @@ public:
     uint8_t optionMask;
     uint8_t optionOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1678,7 +1678,7 @@ public:
     uint8_t optionMask;
     uint8_t optionOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1709,7 +1709,7 @@ public:
     uint8_t level;
     uint16_t transitionTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1740,7 +1740,7 @@ public:
     MoveMode moveMode;
     uint8_t rate;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1773,7 +1773,7 @@ public:
     uint8_t stepSize;
     uint16_t transitionTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1800,7 +1800,7 @@ public:
     static constexpr CommandId GetCommandId() { return StopWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1834,7 +1834,7 @@ public:
     uint8_t alarmCode;
     chip::ClusterId clusterId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1865,7 +1865,7 @@ public:
     uint8_t alarmCode;
     chip::ClusterId clusterId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1891,7 +1891,7 @@ public:
     static constexpr CommandId GetCommandId() { return ResetAllAlarms::Id; }
     static constexpr ClusterId GetClusterId() { return Alarms::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1924,7 +1924,7 @@ public:
     chip::ClusterId clusterId;
     uint32_t timeStamp;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1952,7 +1952,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Alarms::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1976,7 +1976,7 @@ public:
     static constexpr CommandId GetCommandId() { return ResetAlarmLog::Id; }
     static constexpr ClusterId GetClusterId() { return Alarms::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2015,7 +2015,7 @@ public:
     bool powerProfileRemoteControl;
     uint8_t powerProfileState;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -2035,7 +2035,7 @@ public:
     uint8_t energyPhaseId;
     uint16_t scheduledTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -2063,7 +2063,7 @@ public:
     uint16_t energy;
     uint16_t maxActivationDelay;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -2087,7 +2087,7 @@ public:
 
     uint8_t powerProfileId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2121,7 +2121,7 @@ public:
     uint8_t numOfTransferredPhases;
     DataModel::List<TransferredPhase::Type> transferredPhases;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2149,7 +2149,7 @@ public:
     static constexpr CommandId GetCommandId() { return PowerProfileStateRequest::Id; }
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2182,7 +2182,7 @@ public:
     uint8_t numOfTransferredPhases;
     DataModel::List<TransferredPhase::Type> transferredPhases;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2219,7 +2219,7 @@ public:
     uint32_t price;
     uint8_t priceTrailingDigit;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2252,7 +2252,7 @@ public:
     uint8_t powerProfileCount;
     DataModel::List<PowerProfileRecord::Type> powerProfileRecords;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2285,7 +2285,7 @@ public:
     uint32_t price;
     uint8_t priceTrailingDigit;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2315,7 +2315,7 @@ public:
 
     uint8_t powerProfileId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2347,7 +2347,7 @@ public:
     uint8_t numOfScheduledPhases;
     DataModel::List<ScheduledPhase::Type> scheduledPhases;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2379,7 +2379,7 @@ public:
     uint8_t powerProfileCount;
     DataModel::List<PowerProfileRecord::Type> powerProfileRecords;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2412,7 +2412,7 @@ public:
     uint8_t numOfScheduledPhases;
     DataModel::List<ScheduledPhase::Type> scheduledPhases;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2439,7 +2439,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetOverallSchedulePrice::Id; }
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2466,7 +2466,7 @@ public:
 
     uint8_t powerProfileId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2494,7 +2494,7 @@ public:
 
     uint8_t powerProfileId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2522,7 +2522,7 @@ public:
 
     uint8_t powerProfileId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2554,7 +2554,7 @@ public:
     uint8_t numOfScheduledPhases;
     DataModel::List<ScheduledPhase::Type> scheduledPhases;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2590,7 +2590,7 @@ public:
     uint32_t price;
     uint8_t priceTrailingDigit;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2625,7 +2625,7 @@ public:
     uint8_t numOfScheduledPhases;
     DataModel::List<ScheduledPhase::Type> scheduledPhases;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2659,7 +2659,7 @@ public:
     uint16_t startAfter;
     uint16_t stopBefore;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2693,7 +2693,7 @@ public:
     uint16_t startAfter;
     uint16_t stopBefore;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2727,7 +2727,7 @@ public:
     uint8_t powerProfileId;
     uint16_t powerProfileStartTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2823,7 +2823,7 @@ public:
 
     CommandIdentification commandId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2855,7 +2855,7 @@ public:
     uint8_t remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2882,7 +2882,7 @@ public:
     static constexpr CommandId GetCommandId() { return SignalState::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2913,7 +2913,7 @@ public:
     uint8_t remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2947,7 +2947,7 @@ public:
     uint8_t functionDataType;
     DataModel::List<uint8_t> functionData;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2974,7 +2974,7 @@ public:
     static constexpr CommandId GetCommandId() { return OverloadPauseResume::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -2998,7 +2998,7 @@ public:
     static constexpr CommandId GetCommandId() { return OverloadPause::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3025,7 +3025,7 @@ public:
 
     WarningEvent warningEvent;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3055,7 +3055,7 @@ public:
     chip::DeviceTypeId type;
     uint16_t revision;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -3079,7 +3079,7 @@ public:
     static constexpr CommandId GetCommandId() { return CheckIn::Id; }
     static constexpr ClusterId GetClusterId() { return PollControl::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3108,7 +3108,7 @@ public:
     bool startFastPolling;
     uint16_t fastPollTimeout;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3134,7 +3134,7 @@ public:
     static constexpr CommandId GetCommandId() { return FastPollStop::Id; }
     static constexpr ClusterId GetClusterId() { return PollControl::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3161,7 +3161,7 @@ public:
 
     uint32_t newLongPollInterval;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3189,7 +3189,7 @@ public:
 
     uint16_t newShortPollInterval;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3219,7 +3219,7 @@ public:
     static constexpr CommandId GetCommandId() { return StartUp::Id; }
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3243,7 +3243,7 @@ public:
     static constexpr CommandId GetCommandId() { return MfgSpecificPing::Id; }
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3267,7 +3267,7 @@ public:
     static constexpr CommandId GetCommandId() { return ShutDown::Id; }
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3291,7 +3291,7 @@ public:
     static constexpr CommandId GetCommandId() { return Leave::Id; }
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3377,7 +3377,7 @@ public:
     bool requestorCanConsent;
     chip::ByteSpan metadataForProvider;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3414,7 +3414,7 @@ public:
     chip::ByteSpan updateToken;
     uint32_t newVersion;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3445,7 +3445,7 @@ public:
     chip::ByteSpan updateToken;
     uint32_t softwareVersion;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3488,7 +3488,7 @@ public:
     bool userConsentNeeded;
     chip::ByteSpan metadataForRequestor;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3525,7 +3525,7 @@ public:
     OTAApplyUpdateAction action;
     uint32_t delayedActionTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3578,7 +3578,7 @@ public:
     OTAAnnouncementReason announcementReason;
     chip::ByteSpan metadataForNode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3638,7 +3638,7 @@ struct Type
 public:
     uint32_t failSafeExpiryLengthMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -3666,7 +3666,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3698,7 +3698,7 @@ public:
     GeneralCommissioningError errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3733,7 +3733,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3766,7 +3766,7 @@ public:
     GeneralCommissioningError errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3792,7 +3792,7 @@ public:
     static constexpr CommandId GetCommandId() { return CommissioningComplete::Id; }
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3821,7 +3821,7 @@ public:
     GeneralCommissioningError errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3880,7 +3880,7 @@ struct Type
 public:
     chip::ByteSpan discoveryResponse;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -3906,7 +3906,7 @@ public:
     uint8_t channel;
     uint32_t frequencyBand;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -3934,7 +3934,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -3970,7 +3970,7 @@ public:
     DataModel::List<WiFiInterfaceScanResult::Type> wifiScanResults;
     DataModel::List<ThreadInterfaceScanResult::Type> threadScanResults;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4007,7 +4007,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4040,7 +4040,7 @@ public:
     uint8_t errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4075,7 +4075,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4108,7 +4108,7 @@ public:
     uint8_t errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4141,7 +4141,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4173,7 +4173,7 @@ public:
     uint8_t errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4206,7 +4206,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4238,7 +4238,7 @@ public:
     uint8_t errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4271,7 +4271,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4303,7 +4303,7 @@ public:
     uint8_t errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4336,7 +4336,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4368,7 +4368,7 @@ public:
     uint8_t errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4401,7 +4401,7 @@ public:
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4433,7 +4433,7 @@ public:
     uint8_t errorCode;
     Span<const char> debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4462,7 +4462,7 @@ public:
 
     uint32_t timeoutMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4539,7 +4539,7 @@ public:
     LogsTransferProtocol requestedProtocol;
     chip::ByteSpan transferFileDesignator;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4575,7 +4575,7 @@ public:
     uint32_t timeStamp;
     uint32_t timeSinceBoot;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4700,7 +4700,7 @@ public:
     chip::ByteSpan hardwareAddress;
     InterfaceType type;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -4730,7 +4730,7 @@ public:
     uint32_t stackFreeMinimum;
     uint32_t stackSize;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -4751,7 +4751,7 @@ public:
     static constexpr CommandId GetCommandId() { return ResetWatermarks::Id; }
     static constexpr ClusterId GetClusterId() { return SoftwareDiagnostics::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -4835,7 +4835,7 @@ public:
     bool fullNetworkData;
     bool isChild;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -4875,7 +4875,7 @@ public:
     bool securityPolicyPresent;
     bool channelMaskPresent;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -4911,7 +4911,7 @@ public:
     bool allocated;
     bool linkEstablished;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -4931,7 +4931,7 @@ public:
     uint16_t rotationTime;
     uint16_t flags;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -4952,7 +4952,7 @@ public:
     static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5013,7 +5013,7 @@ public:
     static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5062,7 +5062,7 @@ public:
     static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5091,7 +5091,7 @@ public:
     static constexpr CommandId GetCommandId() { return StartUp::Id; }
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5115,7 +5115,7 @@ public:
     static constexpr CommandId GetCommandId() { return ShutDown::Id; }
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5139,7 +5139,7 @@ public:
     static constexpr CommandId GetCommandId() { return Leave::Id; }
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5163,7 +5163,7 @@ public:
     static constexpr CommandId GetCommandId() { return ReachableChanged::Id; }
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5221,7 +5221,7 @@ public:
     chip::ByteSpan salt;
     uint16_t passcodeID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5254,7 +5254,7 @@ public:
 
     uint16_t commissioningTimeout;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5279,7 +5279,7 @@ public:
     static constexpr CommandId GetCommandId() { return RevokeCommissioning::Id; }
     static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5336,7 +5336,7 @@ public:
     chip::NodeId nodeId;
     chip::ByteSpan label;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -5356,7 +5356,7 @@ public:
     uint8_t fabricIndex;
     chip::ByteSpan noc;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -5380,7 +5380,7 @@ public:
 
     chip::ByteSpan attestationNonce;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5410,7 +5410,7 @@ public:
     chip::ByteSpan attestationElements;
     chip::ByteSpan signature;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5439,7 +5439,7 @@ public:
 
     uint8_t certificateType;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5467,7 +5467,7 @@ public:
 
     chip::ByteSpan certificate;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5495,7 +5495,7 @@ public:
 
     chip::ByteSpan CSRNonce;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5525,7 +5525,7 @@ public:
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5562,7 +5562,7 @@ public:
     chip::NodeId caseAdminNode;
     uint16_t adminVendorId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5596,7 +5596,7 @@ public:
     chip::ByteSpan NOCValue;
     chip::ByteSpan ICACValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5629,7 +5629,7 @@ public:
     uint8_t fabricIndex;
     chip::ByteSpan debugText;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5659,7 +5659,7 @@ public:
 
     Span<const char> label;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5687,7 +5687,7 @@ public:
 
     uint8_t fabricIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5715,7 +5715,7 @@ public:
 
     chip::ByteSpan rootCertificate;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5743,7 +5743,7 @@ public:
 
     chip::ByteSpan trustedRootIdentifier;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5773,7 +5773,7 @@ public:
     chip::ByteSpan label;
     chip::ByteSpan value;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -5889,7 +5889,7 @@ public:
 
     chip::ByteSpan pin;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5917,7 +5917,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5945,7 +5945,7 @@ public:
 
     chip::ByteSpan pin;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -5973,7 +5973,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6001,7 +6001,7 @@ public:
 
     Span<const char> pin;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6029,7 +6029,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6059,7 +6059,7 @@ public:
     uint16_t timeoutInSeconds;
     chip::ByteSpan pin;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6088,7 +6088,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6116,7 +6116,7 @@ public:
 
     uint16_t logIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6156,7 +6156,7 @@ public:
     uint16_t userId;
     chip::ByteSpan pin;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6196,7 +6196,7 @@ public:
     DoorLockUserType userType;
     chip::ByteSpan pin;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6227,7 +6227,7 @@ public:
 
     DoorLockSetPinOrIdStatus status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6255,7 +6255,7 @@ public:
 
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6289,7 +6289,7 @@ public:
     DoorLockUserType userType;
     chip::ByteSpan pin;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6320,7 +6320,7 @@ public:
 
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6348,7 +6348,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6373,7 +6373,7 @@ public:
     static constexpr CommandId GetCommandId() { return ClearAllPins::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6400,7 +6400,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6430,7 +6430,7 @@ public:
     uint16_t userId;
     uint8_t userStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6459,7 +6459,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6487,7 +6487,7 @@ public:
 
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6517,7 +6517,7 @@ public:
     uint16_t userId;
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6558,7 +6558,7 @@ public:
     uint8_t endHour;
     uint8_t endMinute;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6592,7 +6592,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6622,7 +6622,7 @@ public:
     uint8_t scheduleId;
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6665,7 +6665,7 @@ public:
     uint8_t endHour;
     uint8_t endMinute;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6702,7 +6702,7 @@ public:
     uint8_t scheduleId;
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6731,7 +6731,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6765,7 +6765,7 @@ public:
     uint32_t localStartTime;
     uint32_t localEndTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6796,7 +6796,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6826,7 +6826,7 @@ public:
     uint8_t scheduleId;
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6863,7 +6863,7 @@ public:
     uint32_t localStartTime;
     uint32_t localEndTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6897,7 +6897,7 @@ public:
     uint8_t scheduleId;
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6926,7 +6926,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6960,7 +6960,7 @@ public:
     uint32_t localEndTime;
     uint8_t operatingModeDuringHoliday;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -6991,7 +6991,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7019,7 +7019,7 @@ public:
 
     uint8_t scheduleId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7055,7 +7055,7 @@ public:
     uint32_t localEndTime;
     uint8_t operatingModeDuringHoliday;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7087,7 +7087,7 @@ public:
 
     uint8_t scheduleId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7115,7 +7115,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7145,7 +7145,7 @@ public:
     uint16_t userId;
     DoorLockUserType userType;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7174,7 +7174,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7202,7 +7202,7 @@ public:
 
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7232,7 +7232,7 @@ public:
     uint16_t userId;
     DoorLockUserType userType;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7267,7 +7267,7 @@ public:
     DoorLockUserType userType;
     chip::ByteSpan id;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7298,7 +7298,7 @@ public:
 
     DoorLockSetPinOrIdStatus status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7326,7 +7326,7 @@ public:
 
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7360,7 +7360,7 @@ public:
     DoorLockUserType userType;
     chip::ByteSpan rfid;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7391,7 +7391,7 @@ public:
 
     uint16_t userId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7419,7 +7419,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7444,7 +7444,7 @@ public:
     static constexpr CommandId GetCommandId() { return ClearAllRfids::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7471,7 +7471,7 @@ public:
 
     uint8_t status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7509,7 +7509,7 @@ public:
     uint32_t timeStamp;
     Span<const char> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7556,7 +7556,7 @@ public:
     uint32_t timeStamp;
     Span<const char> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7649,7 +7649,7 @@ public:
     static constexpr CommandId GetCommandId() { return UpOrOpen::Id; }
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7673,7 +7673,7 @@ public:
     static constexpr CommandId GetCommandId() { return DownOrClose::Id; }
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7697,7 +7697,7 @@ public:
     static constexpr CommandId GetCommandId() { return StopMotion::Id; }
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7724,7 +7724,7 @@ public:
 
     uint16_t liftValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7754,7 +7754,7 @@ public:
     uint8_t liftPercentageValue;
     uint16_t liftPercent100thsValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7783,7 +7783,7 @@ public:
 
     uint16_t tiltValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7813,7 +7813,7 @@ public:
     uint8_t tiltPercentageValue;
     uint16_t tiltPercent100thsValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7847,7 +7847,7 @@ public:
 
     uint8_t percentOpen;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7872,7 +7872,7 @@ public:
     static constexpr CommandId GetCommandId() { return BarrierControlStop::Id; }
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7952,7 +7952,7 @@ public:
     SetpointAdjustMode mode;
     int8_t amount;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -7987,7 +7987,7 @@ public:
     uint8_t modeForSequence;
     DataModel::List<uint8_t> payload;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8024,7 +8024,7 @@ public:
     uint8_t modeForSequence;
     DataModel::List<uint8_t> payload;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8065,7 +8065,7 @@ public:
     int16_t setpoint;
     uint16_t unreadEntries;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8100,7 +8100,7 @@ public:
     uint8_t daysToReturn;
     uint8_t modeToReturn;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8126,7 +8126,7 @@ public:
     static constexpr CommandId GetCommandId() { return ClearWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8150,7 +8150,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetRelayStatusLog::Id; }
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8301,7 +8301,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8339,7 +8339,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8378,7 +8378,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8416,7 +8416,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8453,7 +8453,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8492,7 +8492,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8532,7 +8532,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8572,7 +8572,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8610,7 +8610,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8649,7 +8649,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8687,7 +8687,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8726,7 +8726,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8764,7 +8764,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8803,7 +8803,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8843,7 +8843,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8887,7 +8887,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8923,7 +8923,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -8962,7 +8962,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9007,7 +9007,7 @@ public:
     uint8_t optionsMask;
     uint8_t optionsOverride;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9202,7 +9202,7 @@ public:
     IasEnrollResponseCode enrollResponseCode;
     uint8_t zoneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9237,7 +9237,7 @@ public:
     uint8_t zoneId;
     uint16_t delay;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9265,7 +9265,7 @@ public:
     static constexpr CommandId GetCommandId() { return InitiateNormalOperationMode::Id; }
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9294,7 +9294,7 @@ public:
     IasZoneType zoneType;
     uint16_t manufacturerCode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9325,7 +9325,7 @@ public:
     uint8_t testModeDuration;
     uint8_t currentZoneSensitivityLevel;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9351,7 +9351,7 @@ public:
     static constexpr CommandId GetCommandId() { return InitiateNormalOperationModeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9375,7 +9375,7 @@ public:
     static constexpr CommandId GetCommandId() { return InitiateTestModeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9527,7 +9527,7 @@ public:
     uint8_t zoneId;
     uint16_t zoneStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -9555,7 +9555,7 @@ public:
     Span<const char> armDisarmCode;
     uint8_t zoneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9585,7 +9585,7 @@ public:
 
     IasAceArmNotification armNotification;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9617,7 +9617,7 @@ public:
     DataModel::List<uint8_t> zoneIds;
     Span<const char> armDisarmCode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9677,7 +9677,7 @@ public:
     uint16_t section14;
     uint16_t section15;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9717,7 +9717,7 @@ public:
     static constexpr CommandId GetCommandId() { return Emergency::Id; }
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9750,7 +9750,7 @@ public:
     chip::NodeId ieeeAddress;
     Span<const char> zoneLabel;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9778,7 +9778,7 @@ public:
     static constexpr CommandId GetCommandId() { return Fire::Id; }
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9811,7 +9811,7 @@ public:
     IasAceAudibleNotification audibleNotification;
     Span<const char> zoneLabel;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9839,7 +9839,7 @@ public:
     static constexpr CommandId GetCommandId() { return Panic::Id; }
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9872,7 +9872,7 @@ public:
     IasAceAudibleNotification audibleNotification;
     IasAceAlarmStatus alarmStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9900,7 +9900,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetZoneIdMap::Id; }
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9933,7 +9933,7 @@ public:
     IasAceAudibleNotification audibleNotification;
     IasAceAlarmStatus alarmStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9964,7 +9964,7 @@ public:
 
     uint8_t zoneId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -9994,7 +9994,7 @@ public:
     uint8_t numberOfZones;
     DataModel::List<uint8_t> zoneIds;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10020,7 +10020,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetPanelStatus::Id; }
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10049,7 +10049,7 @@ public:
     uint8_t numberOfZones;
     DataModel::List<IasAceBypassResult> bypassResult;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10075,7 +10075,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetBypassedZoneList::Id; }
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10106,7 +10106,7 @@ public:
     uint8_t numberOfZones;
     DataModel::List<IasAceZoneStatusResult::Type> zoneStatusResult;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10142,7 +10142,7 @@ public:
     bool zoneStatusMaskFlag;
     uint16_t zoneStatusMask;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10184,7 +10184,7 @@ public:
     uint8_t strobeDutyCycle;
     uint8_t strobeLevel;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10215,7 +10215,7 @@ public:
 
     uint8_t squawkInfo;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10277,7 +10277,7 @@ public:
     chip::ByteSpan callSign;
     chip::ByteSpan affiliateCallSign;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -10301,7 +10301,7 @@ public:
     Span<const char> postalCode;
     TvChannelLineupInfoType lineupInfoType;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -10325,7 +10325,7 @@ public:
 
     Span<const char> match;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10355,7 +10355,7 @@ public:
     DataModel::List<TvChannelInfo::Type> channelMatch;
     TvChannelErrorType errorType;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10386,7 +10386,7 @@ public:
     uint16_t majorNumber;
     uint16_t minorNumber;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10415,7 +10415,7 @@ public:
 
     uint16_t count;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10458,7 +10458,7 @@ public:
     uint8_t identifier;
     chip::ByteSpan name;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -10484,7 +10484,7 @@ public:
     uint8_t target;
     Span<const char> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10515,7 +10515,7 @@ public:
     NavigateTargetStatus status;
     Span<const char> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10576,7 +10576,7 @@ public:
     uint64_t updatedAt;
     uint64_t position;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -10597,7 +10597,7 @@ public:
     static constexpr CommandId GetCommandId() { return MediaPlay::Id; }
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10624,7 +10624,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10649,7 +10649,7 @@ public:
     static constexpr CommandId GetCommandId() { return MediaPause::Id; }
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10676,7 +10676,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10701,7 +10701,7 @@ public:
     static constexpr CommandId GetCommandId() { return MediaStop::Id; }
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10728,7 +10728,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10753,7 +10753,7 @@ public:
     static constexpr CommandId GetCommandId() { return MediaStartOver::Id; }
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10780,7 +10780,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10805,7 +10805,7 @@ public:
     static constexpr CommandId GetCommandId() { return MediaPrevious::Id; }
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10832,7 +10832,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10857,7 +10857,7 @@ public:
     static constexpr CommandId GetCommandId() { return MediaNext::Id; }
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10884,7 +10884,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10909,7 +10909,7 @@ public:
     static constexpr CommandId GetCommandId() { return MediaRewind::Id; }
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10936,7 +10936,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10961,7 +10961,7 @@ public:
     static constexpr CommandId GetCommandId() { return MediaFastForward::Id; }
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -10988,7 +10988,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11016,7 +11016,7 @@ public:
 
     uint64_t deltaPositionMilliseconds;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11044,7 +11044,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11072,7 +11072,7 @@ public:
 
     uint64_t deltaPositionMilliseconds;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11100,7 +11100,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11128,7 +11128,7 @@ public:
 
     uint64_t position;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11156,7 +11156,7 @@ public:
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11212,7 +11212,7 @@ public:
     chip::ByteSpan name;
     chip::ByteSpan description;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -11236,7 +11236,7 @@ public:
 
     uint8_t index;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11261,7 +11261,7 @@ public:
     static constexpr CommandId GetCommandId() { return ShowInputStatus::Id; }
     static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11285,7 +11285,7 @@ public:
     static constexpr CommandId GetCommandId() { return HideInputStatus::Id; }
     static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11314,7 +11314,7 @@ public:
     uint8_t index;
     Span<const char> name;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11345,7 +11345,7 @@ public:
     static constexpr CommandId GetCommandId() { return Sleep::Id; }
     static constexpr ClusterId GetClusterId() { return LowPower::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11486,7 +11486,7 @@ public:
 
     KeypadInputCecKeyCode keyCode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11514,7 +11514,7 @@ public:
 
     KeypadInputStatus status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11602,7 +11602,7 @@ public:
     Span<const char> name;
     Span<const char> value;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -11624,7 +11624,7 @@ public:
     Span<const char> value;
     DataModel::List<ContentLaunchAdditionalInfo::Type> externalIDList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11658,7 +11658,7 @@ public:
     uint8_t splash;
     uint8_t waterMark;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -11680,7 +11680,7 @@ public:
     Span<const char> height;
     ContentLaunchMetricType metric;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -11702,7 +11702,7 @@ public:
     Span<const char> color;
     uint8_t size;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -11728,7 +11728,7 @@ public:
     bool autoPlay;
     Span<const char> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11759,7 +11759,7 @@ public:
     Span<const char> data;
     ContentLaunchStatus contentLaunchStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11790,7 +11790,7 @@ public:
     Span<const char> contentURL;
     Span<const char> displayString;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11821,7 +11821,7 @@ public:
     Span<const char> data;
     ContentLaunchStatus contentLaunchStatus;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11870,7 +11870,7 @@ public:
     AudioOutputType outputType;
     chip::ByteSpan name;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -11894,7 +11894,7 @@ public:
 
     uint8_t index;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11924,7 +11924,7 @@ public:
     uint8_t index;
     Span<const char> name;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -11968,7 +11968,7 @@ public:
     uint16_t catalogVendorId;
     Span<const char> applicationId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -11996,7 +11996,7 @@ public:
     uint16_t catalogVendorId;
     Span<const char> applicationId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12028,7 +12028,7 @@ public:
     ApplicationLauncherStatus status;
     Span<const char> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12076,7 +12076,7 @@ public:
 
     ApplicationBasicStatus status;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12109,7 +12109,7 @@ public:
 
     Span<const char> tempAccountIdentifier;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12137,7 +12137,7 @@ public:
 
     Span<const char> setupPIN;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12167,7 +12167,7 @@ public:
     Span<const char> tempAccountIdentifier;
     Span<const char> setupPIN;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12218,7 +12218,7 @@ public:
     chip::ByteSpan d;
     Span<const char> e;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -12240,7 +12240,7 @@ public:
     bool b;
     SimpleStruct::Type c;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -12270,7 +12270,7 @@ public:
     DataModel::List<chip::ByteSpan> f;
     DataModel::List<uint8_t> g;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12298,7 +12298,7 @@ struct Type
 public:
     DataModel::List<NestedStructList::Type> a;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12322,7 +12322,7 @@ public:
     uint64_t fabricIndex;
     chip::ByteSpan operationalCert;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -12343,7 +12343,7 @@ public:
     static constexpr CommandId GetCommandId() { return Test::Id; }
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12370,7 +12370,7 @@ public:
 
     uint8_t returnValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12395,7 +12395,7 @@ public:
     static constexpr CommandId GetCommandId() { return TestNotHandled::Id; }
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12422,7 +12422,7 @@ public:
 
     uint8_t returnValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12447,7 +12447,7 @@ public:
     static constexpr CommandId GetCommandId() { return TestSpecific::Id; }
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12474,7 +12474,7 @@ public:
 
     bool returnValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12499,7 +12499,7 @@ public:
     static constexpr CommandId GetCommandId() { return TestUnknownCommand::Id; }
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12536,7 +12536,7 @@ public:
     SimpleEnum arg5;
     bool arg6;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12571,7 +12571,7 @@ public:
     uint8_t arg1;
     uint8_t arg2;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12600,7 +12600,7 @@ public:
 
     bool arg1;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12638,7 +12638,7 @@ public:
     SimpleEnum arg5;
     bool arg6;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12829,7 +12829,7 @@ public:
     Span<const char> message;
     uint8_t optionalExtendedMessageControl;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12859,7 +12859,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetLastMessage::Id; }
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12888,7 +12888,7 @@ public:
     uint32_t messageId;
     uint8_t messageControl;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12923,7 +12923,7 @@ public:
     uint8_t messageConfirmationControl;
     chip::ByteSpan messageResponse;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12964,7 +12964,7 @@ public:
     Span<const char> message;
     uint8_t optionalExtendedMessageControl;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -12997,7 +12997,7 @@ public:
 
     uint32_t earliestImplementationTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13025,7 +13025,7 @@ public:
 
     uint32_t implementationDateTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13076,7 +13076,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetAlerts::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13103,7 +13103,7 @@ public:
 
     uint8_t alertsCount;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13131,7 +13131,7 @@ public:
 
     uint8_t alertsCount;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13161,7 +13161,7 @@ public:
     uint8_t eventHeader;
     EventIdentification eventId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13201,7 +13201,7 @@ public:
     uint32_t logLength;
     DataModel::List<uint8_t> logPayload;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13232,7 +13232,7 @@ public:
 
     uint32_t logId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13266,7 +13266,7 @@ public:
     uint32_t logLength;
     DataModel::List<uint8_t> logPayload;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13294,7 +13294,7 @@ public:
     static constexpr CommandId GetCommandId() { return LogQueueRequest::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13323,7 +13323,7 @@ public:
     uint8_t logQueueSize;
     DataModel::List<uint32_t> logIds;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13354,7 +13354,7 @@ public:
     uint8_t logQueueSize;
     DataModel::List<uint32_t> logIds;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13394,7 +13394,7 @@ public:
     uint8_t maxNumberOfIntervals;
     DataModel::List<uint16_t> listOfAttributes;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13422,7 +13422,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetProfileInfoCommand::Id; }
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13459,7 +13459,7 @@ public:
     uint16_t attributeId;
     DataModel::List<uint8_t> intervals;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13496,7 +13496,7 @@ public:
     uint32_t startTime;
     uint8_t numberOfIntervals;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13537,7 +13537,7 @@ public:
     chip::EndpointId endpointId;
     chip::ClusterId clusterId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13574,7 +13574,7 @@ public:
     chip::EndpointId endpointId;
     chip::ClusterId clusterId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13625,7 +13625,7 @@ public:
     uint64_t groupKeyEpochStartTime;
     GroupKeySecurityPolicy groupKeySecurityPolicy;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -13647,7 +13647,7 @@ public:
     uint16_t vendorGroupId;
     uint16_t groupKeySetIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -13674,7 +13674,7 @@ public:
 
     uint8_t argOne;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -13707,7 +13707,7 @@ public:
 
     uint8_t argOne;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType

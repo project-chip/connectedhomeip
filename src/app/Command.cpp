@@ -214,6 +214,14 @@ void Command::Abort()
     //
     if (mpExchangeCtx != nullptr)
     {
+        // We (or more precisely our subclass) might be a delegate for this
+        // exchange, and we don't want the OnExchangeClosing notification in
+        // that case.  Null out the delegate to avoid that.
+        //
+        // TODO: This makes all sorts of assumptions about what the delegate is
+        // (notice the "might" above!) that might not hold in practice.  We
+        // really need a better solution here....
+        mpExchangeCtx->SetDelegate(nullptr);
         mpExchangeCtx->Abort();
         mpExchangeCtx = nullptr;
     }

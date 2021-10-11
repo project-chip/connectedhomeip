@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,20 +16,25 @@
  *    limitations under the License.
  */
 
-#include <app/Command.h>
-#include <app/util/af.h>
+#pragma once
 
-#include "AppMain.h"
+#include <app/util/basic-types.h>
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
+namespace chip {
+namespace app {
+
+/**
+ * A representation of a concrete attribute path.
+ */
+struct ConcreteAttributePath
 {
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
+    ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId)
+    {}
 
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-    ChipLinuxAppMainLoop();
-    return 0;
-}
+    const EndpointId mEndpointId   = 0;
+    const ClusterId mClusterId     = 0;
+    const AttributeId mAttributeId = 0;
+};
+} // namespace app
+} // namespace chip

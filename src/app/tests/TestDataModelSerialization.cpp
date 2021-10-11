@@ -109,18 +109,18 @@ void TestDataModelSerialization::SetupReader()
 template <typename T>
 struct TagValuePair
 {
-    uint64_t tag;
+    TLV::Tag tag;
     T & value;
 };
 
 template <typename T>
-TagValuePair<T> MakeTagValuePair(uint64_t tag, T & value)
+TagValuePair<T> MakeTagValuePair(TLV::Tag tag, T & value)
 {
     return TagValuePair<T>{ tag, value };
 }
 
 template <typename... ArgTypes>
-CHIP_ERROR EncodeStruct(TLV::TLVWriter & writer, uint64_t tag, ArgTypes... Args)
+CHIP_ERROR EncodeStruct(TLV::TLVWriter & writer, TLV::Tag tag, ArgTypes... Args)
 {
     using expand_type = int[];
     TLV::TLVType type;

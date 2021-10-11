@@ -54,8 +54,8 @@ extern CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, vo
 extern CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount);
 extern CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount, bool aRecurse);
 
-extern CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult);
-extern CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult, bool aRecurse);
+extern CHIP_ERROR Find(const TLVReader & aReader, const Tag & aTag, TLVReader & aResult);
+extern CHIP_ERROR Find(const TLVReader & aReader, const Tag & aTag, TLVReader & aResult, bool aRecurse);
 
 extern CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aHandler, void * aContext, TLVReader & aResult);
 extern CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aHandler, void * aContext, TLVReader & aResult, bool aRecurse);
