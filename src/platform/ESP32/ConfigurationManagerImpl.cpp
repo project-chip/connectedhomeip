@@ -84,12 +84,12 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
         SuccessOrExit(err);
     }
 
-/*    if (!ConfigValueExists(kCounterKey_TotalOperationalHours))
-    {
-        err = StoreTotalOperationalHours(0);
-        SuccessOrExit(err);
-    }
-*/
+    /*    if (!ConfigValueExists(kCounterKey_TotalOperationalHours))
+        {
+            err = StoreTotalOperationalHours(0);
+            SuccessOrExit(err);
+        }
+    */
     if (!ConfigValueExists(kCounterKey_BootReason))
     {
         err = StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
