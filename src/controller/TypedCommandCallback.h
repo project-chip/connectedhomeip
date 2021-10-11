@@ -28,7 +28,7 @@ namespace chip {
 namespace Controller {
 
 /*
- * This provides an adapter class that implements the CommandSender::Callback and in turn, provides two notable features:
+ * This provides an adapter class that implements CommandSender::Callback and provides two additional features:
  *  1. The ability to pass in std::function closures to permit more flexible programming scenarios than are provided by the strict
  *     delegate interface stipulated by CommandSender::Callback
  *
@@ -128,6 +128,7 @@ inline void TypedCommandCallback<app::DataModel::NullObjectType>::OnResponse(app
     if (aReader != nullptr)
     {
         mOnError(Protocols::InteractionModel::Status::Failure, CHIP_ERROR_SCHEMA_MISMATCH);
+        return;
     }
 
     app::DataModel::NullObjectType nullResp;

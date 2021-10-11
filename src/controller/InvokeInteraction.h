@@ -25,21 +25,19 @@ namespace chip {
 namespace Controller {
 
 /*
- * A typed command invocation function that takes as input, a cluster-object representation of a command request and
- * callbacks for success and failure and returns back a decoded cluster-object representation of the response through
- * the provided success callback. On failure, onErrorCb is invoked instead.
+ * A typed command invocation function that takes as input a cluster-object representation of a command request and
+ * callbacks for success and failure and either returns a decoded cluster-object representation of the response through
+ * the provided success callback or calls the provided failure callback.
  *
  * The RequestObjectT is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object
  * that can be encoded using the DataModel::Encode machinery and exposes the GetClusterId() and GetCommandId() functions
  * is expected to work.
  *
- * The ResponseObjectT is generally expected to be a ClusterName::Commands::CommandName::DecodableType type with the following
- * two types permissible:
+ * The ResponseObjectT is expected to be one of two things:
  *
- *    - A struct type in the case of a data response, with methods for GetClusterId() and GetCommandId().
- *    - A DataModel::NullObjectType in the case of no data response.
- *
- * However, any object that is decodable using the DataModel::Decode machinery should suffice.
+ *    - If a data response is expected on success, a struct type decodable via DataModel::Decode which has GetClusterId() and
+ * GetCommandId() methods.  A ClusterName::Commands::ResponseCommandName::DecodableType is typically used.
+ *    - If a status response is expected on success, a DataModel::NullObjectType.
  *
  */
 template <typename ResponseObjectT = app::DataModel::NullObjectType, typename RequestObjectT>

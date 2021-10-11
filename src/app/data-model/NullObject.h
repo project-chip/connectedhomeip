@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <app/data-model/Decode.h>
-#include <app/data-model/Encode.h>
-
 namespace chip {
 namespace app {
 namespace DataModel {

@@ -122,8 +122,7 @@ public:
      * object that can be encoded using the DataModel::Encode machinery and
      * exposes the right command id will work.
      *
-     * @param [in] aRequestCommandPath the concrete path of the command we are
-     *             responding to.
+     * @param [in] aRequestCommandPath the path of the command being requested.
      * @param [in] aData the data for the request.
      */
     template <typename CommandDataT>
