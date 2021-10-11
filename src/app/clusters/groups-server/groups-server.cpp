@@ -249,7 +249,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
     uint8_t listLen = 0;
     CHIP_ERROR err  = CHIP_NO_ERROR;
 
-    emberAfGroupsClusterPrintln("RX: GetGroupMembership");
+    emberAfGroupsClusterPrint("RX: GetGroupMembership [");
 
     // For all networks, Get Group Membership commands may be sent either
     // unicast or broadcast (removing the ZLL-specific limitation to unicast).
@@ -278,6 +278,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
         while (iter.Next())
         {
             GroupId groupId = iter.GetValue();
+            emberAfGroupsClusterPrint(" 0x%02" PRIx16, groupId);
             for (j = 0; j < EMBER_BINDING_TABLE_SIZE; j++)
             {
                 EmberBindingTableEntry entry;
@@ -296,6 +297,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
         }
         err = iter.GetStatus();
     }
+
+    emberAfGroupsClusterPrintln("]");
 
     if (err != CHIP_NO_ERROR)
     {
