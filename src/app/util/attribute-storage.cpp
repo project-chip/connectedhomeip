@@ -679,12 +679,12 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
                                 {
                                     return (write ? emberAfExternalAttributeWriteCallback(
-                                                                attRecord->endpoint, attRecord->clusterId, am,
-                                                                emAfGetManufacturerCodeForAttribute(cluster, am), buffer, index)
+                                                        attRecord->endpoint, attRecord->clusterId, am,
+                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer, index)
                                                   : emberAfExternalAttributeReadCallback(
-                                                                attRecord->endpoint, attRecord->clusterId, am,
-                                                                emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
-                                                                emberAfAttributeSize(am), index));
+                                                        attRecord->endpoint, attRecord->clusterId, am,
+                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
+                                                        emberAfAttributeSize(am), index));
                                 }
                                 else
                                 {
@@ -696,7 +696,6 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     else
                                     {
                                         return EMBER_ZCL_STATUS_FAILURE;
-
                                     }
                                 }
                             }

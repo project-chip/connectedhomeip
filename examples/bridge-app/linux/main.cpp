@@ -133,10 +133,10 @@ DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 // REVISION DEFINITIONS:
 // =================================================================================
 
-#define ZCL_DESCRIPTOR_CLUSTER_REVISION                 (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION       (1u)
-#define ZCL_FIXED_LABEL_CLUSTER_REVISION                (1u)
-#define ZCL_ON_OFF_CLUSTER_REVISION                     (4u)
+#define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
+#define ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION (1u)
+#define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
+#define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
 // ---------------------------------------------------------------------------
 
@@ -270,7 +270,7 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *buffer =(uint16_t)ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION;
+        *buffer = (uint16_t) ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION;
     }
     else
     {
@@ -290,7 +290,7 @@ EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attribute
     }
     else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *buffer =(uint16_t)ZCL_ON_OFF_CLUSTER_REVISION;
+        *buffer = (uint16_t) ZCL_ON_OFF_CLUSTER_REVISION;
     }
     else
     {
@@ -332,7 +332,7 @@ EmberAfStatus HandleReadDescriptorAttribute(uint16_t endpointIndex, chip::Attrib
     }
     else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *buffer =(uint16_t)ZCL_DESCRIPTOR_CLUSTER_REVISION;
+        *buffer = (uint16_t) ZCL_DESCRIPTOR_CLUSTER_REVISION;
     }
     else
     {
@@ -347,11 +347,10 @@ EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, EmberAfAttributeMetada
     if ((am->attributeId == ZCL_LABEL_LIST_ATTRIBUTE_ID) && (maxReadLength <= kFixedLabelAttributeArraySize))
     {
         EncodeFixedLabel("room", dev->GetLocation(), buffer, maxReadLength, am);
-
     }
     else if ((am->attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
-        *buffer =(uint16_t)ZCL_FIXED_LABEL_CLUSTER_REVISION;
+        *buffer = (uint16_t) ZCL_FIXED_LABEL_CLUSTER_REVISION;
     }
     else
     {
