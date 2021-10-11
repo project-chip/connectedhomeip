@@ -29348,7 +29348,7 @@ JNI_METHOD(void, WindowCoveringCluster, reportSafetyStatusAttribute)(JNIEnv * en
 
 JNI_METHOD(void, WindowCoveringCluster, readFeatureMapAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {

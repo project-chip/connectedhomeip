@@ -7599,62 +7599,6 @@ public:
 } // namespace Commands
 } // namespace DoorLock
 namespace WindowCovering {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for WcEndProductType
-enum class WcEndProductType : uint8_t
-{
-    WC_END_PRODUCT_TYPE_ROLLER_SHADE                 = 0x00,
-    WC_END_PRODUCT_TYPE_ROMAN_SHADE                  = 0x01,
-    WC_END_PRODUCT_TYPE_BALLOON_SHADE                = 0x02,
-    WC_END_PRODUCT_TYPE_WOVEN_WOOD                   = 0x03,
-    WC_END_PRODUCT_TYPE_PLEATED_SHADE                = 0x04,
-    WC_END_PRODUCT_TYPE_CELLULAR_SHADE               = 0x05,
-    WC_END_PRODUCT_TYPE_LAYERED_SHADE                = 0x06,
-    WC_END_PRODUCT_TYPE_LAYERED_SHADE2_D             = 0x07,
-    WC_END_PRODUCT_TYPE_SHEER_SHADE                  = 0x08,
-    WC_END_PRODUCT_TYPE_TILT_ONLY_INTERIOR_BLIND     = 0x09,
-    WC_END_PRODUCT_TYPE_INTERIOR_BLIND               = 0x0A,
-    WC_END_PRODUCT_TYPE_VERTICAL_BLIND_STRIP_CURTAIN = 0x0B,
-    WC_END_PRODUCT_TYPE_INTERIOR_VENETIAN_BLIND      = 0x0C,
-    WC_END_PRODUCT_TYPE_EXTERIOR_VENETIAN_BLIND      = 0x0D,
-    WC_END_PRODUCT_TYPE_LATERAL_LEFT_CURTAIN         = 0x0E,
-    WC_END_PRODUCT_TYPE_LATERAL_RIGHT_CURTAIN        = 0x0F,
-    WC_END_PRODUCT_TYPE_CENTRAL_CURTAIN              = 0x10,
-    WC_END_PRODUCT_TYPE_ROLLER_SHUTTER               = 0x11,
-    WC_END_PRODUCT_TYPE_EXTERIOR_VERTICAL_SCREEN     = 0x12,
-    WC_END_PRODUCT_TYPE_AWNING_TERRACE_PATIO         = 0x13,
-    WC_END_PRODUCT_TYPE_AWNING_VERTICAL_SCREEN       = 0x14,
-    WC_END_PRODUCT_TYPE_TILT_ONLY_PERGOLA            = 0x15,
-    WC_END_PRODUCT_TYPE_SWINGING_SHUTTER             = 0x16,
-    WC_END_PRODUCT_TYPE_SLIDING_SHUTTER              = 0x17,
-    WC_END_PRODUCT_TYPE_UNKNOWN                      = 0xFF,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WcEndProductType                     = EmberAfWcEndProductType;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for WcType
-enum class WcType : uint8_t
-{
-    WC_TYPE_ROLLERSHADE                 = 0x00,
-    WC_TYPE_ROLLERSHADE2_MOTOR          = 0x01,
-    WC_TYPE_ROLLERSHADE_EXTERIOR        = 0x02,
-    WC_TYPE_ROLLERSHADE_EXTERIOR2_MOTOR = 0x03,
-    WC_TYPE_DRAPERY                     = 0x04,
-    WC_TYPE_AWNING                      = 0x05,
-    WC_TYPE_SHUTTER                     = 0x06,
-    WC_TYPE_TILT_BLIND_TILT_ONLY        = 0x07,
-    WC_TYPE_TILT_BLIND_LIFT_AND_TILT    = 0x08,
-    WC_TYPE_PROJECTOR_SCREEN            = 0x09,
-    WC_TYPE_UNKNOWN                     = 0xFF,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WcType                               = EmberAfWcType;
-#endif
 
 namespace Commands {
 namespace UpOrOpen {
