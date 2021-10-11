@@ -41,7 +41,8 @@
     <string name="send_command_on_btn_text">On</string>
     <string name="send_command_off_btn_text">Off</string>
     <string name="send_command_toggle_btn_text">Toggle</string>
-    <string name="read_on_off_attribute_btn_text">Read On/Off</string>
+    <string name="read_on_off_attribute_btn_text">Read</string>
+    <string name="show_subscribe_dialog_btn_text">Subscribe</string>
     <string name="send_command_type_label_text">%s/%d command sent!</string>
     <string name="rendezvous_over_ble_btn_text">Rendezvous over BLE</string>
     <string name="rendezvous_over_soft_ap_btn_text">Rendezvous over Soft AP</string>
@@ -96,10 +97,15 @@
     <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
     <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
     <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
-
+    
     <string name="basic_cluster_btn_text">Basic cluster</string>
     <string name="basic_cluster_read_user_label_btn_text">Read User Label</string>
     <string name="basic_cluster_write_user_label_btn_text">Write User Label</string>
     <string name="basic_cluster_write_user_label_hint_text">Enter User Label</string>
     <string name="basic_cluster_read_product_name_btn_text">Read Product Name</string>
+
+    <string name="subscribe_dialog_title_text">Subscribe on/off</string>
+    <string name="subscribe_dialog_subscribe_btn_text">Subscribe</string>
+    <string name="subscribe_dialog_min_interval_hint">Minimum interval (seconds)</string>
+    <string name="subscribe_dialog_max_interval_hint">Maximum interval (seconds)</string>
 </resources>
