@@ -93,7 +93,7 @@ public:
      *               type.
      */
     CHIP_ERROR DecodeStatusIB(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode, uint32_t * apProtocolId,
-                                   uint16_t * apProtocolCode) const;
+                              uint16_t * apProtocolCode) const;
 
     inline CHIP_ERROR DecodeStatusIB(Type & aStatusIB)
     {
@@ -135,8 +135,8 @@ public:
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
-    StatusIB::Builder & EncodeStatusIB(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                 const uint32_t aProtocolId, const uint16_t aProtocolCode);
+    StatusIB::Builder & EncodeStatusIB(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
+                                       const uint16_t aProtocolCode);
 
     inline StatusIB::Builder & EncodeStatusIB(const Type & aStatusIB)
     {

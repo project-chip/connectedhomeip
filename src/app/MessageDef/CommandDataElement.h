@@ -41,9 +41,9 @@ namespace app {
 namespace CommandDataElement {
 enum
 {
-    kCsTag_CommandPath   = 0,
-    kCsTag_Data          = 1,
-    kCsTag_StatusIB = 2,
+    kCsTag_CommandPath = 0,
+    kCsTag_Data        = 1,
+    kCsTag_StatusIB    = 2,
 };
 
 class Parser : public chip::app::Parser

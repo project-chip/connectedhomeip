@@ -50,8 +50,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR StatusIB::Parser::DecodeStatusIB(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode,
-                                                      uint32_t * apProtocolId, uint16_t * apProtocolCode) const
+CHIP_ERROR StatusIB::Parser::DecodeStatusIB(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode, uint32_t * apProtocolId,
+                                            uint16_t * apProtocolCode) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader lReader;
@@ -188,7 +188,7 @@ CHIP_ERROR StatusIB::Builder::Init(chip::TLV::TLVWriter * const apWriter, const 
 }
 
 StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                                     const uint32_t aProtocolId, const uint16_t aProtocolCode)
+                                                      const uint32_t aProtocolId, const uint16_t aProtocolCode)
 {
     Tag tag = chip::TLV::AnonymousTag;
 

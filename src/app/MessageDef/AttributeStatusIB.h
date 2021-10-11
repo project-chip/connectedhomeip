@@ -41,7 +41,7 @@ namespace AttributeStatusIB {
 enum
 {
     kCsTag_AttributePath = 0,
-    kCsTag_StatusIB = 1,
+    kCsTag_StatusIB      = 1,
 };
 
 class Builder : public chip::app::Builder

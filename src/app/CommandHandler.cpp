@@ -167,8 +167,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const ConcreteCommandPath & aCommandPat
     err = PrepareCommand(commandPathParams, false /* aStartDataStruct */);
     SuccessOrExit(err);
 
-    StatusIBBuilder =
-        mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusIBBuilder();
+    StatusIBBuilder = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusIBBuilder();
 
     //
     // TODO: Most of the callers are incorrectly passing SecureChannel as the protocol ID, when in fact, the status code provided

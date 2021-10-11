@@ -338,8 +338,7 @@ void BuildStatusIB(nlTestSuite * apSuite, StatusIB::Builder & aStatusIBBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    aStatusIBBuilder.EncodeStatusIB(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3)
-        .EndOfStatusIB();
+    aStatusIBBuilder.EncodeStatusIB(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3).EndOfStatusIB();
     err = aStatusIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }

@@ -146,8 +146,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
 
         // Default to success when an invoke response is received.
         StatusIB::Type StatusIB{ chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                           chip::Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
-                                           to_underlying(Protocols::InteractionModel::Status::Success) };
+                                 chip::Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
+                                 to_underlying(Protocols::InteractionModel::Status::Success) };
         StatusIB::Parser StatusIBParser;
         err = aCommandElement.GetStatusIB(&StatusIBParser);
         if (CHIP_NO_ERROR == err)

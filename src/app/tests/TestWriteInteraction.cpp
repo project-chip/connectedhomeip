@@ -183,8 +183,7 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
 
     StatusIB::Builder StatusIBBuilder = attributeStatusIBBuilder.CreateStatusIBBuilder();
     NL_TEST_ASSERT(apSuite, StatusIBBuilder.GetError() == CHIP_NO_ERROR);
-    StatusIBBuilder.EncodeStatusIB(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3)
-        .EndOfStatusIB();
+    StatusIBBuilder.EncodeStatusIB(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3).EndOfStatusIB();
     err = StatusIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
