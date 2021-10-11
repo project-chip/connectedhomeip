@@ -407,8 +407,13 @@ function zapTypeToClusterObjectType(type, isDecodable)
     return 'uint24_t';
   case 'INT32U':
     return 'uint32_t';
+  case 'INT56U':
+  case 'int56u':
   case 'INT64U':
     return 'uint64_t';
+  case 'single':
+  case 'SINGLE':
+    return 'float';
   }
 
   function fn(pkgId)
@@ -428,6 +433,7 @@ function zapTypeToClusterObjectType(type, isDecodable)
       case 'uint32_t':
       case 'int64_t':
       case 'uint64_t':
+      case 'float':
         return zclType;
       default:
         if (isDecodable) {
