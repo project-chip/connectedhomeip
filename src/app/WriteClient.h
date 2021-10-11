@@ -23,6 +23,7 @@
 #include <app/MessageDef/AttributeDataList.h>
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/MessageDef/WriteRequest.h>
+#include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -183,14 +184,15 @@ public:
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put
      */
     template <class T>
-    CHIP_ERROR EncodeScalarAttributeWritePayload(const chip::app::AttributePathParams & attributePath, T value)
+    CHIP_ERROR EncodeScalarAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const T & value)
     {
         chip::TLV::TLVWriter * writer = nullptr;
 
         VerifyOrReturnError(mpWriteClient != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(mpWriteClient->PrepareAttribute(attributePath));
         VerifyOrReturnError((writer = mpWriteClient->GetAttributeDataElementTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(writer->Put(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
+        ReturnErrorOnFailure(
+            DataModel::Encode(*writer, chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
         ReturnErrorOnFailure(mpWriteClient->FinishAttribute());
 
         return CHIP_NO_ERROR;
