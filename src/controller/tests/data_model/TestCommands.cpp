@@ -209,8 +209,7 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
 
     responseDirective = kSendSuccessStatusCode;
 
-    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId,
-                                                                                 request, onSuccessCb, onFailureCb);
+    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
 
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled);
     NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 0);
@@ -238,8 +237,7 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
 
     responseDirective = kSendError;
 
-    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId,
-                                                                                 request, onSuccessCb, onFailureCb);
+    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
 
     NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && onFailureWasCalled);
     NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 0);

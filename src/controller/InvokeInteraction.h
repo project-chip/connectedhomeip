@@ -73,7 +73,7 @@ CHIP_ERROR InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, Sessi
 
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData));
     ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle.GetPeerNodeId(), sessionHandle.GetFabricIndex(),
-                                                            Optional<SessionHandle>(sessionHandle)));
+                                                           Optional<SessionHandle>(sessionHandle)));
 
     //
     // We've effectively transfered ownership of the above allocated objects to CommandSender, and we need to wait for it to call us
