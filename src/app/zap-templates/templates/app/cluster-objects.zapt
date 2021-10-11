@@ -34,6 +34,9 @@ using {{asType label}} = EmberAf{{asType label}};
 {{/zcl_enums}}
 
 {{#zcl_structs}}
+{{#first}}
+namespace Structs {
+{{/first}}
 namespace {{name}} {
     enum class Fields {
     {{#zcl_struct_items}}
@@ -74,6 +77,9 @@ namespace {{name}} {
     {{/if}}
 
 } // namespace {{name}}
+{{#last}}
+} // namespace Structs
+{{/last}}
 {{/zcl_structs}}
 
 {{#zcl_commands}}
