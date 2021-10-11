@@ -688,7 +688,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 }
                                 else
                                 {
-                                    // Internally storage is only supported for fixed endpoints
+                                    // Internal storage is only supported for fixed endpoints
                                     if (!isDynamicEndpoint)
                                     {
                                         return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index);
