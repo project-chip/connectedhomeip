@@ -56,8 +56,8 @@ public:
      * failure.
      */
     template <typename RequestDataT, typename ResponseDataT>
-    CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context, CommandResponseSuccessCallback<ResponseDataT> successCb,
-                             CommandResponseFailureCallback failureCb)
+    CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
+                             CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
@@ -70,8 +70,8 @@ public:
             failureCb(context, app::ToEmberAfStatus(aIMStatus));
         };
 
-        return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
-                                    onSuccessCb, onFailureCb);
+        return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                                   requestData, onSuccessCb, onFailureCb);
     }
 
 protected:

@@ -25,7 +25,7 @@ namespace chip {
 namespace Controller {
 
 /*
- * A typed command invocation function that takes as input, a cluster-object representation of a command request and 
+ * A typed command invocation function that takes as input, a cluster-object representation of a command request and
  * callbacks for success and failure and returns back a decoded cluster-object representation of the response through
  * the provided success callback. On failure, onErrorCb is invoked instead.
  *
@@ -35,7 +35,7 @@ namespace Controller {
  *
  * The ResponseObjectT is generally expected to be a ClusterName::Commands::CommandName::DecodableType type with the following
  * two types permissible:
- * 
+ *
  *    - A struct type in the case of a data response, with methods for GetClusterId() and GetCommandId().
  *    - A DataModel::NullObjectType in the case of no data response.
  *
@@ -56,7 +56,7 @@ CHIP_ERROR InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, Sessi
     //
     auto decoder = chip::Platform::MakeUnique<TypedCommandCallback<ResponseObjectT>>(onSuccessCb, onErrorCb);
     VerifyOrReturnError(decoder != nullptr, CHIP_ERROR_NO_MEMORY);
- 
+
     //
     // Upon successful completion of SendCommandRequest below, we're expected to free up the respective allocated objects
     // in the OnDone callback.
@@ -73,7 +73,7 @@ CHIP_ERROR InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, Sessi
 
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData));
     ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle.GetPeerNodeId(), sessionHandle.GetFabricIndex(),
-                                                            Optional<SessionHandle>(sessionHandle)));
+                                                           Optional<SessionHandle>(sessionHandle)));
 
     //
     // We've effectively transfered ownership of the above allocated objects to CommandSender, and we need to wait for it to call us

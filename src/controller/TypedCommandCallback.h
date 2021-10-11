@@ -60,7 +60,8 @@ private:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
                     TLV::TLVReader * aReader) override;
 
-    void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) override
+    void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aIMStatus,
+                 CHIP_ERROR aError) override
     {
         mOnError(aIMStatus, aError);
     }
@@ -79,8 +80,8 @@ private:
  */
 template <typename CommandResponseObjectT>
 void TypedCommandCallback<CommandResponseObjectT>::OnResponse(app::CommandSender * apCommandSender,
-                                                                const app::ConcreteCommandPath & aCommandPath,
-                                                                TLV::TLVReader * aReader)
+                                                              const app::ConcreteCommandPath & aCommandPath,
+                                                              TLV::TLVReader * aReader)
 {
     CommandResponseObjectT response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -95,7 +96,8 @@ void TypedCommandCallback<CommandResponseObjectT>::OnResponse(app::CommandSender
     // Validate that the data response we received matches what we expect in terms of its cluster and command IDs.
     //
     VerifyOrExit(aCommandPath.mClusterId == CommandResponseObjectT::GetClusterId() &&
-                 aCommandPath.mCommandId == CommandResponseObjectT::GetCommandId(), err = CHIP_ERROR_SCHEMA_MISMATCH);
+                     aCommandPath.mCommandId == CommandResponseObjectT::GetCommandId(),
+                 err = CHIP_ERROR_SCHEMA_MISMATCH);
 
     err = app::DataModel::Decode(*aReader, response);
     SuccessOrExit(err);
@@ -103,7 +105,8 @@ void TypedCommandCallback<CommandResponseObjectT>::OnResponse(app::CommandSender
     mOnSuccess(aCommandPath, response);
 
 exit:
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         mOnError(Protocols::InteractionModel::Status::Failure, err);
     }
 }
@@ -116,8 +119,8 @@ exit:
  */
 template <>
 inline void TypedCommandCallback<app::DataModel::NullObjectType>::OnResponse(app::CommandSender * apCommandSender,
-                                                                               const app::ConcreteCommandPath & aCommandPath,
-                                                                               TLV::TLVReader * aReader)
+                                                                             const app::ConcreteCommandPath & aCommandPath,
+                                                                             TLV::TLVReader * aReader)
 {
     //
     // If we got a valid reader, it means we received response data that we were not expecting to receive.

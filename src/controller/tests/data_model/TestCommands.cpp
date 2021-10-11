@@ -107,19 +107,20 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     }
 }
 
-void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                          CommandSender * apCommandObj)
-{
-    ChipLogDetail(Controller,
-                  "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
-    // Nothing todo.
-}
-
 bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // Mock cluster catalog, only support one command on one cluster on one endpoint.
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
+}
+
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace app
@@ -208,8 +209,7 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
 
     responseDirective = kSendSuccessStatusCode;
 
-    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId,
-                                                                                 request, onSuccessCb, onFailureCb);
+    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
 
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled);
     NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 0);
@@ -237,8 +237,7 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
 
     responseDirective = kSendError;
 
-    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId,
-                                                                                 request, onSuccessCb, onFailureCb);
+    chip::Controller::InvokeCommandRequest(gExchangeManager, sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
 
     NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && onFailureWasCalled);
     NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 0);
