@@ -49,7 +49,7 @@ CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements,
     CHIP_ERROR error;
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {
-        uint64_t tag = tlvReader.GetTag();
+        TLV::Tag tag = tlvReader.GetTag();
         if (TLV::IsProfileTag(tag))
         {
             count++;
