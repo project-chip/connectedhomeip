@@ -206,46 +206,6 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         return true;
     }
 
-    case ZCL_CONFIGURE_REPORTING_COMMAND_ID:
-        if (emberAfConfigureReportingCommandCallback(cmd))
-        {
-            return true;
-        }
-        break;
-
-    case ZCL_READ_REPORTING_CONFIGURATION_COMMAND_ID:
-        if (emberAfReadReportingConfigurationCommandCallback(cmd))
-        {
-            return true;
-        }
-        break;
-
-    case ZCL_CONFIGURE_REPORTING_RESPONSE_COMMAND_ID:
-        if (!emberAfConfigureReportingResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
-        {
-            emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
-        }
-        return true;
-
-    // ([status:1] [direction:1] [attribute id:4] [type:0/1] ...
-    // ... [min interval:0/2] [max interval:0/2] [reportable change:0/V] ...
-    // ... [timeout:0/2])+
-    case ZCL_READ_REPORTING_CONFIGURATION_RESPONSE_COMMAND_ID:
-        if (!emberAfReadReportingConfigurationResponseCallback(clusterId, message + msgIndex,
-                                                               static_cast<uint16_t>(msgLen - msgIndex)))
-        {
-            emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
-        }
-        return true;
-
-    // ([attribute id:4] [type:1] [data:V])+
-    case ZCL_REPORT_ATTRIBUTES_COMMAND_ID:
-        if (!emberAfReportAttributesCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
-        {
-            emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
-        }
-        return true;
-
     // [command id:4] [status:1]
     case ZCL_DEFAULT_RESPONSE_COMMAND_ID: {
         EmberAfStatus status;

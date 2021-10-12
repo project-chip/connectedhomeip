@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <lib/support/Span.h>
 
 /** @brief Get Group Name
  *
@@ -38,7 +39,8 @@ void emberAfPluginGroupsServerGetGroupNameCallback(chip::EndpointId endpoint, ch
  * @param groupId Group ID Ver.: always
  * @param groupName Group Name Ver.: always
  */
-void emberAfPluginGroupsServerSetGroupNameCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t * groupName);
+void emberAfPluginGroupsServerSetGroupNameCallback(chip::EndpointId endpoint, chip::GroupId groupId,
+                                                   const chip::CharSpan & groupName);
 
 /** @brief Group Names Supported
  *

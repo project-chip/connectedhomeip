@@ -63,36 +63,6 @@ limitations under the License.
       </description>
       <arg name="writeAttributeRecords" type="WriteAttributeRecord" array="true"/>
     </command>
-    <command code="0x06" name="ConfigureReporting" source="either">
-      <description>
-        Command description for ConfigureReporting
-      </description>
-      <arg name="configureReportingRecords" type="ConfigureReportingRecord" array="true"/>
-    </command>
-    <command code="0x07" name="ConfigureReportingResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for ConfigureReportingResponse
-      </description>
-      <arg name="configureReportingStatusRecords" type="ConfigureReportingStatusRecord" array="true"/>
-    </command>
-    <command code="0x08" name="ReadReportingConfiguration" source="either">
-      <description>
-        Command description for ReadReportingConfiguration
-      </description>
-      <arg name="readReportingConfigurationAttributeRecords" type="ReadReportingConfigurationAttributeRecord" array="true"/>
-    </command>
-    <command code="0x09" name="ReadReportingConfigurationResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for ReadReportingConfigurationResponse
-      </description>
-      <arg name="readReportingConfigurationRecords" type="ReadReportingConfigurationRecord" array="true"/>
-    </command>
-    <command code="0x0A" name="ReportAttributes" source="either">
-      <description>
-        Command description for ReportAttributes
-      </description>
-      <arg name="reportAttributeRecords" type="ReportAttributeRecord" array="true"/>
-    </command>
     <command code="0x0B" name="DefaultResponse" source="either" disableDefaultResponse="true">
       <description>
         Command description for DefaultResponse

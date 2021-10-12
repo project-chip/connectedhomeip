@@ -115,9 +115,10 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, Attrib
 } // anonymous namespace
 
 bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
-                                                                 const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                                 Commands::ResetCounts::DecodableType & commandData)
+                                                                 const app::ConcreteCommandPath & commandPath,
+                                                                 const Commands::ResetCounts::DecodableType & commandData)
 {
+    EndpointId endpoint  = commandPath.mEndpointId;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,

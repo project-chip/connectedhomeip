@@ -12022,9 +12022,8 @@ void emberAfSampleMfgSpecificCluster2ClusterClientTickCallback(chip::EndpointId 
  * @brief Identify Cluster Identify Command callback (from client)
  */
 bool emberAfIdentifyClusterIdentifyCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                            uint16_t identifyTime,
-                                            chip::app::Clusters::Identify::Commands::Identify::DecodableType & fields);
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::Identify::Commands::Identify::DecodableType & commandData);
 /**
  * @brief Identify Cluster IdentifyQueryResponse Command callback (from server)
  */
@@ -12033,23 +12032,21 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::EndpointId endpoi
 /**
  * @brief Identify Cluster IdentifyQuery Command callback (from client)
  */
-bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 chip::app::Clusters::Identify::Commands::IdentifyQuery::DecodableType & fields);
+bool emberAfIdentifyClusterIdentifyQueryCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Identify::Commands::IdentifyQuery::DecodableType & commandData);
 /**
  * @brief Identify Cluster TriggerEffect Command callback (from client)
  */
-bool emberAfIdentifyClusterTriggerEffectCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 uint8_t effectIdentifier, uint8_t effectVariant,
-                                                 chip::app::Clusters::Identify::Commands::TriggerEffect::DecodableType & fields);
+bool emberAfIdentifyClusterTriggerEffectCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Identify::Commands::TriggerEffect::DecodableType & commandData);
 /**
  * @brief Groups Cluster AddGroup Command callback (from client)
  */
 bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                          uint16_t groupId, uint8_t * groupName,
-                                          chip::app::Clusters::Groups::Commands::AddGroup::DecodableType & fields);
+                                          const chip::app::ConcreteCommandPath & commandPath,
+                                          const chip::app::Clusters::Groups::Commands::AddGroup::DecodableType & commandData);
 /**
  * @brief Groups Cluster AddGroupResponse Command callback (from server)
  */
@@ -12059,9 +12056,8 @@ bool emberAfGroupsClusterAddGroupResponseCallback(chip::EndpointId endpoint, chi
  * @brief Groups Cluster ViewGroup Command callback (from client)
  */
 bool emberAfGroupsClusterViewGroupCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                           uint16_t groupId,
-                                           chip::app::Clusters::Groups::Commands::ViewGroup::DecodableType & fields);
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::Groups::Commands::ViewGroup::DecodableType & commandData);
 /**
  * @brief Groups Cluster ViewGroupResponse Command callback (from server)
  */
@@ -12071,9 +12067,8 @@ bool emberAfGroupsClusterViewGroupResponseCallback(chip::EndpointId endpoint, ch
  * @brief Groups Cluster GetGroupMembership Command callback (from client)
  */
 bool emberAfGroupsClusterGetGroupMembershipCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t * groupList,
-    chip::app::Clusters::Groups::Commands::GetGroupMembership::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groups::Commands::GetGroupMembership::DecodableType & commandData);
 /**
  * @brief Groups Cluster GetGroupMembershipResponse Command callback (from server)
  */
@@ -12084,9 +12079,8 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::EndpointId end
  * @brief Groups Cluster RemoveGroup Command callback (from client)
  */
 bool emberAfGroupsClusterRemoveGroupCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                             uint16_t groupId,
-                                             chip::app::Clusters::Groups::Commands::RemoveGroup::DecodableType & fields);
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::Groups::Commands::RemoveGroup::DecodableType & commandData);
 /**
  * @brief Groups Cluster RemoveGroupResponse Command callback (from server)
  */
@@ -12095,23 +12089,21 @@ bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::EndpointId endpoint, 
 /**
  * @brief Groups Cluster RemoveAllGroups Command callback (from client)
  */
-bool emberAfGroupsClusterRemoveAllGroupsCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 chip::app::Clusters::Groups::Commands::RemoveAllGroups::DecodableType & fields);
+bool emberAfGroupsClusterRemoveAllGroupsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groups::Commands::RemoveAllGroups::DecodableType & commandData);
 /**
  * @brief Groups Cluster AddGroupIfIdentifying Command callback (from client)
  */
 bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t groupId, uint8_t * groupName, chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::DecodableType & commandData);
 /**
  * @brief Scenes Cluster AddScene Command callback (from client)
  */
 bool emberAfScenesClusterAddSceneCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                          uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                          /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets,
-                                          chip::app::Clusters::Scenes::Commands::AddScene::DecodableType & fields);
+                                          const chip::app::ConcreteCommandPath & commandPath,
+                                          const chip::app::Clusters::Scenes::Commands::AddScene::DecodableType & commandData);
 /**
  * @brief Scenes Cluster AddSceneResponse Command callback (from server)
  */
@@ -12121,9 +12113,8 @@ bool emberAfScenesClusterAddSceneResponseCallback(chip::EndpointId endpoint, chi
  * @brief Scenes Cluster ViewScene Command callback (from client)
  */
 bool emberAfScenesClusterViewSceneCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                           uint16_t groupId, uint8_t sceneId,
-                                           chip::app::Clusters::Scenes::Commands::ViewScene::DecodableType & fields);
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::Scenes::Commands::ViewScene::DecodableType & commandData);
 /**
  * @brief Scenes Cluster ViewSceneResponse Command callback (from server)
  */
@@ -12134,9 +12125,8 @@ bool emberAfScenesClusterViewSceneResponseCallback(chip::EndpointId endpoint, ch
  * @brief Scenes Cluster RemoveScene Command callback (from client)
  */
 bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                             uint16_t groupId, uint8_t sceneId,
-                                             chip::app::Clusters::Scenes::Commands::RemoveScene::DecodableType & fields);
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::Scenes::Commands::RemoveScene::DecodableType & commandData);
 /**
  * @brief Scenes Cluster RemoveSceneResponse Command callback (from server)
  */
@@ -12145,10 +12135,9 @@ bool emberAfScenesClusterRemoveSceneResponseCallback(chip::EndpointId endpoint, 
 /**
  * @brief Scenes Cluster RemoveAllScenes Command callback (from client)
  */
-bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 uint16_t groupId,
-                                                 chip::app::Clusters::Scenes::Commands::RemoveAllScenes::DecodableType & fields);
+bool emberAfScenesClusterRemoveAllScenesCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Scenes::Commands::RemoveAllScenes::DecodableType & commandData);
 /**
  * @brief Scenes Cluster RemoveAllScenesResponse Command callback (from server)
  */
@@ -12158,9 +12147,8 @@ bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::EndpointId endpoi
  * @brief Scenes Cluster StoreScene Command callback (from client)
  */
 bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                            uint16_t groupId, uint8_t sceneId,
-                                            chip::app::Clusters::Scenes::Commands::StoreScene::DecodableType & fields);
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::Scenes::Commands::StoreScene::DecodableType & commandData);
 /**
  * @brief Scenes Cluster StoreSceneResponse Command callback (from server)
  */
@@ -12170,15 +12158,14 @@ bool emberAfScenesClusterStoreSceneResponseCallback(chip::EndpointId endpoint, c
  * @brief Scenes Cluster RecallScene Command callback (from client)
  */
 bool emberAfScenesClusterRecallSceneCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                             uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                                             chip::app::Clusters::Scenes::Commands::RecallScene::DecodableType & fields);
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::Scenes::Commands::RecallScene::DecodableType & commandData);
 /**
  * @brief Scenes Cluster GetSceneMembership Command callback (from client)
  */
 bool emberAfScenesClusterGetSceneMembershipCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t groupId, chip::app::Clusters::Scenes::Commands::GetSceneMembership::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Scenes::Commands::GetSceneMembership::DecodableType & commandData);
 /**
  * @brief Scenes Cluster GetSceneMembershipResponse Command callback (from server)
  */
@@ -12188,11 +12175,9 @@ bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::EndpointId end
 /**
  * @brief Scenes Cluster EnhancedAddScene Command callback (from client)
  */
-bool emberAfScenesClusterEnhancedAddSceneCallback(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                  uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                                  /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets,
-                                                  chip::app::Clusters::Scenes::Commands::EnhancedAddScene::DecodableType & fields);
+bool emberAfScenesClusterEnhancedAddSceneCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Scenes::Commands::EnhancedAddScene::DecodableType & commandData);
 /**
  * @brief Scenes Cluster EnhancedAddSceneResponse Command callback (from server)
  */
@@ -12202,8 +12187,8 @@ bool emberAfScenesClusterEnhancedAddSceneResponseCallback(chip::EndpointId endpo
  * @brief Scenes Cluster EnhancedViewScene Command callback (from client)
  */
 bool emberAfScenesClusterEnhancedViewSceneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t groupId, uint8_t sceneId, chip::app::Clusters::Scenes::Commands::EnhancedViewScene::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Scenes::Commands::EnhancedViewScene::DecodableType & commandData);
 /**
  * @brief Scenes Cluster EnhancedViewSceneResponse Command callback (from server)
  */
@@ -12214,10 +12199,8 @@ bool emberAfScenesClusterEnhancedViewSceneResponseCallback(
  * @brief Scenes Cluster CopyScene Command callback (from client)
  */
 bool emberAfScenesClusterCopySceneCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                           uint8_t mode, uint16_t groupIdFrom, uint8_t sceneIdFrom, uint16_t groupIdTo,
-                                           uint8_t sceneIdTo,
-                                           chip::app::Clusters::Scenes::Commands::CopyScene::DecodableType & fields);
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::Scenes::Commands::CopyScene::DecodableType & commandData);
 /**
  * @brief Scenes Cluster CopySceneResponse Command callback (from server)
  */
@@ -12227,130 +12210,119 @@ bool emberAfScenesClusterCopySceneResponseCallback(chip::EndpointId endpoint, ch
  * @brief On/Off Cluster Off Command callback (from client)
  */
 bool emberAfOnOffClusterOffCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                    chip::EndpointId endpoint, chip::app::Clusters::OnOff::Commands::Off::DecodableType & fields);
+                                    const chip::app::Clusters::OnOff::Commands::Off::DecodableType & commandData);
 /**
  * @brief On/Off Cluster SampleMfgSpecificOffWithTransition Command callback (from client)
  */
 bool emberAfOnOffClusterSampleMfgSpecificOffWithTransitionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::OnOff::Commands::SampleMfgSpecificOffWithTransition::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificOffWithTransition::DecodableType & commandData);
 /**
  * @brief On/Off Cluster On Command callback (from client)
  */
 bool emberAfOnOffClusterOnCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                   chip::EndpointId endpoint, chip::app::Clusters::OnOff::Commands::On::DecodableType & fields);
+                                   const chip::app::Clusters::OnOff::Commands::On::DecodableType & commandData);
 /**
  * @brief On/Off Cluster SampleMfgSpecificOnWithTransition Command callback (from client)
  */
 bool emberAfOnOffClusterSampleMfgSpecificOnWithTransitionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::OnOff::Commands::SampleMfgSpecificOnWithTransition::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificOnWithTransition::DecodableType & commandData);
 /**
  * @brief On/Off Cluster SampleMfgSpecificOnWithTransition2 Command callback (from client)
  */
 bool emberAfOnOffClusterSampleMfgSpecificOnWithTransition2Callback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::OnOff::Commands::SampleMfgSpecificOnWithTransition2::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificOnWithTransition2::DecodableType & commandData);
 /**
  * @brief On/Off Cluster Toggle Command callback (from client)
  */
 bool emberAfOnOffClusterToggleCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                       chip::EndpointId endpoint,
-                                       chip::app::Clusters::OnOff::Commands::Toggle::DecodableType & fields);
+                                       const chip::app::Clusters::OnOff::Commands::Toggle::DecodableType & commandData);
 /**
  * @brief On/Off Cluster SampleMfgSpecificToggleWithTransition Command callback (from client)
  */
 bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransitionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::OnOff::Commands::SampleMfgSpecificToggleWithTransition::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificToggleWithTransition::DecodableType & commandData);
 /**
  * @brief On/Off Cluster SampleMfgSpecificToggleWithTransition2 Command callback (from client)
  */
 bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransition2Callback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::OnOff::Commands::SampleMfgSpecificToggleWithTransition2::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificToggleWithTransition2::DecodableType & commandData);
 /**
  * @brief On/Off Cluster OffWithEffect Command callback (from client)
  */
-bool emberAfOnOffClusterOffWithEffectCallback(chip::app::CommandHandler * commandObj,
-                                              const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                              uint8_t EffectId, uint8_t EffectVariant,
-                                              chip::app::Clusters::OnOff::Commands::OffWithEffect::DecodableType & fields);
+bool emberAfOnOffClusterOffWithEffectCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OnOff::Commands::OffWithEffect::DecodableType & commandData);
 /**
  * @brief On/Off Cluster OnWithRecallGlobalScene Command callback (from client)
  */
 bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::DecodableType & commandData);
 /**
  * @brief On/Off Cluster OnWithTimedOff Command callback (from client)
  */
-bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::CommandHandler * commandObj,
-                                               const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                               uint8_t OnOffControl, uint16_t OnTime, uint16_t OffWaitTime,
-                                               chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & fields);
+bool emberAfOnOffClusterOnWithTimedOffCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
 /**
  * @brief Level Control Cluster MoveToLevel Command callback (from client)
  */
 bool emberAfLevelControlClusterMoveToLevelCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
-    chip::app::Clusters::LevelControl::Commands::MoveToLevel::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::LevelControl::Commands::MoveToLevel::DecodableType & commandData);
 /**
  * @brief Level Control Cluster Move Command callback (from client)
  */
 bool emberAfLevelControlClusterMoveCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                            uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride,
-                                            chip::app::Clusters::LevelControl::Commands::Move::DecodableType & fields);
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::LevelControl::Commands::Move::DecodableType & commandData);
 /**
  * @brief Level Control Cluster Step Command callback (from client)
  */
 bool emberAfLevelControlClusterStepCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                            uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask,
-                                            uint8_t optionOverride,
-                                            chip::app::Clusters::LevelControl::Commands::Step::DecodableType & fields);
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::LevelControl::Commands::Step::DecodableType & commandData);
 /**
  * @brief Level Control Cluster Stop Command callback (from client)
  */
 bool emberAfLevelControlClusterStopCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                            uint8_t optionMask, uint8_t optionOverride,
-                                            chip::app::Clusters::LevelControl::Commands::Stop::DecodableType & fields);
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::LevelControl::Commands::Stop::DecodableType & commandData);
 /**
  * @brief Level Control Cluster MoveToLevelWithOnOff Command callback (from client)
  */
 bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t level, uint16_t transitionTime,
-    chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::DecodableType & commandData);
 /**
  * @brief Level Control Cluster MoveWithOnOff Command callback (from client)
  */
 bool emberAfLevelControlClusterMoveWithOnOffCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t moveMode, uint8_t rate, chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::DecodableType & commandData);
 /**
  * @brief Level Control Cluster StepWithOnOff Command callback (from client)
  */
 bool emberAfLevelControlClusterStepWithOnOffCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime,
-    chip::app::Clusters::LevelControl::Commands::StepWithOnOff::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::LevelControl::Commands::StepWithOnOff::DecodableType & commandData);
 /**
  * @brief Level Control Cluster StopWithOnOff Command callback (from client)
  */
 bool emberAfLevelControlClusterStopWithOnOffCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::LevelControl::Commands::StopWithOnOff::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::LevelControl::Commands::StopWithOnOff::DecodableType & commandData);
 /**
  * @brief Alarms Cluster ResetAlarm Command callback (from client)
  */
 bool emberAfAlarmsClusterResetAlarmCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                            uint8_t alarmCode, chip::ClusterId clusterId,
-                                            chip::app::Clusters::Alarms::Commands::ResetAlarm::DecodableType & fields);
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::Alarms::Commands::ResetAlarm::DecodableType & commandData);
 /**
  * @brief Alarms Cluster Alarm Command callback (from server)
  */
@@ -12359,9 +12331,9 @@ bool emberAfAlarmsClusterAlarmCallback(chip::EndpointId endpoint, chip::app::Com
 /**
  * @brief Alarms Cluster ResetAllAlarms Command callback (from client)
  */
-bool emberAfAlarmsClusterResetAllAlarmsCallback(chip::app::CommandHandler * commandObj,
-                                                const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                chip::app::Clusters::Alarms::Commands::ResetAllAlarms::DecodableType & fields);
+bool emberAfAlarmsClusterResetAllAlarmsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Alarms::Commands::ResetAllAlarms::DecodableType & commandData);
 /**
  * @brief Alarms Cluster GetAlarmResponse Command callback (from server)
  */
@@ -12371,20 +12343,20 @@ bool emberAfAlarmsClusterGetAlarmResponseCallback(chip::EndpointId endpoint, chi
  * @brief Alarms Cluster GetAlarm Command callback (from client)
  */
 bool emberAfAlarmsClusterGetAlarmCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                          chip::app::Clusters::Alarms::Commands::GetAlarm::DecodableType & fields);
+                                          const chip::app::ConcreteCommandPath & commandPath,
+                                          const chip::app::Clusters::Alarms::Commands::GetAlarm::DecodableType & commandData);
 /**
  * @brief Alarms Cluster ResetAlarmLog Command callback (from client)
  */
-bool emberAfAlarmsClusterResetAlarmLogCallback(chip::app::CommandHandler * commandObj,
-                                               const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                               chip::app::Clusters::Alarms::Commands::ResetAlarmLog::DecodableType & fields);
+bool emberAfAlarmsClusterResetAlarmLogCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Alarms::Commands::ResetAlarmLog::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster PowerProfileRequest Command callback (from client)
  */
 bool emberAfPowerProfileClusterPowerProfileRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t powerProfileId, chip::app::Clusters::PowerProfile::Commands::PowerProfileRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PowerProfile::Commands::PowerProfileRequest::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster PowerProfileNotification Command callback (from server)
  */
@@ -12395,8 +12367,8 @@ bool emberAfPowerProfileClusterPowerProfileNotificationCallback(
  * @brief Power Profile Cluster PowerProfileStateRequest Command callback (from client)
  */
 bool emberAfPowerProfileClusterPowerProfileStateRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::PowerProfile::Commands::PowerProfileStateRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PowerProfile::Commands::PowerProfileStateRequest::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster PowerProfileResponse Command callback (from server)
  */
@@ -12407,9 +12379,8 @@ bool emberAfPowerProfileClusterPowerProfileResponseCallback(
  * @brief Power Profile Cluster GetPowerProfilePriceResponse Command callback (from client)
  */
 bool emberAfPowerProfileClusterGetPowerProfilePriceResponseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t powerProfileId, uint16_t currency, uint32_t price, uint8_t priceTrailingDigit,
-    chip::app::Clusters::PowerProfile::Commands::GetPowerProfilePriceResponse::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PowerProfile::Commands::GetPowerProfilePriceResponse::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster PowerProfileStateResponse Command callback (from server)
  */
@@ -12420,9 +12391,8 @@ bool emberAfPowerProfileClusterPowerProfileStateResponseCallback(
  * @brief Power Profile Cluster GetOverallSchedulePriceResponse Command callback (from client)
  */
 bool emberAfPowerProfileClusterGetOverallSchedulePriceResponseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t currency, uint32_t price, uint8_t priceTrailingDigit,
-    chip::app::Clusters::PowerProfile::Commands::GetOverallSchedulePriceResponse::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PowerProfile::Commands::GetOverallSchedulePriceResponse::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster GetPowerProfilePrice Command callback (from server)
  */
@@ -12432,9 +12402,8 @@ bool emberAfPowerProfileClusterGetPowerProfilePriceCallback(chip::EndpointId end
  * @brief Power Profile Cluster EnergyPhasesScheduleNotification Command callback (from client)
  */
 bool emberAfPowerProfileClusterEnergyPhasesScheduleNotificationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t powerProfileId, uint8_t numOfScheduledPhases, /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases,
-    chip::app::Clusters::PowerProfile::Commands::EnergyPhasesScheduleNotification::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PowerProfile::Commands::EnergyPhasesScheduleNotification::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster PowerProfilesStateNotification Command callback (from server)
  */
@@ -12445,9 +12414,8 @@ bool emberAfPowerProfileClusterPowerProfilesStateNotificationCallback(
  * @brief Power Profile Cluster EnergyPhasesScheduleResponse Command callback (from client)
  */
 bool emberAfPowerProfileClusterEnergyPhasesScheduleResponseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t powerProfileId, uint8_t numOfScheduledPhases, /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases,
-    chip::app::Clusters::PowerProfile::Commands::EnergyPhasesScheduleResponse::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PowerProfile::Commands::EnergyPhasesScheduleResponse::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster GetOverallSchedulePrice Command callback (from server)
  */
@@ -12456,9 +12424,8 @@ bool emberAfPowerProfileClusterGetOverallSchedulePriceCallback(chip::EndpointId 
  * @brief Power Profile Cluster PowerProfileScheduleConstraintsRequest Command callback (from client)
  */
 bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t powerProfileId,
-    chip::app::Clusters::PowerProfile::Commands::PowerProfileScheduleConstraintsRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PowerProfile::Commands::PowerProfileScheduleConstraintsRequest::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster EnergyPhasesScheduleRequest Command callback (from server)
  */
@@ -12468,8 +12435,8 @@ bool emberAfPowerProfileClusterEnergyPhasesScheduleRequestCallback(chip::Endpoin
  * @brief Power Profile Cluster EnergyPhasesScheduleStateRequest Command callback (from client)
  */
 bool emberAfPowerProfileClusterEnergyPhasesScheduleStateRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t powerProfileId, chip::app::Clusters::PowerProfile::Commands::EnergyPhasesScheduleStateRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PowerProfile::Commands::EnergyPhasesScheduleStateRequest::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster EnergyPhasesScheduleStateResponse Command callback (from server)
  */
@@ -12480,9 +12447,8 @@ bool emberAfPowerProfileClusterEnergyPhasesScheduleStateResponseCallback(
  * @brief Power Profile Cluster GetPowerProfilePriceExtendedResponse Command callback (from client)
  */
 bool emberAfPowerProfileClusterGetPowerProfilePriceExtendedResponseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t powerProfileId, uint16_t currency, uint32_t price, uint8_t priceTrailingDigit,
-    chip::app::Clusters::PowerProfile::Commands::GetPowerProfilePriceExtendedResponse::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PowerProfile::Commands::GetPowerProfilePriceExtendedResponse::DecodableType & commandData);
 /**
  * @brief Power Profile Cluster EnergyPhasesScheduleStateNotification Command callback (from server)
  */
@@ -12513,8 +12479,8 @@ bool emberAfPowerProfileClusterGetPowerProfilePriceExtendedCallback(chip::Endpoi
  * @brief Appliance Control Cluster ExecutionOfACommand Command callback (from client)
  */
 bool emberAfApplianceControlClusterExecutionOfACommandCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t commandId, chip::app::Clusters::ApplianceControl::Commands::ExecutionOfACommand::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplianceControl::Commands::ExecutionOfACommand::DecodableType & commandData);
 /**
  * @brief Appliance Control Cluster SignalStateResponse Command callback (from server)
  */
@@ -12525,8 +12491,8 @@ bool emberAfApplianceControlClusterSignalStateResponseCallback(chip::EndpointId 
  * @brief Appliance Control Cluster SignalState Command callback (from client)
  */
 bool emberAfApplianceControlClusterSignalStateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::ApplianceControl::Commands::SignalState::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplianceControl::Commands::SignalState::DecodableType & commandData);
 /**
  * @brief Appliance Control Cluster SignalStateNotification Command callback (from server)
  */
@@ -12538,27 +12504,26 @@ bool emberAfApplianceControlClusterSignalStateNotificationCallback(chip::Endpoin
  * @brief Appliance Control Cluster WriteFunctions Command callback (from client)
  */
 bool emberAfApplianceControlClusterWriteFunctionsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t functionId, uint8_t functionDataType, /* TYPE WARNING: array array defaults to */ uint8_t * functionData,
-    chip::app::Clusters::ApplianceControl::Commands::WriteFunctions::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplianceControl::Commands::WriteFunctions::DecodableType & commandData);
 /**
  * @brief Appliance Control Cluster OverloadPauseResume Command callback (from client)
  */
 bool emberAfApplianceControlClusterOverloadPauseResumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::ApplianceControl::Commands::OverloadPauseResume::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplianceControl::Commands::OverloadPauseResume::DecodableType & commandData);
 /**
  * @brief Appliance Control Cluster OverloadPause Command callback (from client)
  */
 bool emberAfApplianceControlClusterOverloadPauseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::ApplianceControl::Commands::OverloadPause::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplianceControl::Commands::OverloadPause::DecodableType & commandData);
 /**
  * @brief Appliance Control Cluster OverloadWarning Command callback (from client)
  */
 bool emberAfApplianceControlClusterOverloadWarningCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t warningEvent, chip::app::Clusters::ApplianceControl::Commands::OverloadWarning::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplianceControl::Commands::OverloadWarning::DecodableType & commandData);
 /**
  * @brief Poll Control Cluster CheckIn Command callback (from server)
  */
@@ -12567,27 +12532,26 @@ bool emberAfPollControlClusterCheckInCallback(chip::EndpointId endpoint, chip::a
  * @brief Poll Control Cluster CheckInResponse Command callback (from client)
  */
 bool emberAfPollControlClusterCheckInResponseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    bool startFastPolling, uint16_t fastPollTimeout,
-    chip::app::Clusters::PollControl::Commands::CheckInResponse::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PollControl::Commands::CheckInResponse::DecodableType & commandData);
 /**
  * @brief Poll Control Cluster FastPollStop Command callback (from client)
  */
 bool emberAfPollControlClusterFastPollStopCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::PollControl::Commands::FastPollStop::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PollControl::Commands::FastPollStop::DecodableType & commandData);
 /**
  * @brief Poll Control Cluster SetLongPollInterval Command callback (from client)
  */
 bool emberAfPollControlClusterSetLongPollIntervalCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint32_t newLongPollInterval, chip::app::Clusters::PollControl::Commands::SetLongPollInterval::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PollControl::Commands::SetLongPollInterval::DecodableType & commandData);
 /**
  * @brief Poll Control Cluster SetShortPollInterval Command callback (from client)
  */
 bool emberAfPollControlClusterSetShortPollIntervalCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t newShortPollInterval, chip::app::Clusters::PollControl::Commands::SetShortPollInterval::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::PollControl::Commands::SetShortPollInterval::DecodableType & commandData);
 /**
  * @brief Basic Cluster StartUp Command callback (from server)
  */
@@ -12595,9 +12559,9 @@ bool emberAfBasicClusterStartUpCallback(chip::EndpointId endpoint, chip::app::Co
 /**
  * @brief Basic Cluster MfgSpecificPing Command callback (from client)
  */
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj,
-                                                const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                chip::app::Clusters::Basic::Commands::MfgSpecificPing::DecodableType & fields);
+bool emberAfBasicClusterMfgSpecificPingCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Basic::Commands::MfgSpecificPing::DecodableType & commandData);
 /**
  * @brief Basic Cluster ShutDown Command callback (from server)
  */
@@ -12610,24 +12574,20 @@ bool emberAfBasicClusterLeaveCallback(chip::EndpointId endpoint, chip::app::Comm
  * @brief OTA Software Update Provider Cluster QueryImage Command callback (from client)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t vendorId, uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported,
-    uint8_t * location, bool requestorCanConsent, chip::ByteSpan metadataForProvider,
-    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
 /**
  * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan updateToken, uint32_t newVersion,
-    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData);
 /**
  * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback (from client)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan updateToken, uint32_t softwareVersion,
-    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
 /**
  * @brief OTA Software Update Provider Cluster QueryImageResponse Command callback (from server)
  */
@@ -12647,16 +12607,14 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(c
  * @brief OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
  */
 bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan providerLocation, uint16_t vendorId, uint8_t announcementReason, chip::ByteSpan metadataForNode,
-    chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
 /**
  * @brief General Commissioning Cluster ArmFailSafe Command callback (from client)
  */
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs,
-    chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData);
 /**
  * @brief General Commissioning Cluster ArmFailSafeResponse Command callback (from server)
  */
@@ -12666,9 +12624,8 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::Endpoin
  * @brief General Commissioning Cluster SetRegulatoryConfig Command callback (from client)
  */
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t location, uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs,
-    chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & commandData);
 /**
  * @brief General Commissioning Cluster SetRegulatoryConfigResponse Command callback (from server)
  */
@@ -12679,8 +12636,8 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip:
  * @brief General Commissioning Cluster CommissioningComplete Command callback (from client)
  */
 bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::DecodableType & commandData);
 /**
  * @brief General Commissioning Cluster CommissioningCompleteResponse Command callback (from server)
  */
@@ -12691,9 +12648,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chi
  * @brief Network Commissioning Cluster ScanNetworks Command callback (from client)
  */
 bool emberAfNetworkCommissioningClusterScanNetworksCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan ssid, uint64_t breadcrumb, uint32_t timeoutMs,
-    chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::DecodableType & commandData);
 /**
  * @brief Network Commissioning Cluster ScanNetworksResponse Command callback (from server)
  */
@@ -12705,9 +12661,8 @@ bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
  * @brief Network Commissioning Cluster AddWiFiNetwork Command callback (from client)
  */
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs,
-    chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::DecodableType & commandData);
 /**
  * @brief Network Commissioning Cluster AddWiFiNetworkResponse Command callback (from server)
  */
@@ -12718,9 +12673,8 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::Endp
  * @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback (from client)
  */
 bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs,
-    chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::DecodableType & commandData);
 /**
  * @brief Network Commissioning Cluster UpdateWiFiNetworkResponse Command callback (from server)
  */
@@ -12731,9 +12685,8 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::E
  * @brief Network Commissioning Cluster AddThreadNetwork Command callback (from client)
  */
 bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs,
-    chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::DecodableType & commandData);
 /**
  * @brief Network Commissioning Cluster AddThreadNetworkResponse Command callback (from server)
  */
@@ -12744,9 +12697,8 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::En
  * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback (from client)
  */
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs,
-    chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::DecodableType & commandData);
 /**
  * @brief Network Commissioning Cluster UpdateThreadNetworkResponse Command callback (from server)
  */
@@ -12757,9 +12709,8 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip:
  * @brief Network Commissioning Cluster RemoveNetwork Command callback (from client)
  */
 bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan NetworkID, uint64_t Breadcrumb, uint32_t TimeoutMs,
-    chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::DecodableType & commandData);
 /**
  * @brief Network Commissioning Cluster RemoveNetworkResponse Command callback (from server)
  */
@@ -12770,9 +12721,8 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::Endpo
  * @brief Network Commissioning Cluster EnableNetwork Command callback (from client)
  */
 bool emberAfNetworkCommissioningClusterEnableNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs,
-    chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::DecodableType & commandData);
 /**
  * @brief Network Commissioning Cluster EnableNetworkResponse Command callback (from server)
  */
@@ -12783,9 +12733,8 @@ bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::Endpo
  * @brief Network Commissioning Cluster DisableNetwork Command callback (from client)
  */
 bool emberAfNetworkCommissioningClusterDisableNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs,
-    chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::DecodableType & commandData);
 /**
  * @brief Network Commissioning Cluster DisableNetworkResponse Command callback (from server)
  */
@@ -12796,16 +12745,14 @@ bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::Endp
  * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback (from client)
  */
 bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint32_t timeoutMs,
-    chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::DecodableType & commandData);
 /**
  * @brief Diagnostic Logs Cluster RetrieveLogsRequest Command callback (from client)
  */
 bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t intent, uint8_t requestedProtocol, chip::ByteSpan transferFileDesignator,
-    chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType & commandData);
 /**
  * @brief Diagnostic Logs Cluster RetrieveLogsResponse Command callback (from server)
  */
@@ -12816,26 +12763,26 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(chip::EndpointId e
  * @brief Software Diagnostics Cluster ResetWatermarks Command callback (from client)
  */
 bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::DecodableType & commandData);
 /**
  * @brief Thread Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
  * @brief WiFi Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
 bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
  * @brief Ethernet Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
 bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
  * @brief Bridged Device Basic Cluster StartUp Command callback (from server)
  */
@@ -12856,30 +12803,26 @@ bool emberAfBridgedDeviceBasicClusterReachableChangedCallback(chip::EndpointId e
  * @brief AdministratorCommissioning Cluster OpenCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t CommissioningTimeout, chip::ByteSpan PAKEVerifier, uint16_t Discriminator, uint32_t Iterations, chip::ByteSpan Salt,
-    uint16_t PasscodeID,
-    chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData);
 /**
  * @brief AdministratorCommissioning Cluster OpenBasicCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t CommissioningTimeout,
-    chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
 /**
  * @brief AdministratorCommissioning Cluster RevokeCommissioning Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster AttestationRequest Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterAttestationRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan AttestationNonce,
-    chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster AttestationResponse Command callback (from server)
  */
@@ -12890,9 +12833,8 @@ bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::Endpo
  * @brief Operational Credentials Cluster CertificateChainRequest Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t CertificateType,
-    chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster CertificateChainResponse Command callback (from server)
  */
@@ -12903,8 +12845,8 @@ bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(chip::
  * @brief Operational Credentials Cluster OpCSRRequest Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan CSRNonce, chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster OpCSRResponse Command callback (from server)
  */
@@ -12914,16 +12856,14 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::EndpointId 
  * @brief Operational Credentials Cluster AddNOC Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterAddNOCCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan NOCValue, chip::ByteSpan ICACValue, chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode, uint16_t AdminVendorId,
-    chip::app::Clusters::OperationalCredentials::Commands::AddNOC::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::AddNOC::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster UpdateNOC Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterUpdateNOCCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan NOCValue, chip::ByteSpan ICACValue,
-    chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster NOCResponse Command callback (from server)
  */
@@ -12933,35 +12873,32 @@ bool emberAfOperationalCredentialsClusterNOCResponseCallback(chip::EndpointId en
  * @brief Operational Credentials Cluster UpdateFabricLabel Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t * Label, chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster RemoveFabric Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t FabricIndex, chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster AddTrustedRootCertificate Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan RootCertificate,
-    chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster RemoveTrustedRootCertificate Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::ByteSpan TrustedRootIdentifier,
-    chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                            chip::ByteSpan PIN,
-                                            chip::app::Clusters::DoorLock::Commands::LockDoor::DecodableType & fields);
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::DoorLock::Commands::LockDoor::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoorResponse Command callback (from server)
  */
@@ -12970,10 +12907,9 @@ bool emberAfDoorLockClusterLockDoorResponseCallback(chip::EndpointId endpoint, c
 /**
  * @brief Door Lock Cluster UnlockDoor Command callback (from client)
  */
-bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::CommandHandler * commandObj,
-                                              const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                              chip::ByteSpan PIN,
-                                              chip::app::Clusters::DoorLock::Commands::UnlockDoor::DecodableType & fields);
+bool emberAfDoorLockClusterUnlockDoorCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::UnlockDoor::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster UnlockDoorResponse Command callback (from server)
  */
@@ -12983,8 +12919,8 @@ bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::EndpointId endpoint,
  * @brief Door Lock Cluster Toggle Command callback (from client)
  */
 bool emberAfDoorLockClusterToggleCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                          uint8_t * pin, chip::app::Clusters::DoorLock::Commands::Toggle::DecodableType & fields);
+                                          const chip::app::ConcreteCommandPath & commandPath,
+                                          const chip::app::Clusters::DoorLock::Commands::Toggle::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster ToggleResponse Command callback (from server)
  */
@@ -12993,9 +12929,8 @@ bool emberAfDoorLockClusterToggleResponseCallback(chip::EndpointId endpoint, chi
  * @brief Door Lock Cluster UnlockWithTimeout Command callback (from client)
  */
 bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t timeoutInSeconds, chip::ByteSpan pin,
-    chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster UnlockWithTimeoutResponse Command callback (from server)
  */
@@ -13004,10 +12939,9 @@ bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(chip::EndpointId en
 /**
  * @brief Door Lock Cluster GetLogRecord Command callback (from client)
  */
-bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::CommandHandler * commandObj,
-                                                const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                uint16_t logIndex,
-                                                chip::app::Clusters::DoorLock::Commands::GetLogRecord::DecodableType & fields);
+bool emberAfDoorLockClusterGetLogRecordCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetLogRecord::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster GetLogRecordResponse Command callback (from server)
  */
@@ -13018,9 +12952,8 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::EndpointId endpoin
  * @brief Door Lock Cluster SetPin Command callback (from client)
  */
 bool emberAfDoorLockClusterSetPinCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                          uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin,
-                                          chip::app::Clusters::DoorLock::Commands::SetPin::DecodableType & fields);
+                                          const chip::app::ConcreteCommandPath & commandPath,
+                                          const chip::app::Clusters::DoorLock::Commands::SetPin::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster SetPinResponse Command callback (from server)
  */
@@ -13029,8 +12962,8 @@ bool emberAfDoorLockClusterSetPinResponseCallback(chip::EndpointId endpoint, chi
  * @brief Door Lock Cluster GetPin Command callback (from client)
  */
 bool emberAfDoorLockClusterGetPinCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                          uint16_t userId, chip::app::Clusters::DoorLock::Commands::GetPin::DecodableType & fields);
+                                          const chip::app::ConcreteCommandPath & commandPath,
+                                          const chip::app::Clusters::DoorLock::Commands::GetPin::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster GetPinResponse Command callback (from server)
  */
@@ -13040,9 +12973,8 @@ bool emberAfDoorLockClusterGetPinResponseCallback(chip::EndpointId endpoint, chi
  * @brief Door Lock Cluster ClearPin Command callback (from client)
  */
 bool emberAfDoorLockClusterClearPinCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                            uint16_t userId,
-                                            chip::app::Clusters::DoorLock::Commands::ClearPin::DecodableType & fields);
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::DoorLock::Commands::ClearPin::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster ClearPinResponse Command callback (from server)
  */
@@ -13051,9 +12983,9 @@ bool emberAfDoorLockClusterClearPinResponseCallback(chip::EndpointId endpoint, c
 /**
  * @brief Door Lock Cluster ClearAllPins Command callback (from client)
  */
-bool emberAfDoorLockClusterClearAllPinsCallback(chip::app::CommandHandler * commandObj,
-                                                const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                chip::app::Clusters::DoorLock::Commands::ClearAllPins::DecodableType & fields);
+bool emberAfDoorLockClusterClearAllPinsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearAllPins::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster ClearAllPinsResponse Command callback (from server)
  */
@@ -13062,10 +12994,9 @@ bool emberAfDoorLockClusterClearAllPinsResponseCallback(chip::EndpointId endpoin
 /**
  * @brief Door Lock Cluster SetUserStatus Command callback (from client)
  */
-bool emberAfDoorLockClusterSetUserStatusCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 uint16_t userId, uint8_t userStatus,
-                                                 chip::app::Clusters::DoorLock::Commands::SetUserStatus::DecodableType & fields);
+bool emberAfDoorLockClusterSetUserStatusCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetUserStatus::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster SetUserStatusResponse Command callback (from server)
  */
@@ -13074,10 +13005,9 @@ bool emberAfDoorLockClusterSetUserStatusResponseCallback(chip::EndpointId endpoi
 /**
  * @brief Door Lock Cluster GetUserStatus Command callback (from client)
  */
-bool emberAfDoorLockClusterGetUserStatusCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 uint16_t userId,
-                                                 chip::app::Clusters::DoorLock::Commands::GetUserStatus::DecodableType & fields);
+bool emberAfDoorLockClusterGetUserStatusCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetUserStatus::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster GetUserStatusResponse Command callback (from server)
  */
@@ -13087,9 +13017,8 @@ bool emberAfDoorLockClusterGetUserStatusResponseCallback(chip::EndpointId endpoi
  * @brief Door Lock Cluster SetWeekdaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterSetWeekdayScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
-    uint8_t endMinute, chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster SetWeekdayScheduleResponse Command callback (from server)
  */
@@ -13099,8 +13028,8 @@ bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(chip::EndpointId e
  * @brief Door Lock Cluster GetWeekdaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterGetWeekdayScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t scheduleId, uint16_t userId, chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster GetWeekdayScheduleResponse Command callback (from server)
  */
@@ -13112,8 +13041,8 @@ bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(chip::EndpointId e
  * @brief Door Lock Cluster ClearWeekdaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterClearWeekdayScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t scheduleId, uint16_t userId, chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster ClearWeekdayScheduleResponse Command callback (from server)
  */
@@ -13123,9 +13052,8 @@ bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(chip::EndpointId
  * @brief Door Lock Cluster SetYeardaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterSetYeardayScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime,
-    chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster SetYeardayScheduleResponse Command callback (from server)
  */
@@ -13135,8 +13063,8 @@ bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(chip::EndpointId e
  * @brief Door Lock Cluster GetYeardaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterGetYeardayScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t scheduleId, uint16_t userId, chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster GetYeardayScheduleResponse Command callback (from server)
  */
@@ -13147,8 +13075,8 @@ bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(chip::EndpointId e
  * @brief Door Lock Cluster ClearYeardaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterClearYeardayScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t scheduleId, uint16_t userId, chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster ClearYeardayScheduleResponse Command callback (from server)
  */
@@ -13158,9 +13086,8 @@ bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(chip::EndpointId
  * @brief Door Lock Cluster SetHolidaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterSetHolidayScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday,
-    chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster SetHolidayScheduleResponse Command callback (from server)
  */
@@ -13170,8 +13097,8 @@ bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(chip::EndpointId e
  * @brief Door Lock Cluster GetHolidaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterGetHolidayScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t scheduleId, chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster GetHolidayScheduleResponse Command callback (from server)
  */
@@ -13182,8 +13109,8 @@ bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(chip::EndpointId e
  * @brief Door Lock Cluster ClearHolidaySchedule Command callback (from client)
  */
 bool emberAfDoorLockClusterClearHolidayScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t scheduleId, chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster ClearHolidayScheduleResponse Command callback (from server)
  */
@@ -13192,10 +13119,9 @@ bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(chip::EndpointId
 /**
  * @brief Door Lock Cluster SetUserType Command callback (from client)
  */
-bool emberAfDoorLockClusterSetUserTypeCallback(chip::app::CommandHandler * commandObj,
-                                               const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                               uint16_t userId, uint8_t userType,
-                                               chip::app::Clusters::DoorLock::Commands::SetUserType::DecodableType & fields);
+bool emberAfDoorLockClusterSetUserTypeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetUserType::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster SetUserTypeResponse Command callback (from server)
  */
@@ -13204,10 +13130,9 @@ bool emberAfDoorLockClusterSetUserTypeResponseCallback(chip::EndpointId endpoint
 /**
  * @brief Door Lock Cluster GetUserType Command callback (from client)
  */
-bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::CommandHandler * commandObj,
-                                               const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                               uint16_t userId,
-                                               chip::app::Clusters::DoorLock::Commands::GetUserType::DecodableType & fields);
+bool emberAfDoorLockClusterGetUserTypeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetUserType::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster GetUserTypeResponse Command callback (from server)
  */
@@ -13217,9 +13142,8 @@ bool emberAfDoorLockClusterGetUserTypeResponseCallback(chip::EndpointId endpoint
  * @brief Door Lock Cluster SetRfid Command callback (from client)
  */
 bool emberAfDoorLockClusterSetRfidCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                           uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan id,
-                                           chip::app::Clusters::DoorLock::Commands::SetRfid::DecodableType & fields);
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::DoorLock::Commands::SetRfid::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster SetRfidResponse Command callback (from server)
  */
@@ -13229,9 +13153,8 @@ bool emberAfDoorLockClusterSetRfidResponseCallback(chip::EndpointId endpoint, ch
  * @brief Door Lock Cluster GetRfid Command callback (from client)
  */
 bool emberAfDoorLockClusterGetRfidCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                           uint16_t userId,
-                                           chip::app::Clusters::DoorLock::Commands::GetRfid::DecodableType & fields);
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::DoorLock::Commands::GetRfid::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster GetRfidResponse Command callback (from server)
  */
@@ -13241,9 +13164,8 @@ bool emberAfDoorLockClusterGetRfidResponseCallback(chip::EndpointId endpoint, ch
  * @brief Door Lock Cluster ClearRfid Command callback (from client)
  */
 bool emberAfDoorLockClusterClearRfidCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                             uint16_t userId,
-                                             chip::app::Clusters::DoorLock::Commands::ClearRfid::DecodableType & fields);
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::DoorLock::Commands::ClearRfid::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster ClearRfidResponse Command callback (from server)
  */
@@ -13252,9 +13174,9 @@ bool emberAfDoorLockClusterClearRfidResponseCallback(chip::EndpointId endpoint, 
 /**
  * @brief Door Lock Cluster ClearAllRfids Command callback (from client)
  */
-bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 chip::app::Clusters::DoorLock::Commands::ClearAllRfids::DecodableType & fields);
+bool emberAfDoorLockClusterClearAllRfidsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearAllRfids::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster ClearAllRfidsResponse Command callback (from server)
  */
@@ -13276,65 +13198,63 @@ bool emberAfDoorLockClusterProgrammingEventNotificationCallback(chip::EndpointId
 /**
  * @brief Window Covering Cluster UpOrOpen Command callback (from client)
  */
-bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                  chip::app::Clusters::WindowCovering::Commands::UpOrOpen::DecodableType & fields);
+bool emberAfWindowCoveringClusterUpOrOpenCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::WindowCovering::Commands::UpOrOpen::DecodableType & commandData);
 /**
  * @brief Window Covering Cluster DownOrClose Command callback (from client)
  */
 bool emberAfWindowCoveringClusterDownOrCloseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::WindowCovering::Commands::DownOrClose::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::WindowCovering::Commands::DownOrClose::DecodableType & commandData);
 /**
  * @brief Window Covering Cluster StopMotion Command callback (from client)
  */
 bool emberAfWindowCoveringClusterStopMotionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::WindowCovering::Commands::StopMotion::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::WindowCovering::Commands::StopMotion::DecodableType & commandData);
 /**
  * @brief Window Covering Cluster GoToLiftValue Command callback (from client)
  */
 bool emberAfWindowCoveringClusterGoToLiftValueCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t liftValue, chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::DecodableType & commandData);
 /**
  * @brief Window Covering Cluster GoToLiftPercentage Command callback (from client)
  */
 bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t liftPercentageValue, uint16_t liftPercent100thsValue,
-    chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::DecodableType & commandData);
 /**
  * @brief Window Covering Cluster GoToTiltValue Command callback (from client)
  */
 bool emberAfWindowCoveringClusterGoToTiltValueCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t tiltValue, chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::DecodableType & commandData);
 /**
  * @brief Window Covering Cluster GoToTiltPercentage Command callback (from client)
  */
 bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t tiltPercentageValue, uint16_t tiltPercent100thsValue,
-    chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & commandData);
 /**
  * @brief Barrier Control Cluster BarrierControlGoToPercent Command callback (from client)
  */
 bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t percentOpen, chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::DecodableType & commandData);
 /**
  * @brief Barrier Control Cluster BarrierControlStop Command callback (from client)
  */
 bool emberAfBarrierControlClusterBarrierControlStopCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t mode, int8_t amount, chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster CurrentWeeklySchedule Command callback (from server)
  */
@@ -13346,10 +13266,8 @@ bool emberAfThermostatClusterCurrentWeeklyScheduleCallback(chip::EndpointId endp
  * @brief Thermostat Cluster SetWeeklySchedule Command callback (from client)
  */
 bool emberAfThermostatClusterSetWeeklyScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
-    /* TYPE WARNING: array array defaults to */ uint8_t * payload,
-    chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster RelayStatusLog Command callback (from server)
  */
@@ -13360,164 +13278,140 @@ bool emberAfThermostatClusterRelayStatusLogCallback(chip::EndpointId endpoint, c
  * @brief Thermostat Cluster GetWeeklySchedule Command callback (from client)
  */
 bool emberAfThermostatClusterGetWeeklyScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t daysToReturn, uint8_t modeToReturn,
-    chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster ClearWeeklySchedule Command callback (from client)
  */
 bool emberAfThermostatClusterClearWeeklyScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster GetRelayStatusLog Command callback (from client)
  */
 bool emberAfThermostatClusterGetRelayStatusLogCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveToHue Command callback (from client)
  */
-bool emberAfColorControlClusterMoveToHueCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 uint8_t hue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
-                                                 uint8_t optionsOverride,
-                                                 chip::app::Clusters::ColorControl::Commands::MoveToHue::DecodableType & fields);
+bool emberAfColorControlClusterMoveToHueCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::MoveToHue::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveHue Command callback (from client)
  */
-bool emberAfColorControlClusterMoveHueCallback(chip::app::CommandHandler * commandObj,
-                                               const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                               uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride,
-                                               chip::app::Clusters::ColorControl::Commands::MoveHue::DecodableType & fields);
+bool emberAfColorControlClusterMoveHueCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::MoveHue::DecodableType & commandData);
 /**
  * @brief Color Control Cluster StepHue Command callback (from client)
  */
-bool emberAfColorControlClusterStepHueCallback(chip::app::CommandHandler * commandObj,
-                                               const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                               uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
-                                               uint8_t optionsOverride,
-                                               chip::app::Clusters::ColorControl::Commands::StepHue::DecodableType & fields);
+bool emberAfColorControlClusterStepHueCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::StepHue::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveToSaturation Command callback (from client)
  */
 bool emberAfColorControlClusterMoveToSaturationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::MoveToSaturation::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::MoveToSaturation::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveSaturation Command callback (from client)
  */
 bool emberAfColorControlClusterMoveSaturationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::MoveSaturation::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::MoveSaturation::DecodableType & commandData);
 /**
  * @brief Color Control Cluster StepSaturation Command callback (from client)
  */
 bool emberAfColorControlClusterStepSaturationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::StepSaturation::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::StepSaturation::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveToHueAndSaturation Command callback (from client)
  */
 bool emberAfColorControlClusterMoveToHueAndSaturationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveToColor Command callback (from client)
  */
 bool emberAfColorControlClusterMoveToColorCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::MoveToColor::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::MoveToColor::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveColor Command callback (from client)
  */
-bool emberAfColorControlClusterMoveColorCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride,
-                                                 chip::app::Clusters::ColorControl::Commands::MoveColor::DecodableType & fields);
+bool emberAfColorControlClusterMoveColorCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::MoveColor::DecodableType & commandData);
 /**
  * @brief Color Control Cluster StepColor Command callback (from client)
  */
-bool emberAfColorControlClusterStepColorCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask,
-                                                 uint8_t optionsOverride,
-                                                 chip::app::Clusters::ColorControl::Commands::StepColor::DecodableType & fields);
+bool emberAfColorControlClusterStepColorCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::StepColor::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveToColorTemperature Command callback (from client)
  */
 bool emberAfColorControlClusterMoveToColorTemperatureCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType & commandData);
 /**
  * @brief Color Control Cluster EnhancedMoveToHue Command callback (from client)
  */
 bool emberAfColorControlClusterEnhancedMoveToHueCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t enhancedHue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::DecodableType & commandData);
 /**
  * @brief Color Control Cluster EnhancedMoveHue Command callback (from client)
  */
 bool emberAfColorControlClusterEnhancedMoveHueCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::DecodableType & commandData);
 /**
  * @brief Color Control Cluster EnhancedStepHue Command callback (from client)
  */
 bool emberAfColorControlClusterEnhancedStepHueCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::DecodableType & commandData);
 /**
  * @brief Color Control Cluster EnhancedMoveToHueAndSaturation Command callback (from client)
  */
 bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t enhancedHue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::DecodableType & commandData);
 /**
  * @brief Color Control Cluster ColorLoopSet Command callback (from client)
  */
 bool emberAfColorControlClusterColorLoopSetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t updateFlags, uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue, uint8_t optionsMask,
-    uint8_t optionsOverride, chip::app::Clusters::ColorControl::Commands::ColorLoopSet::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::DecodableType & commandData);
 /**
  * @brief Color Control Cluster StopMoveStep Command callback (from client)
  */
 bool emberAfColorControlClusterStopMoveStepCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::StopMoveStep::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::StopMoveStep::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveColorTemperature Command callback (from client)
  */
 bool emberAfColorControlClusterMoveColorTemperatureCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask,
-    uint8_t optionsOverride, chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & commandData);
 /**
  * @brief Color Control Cluster StepColorTemperature Command callback (from client)
  */
 bool emberAfColorControlClusterStepColorTemperatureCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMinimum,
-    uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride,
-    chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
 /**
  * @brief IAS Zone Cluster ZoneEnrollResponse Command callback (from client)
  */
 bool emberAfIasZoneClusterZoneEnrollResponseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t enrollResponseCode, uint8_t zoneId, chip::app::Clusters::IasZone::Commands::ZoneEnrollResponse::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IasZone::Commands::ZoneEnrollResponse::DecodableType & commandData);
 /**
  * @brief IAS Zone Cluster ZoneStatusChangeNotification Command callback (from server)
  */
@@ -13528,8 +13422,8 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(chip::EndpointId 
  * @brief IAS Zone Cluster InitiateNormalOperationMode Command callback (from client)
  */
 bool emberAfIasZoneClusterInitiateNormalOperationModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::IasZone::Commands::InitiateNormalOperationMode::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IasZone::Commands::InitiateNormalOperationMode::DecodableType & commandData);
 /**
  * @brief IAS Zone Cluster ZoneEnrollRequest Command callback (from server)
  */
@@ -13539,9 +13433,8 @@ bool emberAfIasZoneClusterZoneEnrollRequestCallback(chip::EndpointId endpoint, c
  * @brief IAS Zone Cluster InitiateTestMode Command callback (from client)
  */
 bool emberAfIasZoneClusterInitiateTestModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t testModeDuration, uint8_t currentZoneSensitivityLevel,
-    chip::app::Clusters::IasZone::Commands::InitiateTestMode::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IasZone::Commands::InitiateTestMode::DecodableType & commandData);
 /**
  * @brief IAS Zone Cluster InitiateNormalOperationModeResponse Command callback (from server)
  */
@@ -13555,8 +13448,7 @@ bool emberAfIasZoneClusterInitiateTestModeResponseCallback(chip::EndpointId endp
  * @brief IAS ACE Cluster Arm Command callback (from client)
  */
 bool emberAfIasAceClusterArmCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                     chip::EndpointId endpoint, uint8_t armMode, uint8_t * armDisarmCode, uint8_t zoneId,
-                                     chip::app::Clusters::IasAce::Commands::Arm::DecodableType & fields);
+                                     const chip::app::Clusters::IasAce::Commands::Arm::DecodableType & commandData);
 /**
  * @brief IAS ACE Cluster ArmResponse Command callback (from server)
  */
@@ -13566,9 +13458,7 @@ bool emberAfIasAceClusterArmResponseCallback(chip::EndpointId endpoint, chip::ap
  * @brief IAS ACE Cluster Bypass Command callback (from client)
  */
 bool emberAfIasAceClusterBypassCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                        chip::EndpointId endpoint, uint8_t numberOfZones,
-                                        /* TYPE WARNING: array array defaults to */ uint8_t * zoneIds, uint8_t * armDisarmCode,
-                                        chip::app::Clusters::IasAce::Commands::Bypass::DecodableType & fields);
+                                        const chip::app::Clusters::IasAce::Commands::Bypass::DecodableType & commandData);
 /**
  * @brief IAS ACE Cluster GetZoneIdMapResponse Command callback (from server)
  */
@@ -13582,8 +13472,8 @@ bool emberAfIasAceClusterGetZoneIdMapResponseCallback(chip::EndpointId endpoint,
  * @brief IAS ACE Cluster Emergency Command callback (from client)
  */
 bool emberAfIasAceClusterEmergencyCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                           chip::app::Clusters::IasAce::Commands::Emergency::DecodableType & fields);
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::IasAce::Commands::Emergency::DecodableType & commandData);
 /**
  * @brief IAS ACE Cluster GetZoneInformationResponse Command callback (from server)
  */
@@ -13594,8 +13484,7 @@ bool emberAfIasAceClusterGetZoneInformationResponseCallback(chip::EndpointId end
  * @brief IAS ACE Cluster Fire Command callback (from client)
  */
 bool emberAfIasAceClusterFireCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                      chip::EndpointId endpoint,
-                                      chip::app::Clusters::IasAce::Commands::Fire::DecodableType & fields);
+                                      const chip::app::Clusters::IasAce::Commands::Fire::DecodableType & commandData);
 /**
  * @brief IAS ACE Cluster ZoneStatusChanged Command callback (from server)
  */
@@ -13605,8 +13494,7 @@ bool emberAfIasAceClusterZoneStatusChangedCallback(chip::EndpointId endpoint, ch
  * @brief IAS ACE Cluster Panic Command callback (from client)
  */
 bool emberAfIasAceClusterPanicCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                       chip::EndpointId endpoint,
-                                       chip::app::Clusters::IasAce::Commands::Panic::DecodableType & fields);
+                                       const chip::app::Clusters::IasAce::Commands::Panic::DecodableType & commandData);
 /**
  * @brief IAS ACE Cluster PanelStatusChanged Command callback (from server)
  */
@@ -13616,9 +13504,9 @@ bool emberAfIasAceClusterPanelStatusChangedCallback(chip::EndpointId endpoint, c
 /**
  * @brief IAS ACE Cluster GetZoneIdMap Command callback (from client)
  */
-bool emberAfIasAceClusterGetZoneIdMapCallback(chip::app::CommandHandler * commandObj,
-                                              const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                              chip::app::Clusters::IasAce::Commands::GetZoneIdMap::DecodableType & fields);
+bool emberAfIasAceClusterGetZoneIdMapCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IasAce::Commands::GetZoneIdMap::DecodableType & commandData);
 /**
  * @brief IAS ACE Cluster GetPanelStatusResponse Command callback (from server)
  */
@@ -13629,8 +13517,8 @@ bool emberAfIasAceClusterGetPanelStatusResponseCallback(chip::EndpointId endpoin
  * @brief IAS ACE Cluster GetZoneInformation Command callback (from client)
  */
 bool emberAfIasAceClusterGetZoneInformationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t zoneId, chip::app::Clusters::IasAce::Commands::GetZoneInformation::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IasAce::Commands::GetZoneInformation::DecodableType & commandData);
 /**
  * @brief IAS ACE Cluster SetBypassedZoneList Command callback (from server)
  */
@@ -13640,9 +13528,9 @@ bool emberAfIasAceClusterSetBypassedZoneListCallback(chip::EndpointId endpoint, 
 /**
  * @brief IAS ACE Cluster GetPanelStatus Command callback (from client)
  */
-bool emberAfIasAceClusterGetPanelStatusCallback(chip::app::CommandHandler * commandObj,
-                                                const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                chip::app::Clusters::IasAce::Commands::GetPanelStatus::DecodableType & fields);
+bool emberAfIasAceClusterGetPanelStatusCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IasAce::Commands::GetPanelStatus::DecodableType & commandData);
 /**
  * @brief IAS ACE Cluster BypassResponse Command callback (from server)
  */
@@ -13653,8 +13541,8 @@ bool emberAfIasAceClusterBypassResponseCallback(chip::EndpointId endpoint, chip:
  * @brief IAS ACE Cluster GetBypassedZoneList Command callback (from client)
  */
 bool emberAfIasAceClusterGetBypassedZoneListCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::IasAce::Commands::GetBypassedZoneList::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IasAce::Commands::GetBypassedZoneList::DecodableType & commandData);
 /**
  * @brief IAS ACE Cluster GetZoneStatusResponse Command callback (from server)
  */
@@ -13664,32 +13552,26 @@ bool emberAfIasAceClusterGetZoneStatusResponseCallback(chip::EndpointId endpoint
 /**
  * @brief IAS ACE Cluster GetZoneStatus Command callback (from client)
  */
-bool emberAfIasAceClusterGetZoneStatusCallback(chip::app::CommandHandler * commandObj,
-                                               const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                               uint8_t startingZoneId, uint8_t maxNumberOfZoneIds, bool zoneStatusMaskFlag,
-                                               uint16_t zoneStatusMask,
-                                               chip::app::Clusters::IasAce::Commands::GetZoneStatus::DecodableType & fields);
+bool emberAfIasAceClusterGetZoneStatusCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IasAce::Commands::GetZoneStatus::DecodableType & commandData);
 /**
  * @brief IAS WD Cluster StartWarning Command callback (from client)
  */
 bool emberAfIasWdClusterStartWarningCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                             uint8_t warningInfo, uint16_t warningDuration, uint8_t strobeDutyCycle,
-                                             uint8_t strobeLevel,
-                                             chip::app::Clusters::IasWd::Commands::StartWarning::DecodableType & fields);
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::IasWd::Commands::StartWarning::DecodableType & commandData);
 /**
  * @brief IAS WD Cluster Squawk Command callback (from client)
  */
 bool emberAfIasWdClusterSquawkCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                       chip::EndpointId endpoint, uint8_t squawkInfo,
-                                       chip::app::Clusters::IasWd::Commands::Squawk::DecodableType & fields);
+                                       const chip::app::Clusters::IasWd::Commands::Squawk::DecodableType & commandData);
 /**
  * @brief TV Channel Cluster ChangeChannel Command callback (from client)
  */
-bool emberAfTvChannelClusterChangeChannelCallback(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                  uint8_t * match,
-                                                  chip::app::Clusters::TvChannel::Commands::ChangeChannel::DecodableType & fields);
+bool emberAfTvChannelClusterChangeChannelCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TvChannel::Commands::ChangeChannel::DecodableType & commandData);
 /**
  * @brief TV Channel Cluster ChangeChannelResponse Command callback (from server)
  */
@@ -13700,22 +13582,20 @@ bool emberAfTvChannelClusterChangeChannelResponseCallback(chip::EndpointId endpo
  * @brief TV Channel Cluster ChangeChannelByNumber Command callback (from client)
  */
 bool emberAfTvChannelClusterChangeChannelByNumberCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t majorNumber, uint16_t minorNumber,
-    chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::DecodableType & commandData);
 /**
  * @brief TV Channel Cluster SkipChannel Command callback (from client)
  */
-bool emberAfTvChannelClusterSkipChannelCallback(chip::app::CommandHandler * commandObj,
-                                                const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                uint16_t Count,
-                                                chip::app::Clusters::TvChannel::Commands::SkipChannel::DecodableType & fields);
+bool emberAfTvChannelClusterSkipChannelCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TvChannel::Commands::SkipChannel::DecodableType & commandData);
 /**
  * @brief Target Navigator Cluster NavigateTarget Command callback (from client)
  */
 bool emberAfTargetNavigatorClusterNavigateTargetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t target, uint8_t * data, chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::DecodableType & commandData);
 /**
  * @brief Target Navigator Cluster NavigateTargetResponse Command callback (from server)
  */
@@ -13724,9 +13604,9 @@ bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::EndpointI
 /**
  * @brief Media Playback Cluster MediaPlay Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaPlayCallback(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                  chip::app::Clusters::MediaPlayback::Commands::MediaPlay::DecodableType & fields);
+bool emberAfMediaPlaybackClusterMediaPlayCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaPlay::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaPlayResponse Command callback (from server)
  */
@@ -13736,8 +13616,8 @@ bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(chip::EndpointId endpo
  * @brief Media Playback Cluster MediaPause Command callback (from client)
  */
 bool emberAfMediaPlaybackClusterMediaPauseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::MediaPlayback::Commands::MediaPause::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaPause::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaPauseResponse Command callback (from server)
  */
@@ -13746,9 +13626,9 @@ bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(chip::EndpointId endp
 /**
  * @brief Media Playback Cluster MediaStop Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaStopCallback(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                  chip::app::Clusters::MediaPlayback::Commands::MediaStop::DecodableType & fields);
+bool emberAfMediaPlaybackClusterMediaStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaStop::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaStopResponse Command callback (from server)
  */
@@ -13758,8 +13638,8 @@ bool emberAfMediaPlaybackClusterMediaStopResponseCallback(chip::EndpointId endpo
  * @brief Media Playback Cluster MediaStartOver Command callback (from client)
  */
 bool emberAfMediaPlaybackClusterMediaStartOverCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaStartOverResponse Command callback (from server)
  */
@@ -13769,8 +13649,8 @@ bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(chip::EndpointId 
  * @brief Media Playback Cluster MediaPrevious Command callback (from client)
  */
 bool emberAfMediaPlaybackClusterMediaPreviousCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaPreviousResponse Command callback (from server)
  */
@@ -13779,9 +13659,9 @@ bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(chip::EndpointId e
 /**
  * @brief Media Playback Cluster MediaNext Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaNextCallback(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                  chip::app::Clusters::MediaPlayback::Commands::MediaNext::DecodableType & fields);
+bool emberAfMediaPlaybackClusterMediaNextCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaNext::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaNextResponse Command callback (from server)
  */
@@ -13791,8 +13671,8 @@ bool emberAfMediaPlaybackClusterMediaNextResponseCallback(chip::EndpointId endpo
  * @brief Media Playback Cluster MediaRewind Command callback (from client)
  */
 bool emberAfMediaPlaybackClusterMediaRewindCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::MediaPlayback::Commands::MediaRewind::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaRewind::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaRewindResponse Command callback (from server)
  */
@@ -13802,8 +13682,8 @@ bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(chip::EndpointId end
  * @brief Media Playback Cluster MediaFastForward Command callback (from client)
  */
 bool emberAfMediaPlaybackClusterMediaFastForwardCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaFastForwardResponse Command callback (from server)
  */
@@ -13813,8 +13693,8 @@ bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(chip::EndpointI
  * @brief Media Playback Cluster MediaSkipForward Command callback (from client)
  */
 bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint64_t deltaPositionMilliseconds, chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaSkipForwardResponse Command callback (from server)
  */
@@ -13824,8 +13704,8 @@ bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(chip::EndpointI
  * @brief Media Playback Cluster MediaSkipBackward Command callback (from client)
  */
 bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint64_t deltaPositionMilliseconds, chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaSkipBackwardResponse Command callback (from server)
  */
@@ -13834,10 +13714,9 @@ bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(chip::Endpoint
 /**
  * @brief Media Playback Cluster MediaSeek Command callback (from client)
  */
-bool emberAfMediaPlaybackClusterMediaSeekCallback(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                  uint64_t position,
-                                                  chip::app::Clusters::MediaPlayback::Commands::MediaSeek::DecodableType & fields);
+bool emberAfMediaPlaybackClusterMediaSeekCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::MediaSeek::DecodableType & commandData);
 /**
  * @brief Media Playback Cluster MediaSeekResponse Command callback (from server)
  */
@@ -13846,42 +13725,38 @@ bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(chip::EndpointId endpo
 /**
  * @brief Media Input Cluster SelectInput Command callback (from client)
  */
-bool emberAfMediaInputClusterSelectInputCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 uint8_t index,
-                                                 chip::app::Clusters::MediaInput::Commands::SelectInput::DecodableType & fields);
+bool emberAfMediaInputClusterSelectInputCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaInput::Commands::SelectInput::DecodableType & commandData);
 /**
  * @brief Media Input Cluster ShowInputStatus Command callback (from client)
  */
 bool emberAfMediaInputClusterShowInputStatusCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::MediaInput::Commands::ShowInputStatus::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaInput::Commands::ShowInputStatus::DecodableType & commandData);
 /**
  * @brief Media Input Cluster HideInputStatus Command callback (from client)
  */
 bool emberAfMediaInputClusterHideInputStatusCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::MediaInput::Commands::HideInputStatus::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaInput::Commands::HideInputStatus::DecodableType & commandData);
 /**
  * @brief Media Input Cluster RenameInput Command callback (from client)
  */
-bool emberAfMediaInputClusterRenameInputCallback(chip::app::CommandHandler * commandObj,
-                                                 const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                                 uint8_t index, uint8_t * name,
-                                                 chip::app::Clusters::MediaInput::Commands::RenameInput::DecodableType & fields);
+bool emberAfMediaInputClusterRenameInputCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaInput::Commands::RenameInput::DecodableType & commandData);
 /**
  * @brief Low Power Cluster Sleep Command callback (from client)
  */
 bool emberAfLowPowerClusterSleepCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                         chip::EndpointId endpoint,
-                                         chip::app::Clusters::LowPower::Commands::Sleep::DecodableType & fields);
+                                         const chip::app::Clusters::LowPower::Commands::Sleep::DecodableType & commandData);
 /**
  * @brief Keypad Input Cluster SendKey Command callback (from client)
  */
-bool emberAfKeypadInputClusterSendKeyCallback(chip::app::CommandHandler * commandObj,
-                                              const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                              uint8_t keyCode,
-                                              chip::app::Clusters::KeypadInput::Commands::SendKey::DecodableType & fields);
+bool emberAfKeypadInputClusterSendKeyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::KeypadInput::Commands::SendKey::DecodableType & commandData);
 /**
  * @brief Keypad Input Cluster SendKeyResponse Command callback (from server)
  */
@@ -13891,8 +13766,8 @@ bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::EndpointId endpoint,
  * @brief Content Launcher Cluster LaunchContent Command callback (from client)
  */
 bool emberAfContentLauncherClusterLaunchContentCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    bool autoPlay, uint8_t * data, chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData);
 /**
  * @brief Content Launcher Cluster LaunchContentResponse Command callback (from server)
  */
@@ -13902,9 +13777,8 @@ bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::EndpointId
  * @brief Content Launcher Cluster LaunchURL Command callback (from client)
  */
 bool emberAfContentLauncherClusterLaunchURLCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t * contentURL, uint8_t * displayString,
-    chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData);
 /**
  * @brief Content Launcher Cluster LaunchURLResponse Command callback (from server)
  */
@@ -13914,21 +13788,20 @@ bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::EndpointId end
  * @brief Audio Output Cluster SelectOutput Command callback (from client)
  */
 bool emberAfAudioOutputClusterSelectOutputCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t index, chip::app::Clusters::AudioOutput::Commands::SelectOutput::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AudioOutput::Commands::SelectOutput::DecodableType & commandData);
 /**
  * @brief Audio Output Cluster RenameOutput Command callback (from client)
  */
 bool emberAfAudioOutputClusterRenameOutputCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t index, uint8_t * name, chip::app::Clusters::AudioOutput::Commands::RenameOutput::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AudioOutput::Commands::RenameOutput::DecodableType & commandData);
 /**
  * @brief Application Launcher Cluster LaunchApp Command callback (from client)
  */
 bool emberAfApplicationLauncherClusterLaunchAppCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t * data, uint16_t catalogVendorId, uint8_t * applicationId,
-    chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::DecodableType & commandData);
 /**
  * @brief Application Launcher Cluster LaunchAppResponse Command callback (from server)
  */
@@ -13938,14 +13811,14 @@ bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::EndpointId
  * @brief Application Basic Cluster ChangeStatus Command callback (from client)
  */
 bool emberAfApplicationBasicClusterChangeStatusCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t status, chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::DecodableType & commandData);
 /**
  * @brief Account Login Cluster GetSetupPIN Command callback (from client)
  */
 bool emberAfAccountLoginClusterGetSetupPINCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t * tempAccountIdentifier, chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::DecodableType & commandData);
 /**
  * @brief Account Login Cluster GetSetupPINResponse Command callback (from server)
  */
@@ -13955,15 +13828,14 @@ bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::EndpointId endp
  * @brief Account Login Cluster Login Command callback (from client)
  */
 bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                             uint8_t * tempAccountIdentifier, uint8_t * setupPIN,
-                                             chip::app::Clusters::AccountLogin::Commands::Login::DecodableType & fields);
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::AccountLogin::Commands::Login::DecodableType & commandData);
 /**
  * @brief Test Cluster Cluster Test Command callback (from client)
  */
 bool emberAfTestClusterClusterTestCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-                                           chip::app::Clusters::TestCluster::Commands::Test::DecodableType & fields);
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::TestCluster::Commands::Test::DecodableType & commandData);
 /**
  * @brief Test Cluster Cluster TestSpecificResponse Command callback (from server)
  */
@@ -13973,8 +13845,8 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::EndpointId endp
  * @brief Test Cluster Cluster TestNotHandled Command callback (from client)
  */
 bool emberAfTestClusterClusterTestNotHandledCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::TestCluster::Commands::TestNotHandled::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestNotHandled::DecodableType & commandData);
 /**
  * @brief Test Cluster Cluster TestAddArgumentsResponse Command callback (from server)
  */
@@ -13984,8 +13856,8 @@ bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(chip::EndpointId 
  * @brief Test Cluster Cluster TestSpecific Command callback (from client)
  */
 bool emberAfTestClusterClusterTestSpecificCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::TestCluster::Commands::TestSpecific::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestSpecific::DecodableType & commandData);
 /**
  * @brief Test Cluster Cluster TestSimpleArgumentResponse Command callback (from server)
  */
@@ -13995,8 +13867,8 @@ bool emberAfTestClusterClusterTestSimpleArgumentResponseCallback(chip::EndpointI
  * @brief Test Cluster Cluster TestUnknownCommand Command callback (from client)
  */
 bool emberAfTestClusterClusterTestUnknownCommandCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::DecodableType & commandData);
 /**
  * @brief Test Cluster Cluster TestStructArrayArgumentResponse Command callback (from server)
  */
@@ -14008,22 +13880,20 @@ bool emberAfTestClusterClusterTestStructArrayArgumentResponseCallback(
  * @brief Test Cluster Cluster TestAddArguments Command callback (from client)
  */
 bool emberAfTestClusterClusterTestAddArgumentsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t arg1, uint8_t arg2, chip::app::Clusters::TestCluster::Commands::TestAddArguments::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestAddArguments::DecodableType & commandData);
 /**
  * @brief Test Cluster Cluster TestSimpleArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestSimpleArgumentRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    bool arg1, chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentRequest::DecodableType & commandData);
 /**
  * @brief Test Cluster Cluster TestStructArrayArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestStructArrayArgumentRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    /* TYPE WARNING: array array defaults to */ uint8_t * arg1, /* TYPE WARNING: array array defaults to */ uint8_t * arg2,
-    /* TYPE WARNING: array array defaults to */ uint8_t * arg3, /* TYPE WARNING: array array defaults to */ uint8_t * arg4,
-    uint8_t arg5, bool arg6, chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */
@@ -14035,8 +13905,8 @@ bool emberAfMessagingClusterDisplayMessageCallback(chip::EndpointId endpoint, ch
  * @brief Messaging Cluster GetLastMessage Command callback (from client)
  */
 bool emberAfMessagingClusterGetLastMessageCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::Messaging::Commands::GetLastMessage::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Messaging::Commands::GetLastMessage::DecodableType & commandData);
 /**
  * @brief Messaging Cluster CancelMessage Command callback (from server)
  */
@@ -14046,9 +13916,8 @@ bool emberAfMessagingClusterCancelMessageCallback(chip::EndpointId endpoint, chi
  * @brief Messaging Cluster MessageConfirmation Command callback (from client)
  */
 bool emberAfMessagingClusterMessageConfirmationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint32_t messageId, uint32_t confirmationTime, uint8_t messageConfirmationControl, chip::ByteSpan messageResponse,
-    chip::app::Clusters::Messaging::Commands::MessageConfirmation::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Messaging::Commands::MessageConfirmation::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayProtectedMessage Command callback (from server)
  */
@@ -14060,8 +13929,8 @@ bool emberAfMessagingClusterDisplayProtectedMessageCallback(chip::EndpointId end
  * @brief Messaging Cluster GetMessageCancellation Command callback (from client)
  */
 bool emberAfMessagingClusterGetMessageCancellationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint32_t earliestImplementationTime, chip::app::Clusters::Messaging::Commands::GetMessageCancellation::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Messaging::Commands::GetMessageCancellation::DecodableType & commandData);
 /**
  * @brief Messaging Cluster CancelAllMessages Command callback (from server)
  */
@@ -14071,8 +13940,8 @@ bool emberAfMessagingClusterCancelAllMessagesCallback(chip::EndpointId endpoint,
  * @brief Appliance Events and Alert Cluster GetAlerts Command callback (from client)
  */
 bool emberAfApplianceEventsAndAlertClusterGetAlertsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::ApplianceEventsAndAlert::Commands::GetAlerts::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplianceEventsAndAlert::Commands::GetAlerts::DecodableType & commandData);
 /**
  * @brief Appliance Events and Alert Cluster GetAlertsResponse Command callback (from server)
  */
@@ -14099,8 +13968,8 @@ bool emberAfApplianceStatisticsClusterLogNotificationCallback(chip::EndpointId e
  * @brief Appliance Statistics Cluster LogRequest Command callback (from client)
  */
 bool emberAfApplianceStatisticsClusterLogRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint32_t logId, chip::app::Clusters::ApplianceStatistics::Commands::LogRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplianceStatistics::Commands::LogRequest::DecodableType & commandData);
 /**
  * @brief Appliance Statistics Cluster LogResponse Command callback (from server)
  */
@@ -14111,8 +13980,8 @@ bool emberAfApplianceStatisticsClusterLogResponseCallback(chip::EndpointId endpo
  * @brief Appliance Statistics Cluster LogQueueRequest Command callback (from client)
  */
 bool emberAfApplianceStatisticsClusterLogQueueRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::ApplianceStatistics::Commands::LogQueueRequest::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplianceStatistics::Commands::LogQueueRequest::DecodableType & commandData);
 /**
  * @brief Appliance Statistics Cluster LogQueueResponse Command callback (from server)
  */
@@ -14135,8 +14004,8 @@ bool emberAfElectricalMeasurementClusterGetProfileInfoResponseCommandCallback(
  * @brief Electrical Measurement Cluster GetProfileInfoCommand Command callback (from client)
  */
 bool emberAfElectricalMeasurementClusterGetProfileInfoCommandCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoCommand::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoCommand::DecodableType & commandData);
 /**
  * @brief Electrical Measurement Cluster GetMeasurementProfileResponseCommand Command callback (from server)
  */
@@ -14148,35 +14017,30 @@ bool emberAfElectricalMeasurementClusterGetMeasurementProfileResponseCommandCall
  * @brief Electrical Measurement Cluster GetMeasurementProfileCommand Command callback (from client)
  */
 bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint16_t attributeId, uint32_t startTime, uint8_t numberOfIntervals,
-    chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::DecodableType & commandData);
 /**
  * @brief Binding Cluster Bind Command callback (from client)
  */
 bool emberAfBindingClusterBindCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                       chip::EndpointId endpoint, chip::NodeId nodeId, chip::GroupId groupId,
-                                       chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                       chip::app::Clusters::Binding::Commands::Bind::DecodableType & fields);
+                                       const chip::app::Clusters::Binding::Commands::Bind::DecodableType & commandData);
 /**
  * @brief Binding Cluster Unbind Command callback (from client)
  */
 bool emberAfBindingClusterUnbindCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                         chip::EndpointId endpoint, chip::NodeId nodeId, chip::GroupId groupId,
-                                         chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                         chip::app::Clusters::Binding::Commands::Unbind::DecodableType & fields);
+                                         const chip::app::Clusters::Binding::Commands::Unbind::DecodableType & commandData);
 /**
  * @brief Sample Mfg Specific Cluster Cluster CommandOne Command callback (from client)
  */
 bool emberAfSampleMfgSpecificClusterClusterCommandOneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t argOne, chip::app::Clusters::SampleMfgSpecificCluster::Commands::CommandOne::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::SampleMfgSpecificCluster::Commands::CommandOne::DecodableType & commandData);
 /**
  * @brief Sample Mfg Specific Cluster 2 Cluster CommandTwo Command callback (from client)
  */
 bool emberAfSampleMfgSpecificCluster2ClusterCommandTwoCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    uint8_t argOne, chip::app::Clusters::SampleMfgSpecificCluster2::Commands::CommandTwo::DecodableType & fields);
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::SampleMfgSpecificCluster2::Commands::CommandTwo::DecodableType & commandData);
 
 /** @brief Add To Current App Tasks
  *
@@ -14281,34 +14145,6 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * detected in the received command.  Ver.: always
  */
 bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status);
-
-/** @brief Configure Reporting Response
- *
- * This function is called by the application framework when a Configure
- * Reporting Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute status records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfConfigureReportingResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
-
-/** @brief Read Reporting Configuration Response
- *
- * This function is called by the application framework when a Read Reporting
- * Configuration Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute reporting configuration
- * records.  Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief Discover Attributes Response
  *
@@ -14514,19 +14350,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                     uint8_t * buffer, int32_t index = -1);
-
-/** @brief Report Attributes
- *
- * This function is called by the application framework when a Report Attributes
- * command is received from an external device.  The application should return
- * true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this command.  Ver.: always
- * @param buffer Buffer containing the list of attribute report records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfReportAttributesCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief Get Current Time
  *

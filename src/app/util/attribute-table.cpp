@@ -604,7 +604,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // Function itself will weed out tokens that are not tokenized.
         emAfSaveAttributeToToken(data, endpoint, cluster, metadata);
 
-        InteractionModelReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
+        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
 
         // Post write attribute callback for all attributes changes, regardless
         // of cluster.

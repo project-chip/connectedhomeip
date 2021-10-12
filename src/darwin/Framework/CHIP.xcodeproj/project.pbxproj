@@ -31,8 +31,6 @@
 		1E85732F26551A490050A4D9 /* attribute-size-util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731F26551A490050A4D9 /* attribute-size-util.cpp */; };
 		1E85733026551A490050A4D9 /* process-cluster-message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85732026551A490050A4D9 /* process-cluster-message.cpp */; };
 		1E85733126551A490050A4D9 /* chip-message-send.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85732126551A490050A4D9 /* chip-message-send.cpp */; };
-		1E85733426551A700050A4D9 /* reporting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85733226551A700050A4D9 /* reporting.cpp */; };
-		1E85733526551A700050A4D9 /* reporting-default-configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85733326551A700050A4D9 /* reporting-default-configuration.cpp */; };
 		1EB41B7B263C4CC60048E4C1 /* CHIPClustersTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */; };
 		1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE5925CC26E900D7304F /* CHIPClustersObjc.mm */; };
 		1EC4CE6425CC276600D7304F /* CHIPClustersObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -119,8 +117,6 @@
 		1E85731F26551A490050A4D9 /* attribute-size-util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size-util.cpp"; path = "../../../app/util/attribute-size-util.cpp"; sourceTree = "<group>"; };
 		1E85732026551A490050A4D9 /* process-cluster-message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "process-cluster-message.cpp"; path = "../../../app/util/process-cluster-message.cpp"; sourceTree = "<group>"; };
 		1E85732126551A490050A4D9 /* chip-message-send.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "chip-message-send.cpp"; path = "../../../app/util/chip-message-send.cpp"; sourceTree = "<group>"; };
-		1E85733226551A700050A4D9 /* reporting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = reporting.cpp; path = ../../../app/reporting/reporting.cpp; sourceTree = "<group>"; };
-		1E85733326551A700050A4D9 /* reporting-default-configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "reporting-default-configuration.cpp"; path = "../../../app/reporting/reporting-default-configuration.cpp"; sourceTree = "<group>"; };
 		1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPClustersTests.m; sourceTree = "<group>"; };
 		1EC4CE5925CC26E900D7304F /* CHIPClustersObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPClustersObjc.mm; path = "zap-generated/CHIPClustersObjc.mm"; sourceTree = "<group>"; };
 		1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPClustersObjc.h; path = "zap-generated/CHIPClustersObjc.h"; sourceTree = "<group>"; };
@@ -203,8 +199,6 @@
 				2F79A67626CE6672006377B0 /* im-client-callbacks.cpp */,
 				1E16A8FD26B9876900683C53 /* CHIPClusters.cpp */,
 				2FD775542695557E00FF4B12 /* error-mapping.cpp */,
-				1E85733326551A700050A4D9 /* reporting-default-configuration.cpp */,
-				1E85733226551A700050A4D9 /* reporting.cpp */,
 				1E85731926551A490050A4D9 /* af-event.cpp */,
 				1E85731B26551A490050A4D9 /* af-main-common.cpp */,
 				1E85731426551A490050A4D9 /* attribute-list-byte-span.cpp */,
@@ -502,7 +496,6 @@
 				1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */,
 				2F79A67726CE6672006377B0 /* im-client-callbacks.cpp in Sources */,
 				1E85732226551A490050A4D9 /* binding-table.cpp in Sources */,
-				1E85733426551A700050A4D9 /* reporting.cpp in Sources */,
 				1ED276E226C5812A00547A89 /* CHIPCluster.mm in Sources */,
 				1E85733026551A490050A4D9 /* process-cluster-message.cpp in Sources */,
 				1E85732526551A490050A4D9 /* message.cpp in Sources */,
@@ -519,7 +512,6 @@
 				B289D4222639C0D300D4E314 /* CHIPOnboardingPayloadParser.m in Sources */,
 				1E85732F26551A490050A4D9 /* attribute-size-util.cpp in Sources */,
 				2C1B027A2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.mm in Sources */,
-				1E85733526551A700050A4D9 /* reporting-default-configuration.cpp in Sources */,
 				1E85732926551A490050A4D9 /* af-event.cpp in Sources */,
 				B2E0D7B9245B0B5C003C5B48 /* CHIPSetupPayload.mm in Sources */,
 				B2E0D7B6245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm in Sources */,

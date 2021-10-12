@@ -420,43 +420,6 @@ limitations under the License.
     <item name="status" type="Status"/>
     <item name="attributeId" type="ATTRIB_ID"/>
   </struct>
-  <struct name="ConfigureReportingRecord">
-    <item name="direction" type="INT8U"/>
-    <item name="attributeId" type="ATTRIB_ID"/>
-    <item name="attributeType" type="INT8U"/>
-    <item name="minimumReportingInterval" type="INT16U"/>
-    <item name="maximumReportingInterval" type="INT16U"/>
-    <item name="reportableChangeLocation" type="NO_DATA"/>
-    <item name="timeoutPeriod" type="INT16U"/>
-  </struct>
-  <struct name="ConfigureReportingStatusRecord">
-    <item name="status" type="Status"/>
-    <item name="direction" type="INT8U"/>
-    <item name="attributeId" type="ATTRIB_ID"/>
-  </struct>
-  <struct name="ReadReportingConfigurationRecord">
-    <item name="status" type="Status"/>
-    <item name="direction" type="INT8U"/>
-    <item name="attributeId" type="ATTRIB_ID"/>
-    <item name="attributeType" type="INT8U"/>
-    <item name="minimumReportingInterval" type="INT16U"/>
-    <item name="maximumReportingInterval" type="INT16U"/>
-    <item name="reportableChangeLocation" type="NO_DATA"/>
-    <item name="timeoutPeriod" type="INT16U"/>
-  </struct>
-  <enum name="ReportingDirection" type="ENUM8">
-    <item name="reported" value="0x00"/>
-    <item name="received" value="0x01"/>
-  </enum>
-  <struct name="ReadReportingConfigurationAttributeRecord">
-    <item name="direction" type="INT8U"/>
-    <item name="attributeId" type="ATTRIB_ID"/>
-  </struct>
-  <struct name="ReportAttributeRecord">
-    <item name="attributeId" type="ATTRIB_ID"/>
-    <item name="attributeType" type="INT8U"/>
-    <item name="attributeLocation" type="NO_DATA"/>
-  </struct>
   <struct name="DiscoverAttributesInfoRecord">
     <item name="attributeId" type="ATTRIB_ID"/>
     <item name="attributeType" type="INT8U"/>

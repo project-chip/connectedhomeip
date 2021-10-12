@@ -1367,38 +1367,3 @@
             0x00, 0x00                                                                                                             \
         }                                                                                                                          \
     }
-
-// Array of EmberAfPluginReportingEntry structures.
-#define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_##x
-#define ZAP_REPORT_DIRECTION(x) ZRD(x)
-
-// User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (6)
-#define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
-
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (6)
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
-    {                                                                                                                              \
-                                                                                                                                   \
-        /* Endpoint: 1, Cluster: Color Control (server) */                                                                         \
-        {                                                                                                                          \
-            ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0300, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }          \
-        }, /* current hue */                                                                                                       \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0300, 0x0001, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* current saturation */                                                                                            \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0300, 0x0003, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* current x */                                                                                                     \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0300, 0x0004, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* current y */                                                                                                     \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0300, 0x0007, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* color temperature */                                                                                             \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: Occupancy Sensing (server) */                                                                 \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0406, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* occupancy */                                                                                                     \
-    }

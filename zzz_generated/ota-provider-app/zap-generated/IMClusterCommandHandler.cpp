@@ -261,9 +261,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.updateToken, commandData.newVersion,
-                    commandData);
+                wasHandled =
+                    emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -272,9 +271,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.updateToken, commandData.softwareVersion,
-                    commandData);
+                wasHandled =
+                    emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -283,11 +281,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.vendorId, commandData.productId,
-                    commandData.hardwareVersion, commandData.softwareVersion, to_underlying(commandData.protocolsSupported),
-                    const_cast<uint8_t *>(Uint8::from_const_char(commandData.location.data())), commandData.requestorCanConsent,
-                    commandData.metadataForProvider, commandData);
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -327,9 +321,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.NOCValue, commandData.ICACValue,
-                    commandData.IPKValue, commandData.caseAdminNode, commandData.adminVendorId, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -338,8 +330,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.rootCertificate, commandData);
+                wasHandled =
+                    emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -348,8 +340,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAttestationRequestCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.attestationNonce, commandData);
+                wasHandled =
+                    emberAfOperationalCredentialsClusterAttestationRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -358,8 +350,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.certificateType, commandData);
+                wasHandled =
+                    emberAfOperationalCredentialsClusterCertificateChainRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -368,8 +360,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.CSRNonce, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -378,8 +369,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.fabricIndex, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -388,9 +378,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId,
-                    const_cast<uint8_t *>(Uint8::from_const_char(commandData.label.data())), commandData);
+                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }

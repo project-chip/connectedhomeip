@@ -150,8 +150,8 @@ void emberAfPluginTestClusterServerInitCallback(void)
     }
 }
 
-bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                           Commands::Test::DecodableType & commandData)
+bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
+                                           const Commands::Test::DecodableType & commandData)
 {
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -181,26 +181,29 @@ exit:
 }
 
 bool emberAfTestClusterClusterTestSpecificCallback(app::CommandHandler * apCommandObj, const app::ConcreteCommandPath & commandPath,
-                                                   EndpointId endpoint, Commands::TestSpecific::DecodableType & commandData)
+                                                   const Commands::TestSpecific::DecodableType & commandData)
 {
-    return sendNumericResponse(endpoint, apCommandObj, Commands::TestSpecificResponse::Id, 7);
+    return sendNumericResponse(commandPath.mEndpointId, apCommandObj, Commands::TestSpecificResponse::Id, 7);
 }
 
 bool emberAfTestClusterClusterTestNotHandledCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
-                                                     EndpointId endpoint, Commands::TestNotHandled::DecodableType & commandData)
+                                                     const Commands::TestNotHandled::DecodableType & commandData)
 {
     return false;
 }
 
 bool emberAfTestClusterClusterTestAddArgumentsCallback(app::CommandHandler * apCommandObj,
-                                                       const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                       uint8_t arg1, uint8_t arg2,
-                                                       Commands::TestAddArguments::DecodableType & commandData)
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const Commands::TestAddArguments::DecodableType & commandData)
 {
+    auto & arg1 = commandData.arg1;
+    auto & arg2 = commandData.arg2;
+
     if (arg1 > UINT8_MAX - arg2)
     {
         return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    return sendNumericResponse(endpoint, apCommandObj, Commands::TestAddArgumentsResponse::Id, static_cast<uint8_t>(arg1 + arg2));
+    return sendNumericResponse(commandPath.mEndpointId, apCommandObj, Commands::TestAddArgumentsResponse::Id,
+                               static_cast<uint8_t>(arg1 + arg2));
 }

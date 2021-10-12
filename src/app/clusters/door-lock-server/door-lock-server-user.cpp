@@ -162,7 +162,7 @@ static void printUserTables(void)
 }
 
 // Returns status byte for use in SetPinResponse and SetRfidResponse commands.
-static uint8_t setUser(uint16_t userId, uint8_t userStatus, uint8_t userType, ByteSpan & code,
+static uint8_t setUser(uint16_t userId, uint8_t userStatus, uint8_t userType, const ByteSpan & code,
                        EmberAfPluginDoorLockServerUser * userTable, uint8_t userTableSize)
 {
     bool success = false;
@@ -226,9 +226,10 @@ static uint8_t clearUserPinOrRfid(uint16_t userId, EmberAfPluginDoorLockServerUs
 }
 
 bool emberAfDoorLockClusterGetUserTypeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               EndpointId endpoint, uint16_t userId,
-                                               Commands::GetUserType::DecodableType & commandData)
+                                               const Commands::GetUserType::DecodableType & commandData)
 {
+    auto & userId = commandData.userId;
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (emAfPluginDoorLockServerCheckForSufficientSpace(userId, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE))
     {
@@ -254,9 +255,11 @@ exit:
 }
 
 bool emberAfDoorLockClusterSetUserTypeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               EndpointId endpoint, uint16_t userId, uint8_t userType,
-                                               Commands::SetUserType::DecodableType & commandData)
+                                               const Commands::SetUserType::DecodableType & commandData)
 {
+    auto & userId   = commandData.userId;
+    auto & userType = commandData.userType;
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: Need to validate userType.  https://github.com/project-chip/connectedhomeip/issues/3580
     uint8_t status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType))
@@ -297,9 +300,13 @@ bool emAfPluginDoorLockServerSetPinUserType(uint16_t userId, EmberAfDoorLockUser
 // PIN handling
 
 bool emberAfDoorLockClusterSetPinCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          EndpointId endpoint, uint16_t userId, uint8_t userStatus, uint8_t userType, ByteSpan pin,
-                                          Commands::SetPin::DecodableType & commandData)
+                                          const Commands::SetPin::DecodableType & commandData)
 {
+    auto & userId     = commandData.userId;
+    auto & userStatus = commandData.userStatus;
+    auto & userType   = commandData.userType;
+    auto & pin        = commandData.pin;
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     // send response
     uint8_t status = setUser(userId, userStatus, userType, pin, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
@@ -351,8 +358,10 @@ static bool getSendPinOverTheAir(void)
 }
 
 bool emberAfDoorLockClusterGetPinCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          EndpointId endpoint, uint16_t userId, Commands::GetPin::DecodableType & commandData)
+                                          const Commands::GetPin::DecodableType & commandData)
 {
+    auto & userId = commandData.userId;
+
     EmberAfPluginDoorLockServerUser user;
     EmberStatus status = EMBER_SUCCESS;
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -396,8 +405,10 @@ exit:
 }
 
 bool emberAfDoorLockClusterClearPinCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                            EndpointId endpoint, uint16_t userId, Commands::ClearPin::DecodableType & commandData)
+                                            const Commands::ClearPin::DecodableType & commandData)
 {
+    auto & userId = commandData.userId;
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status = clearUserPinOrRfid(userId, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     // get bitmask so we can check if we should send event notification
@@ -439,7 +450,7 @@ exit:
 }
 
 bool emberAfDoorLockClusterClearAllPinsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                EndpointId endpoint, Commands::ClearAllPins::DecodableType & commandData)
+                                                const Commands::ClearAllPins::DecodableType & commandData)
 {
     uint8_t i;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -470,9 +481,13 @@ exit:
 // RFID handling
 
 bool emberAfDoorLockClusterSetRfidCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           EndpointId endpoint, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                           ByteSpan rfid, Commands::SetRfid::DecodableType & commandData)
+                                           const Commands::SetRfid::DecodableType & commandData)
 {
+    auto & userId     = commandData.userId;
+    auto & userStatus = commandData.userStatus;
+    auto & userType   = commandData.userType;
+    auto & rfid       = commandData.id;
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status =
         setUser(userId, userStatus, userType, rfid, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
@@ -495,8 +510,10 @@ exit:
 }
 
 bool emberAfDoorLockClusterGetRfidCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           EndpointId endpoint, uint16_t userId, Commands::GetRfid::DecodableType & commandData)
+                                           const Commands::GetRfid::DecodableType & commandData)
 {
+    auto & userId = commandData.userId;
+
     EmberAfPluginDoorLockServerUser user;
     EmberStatus status = EMBER_SUCCESS;
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -533,8 +550,10 @@ exit:
 }
 
 bool emberAfDoorLockClusterClearRfidCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             EndpointId endpoint, uint16_t userId, Commands::ClearRfid::DecodableType & commandData)
+                                             const Commands::ClearRfid::DecodableType & commandData)
 {
+    auto & userId = commandData.userId;
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status = clearUserPinOrRfid(userId, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
 
@@ -556,7 +575,7 @@ exit:
 }
 
 bool emberAfDoorLockClusterClearAllRfidsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 EndpointId endpoint, Commands::ClearAllRfids::DecodableType & commandData)
+                                                 const Commands::ClearAllRfids::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     for (uint8_t i = 0; i < EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE; i++)
@@ -605,7 +624,7 @@ static void printSuccessOrFailure(bool success)
  * Note that the "pin" parameter is a Zigbee string, so the first byte is the
  * length of the remaining bytes
  */
-static bool verifyPin(ByteSpan & pin, uint8_t * userId)
+static bool verifyPin(const ByteSpan & pin, uint8_t * userId)
 {
     bool pinRequired = false;
     EmberAfStatus status;
@@ -637,8 +656,10 @@ static bool verifyPin(ByteSpan & pin, uint8_t * userId)
 }
 
 bool emberAfDoorLockClusterLockDoorCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                            EndpointId endpoint, ByteSpan PIN, Commands::LockDoor::DecodableType & commandData)
+                                            const Commands::LockDoor::DecodableType & commandData)
 {
+    auto & PIN = commandData.pin;
+
     uint8_t userId                = 0;
     bool pinVerified              = verifyPin(PIN, &userId);
     bool doorLocked               = false;
@@ -704,8 +725,10 @@ exit:
 }
 
 bool emberAfDoorLockClusterUnlockDoorCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                              EndpointId endpoint, ByteSpan pin, Commands::UnlockDoor::DecodableType & commandData)
+                                              const Commands::UnlockDoor::DecodableType & commandData)
 {
+    auto & pin = commandData.pin;
+
     uint8_t userId                = 0;
     bool pinVerified              = verifyPin(pin, &userId);
     bool doorUnlocked             = false;
@@ -895,9 +918,11 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 }
 
 bool emberAfDoorLockClusterUnlockWithTimeoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                     EndpointId endpoint, uint16_t timeoutS, ByteSpan pin,
-                                                     Commands::UnlockWithTimeout::DecodableType & commandData)
+                                                     const Commands::UnlockWithTimeout::DecodableType & commandData)
 {
+    auto & timeoutS = commandData.timeoutInSeconds;
+    auto & pin      = commandData.pin;
+
     uint8_t userId;
     uint8_t status;
     CHIP_ERROR err = CHIP_NO_ERROR;

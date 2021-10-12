@@ -13,7 +13,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     dispatch_queue_t queue = dispatch_get_main_queue();
     {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{definedValue}}{{/chip_tests_item_parameters}});
 {{else}}
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTest{{asUpperCamelCase cluster}} * cluster = [[CHIPTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:queue];
     XCTAssertNotNil(cluster);
