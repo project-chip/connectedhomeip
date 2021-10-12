@@ -37,7 +37,10 @@
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
+#include <app/clusters/ota-requestor/ota-requestor.h>
+
 #include "BDXDownloader.h"
+#include "ExampleRequestorDelegate.h"
 #include "ExampleSelfCommissioning.h"
 #include "PersistentStorage.h"
 
@@ -222,6 +225,9 @@ int main(int argc, char * argv[])
     {
         return 1;
     }
+
+    ExampleRequestorDelegate delegate;
+    chip::app::clusters::OTARequestor::SetDelegate(&delegate);
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     err = mStorage.Init();
