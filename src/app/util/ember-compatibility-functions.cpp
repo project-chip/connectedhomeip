@@ -482,9 +482,8 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 } // namespace app
 } // namespace chip
 
-void InteractionModelReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                      uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type,
-                                                      uint8_t * data)
+void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                            uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
 {
     IgnoreUnusedVariable(manufacturerCode);
     IgnoreUnusedVariable(type);

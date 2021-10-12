@@ -485,11 +485,6 @@ enum
 };
 
 /**
- * @brief Returns the type of the attribute, either ANALOG, DISCRETE or NONE
- */
-uint8_t emberAfGetAttributeAnalogOrDiscreteType(uint8_t dataType);
-
-/**
  *@brief Returns true if type is signed, false otherwise.
  */
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType);

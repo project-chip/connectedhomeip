@@ -47,7 +47,6 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/print-cluster.h>
-#include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af-main.h>
 #include <app/util/af.h>
@@ -121,12 +120,6 @@ static uint8_t /*enum EmberAfDisableDefaultResponse*/ emAfSavedDisableDefaultRes
 uint8_t emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
 
 static EmberAfInterpanHeader interpanResponseHeader;
-
-static const uint8_t emberAfAnalogDiscreteThresholds[] = { 0x07, EMBER_AF_DATA_TYPE_NONE,   0x1F, EMBER_AF_DATA_TYPE_DISCRETE,
-                                                           0x2F, EMBER_AF_DATA_TYPE_ANALOG, 0x37, EMBER_AF_DATA_TYPE_DISCRETE,
-                                                           0x3F, EMBER_AF_DATA_TYPE_ANALOG, 0x57, EMBER_AF_DATA_TYPE_DISCRETE,
-                                                           0xDF, EMBER_AF_DATA_TYPE_NONE,   0xE7, EMBER_AF_DATA_TYPE_ANALOG,
-                                                           0xFF, EMBER_AF_DATA_TYPE_NONE };
 
 uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0,
@@ -296,9 +289,6 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
     // initialize event management system
     emAfInitEvents();
 
-    // Initialize the reporting plugin
-    emberAfPluginReportingInitCallback();
-
 #ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
     emberAfPluginBarrierControlServerInitCallback();
 #endif
@@ -335,23 +325,6 @@ void emberAfTick(void)
 // ****************************************
 void emberAfStackDown(void)
 {
-    // (Case 14696) Clearing the report table is only necessary if the stack is
-    // going down for good; if we're rejoining, leave the table intact since we'll
-    // be right back, hopefully.
-    // (Issue 77101) Also don't clear the table if the stack has gone down as a
-    // a result of losing its parent or some other transient state where a future
-    // rejoin is expected to get us back online.
-    if ((false)
-        // emberStackIsPerformingRejoin() == false
-        // && emberNetworkState() == EMBER_NO_NETWORK
-    )
-    {
-        // the report table should be cleared when the stack comes down.
-        // going to a new network means new report devices should be discovered.
-        // if the table isnt cleared the device keeps trying to send messages.
-        emberAfClearReportTableCallback();
-    }
-
     emberAfRegistrationAbortCallback();
 }
 
@@ -1019,20 +992,6 @@ int8_t emberAfCompareDates(EmberAfDate* date1, EmberAfDate* date2)
   return (val1 == val2) ? 0 : ((val1 < val2) ? -1 : 1);
 }
 #endif
-
-// returns the type that the attribute is, either EMBER_AF_DATA_TYPE_ANALOG,
-// EMBER_AF_DATA_TYPE_DISCRETE, or EMBER_AF_DATA_TYPE_NONE. This is based on table
-// 2.15 from the ZCL spec 075123r02
-uint8_t emberAfGetAttributeAnalogOrDiscreteType(uint8_t dataType)
-{
-    unsigned index = 0;
-
-    while (emberAfAnalogDiscreteThresholds[index] < dataType)
-    {
-        index += 2;
-    }
-    return emberAfAnalogDiscreteThresholds[index + 1];
-}
 
 // Zigbee spec says types between signed 8 bit and signed 64 bit
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
