@@ -228,7 +228,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -d/--discriminator <discriminator>\n"
                              "        A 12-bit value used to discern between multiple commissionable CHIP device"
                              "        advertisements. Default value is 3840\n"};
-                             
+
 HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
