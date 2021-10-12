@@ -33,10 +33,7 @@
 namespace chip {
 namespace app {
 
-Command::Command(Messaging::ExchangeManager * apExchangeMgr)
-{
-    mpExchangeMgr = apExchangeMgr;
-}
+Command::Command() {}
 
 CHIP_ERROR Command::AllocateBuffer()
 {

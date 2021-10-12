@@ -418,31 +418,37 @@ function zapTypeToClusterObjectType(type, isDecodable)
 
   function fn(pkgId)
   {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'bool':
-      case 'int8_t':
-      case 'uint8_t':
-      case 'int16_t':
-      case 'uint16_t':
-      case 'int24_t':
-      case 'uint24_t':
-      case 'int32_t':
-      case 'uint32_t':
-      case 'int64_t':
-      case 'uint64_t':
-      case 'float':
-        return zclType;
-      default:
-        if (isDecodable) {
-          return "Structs::" + type + '::DecodableType'
-        } else {
-          return "Structs::" + type + '::Type'
-        }
+    return zclHelper.isEnum(this.global.db, type, pkgId).then(isEnum => {
+      if (isEnum != 'unknown' || type.startsWith('enum')) {
+        return type;
       }
-    })
+
+      const options = { 'hash' : {} };
+      return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+        const basicType = ChipTypesHelper.asBasicType(zclType);
+        switch (basicType) {
+        case 'bool':
+        case 'int8_t':
+        case 'uint8_t':
+        case 'int16_t':
+        case 'uint16_t':
+        case 'int24_t':
+        case 'uint24_t':
+        case 'int32_t':
+        case 'uint32_t':
+        case 'int64_t':
+        case 'uint64_t':
+        case 'float':
+          return zclType;
+        default:
+          if (isDecodable) {
+            return 'Structs::' + type + '::DecodableType'
+          } else {
+            return 'Structs::' + type + '::Type'
+          }
+        }
+      });
+    });
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {

@@ -99,15 +99,4 @@
 #define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT ({{endpoint_attribute_manufacturer_code_count}})
 #define GENERATED_ATTRIBUTE_MANUFACTURER_CODES {{endpoint_attribute_manufacturer_codes}}
 
-// Array of EmberAfPluginReportingEntry structures.
-#define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_ ## x
-#define ZAP_REPORT_DIRECTION(x) ZRD(x)
-
-// User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
-#define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
-
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS {{endpoint_reporting_config_defaults}}
-
 {{/endpoint_config}}

@@ -22,12 +22,6 @@ allprojects {
     }
 }
 
-ext {
-    matterSdkSourceBuild = project.getProperties().get("matter.sdk.source.build").toBoolean()
-    matterSdkBuildRoot = project.getProperties().get("matter.sdk.build.root")
-    matterSdkUtestLib = project.getProperties().get("matter.sdk.utest.lib")
-}
-
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

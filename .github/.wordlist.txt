@@ -111,6 +111,7 @@ CAfile
 cancelled
 CBB
 cbd
+CMD
 CCMP
 CCS
 CCSTUDIO
@@ -137,6 +138,7 @@ ChipImResponder
 ChipLight
 ChipMessageLayer
 CHIPTool
+CHIPTest
 chmod
 chrpath
 cipd
@@ -249,6 +251,7 @@ DevKitM
 df
 dfu
 DHCP
+DHCPC
 DHCPv
 dhrishi
 dialout
@@ -430,6 +433,7 @@ Impl
 ImplClass
 implementers
 imx
+imxlinux
 indexhtml
 Inet
 InetLayer
@@ -532,6 +536,8 @@ matterBuildSrcDir
 matterc
 matterd
 MatterLock
+matterSdkSourceBuild
+matterUTestLib
 MaxInterval
 MaxRtrAdvInterval
 mbedTLS
@@ -670,6 +676,7 @@ PinCode
 pkgconfig
 PlatformManager
 PlatformManagerImpl
+plaintext
 plt
 png
 polymorphism
@@ -787,6 +794,7 @@ SerialNumber
 ServiceId
 SetDns
 SetUpPINCode
+SetpointRaiseLower
 SetupQRCode
 sexualized
 SIGINT
@@ -895,6 +903,7 @@ ttyUSB
 TvChannel
 txt
 uart
+udhcpc
 UART
 UDP
 UDPEndPoint

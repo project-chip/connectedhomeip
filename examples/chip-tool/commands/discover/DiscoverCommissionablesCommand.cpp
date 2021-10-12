@@ -25,13 +25,13 @@ CHIP_ERROR DiscoverCommissionablesCommand::Run()
 {
     GetExecContext()->commissioner->RegisterDeviceDiscoveryDelegate(this);
 
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint64_t) 0);
+    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
     return GetExecContext()->commissioner->DiscoverCommissionableNodes(filter);
 }
 
-void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData)
+void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
-    char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+    char rotatingId[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
     Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
 
     ChipLogProgress(Discovery, "Discovered Node: ");

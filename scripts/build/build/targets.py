@@ -14,7 +14,7 @@
 
 import os
 
-from builders.android import AndroidBoard, AndroidBuilder
+from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp, HostBoard
@@ -129,10 +129,12 @@ def NrfTargets():
 def AndroidTargets():
     target = Target('android', AndroidBuilder)
 
-    yield target.Extend('arm-chip-tool', board=AndroidBoard.ARM)
-    yield target.Extend('arm64-chip-tool', board=AndroidBoard.ARM64)
-    yield target.Extend('x64-chip-tool', board=AndroidBoard.X64)
-    yield target.Extend('x86-chip-tool', board=AndroidBoard.X86)
+    yield target.Extend('arm-chip-tool', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('arm64-chip-tool', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('x64-chip-tool', board=AndroidBoard.X64, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('x86-chip-tool', board=AndroidBoard.X86, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('androidstudio-chip-tool', board=AndroidBoard.AndroidStudio, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('arm64-chip-test', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TEST)
 
 
 ALL = []

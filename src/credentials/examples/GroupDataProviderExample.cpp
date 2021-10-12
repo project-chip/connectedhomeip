@@ -37,12 +37,24 @@ protected:
     struct EndpointEntry : public GroupMapping
     {
         bool in_use = false;
+        void Clear()
+        {
+            endpoint = 0;
+            group    = 0;
+            in_use   = false;
+        }
     };
 
     struct KeysEntry : public KeySet
     {
         bool in_use = false;
-        uint16_t key_set_index;
+        void Clear()
+        {
+            memset(epoch_keys, 0x00, sizeof(epoch_keys));
+            key_set_index = 0;
+            num_keys_used = 0;
+            in_use        = false;
+        }
     };
 
     struct Fabric
@@ -57,6 +69,21 @@ protected:
         size_t states_count;
         // Group key sets for fabric
         KeysEntry keys[kKeyEntriesMax];
+
+        void Clear()
+        {
+            in_use       = false;
+            fabric_index = 0;
+            states_count = 0;
+            for (size_t i = 0; i < kEndpointEntriesMax; i++)
+            {
+                endpoints[i].Clear();
+            }
+            for (size_t i = 0; i < kKeyEntriesMax; i++)
+            {
+                keys[i].Clear();
+            }
+        }
     };
 
     struct StateEntry : public GroupState
@@ -65,11 +92,11 @@ protected:
         bool in_use     = false;
         void Clear()
         {
+            in_use        = false;
             fabric_index  = 0;
             group         = 0;
             key_set_index = 0;
             fabric        = nullptr;
-            in_use        = false;
         }
     };
 
@@ -292,7 +319,13 @@ protected:
 public:
     CHIP_ERROR Init() override
     {
+        // Clear-out all fabric entries
+        for (size_t i = 0; i < kNumFabrics; ++i)
+        {
+            mFabrics[i].Clear();
+        }
         // Clear-out all entries of index mapping.
+        mGroupStatesCount = 0;
         for (size_t i = 0; i < kMaxNumGroupStates; ++i)
         {
             mGroupStates[i].Clear();
@@ -304,12 +337,12 @@ public:
     void Finish() override { mInitialized = false; }
 
     // Endpoints
-    bool GroupMappingExists(chip::FabricIndex fabric_index, GroupMapping & mapping) override
+    bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping) override
     {
         VerifyOrReturnError(mInitialized, false);
 
         Fabric * fabric = GetExistingFabric(fabric_index);
-        VerifyOrReturnError(fabric, false);
+        VerifyOrReturnError(nullptr != fabric, false);
 
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
         {
@@ -322,14 +355,14 @@ public:
         return false;
     }
 
-    CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping, const char * name) override
+    CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping, const char * name) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
         (void) name; // Unused!
 
         Fabric * fabric = GetExistingFabricOrAllocateNew(fabric_index);
-        VerifyOrReturnError(fabric, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nullptr != fabric, CHIP_ERROR_NO_MEMORY);
 
         // Search for existing mapping
         for (uint16_t i = 0; i < kEndpointEntriesMax; ++i)
@@ -356,12 +389,12 @@ public:
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping) override
+    CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
         Fabric * fabric = GetExistingFabric(fabric_index);
-        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Search for existing mapping
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
@@ -383,7 +416,7 @@ public:
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
         Fabric * fabric = GetExistingFabric(fabric_index);
-        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Remove all mappings from fabric
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
@@ -403,7 +436,7 @@ public:
 
     // States
 
-    CHIP_ERROR SetGroupState(uint16_t state_index, const GroupState & state) override
+    CHIP_ERROR SetGroupState(size_t state_index, const GroupState & state) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
@@ -411,7 +444,7 @@ public:
         VerifyOrReturnError(static_cast<size_t>(state_index) <= mGroupStatesCount, CHIP_ERROR_INVALID_ARGUMENT);
 
         Fabric * fabric = GetExistingFabricOrAllocateNew(state.fabric_index);
-        VerifyOrReturnError(fabric, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nullptr != fabric, CHIP_ERROR_NO_MEMORY);
 
         StateEntry & entry = mGroupStates[state_index];
         bool appending     = static_cast<size_t>(state_index) == mGroupStatesCount;
@@ -444,7 +477,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetGroupState(uint16_t state_index, GroupState & state) override
+    CHIP_ERROR GetGroupState(size_t state_index, GroupState & state) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
         VerifyOrReturnError(static_cast<size_t>(state_index) < mGroupStatesCount, CHIP_ERROR_KEY_NOT_FOUND);
@@ -460,7 +493,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR RemoveGroupState(uint16_t state_index) override
+    CHIP_ERROR RemoveGroupState(size_t state_index) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
         VerifyOrReturnError(static_cast<size_t>(state_index) < mGroupStatesCount, CHIP_ERROR_KEY_NOT_FOUND);
@@ -516,12 +549,14 @@ public:
     void Release(AllGroupStateIterator * iterator) { mAllStateIterators.ReleaseObject(iterator); }
 
     // Keys
-    CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys) override
+    CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, const KeySet & keys) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
-        Fabric * fabric   = GetExistingFabric(fabric_index);
+        Fabric * fabric   = GetExistingFabricOrAllocateNew(fabric_index);
         KeysEntry * entry = nullptr;
+
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Search for existing, or unused entry
         for (uint16_t i = 0; fabric && i < kKeyEntriesMax; ++i)
@@ -557,6 +592,8 @@ public:
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
         Fabric * fabric = GetExistingFabric(fabric_index);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
+
         // Search for existing keys
         for (uint16_t i = 0; fabric && i < kKeyEntriesMax; ++i)
         {
@@ -577,6 +614,8 @@ public:
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
         Fabric * fabric = GetExistingFabric(fabric_index);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
+
         // Search for existing keys
         for (uint16_t i = 0; fabric && i < kKeyEntriesMax; ++i)
         {
@@ -598,6 +637,25 @@ public:
     }
 
     void Release(KeysIterator * iterator) { return mKeyIterators.ReleaseObject(iterator); }
+
+    CHIP_ERROR RemoveFabric(chip::FabricIndex fabric_index) override
+    {
+        Fabric * fabric = GetExistingFabric(fabric_index);
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_FABRIC_ID);
+        // Remove group states
+        for (size_t i = 0; i < kMaxNumGroupStates; ++i)
+        {
+            if (mGroupStates[i].fabric == fabric)
+            {
+                RemoveGroupState(i);
+            }
+        }
+        // Release other resources associated with the fabric entry, such as mapped
+        // endpoints (i.e. through the Groups cluster) and group key sets, both of which
+        // live in the `Fabric` data structure of this implementation.
+        fabric->Clear();
+        return CHIP_NO_ERROR;
+    }
 
 private:
     bool mInitialized = false;

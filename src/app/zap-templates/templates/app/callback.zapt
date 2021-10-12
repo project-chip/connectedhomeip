@@ -158,8 +158,8 @@ bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Cal
        {{#zcl_command_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/zcl_command_arguments}});
  {{else}}
 bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::app::CommandHandler * commandObj,
-      const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-      {{#zcl_command_arguments}}{{asUnderlyingZclType type}} {{asSymbol label}},{{/zcl_command_arguments}} chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & fields);
+      const chip::app::ConcreteCommandPath & commandPath,
+      const chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & commandData);
 {{/if}}
 {{/zcl_commands}}
 {{/zcl_clusters}}
@@ -267,34 +267,6 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * detected in the received command.  Ver.: always
  */
 bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status);
-
-/** @brief Configure Reporting Response
- *
- * This function is called by the application framework when a Configure
- * Reporting Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute status records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfConfigureReportingResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
-
-/** @brief Read Reporting Configuration Response
- *
- * This function is called by the application framework when a Read Reporting
- * Configuration Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute reporting configuration
- * records.  Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief Discover Attributes Response
  *
@@ -502,19 +474,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                     uint8_t * buffer, int32_t index = -1);
-
-/** @brief Report Attributes
- *
- * This function is called by the application framework when a Report Attributes
- * command is received from an external device.  The application should return
- * true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this command.  Ver.: always
- * @param buffer Buffer containing the list of attribute report records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfReportAttributesCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief Get Current Time
  *
