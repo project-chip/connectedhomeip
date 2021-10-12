@@ -33,6 +33,7 @@ APIs
 apk
 AppConfig
 ApplicationBasic
+ApplicationIdentifier
 ApplicationLauncher
 approver
 appspot
@@ -46,6 +47,7 @@ armv
 ASYNC
 att
 attId
+attributeValue
 attrListName
 attrMask
 attSizeBytes
@@ -264,6 +266,7 @@ DISTRO
 Distutils
 DK
 DL
+DMG
 DNS
 Dnsmasq
 dnsmasqd
@@ -437,8 +440,8 @@ Infineon
 ini
 init
 inlined
-instantiation
 installDebug
+instantiation
 integrations
 IntelliSense
 InteractionModelVersion
@@ -533,6 +536,7 @@ matterc
 matterd
 MatterLock
 MaxInterval
+MaxIntervalCeilingSeconds
 MaxRtrAdvInterval
 mbedTLS
 mcu
@@ -562,6 +566,7 @@ MicroSD
 middleware
 Minicom
 MinInterval
+MinIntervalFloorSeconds
 MinRtrAdvInterval
 mkdir
 mlan
@@ -773,8 +778,8 @@ ScriptBinding
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -828,6 +833,8 @@ subdirectory
 submodule
 submodules
 subprocess
+SubscribeResponse
+SubscriptionId
 sudo
 svg
 SVR
@@ -959,12 +966,14 @@ wrover
 WS
 WSL
 WSTK
+xa
 xab
 xaver
 xbef
 xcd
 Xcode
 xd
+xdeadbeefcafe
 xds
 xdsdfu
 xef
@@ -991,6 +1000,7 @@ zaptool
 ZCL
 zclconfigure
 zclread
+zclsubscribe
 zclwrite
 ZephyrConfig
 zephyrproject
