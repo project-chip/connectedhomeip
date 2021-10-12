@@ -85,7 +85,8 @@ def Esp32Targets():
     yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
     rpc_aware_targets = [
-        esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
+        esp32_target.Extend('m5stack-all-clusters',
+                            board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
     ]
 
     for target in rpc_aware_targets:
