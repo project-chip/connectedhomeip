@@ -121,16 +121,20 @@ void InteractionModelEngine::Shutdown()
 }
 
 CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                                                 uint64_t aAppIdentifier)
+                                                 uint64_t aAppIdentifier, InteractionModelDelegate *apDelegateOverride)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+
+    if (apDelegateOverride == nullptr) {
+        apDelegateOverride = mpDelegate;
+    }
 
     for (auto & readClient : mReadClients)
     {
         if (readClient.IsFree())
         {
             *apReadClient = &readClient;
-            err           = readClient.Init(mpExchangeMgr, mpDelegate, aInteractionType, aAppIdentifier);
+            err           = readClient.Init(mpExchangeMgr, apDelegateOverride, aInteractionType, aAppIdentifier);
             if (CHIP_NO_ERROR != err)
             {
                 *apReadClient = nullptr;
@@ -140,6 +144,32 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
     }
 
     return err;
+}
+
+uint32_t InteractionModelEngine::GetNumActiveReadClients()
+{
+    uint32_t numActive = 0;
+
+    for (auto & readClient : mReadClients) {
+        if (!readClient.IsFree()) {
+            numActive++;
+        }
+    }
+
+    return numActive;
+}
+
+uint32_t InteractionModelEngine::GetNumActiveReadHandlers()
+{
+    uint32_t numActive = 0;
+
+    for (auto & readHandler : mReadHandlers) {
+        if (!readHandler.IsFree()) {
+            numActive++;
+        }
+    }
+
+    return numActive;
 }
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)

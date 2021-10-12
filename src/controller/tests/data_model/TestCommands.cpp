@@ -162,7 +162,7 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     auto onSuccessCb =
         [apSuite, &onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                       const TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & dataResponse) {
+                                       const auto & dataResponse) {
             uint8_t i;
 
             i         = 0;
@@ -209,7 +209,7 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
     request.arg1 = true;
 
     auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                             const chip::app::DataModel::NullObjectType & dataResponse) {
+                                             const auto & dataResponse) {
         onSuccessWasCalled = true;
     };
 
@@ -237,7 +237,7 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
     request.arg1 = true;
 
     auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                             const chip::app::DataModel::NullObjectType & dataResponse) {
+                                             const auto & dataResponse) {
         onSuccessWasCalled = true;
     };
 

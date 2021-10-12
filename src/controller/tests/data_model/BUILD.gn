@@ -24,6 +24,7 @@ chip_test_suite("interaction-tests") {
 
   if (chip_device_platform != "mbed") {
     test_sources = [ "TestCommands.cpp" ]
+    test_sources += [ "TestRead.cpp" ]
   }
 
   public_deps = [
