@@ -112,8 +112,9 @@ public:
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
 
     /**
-     * Tears down a active subscription. Will do nothing and return CHIP_NO_ERROR if no subscription found.
+     * Tears down an active subscription.
      *
+     * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
      * @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR ShutdownSubscription(uint64_t aSubscriptionId);

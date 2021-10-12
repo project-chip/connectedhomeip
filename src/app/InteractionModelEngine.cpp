@@ -144,13 +144,14 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
 
     for (auto & readClient : mReadClients)
     {
         if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.IsMatchingClient(aSubscriptionId))
         {
             readClient.Shutdown();
+            err = CHIP_NO_ERROR;
         }
     }
 

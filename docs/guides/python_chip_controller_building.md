@@ -584,20 +584,20 @@ chip-device-ctrl > zclsubscribe OccupancySensing Occupancy 1234 1 10 20
 
 ### `zclsubscribe -shutdown <subscription id>`
 
-Configure ZCL attribute reporting settings. For example:
+Shutdown an existing attribute subscription.
 
 ```
 chip-device-ctrl > zclsubscribe -shutdown 0xdeadbeefcafe
 ```
 
-The subscription id can be obtained by previous subscription messages:
+The subscription id can be obtained from previous subscription messages:
 
 ```
 chip-device-ctrl > zclsubscribe OnOff OnOff 1 1 10 20
 (omitted messages)
 [1633922898.965587][1117858:1117866] CHIP:DMG: SubscribeResponse =
 [1633922898.965599][1117858:1117866] CHIP:DMG: {
-[1633922898.965610][1117858:1117866] CHIP:DMG:  SubscriptionId = 0x11675bb9f688e4ad,
+[1633922898.965610][1117858:1117866] CHIP:DMG:  SubscriptionId = 0xdeadbeefcafe,
 [1633922898.965622][1117858:1117866] CHIP:DMG:  MinIntervalFloorSeconds = 0xa,
 [1633922898.965633][1117858:1117866] CHIP:DMG:  MaxIntervalCeilingSeconds = 0x14,
 [1633922898.965644][1117858:1117866] CHIP:DMG: }

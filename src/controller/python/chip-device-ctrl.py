@@ -810,7 +810,7 @@ class DeviceMgrCmd(Cmd):
         To subscribe ZCL attribute reporting:
         zclsubscribe <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval>
 
-        To shutdown a subscription:
+        To shut down a subscription:
         zclsubscribe -shutdown <subscriptionId>
         """
         try:
