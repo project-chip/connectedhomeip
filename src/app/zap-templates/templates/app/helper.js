@@ -433,6 +433,62 @@ function zapTypeToDecodableClusterObjectType(type, options)
   return zapTypeToClusterObjectType.call(this, type, true, options)
 }
 
+function zapTypeToPythonClusterObjectType(type, options)
+{
+  if (StringHelper.isCharString(type)) {
+    return 'str';
+  }
+
+  if (StringHelper.isOctetString(type)) {
+    return 'bytes';
+  }
+
+  if (type == 'single' || type == 'double') {
+    return 'float';
+  }
+
+  async function fn(pkgId)
+  {
+    const ns          = asUpperCamelCase(options.hash.ns);
+    const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+    if (await typeChecker('isEnum')) {
+      return ns + '.Enums.' + type;
+    }
+
+    if (await typeChecker('isBitmap')) {
+      return 'int';
+    }
+
+    if (await typeChecker('isStruct')) {
+      return ns + '.Structs.' + type;
+    }
+
+    return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options).then((type) => {
+      switch (ChipTypesHelper.asBasicType(type)) {
+      case 'bool':
+        return 'bool';
+      case 'int8_t':
+      case 'uint8_t':
+      case 'int16_t':
+      case 'uint16_t':
+      case 'int24_t':
+      case 'uint24_t':
+      case 'int32_t':
+      case 'uint32_t':
+      case 'int64_t':
+      case 'uint64_t':
+        return 'int';
+      default:
+        throw 'Unhandled type ' + type;
+      }
+    });
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  return templateUtil.templatePromise(this.global, promise)
+}
+
 //
 // Module exports
 //
@@ -448,3 +504,4 @@ exports.hasSpecificAttributes               = hasSpecificAttributes;
 exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
+exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
