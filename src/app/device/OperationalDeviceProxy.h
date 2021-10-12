@@ -16,15 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *  @file
- *    This file contains implementation of OperationalDeviceProxy class.
- *    The objects of this class is for any two devices on the operational
- *    network to establish a secure session with each other. The class
- *    provides mechanism to construct, send and receive messages to and
- *    from the corresponding device.
- */
-
 #pragma once
 
 #include <controller/CHIPDevice.h>
@@ -33,6 +24,10 @@ namespace chip {
 namespace app {
 namespace device {
 
+/**
+ * This struct contains device specific parameters that are needed to establish a secure session. The
+ * pointers passed in are not owned by this object and should have a lifetime beyond this object.
+*/
 struct OperationalDeviceProxyInitParams
 {
     SessionManager * sessionManager          = nullptr;
@@ -43,10 +38,20 @@ struct OperationalDeviceProxyInitParams
 
 class OperationalDeviceProxy;
 
-// TODO: CHIPDevice needs to be refactored and when that happens, the type for this callback may change
-typedef void (*OnOperationalDeviceConnected)(void * context, OperationalDeviceProxy * operationalDevice);
-typedef void (*OnOperationalDeviceConnectionFailure)(void * context, NodeId nodeId, CHIP_ERROR error);
+// TODO: https://github.com/project-chip/connectedhomeip/issues/10423 will provide a refactor of the `Device`
+// class. When that happens, the type of the last param for this callback may change as the registrar of this
+// callback would need to be able to associate the peer device with the cluster command being setn.
+typedef void (*OnOperationalDeviceConnected)(void * context, OperationalDeviceProxy * operationalDeviceProxy);
+typedef void (*OnOperationalDeviceConnectionFailure)(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error);
 
+/**
+ * @class OperationalDeviceProxy
+ *
+ * @brief This is a device proxy class for any two devices on the operational network to establish a
+ * secure session with each other via CASE. To establish a secure session, the caller of this class
+ * must supply the node ID, fabric index, as well as other device specific parameters to the peer node
+ * it wants to communicate with.
+ */
 class DLL_EXPORT OperationalDeviceProxy : public Messaging::ExchangeMgrDelegate
 {
 public:
@@ -60,20 +65,20 @@ public:
      *   Initialize an operational device object with node ID, fabric index and other
      *   device specific parameters used to establish a secure session.
      *
-     * @param[in] nodeId       Node ID of the device
-     * @param[in] fabricIndex  Fabric index of the device
-     * @param[in] params       Device specific parameters
+     * @param[in] nodeId       Node ID of the device in which the secure session is established for
+     * @param[in] fabricIndex  Fabric index of the device in which the secure session is established for
+     * @param[in] initParams   Device specific parameters used in establishing the secure session
      */
-    void Init(NodeId nodeId, FabricIndex fabricIndex, OperationalDeviceProxyInitParams params)
+    void Init(NodeId nodeId, FabricIndex fabricIndex, OperationalDeviceProxyInitParams initParams)
     {
-        VerifyOrReturn(params.sessionManager != nullptr);
-        VerifyOrReturn(params.exchangeMgr != nullptr);
-        VerifyOrReturn(params.idAllocator != nullptr);
-        VerifyOrReturn(params.fabricsTable != nullptr);
+        VerifyOrReturn(initParams.sessionManager != nullptr);
+        VerifyOrReturn(initParams.exchangeMgr != nullptr);
+        VerifyOrReturn(initParams.idAllocator != nullptr);
+        VerifyOrReturn(initParams.fabricsTable != nullptr);
 
         mNodeId      = nodeId;
         mFabricIndex = fabricIndex;
-        mInitParams  = params;
+        mInitParams  = initParams;
     }
 
     /**
@@ -93,9 +98,10 @@ public:
 
     /**
      * @brief
-     *   Update address of the device
+     *   Update address of the device. The address is used as part of secure session establishment
+     *   and therefore, must be updated before a secure session is established.
      *
-     * @param[in] address  Address of the device
+     * @param[in] address  Address of the device in which the secure session is established for
      */
     // TODO: After a requested CHIP node ID has been successfully resolved, call this to update
     CHIP_ERROR UpdateAddress(const Transport::PeerAddress & address);
@@ -103,12 +109,8 @@ public:
     chip::Controller::Device & GetDevice() { return mDevice; }
 
 private:
-    /**
-     * ----- Data members -----
-     */
-
     /* Node ID assigned to the device */
-    NodeId mNodeId;
+    NodeId mNodeId = kUndefinedNodeId;
 
     /* Fabric index of the device */
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
@@ -123,8 +125,9 @@ private:
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
 
-    // TODO: CHIPDevice needs to be refactored and when that happens, this class will no longer act
-    // as a wrapper to Device class. This class should not need to hold a Device class object.
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/10423 will provide a refactor of the `Device`
+    // class. When that happens, this class will no longer act as a wrapper to the `Device` class. This class
+    // should not need to hold a Device class object.
     Controller::Device mDevice;
 
     /**
@@ -145,9 +148,11 @@ private:
     /**
      * ----- Wrapper callbacks for Device class -----
      */
-    // TODO: CHIPDevice needs to be refactored and when that happens, these callbacks are no longer
-    // needed. They are currently being used to forward callbacks from the Device class to the users
-    // of the OperationalDeviceProxy class.
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/10423 will provide a refactor of the `Device`
+    // class. When that happens, these callbacks are no longer needed. They are currently being used to forward
+    // callbacks from the `Device` class to the users of the `OperationalDeviceProxy` class. Once the
+    // `OperationalDeviceProxy` class is no longer a wrapper to the `Device` class, the former will no longer
+    // need to register for the following callbacks to the `Device` class.
     static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 

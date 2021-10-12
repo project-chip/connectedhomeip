@@ -16,15 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *  @file
- *    This file contains implementation of OperationalDeviceProxy class.
- *    The objects of this class is for any two devices on the operational
- *    network to establish a secure session with each other. The class
- *    provides mechanism to construct, send and receive messages to and
- *    from the corresponding device.
- */
-
 #include <app/device/OperationalDeviceProxy.h>
 
 namespace chip {
@@ -58,6 +49,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnOperationalDevic
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDevice.Init(initParams, mNodeId, mAddress, mFabricIndex);
     mDevice.OperationalCertProvisioned();
+    mDevice.SetActive(true);
     err = mDevice.EstablishConnectivity(&mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     SuccessOrExit(err);
 
@@ -120,7 +112,7 @@ void OperationalDeviceProxy::DequeueConnectionFailureCallbacks(CHIP_ERROR error,
         cb->Cancel();
         if (executeCallback)
         {
-            cb->mCall(cb->mContext, mNodeId, error);
+            cb->mCall(cb->mContext, this, error);
         }
     }
 }
@@ -128,7 +120,6 @@ void OperationalDeviceProxy::DequeueConnectionFailureCallbacks(CHIP_ERROR error,
 void OperationalDeviceProxy::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr)
 {
     mDevice.OnNewConnection(session);
-    mDevice.SetActive(true);
 }
 
 void OperationalDeviceProxy::OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr)
@@ -138,7 +129,7 @@ void OperationalDeviceProxy::OnConnectionExpired(SessionHandle session, Messagin
 
 void OperationalDeviceProxy::OnDeviceConnectedFn(void * context, Controller::Device * device)
 {
-    VerifyOrReturn(context != nullptr);
+    VerifyOrReturn(context != nullptr, ChipLogError(OperationalDeviceProxy, "%s: invalid context", __FUNCTION__));
     OperationalDeviceProxy * operationalDevice = reinterpret_cast<OperationalDeviceProxy *>(context);
     operationalDevice->DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, false);
     operationalDevice->DequeueConnectionSuccessCallbacks(true);
@@ -146,7 +137,7 @@ void OperationalDeviceProxy::OnDeviceConnectedFn(void * context, Controller::Dev
 
 void OperationalDeviceProxy::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
 {
-    VerifyOrReturn(context != nullptr);
+    VerifyOrReturn(context != nullptr, ChipLogError(OperationalDeviceProxy, "%s: invalid context", __FUNCTION__));
     OperationalDeviceProxy * operationalDevice = reinterpret_cast<OperationalDeviceProxy *>(context);
     operationalDevice->DequeueConnectionSuccessCallbacks(false);
     operationalDevice->DequeueConnectionFailureCallbacks(error, true);
