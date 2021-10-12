@@ -446,7 +446,7 @@ struct Sigma1Params
     static constexpr uint8_t initiatorEphPubKeyTag = 4;
     static constexpr uint8_t resumptionIdTag       = 6;
     static constexpr uint8_t initiatorResumeMICTag = 7;
-    static constexpr uint64_t NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
 
     static constexpr bool includeStructEnd = true;
 
@@ -541,7 +541,7 @@ struct Sigma1NoStructEnd : public BadSigma1ParamsBase
 
 struct Sigma1WrongTags : public BadSigma1ParamsBase
 {
-    static constexpr uint64_t NumToTag(uint8_t num) { return TLV::ProfileTag(0, num); }
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ProfileTag(0, num); }
 };
 
 struct Sigma1TooLongRandom : public BadSigma1ParamsBase

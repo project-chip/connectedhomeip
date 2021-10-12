@@ -10,8 +10,11 @@ namespace Clusters {
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
 {{#zcl_structs}}
+{{#first}}
+namespace Structs {
+{{/first}}
 namespace {{asType label}} {
-CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
+CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_struct_items}}
@@ -47,12 +50,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 }
 
 } // namespace {{asType label}}
+{{#last}}
+} // namespace Structs
+{{/last}}
 {{/zcl_structs}}
 
 namespace Commands {
 {{#zcl_commands}}
 namespace {{asUpperCamelCase name}} {
-CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
+CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_command_arguments}}

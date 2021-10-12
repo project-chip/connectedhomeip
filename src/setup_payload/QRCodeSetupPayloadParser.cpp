@@ -65,7 +65,7 @@ static CHIP_ERROR readBits(std::vector<uint8_t> buf, size_t & index, uint64_t & 
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR openTLVContainer(TLV::ContiguousBufferTLVReader & reader, TLV::TLVType type, uint64_t tag,
+static CHIP_ERROR openTLVContainer(TLV::ContiguousBufferTLVReader & reader, TLV::TLVType type, TLV::Tag tag,
                                    TLV::ContiguousBufferTLVReader & containerReader)
 {
     VerifyOrReturnError(reader.GetType() == type, CHIP_ERROR_INVALID_ARGUMENT);

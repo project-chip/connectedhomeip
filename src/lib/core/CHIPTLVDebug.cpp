@@ -58,7 +58,7 @@ namespace Debug {
 static void DumpHandler(DumpWriter aWriter, const char * aIndent, const TLVReader & aReader, size_t aDepth)
 {
     const TLVType type     = aReader.GetType();
-    const uint64_t tag     = aReader.GetTag();
+    const Tag tag          = aReader.GetTag();
     const uint32_t len     = aReader.GetLength();
     const uint8_t * strbuf = nullptr;
     CHIP_ERROR err         = CHIP_NO_ERROR;

@@ -49,12 +49,12 @@
 
 namespace {
 
-static const chip::NodeId kTestDeviceNodeId1    = 0x18B4300000000001ULL;
-static const chip::NodeId kTestDeviceNodeId2    = 0x18B4300000000002ULL;
-static const chip::ClusterId kLivenessClusterId = 0x00000022;
-static const uint32_t kLivenessChangeEvent      = 1;
-static const chip::EndpointId kTestEndpointId   = 2;
-static const uint64_t kLivenessDeviceStatus     = chip::TLV::ContextTag(1);
+static const chip::NodeId kTestDeviceNodeId1      = 0x18B4300000000001ULL;
+static const chip::NodeId kTestDeviceNodeId2      = 0x18B4300000000002ULL;
+static const chip::ClusterId kLivenessClusterId   = 0x00000022;
+static const uint32_t kLivenessChangeEvent        = 1;
+static const chip::EndpointId kTestEndpointId     = 2;
+static const chip::TLV::Tag kLivenessDeviceStatus = chip::TLV::ContextTag(1);
 static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 static chip::System::LayerImpl gSystemLayer;
 

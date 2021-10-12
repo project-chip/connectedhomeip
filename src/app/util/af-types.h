@@ -55,6 +55,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
+#include <app/ConcreteAttributePath.h>
 #include <lib/support/Variant.h>
 #include <messaging/ExchangeContext.h>
 
@@ -1227,23 +1228,14 @@ typedef void (*EmberAfInitFunction)(chip::EndpointId endpoint);
  *
  * This function is called just after an attribute changes.
  */
-typedef void (*EmberAfClusterAttributeChangedCallback)(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/**
- * @brief Type for referring to the manufacturer specific
- *        attribute changed callback function.
- *
- * This function is called just after a manufacturer specific attribute changes.
- */
-typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           uint16_t manufacturerCode);
+typedef void (*EmberAfClusterAttributeChangedCallback)(const chip::app::ConcreteAttributePath & attributePath);
 
 /**
  * @brief Type for referring to the pre-attribute changed callback function.
  *
  * This function is called before an attribute changes.
  */
-typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(chip::EndpointId endpoint, chip::AttributeId attributeId,
+typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(const chip::app::ConcreteAttributePath & attributePath,
                                                                    EmberAfAttributeType attributeType, uint16_t size,
                                                                    uint8_t * value);
 

@@ -62,7 +62,7 @@ chip::EndpointId kTestEndpointId      = 1;
 chip::EventId kTestEventIdDebug       = 1;
 chip::EventId kTestEventIdCritical    = 2;
 uint8_t kTestFieldValue1              = 1;
-uint64_t kTestEventTag                = 1;
+chip::TLV::Tag kTestEventTag          = chip::TLV::ContextTag(1);
 using TestContext                     = chip::Test::MessagingContext;
 TestContext sContext;
 

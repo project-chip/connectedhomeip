@@ -52,7 +52,7 @@ struct List : public Span<T>
 };
 
 template <typename X>
-inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, List<X> list)
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
 {
     TLV::TLVType type;
 
