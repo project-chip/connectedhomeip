@@ -72,8 +72,18 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
                   aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
 
     if (aCommandPath.mClusterId == TestCluster::Id &&
-        aCommandPath.mCommandId == TestCluster::Commands::TestSimpleArgumentRequest::Type::GetCommandId())
+        aCommandPath.mCommandId == TestCluster::Commands::TestStructArrayArgumentRequest::Type::GetCommandId())
     {
+        TestCluster::Commands::TestStructArrayArgumentRequest::DecodableType dataRequest;
+
+        if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Unable to decode the request");
+            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kFailure,
+                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Failure);
+            return;
+        }
+
         if (responseDirective == kSendDataResponse)
         {
             TestCluster::Commands::TestStructArrayArgumentResponse::Type dataResponse;

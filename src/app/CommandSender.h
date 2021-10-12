@@ -128,11 +128,11 @@ public:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
     {
-        ReturnErrorOnFailure(PrepareCommand(aCommandPath));
+        ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
         TLV::TLVWriter * writer = GetCommandDataElementTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataElement::kCsTag_Data), aData));
-        return FinishCommand();
+        return FinishCommand(/* aEndDataStruct = */ false);
     }
 
     // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.

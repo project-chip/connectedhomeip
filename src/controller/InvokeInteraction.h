@@ -41,8 +41,8 @@ namespace Controller {
  *
  */
 template <typename ResponseObjectT = app::DataModel::NullObjectType, typename RequestObjectT>
-CHIP_ERROR InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle & sessionHandle,
-                                chip::EndpointId endpointId, const RequestObjectT & requestCommandData,
+CHIP_ERROR InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+                                const RequestObjectT & requestCommandData,
                                 typename TypedCommandCallback<ResponseObjectT>::OnSuccessCallbackType onSuccessCb,
                                 typename TypedCommandCallback<ResponseObjectT>::OnErrorCallbackType onErrorCb)
 {
