@@ -123,9 +123,6 @@ int AppTask::Init()
         ChipLogProgress(NotSpecified, "Enabling BLE advertising.");
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
-#ifdef MBED_CONF_APP_DEVICE_NAME
-    ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_DEVICE_NAME);
-#endif
 
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
@@ -150,6 +147,8 @@ int AppTask::StartApp()
         ChipLogError(NotSpecified, "AppTask.Init() failed");
         return ret;
     }
+
+    ChipLogProgress(NotSpecified, "Mbed lighting-app example application run");
 
     while (true)
     {

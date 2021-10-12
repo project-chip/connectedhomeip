@@ -185,7 +185,7 @@
             "id": "mbedApp",
             "description": "What mbed application do you want to use?",
             "options": ["lock-app", "lighting-app"],
-            "default": "shell"
+            "default": "lock-app"
         },
         {
             "type": "pickString",

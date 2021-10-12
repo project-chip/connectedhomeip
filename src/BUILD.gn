@@ -59,11 +59,12 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/retransmit/tests",
     ]
 
-    if (current_os != "zephyr") {
+    if (current_os != "zephyr" && current_os != "mbed") {
       deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
-    if (current_os != "zephyr" && chip_device_platform != "efr32") {
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "efr32") {
       deps += [
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
@@ -98,7 +99,8 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/controller/tests" ]
     }
 
-    if (current_os != "zephyr" && chip_device_platform != "esp32") {
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "esp32") {
       deps += [ "${chip_root}/src/lib/shell/tests" ]
     }
 
