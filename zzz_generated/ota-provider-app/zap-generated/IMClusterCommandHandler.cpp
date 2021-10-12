@@ -68,9 +68,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.expiryLengthSeconds, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -79,8 +77,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj, aCommandPath,
-                                                                                             aCommandPath.mEndpointId, commandData);
+                wasHandled =
+                    emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -89,10 +87,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, to_underlying(commandData.location),
-                    const_cast<uint8_t *>(Uint8::from_const_char(commandData.countryCode.data())), commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -132,9 +127,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.operationalDataset, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -143,9 +136,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.ssid, commandData.credentials,
-                    commandData.breadcrumb, commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -154,9 +145,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.networkID, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -165,9 +154,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.networkID, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -176,8 +163,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(apCommandObj, aCommandPath,
+                                                                                                         commandData);
             }
             break;
         }
@@ -186,9 +173,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.networkID, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -197,9 +182,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.ssid, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -208,9 +191,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.operationalDataset, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -219,9 +200,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.ssid, commandData.credentials,
-                    commandData.breadcrumb, commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }

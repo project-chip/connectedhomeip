@@ -49,9 +49,6 @@ public:
                                          uint16_t value);
     CHIP_ERROR WriteAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint8_t value);
-    CHIP_ERROR SubscribeAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeOnOff(Callback::Cancelable * onReportCallback);
 };
 
 } // namespace Controller
