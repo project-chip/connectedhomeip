@@ -73,7 +73,7 @@ class ChipClusters:
                     "commandName": "OpenCommissioningWindow",
                     "args": {
                         "commissioningTimeout": "int",
-                        "pAKEVerifier": "bytes",
+                        "PAKEVerifier": "bytes",
                         "discriminator": "int",
                         "iterations": "int",
                         "salt": "bytes",
@@ -1225,7 +1225,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LockDoor",
                     "args": {
-                        "pin": "str",
+                        "pin": "bytes",
                     },
                 },
             0x00000011: {
@@ -1245,7 +1245,7 @@ class ChipClusters:
                         "userId": "int",
                         "userStatus": "int",
                         "userType": "int",
-                        "pin": "str",
+                        "pin": "bytes",
                     },
                 },
             0x00000016: {
@@ -1255,7 +1255,7 @@ class ChipClusters:
                         "userId": "int",
                         "userStatus": "int",
                         "userType": "int",
-                        "id": "str",
+                        "id": "bytes",
                     },
                 },
             0x00000014: {
@@ -1293,7 +1293,7 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "UnlockDoor",
                     "args": {
-                        "pin": "str",
+                        "pin": "bytes",
                     },
                 },
             0x00000003: {
@@ -1301,7 +1301,7 @@ class ChipClusters:
                     "commandName": "UnlockWithTimeout",
                     "args": {
                         "timeoutInSeconds": "int",
-                        "pin": "str",
+                        "pin": "bytes",
                     },
                 },
             },
@@ -1409,6 +1409,16 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x00000000: {
+                    "attributeName": "PHYRate",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "FullDuplex",
+                    "attributeId": 0x00000001,
+                    "type": "bool",
+                },
                 0x00000002: {
                     "attributeName": "PacketRxCount",
                     "attributeId": 0x00000002,
@@ -1432,6 +1442,16 @@ class ChipClusters:
                 0x00000006: {
                     "attributeName": "OverrunCount",
                     "attributeId": 0x00000006,
+                    "type": "int",
+                },
+                0x00000007: {
+                    "attributeName": "CarrierDetect",
+                    "attributeId": 0x00000007,
+                    "type": "bool",
+                },
+                0x00000008: {
+                    "attributeName": "TimeSinceReset",
+                    "attributeId": 0x00000008,
                     "type": "int",
                 },
                 0x0000FFFD: {
@@ -2329,9 +2349,9 @@ class ChipClusters:
                     "commandId": 0x00000006,
                     "commandName": "AddNOC",
                     "args": {
-                        "nOCValue": "bytes",
-                        "iCACValue": "bytes",
-                        "iPKValue": "bytes",
+                        "NOCValue": "bytes",
+                        "ICACValue": "bytes",
+                        "IPKValue": "bytes",
                         "caseAdminNode": "int",
                         "adminVendorId": "int",
                     },
@@ -2361,7 +2381,7 @@ class ChipClusters:
                     "commandId": 0x00000004,
                     "commandName": "OpCSRRequest",
                     "args": {
-                        "cSRNonce": "bytes",
+                        "CSRNonce": "bytes",
                     },
                 },
             0x0000000A: {
@@ -2389,8 +2409,8 @@ class ChipClusters:
                     "commandId": 0x00000007,
                     "commandName": "UpdateNOC",
                     "args": {
-                        "nOCValue": "bytes",
-                        "iCACValue": "bytes",
+                        "NOCValue": "bytes",
+                        "ICACValue": "bytes",
                     },
                 },
             },
@@ -3997,9 +4017,9 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_OpenBasicCommissioningWindow(
                 device, ZCLendpoint, ZCLgroupid, commissioningTimeout
         )
-    def ClusterAdministratorCommissioning_CommandOpenCommissioningWindow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, commissioningTimeout: int, pAKEVerifier: bytes, discriminator: int, iterations: int, salt: bytes, passcodeID: int):
+    def ClusterAdministratorCommissioning_CommandOpenCommissioningWindow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, commissioningTimeout: int, PAKEVerifier: bytes, discriminator: int, iterations: int, salt: bytes, passcodeID: int):
         return self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_OpenCommissioningWindow(
-                device, ZCLendpoint, ZCLgroupid, commissioningTimeout, pAKEVerifier, len(pAKEVerifier), discriminator, iterations, salt, len(salt), passcodeID
+                device, ZCLendpoint, ZCLgroupid, commissioningTimeout, PAKEVerifier, len(PAKEVerifier), discriminator, iterations, salt, len(salt), passcodeID
         )
     def ClusterAdministratorCommissioning_CommandRevokeCommissioning(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_RevokeCommissioning(
@@ -4192,7 +4212,6 @@ class ChipClusters:
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId
         )
     def ClusterDoorLock_CommandLockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
-        pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor(
                 device, ZCLendpoint, ZCLgroupid, pin, len(pin)
         )
@@ -4201,12 +4220,10 @@ class ChipClusters:
                 device, ZCLendpoint, ZCLgroupid, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday
         )
     def ClusterDoorLock_CommandSetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, pin: bytes):
-        pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin(
                 device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, pin, len(pin)
         )
     def ClusterDoorLock_CommandSetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, id: bytes):
-        id = id.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid(
                 device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, id, len(id)
         )
@@ -4223,12 +4240,10 @@ class ChipClusters:
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId, localStartTime, localEndTime
         )
     def ClusterDoorLock_CommandUnlockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
-        pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor(
                 device, ZCLendpoint, ZCLgroupid, pin, len(pin)
         )
     def ClusterDoorLock_CommandUnlockWithTimeout(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutInSeconds: int, pin: bytes):
-        pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(
                 device, ZCLendpoint, ZCLgroupid, timeoutInSeconds, pin, len(pin)
         )
@@ -4465,9 +4480,9 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterOperationalCredentials_CommandAddNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCValue: bytes, iCACValue: bytes, iPKValue: bytes, caseAdminNode: int, adminVendorId: int):
+    def ClusterOperationalCredentials_CommandAddNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, NOCValue: bytes, ICACValue: bytes, IPKValue: bytes, caseAdminNode: int, adminVendorId: int):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC(
-                device, ZCLendpoint, ZCLgroupid, nOCValue, len(nOCValue), iCACValue, len(iCACValue), iPKValue, len(iPKValue), caseAdminNode, adminVendorId
+                device, ZCLendpoint, ZCLgroupid, NOCValue, len(NOCValue), ICACValue, len(ICACValue), IPKValue, len(IPKValue), caseAdminNode, adminVendorId
         )
     def ClusterOperationalCredentials_CommandAddTrustedRootCertificate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rootCertificate: bytes):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate(
@@ -4481,9 +4496,9 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertificateChainRequest(
                 device, ZCLendpoint, ZCLgroupid, certificateType
         )
-    def ClusterOperationalCredentials_CommandOpCSRRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, cSRNonce: bytes):
+    def ClusterOperationalCredentials_CommandOpCSRRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, CSRNonce: bytes):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(
-                device, ZCLendpoint, ZCLgroupid, cSRNonce, len(cSRNonce)
+                device, ZCLendpoint, ZCLgroupid, CSRNonce, len(CSRNonce)
         )
     def ClusterOperationalCredentials_CommandRemoveFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricIndex: int):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(
@@ -4498,9 +4513,9 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel(
                 device, ZCLendpoint, ZCLgroupid, label, len(label)
         )
-    def ClusterOperationalCredentials_CommandUpdateNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCValue: bytes, iCACValue: bytes):
+    def ClusterOperationalCredentials_CommandUpdateNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, NOCValue: bytes, ICACValue: bytes):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateNOC(
-                device, ZCLendpoint, ZCLgroupid, nOCValue, len(nOCValue), iCACValue, len(iCACValue)
+                device, ZCLendpoint, ZCLgroupid, NOCValue, len(NOCValue), ICACValue, len(ICACValue)
         )
     def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: bytes, clusterId: int, length: int, value: int):
         sceneName = sceneName.encode("utf-8") + b'\x00'
@@ -4965,6 +4980,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMax(device, ZCLendpoint, ZCLgroupid)
     def ClusterElectricalMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterEthernetNetworkDiagnostics_ReadAttributePHYRate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PHYRate(device, ZCLendpoint, ZCLgroupid)
+    def ClusterEthernetNetworkDiagnostics_ReadAttributeFullDuplex(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FullDuplex(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributePacketRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributePacketTxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4975,6 +4994,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CollisionCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributeOverrunCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_OverrunCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterEthernetNetworkDiagnostics_ReadAttributeCarrierDetect(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CarrierDetect(device, ZCLendpoint, ZCLgroupid)
+    def ClusterEthernetNetworkDiagnostics_ReadAttributeTimeSinceReset(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_TimeSinceReset(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterFixedLabel_ReadAttributeLabelList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -6319,6 +6342,12 @@ class ChipClusters:
         # Cluster EthernetNetworkDiagnostics Command ResetCounts
         self._chipLib.chip_ime_AppendCommand_EthernetNetworkDiagnostics_ResetCounts.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_EthernetNetworkDiagnostics_ResetCounts.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute PHYRate
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PHYRate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PHYRate.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute FullDuplex
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FullDuplex.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FullDuplex.restype = ctypes.c_uint32
         # Cluster EthernetNetworkDiagnostics ReadAttribute PacketRxCount
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount.restype = ctypes.c_uint32
@@ -6334,6 +6363,12 @@ class ChipClusters:
         # Cluster EthernetNetworkDiagnostics ReadAttribute OverrunCount
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_OverrunCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_OverrunCount.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute CarrierDetect
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CarrierDetect.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CarrierDetect.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute TimeSinceReset
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_TimeSinceReset.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_TimeSinceReset.restype = ctypes.c_uint32
         # Cluster EthernetNetworkDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision.restype = ctypes.c_uint32

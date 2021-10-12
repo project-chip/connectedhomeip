@@ -379,6 +379,10 @@ public:
     EthernetNetworkDiagnosticsClusterTest() : EthernetNetworkDiagnosticsCluster() {}
     ~EthernetNetworkDiagnosticsClusterTest() {}
 
+    CHIP_ERROR WriteAttributePHYRate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint8_t value);
+    CHIP_ERROR WriteAttributeFullDuplex(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        bool value);
     CHIP_ERROR WriteAttributePacketRxCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                            uint64_t value);
     CHIP_ERROR WriteAttributePacketTxCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -389,6 +393,10 @@ public:
                                             uint64_t value);
     CHIP_ERROR WriteAttributeOverrunCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint64_t value);
+    CHIP_ERROR WriteAttributeCarrierDetect(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           bool value);
+    CHIP_ERROR WriteAttributeTimeSinceReset(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint64_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

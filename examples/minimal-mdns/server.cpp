@@ -22,15 +22,15 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <lib/mdns/ServiceNaming.h>
-#include <lib/mdns/minimal/QueryBuilder.h>
-#include <lib/mdns/minimal/ResponseSender.h>
-#include <lib/mdns/minimal/Server.h>
-#include <lib/mdns/minimal/core/QName.h>
-#include <lib/mdns/minimal/responders/IP.h>
-#include <lib/mdns/minimal/responders/Ptr.h>
-#include <lib/mdns/minimal/responders/Srv.h>
-#include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/dnssd/ServiceNaming.h>
+#include <lib/dnssd/minimal_mdns/QueryBuilder.h>
+#include <lib/dnssd/minimal_mdns/ResponseSender.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
+#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/minimal_mdns/responders/IP.h>
+#include <lib/dnssd/minimal_mdns/responders/Ptr.h>
+#include <lib/dnssd/minimal_mdns/responders/Srv.h>
+#include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -187,22 +187,24 @@ int main(int argc, char ** args)
     mdns::Minimal::Server<10 /* endpoints */> mdnsServer;
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
-    mdns::Minimal::QNamePart tcpServiceName[] = { Mdns::kOperationalServiceName, Mdns::kOperationalProtocol, Mdns::kLocalDomain };
-    mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, Mdns::kOperationalServiceName,
-                                                        Mdns::kOperationalProtocol, Mdns::kLocalDomain };
-    mdns::Minimal::QNamePart udpServiceName[] = { Mdns::kCommissionableServiceName, Mdns::kCommissionProtocol, Mdns::kLocalDomain };
-    mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, Mdns::kCommissionableServiceName,
-                                                        Mdns::kCommissionProtocol, Mdns::kLocalDomain };
+    mdns::Minimal::QNamePart tcpServiceName[]       = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
+                                                  Dnssd::kLocalDomain };
+    mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, Dnssd::kOperationalServiceName,
+                                                        Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
+    mdns::Minimal::QNamePart udpServiceName[]       = { Dnssd::kCommissionableServiceName, Dnssd::kCommissionProtocol,
+                                                  Dnssd::kLocalDomain };
+    mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, Dnssd::kCommissionableServiceName,
+                                                        Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
 
     // several UDP versions for discriminators
-    mdns::Minimal::QNamePart udpDiscriminator1[] = { "S52", Mdns::kSubtypeServiceNamePart, Mdns::kCommissionableServiceName,
-                                                     Mdns::kCommissionProtocol, Mdns::kLocalDomain };
-    mdns::Minimal::QNamePart udpDiscriminator2[] = { "V123", Mdns::kSubtypeServiceNamePart, Mdns::kCommissionableServiceName,
-                                                     Mdns::kCommissionProtocol, Mdns::kLocalDomain };
-    mdns::Minimal::QNamePart udpDiscriminator3[] = { "L840", Mdns::kSubtypeServiceNamePart, Mdns::kCommissionableServiceName,
-                                                     Mdns::kCommissionProtocol, Mdns::kLocalDomain };
+    mdns::Minimal::QNamePart udpDiscriminator1[] = { "S52", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
+                                                     Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+    mdns::Minimal::QNamePart udpDiscriminator2[] = { "V123", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
+                                                     Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+    mdns::Minimal::QNamePart udpDiscriminator3[] = { "L840", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
+                                                     Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
 
-    mdns::Minimal::QNamePart serverName[] = { gOptions.instanceName, Mdns::kLocalDomain };
+    mdns::Minimal::QNamePart serverName[] = { gOptions.instanceName, Dnssd::kLocalDomain };
 
     mdns::Minimal::IPv4Responder ipv4Responder(serverName);
     mdns::Minimal::IPv6Responder ipv6Responder(serverName);

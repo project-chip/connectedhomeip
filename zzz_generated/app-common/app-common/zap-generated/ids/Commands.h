@@ -1556,13 +1556,29 @@ namespace TestSpecific {
 static constexpr CommandId Id = 0x00000002;
 } // namespace TestSpecific
 
+namespace TestSimpleArgumentResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace TestSimpleArgumentResponse
+
 namespace TestUnknownCommand {
 static constexpr CommandId Id = 0x00000003;
 } // namespace TestUnknownCommand
 
+namespace TestStructArrayArgumentResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace TestStructArrayArgumentResponse
+
 namespace TestAddArguments {
 static constexpr CommandId Id = 0x00000004;
 } // namespace TestAddArguments
+
+namespace TestSimpleArgumentRequest {
+static constexpr CommandId Id = 0x00000005;
+} // namespace TestSimpleArgumentRequest
+
+namespace TestStructArrayArgumentRequest {
+static constexpr CommandId Id = 0x00000006;
+} // namespace TestStructArrayArgumentRequest
 
 } // namespace Commands
 } // namespace TestCluster

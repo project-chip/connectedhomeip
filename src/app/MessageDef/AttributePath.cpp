@@ -193,7 +193,7 @@ CHIP_ERROR AttributePath::Parser::GetListIndex(chip::ListIndex * const apListInd
     return GetUnsignedInteger(kCsTag_ListIndex, apListIndex);
 }
 
-CHIP_ERROR AttributePath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
+CHIP_ERROR AttributePath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);

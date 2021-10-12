@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)openBasicCommissioningWindow:(uint16_t)commissioningTimeout responseHandler:(ResponseHandler)responseHandler;
 - (void)openCommissioningWindow:(uint16_t)commissioningTimeout
-                   pAKEVerifier:(NSData *)pAKEVerifier
+                   PAKEVerifier:(NSData *)PAKEVerifier
                   discriminator:(uint16_t)discriminator
                      iterations:(uint32_t)iterations
                            salt:(NSData *)salt
@@ -607,7 +607,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getUserType:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler;
 - (void)getWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler;
 - (void)getYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler;
-- (void)lockDoor:(NSString *)pin responseHandler:(ResponseHandler)responseHandler;
+- (void)lockDoor:(NSData *)pin responseHandler:(ResponseHandler)responseHandler;
 - (void)setHolidaySchedule:(uint8_t)scheduleId
                 localStartTime:(uint32_t)localStartTime
                   localEndTime:(uint32_t)localEndTime
@@ -616,12 +616,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setPin:(uint16_t)userId
          userStatus:(uint8_t)userStatus
            userType:(uint8_t)userType
-                pin:(NSString *)pin
+                pin:(NSData *)pin
     responseHandler:(ResponseHandler)responseHandler;
 - (void)setRfid:(uint16_t)userId
          userStatus:(uint8_t)userStatus
            userType:(uint8_t)userType
-                 id:(NSString *)id
+                 id:(NSData *)id
     responseHandler:(ResponseHandler)responseHandler;
 - (void)setUserType:(uint16_t)userId userType:(uint8_t)userType responseHandler:(ResponseHandler)responseHandler;
 - (void)setWeekdaySchedule:(uint8_t)scheduleId
@@ -637,8 +637,8 @@ NS_ASSUME_NONNULL_BEGIN
             localStartTime:(uint32_t)localStartTime
               localEndTime:(uint32_t)localEndTime
            responseHandler:(ResponseHandler)responseHandler;
-- (void)unlockDoor:(NSString *)pin responseHandler:(ResponseHandler)responseHandler;
-- (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(NSString *)pin responseHandler:(ResponseHandler)responseHandler;
+- (void)unlockDoor:(NSData *)pin responseHandler:(ResponseHandler)responseHandler;
+- (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(NSData *)pin responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeLockStateWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeLockStateWithMinInterval:(uint16_t)minInterval
@@ -694,6 +694,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetCounts:(ResponseHandler)responseHandler;
 
+- (void)readAttributePHYRateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeFullDuplexWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePacketRxCountWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributePacketTxCountWithResponseHandler:(ResponseHandler)responseHandler;
@@ -703,6 +707,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCarrierDetectWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeTimeSinceResetWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1133,20 +1141,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOperationalCredentials : CHIPCluster
 
-- (void)addNOC:(NSData *)nOCValue
-          iCACValue:(NSData *)iCACValue
-           iPKValue:(NSData *)iPKValue
+- (void)addNOC:(NSData *)NOCValue
+          ICACValue:(NSData *)ICACValue
+           IPKValue:(NSData *)IPKValue
       caseAdminNode:(uint64_t)caseAdminNode
       adminVendorId:(uint16_t)adminVendorId
     responseHandler:(ResponseHandler)responseHandler;
 - (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler;
 - (void)attestationRequest:(NSData *)attestationNonce responseHandler:(ResponseHandler)responseHandler;
 - (void)certificateChainRequest:(uint8_t)certificateType responseHandler:(ResponseHandler)responseHandler;
-- (void)opCSRRequest:(NSData *)cSRNonce responseHandler:(ResponseHandler)responseHandler;
+- (void)opCSRRequest:(NSData *)CSRNonce responseHandler:(ResponseHandler)responseHandler;
 - (void)removeFabric:(uint8_t)fabricIndex responseHandler:(ResponseHandler)responseHandler;
 - (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler;
 - (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler;
-- (void)updateNOC:(NSData *)nOCValue iCACValue:(NSData *)iCACValue responseHandler:(ResponseHandler)responseHandler;
+- (void)updateNOC:(NSData *)NOCValue ICACValue:(NSData *)ICACValue responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeFabricsListWithResponseHandler:(ResponseHandler)responseHandler;
 

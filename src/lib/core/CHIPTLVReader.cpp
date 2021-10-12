@@ -505,7 +505,7 @@ CHIP_ERROR TLVReader::Next()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Next(uint64_t expectedTag)
+CHIP_ERROR TLVReader::Next(Tag expectedTag)
 {
     CHIP_ERROR err = Next();
     if (err != CHIP_NO_ERROR)
@@ -515,7 +515,7 @@ CHIP_ERROR TLVReader::Next(uint64_t expectedTag)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Next(TLVType expectedType, uint64_t expectedTag)
+CHIP_ERROR TLVReader::Next(TLVType expectedType, Tag expectedTag)
 {
     CHIP_ERROR err = Next(expectedTag);
     if (err != CHIP_NO_ERROR)
@@ -771,7 +771,7 @@ CHIP_ERROR TLVReader::VerifyElement()
     return CHIP_NO_ERROR;
 }
 
-uint64_t TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
+Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
 {
     uint16_t vendorId;
     uint16_t profileNum;
@@ -912,7 +912,7 @@ TLVElementType TLVReader::ElementType() const
     return static_cast<TLVElementType>(mControlByte & kTLVTypeMask);
 }
 
-CHIP_ERROR TLVReader::FindElementWithTag(const uint64_t tag, TLVReader & destReader) const
+CHIP_ERROR TLVReader::FindElementWithTag(Tag tag, TLVReader & destReader) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

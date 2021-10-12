@@ -108,8 +108,12 @@ static bool EnsureWifiIsStarted()
 
 int ChipLinuxAppInit(int argc, char ** argv)
 {
-    CHIP_ERROR err                                   = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+#if CONFIG_NETWORK_LAYER_BLE
     chip::RendezvousInformationFlags rendezvousFlags = chip::RendezvousInformationFlag::kBLE;
+#else  // CONFIG_NETWORK_LAYER_BLE
+    chip::RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
+#endif // CONFIG_NETWORK_LAYER_BLE
 
 #ifdef CONFIG_RENDEZVOUS_MODE
     rendezvousFlags = static_cast<chip::RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
@@ -284,6 +288,13 @@ void ChipLinuxAppMainLoop()
 
     // Init ZCL Data Model and CHIP App Server
     chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
+
+    // Now that the server has started and we are done with our startup logging,
+    // log our discovery/onboarding information again so it's not lost in the
+    // noise.
+    ConfigurationMgr().LogDeviceConfig();
+
+    PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

@@ -52,7 +52,7 @@ public:
      *
      *  @return #CHIP_NO_ERROR on success
      */
-    CHIP_ERROR GetReaderOnTag(const uint64_t aTagToFind, chip::TLV::TLVReader * const apReader) const;
+    CHIP_ERROR GetReaderOnTag(const TLV::Tag aTagToFind, TLV::TLVReader * const apReader) const;
 
     /**
      *  @brief Get the TLV Reader

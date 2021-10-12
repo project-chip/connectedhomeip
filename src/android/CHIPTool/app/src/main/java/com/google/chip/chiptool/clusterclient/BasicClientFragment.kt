@@ -45,9 +45,8 @@ class BasicClientFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    // TODO: use the fabric ID that was used to commission the device
-    val testFabricId = "5544332211"
-    basicClusterFabricIdEd.setText(testFabricId)
+    val compressedFabricId = deviceController.compressedFabricId
+    basicClusterFabricIdEd.setText(compressedFabricId.toULong().toString(16).padStart(16,'0'))
     basicClusterDeviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
 
@@ -79,7 +78,7 @@ class BasicClientFragment : Fragment() {
   private fun updateAddressClick() {
     try {
       deviceController.updateDevice(
-        basicClusterFabricIdEd.text.toString().toULong().toLong(),
+        basicClusterFabricIdEd.text.toString().toULong(16).toLong(),
         basicClusterDeviceIdEd.text.toString().toULong().toLong()
       )
       showMessage("Address update started")

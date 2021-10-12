@@ -309,7 +309,7 @@
 /** @brief Command description for AddGroupResponse
  *
  * Command: AddGroupResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandGroupsClusterAddGroupResponse(status)                                                                    \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -349,7 +349,7 @@
 /** @brief Command description for ViewGroupResponse
  *
  * Command: ViewGroupResponse
- * @param status Status
+ * @param status ENUM8
  * @param groupId INT16U
  * @param groupName CHAR_STRING
  */
@@ -414,7 +414,7 @@
 /** @brief Command description for RemoveGroupResponse
  *
  * Command: RemoveGroupResponse
- * @param status Status
+ * @param status ENUM8
  * @param groupId INT16U
  */
 #define emberAfFillCommandGroupsClusterRemoveGroupResponse(status, groupId)                                                        \
@@ -455,7 +455,7 @@
 /** @brief Command description for AddSceneResponse
  *
  * Command: AddSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterAddSceneResponse(status)                                                                    \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -527,7 +527,7 @@
 /** @brief Command description for ViewSceneResponse
  *
  * Command: ViewSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterViewSceneResponse(status)                                                                   \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -574,7 +574,7 @@
 /** @brief Command description for RemoveSceneResponse
  *
  * Command: RemoveSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterRemoveSceneResponse(status)                                                                 \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -615,7 +615,7 @@
 /** @brief Command description for RemoveAllScenesResponse
  *
  * Command: RemoveAllScenesResponse
- * @param status Status
+ * @param status ENUM8
  * @param groupId INT16U
  */
 #define emberAfFillCommandScenesClusterRemoveAllScenesResponse(status, groupId)                                                    \
@@ -636,7 +636,7 @@
 /** @brief Command description for StoreSceneResponse
  *
  * Command: StoreSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterStoreSceneResponse(status)                                                                  \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -689,7 +689,7 @@
 /** @brief Command description for GetSceneMembershipResponse
  *
  * Command: GetSceneMembershipResponse
- * @param status Status
+ * @param status ENUM8
  * @param capacity INT8U
  * @param groupId INT16U
  * @param sceneCount INT8U
@@ -715,7 +715,7 @@
 /** @brief Command description for EnhancedAddSceneResponse
  *
  * Command: EnhancedAddSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterEnhancedAddSceneResponse(status)                                                            \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -787,7 +787,7 @@
 /** @brief Command description for EnhancedViewSceneResponse
  *
  * Command: EnhancedViewSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterEnhancedViewSceneResponse(status)                                                           \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -834,7 +834,7 @@
 /** @brief Command description for CopySceneResponse
  *
  * Command: CopySceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterCopySceneResponse(status)                                                                   \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -1111,7 +1111,7 @@
 /** @brief Command description for GetAlarmResponse
  *
  * Command: GetAlarmResponse
- * @param status Status
+ * @param status ENUM8
  * @param alarmCode ENUM8
  * @param clusterId CLUSTER_ID
  * @param timeStamp epoch_s
@@ -2376,7 +2376,7 @@
 /** @brief Command description for LockDoor
  *
  * Command: LockDoor
- * @param PIN CHAR_STRING
+ * @param PIN OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterLockDoor(PIN) emberAfFillExternalBuffer(mask,                                                                       \
@@ -2396,7 +2396,7 @@
 /** @brief Command description for UnlockDoor
  *
  * Command: UnlockDoor
- * @param PIN CHAR_STRING
+ * @param PIN OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterUnlockDoor(PIN) emberAfFillExternalBuffer(mask,                                                                     \
@@ -2458,7 +2458,7 @@
 /** @brief Command description for UnlockWithTimeout
  *
  * Command: UnlockWithTimeout
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterUnlockWithTimeout(pin) emberAfFillExternalBuffer(mask,                                                              \
@@ -2484,7 +2484,7 @@
  * @param source INT8U
  * @param eventIdOrAlarmCode INT8U
  * @param userId INT16U
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterGetLogRecordResponse(logEntryId, timestamp, eventType, source, eventIdOrAlarmCode, userId, pin)                     \
@@ -2518,7 +2518,7 @@
  * Command: SetPin
  * @param userStatus DoorLockUserStatus
  * @param userType DoorLockUserType
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterSetPin(userStatus, userType, pin)                                                                                   \
@@ -2542,7 +2542,7 @@
  * @param userId INT16U
  * @param userStatus DoorLockUserStatus
  * @param userType DoorLockUserType
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterGetPinResponse(userId, userStatus, userType, pin)                                                                   \
@@ -3026,7 +3026,7 @@
  * Command: SetRfid
  * @param userStatus DoorLockUserStatus
  * @param userType DoorLockUserType
- * @param id CHAR_STRING
+ * @param id OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterSetRfid(userStatus, userType, id)                                                                                   \
@@ -3050,7 +3050,7 @@
  * @param userId INT16U
  * @param userStatus DoorLockUserStatus
  * @param userType DoorLockUserType
- * @param rfid CHAR_STRING
+ * @param rfid OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterGetRfidResponse(userId, userStatus, userType, rfid)                                                                 \
@@ -3103,7 +3103,7 @@
  * @param source INT8U
  * @param eventCode DoorLockOperationEventCode
  * @param userId INT16U
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  * @param timeStamp epoch_s
  * @param data CHAR_STRING
  */
@@ -3119,7 +3119,7 @@
  * @param source INT8U
  * @param eventCode DoorLockProgrammingEventCode
  * @param userId INT16U
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  * @param userType DoorLockUserType
  * @param userStatus DoorLockUserStatus
  * @param timeStamp epoch_s
@@ -4697,6 +4697,17 @@
                                                                                                                                    \
                                                            ZCL_TEST_SPECIFIC_COMMAND_ID, "", );
 
+/** @brief Command description for TestSimpleArgumentResponse
+ *
+ * Command: TestSimpleArgumentResponse
+ * @param returnValue BOOLEAN
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestSimpleArgumentResponse(returnValue)                                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_SIMPLE_ARGUMENT_RESPONSE_COMMAND_ID, "u", returnValue);
+
 /** @brief Command description for TestUnknownCommand
  *
  * Command: TestUnknownCommand
@@ -4705,6 +4716,27 @@
     ClusterClusterTestUnknownCommand() emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
                                                                  ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID, "", );
+
+/** @brief Command description for TestStructArrayArgumentResponse
+ *
+ * Command: TestStructArrayArgumentResponse
+ * @param arg1 NestedStructList []
+ * @param arg1Len int
+ * @param arg2 SimpleStruct []
+ * @param arg2Len int
+ * @param arg3 SimpleEnum []
+ * @param arg3Len int
+ * @param arg4 BOOLEAN []
+ * @param arg4Len int
+ * @param arg5 SimpleEnum
+ * @param arg6 BOOLEAN
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestStructArrayArgumentResponse(arg1, arg1Len, arg2, arg2Len, arg3, arg3Len, arg4, arg4Len, arg5, arg6)          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_STRUCT_ARRAY_ARGUMENT_RESPONSE_COMMAND_ID, "bbbbuu", arg1, arg1Len, arg2, arg2Len,      \
+                                  arg3, arg3Len, arg4, arg4Len, arg5, arg6);
 
 /** @brief Command description for TestAddArguments
  *
@@ -4716,6 +4748,38 @@
     ClusterClusterTestAddArguments(arg1, arg2) emberAfFillExternalBuffer(mask,                                                     \
                                                                                                                                    \
                                                                          ZCL_TEST_ADD_ARGUMENTS_COMMAND_ID, "uu", arg1, arg2);
+
+/** @brief Command description for TestSimpleArgumentRequest
+ *
+ * Command: TestSimpleArgumentRequest
+ * @param arg1 BOOLEAN
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestSimpleArgumentRequest(arg1)                                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_SIMPLE_ARGUMENT_REQUEST_COMMAND_ID, "u", arg1);
+
+/** @brief Command description for TestStructArrayArgumentRequest
+ *
+ * Command: TestStructArrayArgumentRequest
+ * @param arg1 NestedStructList []
+ * @param arg1Len int
+ * @param arg2 SimpleStruct []
+ * @param arg2Len int
+ * @param arg3 SimpleEnum []
+ * @param arg3Len int
+ * @param arg4 BOOLEAN []
+ * @param arg4Len int
+ * @param arg5 SimpleEnum
+ * @param arg6 BOOLEAN
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestStructArrayArgumentRequest(arg1, arg1Len, arg2, arg2Len, arg3, arg3Len, arg4, arg4Len, arg5, arg6)           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_STRUCT_ARRAY_ARGUMENT_REQUEST_COMMAND_ID, "bbbbuu", arg1, arg1Len, arg2, arg2Len, arg3, \
+                                  arg3Len, arg4, arg4Len, arg5, arg6);
 
 /** @brief Command description for GetLastMessage
  *

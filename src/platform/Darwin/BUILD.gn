@@ -46,14 +46,14 @@ static_library("Darwin") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DnssdImpl.cpp",
+    "DnssdImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
     "KeyValueStoreManagerImpl.mm",
     "Logging.cpp",
     "MdnsError.cpp",
     "MdnsError.h",
-    "MdnsImpl.cpp",
-    "MdnsImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -62,7 +62,7 @@ static_library("Darwin") {
   ]
 
   deps = [
-    "${chip_root}/src/lib/mdns:platform_header",
+    "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
   ]
 

@@ -52,6 +52,7 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
                ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
+               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
@@ -72,7 +73,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
                ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
-               ${CHIP_ROOT}/src/app/server/Mdns.cpp
+               ${CHIP_ROOT}/src/app/server/Dnssd.cpp
                ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
                ${CHIP_ROOT}/src/app/server/Server.cpp
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp

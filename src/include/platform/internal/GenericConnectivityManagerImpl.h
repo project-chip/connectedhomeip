@@ -47,6 +47,10 @@ public:
     uint16_t _GetUserSelectedModeTimeout();
     void _SetUserSelectedModeTimeout(uint16_t val);
 
+    CHIP_ERROR _GetEthPHYRate(uint8_t & pHYRate);
+    CHIP_ERROR _GetEthFullDuplex(bool & fullDuplex);
+    CHIP_ERROR _GetEthCarrierDetect(bool & carrierDetect);
+    CHIP_ERROR _GetEthTimeSinceReset(uint64_t & timeSinceReset);
     CHIP_ERROR _GetEthPacketRxCount(uint64_t & packetRxCount);
     CHIP_ERROR _GetEthPacketTxCount(uint64_t & packetTxCount);
     CHIP_ERROR _GetEthTxErrCount(uint64_t & txErrCount);
@@ -77,6 +81,30 @@ inline uint16_t GenericConnectivityManagerImpl<ImplClass>::_GetUserSelectedModeT
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedModeTimeout(uint16_t val)
 {}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetEthPHYRate(uint8_t & pHYRate)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetEthFullDuplex(bool & fullDuplex)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetEthCarrierDetect(bool & carrierDetect)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetEthTimeSinceReset(uint64_t & timeSinceReset)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
 template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetEthPacketRxCount(uint64_t & packetRxCount)

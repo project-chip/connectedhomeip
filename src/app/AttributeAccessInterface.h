@@ -21,6 +21,8 @@
 #include <app/ClusterInfo.h>
 #include <app/MessageDef/AttributeDataElement.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/List.h> // So we can encode lists
+#include <app/data-model/TagBoundEncoder.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
@@ -38,10 +40,11 @@
 namespace chip {
 namespace app {
 
-class AttributeValueEncoder
+class AttributeValueEncoder : protected TagBoundEncoder
 {
 public:
-    AttributeValueEncoder(TLV::TLVWriter * aWriter) : mWriter(aWriter) {}
+    AttributeValueEncoder(TLV::TLVWriter * aWriter) : TagBoundEncoder(aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data))
+    {}
 
     template <typename... Ts>
     CHIP_ERROR Encode(Ts... aArgs)
@@ -51,7 +54,28 @@ public:
         {
             return CHIP_NO_ERROR;
         }
-        return DataModel::Encode(*mWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), std::forward<Ts>(aArgs)...);
+        return TagBoundEncoder::Encode(std::forward<Ts>(aArgs)...);
+    }
+
+    /**
+     * aCallback is expected to take a const TagBoundEncoder& argument and
+     * Encode() on it as many times as needed to encode all the list elements
+     * one by one.  If any of those Encode() calls returns failure, aCallback
+     * must stop encoding and return failure.  When all items are encoded
+     * aCallback is expected to return success.
+     *
+     * aCallback may not be called.  Consumers must not assume it will be
+     * called.
+     */
+    template <typename ListGenerator>
+    CHIP_ERROR EncodeList(ListGenerator aCallback)
+    {
+        mTriedEncode = true;
+        if (mWriter == nullptr)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return TagBoundEncoder::EncodeList(aCallback);
     }
 
     bool TriedEncode() const { return mTriedEncode; }
@@ -66,7 +90,6 @@ public:
     }
 
 private:
-    TLV::TLVWriter * mWriter;
     bool mTriedEncode = false;
 };
 
