@@ -16,7 +16,7 @@
  */
 
 #include <inet/Inet.h>
-#include <lib/mdns/minimal/Server.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
 
 namespace MdnsExample {
 

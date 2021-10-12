@@ -158,8 +158,8 @@ bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Cal
        {{#zcl_command_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/zcl_command_arguments}});
  {{else}}
 bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::app::CommandHandler * commandObj,
-      const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-      {{#zcl_command_arguments}}{{asUnderlyingZclType type}} {{asSymbol label}},{{/zcl_command_arguments}} chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & fields);
+      const chip::app::ConcreteCommandPath & commandPath,
+      const chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & commandData);
 {{/if}}
 {{/zcl_commands}}
 {{/zcl_clusters}}

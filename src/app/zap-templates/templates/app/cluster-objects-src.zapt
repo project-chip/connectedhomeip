@@ -10,6 +10,9 @@ namespace Clusters {
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
 {{#zcl_structs}}
+{{#first}}
+namespace Structs {
+{{/first}}
 namespace {{asType label}} {
 CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     TLV::TLVType outer;
@@ -47,6 +50,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 }
 
 } // namespace {{asType label}}
+{{#last}}
+} // namespace Structs
+{{/last}}
 {{/zcl_structs}}
 
 namespace Commands {

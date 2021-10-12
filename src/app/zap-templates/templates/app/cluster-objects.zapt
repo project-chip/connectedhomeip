@@ -34,6 +34,9 @@ using {{asType label}} = EmberAf{{asType label}};
 {{/zcl_enums}}
 
 {{#zcl_structs}}
+{{#first}}
+namespace Structs {
+{{/first}}
 namespace {{name}} {
     enum class Fields {
     {{#zcl_struct_items}}
@@ -44,11 +47,7 @@ namespace {{name}} {
     struct Type {
     public:
         {{#zcl_struct_items}}
-        {{#if isArray}}
-        DataModel::List<{{#if_is_enum type}}{{type}}{{else}}{{zapTypeToEncodableClusterObjectType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
-        {{else}}
-        {{#if_is_enum type}}{{type}}{{else}}{{zapTypeToEncodableClusterObjectType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
-        {{/if}}
+        {{#if isArray}}DataModel::List<{{/if}}{{zapTypeToEncodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
         {{/zcl_struct_items}}
 
         CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
@@ -61,11 +60,7 @@ namespace {{name}} {
     struct DecodableType {
     public:
         {{#zcl_struct_items}}
-        {{#if isArray}}
-        DataModel::DecodableList<{{#if_is_enum type}}{{type}}{{else}}{{zapTypeToDecodableClusterObjectType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
-        {{else}}
-        {{#if_is_enum type}}{{type}}{{else}}{{zapTypeToDecodableClusterObjectType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
-        {{/if}}
+        {{#if isArray}}DataModel::DecodableList<{{/if}}{{zapTypeToDecodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
         {{/zcl_struct_items}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
     };
@@ -74,6 +69,9 @@ namespace {{name}} {
     {{/if}}
 
 } // namespace {{name}}
+{{#last}}
+} // namespace Structs
+{{/last}}
 {{/zcl_structs}}
 
 {{#zcl_commands}}
@@ -95,11 +93,7 @@ public:
     static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_command_arguments}}
-    {{#if isArray}}
-    DataModel::List<{{#if_is_enum type}}{{type}}{{else}}{{zapTypeToEncodableClusterObjectType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
-    {{else}}
-    {{#if_is_enum type}}{{type}}{{else}}{{zapTypeToEncodableClusterObjectType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
-    {{/if}}
+    {{#if isArray}}DataModel::List<{{/if}}{{zapTypeToEncodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
     {{/zcl_command_arguments}}
 
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
@@ -111,11 +105,7 @@ public:
     static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_command_arguments}}
-    {{#if isArray}}
-    DataModel::DecodableList<{{#if_is_enum type}}{{type}}{{else}}{{zapTypeToDecodableClusterObjectType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
-    {{else}}
-    {{#if_is_enum type}}{{type}}{{else}}{{zapTypeToDecodableClusterObjectType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
-    {{/if}}
+    {{#if isArray}}DataModel::DecodableList<{{/if}}{{zapTypeToDecodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
     {{/zcl_command_arguments}}
     CHIP_ERROR Decode(TLV::TLVReader &reader);
 };

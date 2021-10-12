@@ -46,7 +46,7 @@
 #include "pw_status/try.h"
 #include "wifi_service/wifi_service.rpc.pb.h"
 
-#include "ServiceProvisioning.h"
+#include "WiFiProvisioning.h"
 
 #include "ESP32Utils.h"
 

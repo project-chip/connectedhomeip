@@ -191,7 +191,7 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
                                                           const PayloadHeader & aPayloadHeader,
                                                           System::PacketBufferHandle && aPayload)
 {
-    CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(mpExchangeMgr, this);
+    CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(this);
     if (commandHandler == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;

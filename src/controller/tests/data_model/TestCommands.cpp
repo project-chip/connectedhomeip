@@ -87,7 +87,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         if (responseDirective == kSendDataResponse)
         {
             TestCluster::Commands::TestStructArrayArgumentResponse::Type dataResponse;
-            TestCluster::NestedStructList::Type nestedStructList[4];
+            TestCluster::Structs::NestedStructList::Type nestedStructList[4];
 
             uint8_t i = 0;
             for (auto & item : nestedStructList)

@@ -35,7 +35,6 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
@@ -63,7 +62,7 @@ public:
      *
      * The callback passed in has to outlive this CommandHandler object.
      */
-    CommandHandler(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback);
+    CommandHandler(Callback * apCallback);
 
     /*
      * Main entrypoint for this class to handle an invoke request.

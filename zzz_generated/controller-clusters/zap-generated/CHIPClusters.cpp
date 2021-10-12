@@ -925,7 +925,7 @@ CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSucces
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -953,7 +953,7 @@ CHIP_ERROR BasicCluster::WriteAttributeLocation(Callback::Cancelable * onSuccess
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -1088,7 +1088,7 @@ CHIP_ERROR BasicCluster::WriteAttributeLocalConfigDisabled(Callback::Cancelable 
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -1142,7 +1142,7 @@ CHIP_ERROR BinaryInputBasicCluster::WriteAttributeOutOfService(Callback::Cancela
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -1171,7 +1171,7 @@ CHIP_ERROR BinaryInputBasicCluster::WriteAttributePresentValue(Callback::Cancela
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -1407,7 +1407,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::WriteAttributeUserLabel(Callback::Cancelab
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -2711,7 +2711,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorControlOptions(Callback::Canc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -2968,7 +2968,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointX(Callback::Cancelable *
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -2997,7 +2997,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointY(Callback::Cancelable *
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3026,7 +3026,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRX(Callback::Cancelable 
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3055,7 +3055,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRY(Callback::Cancelable 
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3084,7 +3084,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRIntensity(Callback::Can
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3113,7 +3113,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGX(Callback::Cancelable 
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3142,7 +3142,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGY(Callback::Cancelable 
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3171,7 +3171,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGIntensity(Callback::Can
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3200,7 +3200,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBX(Callback::Cancelable 
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3229,7 +3229,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBY(Callback::Cancelable 
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3258,7 +3258,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBIntensity(Callback::Can
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -3420,7 +3420,7 @@ CHIP_ERROR ColorControlCluster::WriteAttributeStartUpColorTemperatureMireds(Call
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -5276,7 +5276,7 @@ CHIP_ERROR GeneralCommissioningCluster::WriteAttributeBreadcrumb(Callback::Cance
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -5842,7 +5842,7 @@ CHIP_ERROR IdentifyCluster::WriteAttributeIdentifyTime(Callback::Cancelable * on
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -7804,7 +7804,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorCluster::WriteAttributeDefaultOtaProvider(C
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -8206,7 +8206,7 @@ CHIP_ERROR OnOffCluster::WriteAttributeOnTime(Callback::Cancelable * onSuccessCa
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -8235,7 +8235,7 @@ CHIP_ERROR OnOffCluster::WriteAttributeOffWaitTime(Callback::Cancelable * onSucc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -8264,7 +8264,7 @@ CHIP_ERROR OnOffCluster::WriteAttributeStartUpOnOff(Callback::Cancelable * onSuc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -8330,7 +8330,7 @@ CHIP_ERROR OnOffSwitchConfigurationCluster::WriteAttributeSwitchActions(Callback
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -9107,7 +9107,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callb
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10260,7 +10260,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeBoolean(Callback::Cancelable * onSu
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10289,7 +10289,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeBitmap8(Callback::Cancelable * onSu
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10318,7 +10318,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeBitmap16(Callback::Cancelable * onS
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10347,7 +10347,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeBitmap32(Callback::Cancelable * onS
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10376,7 +10376,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeBitmap64(Callback::Cancelable * onS
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10405,7 +10405,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeInt8u(Callback::Cancelable * onSucc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10434,7 +10434,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeInt16u(Callback::Cancelable * onSuc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10463,7 +10463,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeInt32u(Callback::Cancelable * onSuc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10492,7 +10492,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeInt64u(Callback::Cancelable * onSuc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10521,7 +10521,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeInt8s(Callback::Cancelable * onSucc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10550,7 +10550,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeInt16s(Callback::Cancelable * onSuc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10579,7 +10579,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeInt32s(Callback::Cancelable * onSuc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10608,7 +10608,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeInt64s(Callback::Cancelable * onSuc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10637,7 +10637,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeEnum8(Callback::Cancelable * onSucc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10666,7 +10666,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeEnum16(Callback::Cancelable * onSuc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10695,7 +10695,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeOctetString(Callback::Cancelable * 
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10760,7 +10760,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeLongOctetString(Callback::Cancelabl
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10789,7 +10789,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeCharString(Callback::Cancelable * o
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10818,7 +10818,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeLongCharString(Callback::Cancelable
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10847,7 +10847,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeEpochUs(Callback::Cancelable * onSu
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10876,7 +10876,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeEpochS(Callback::Cancelable * onSuc
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -10905,7 +10905,7 @@ CHIP_ERROR TestClusterCluster::WriteAttributeUnsupported(Callback::Cancelable * 
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11237,7 +11237,7 @@ CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedCoolingSetpoint(Callback::Ca
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11266,7 +11266,7 @@ CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedHeatingSetpoint(Callback::Ca
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11295,7 +11295,7 @@ CHIP_ERROR ThermostatCluster::WriteAttributeMinHeatSetpointLimit(Callback::Cance
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11324,7 +11324,7 @@ CHIP_ERROR ThermostatCluster::WriteAttributeMaxHeatSetpointLimit(Callback::Cance
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11353,7 +11353,7 @@ CHIP_ERROR ThermostatCluster::WriteAttributeMinCoolSetpointLimit(Callback::Cance
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11382,7 +11382,7 @@ CHIP_ERROR ThermostatCluster::WriteAttributeMaxCoolSetpointLimit(Callback::Cance
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11411,7 +11411,7 @@ CHIP_ERROR ThermostatCluster::WriteAttributeControlSequenceOfOperation(Callback:
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11440,7 +11440,7 @@ CHIP_ERROR ThermostatCluster::WriteAttributeSystemMode(Callback::Cancelable * on
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11532,7 +11532,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeTemperatur
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11562,7 +11562,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeKeypadLock
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -11592,7 +11592,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeSchedulePr
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -13282,7 +13282,7 @@ CHIP_ERROR WindowCoveringCluster::WriteAttributeMode(Callback::Cancelable * onSu
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }

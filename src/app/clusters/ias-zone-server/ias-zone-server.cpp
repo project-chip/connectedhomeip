@@ -353,9 +353,11 @@ static void updateEnrollState(EndpointId endpoint, bool enrolled)
 }
 
 bool emberAfIasZoneClusterZoneEnrollResponseCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                     EndpointId aEndpoint, uint8_t enrollResponseCode, uint8_t zoneId,
-                                                     Commands::ZoneEnrollResponse::DecodableType & commandData)
+                                                     const Commands::ZoneEnrollResponse::DecodableType & commandData)
 {
+    auto & enrollResponseCode = commandData.enrollResponseCode;
+    auto & zoneId             = commandData.zoneId;
+
     EndpointId endpoint;
     uint8_t epZoneId;
     EmberAfStatus status;
