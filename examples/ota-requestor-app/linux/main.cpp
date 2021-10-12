@@ -164,8 +164,12 @@ chip::Protocols::Id FromFullyQualified(uint32_t rawProtocolId)
 
 constexpr uint16_t kOptionProviderLocation = 'p';
 constexpr uint16_t kOptionUdpPort          = 'u';
+constexpr uint16_t kOptionDiscriminator    = 'd';
+
 chip::NodeId providerNodeId                = 0x0;
 uint16_t requestorSecurePort               = 0;
+uint16_t setupDiscriminator                = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     bool retval = true;
@@ -187,6 +191,15 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             retval = false;
         }
         break;
+    case kOptionDiscriminator:
+        setupDiscriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+
+        if ( setupDiscriminator > 0xFFF)
+        {
+            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
+            retval = false;
+        }
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -199,6 +212,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 OptionDef cmdLineOptionsDef[] = {
     { "providerLocation", chip::ArgParser::kArgumentRequired, kOptionProviderLocation },
     { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
+    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator},
     {},
 };
 
@@ -210,8 +224,11 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -u/--udpPort <UDP port number>\n"
                              "        UDP Port that the Requestor listens on for secure connections.\n"
                              "        When this parameter is present the Requestor skips self-commissioning.\n"
-                             "        See README.md for more info.\n" };
-
+                             "        See README.md for more info.\n"
+                             "  -d/--discriminator <discriminator>\n"
+                             "        A 12-bit value used to discern between multiple commissionable CHIP device"
+                             "        advertisements. Default value is 3840\n"};
+                             
 HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
@@ -247,6 +264,17 @@ int main(int argc, char * argv[])
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
+
+    err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
+    if (err == CHIP_NO_ERROR)
+        {
+                ChipLogProgress(SoftwareUpdate, "Setup discriminator set to: %d \n", setupDiscriminator);
+        }
+    else
+        {
+            ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %s \n", chip::ErrorStr(err));
+            goto exit;
+        }
 
     // When the udpPort command line parameter is not present the Requestor self-commissions and automatically requests
     // an image from the Provider. When the parameter is present the Requestor initializes like any other application and

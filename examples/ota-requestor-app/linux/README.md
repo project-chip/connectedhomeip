@@ -37,7 +37,9 @@ In a second terminal:
     self-commissioning and automatic image download logic and instead makes the
     Requestor initialize like a standard Matter application. The udpPort
     parameter specifies the UDP Port that the Requestor listens on for secure
-    connections.
+    connections
+-   Takes an optional discriminator command argument to specify the Setup
+    Discriminator. When the parameter is omitted the value of 3840 is used
 
 ### Limitations
 
