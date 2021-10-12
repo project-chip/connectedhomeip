@@ -66,3 +66,10 @@ class ChipUtility(object):
     @staticmethod
     def StringToCString(s):
         return None if s is None else s.encode()
+
+# To support Python 3.8 and older versions, which does not support @classmethod + @property
+
+
+class classproperty(property):
+    def __get__(self, cls, owner):
+        return classmethod(self.fget).__get__(None, owner)()
