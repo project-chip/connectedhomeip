@@ -24,13 +24,13 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter)
+CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
     return mResolver->FindCommissioners(discoveryFilter);
 }
 
-const Mdns::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
+const Dnssd::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
 {
     return GetDiscoveredNode(idx);
 }

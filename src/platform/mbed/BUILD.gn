@@ -40,7 +40,7 @@ static_library("mbed") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_enable_openthread && chip_mdns == "platform") {
-    sources += [ "../OpenThread/MdnsImpl.cpp" ]
-    deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+    sources += [ "../OpenThread/DnssdImpl.cpp" ]
+    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 }
