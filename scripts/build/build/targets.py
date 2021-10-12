@@ -83,6 +83,7 @@ def Esp32Targets():
     target = Target('esp32', Esp32Builder)
 
     yield target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
+    yield target.Extend('m5stack-ota-requestor', board=Esp32Board.M5Stack, app=Esp32App.OTA_REQUESTOR)
     yield target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
     devkitc = target.Extend('devkitc', board=Esp32Board.DevKitC)
