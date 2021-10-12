@@ -97,13 +97,14 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
 
     err = DeconstructAttestationElements(ByteSpan(attestationElements.Get(), attestationElementsLen), certificationDeclarationSpan,
                                          attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan, vendorReserved);
-#if 0
-    {
-        NL_TEST_ASSERT(inSuite, vendorReservedArray[i].data_equal(vendorReservedDeconstructed[i]));
-    }
-    NL_TEST_ASSERT(inSuite, vendorIdDeconstructed == vendorId);
-    NL_TEST_ASSERT(inSuite, profileNumDeconstructed == profileNum);
-#endif
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, certificationDeclarationSpan.data_equal(ByteSpan(certificationDeclaration)));
+
+    NL_TEST_ASSERT(inSuite, attestationNonceSpan.data_equal(ByteSpan(attestationNonce)));
+
+    NL_TEST_ASSERT(inSuite, timestamp == timestampDeconstructed);
+
+    NL_TEST_ASSERT(inSuite, firmwareInfoSpan.empty());
 }
 
 static void TestAttestationElements_Construction(nlTestSuite * inSuite, void * inContext)
@@ -218,7 +219,7 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
     NL_TEST_ASSERT(inSuite, timestampTestVector == timestampDeconstructed);
     NL_TEST_ASSERT(inSuite, firmwareInfoDeconstructed.empty());
-    NL_TEST_ASSERT(inSuite, ArraySize(vendorReservedArrayTestVector) == vendorReserved.numElements());
+    NL_TEST_ASSERT(inSuite, ArraySize(vendorReservedArrayTestVector) == vendorReserved.GetNumberOfElements());
     struct VendorReservedElement element;
 
     while (vendorReserved.GetNextVendorReservedElement(element) == CHIP_NO_ERROR)
@@ -308,15 +309,7 @@ static void TestAttestationElements_DeconstructionWithFirmwareInfo(nlTestSuite *
     NL_TEST_ASSERT(inSuite, attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
     NL_TEST_ASSERT(inSuite, timestampTestVector == timestampDeconstructed);
     NL_TEST_ASSERT(inSuite, firmwareInfoDeconstructed.data_equal(ByteSpan(firmwareInfoTestVector)));
-    NL_TEST_ASSERT(inSuite, ArraySize(vendorReservedArrayTestVector) == vendorReserved.numElements());
-#if 0
-    for (size_t i = 0; i < ArraySize(vendorReservedArrayTestVector); ++i)
-    {
-        NL_TEST_ASSERT(inSuite, vendorReservedArrayTestVector[i].data_equal(vendorReservedDeconstructed[i]));
-    }
-    NL_TEST_ASSERT(inSuite, vendorIdDeconstructed == vendorIdTestVector);
-    NL_TEST_ASSERT(inSuite, profileNumDeconstructed == profileNumTestVector);
-#else
+    NL_TEST_ASSERT(inSuite, ArraySize(vendorReservedArrayTestVector) == vendorReserved.GetNumberOfElements());
     struct VendorReservedElement element;
     size_t elementsSeen = 0;
 
@@ -342,8 +335,6 @@ static void TestAttestationElements_DeconstructionWithFirmwareInfo(nlTestSuite *
             break;
     }
     NL_TEST_ASSERT(inSuite, elementsSeen == ArraySize(vendorReservedArrayTestVector));
-
-#endif
 }
 
 static void TestAttestationElements_DeconstructionUnordered(nlTestSuite * inSuite, void * inContext)

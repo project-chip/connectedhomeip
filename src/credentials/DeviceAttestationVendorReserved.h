@@ -16,10 +16,11 @@
  */
 #pragma once
 
-#include <cstdint>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/Span.h>
+
+#include <cstdint>
 
 namespace chip {
 namespace Credentials {
@@ -30,8 +31,8 @@ struct VendorReservedElement
     uint16_t profileNum;
     uint32_t tagNum;
     ByteSpan vendorReservedData;
-    struct VendorReservedElement * next; // for linking sorted construction list
-    bool used;                           // when sorting, this element is already used
+    //    struct VendorReservedElement * next; // for linking sorted construction list
+    //   bool used;                           // when sorting, this element is already used
 };
 
 // extract elements out of the device attestation bytespan
@@ -59,6 +60,7 @@ public:
         }
     }
 
+    // read TLV until first profile tag
     CHIP_ERROR Init()
     {
         if (!used)
@@ -82,13 +84,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Next()
-    {
-        ReturnErrorOnFailure(tlvReader.Next());
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Next() { return tlvReader.Next(); }
 
-    size_t numElements() { return numVendorReservedData; }
+    size_t GetNumberOfElements() { return numVendorReservedData; }
 
     CHIP_ERROR GetNextVendorReservedElement(struct VendorReservedElement & element)
     {
@@ -122,36 +120,23 @@ public:
         elements(array), maxSize(size), used(0)
     {}
 
-    typedef struct VendorReservedElement * iterator;
     typedef const struct VendorReservedElement * const_iterator;
 
-    iterator Next()
+    const_iterator Next()
     {
-        current = current->next;
-        return current;
+        if (current + 1 == used)
+        {
+            return nullptr;
+        }
+        return &elements[++current];
     }
-    iterator begin()
+
+    const_iterator cbegin()
     {
-#if 1
         do_sorting(); // when beginning to iterator, make a linked list and return the head element
-        current = head;
-        return current;
-#else
-        if (used > 0)
-            return &elements[0];
-        else
-            return nullptr;
-#endif
+        current = 0;
+        return elements;
     }
-#if 0
-    iterator end()
-    {
-        if (used > 0)
-            return &elements[used];
-        else
-            return nullptr;
-    }
-#endif
 
     CHIP_ERROR addVendorReservedElement(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum, ByteSpan span)
     {
@@ -175,92 +160,66 @@ private:
      */
     void do_sorting()
     {
-        head = nullptr;
-        tail = nullptr;
+        size_t starting = 0;
 
-        if (used == 0)
-        {
-            return;
-        }
-
-        size_t i;
-
-        for (i = 0; i < used; i++)
-        {
-            elements[i].used = false;
-            elements[i].next = nullptr;
-        }
-
-        size_t left                                = used;
-        struct VendorReservedElement * lastElement = nullptr;
-        while (left)
+        while (starting < used)
         {
             uint32_t minVendor = UINT32_MAX;
 
-            // find lowest vendor
-            for (i = 0; i < used; i++)
+            // find lowest vendorId
+            size_t i;
+            for (i = starting; i < used; i++)
             {
-                if (!elements[i].used)
+                if (elements[i].vendorId < minVendor)
                 {
-                    if (elements[i].vendorId < minVendor)
-                        minVendor = elements[i].vendorId;
+                    minVendor = elements[i].vendorId;
                 }
             }
 
             uint32_t minProfile = UINT32_MAX;
-
-            // find lowest profileNum
-            for (i = 0; i < used; i++)
+            // find lowest ProfileNum
+            for (i = starting; i < used; i++)
             {
-                if (!elements[i].used)
+                if (elements[i].vendorId == minVendor)
                 {
-                    if (elements[i].vendorId == minVendor)
-                    {
-                        if (elements[i].profileNum < minProfile)
-                            minProfile = elements[i].profileNum;
-                    }
+                    if (elements[i].profileNum < minProfile)
+                        minProfile = elements[i].profileNum;
                 }
             }
 
-            uint64_t minTagNum                           = ~0;
-            struct VendorReservedElement * lowestElement = nullptr;
-
-            // find lowest tagNum
-            for (i = 0; i < used; i++)
+            // first lowest tagNum for this vendorId/profileNum
+            uint64_t minTagNum = UINT64_MAX;
+            size_t lowestIndex;
+            for (i = starting; i < used; i++)
             {
-                if (!elements[i].used)
+                if (elements[i].vendorId == minVendor && elements[i].profileNum == minProfile)
                 {
                     if (elements[i].tagNum < minTagNum)
                     {
-                        minTagNum     = elements[i].tagNum;
-                        lowestElement = &elements[i];
+                        minTagNum   = elements[i].tagNum;
+                        lowestIndex = i;
                     }
                 }
             }
 
-            // lowest element is the next element in list
-            if (!head)
+            // lowestIndex is the element to move into elements[starting].
+            if (lowestIndex != starting)
             {
-                head = lowestElement;
-                tail = lowestElement;
-            }
-            else if (lastElement)
-            {
+                //
+                VendorReservedElement tmpElement;
 
-                lastElement->next = lowestElement;
+                tmpElement            = elements[starting];
+                elements[starting]    = elements[lowestIndex];
+                elements[lowestIndex] = tmpElement;
             }
-            lowestElement->used = true;
-            lastElement         = lowestElement;
-            left--;
+            starting++;
         }
     }
 
     VendorReservedElement * elements;
-    size_t maxSize;                  // size of elements array
-    size_t used = 0;                 // elements used
-    VendorReservedElement * current; // element being looked at
-    VendorReservedElement * head;    // after threading
-    VendorReservedElement * tail;    // after threading
+    size_t maxSize;  // size of elements array
+    size_t used = 0; // elements used
+    size_t current;  // iterating from [0...maxSize -1]
 };
 
 // allocate space for DeviceAttestationVendorReserved on the stack

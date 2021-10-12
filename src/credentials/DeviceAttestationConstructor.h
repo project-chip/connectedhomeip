@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "DeviceAttestationVendorReserved.h"
+#include <credentials/DeviceAttestationVendorReserved.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
@@ -59,8 +59,10 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
  *  @brief Count the number of VendorReservedElements in a DeviceAttestation blob
  *
  *  @param[in]   attestationElements ByeSpan conitaining source of Attestation Elements data
+ *  @param[out]
+ *  @returns CHIP_NO_ERROR on success
  */
-size_t CountVendorReservedElementsInDA(const ByteSpan & attestationElements);
+CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements, size_t & numElements);
 
 } // namespace Credentials
 } // namespace chip

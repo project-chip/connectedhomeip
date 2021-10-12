@@ -17,10 +17,11 @@
 #include "DeviceAttestationConstructor.h"
 #include "DeviceAttestationVendorReserved.h"
 
-#include <cstdint>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+#include <cstdint>
 
 namespace chip {
 namespace Credentials {
@@ -35,20 +36,17 @@ enum : uint32_t
 };
 
 // utility to determine number of Vendor Reserved elemenets in a bytespan
-size_t CountVendorReservedElementsInDA(const ByteSpan & attestationElements)
+CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements, size_t & numOfElements)
 {
     TLV::ContiguousBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
     tlvReader.Init(attestationElements);
-    if (CHIP_NO_ERROR != tlvReader.Next(containerType, TLV::AnonymousTag))
-        return 0;
-    if (CHIP_NO_ERROR != tlvReader.EnterContainer(containerType))
-        return 0;
-
-    CHIP_ERROR error;
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
     int count = 0;
+    CHIP_ERROR error;
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {
         uint64_t tag = tlvReader.GetTag();
@@ -57,7 +55,10 @@ size_t CountVendorReservedElementsInDA(const ByteSpan & attestationElements)
             count++;
         }
     }
-    return count;
+    VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_END_OF_TLV, error);
+
+    numOfElements = count;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
@@ -80,8 +81,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 
     CHIP_ERROR error;
 
-    // TODO: per conversation with Tennessee, should be two consecutive loops (rather than one big
-    // loop, since the contextTags come before the profileTags)
+    // process context tags first (should be in sorted order)
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {
         uint64_t tag = tlvReader.GetTag();
@@ -121,34 +121,18 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 
         lastContextTagId = TLV::TagNumFromTag(tag);
     }
-#if 0
-        else if (TLV::IsProfileTag(tag))
-        {
-            // vendor fields
-            uint16_t currentVendorId;
-            uint16_t currentProfileNum;
-
-            currentVendorId   = TLV::VendorIdFromTag(tag);
-            currentProfileNum = TLV::ProfileNumFromTag(tag);
-        }
-        else
-        {
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-        }
-#endif
 
     VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_END_OF_TLV, error);
 
-    // VerifyOrReturnError(lastContextTagId != UINT32_MAX, CHIP_ERROR_MISSING_TLV_ELEMENT);
     VerifyOrReturnError(certificationDeclarationExists && attestationNonceExists && timestampExists,
                         CHIP_ERROR_MISSING_TLV_ELEMENT);
 
-    size_t count = CountVendorReservedElementsInDA(attestationElements);
+    size_t count;
+    ReturnErrorOnFailure(CountVendorReservedElementsInDA(attestationElements, count));
     vendorReserved.SaveAttestationElements(count, attestationElements);
     return CHIP_NO_ERROR;
 }
 
-// TODO: have independent vendorId and profileNum entries map to each vendor Reserved entry
 // Have a class for vendor reserved data, discussed in:
 // https://github.com/project-chip/connectedhomeip/issues/9825
 CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
@@ -161,12 +145,6 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
 
     VerifyOrReturnError(!certificationDeclaration.empty() && !attestationNonce.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(attestationNonce.size() == 32, CHIP_ERROR_INVALID_ARGUMENT);
-#if 0
-    if (vendorReservedArraySize != 0)
-    {
-        VerifyOrReturnError(vendorReservedArray != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-#endif
 
     tlvWriter.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
     outerContainerType = TLV::kTLVType_NotSpecified;
@@ -179,7 +157,7 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
         ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(4), firmwareInfo));
     }
 
-    VendorReservedElement * element = vendorReserved.begin();
+    const VendorReservedElement * element = vendorReserved.cbegin();
     while (element)
     {
         ReturnErrorOnFailure(
