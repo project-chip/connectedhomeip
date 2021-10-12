@@ -305,7 +305,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
 {
     auto & percentOpen = commandData.percentOpen;
 
-    EndpointId endpoint  = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
+    EndpointId endpoint = commandPath.mEndpointId;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     emberAfBarrierControlClusterPrintln("RX: GoToPercentCallback p=%d", percentOpen);
@@ -349,7 +349,7 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::BarrierControlStop::DecodableType & commandData)
 {
-    EndpointId endpoint = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
+    EndpointId endpoint = commandPath.mEndpointId;
     emberAfDeactivateServerTick(endpoint, BarrierControl::Id);
     setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
     sendDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
