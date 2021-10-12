@@ -305,7 +305,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
 {
     auto & percentOpen = commandData.percentOpen;
 
-    EndpointId endpoint = commandPath.mEndpointId;
+    EndpointId endpoint  = commandPath.mEndpointId;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     emberAfBarrierControlClusterPrintln("RX: GoToPercentCallback p=%d", percentOpen);
