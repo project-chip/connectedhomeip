@@ -238,7 +238,7 @@ static void OnDoorLockClusterGetHolidayScheduleResponse(void * context, uint8_t 
 }
 
 static void OnDoorLockClusterGetLogRecordResponse(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType,
-                                                  uint8_t source, uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+                                                  uint8_t source, uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
 {
     ChipLogProgress(chipTool, "DoorLockClusterGetLogRecordResponse");
 
@@ -246,7 +246,8 @@ static void OnDoorLockClusterGetLogRecordResponse(void * context, uint16_t logEn
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterGetPinResponse(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
+static void OnDoorLockClusterGetPinResponse(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                            chip::ByteSpan pin)
 {
     ChipLogProgress(chipTool, "DoorLockClusterGetPinResponse");
 
@@ -254,7 +255,8 @@ static void OnDoorLockClusterGetPinResponse(void * context, uint16_t userId, uin
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterGetRfidResponse(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+static void OnDoorLockClusterGetRfidResponse(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                             chip::ByteSpan rfid)
 {
     ChipLogProgress(chipTool, "DoorLockClusterGetRfidResponse");
 
@@ -8550,8 +8552,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.LockDoor(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                chip::ByteSpan(chip::Uint8::from_char(mPin), strlen(mPin)));
+        return cluster.LockDoor(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mPin);
     }
 
 private:
@@ -8559,7 +8560,7 @@ private:
         new chip::Callback::Callback<DoorLockClusterLockDoorResponseCallback>(OnDoorLockClusterLockDoorResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mPin;
+    chip::ByteSpan mPin;
 };
 
 /*
@@ -8630,8 +8631,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.SetPin(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUserId, mUserStatus, mUserType,
-                              chip::ByteSpan(chip::Uint8::from_char(mPin), strlen(mPin)));
+        return cluster.SetPin(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUserId, mUserStatus, mUserType, mPin);
     }
 
 private:
@@ -8642,7 +8642,7 @@ private:
     uint16_t mUserId;
     uint8_t mUserStatus;
     uint8_t mUserType;
-    char * mPin;
+    chip::ByteSpan mPin;
 };
 
 /*
@@ -8671,8 +8671,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.SetRfid(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUserId, mUserStatus, mUserType,
-                               chip::ByteSpan(chip::Uint8::from_char(mId), strlen(mId)));
+        return cluster.SetRfid(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUserId, mUserStatus, mUserType, mId);
     }
 
 private:
@@ -8683,7 +8682,7 @@ private:
     uint16_t mUserId;
     uint8_t mUserStatus;
     uint8_t mUserType;
-    char * mId;
+    chip::ByteSpan mId;
 };
 
 /*
@@ -8835,8 +8834,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UnlockDoor(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                  chip::ByteSpan(chip::Uint8::from_char(mPin), strlen(mPin)));
+        return cluster.UnlockDoor(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mPin);
     }
 
 private:
@@ -8844,7 +8842,7 @@ private:
         new chip::Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>(OnDoorLockClusterUnlockDoorResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mPin;
+    chip::ByteSpan mPin;
 };
 
 /*
@@ -8871,8 +8869,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UnlockWithTimeout(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTimeoutInSeconds,
-                                         chip::ByteSpan(chip::Uint8::from_char(mPin), strlen(mPin)));
+        return cluster.UnlockWithTimeout(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTimeoutInSeconds, mPin);
     }
 
 private:
@@ -8882,7 +8879,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint16_t mTimeoutInSeconds;
-    char * mPin;
+    chip::ByteSpan mPin;
 };
 
 /*

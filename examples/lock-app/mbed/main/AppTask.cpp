@@ -29,7 +29,7 @@
 // from unistd.h to avoid a conflicting declaration with the `sleep()` provided
 // by Mbed-OS in mbed_power_mgmt.h.
 #define sleep unistd_sleep
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -97,7 +97,7 @@ int AppTask::Init()
                 if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
                     event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
                 {
-                    chip::app::MdnsServer::Instance().StartServer();
+                    chip::app::DnssdServer::Instance().StartServer();
                 }
             }
         },

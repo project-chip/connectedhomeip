@@ -18,7 +18,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 

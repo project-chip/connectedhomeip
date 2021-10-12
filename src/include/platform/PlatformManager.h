@@ -33,6 +33,10 @@
 
 namespace chip {
 
+namespace Dnssd {
+class DiscoveryImplPlatform;
+}
+
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -176,6 +180,7 @@ private:
     friend class PlatformManagerImpl;
     friend class ConnectivityManagerImpl;
     friend class ConfigurationManagerImpl;
+    friend class Dnssd::DiscoveryImplPlatform;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;

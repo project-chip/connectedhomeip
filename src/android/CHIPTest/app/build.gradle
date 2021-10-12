@@ -3,6 +3,10 @@ plugins {
     id 'kotlin-android'
 }
 
+println 'matterSdkSourceBuild='+matterSdkSourceBuild
+println 'matterBuildSrcDir='+matterBuildSrcDir
+println 'matterUTestLib='+matterUTestLib
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -20,9 +24,9 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments "-DMATTER_SDK_SOURCE_BUILD="+rootProject.ext.matterSdkSourceBuild \
-                    , "-DMATTER_SDK_BUILD_ROOT="+rootProject.ext.matterSdkBuildRoot \
-                    , "-DMATTER_SDK_UTEST_LIB="+rootProject.ext.matterSdkUtestLib
+                arguments "-DMATTER_SDK_SOURCE_BUILD="+matterSdkSourceBuild \
+                    , "-DMATTER_SDK_BUILD_ROOT="+matterBuildSrcDir \
+                    , "-DMATTER_SDK_UTEST_LIB="+matterUTestLib
             }
         }
     }
@@ -60,7 +64,7 @@ android {
 }
 
 dependencies {
-    if(!rootProject.ext.matterSdkSourceBuild) {
+    if(!matterSdkSourceBuild.toBoolean()) {
         implementation fileTree(dir: "libs", include: ["*.jar"])
     }
 

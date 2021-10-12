@@ -17,14 +17,14 @@
 
 #pragma once
 
-#include "MdnsImpl.h"
+#include "DnssdImpl.h"
 
 namespace chip {
-namespace Mdns {
+namespace Dnssd {
 namespace Error {
 
 const char * ToString(DNSServiceErrorType errorCode);
 
 } // namespace Error
-} // namespace Mdns
+} // namespace Dnssd
 } // namespace chip

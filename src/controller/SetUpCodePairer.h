@@ -38,9 +38,9 @@
 #include <ble/BleLayer.h>
 #endif // CONFIG_NETWORK_BLE
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 #include <controller/DeviceDiscoveryDelegate.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 namespace chip {
 namespace Controller {
@@ -48,9 +48,9 @@ namespace Controller {
 class DeviceCommissioner;
 
 class DLL_EXPORT SetUpCodePairer
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     : public DeviceDiscoveryDelegate
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 {
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
@@ -73,10 +73,10 @@ private:
 
     void OnDeviceDiscovered(RendezvousParameters & params);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData) override;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;

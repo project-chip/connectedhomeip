@@ -21,11 +21,11 @@
 #include <nlunit-test.h>
 
 using namespace chip;
-using namespace chip::Mdns;
+using namespace chip::Dnssd;
 using namespace chip::Controller;
 
 namespace chip {
-namespace Mdns {
+namespace Dnssd {
 namespace {
 
 class MockResolver : public Resolver
@@ -44,7 +44,7 @@ public:
 };
 
 } // namespace
-} // namespace Mdns
+} // namespace Dnssd
 } // namespace chip
 
 namespace {
@@ -54,7 +54,7 @@ void TestGetDiscoveredCommissioner_HappyCase(nlTestSuite * inSuite, void * inCon
 {
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
-    chip::Mdns::DiscoveredNodeData inNodeData;
+    chip::Dnssd::DiscoveredNodeData inNodeData;
     strncpy(inNodeData.hostName, "mockHostName", sizeof inNodeData.hostName);
     Inet::IPAddress::FromString("192.168.1.10", inNodeData.ipAddress[0]);
     inNodeData.numIPs++;
@@ -73,7 +73,7 @@ void TestGetDiscoveredCommissioner_InvalidNodeDiscovered_ReturnsNullptr(nlTestSu
 {
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
-    chip::Mdns::DiscoveredNodeData inNodeData;
+    chip::Dnssd::DiscoveredNodeData inNodeData;
     Inet::IPAddress::FromString("192.168.1.10", inNodeData.ipAddress[0]);
     inNodeData.numIPs++;
     inNodeData.port = 5540;
@@ -90,7 +90,7 @@ void TestGetDiscoveredCommissioner_HappyCase_OneValidOneInvalidNode(nlTestSuite 
 {
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
-    chip::Mdns::DiscoveredNodeData invalidNodeData, validNodeData;
+    chip::Dnssd::DiscoveredNodeData invalidNodeData, validNodeData;
     // strncpy(inNodeData1.hostName, "mockHostName1", sizeof inNodeData1.hostName);
     Inet::IPAddress::FromString("192.168.1.10", invalidNodeData.ipAddress[0]);
     invalidNodeData.numIPs++;
@@ -138,7 +138,7 @@ void TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter(nlTestSuite * inSuit
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
     NL_TEST_ASSERT(inSuite,
-                   controller.DiscoverCommissioners(Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, 35)) ==
+                   controller.DiscoverCommissioners(Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, 35)) ==
                        CHIP_NO_ERROR);
 }
 

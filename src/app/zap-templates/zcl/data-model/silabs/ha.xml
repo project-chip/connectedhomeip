@@ -1312,13 +1312,13 @@ limitations under the License.
       <description>
         Locks the door
       </description>
-      <arg name="PIN" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
+      <arg name="PIN" type="OCTET_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
     <command source="client" code="0x01" name="UnlockDoor" optional="false" cli="zcl lock unlock">
       <description>
         Unlocks the door
       </description>
-      <arg name="PIN" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
+      <arg name="PIN" type="OCTET_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
     <command source="client" code="0x02" name="Toggle" optional="true" introducedIn="ha-1.2-05-3520-29">
       <description>
@@ -1331,7 +1331,7 @@ limitations under the License.
          Unlock the door with a timeout. When the timeout expires, the door will automatically re-lock.
        </description>
       <arg name="timeoutInSeconds" type="INT16U"/>
-      <arg name="pin" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
+      <arg name="pin" type="OCTET_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
     <command source="client" code="0x04" name="GetLogRecord" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-log-record">
       <description>
@@ -1346,7 +1346,7 @@ limitations under the License.
       <arg name="userId" type="INT16U"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="userType" type="DoorLockUserType"/>
-      <arg name="pin" type="CHAR_STRING"/>
+      <arg name="pin" type="OCTET_STRING"/>
     </command>
     <command source="client" code="0x06" name="GetPin" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-pin">
       <description>
@@ -1468,7 +1468,7 @@ limitations under the License.
       <arg name="userId" type="INT16U"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="userType" type="DoorLockUserType"/>
-      <arg name="id" type="CHAR_STRING"/>
+      <arg name="id" type="OCTET_STRING"/>
     </command>
     <command source="client" code="0x17" name="GetRfid" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-rfid">
       <description>
@@ -1521,7 +1521,7 @@ limitations under the License.
       <arg name="source" type="INT8U"/>
       <arg name="eventIdOrAlarmCode" type="INT8U"/>
       <arg name="userId" type="INT16U"/>
-      <arg name="pin" type="CHAR_STRING"/>
+      <arg name="pin" type="OCTET_STRING"/>
     </command>
     <command source="server" code="0x05" name="SetPinResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1536,7 +1536,7 @@ limitations under the License.
       <arg name="userId" type="INT16U"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="userType" type="DoorLockUserType"/>
-      <arg name="pin" type="CHAR_STRING"/>
+      <arg name="pin" type="OCTET_STRING"/>
     </command>
     <command source="server" code="0x07" name="ClearPinResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1658,7 +1658,7 @@ limitations under the License.
       <arg name="userId" type="INT16U"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="userType" type="DoorLockUserType"/>
-      <arg name="rfid" type="CHAR_STRING"/>
+      <arg name="rfid" type="OCTET_STRING"/>
     </command>
     <command source="server" code="0x18" name="ClearRfidResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1679,7 +1679,7 @@ limitations under the License.
       <arg name="source" type="INT8U"/>
       <arg name="eventCode" type="DoorLockOperationEventCode"/>
       <arg name="userId" type="INT16U"/>
-      <arg name="pin" type="CHAR_STRING"/>
+      <arg name="pin" type="OCTET_STRING"/>
       <arg name="timeStamp" type="epoch_s"/>
       <arg name="data" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
@@ -1690,7 +1690,7 @@ limitations under the License.
       <arg name="source" type="INT8U"/>
       <arg name="eventCode" type="DoorLockProgrammingEventCode"/>
       <arg name="userId" type="INT16U"/>
-      <arg name="pin" type="CHAR_STRING"/>
+      <arg name="pin" type="OCTET_STRING"/>
       <arg name="userType" type="DoorLockUserType"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="timeStamp" type="epoch_s"/>

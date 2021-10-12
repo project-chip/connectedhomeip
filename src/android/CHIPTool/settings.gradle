@@ -1,5 +1,5 @@
 include ':app'
-if (!matterBuildSrcDir.isEmpty()) {
+if (matterSdkSourceBuild.toBoolean() && !matterBuildSrcDir.isEmpty()) {
     include ':chip-library'
 }
 rootProject.name = "CHIPTool"

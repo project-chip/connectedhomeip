@@ -445,6 +445,8 @@ public:
     CHIP_ERROR EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() { return mpIMDelegate; };
+
 private:
     enum class ConnectionState
     {

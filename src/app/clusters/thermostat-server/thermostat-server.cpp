@@ -30,7 +30,9 @@
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -66,14 +68,15 @@ void emberAfThermostatClusterServerInitCallback()
     // or should this just be the responsibility of the thermostat application?
 }
 
-EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value)
+Protocols::InteractionModel::Status
+MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EndpointId endpoint  = attributePath.mEndpointId;
     int16_t requested;
 
-    switch (attributeId)
+    switch (attributePath.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id: {
         int16_t AbsMinHeatSetpointLimit;
@@ -253,7 +256,7 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
         break;
     }
 
-    return status;
+    return app::ToInteractionModelStatus(status);
 }
 
 bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,

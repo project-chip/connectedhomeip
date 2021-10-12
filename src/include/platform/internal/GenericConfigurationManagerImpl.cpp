@@ -231,6 +231,34 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePrimaryWiFiMACAddre
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPrimaryMACAddress(MutableByteSpan buf)
+{
+    if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    memset(buf.data(), 0, buf.size());
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (chip::DeviceLayer::ThreadStackMgr().GetPrimary802154MACAddress(buf.data()) == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(DeviceLayer, "Using Thread extended MAC for hostname.");
+        return CHIP_NO_ERROR;
+    }
+#else
+    if (DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(DeviceLayer, "Using wifi MAC for hostname");
+        return CHIP_NO_ERROR;
+    }
+#endif
+
+    ChipLogError(DeviceLayer, "MAC is not known, using a default.");
+    uint8_t temp[ConfigurationManager::kMaxMACAddressLength] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0, 0xDD, 0xCA };
+    memcpy(buf.data(), temp, buf.size());
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPrimary802154MACAddress(uint8_t * buf)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

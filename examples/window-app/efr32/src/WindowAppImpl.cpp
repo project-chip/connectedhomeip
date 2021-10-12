@@ -23,7 +23,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <lcd.h>
 #include <lib/core/CHIPError.h>
-#include <lib/mdns/Advertiser.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <qrcodegen.h>

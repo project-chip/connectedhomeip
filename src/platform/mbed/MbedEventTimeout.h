@@ -39,6 +39,7 @@ public:
      *
      */
     static void AttachTimeout(mbed::Callback<void()> func, std::chrono::microseconds t);
+    static void DetachTimeout();
 };
 
 } // namespace DeviceLayer

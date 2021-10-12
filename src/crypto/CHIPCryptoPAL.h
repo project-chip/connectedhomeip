@@ -26,6 +26,8 @@
 #include <crypto/CryptoBuildConfig.h>
 #endif
 
+#include <system/SystemConfig.h>
+
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
@@ -63,6 +65,13 @@ constexpr size_t kMax_Salt_Length = 16;
 constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
 constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
+constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
+constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
+
+// TODO: Remove AES-256 from CryptoPAL since not required by V1 spec
+constexpr size_t kAES_CCM256_Key_Length   = 256u / 8u;
+constexpr size_t kAES_CCM256_Block_Length = kAES_CCM256_Key_Length;
+
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.
@@ -73,18 +82,7 @@ constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
 constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
 
-/*
- * Worst case is OpenSSL, so let's use its worst case and let static assert tell us if
- * we are wrong, since `typedef SHA_LONG unsigned int` is default.
- *   SHA_LONG h[8];
- *   SHA_LONG Nl, Nh;
- *   SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
- *   unsigned int num, md_len;
- *
- * We also have to account for possibly some custom extensions on some targets,
- * especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
- */
-constexpr size_t kMAX_Hash_SHA256_Context_Size = ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t));
+constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE;
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER

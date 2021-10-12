@@ -115,12 +115,13 @@ private:
                             /* memory provided */ nullptr, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME };
     osThreadId_t mChipTaskId = 0;
     rtos::Mutex mThisStateMutex;
-    rtos::ConditionVariable mEvenLoopStopCond{ mThisStateMutex };
+    rtos::ConditionVariable mEventLoopCond{ mThisStateMutex };
     rtos::Mutex mChipStackMutex;
     static const size_t event_size = EVENTS_EVENT_SIZE + sizeof(void *) + sizeof(ChipDeviceEvent *);
     events::EventQueue mQueue      = { event_size * CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE };
     mstd::atomic<bool> mShouldRunEventLoop;
     bool mEventLoopHasStopped = false;
+    bool mEventLoopHasRun     = false;
 };
 
 /**

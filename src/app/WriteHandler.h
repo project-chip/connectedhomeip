@@ -88,7 +88,7 @@ private:
     CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & packet);
     CHIP_ERROR SendWriteResponse();
     CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                      AttributeStatusElement::Builder aAttributeStatusElement);
+                                      AttributeStatusIB::Builder aAttributeStatusIB);
 
     void MoveToState(const State aTargetState);
     void ClearState();

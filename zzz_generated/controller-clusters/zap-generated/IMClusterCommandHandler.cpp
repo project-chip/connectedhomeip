@@ -26,8 +26,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
-
 #include <app/InteractionModelEngine.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/TypeTraits.h>
 
 // Currently we need some work to keep compatible with ember lib.
 #include <app/util/ember-compatibility-functions.h>
@@ -937,7 +938,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             uint8_t source;
             uint8_t eventIdOrAlarmCode;
             uint16_t userId;
-            const uint8_t * pin;
+            chip::ByteSpan pin;
             bool argExists[7];
 
             memset(argExists, 0, sizeof argExists);
@@ -986,8 +987,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                     TLVUnpackError = aDataTlv.Get(userId);
                     break;
                 case 6:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(pin);
+                    TLVUnpackError = aDataTlv.Get(pin);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1010,7 +1010,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             {
                 wasHandled = emberAfDoorLockClusterGetLogRecordResponseCallback(aCommandPath.mEndpointId, apCommandObj, logEntryId,
                                                                                 timestamp, eventType, source, eventIdOrAlarmCode,
-                                                                                userId, const_cast<uint8_t *>(pin));
+                                                                                userId, pin);
             }
             break;
         }
@@ -1019,7 +1019,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             uint16_t userId;
             uint8_t userStatus;
             uint8_t userType;
-            const uint8_t * pin;
+            chip::ByteSpan pin;
             bool argExists[4];
 
             memset(argExists, 0, sizeof argExists);
@@ -1059,8 +1059,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                     TLVUnpackError = aDataTlv.Get(userType);
                     break;
                 case 3:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(pin);
+                    TLVUnpackError = aDataTlv.Get(pin);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1082,7 +1081,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 wasHandled = emberAfDoorLockClusterGetPinResponseCallback(aCommandPath.mEndpointId, apCommandObj, userId,
-                                                                          userStatus, userType, const_cast<uint8_t *>(pin));
+                                                                          userStatus, userType, pin);
             }
             break;
         }
@@ -1091,7 +1090,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             uint16_t userId;
             uint8_t userStatus;
             uint8_t userType;
-            const uint8_t * rfid;
+            chip::ByteSpan rfid;
             bool argExists[4];
 
             memset(argExists, 0, sizeof argExists);
@@ -1131,8 +1130,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                     TLVUnpackError = aDataTlv.Get(userType);
                     break;
                 case 3:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(rfid);
+                    TLVUnpackError = aDataTlv.Get(rfid);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1154,7 +1152,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 wasHandled = emberAfDoorLockClusterGetRfidResponseCallback(aCommandPath.mEndpointId, apCommandObj, userId,
-                                                                           userStatus, userType, const_cast<uint8_t *>(rfid));
+                                                                           userStatus, userType, rfid);
             }
             break;
         }
@@ -5263,8 +5261,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
 
     Compatibility::SetupEmberAfObjects(apCommandObj, aCommandPath);
 
-    TLV::TLVType dataTlvType;
-    SuccessOrExit(aReader.EnterContainer(dataTlvType));
     switch (aCommandPath.mClusterId)
     {
     default:
@@ -5274,8 +5270,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     }
 
-exit:
-    aReader.ExitContainer(dataTlvType);
     Compatibility::ResetEmberAfObjects();
 }
 

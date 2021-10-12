@@ -21,13 +21,13 @@ on:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-    cancel-in-progress: true    
+    cancel-in-progress: true
 
 jobs:
     mbedos:
         name: Mbed OS examples building
         timeout-minutes: 60
-        
+
         env:
             BUILD_TYPE: mbedos
             APP_PROFILE: release
@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-mbed-os:latest
+            image: connectedhomeip/chip-build-mbed-os:0.5.11
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -82,6 +82,10 @@ jobs:
                     examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lighting-app-example \
                     /tmp/bloat_reports/
 
+            - name: Build unit tests
+              timeout-minutes: 10
+              run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
+
             - name: Copy aside build products
               run: |
                   mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
@@ -104,7 +108,7 @@ jobs:
               if: ${{ !env.ACT }}
               with:
                   name:
-                      ${{ env.BUILD_TYPE }}-binaries-${{env.APP_TARGET}}-${{ env.APP_PROFILE}}-build-${{
+                      ${{ env.BUILD_TYPE }}-binaries-${{ env.APP_TARGET }}-${{ env.APP_PROFILE }}-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
 

@@ -179,7 +179,7 @@ function chip_endpoint_generated_functions()
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
@@ -191,7 +191,7 @@ function chip_endpoint_generated_functions()
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
@@ -334,6 +334,19 @@ function hasSpecificAttributes(options)
 function asLowerCamelCase(label)
 {
   let str = string.toCamelCase(label, true);
+  // Check for the case when were:
+  // 1. A single word (that's the regexp at the beginning, which matches the
+  //    word-splitting regexp in string.toCamelCase).
+  // 2. Starting with multiple capital letters in a row.
+  // 3. But not _all_ capital letters (which we purposefully
+  //    convert to all-lowercase).
+  //
+  // and if all those conditions hold, preserve the leading capital letters by
+  // uppercasing the first one, which got lowercased.
+  if (!/ |_|-|\//.test(label) && label.length > 1 && label.substring(0, 2).toUpperCase() == label.substring(0, 2)
+      && label.toUpperCase() != label) {
+    str = str[0].toUpperCase() + str.substring(1);
+  }
   return str.replace(/[\.:]/g, '');
 }
 
@@ -400,30 +413,36 @@ function zapTypeToClusterObjectType(type, isDecodable)
 
   function fn(pkgId)
   {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'bool':
-      case 'int8_t':
-      case 'uint8_t':
-      case 'int16_t':
-      case 'uint16_t':
-      case 'int24_t':
-      case 'uint24_t':
-      case 'int32_t':
-      case 'uint32_t':
-      case 'int64_t':
-      case 'uint64_t':
-        return zclType;
-      default:
-        if (isDecodable) {
-          return type + '::DecodableType'
-        } else {
-          return type + '::Type'
-        }
+    return zclHelper.isEnum(this.global.db, type, pkgId).then(isEnum => {
+      if (isEnum != 'unknown' || type.startsWith('enum')) {
+        return type;
       }
-    })
+
+      const options = { 'hash' : {} };
+      return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+        const basicType = ChipTypesHelper.asBasicType(zclType);
+        switch (basicType) {
+        case 'bool':
+        case 'int8_t':
+        case 'uint8_t':
+        case 'int16_t':
+        case 'uint16_t':
+        case 'int24_t':
+        case 'uint24_t':
+        case 'int32_t':
+        case 'uint32_t':
+        case 'int64_t':
+        case 'uint64_t':
+          return zclType;
+        default:
+          if (isDecodable) {
+            return 'Structs::' + type + '::DecodableType'
+          } else {
+            return 'Structs::' + type + '::Type'
+          }
+        }
+      });
+    });
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {

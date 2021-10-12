@@ -198,6 +198,10 @@ public class ChipDeviceController {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
+  public long getCompressedFabricId() {
+    return getCompressedFabricId(deviceControllerPtr);
+  }
+
   public void updateDevice(long fabricId, long deviceId) {
     updateDevice(deviceControllerPtr, fabricId, deviceId);
   }
@@ -248,6 +252,8 @@ public class ChipDeviceController {
   private native void deleteDeviceController(long deviceControllerPtr);
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
+
+  private native long getCompressedFabricId(long deviceControllerPtr);
 
   private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
 
