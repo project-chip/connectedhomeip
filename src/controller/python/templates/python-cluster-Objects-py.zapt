@@ -1,0 +1,79 @@
+'''
+{{> header}}
+'''
+
+# This file contains generated struct, enum, command definition.
+# Users are not expected to import this file, instead, users can use import chip.clusters, which will import all symbols from this file and can get a readable, pretty naming like clusters.OnOff.commands.OnCommand
+
+from dataclasses import dataclass
+import typing
+from enum import IntEnum
+from chip import ChipUtility
+
+from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand
+
+
+{{#zcl_clusters}}
+@dataclass
+class {{asUpperCamelCase name}}:
+    id: typing.ClassVar[int] = {{asHex code 4}}
+
+{{#zcl_enums}}
+{{#first}}
+    class Enums:
+{{/first}}
+        class {{asType label}}(IntEnum):
+{{#zcl_enum_items}}
+            k{{asUpperCamelCase label}} = {{asHex value 2}}
+{{/zcl_enum_items}}
+
+{{/zcl_enums}}
+
+{{#zcl_structs}}
+{{#first}}
+    class Structs:
+{{/first}}
+        @dataclass
+        class {{asUpperCamelCase name}}(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                        {{#zcl_struct_items}}
+                            ClusterObjectFieldDescriptor(Label="{{ asUpperCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type (asUpperCamelCase parent.parent.name)}}{{#if isArray}}, IsArray=True{{/if}}),
+                        {{/zcl_struct_items}}
+                    ])
+
+            {{#zcl_struct_items}}
+            {{ asUpperCamelCase label }}: {{#if isArray}}typing.List[{{/if}}'{{zapTypeToPythonClusterObjectType type (asUpperCamelCase parent.parent.name)}}'{{#if isArray}}]{{/if}}
+            {{/zcl_struct_items}}
+
+{{#last}}
+
+{{/last}}
+{{/zcl_structs}}
+
+{{#zcl_commands}}
+{{#first}}
+    class Commands:
+{{/first}}
+        @dataclass
+        class {{asUpperCamelCase name}}(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = {{ asHex parent.code 4 }}
+            command_id: typing.ClassVar[int] = {{ asHex code 4 }}
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                        {{#zcl_command_arguments}}
+                            ClusterObjectFieldDescriptor(Label="{{ asUpperCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type (asUpperCamelCase parent.parent.name)}}{{#if isArray}}, IsArray=True{{/if}}),
+                        {{/zcl_command_arguments}}
+                    ])
+
+            {{#zcl_command_arguments}}
+            {{ asUpperCamelCase label }}: {{#if isArray}}typing.List[{{/if}}'{{zapTypeToPythonClusterObjectType type (asUpperCamelCase parent.parent.name)}}'{{#if isArray}}]{{/if}}
+            {{/zcl_command_arguments}}
+
+{{/zcl_commands}}
+{{/zcl_clusters}}

@@ -114,6 +114,7 @@ pw_python_action("python") {
         "chip/clusters/CHIPClusters.py",
         "chip/clusters/ClusterObjects.py",
         "chip/clusters/Command.py",
+        "chip/clusters/Objects.py",
         "chip/clusters/TestObjects.py",
         "chip/clusters/__init__.py",
         "chip/configuration/__init__.py",

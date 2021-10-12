@@ -416,6 +416,70 @@ function zapTypeToDecodableClusterObjectType(type, options)
   return zapTypeToClusterObjectType.call(this, type, true, options)
 }
 
+function zapTypeToPythonClusterObjectType(type, clusterName)
+{
+  if (StringHelper.isOctetString(type)) {
+    return 'bytes';
+  }
+
+  if (StringHelper.isCharString(type)) {
+    return 'str';
+  }
+
+  switch (type) {
+  case 'BOOLEAN':
+    return 'bool';
+  case 'INT8S':
+  case 'INT16S':
+  case 'INT24S':
+  case 'INT32S':
+  case 'INT64S':
+  case 'INT8U':
+  case 'INT16U':
+  case 'INT24U':
+  case 'INT32U':
+  case 'INT64U':
+    return 'int';
+  }
+
+  function fn(pkgId)
+  {
+    return zclHelper.isEnum(this.global.db, type, pkgId).then(isEnum => {
+      if (isEnum != 'unknown' || type.startsWith('enum')) {
+        return clusterName + '.Enums.' + type;
+      }
+
+      const options = { 'hash' : {} };
+      return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+        const basicType = ChipTypesHelper.asBasicType(zclType);
+        switch (basicType) {
+        case 'bool':
+          return 'bool';
+        case 'int8_t':
+        case 'uint8_t':
+        case 'int16_t':
+        case 'uint16_t':
+        case 'int24_t':
+        case 'uint24_t':
+        case 'int32_t':
+        case 'uint32_t':
+        case 'int64_t':
+        case 'uint64_t':
+          return 'int';
+        default:
+          return clusterName + '.Structs.' + type;
+        }
+      });
+    });
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
+  return templateUtil.templatePromise(this.global, promise)
+}
+
 //
 // Module exports
 //
@@ -431,3 +495,4 @@ exports.hasSpecificAttributes               = hasSpecificAttributes;
 exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
+exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
