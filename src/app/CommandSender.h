@@ -26,6 +26,7 @@
 
 #include <type_traits>
 
+#include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -114,6 +115,25 @@ public:
      * The callback passed in has to outlive this CommandSender object.
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr);
+
+    /**
+     * API for adding a data request.  The template parameter T is generally
+     * expected to be a ClusterName::Commands::CommandName::Type struct, but any
+     * object that can be encoded using the DataModel::Encode machinery and
+     * exposes the right command id will work.
+     *
+     * @param [in] aRequestCommandPath the path of the command being requested.
+     * @param [in] aData the data for the request.
+     */
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
+    {
+        ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
+        TLV::TLVWriter * writer = GetCommandDataElementTLVWriter();
+        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataElement::kCsTag_Data), aData));
+        return FinishCommand(/* aEndDataStruct = */ false);
+    }
 
     // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
     //
