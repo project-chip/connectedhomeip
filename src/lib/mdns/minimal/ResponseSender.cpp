@@ -167,7 +167,7 @@ CHIP_ERROR ResponseSender::FlushReply()
         if (mSendState.SendUnicast())
         {
             ChipLogDetail(Discovery, "Directly sending mDns reply to peer %s on port %d", srcAddressString,
-                            mSendState.GetSourcePort());
+                          mSendState.GetSourcePort());
             ReturnErrorOnFailure(mServer->DirectSend(mResponseBuilder.ReleasePacket(), mSendState.GetSourceAddress(),
                                                      mSendState.GetSourcePort(), mSendState.GetSourceInterfaceId()));
         }
