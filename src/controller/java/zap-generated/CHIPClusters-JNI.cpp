@@ -29349,38 +29349,26 @@ JNI_METHOD(void, WindowCoveringCluster, reportSafetyStatusAttribute)(JNIEnv * en
 JNI_METHOD(void, WindowCoveringCluster, readFeatureMapAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
-    if (!onSuccess)
-    {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
-        return;
-    }
+    std::unique_ptr<CHIPInt32uAttributeCallback, void (*)(CHIPInt32uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt32uAttributeCallback>(callback), Platform::Delete<CHIPInt32uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
-    if (!onFailure)
-    {
-        delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
-        return;
-    }
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster = reinterpret_cast<WindowCoveringCluster *>(clusterPtr);
-    if (cppCluster == nullptr)
-    {
-        delete onSuccess;
-        delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
-        return;
-    }
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     err = cppCluster->ReadAttributeFeatureMap(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR)
-    {
-        delete onSuccess;
-        delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
-    }
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
 }
 
 JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)

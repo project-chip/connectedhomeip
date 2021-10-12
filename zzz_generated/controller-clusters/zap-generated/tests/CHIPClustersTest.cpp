@@ -5697,7 +5697,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeFeatureMap(Callback::Cancela
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, featureMap));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, featureMap));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
