@@ -63,7 +63,7 @@ bool audioOutputClusterSelectOutput(uint8_t index)
     // TODO: Insert code here
     return true;
 }
-bool audioOutputClusterRenameOutput(uint8_t index, uint8_t * name)
+bool audioOutputClusterRenameOutput(uint8_t index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
     return true;

@@ -169,7 +169,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
 }
 
 bool emberAfOnOffClusterOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                    EndpointId endpoint, Commands::Off::DecodableType & commandData)
+                                    const Commands::Off::DecodableType & commandData)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_OFF_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
@@ -183,7 +183,7 @@ bool emberAfOnOffClusterOffCallback(app::CommandHandler * commandObj, const app:
 }
 
 bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                   EndpointId endpoint, Commands::On::DecodableType & commandData)
+                                   const Commands::On::DecodableType & commandData)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_ON_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
@@ -197,7 +197,7 @@ bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::
 }
 
 bool emberAfOnOffClusterToggleCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                       EndpointId endpoint, Commands::Toggle::DecodableType & commandData)
+                                       const Commands::Toggle::DecodableType & commandData)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_TOGGLE_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
