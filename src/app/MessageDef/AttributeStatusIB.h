@@ -17,7 +17,7 @@
  */
 /**
  *    @file
- *      This file defines AttributeStatusElement parser and builder in CHIP interaction model
+ *      This file defines AttributeStatusIB parser and builder in CHIP interaction model
  *
  */
 
@@ -26,7 +26,7 @@
 #include "AttributePath.h"
 #include "Builder.h"
 #include "Parser.h"
-#include "StatusElement.h"
+#include "StatusIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -37,18 +37,18 @@
 
 namespace chip {
 namespace app {
-namespace AttributeStatusElement {
+namespace AttributeStatusIB {
 enum
 {
     kCsTag_AttributePath = 0,
-    kCsTag_StatusElement = 1,
+    kCsTag_StatusIB      = 1,
 };
 
 class Builder : public chip::app::Builder
 {
 public:
     /**
-     *  @brief Initialize a AttributeStatusElement::Builder for writing into a TLV stream
+     *  @brief Initialize a AttributeStatusIB::Builder for writing into a TLV stream
      *
      *  @param [in] apWriter    A pointer to TLVWriter
      *
@@ -64,22 +64,22 @@ public:
     AttributePath::Builder & CreateAttributePathBuilder();
 
     /**
-     *  @brief Initialize a StatusElement::Builder for writing into the TLV stream
+     *  @brief Initialize a StatusIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to StatusElement::Builder
+     *  @return A reference to StatusIB::Builder
      */
-    StatusElement::Builder & CreateStatusElementBuilder();
+    StatusIB::Builder & CreateStatusIBBuilder();
 
     /**
-     *  @brief Mark the end of this AttributeStatusElement
+     *  @brief Mark the end of this AttributeStatusIB
      *
      *  @return A reference to *this
      */
-    AttributeStatusElement::Builder & EndOfAttributeStatusElement();
+    AttributeStatusIB::Builder & EndOfAttributeStatusIB();
 
 private:
     AttributePath::Builder mAttributePathBuilder;
-    StatusElement::Builder mStatusElementBuilder;
+    StatusIB::Builder mStatusIBBuilder;
 };
 
 class Parser : public chip::app::Parser
@@ -88,7 +88,7 @@ public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this AttributeStatusElement
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this AttributeStatusIB
      *
      *  @return #CHIP_NO_ERROR on success
      */
@@ -122,17 +122,17 @@ public:
     CHIP_ERROR GetAttributePath(AttributePath::Parser * const apAttributePath) const;
 
     /**
-     *  @brief Get a TLVReader for the StatusElement. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the StatusIB. Next() must be called before accessing them.
      *
-     *  @param [in] apStatusElement    A pointer to apStatusElement
+     *  @param [in] apStatusIB    A pointer to apStatusIB
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetStatusElement(StatusElement::Parser * const apStatusElement) const;
+    CHIP_ERROR GetStatusIB(StatusIB::Parser * const apStatusIB) const;
 };
-}; // namespace AttributeStatusElement
+}; // namespace AttributeStatusIB
 
 }; // namespace app
 }; // namespace chip

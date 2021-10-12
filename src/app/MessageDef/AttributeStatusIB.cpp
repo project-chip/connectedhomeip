@@ -17,11 +17,11 @@
  */
 /**
  *    @file
- *      This file defines AttributeStatusElement parser and builder in CHIP interaction model
+ *      This file defines AttributeStatusIB parser and builder in CHIP interaction model
  *
  */
 
-#include "AttributeStatusElement.h"
+#include "AttributeStatusIB.h"
 
 #include "MessageDefHelper.h"
 
@@ -36,12 +36,12 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR AttributeStatusElement::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR AttributeStatusIB::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return InitAnonymousStructure(apWriter);
 }
 
-AttributePath::Builder & AttributeStatusElement::Builder::CreateAttributePathBuilder()
+AttributePath::Builder & AttributeStatusIB::Builder::CreateAttributePathBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathBuilder.ResetError(mError));
@@ -52,24 +52,24 @@ exit:
     return mAttributePathBuilder;
 }
 
-StatusElement::Builder & AttributeStatusElement::Builder::CreateStatusElementBuilder()
+StatusIB::Builder & AttributeStatusIB::Builder::CreateStatusIBBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mStatusElementBuilder.ResetError(mError));
+    VerifyOrExit(CHIP_NO_ERROR == mError, mStatusIBBuilder.ResetError(mError));
 
-    mError = mStatusElementBuilder.Init(mpWriter, kCsTag_StatusElement);
+    mError = mStatusIBBuilder.Init(mpWriter, kCsTag_StatusIB);
 
 exit:
-    return mStatusElementBuilder;
+    return mStatusIBBuilder;
 }
 
-AttributeStatusElement::Builder & AttributeStatusElement::Builder::EndOfAttributeStatusElement()
+AttributeStatusIB::Builder & AttributeStatusIB::Builder::EndOfAttributeStatusIB()
 {
     EndOfContainer();
     return *this;
 }
 
-CHIP_ERROR AttributeStatusElement::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR AttributeStatusIB::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -84,13 +84,13 @@ exit:
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributeStatusElement::Parser::CheckSchemaValidity() const
+CHIP_ERROR AttributeStatusIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
 
-    PRETTY_PRINT("AttributeStatusElement =");
+    PRETTY_PRINT("AttributeStatusIB =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -115,11 +115,11 @@ CHIP_ERROR AttributeStatusElement::Parser::CheckSchemaValidity() const
                 PRETTY_PRINT_DECDEPTH();
             }
             break;
-        case kCsTag_StatusElement:
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_StatusElement)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_StatusElement);
+        case kCsTag_StatusIB:
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_StatusIB)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_StatusIB);
             {
-                StatusElement::Parser status;
+                StatusIB::Parser status;
                 err = status.Init(reader);
                 SuccessOrExit(err);
 
@@ -141,7 +141,7 @@ CHIP_ERROR AttributeStatusElement::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const uint16_t RequiredFields = (1 << kCsTag_AttributePath) | (1 << kCsTag_StatusElement);
+        const uint16_t RequiredFields = (1 << kCsTag_AttributePath) | (1 << kCsTag_StatusIB);
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -161,7 +161,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR AttributeStatusElement::Parser::GetAttributePath(AttributePath::Parser * const apAttributePath) const
+CHIP_ERROR AttributeStatusIB::Parser::GetAttributePath(AttributePath::Parser * const apAttributePath) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -180,17 +180,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR AttributeStatusElement::Parser::GetStatusElement(StatusElement::Parser * const apStatusElement) const
+CHIP_ERROR AttributeStatusIB::Parser::GetStatusIB(StatusIB::Parser * const apStatusIB) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
 
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusElement), reader);
+    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusIB), reader);
     SuccessOrExit(err);
 
     VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    err = apStatusElement->Init(reader);
+    err = apStatusIB->Init(reader);
     SuccessOrExit(err);
 
 exit:
