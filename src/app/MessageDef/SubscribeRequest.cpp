@@ -120,15 +120,15 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_KeepExistingSubscriptions:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_KeepExistingSubscriptions)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_KeepExistingSubscriptions);
+        case kCsTag_KeepSubscriptions:
+            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_KeepSubscriptions)), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_KeepSubscriptions);
             VerifyOrReturnLogError(chip::TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                bool keepExistingSubscriptions;
-                ReturnLogErrorOnFailure(reader.Get(keepExistingSubscriptions));
-                PRETTY_PRINT("\tKeepExistingSubscriptions = %s, ", keepExistingSubscriptions ? "true" : "false");
+                bool keepSubscriptions;
+                ReturnLogErrorOnFailure(reader.Get(keepSubscriptions));
+                PRETTY_PRINT("\tKeepSubscriptions = %s, ", keepSubscriptions ? "true" : "false");
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -205,9 +205,9 @@ CHIP_ERROR SubscribeRequest::Parser::GetMaxIntervalSeconds(uint16_t * const apMa
     return GetUnsignedInteger(kCsTag_MaxIntervalSeconds, apMaxIntervalSeconds);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetKeepExistingSubscriptions(bool * const apKeepExistingSubscription) const
+CHIP_ERROR SubscribeRequest::Parser::GetKeepSubscriptions(bool * const apKeepExistingSubscription) const
 {
-    return GetSimpleValue(kCsTag_KeepExistingSubscriptions, chip::TLV::kTLVType_Boolean, apKeepExistingSubscription);
+    return GetSimpleValue(kCsTag_KeepSubscriptions, chip::TLV::kTLVType_Boolean, apKeepExistingSubscription);
 }
 
 CHIP_ERROR SubscribeRequest::Parser::GetIsProxy(bool * const apIsProxy) const
@@ -277,11 +277,11 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::MaxIntervalSeconds(const 
     return *this;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::KeepExistingSubscriptions(const bool aKeepExistingSubscriptions)
+SubscribeRequest::Builder & SubscribeRequest::Builder::KeepSubscriptions(const bool aKeepSubscriptions)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_KeepExistingSubscriptions), aKeepExistingSubscriptions);
+        mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_KeepSubscriptions), aKeepSubscriptions);
     }
     return *this;
 }

@@ -38,10 +38,12 @@ struct ReadPrepareParams
     uint32_t mTimeout                               = kImMessageTimeoutMsec;
     uint16_t mMinIntervalFloorSeconds               = 0;
     uint16_t mMaxIntervalCeilingSeconds             = 0;
+    bool mKeepSubscriptions                         = true;
 
     ReadPrepareParams(SessionHandle sessionHandle) : mSessionHandle(sessionHandle) {}
     ReadPrepareParams(ReadPrepareParams && other) : mSessionHandle(other.mSessionHandle)
     {
+        mKeepSubscriptions                 = other.mKeepSubscriptions;
         mpEventPathParamsList              = other.mpEventPathParamsList;
         mEventPathParamsListSize           = other.mEventPathParamsListSize;
         mpAttributePathParamsList          = other.mpAttributePathParamsList;
@@ -61,6 +63,7 @@ struct ReadPrepareParams
         if (&other == this)
             return *this;
 
+        mKeepSubscriptions                 = other.mKeepSubscriptions;
         mSessionHandle                     = other.mSessionHandle;
         mpEventPathParamsList              = other.mpEventPathParamsList;
         mEventPathParamsListSize           = other.mEventPathParamsListSize;
