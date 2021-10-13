@@ -16,7 +16,7 @@ configure_file(
     @ONLY
 )
 
-set(MBED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/mbed-os CACHE INTERNAL "")
+set(MBED_PATH $ENV{MBED_OS_PATH} CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
 set(APP_TARGET chip-mbed-all-clusters-app-example)
 
@@ -48,23 +48,24 @@ target_include_directories(${APP_TARGET} PRIVATE
 target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/main/tv-callbacks.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/main/LowPowerManager.cpp
+
+               ${MBED_COMMON}/util/LEDWidget.cpp
+
                ${GEN_DIR}/all-clusters-app/zap-generated/attribute-size.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/CHIPClientCallbacks.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/CHIPClusters.cpp
-               ${GEN_DIR}/ota-provider-app/zap-generated/encoder.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
-               ${MBED_COMMON}/util/LEDWidget.cpp
+               ${GEN_DIR}/app-common/app-common/zap-generated/attributes/Accessors.cpp
+               ${GEN_DIR}/app-common/app-common/zap-generated/cluster-objects.cpp
+               
                ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
-               ${CHIP_ROOT}/src/app/server/Mdns.cpp
+               ${CHIP_ROOT}/src/app/server/Dnssd.cpp
                ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
-               ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
                ${CHIP_ROOT}/src/app/server/Server.cpp
-               ${CHIP_ROOT}/src/app/server/CommissionManager.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
+               ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
+
                ${APP_UTIL}/DataModelHandler.cpp
                ${APP_UTIL}/af-event.cpp
                ${APP_UTIL}/af-main-common.cpp
@@ -82,6 +83,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_UTIL}/process-global-message.cpp
                ${APP_UTIL}/util.cpp
                ${APP_UTIL}/error-mapping.cpp
+
                ${APP_CLUSTERS}/basic/basic.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
@@ -101,7 +103,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/general-commissioning-server/general-commissioning-server.cpp     
                ${APP_CLUSTERS}/groups-server/groups-server.cpp      
                ${APP_CLUSTERS}/ias-zone-server/ias-zone-server.cpp
-               ${APP_CLUSTERS}/identify/identify.cpp
                ${APP_CLUSTERS}/keypad-input-server/keypad-input-server.cpp
                ${APP_CLUSTERS}/level-control/level-control.cpp
                ${APP_CLUSTERS}/low-power-server/low-power-server.cpp
@@ -125,7 +126,9 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/wifi_network_diagnostics_server/wifi_network_diagnostics_server.cpp
                ${APP_CLUSTERS}/pump-configuration-and-control-server/pump-configuration-and-control-server.cpp
                ${APP_CLUSTERS}/administrator-commissioning-server/administrator-commissioning-server.cpp
-               ${GEN_DIR}/app-common/app-common/zap-generated/attributes/Accessors.cpp
+               ${APP_CLUSTERS}/identify-server/identify-server.cpp
+               ${APP_CLUSTERS}/window-covering-server/window-covering-server.cpp
+               ${APP_CLUSTERS}/general_diagnostics_server/general_diagnostics_server.cpp
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

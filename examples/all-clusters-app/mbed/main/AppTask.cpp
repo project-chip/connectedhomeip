@@ -20,28 +20,12 @@
 #include "LEDWidget.h"
 #include <app/server/OnboardingCodesUtil.h>
 
-// FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
-// from unistd.h to avoid a conflicting declaration with the `sleep()` provided
-// by Mbed-OS in mbed_power_mgmt.h.
-#define sleep unistd_sleep
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <platform/CHIPDeviceLayer.h>
-#undef sleep
-
-#include <support/logging/CHIPLogging.h>
-
-// ZAP -- ZCL Advanced Platform
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app/util/attribute-storage.h>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-// mbed-os headers
-#include "platform/Callback.h"
+#include <support/logging/CHIPLogging.h>
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 
@@ -50,7 +34,6 @@ static bool sIsWiFiStationEnabled     = false;
 static bool sIsWiFiStationConnected   = false;
 static bool sIsPairedToAccount        = false;
 static bool sHaveBLEConnections       = false;
-static bool sHaveServiceConnectivity  = false;
 
 // TODO: change EventQueue default event size
 static events::EventQueue sAppEventQueue;
@@ -71,7 +54,7 @@ int AppTask::Init()
                 if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
                     event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
                 {
-                    chip::app::Mdns::StartServer();
+                    chip::app::DnssdServer::Instance().StartServer();
                 }
             }
         },
@@ -101,7 +84,6 @@ int AppTask::Init()
 int AppTask::StartApp()
 {
     int ret = Init();
-
     if (ret)
     {
         ChipLogError(NotSpecified, "AppTask.Init() failed");
@@ -126,32 +108,25 @@ int AppTask::StartApp()
             sIsWiFiStationEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
             sIsWiFiStationConnected   = ConnectivityMgr().IsWiFiStationConnected();
             sHaveBLEConnections       = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity  = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
-        // Consider the system to be "fully connected" if it has service
-        // connectivity and it is able to interact with the service on a regular basis.
-        bool isFullyConnected = sHaveServiceConnectivity;
-
         // Update the status LED
         //
-        // If system has "full connectivity", keep the LED On constantly.
+        // If system is connected to Wi-Fi station, keep the LED On constantly.
         //
-        // If thread and service provisioned, but not attached to the thread network yet OR no
-        // connectivity to the service OR subscriptions are not fully established
+        // If Wi-Fi is provisioned, but not connected to Wi-Fi station yet
         // THEN blink the LED Off for a short period of time.
         //
         // If the system has ble connection(s) uptill the stage above, THEN blink the LEDs at an even
         // rate of 100ms.
         //
         // Otherwise, blink the LED ON for a very short time.
-        if (isFullyConnected)
+        if (sIsWiFiStationConnected)
         {
             sStatusLED.Set(true);
         }
-        else if (sIsWiFiStationProvisioned && sIsWiFiStationEnabled && sIsPairedToAccount &&
-                 (!sIsWiFiStationConnected || !isFullyConnected))
+        else if (sIsWiFiStationProvisioned && sIsWiFiStationEnabled && sIsPairedToAccount && !sIsWiFiStationConnected)
         {
             sStatusLED.Blink(950, 50);
         }
