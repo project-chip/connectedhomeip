@@ -52,9 +52,6 @@ private:
     CHIP_ERROR _StorePrimary802154MACAddress(const uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetDeviceId(uint64_t & deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetManufacturerDeviceId(uint64_t & deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreManufacturerDeviceId(uint64_t deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetSetupPinCode(uint32_t & setupPinCode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreSetupPinCode(uint32_t setupPinCode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetSetupDiscriminator(uint16_t & setupDiscriminator) { return CHIP_ERROR_NOT_IMPLEMENTED; }

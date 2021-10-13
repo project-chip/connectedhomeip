@@ -122,20 +122,6 @@ static void TestConfigurationMgr_ProductRevision(nlTestSuite * inSuite, void * i
     NL_TEST_ASSERT(inSuite, productRev == 1234);
 }
 
-static void TestConfigurationMgr_ManufacturerDeviceId(nlTestSuite * inSuite, void * inContext)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint64_t deviceId;
-
-    err = ConfigurationMgr().StoreManufacturerDeviceId(7212064004600625234);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetManufacturerDeviceId(deviceId);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, deviceId == 7212064004600625234);
-}
-
 static void TestConfigurationMgr_SetupPinCode(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -266,7 +252,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::SerialNumber", TestConfigurationMgr_SerialNumber),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturingDate", TestConfigurationMgr_ManufacturingDate),
     NL_TEST_DEF("Test ConfigurationMgr::ProductRevision", TestConfigurationMgr_ProductRevision),
-    NL_TEST_DEF("Test ConfigurationMgr::ManufacturerDeviceId", TestConfigurationMgr_ManufacturerDeviceId),
     NL_TEST_DEF("Test ConfigurationMgr::SetupPinCode", TestConfigurationMgr_SetupPinCode),
     NL_TEST_DEF("Test ConfigurationMgr::SetupDiscriminator", TestConfigurationMgr_SetupDiscriminator),
     NL_TEST_DEF("Test ConfigurationMgr::RegulatoryLocation", TestConfigurationMgr_RegulatoryLocation),

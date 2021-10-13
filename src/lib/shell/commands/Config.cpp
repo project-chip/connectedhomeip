@@ -72,20 +72,6 @@ static CHIP_ERROR ConfigGetProductRevision(bool printHeader)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR ConfigGetDeviceId(bool printHeader)
-{
-    streamer_t * sout = streamer_get();
-    uint64_t value64;
-
-    ReturnErrorOnFailure(ConfigurationMgr().GetDeviceId(value64));
-    if (printHeader)
-    {
-        streamer_printf(sout, "DeviceId:        ");
-    }
-    streamer_printf(sout, "%" PRIu64 " (0x" ChipLogFormatX64 ")\r\n", value64, ChipLogValueX64(value64));
-    return CHIP_NO_ERROR;
-}
-
 static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
 {
     streamer_t * sout = streamer_get();
@@ -145,8 +131,6 @@ static CHIP_ERROR PrintAllConfigs()
     ReturnErrorOnFailure(ConfigGetSetupPinCode(true));
     ReturnErrorOnFailure(ConfigGetSetupDiscriminator(true));
 
-    ReturnErrorOnFailure(ConfigGetDeviceId(true));
-
     return CHIP_NO_ERROR;
 }
 
@@ -168,10 +152,6 @@ static CHIP_ERROR ConfigHandler(int argc, char ** argv)
         else if (strcmp(argv[0], "productrev") == 0)
         {
             return ConfigGetProductRevision(false);
-        }
-        else if (strcmp(argv[0], "deviceid") == 0)
-        {
-            return ConfigGetDeviceId(false);
         }
         else if (strcmp(argv[0], "pincode") == 0)
         {

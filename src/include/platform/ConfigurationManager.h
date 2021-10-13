@@ -81,8 +81,6 @@ public:
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
     CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize);
     CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev);
-    CHIP_ERROR GetDeviceId(uint64_t & deviceId);
-    CHIP_ERROR GetManufacturerDeviceId(uint64_t & deviceId);
     CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode);
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator);
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
@@ -97,7 +95,6 @@ public:
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf);
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen);
     CHIP_ERROR StoreProductRevision(uint16_t productRev);
-    CHIP_ERROR StoreManufacturerDeviceId(uint64_t deviceId);
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode);
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator);
     CHIP_ERROR StoreRegulatoryLocation(uint32_t location);
@@ -275,16 +272,6 @@ inline CHIP_ERROR ConfigurationManager::GetFirmwareRevision(uint32_t & firmwareR
     return static_cast<ImplClass *>(this)->_GetFirmwareRevision(firmwareRev);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetDeviceId(uint64_t & deviceId)
-{
-    return static_cast<ImplClass *>(this)->_GetDeviceId(deviceId);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetManufacturerDeviceId(uint64_t & deviceId)
-{
-    return static_cast<ImplClass *>(this)->_GetManufacturerDeviceId(deviceId);
-}
-
 inline CHIP_ERROR ConfigurationManager::GetSetupPinCode(uint32_t & setupPinCode)
 {
     return static_cast<ImplClass *>(this)->_GetSetupPinCode(setupPinCode);
@@ -340,11 +327,6 @@ inline CHIP_ERROR ConfigurationManager::StoreManufacturingDate(const char * mfgD
 inline CHIP_ERROR ConfigurationManager::StoreProductRevision(uint16_t productRev)
 {
     return static_cast<ImplClass *>(this)->_StoreProductRevision(productRev);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreManufacturerDeviceId(uint64_t deviceId)
-{
-    return static_cast<ImplClass *>(this)->_StoreManufacturerDeviceId(deviceId);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreSetupPinCode(uint32_t setupPinCode)

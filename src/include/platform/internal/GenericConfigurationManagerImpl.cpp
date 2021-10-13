@@ -79,30 +79,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevisionStrin
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceId(uint64_t & deviceId)
-{
-    CHIP_ERROR err;
-
-    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_MfrDeviceId, deviceId);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_KEY_NOT_FOUND)
-    {
-        deviceId = TestDeviceId;
-        err      = CHIP_NO_ERROR;
-    }
-#endif
-
-    return err;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceId(uint64_t deviceId)
-{
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_MfrDeviceId, deviceId);
-}
-
-template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
 {
     CHIP_ERROR err;
@@ -262,12 +238,6 @@ template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen)
 {
     return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_ManufacturingDate, mfgDate, mfgDateLen);
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceId(uint64_t & deviceId)
-{
-    return Impl()->_GetManufacturerDeviceId(deviceId);
 }
 
 template <class ImplClass>

@@ -72,9 +72,6 @@ public:
     CHIP_ERROR _StorePrimary802154MACAddress(const uint8_t * buf);
     CHIP_ERROR _GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
     CHIP_ERROR _StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen);
-    CHIP_ERROR _GetDeviceId(uint64_t & deviceId);
-    CHIP_ERROR _GetManufacturerDeviceId(uint64_t & deviceId);
-    CHIP_ERROR _StoreManufacturerDeviceId(uint64_t deviceId);
     CHIP_ERROR _GetSetupPinCode(uint32_t & setupPinCode);
     CHIP_ERROR _StoreSetupPinCode(uint32_t setupPinCode);
     CHIP_ERROR _GetSetupDiscriminator(uint16_t & setupDiscriminator);
