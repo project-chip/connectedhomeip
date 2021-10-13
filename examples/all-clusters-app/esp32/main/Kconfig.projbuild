@@ -101,13 +101,6 @@ menu "Demo"
         help
             To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
 
-    config DISABLE_IPV4
-        bool "Disable IPv4 functionality in the CHIP stack"
-        default "n"
-        help
-            Matter spec is based on IPv6 communication only. Enabling this option may save some flash/ram.
-
-
 endmenu
 
 menu "PW RPC Debug channel"

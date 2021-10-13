@@ -120,6 +120,7 @@ class Esp32Builder(Builder):
 
         self._Execute(['mkdir', '-p', self.output_dir])
         self._Execute(['cp', defaults, defaults_out])
+        self._Execute(['rm', os.path.join(example_path, 'sdkconfig')])
 
         if not self.enable_ipv4:
             self._Execute(['bash', '-c', 'echo CONFIG_DISABLE_IPV4=y >>%s' % shlex.quote(defaults_out)])
@@ -136,6 +137,8 @@ class Esp32Builder(Builder):
     def _build(self):
         logging.info('Compiling Esp32 at %s', self.output_dir)
 
+        # Unfortunately sdkconfig is sticky and needs reset on every build
+        self._Execute(['rm', os.path.join(example_path, 'sdkconfig')])
         self._IdfEnvExecute(
             "ninja -C '%s'" % self.output_dir, title='Building ' + self.identifier)
 
