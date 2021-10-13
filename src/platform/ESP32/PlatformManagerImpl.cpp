@@ -193,11 +193,11 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReason)
     }
     else if (reason == ESP_RST_POWERON)
     {
-       bootReason = RST_POWERON;
+        bootReason = RST_POWERON;
     }
     else if (reason == ESP_RST_BROWNOUT)
     {
-       bootReason = RST_BROWNOUT;
+        bootReason = RST_BROWNOUT;
     }
     else if (reason == ESP_RST_SW)
     {
