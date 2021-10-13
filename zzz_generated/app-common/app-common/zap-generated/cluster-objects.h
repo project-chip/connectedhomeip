@@ -216,7 +216,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
     uint16_t groupId;
-    Span<const char> groupName;
+    chip::Span<const char> groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -228,7 +228,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
     uint16_t groupId;
-    Span<const char> groupName;
+    chip::Span<const char> groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddGroup
@@ -308,7 +308,7 @@ public:
 
     uint8_t status;
     uint16_t groupId;
-    Span<const char> groupName;
+    chip::Span<const char> groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -321,7 +321,7 @@ public:
 
     uint8_t status;
     uint16_t groupId;
-    Span<const char> groupName;
+    chip::Span<const char> groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ViewGroupResponse
@@ -488,7 +488,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
     uint16_t groupId;
-    Span<const char> groupName;
+    chip::Span<const char> groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -500,7 +500,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
     uint16_t groupId;
-    Span<const char> groupName;
+    chip::Span<const char> groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddGroupIfIdentifying
@@ -554,7 +554,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    Span<const char> sceneName;
+    chip::Span<const char> sceneName;
     DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -569,7 +569,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    Span<const char> sceneName;
+    chip::Span<const char> sceneName;
     DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -661,7 +661,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    Span<const char> sceneName;
+    chip::Span<const char> sceneName;
     DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -677,7 +677,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    Span<const char> sceneName;
+    chip::Span<const char> sceneName;
     DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -993,7 +993,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    Span<const char> sceneName;
+    chip::Span<const char> sceneName;
     DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1008,7 +1008,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    Span<const char> sceneName;
+    chip::Span<const char> sceneName;
     DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1100,7 +1100,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    Span<const char> sceneName;
+    chip::Span<const char> sceneName;
     DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1116,7 +1116,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    Span<const char> sceneName;
+    chip::Span<const char> sceneName;
     DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3379,7 +3379,7 @@ public:
     uint16_t hardwareVersion;
     uint32_t softwareVersion;
     OTADownloadProtocol protocolsSupported;
-    Span<const char> location;
+    chip::Span<const char> location;
     bool requestorCanConsent;
     chip::ByteSpan metadataForProvider;
 
@@ -3397,7 +3397,7 @@ public:
     uint16_t hardwareVersion;
     uint32_t softwareVersion;
     OTADownloadProtocol protocolsSupported;
-    Span<const char> location;
+    chip::Span<const char> location;
     bool requestorCanConsent;
     chip::ByteSpan metadataForProvider;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -3487,9 +3487,9 @@ public:
 
     OTAQueryStatus status;
     uint32_t delayedActionTime;
-    Span<const char> imageURI;
+    chip::Span<const char> imageURI;
     uint32_t softwareVersion;
-    Span<const char> softwareVersionString;
+    chip::Span<const char> softwareVersionString;
     chip::ByteSpan updateToken;
     bool userConsentNeeded;
     chip::ByteSpan metadataForRequestor;
@@ -3505,9 +3505,9 @@ public:
 
     OTAQueryStatus status;
     uint32_t delayedActionTime;
-    Span<const char> imageURI;
+    chip::Span<const char> imageURI;
     uint32_t softwareVersion;
-    Span<const char> softwareVersionString;
+    chip::Span<const char> softwareVersionString;
     chip::ByteSpan updateToken;
     bool userConsentNeeded;
     chip::ByteSpan metadataForRequestor;
@@ -3704,7 +3704,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3716,7 +3716,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ArmFailSafeResponse
@@ -3737,7 +3737,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     RegulatoryLocationType location;
-    Span<const char> countryCode;
+    chip::Span<const char> countryCode;
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
@@ -3751,7 +3751,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     RegulatoryLocationType location;
-    Span<const char> countryCode;
+    chip::Span<const char> countryCode;
     uint64_t breadcrumb;
     uint32_t timeoutMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -3772,7 +3772,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3784,7 +3784,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetRegulatoryConfigResponse
@@ -3827,7 +3827,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3839,7 +3839,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CommissioningCompleteResponse
@@ -3976,7 +3976,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     DataModel::List<Structs::WiFiInterfaceScanResult::Type> wifiScanResults;
     DataModel::List<Structs::ThreadInterfaceScanResult::Type> threadScanResults;
 
@@ -3990,7 +3990,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType> wifiScanResults;
     DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4048,7 +4048,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4060,7 +4060,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddWiFiNetworkResponse
@@ -4116,7 +4116,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4128,7 +4128,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateWiFiNetworkResponse
@@ -4181,7 +4181,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4193,7 +4193,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddThreadNetworkResponse
@@ -4246,7 +4246,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4258,7 +4258,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateThreadNetworkResponse
@@ -4311,7 +4311,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4323,7 +4323,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveNetworkResponse
@@ -4376,7 +4376,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4388,7 +4388,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnableNetworkResponse
@@ -4441,7 +4441,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4453,7 +4453,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    Span<const char> debugText;
+    chip::Span<const char> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisableNetworkResponse
@@ -5675,7 +5675,7 @@ public:
     static constexpr CommandId GetCommandId() { return UpdateFabricLabel::Id; }
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
 
-    Span<const char> label;
+    chip::Span<const char> label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5686,7 +5686,7 @@ public:
     static constexpr CommandId GetCommandId() { return UpdateFabricLabel::Id; }
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
 
-    Span<const char> label;
+    chip::Span<const char> label;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateFabricLabel
@@ -6019,7 +6019,7 @@ public:
     static constexpr CommandId GetCommandId() { return Toggle::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    Span<const char> pin;
+    chip::Span<const char> pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6030,7 +6030,7 @@ public:
     static constexpr CommandId GetCommandId() { return Toggle::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    Span<const char> pin;
+    chip::Span<const char> pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Toggle
@@ -7527,7 +7527,7 @@ public:
     uint16_t userId;
     chip::ByteSpan pin;
     uint32_t timeStamp;
-    Span<const char> data;
+    chip::Span<const char> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -7543,7 +7543,7 @@ public:
     uint16_t userId;
     chip::ByteSpan pin;
     uint32_t timeStamp;
-    Span<const char> data;
+    chip::Span<const char> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OperationEventNotification
@@ -7574,7 +7574,7 @@ public:
     DoorLockUserType userType;
     DoorLockUserStatus userStatus;
     uint32_t timeStamp;
-    Span<const char> data;
+    chip::Span<const char> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -7592,7 +7592,7 @@ public:
     DoorLockUserType userType;
     DoorLockUserStatus userStatus;
     uint32_t timeStamp;
-    Span<const char> data;
+    chip::Span<const char> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProgrammingEventNotification
@@ -9574,7 +9574,7 @@ public:
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
     IasAceArmMode armMode;
-    Span<const char> armDisarmCode;
+    chip::Span<const char> armDisarmCode;
     uint8_t zoneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -9587,7 +9587,7 @@ public:
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
     IasAceArmMode armMode;
-    Span<const char> armDisarmCode;
+    chip::Span<const char> armDisarmCode;
     uint8_t zoneId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -9637,7 +9637,7 @@ public:
 
     uint8_t numberOfZones;
     DataModel::List<uint8_t> zoneIds;
-    Span<const char> armDisarmCode;
+    chip::Span<const char> armDisarmCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9650,7 +9650,7 @@ public:
 
     uint8_t numberOfZones;
     DataModel::DecodableList<uint8_t> zoneIds;
-    Span<const char> armDisarmCode;
+    chip::Span<const char> armDisarmCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Bypass
@@ -9770,7 +9770,7 @@ public:
     uint8_t zoneId;
     IasZoneType zoneType;
     chip::NodeId ieeeAddress;
-    Span<const char> zoneLabel;
+    chip::Span<const char> zoneLabel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9784,7 +9784,7 @@ public:
     uint8_t zoneId;
     IasZoneType zoneType;
     chip::NodeId ieeeAddress;
-    Span<const char> zoneLabel;
+    chip::Span<const char> zoneLabel;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetZoneInformationResponse
@@ -9831,7 +9831,7 @@ public:
     uint8_t zoneId;
     uint16_t zoneStatus;
     IasAceAudibleNotification audibleNotification;
-    Span<const char> zoneLabel;
+    chip::Span<const char> zoneLabel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9845,7 +9845,7 @@ public:
     uint8_t zoneId;
     uint16_t zoneStatus;
     IasAceAudibleNotification audibleNotification;
-    Span<const char> zoneLabel;
+    chip::Span<const char> zoneLabel;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ZoneStatusChanged
@@ -10319,9 +10319,9 @@ enum class Fields
 struct Type
 {
 public:
-    Span<const char> operatorName;
-    Span<const char> lineupName;
-    Span<const char> postalCode;
+    chip::Span<const char> operatorName;
+    chip::Span<const char> lineupName;
+    chip::Span<const char> postalCode;
     TvChannelLineupInfoType lineupInfoType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10347,7 +10347,7 @@ public:
     static constexpr CommandId GetCommandId() { return ChangeChannel::Id; }
     static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
 
-    Span<const char> match;
+    chip::Span<const char> match;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -10358,7 +10358,7 @@ public:
     static constexpr CommandId GetCommandId() { return ChangeChannel::Id; }
     static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
 
-    Span<const char> match;
+    chip::Span<const char> match;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannel
@@ -10508,7 +10508,7 @@ public:
     static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
 
     uint8_t target;
-    Span<const char> data;
+    chip::Span<const char> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -10520,7 +10520,7 @@ public:
     static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
 
     uint8_t target;
-    Span<const char> data;
+    chip::Span<const char> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTarget
@@ -10539,7 +10539,7 @@ public:
     static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
 
     NavigateTargetStatus status;
-    Span<const char> data;
+    chip::Span<const char> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -10551,7 +10551,7 @@ public:
     static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
 
     NavigateTargetStatus status;
-    Span<const char> data;
+    chip::Span<const char> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTargetResponse
@@ -11342,7 +11342,7 @@ public:
     static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
 
     uint8_t index;
-    Span<const char> name;
+    chip::Span<const char> name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -11354,7 +11354,7 @@ public:
     static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
 
     uint8_t index;
-    Span<const char> name;
+    chip::Span<const char> name;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RenameInput
@@ -11630,8 +11630,8 @@ enum class Fields
 struct Type
 {
 public:
-    Span<const char> name;
-    Span<const char> value;
+    chip::Span<const char> name;
+    chip::Span<const char> value;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11652,7 +11652,7 @@ struct Type
 {
 public:
     ContentLaunchParameterEnum type;
-    Span<const char> value;
+    chip::Span<const char> value;
     DataModel::List<Structs::ContentLaunchAdditionalInfo::Type> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -11662,7 +11662,7 @@ struct DecodableType
 {
 public:
     ContentLaunchParameterEnum type;
-    Span<const char> value;
+    chip::Span<const char> value;
     DataModel::DecodableList<Structs::ContentLaunchAdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -11682,7 +11682,7 @@ enum class Fields
 struct Type
 {
 public:
-    Span<const char> providerName;
+    chip::Span<const char> providerName;
     uint8_t background;
     uint8_t logo;
     uint8_t progressBar;
@@ -11707,8 +11707,8 @@ enum class Fields
 struct Type
 {
 public:
-    Span<const char> width;
-    Span<const char> height;
+    chip::Span<const char> width;
+    chip::Span<const char> height;
     ContentLaunchMetricType metric;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -11729,8 +11729,8 @@ enum class Fields
 struct Type
 {
 public:
-    Span<const char> imageUrl;
-    Span<const char> color;
+    chip::Span<const char> imageUrl;
+    chip::Span<const char> color;
     uint8_t size;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -11758,7 +11758,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
     bool autoPlay;
-    Span<const char> data;
+    chip::Span<const char> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -11770,7 +11770,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
     bool autoPlay;
-    Span<const char> data;
+    chip::Span<const char> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchContent
@@ -11788,7 +11788,7 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchContentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    Span<const char> data;
+    chip::Span<const char> data;
     ContentLaunchStatus contentLaunchStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -11800,7 +11800,7 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchContentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    Span<const char> data;
+    chip::Span<const char> data;
     ContentLaunchStatus contentLaunchStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -11819,8 +11819,8 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchURL::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    Span<const char> contentURL;
-    Span<const char> displayString;
+    chip::Span<const char> contentURL;
+    chip::Span<const char> displayString;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -11831,8 +11831,8 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchURL::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    Span<const char> contentURL;
-    Span<const char> displayString;
+    chip::Span<const char> contentURL;
+    chip::Span<const char> displayString;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURL
@@ -11850,7 +11850,7 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchURLResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    Span<const char> data;
+    chip::Span<const char> data;
     ContentLaunchStatus contentLaunchStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -11862,7 +11862,7 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchURLResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    Span<const char> data;
+    chip::Span<const char> data;
     ContentLaunchStatus contentLaunchStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -11956,7 +11956,7 @@ public:
     static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
 
     uint8_t index;
-    Span<const char> name;
+    chip::Span<const char> name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -11968,7 +11968,7 @@ public:
     static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
 
     uint8_t index;
-    Span<const char> name;
+    chip::Span<const char> name;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RenameOutput
@@ -12001,7 +12001,7 @@ struct Type
 {
 public:
     uint16_t catalogVendorId;
-    Span<const char> applicationId;
+    chip::Span<const char> applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -12028,9 +12028,9 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
 
-    Span<const char> data;
+    chip::Span<const char> data;
     uint16_t catalogVendorId;
-    Span<const char> applicationId;
+    chip::Span<const char> applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12041,9 +12041,9 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
 
-    Span<const char> data;
+    chip::Span<const char> data;
     uint16_t catalogVendorId;
-    Span<const char> applicationId;
+    chip::Span<const char> applicationId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchApp
@@ -12062,7 +12062,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
-    Span<const char> data;
+    chip::Span<const char> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12074,7 +12074,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
-    Span<const char> data;
+    chip::Span<const char> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppResponse
@@ -12143,7 +12143,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetSetupPIN::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    Span<const char> tempAccountIdentifier;
+    chip::Span<const char> tempAccountIdentifier;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12154,7 +12154,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetSetupPIN::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    Span<const char> tempAccountIdentifier;
+    chip::Span<const char> tempAccountIdentifier;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetSetupPIN
@@ -12171,7 +12171,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetSetupPINResponse::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    Span<const char> setupPIN;
+    chip::Span<const char> setupPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12182,7 +12182,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetSetupPINResponse::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    Span<const char> setupPIN;
+    chip::Span<const char> setupPIN;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetSetupPINResponse
@@ -12200,8 +12200,8 @@ public:
     static constexpr CommandId GetCommandId() { return Login::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    Span<const char> tempAccountIdentifier;
-    Span<const char> setupPIN;
+    chip::Span<const char> tempAccountIdentifier;
+    chip::Span<const char> setupPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12212,8 +12212,8 @@ public:
     static constexpr CommandId GetCommandId() { return Login::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    Span<const char> tempAccountIdentifier;
-    Span<const char> setupPIN;
+    chip::Span<const char> tempAccountIdentifier;
+    chip::Span<const char> setupPIN;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Login
@@ -12253,7 +12253,7 @@ public:
     bool b;
     SimpleEnum c;
     chip::ByteSpan d;
-    Span<const char> e;
+    chip::Span<const char> e;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -12864,7 +12864,7 @@ public:
     uint8_t messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
-    Span<const char> message;
+    chip::Span<const char> message;
     uint8_t optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -12880,7 +12880,7 @@ public:
     uint8_t messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
-    Span<const char> message;
+    chip::Span<const char> message;
     uint8_t optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12999,7 +12999,7 @@ public:
     uint8_t messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
-    Span<const char> message;
+    chip::Span<const char> message;
     uint8_t optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -13015,7 +13015,7 @@ public:
     uint8_t messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
-    Span<const char> message;
+    chip::Span<const char> message;
     uint8_t optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

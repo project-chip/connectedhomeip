@@ -376,90 +376,40 @@ function asMEI(prefix, suffix)
  * These types can be found in src/app/data-model/.
  *
  */
-function zapTypeToClusterObjectType(type, isDecodable)
+async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
-  if (StringHelper.isOctetString(type)) {
-    return 'chip::ByteSpan';
-  }
-
   if (StringHelper.isCharString(type)) {
-    return 'Span<const char>';
+    return 'chip::Span<const char>';
   }
 
-  switch (type) {
-  case 'BOOLEAN':
-    return 'bool';
-  case 'INT8S':
-    return 'int8_t';
-  case 'INT16S':
-    return 'int16_t';
-  case 'INT24S':
-    return 'int24_t';
-  case 'INT32S':
-    return 'int32_t';
-  case 'INT64S':
-    return 'int64_t';
-  case 'INT8U':
-    return 'uint8_t';
-  case 'INT16U':
-    return 'uint16_t';
-  case 'INT24U':
-    return 'uint24_t';
-  case 'INT32U':
-    return 'uint32_t';
-  case 'INT64U':
-    return 'uint64_t';
-  }
-
-  function fn(pkgId)
+  async function fn(pkgId)
   {
-    return zclHelper.isEnum(this.global.db, type, pkgId).then(isEnum => {
-      if (isEnum != 'unknown' || type.startsWith('enum')) {
-        return type;
-      }
+    const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
+    const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
-      const options = { 'hash' : {} };
-      return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-        const basicType = ChipTypesHelper.asBasicType(zclType);
-        switch (basicType) {
-        case 'bool':
-        case 'int8_t':
-        case 'uint8_t':
-        case 'int16_t':
-        case 'uint16_t':
-        case 'int24_t':
-        case 'uint24_t':
-        case 'int32_t':
-        case 'uint32_t':
-        case 'int64_t':
-        case 'uint64_t':
-          return zclType;
-        default:
-          if (isDecodable) {
-            return 'Structs::' + type + '::DecodableType'
-          } else {
-            return 'Structs::' + type + '::Type'
-          }
-        }
-      });
-    });
+    if (await typeChecker('isEnum')) {
+      return ns + type;
+    }
+
+    if (await typeChecker('isStruct')) {
+      return ns + 'Structs::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
+    }
+
+    return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
-    console.log(err);
-    throw err;
-  });
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function zapTypeToEncodableClusterObjectType(type)
+function zapTypeToEncodableClusterObjectType(type, options)
 {
-  return zapTypeToClusterObjectType.call(this, type, false)
+  return zapTypeToClusterObjectType.call(this, type, false, options)
 }
 
-function zapTypeToDecodableClusterObjectType(type)
+function zapTypeToDecodableClusterObjectType(type, options)
 {
-  return zapTypeToClusterObjectType.call(this, type, true)
+  return zapTypeToClusterObjectType.call(this, type, true, options)
 }
 
 //
