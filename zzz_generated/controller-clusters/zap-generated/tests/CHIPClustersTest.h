@@ -507,6 +507,18 @@ public:
 
     CHIP_ERROR WriteAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint8_t value);
+    CHIP_ERROR WriteAttributeRemainingTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t value);
+    CHIP_ERROR WriteAttributeMinLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint8_t value);
+    CHIP_ERROR WriteAttributeMaxLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint8_t value);
+    CHIP_ERROR WriteAttributeCurrentFrequency(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t value);
+    CHIP_ERROR WriteAttributeMinFrequency(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
+    CHIP_ERROR WriteAttributeMaxFrequency(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

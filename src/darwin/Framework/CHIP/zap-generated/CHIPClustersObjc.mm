@@ -2573,6 +2573,146 @@ using chip::Callback::Cancelable;
         true);
 }
 
+- (void)readAttributeRemainingTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeRemainingTime(success, failure);
+    });
+}
+
+- (void)readAttributeMinLevelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeMinLevel(success, failure);
+    });
+}
+
+- (void)readAttributeMaxLevelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeMaxLevel(success, failure);
+    });
+}
+
+- (void)readAttributeCurrentFrequencyWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeCurrentFrequency(success, failure);
+    });
+}
+
+- (void)readAttributeMinFrequencyWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeMinFrequency(success, failure);
+    });
+}
+
+- (void)readAttributeMaxFrequencyWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeMaxFrequency(success, failure);
+    });
+}
+
+- (void)readAttributeOptionsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeOptions(success, failure);
+    });
+}
+
+- (void)writeAttributeOptionsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeOptions(success, failure, value);
+    });
+}
+
+- (void)readAttributeOnOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeOnOffTransitionTime(success, failure);
+    });
+}
+
+- (void)writeAttributeOnOffTransitionTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeOnOffTransitionTime(success, failure, value);
+    });
+}
+
+- (void)readAttributeOnLevelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeOnLevel(success, failure);
+    });
+}
+
+- (void)writeAttributeOnLevelWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeOnLevel(success, failure, value);
+    });
+}
+
+- (void)readAttributeOnTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeOnTransitionTime(success, failure);
+    });
+}
+
+- (void)writeAttributeOnTransitionTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeOnTransitionTime(success, failure, value);
+    });
+}
+
+- (void)readAttributeOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeOffTransitionTime(success, failure);
+    });
+}
+
+- (void)writeAttributeOffTransitionTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeOffTransitionTime(success, failure, value);
+    });
+}
+
+- (void)readAttributeDefaultMoveRateWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeDefaultMoveRate(success, failure);
+    });
+}
+
+- (void)writeAttributeDefaultMoveRateWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeDefaultMoveRate(success, failure, value);
+    });
+}
+
+- (void)readAttributeStartUpCurrentLevelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeStartUpCurrentLevel(success, failure);
+    });
+}
+
+- (void)writeAttributeStartUpCurrentLevelWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeStartUpCurrentLevel(success, failure, value);
+    });
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

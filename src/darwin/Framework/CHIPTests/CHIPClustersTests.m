@@ -11651,6 +11651,380 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterLevelControlReadAttributeRemainingTimeWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"LevelControlReadAttributeRemainingTimeWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeRemainingTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl RemainingTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlReadAttributeMinLevelWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlReadAttributeMinLevelWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinLevelWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl MinLevel Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlReadAttributeMaxLevelWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlReadAttributeMaxLevelWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxLevelWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl MaxLevel Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlReadAttributeCurrentFrequencyWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"LevelControlReadAttributeCurrentFrequencyWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentFrequencyWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl CurrentFrequency Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlReadAttributeMinFrequencyWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlReadAttributeMinFrequencyWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinFrequencyWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl MinFrequency Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlReadAttributeMaxFrequencyWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlReadAttributeMaxFrequencyWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxFrequencyWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl MaxFrequency Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlReadAttributeOptionsWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlReadAttributeOptionsWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOptionsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl Options Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlWriteAttributeOptionsWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlWriteAttributeOptionsWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeOptionsWithValue:value
+                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                NSLog(@"LevelControl Options Error: %@", err);
+                                XCTAssertEqual(err.code, 0);
+                                [expectation fulfill];
+                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterLevelControlReadAttributeOnOffTransitionTimeWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"LevelControlReadAttributeOnOffTransitionTimeWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffTransitionTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl OnOffTransitionTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlWriteAttributeOnOffTransitionTimeWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlWriteAttributeOnOffTransitionTimeWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t value = 0x0000;
+    [cluster writeAttributeOnOffTransitionTimeWithValue:value
+                                        responseHandler:^(NSError * err, NSDictionary * values) {
+                                            NSLog(@"LevelControl OnOffTransitionTime Error: %@", err);
+                                            XCTAssertEqual(err.code, 0);
+                                            [expectation fulfill];
+                                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterLevelControlReadAttributeOnLevelWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlReadAttributeOnLevelWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnLevelWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl OnLevel Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlWriteAttributeOnLevelWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlWriteAttributeOnLevelWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeOnLevelWithValue:value
+                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                NSLog(@"LevelControl OnLevel Error: %@", err);
+                                XCTAssertEqual(err.code, 0);
+                                [expectation fulfill];
+                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterLevelControlReadAttributeOnTransitionTimeWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"LevelControlReadAttributeOnTransitionTimeWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnTransitionTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl OnTransitionTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlWriteAttributeOnTransitionTimeWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlWriteAttributeOnTransitionTimeWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t value = 0x0000;
+    [cluster writeAttributeOnTransitionTimeWithValue:value
+                                     responseHandler:^(NSError * err, NSDictionary * values) {
+                                         NSLog(@"LevelControl OnTransitionTime Error: %@", err);
+                                         XCTAssertEqual(err.code, 0);
+                                         [expectation fulfill];
+                                     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterLevelControlReadAttributeOffTransitionTimeWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"LevelControlReadAttributeOffTransitionTimeWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOffTransitionTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl OffTransitionTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlWriteAttributeOffTransitionTimeWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlWriteAttributeOffTransitionTimeWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t value = 0x0000;
+    [cluster writeAttributeOffTransitionTimeWithValue:value
+                                      responseHandler:^(NSError * err, NSDictionary * values) {
+                                          NSLog(@"LevelControl OffTransitionTime Error: %@", err);
+                                          XCTAssertEqual(err.code, 0);
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterLevelControlReadAttributeDefaultMoveRateWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"LevelControlReadAttributeDefaultMoveRateWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeDefaultMoveRateWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl DefaultMoveRate Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlWriteAttributeDefaultMoveRateWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlWriteAttributeDefaultMoveRateWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeDefaultMoveRateWithValue:value
+                                    responseHandler:^(NSError * err, NSDictionary * values) {
+                                        NSLog(@"LevelControl DefaultMoveRate Error: %@", err);
+                                        XCTAssertEqual(err.code, 0);
+                                        [expectation fulfill];
+                                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterLevelControlReadAttributeStartUpCurrentLevelWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"LevelControlReadAttributeStartUpCurrentLevelWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpCurrentLevelWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"LevelControl StartUpCurrentLevel Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterLevelControlWriteAttributeStartUpCurrentLevelWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"LevelControlWriteAttributeStartUpCurrentLevelWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x01;
+    [cluster writeAttributeStartUpCurrentLevelWithValue:value
+                                        responseHandler:^(NSError * err, NSDictionary * values) {
+                                            NSLog(@"LevelControl StartUpCurrentLevel Error: %@", err);
+                                            XCTAssertEqual(err.code, 0);
+                                            [expectation fulfill];
+                                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 - (void)testSendClusterLevelControlReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
