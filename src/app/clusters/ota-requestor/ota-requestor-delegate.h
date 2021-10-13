@@ -29,7 +29,7 @@ namespace app {
 namespace clusters {
 
 /** @brief
- *    Defines methods for implementing application-specific logic for the OTA Provider Cluster.
+ *    Defines methods for implementing application-specific logic for the OTA Requestor Cluster.
  */
 class OTARequestorDelegate
 {
