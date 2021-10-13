@@ -85,14 +85,6 @@ public:
     CHIP_ERROR _GetLifetimeCounter(uint16_t & lifetimeCounter);
     CHIP_ERROR _IncrementLifetimeCounter();
 #endif
-    CHIP_ERROR _GetServiceId(uint64_t & serviceId);
-    CHIP_ERROR _GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen);
-    CHIP_ERROR _StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen);
-    CHIP_ERROR _GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen);
-    CHIP_ERROR _StorePairedAccountId(const char * accountId, size_t accountIdLen);
-    CHIP_ERROR _StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
-                                             const char * accountId, size_t accountIdLen);
-    CHIP_ERROR _ClearServiceProvisioningData();
     CHIP_ERROR _GetFailSafeArmed(bool & val);
     CHIP_ERROR _SetFailSafeArmed(bool val);
     CHIP_ERROR _GetQRCodeString(char * buf, size_t bufSize);
@@ -115,9 +107,7 @@ public:
 #if !defined(NDEBUG)
     CHIP_ERROR _RunUnitTests(void);
 #endif
-    bool _IsServiceProvisioned();
     bool _IsMemberOfFabric();
-    bool _IsPairedToAccount();
     bool _IsFullyProvisioned();
     void _LogDeviceConfig();
 

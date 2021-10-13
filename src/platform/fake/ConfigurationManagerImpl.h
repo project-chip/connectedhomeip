@@ -65,17 +65,6 @@ private:
     CHIP_ERROR _GetLifetimeCounter(uint16_t & lifetimeCounter) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _IncrementLifetimeCounter() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
-    CHIP_ERROR _GetServiceId(uint64_t & serviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StorePairedAccountId(const char * accountId, size_t accountIdLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
-                                             const char * accountId, size_t accountIdLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _ClearServiceProvisioningData() { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetFailSafeArmed(bool & val) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _SetFailSafeArmed(bool val) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetQRCodeString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -98,9 +87,7 @@ private:
 #if !defined(NDEBUG)
     CHIP_ERROR _RunUnitTests(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
-    bool _IsServiceProvisioned() { return false; }
     bool _IsMemberOfFabric() { return false; }
-    bool _IsPairedToAccount() { return false; }
     bool _IsFullyProvisioned() { return false; }
     void _UseManufacturerCredentialsAsOperational(bool val) {}
     void _LogDeviceConfig() {}

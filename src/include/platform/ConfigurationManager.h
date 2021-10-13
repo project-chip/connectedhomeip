@@ -58,7 +58,6 @@ public:
 
     enum
     {
-        kMaxPairingCodeLength      = 16,
         kMaxSerialNumberLength     = 32,
         kMaxFirmwareRevisionLength = 32,
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -86,10 +85,7 @@ public:
     CHIP_ERROR GetManufacturerDeviceId(uint64_t & deviceId);
     CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode);
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator);
-    CHIP_ERROR GetServiceId(uint64_t & serviceId);
     CHIP_ERROR GetFabricId(uint64_t & fabricId);
-    CHIP_ERROR GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen);
-    CHIP_ERROR GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen);
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter);
@@ -106,11 +102,6 @@ public:
     CHIP_ERROR StoreManufacturerDeviceId(uint64_t deviceId);
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode);
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator);
-    CHIP_ERROR StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
-                                            const char * accountId, size_t accountIdLen);
-    CHIP_ERROR ClearServiceProvisioningData();
-    CHIP_ERROR StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen);
-    CHIP_ERROR StorePairedAccountId(const char * accountId, size_t accountIdLen);
     CHIP_ERROR StoreRegulatoryLocation(uint32_t location);
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen);
     CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb);
@@ -125,8 +116,6 @@ public:
     CHIP_ERROR RunUnitTests();
 #endif
 
-    bool IsServiceProvisioned();
-    bool IsPairedToAccount();
     bool IsMemberOfFabric();
     bool IsFullyProvisioned();
     void InitiateFactoryReset();
@@ -309,24 +298,9 @@ inline CHIP_ERROR ConfigurationManager::GetSetupDiscriminator(uint16_t & setupDi
     return static_cast<ImplClass *>(this)->_GetSetupDiscriminator(setupDiscriminator);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetServiceId(uint64_t & serviceId)
-{
-    return static_cast<ImplClass *>(this)->_GetServiceId(serviceId);
-}
-
 inline CHIP_ERROR ConfigurationManager::GetFabricId(uint64_t & fabricId)
 {
     return static_cast<ImplClass *>(this)->_GetFabricId(fabricId);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen)
-{
-    return static_cast<ImplClass *>(this)->_GetServiceConfig(buf, bufSize, serviceConfigLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen)
-{
-    return static_cast<ImplClass *>(this)->_GetPairedAccountId(buf, bufSize, accountIdLen);
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
@@ -396,14 +370,6 @@ inline CHIP_ERROR ConfigurationManager::StoreSetupDiscriminator(uint16_t setupDi
     return static_cast<ImplClass *>(this)->_StoreSetupDiscriminator(setupDiscriminator);
 }
 
-inline CHIP_ERROR ConfigurationManager::StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig,
-                                                                     size_t serviceConfigLen, const char * accountId,
-                                                                     size_t accountIdLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreServiceProvisioningData(serviceId, serviceConfig, serviceConfigLen, accountId,
-                                                                         accountIdLen);
-}
-
 inline CHIP_ERROR ConfigurationManager::StoreRegulatoryLocation(uint32_t location)
 {
     return static_cast<ImplClass *>(this)->_StoreRegulatoryLocation(location);
@@ -417,21 +383,6 @@ inline CHIP_ERROR ConfigurationManager::StoreCountryCode(const char * code, size
 inline CHIP_ERROR ConfigurationManager::StoreBreadcrumb(uint64_t breadcrumb)
 {
     return static_cast<ImplClass *>(this)->_StoreBreadcrumb(breadcrumb);
-}
-
-inline CHIP_ERROR ConfigurationManager::ClearServiceProvisioningData()
-{
-    return static_cast<ImplClass *>(this)->_ClearServiceProvisioningData();
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreServiceConfig(serviceConfig, serviceConfigLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::StorePairedAccountId(const char * accountId, size_t accountIdLen)
-{
-    return static_cast<ImplClass *>(this)->_StorePairedAccountId(accountId, accountIdLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
@@ -457,16 +408,6 @@ inline CHIP_ERROR ConfigurationManager::GetWiFiAPSSID(char * buf, size_t bufSize
 inline CHIP_ERROR ConfigurationManager::GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
 {
     return static_cast<ImplClass *>(this)->_GetBLEDeviceIdentificationInfo(deviceIdInfo);
-}
-
-inline bool ConfigurationManager::IsServiceProvisioned()
-{
-    return static_cast<ImplClass *>(this)->_IsServiceProvisioned();
-}
-
-inline bool ConfigurationManager::IsPairedToAccount()
-{
-    return static_cast<ImplClass *>(this)->_IsPairedToAccount();
 }
 
 inline bool ConfigurationManager::IsMemberOfFabric()

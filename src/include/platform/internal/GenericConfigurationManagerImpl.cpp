@@ -40,10 +40,6 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
-#if CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
-#include <crypto/CHIPCryptoPAL.h>
-#endif
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -410,24 +406,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreBreadcrumb(uint64_t
     return Impl()->WriteConfigValue(ImplClass::kConfigKey_Breadcrumb, breadcrumb);
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceId(uint64_t & serviceId)
-{
-    return Impl()->ReadConfigValue(ImplClass::kConfigKey_ServiceId, serviceId);
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen)
-{
-    return Impl()->ReadConfigValueBin(ImplClass::kConfigKey_ServiceConfig, buf, bufSize, serviceConfigLen);
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen)
-{
-    return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_ServiceConfig, serviceConfig, serviceConfigLen);
-}
-
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetLifetimeCounter(uint16_t & lifetimeCounter)
@@ -442,101 +420,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_IncrementLifetimeCounter
     return mLifetimePersistedCounter.Advance();
 }
 #endif
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen)
-{
-    return Impl()->ReadConfigValueStr(ImplClass::kConfigKey_PairedAccountId, buf, bufSize, accountIdLen);
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairedAccountId(const char * accountId, size_t accountIdLen)
-{
-    CHIP_ERROR err;
-
-    err = Impl()->WriteConfigValueStr(ImplClass::kConfigKey_PairedAccountId, accountId, accountIdLen);
-    SuccessOrExit(err);
-
-    mFlags.Set(Flags::kIsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
-
-exit:
-    return err;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceProvisioningData(uint64_t serviceId,
-                                                                                     const uint8_t * serviceConfig,
-                                                                                     size_t serviceConfigLen,
-                                                                                     const char * accountId, size_t accountIdLen)
-{
-    CHIP_ERROR err;
-
-    err = Impl()->WriteConfigValue(ImplClass::kConfigKey_ServiceId, serviceId);
-    SuccessOrExit(err);
-
-    err = _StoreServiceConfig(serviceConfig, serviceConfigLen);
-    SuccessOrExit(err);
-
-    err = _StorePairedAccountId(accountId, accountIdLen);
-    SuccessOrExit(err);
-
-    mFlags.Set(Flags::kIsServiceProvisioned);
-    mFlags.Set(Flags::kIsPairedToAccount, (accountId != nullptr && accountIdLen != 0));
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceId);
-        Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceConfig);
-        Impl()->ClearConfigValue(ImplClass::kConfigKey_PairedAccountId);
-        mFlags.Clear(Flags::kIsServiceProvisioned);
-        mFlags.Clear(Flags::kIsPairedToAccount);
-    }
-    return err;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioningData()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceId);
-    Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceConfig);
-    Impl()->ClearConfigValue(ImplClass::kConfigKey_PairedAccountId);
-
-    // TODO: Move these behaviors out of configuration manager.
-    // Also, should the flags be cleared even if the corresponding notification fails to post?
-
-    // If necessary, post an event alerting other subsystems to the change in
-    // the account pairing state.
-    if (_IsPairedToAccount())
-    {
-        ChipDeviceEvent event;
-        event.Type                                   = DeviceEventType::kAccountPairingChange;
-        event.AccountPairingChange.IsPairedToAccount = false;
-        err                                          = PlatformMgr().PostEvent(&event);
-    }
-
-    // If necessary, post an event alerting other subsystems to the change in
-    // the service provisioning state.
-    if (_IsServiceProvisioned())
-    {
-        ChipDeviceEvent event;
-        event.Type                                           = DeviceEventType::kServiceProvisioningChange;
-        event.ServiceProvisioningChange.IsServiceProvisioned = false;
-        event.ServiceProvisioningChange.ServiceConfigUpdated = false;
-        CHIP_ERROR postError                                 = PlatformMgr().PostEvent(&event);
-        if (err == CHIP_NO_ERROR)
-        {
-            err = postError;
-        }
-    }
-
-    mFlags.Clear(Flags::kIsServiceProvisioned);
-    mFlags.Clear(Flags::kIsPairedToAccount);
-
-    return err;
-}
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFailSafeArmed(bool & val)
@@ -610,21 +493,9 @@ exit:
 }
 
 template <class ImplClass>
-bool GenericConfigurationManagerImpl<ImplClass>::_IsServiceProvisioned()
-{
-    return mFlags.Has(Flags::kIsServiceProvisioned);
-}
-
-template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsMemberOfFabric()
 {
     return mFlags.Has(Flags::kIsMemberOfFabric);
-}
-
-template <class ImplClass>
-bool GenericConfigurationManagerImpl<ImplClass>::_IsPairedToAccount()
-{
-    return mFlags.Has(Flags::kIsPairedToAccount);
 }
 
 template <class ImplClass>
