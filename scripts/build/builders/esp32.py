@@ -70,8 +70,7 @@ class Esp32App(Enum):
 
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
     if app != Esp32App.ALL_CLUSTERS:
-        # only all-clusters has a specific defaults name
-        return None
+        return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""
     if board == Esp32Board.DevKitC:
@@ -91,11 +90,14 @@ class Esp32Builder(Builder):
                  runner,
                  board: Esp32Board = Esp32Board.M5Stack,
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 enable_ipv4: bool = True
+                 ):
         super(Esp32Builder, self).__init__(root, runner)
         self.board = board
         self.app = app
         self.enable_rpcs = enable_rpcs
+        self.enable_ipv4 = enable_ipv4
 
     def _IdfEnvExecute(self, cmd, cwd=None, title=None):
         self._Execute(
@@ -107,19 +109,29 @@ class Esp32Builder(Builder):
         if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
             return
 
-        defaults = DefaultsFileName(self.board, self.app, self.enable_rpcs)
+        example_path = os.path.join('examples', self.app.ExampleName, 'esp32')
 
-        cmd = 'idf.py'
+        defaults = os.path.join(example_path, DefaultsFileName(self.board, self.app, self.enable_rpcs))
 
-        if defaults:
-            cmd += " -D SDKCONFIG_DEFAULTS='%s'" % defaults
+        if not os.path.exists(defaults):
+            raise Exception('SDK defaults file missing: %s' % defaults)
 
-        cmd += ' -C examples/%s/esp32 -B %s reconfigure' % (
-            self.app.ExampleName, shlex.quote(self.output_dir))
+        defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
+
+        self._Execute(['mkdir', '-p', self.output_dir])
+        self._Execute(['cp', defaults, defaults_out])
+
+        if not self.enable_ipv4:
+            self._Execute(['bash', '-c', 'echo CONFIG_DISABLE_IPV4=y >>%s' % shlex.quote(defaults_out)])
+
+        cmd =  "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} reconfigure".format(
+            defaults=shlex.quote(defaults_out),
+            example_path=example_path,
+            out=shlex.quote(self.output_dir)
+        )
 
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
-        self._IdfEnvExecute(
-            cmd, cwd=self.root, title='Generating ' + self.identifier)
+        self._IdfEnvExecute(cmd, title='Generating ' + self.identifier)
 
     def _build(self):
         logging.info('Compiling Esp32 at %s', self.output_dir)

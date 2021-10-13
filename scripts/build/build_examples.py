@@ -136,7 +136,7 @@ before running this script.
     if dry_run:
         runner = PrintOnlyRunner(dry_run_output)
     else:
-        runner = ShellRunner()
+        runner = ShellRunner(root=repo)
 
     if 'all' in target:
         targets = build.ALL_TARGETS

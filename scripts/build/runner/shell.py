@@ -50,8 +50,9 @@ class LogPipe(threading.Thread):
 
 class ShellRunner:
 
-    def __init__(self):
+    def __init__(self, root: str):
         self.dry_run = False
+        self.root_dir = root
 
     def Run(self, cmd, cwd=None, title=None):
         outpipe = LogPipe(logging.INFO)
@@ -59,6 +60,9 @@ class ShellRunner:
 
         if title:
             logging.info(title)
+
+        if not cwd:
+            cwd = self.root_dir
 
         with subprocess.Popen(cmd, cwd=cwd, stdout=outpipe, stderr=errpipe) as s:
             outpipe.close()
