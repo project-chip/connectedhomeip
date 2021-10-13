@@ -103,6 +103,44 @@ private:
      */
     typedef void (*OnResolveCompleteFunct)(void * appState, CHIP_ERROR err, uint8_t addrCount, IPAddress * addrArray);
 
+    /**
+     *  This method revolves a host name into a list of IP addresses.
+     *
+     *  @note
+     *     Even if the operation completes successfully, the result might be a zero-length list of IP addresses.
+     *     Most of the error generated are returned via the application callback.
+     *
+     *  @param[in]  hostName    A pointer to a C string representing the host name
+     *                          to be queried.
+     *  @param[in]  hostNameLen The string length of host name.
+     *  @param[in]  maxAddrs    The maximum number of addresses to store in the DNS
+     *                          table.
+     *  @param[in]  options     An integer value controlling how host name address
+     *                          resolution is performed.  Values are from the #DNSOptions
+     *                          enumeration.
+     *  @param[in]  addrArray   A pointer to the DNS table.
+     *  @param[in]  onComplete  A pointer to the callback function when a DNS
+     *                          request is complete.
+     *  @param[in]  appState    A pointer to the application state to be passed to
+     *                          onComplete when a DNS request is complete.
+     *
+     *  @retval CHIP_NO_ERROR                   if a DNS request is handled
+     *                                          successfully.
+     *  @retval CHIP_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
+     *                                          the underlying platform.
+     *  @retval _other_                         if other POSIX network or OS error
+     *                                          was returned by the underlying DNS
+     *                                          resolver implementation.
+     *
+     */
+    CHIP_ERROR Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs, IPAddress * addrArray,
+                       OnResolveCompleteFunct onComplete, void * appState);
+
+    /**
+     *  This method cancels DNS requests that are in progress.
+     */
+    CHIP_ERROR Cancel();
+
     static chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> sPool;
 
     /**
@@ -130,6 +168,8 @@ private:
      */
     uint8_t DNSOptions;
 
+    CHIP_ERROR ResolveImpl(char * hostNameBuf);
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     void InitAddrInfoHints(struct addrinfo & hints);
@@ -153,10 +193,6 @@ private:
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    CHIP_ERROR Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs, IPAddress * addrArray,
-                       OnResolveCompleteFunct onComplete, void * appState);
-    CHIP_ERROR Cancel();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     void HandleResolveComplete(void);

@@ -223,7 +223,7 @@ public:
      *  Disable all event handlers. Data sent to an endpoint that disables
      *  reception will be acknowledged until the receive window is exhausted.
      */
-    void DisableReceive();
+    void DisableReceive() { ReceiveEnabled = false; }
 
     /**
      * @brief   Enable reception.
@@ -232,10 +232,17 @@ public:
      *  Enable all event handlers. Data sent to an endpoint that disables
      *  reception will be acknowledged until the receive window is exhausted.
      */
-    void EnableReceive();
+    void EnableReceive()
+    {
+        ReceiveEnabled = true;
+        DriveReceiving();
+    }
 
     /**
      *  @brief EnableNoDelay
+     *
+     *    Switch off nagle buffering algorithm in TCP by setting the
+     *    TCP_NODELAY socket options.
      */
     CHIP_ERROR EnableNoDelay();
 
@@ -278,6 +285,9 @@ public:
     /**
      * @brief   Disable the TCP "keep-alive" option.
      *
+     *    This method can only be called when the endpoint is in one of the connected states.
+     *    This method does nothing if keepalives have not been enabled on the endpoint.
+     *
      * @retval  CHIP_NO_ERROR           success: address and port extracted.
      * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
      * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
@@ -286,26 +296,6 @@ public:
      * @retval  other                   another system or platform error
      */
     CHIP_ERROR DisableKeepAlive();
-
-    /**
-     * @brief   Set the TCP TCP_USER_TIMEOUT socket option.
-     *
-     * @param[in]   userTimeoutMillis    Tcp user timeout value in milliseconds.
-     *
-     * @retval  CHIP_NO_ERROR           success: address and port extracted.
-     * @retval  CHIP_ERROR_NOT_IMPLEMENTED  system implementation not complete.
-     *
-     * @retval  other                   another system or platform error
-     *
-     * @details
-     *  When the value is greater than 0, it specifies the maximum amount of
-     *  time in milliseconds that transmitted data may remain
-     *  unacknowledged before TCP will forcibly close the
-     *  corresponding connection. If the option value is specified as 0,
-     *  TCP will to use the system default.
-     *  See RFC 5482, for further details.
-     */
-    CHIP_ERROR SetUserTimeout(uint32_t userTimeoutMillis);
 
     /**
      * @brief   Acknowledge receipt of message text.
@@ -390,9 +380,12 @@ public:
     /**
      * @brief   Extract whether TCP connection is established.
      */
-    bool IsConnected() const;
+    bool IsConnected() const { return IsConnected(State); }
 
-    void SetConnectTimeout(uint32_t connTimeoutMsecs);
+    /**
+     * Set timeout for Connect to succeed or return an error.
+     */
+    void SetConnectTimeout(const uint32_t connTimeoutMsecs) { mConnectTimeoutMsecs = connTimeoutMsecs; }
 
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
     /**
@@ -413,14 +406,38 @@ public:
      * @details
      *  Reset the idle timer to zero.
      */
-    void MarkActive();
+    void MarkActive()
+    {
+#if INET_TCP_IDLE_CHECK_INTERVAL > 0
+        mRemainingIdleTime = mIdleTimeout;
+#endif // INET_TCP_IDLE_CHECK_INTERVAL > 0
+    }
 
     /**
-     * @brief   Obtain an identifier for the endpoint.
+     * @brief   Set the TCP TCP_USER_TIMEOUT socket option.
      *
-     * @return  Returns an opaque unique identifier for use logs.
+     * @param[in]   userTimeoutMillis    Tcp user timeout value in milliseconds.
+     *
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_NOT_IMPLEMENTED  system implementation not complete.
+     *
+     * @retval  other                   another system or platform error
+     *
+     * @details
+     *  When the value is greater than 0, it specifies the maximum amount of
+     *  time in milliseconds that transmitted data may remain
+     *  unacknowledged before TCP will forcibly close the
+     *  corresponding connection. If the option value is specified as 0,
+     *  TCP will to use the system default.
+     *  See RFC 5482, for further details.
+     *
+     *  @note
+     *    This method can only be called when the endpoint is in one of the connected states.
+     *
+     *    This method can be called multiple times to adjust the keepalive interval or timeout
+     *    count.
      */
-    uint16_t LogId();
+    CHIP_ERROR SetUserTimeout(uint32_t userTimeoutMillis);
 
     /**
      * @brief   Type of connection establishment event handling function.
@@ -621,7 +638,13 @@ private:
     void ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut);
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    uint16_t MaxTCPSendQueuePolls(void);
+    uint16_t MaxTCPSendQueuePolls(void)
+    {
+        // If the UserTimeout is configured less than or equal to the poll interval,
+        // return 1 to poll at least once instead of returning zero and timing out
+        // immediately.
+        return (mUserTimeoutMillis > mTCPSendQueuePollPeriodMillis) ? (mUserTimeoutMillis / mTCPSendQueuePollPeriodMillis) : 1;
+    }
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -649,6 +672,17 @@ private:
 
     void StartConnectTimerIfSet();
     void StopConnectTimer();
+
+    CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr);
+    CHIP_ERROR ListenImpl(uint16_t backlog);
+    CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId);
+    CHIP_ERROR SendQueuedImpl(bool queueWasEmpty);
+    CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis);
+
+    void InitImpl();
+    CHIP_ERROR DriveSendingImpl();
+    void HandleConnectCompleteImpl();
+    void DoCloseImpl(CHIP_ERROR err, int oldState);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     struct BufferOffset
@@ -696,33 +730,6 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS && INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-inline uint16_t TCPEndPoint::MaxTCPSendQueuePolls(void)
-{
-    // If the UserTimeout is configured less than or equal to the poll interval,
-    // return 1 to poll at least once instead of returning zero and timing out
-    // immediately.
-    return (mUserTimeoutMillis > mTCPSendQueuePollPeriodMillis) ? (mUserTimeoutMillis / mTCPSendQueuePollPeriodMillis) : 1;
-}
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS && INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-
-inline bool TCPEndPoint::IsConnected() const
-{
-    return IsConnected(State);
-}
-
-inline uint16_t TCPEndPoint::LogId()
-{
-    return static_cast<uint16_t>(reinterpret_cast<intptr_t>(this));
-}
-
-inline void TCPEndPoint::MarkActive()
-{
-#if INET_TCP_IDLE_CHECK_INTERVAL > 0
-    mRemainingIdleTime = mIdleTimeout;
-#endif // INET_TCP_IDLE_CHECK_INTERVAL > 0
-}
 
 } // namespace Inet
 } // namespace chip
