@@ -58,8 +58,9 @@ enum ArgumentType
     Number_int16,
     Number_int32,
     Number_int64,
-    CharString,
     Boolean,
+    String,
+    CharString,
     OctetString,
     Attribute,
     Address
@@ -131,6 +132,7 @@ public:
      * Add an octet string command argument
      */
     size_t AddArgument(const char * name, chip::ByteSpan * value);
+    size_t AddArgument(const char * name, chip::Span<const char> * value);
     size_t AddArgument(const char * name, AddressWithInterface * out);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out)
     {
