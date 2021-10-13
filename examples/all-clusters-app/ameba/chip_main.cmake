@@ -114,7 +114,6 @@ add_library(
 target_include_directories(
     ${chip_main}
     PUBLIC
-
 	${inc_path}
     ${chip_dir}/zzz_generated/all-clusters-app
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated
