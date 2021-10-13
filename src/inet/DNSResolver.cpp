@@ -53,84 +53,11 @@ namespace Inet {
 
 chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> DNSResolver::sPool;
 
-/**
- *  This method revolves a host name into a list of IP addresses.
- *
- *  @note
- *     Even if the operation completes successfully,
- *     the result might be a zero-length list of IP addresses.
- *     Most of the error generated are returned via the
- *     application callback.
- *
- *  @param[in]  hostName    A pointer to a C string representing the host name
- *                          to be queried.
- *  @param[in]  hostNameLen The string length of host name.
- *  @param[in]  maxAddrs    The maximum number of addresses to store in the DNS
- *                          table.
- *  @param[in]  options     An integer value controlling how host name address
- *                          resolution is performed.  Values are from the #DNSOptions
- *                          enumeration.
- *  @param[in]  addrArray   A pointer to the DNS table.
- *  @param[in]  onComplete  A pointer to the callback function when a DNS
- *                          request is complete.
- *  @param[in]  appState    A pointer to the application state to be passed to
- *                          onComplete when a DNS request is complete.
- *
- *  @retval CHIP_NO_ERROR                   if a DNS request is handled
- *                                          successfully.
- *
- *  @retval CHIP_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
- *                                          the underlying platform.
- *
- *  @retval _other_                         if other POSIX network or OS error
- *                                          was returned by the underlying DNS
- *                                          resolver implementation.
- *
- */
-CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
-                                IPAddress * addrArray, DNSResolver::OnResolveCompleteFunct onComplete, void * appState)
-{
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-#if !CHIP_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
-    Release();
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
-
-    uint8_t addrFamilyOption = (options & kDNSOption_AddrFamily_Mask);
-    uint8_t optionFlags      = (options & kDNSOption_Flags_Mask);
-
-    // Check that the supplied options are valid.
-    if ((addrFamilyOption != kDNSOption_AddrFamily_Any
-#if INET_CONFIG_ENABLE_IPV4
-         && addrFamilyOption != kDNSOption_AddrFamily_IPv4Only && addrFamilyOption != kDNSOption_AddrFamily_IPv4Preferred
-#endif
-         && addrFamilyOption != kDNSOption_AddrFamily_IPv6Only && addrFamilyOption != kDNSOption_AddrFamily_IPv6Preferred) ||
-        (optionFlags & ~kDNSOption_ValidFlags) != 0)
-    {
-        Release();
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_DNS)
-
-    // TODO: Eliminate the need for a local buffer when running on LwIP by changing
-    // the LwIP DNS interface to support non-nul terminated strings.
-
-    char hostNameBuf[NL_DNS_HOSTNAME_MAX_LEN + 1]; // DNS limits hostnames to 253 max characters.
-
-    memcpy(hostNameBuf, hostName, hostNameLen);
-    hostNameBuf[hostNameLen] = 0;
-
-    AppState   = appState;
-    AddrArray  = addrArray;
-    MaxAddrs   = maxAddrs;
-    NumAddrs   = 0;
-    DNSOptions = options;
-    OnComplete = onComplete;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
+CHIP_ERROR DNSResolver::ResolveImpl(char * hostNameBuf)
+{
+#if LWIP_DNS
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 
     u8_t lwipAddrType;
@@ -206,47 +133,14 @@ CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
     }
 
     return res;
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    struct addrinfo gaiHints;
-    struct addrinfo * gaiResults = nullptr;
-    int gaiReturnCode;
-
-    // Configure the hints argument for getaddrinfo()
-    InitAddrInfoHints(gaiHints);
-
-    // Call getaddrinfo() to perform the name resolution.
-    gaiReturnCode = getaddrinfo(hostNameBuf, nullptr, &gaiHints, &gaiResults);
-
-    // Process the return code and results list returned by getaddrinfo(). If the call
-    // was successful this will copy the resultant addresses into the caller's array.
-    res = ProcessGetAddrInfoResult(gaiReturnCode, gaiResults);
-
-    // Invoke the caller's completion function.
-    onComplete(appState, res, NumAddrs, addrArray);
-
-    // Release DNSResolver object.
+#else  // LWIP_DNS
     Release();
-
-    return CHIP_NO_ERROR;
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_DNS)
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // LWIP_DNS
 }
 
-/**
- *  This method cancels DNS requests that are in progress.
- *
- *  @retval CHIP_NO_ERROR.
- *
- */
 CHIP_ERROR DNSResolver::Cancel()
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-
     // NOTE: LwIP does not support canceling DNS requests that are in progress.  As a consequence,
     // we can't release the DNSResolver object until LwIP calls us back (because LwIP retains a
     // pointer to the DNSResolver object while the request is active).  However, now that the
@@ -270,25 +164,8 @@ CHIP_ERROR DNSResolver::Cancel()
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    // NOTE: DNS lookups can be canceled only when using the asynchronous mode.
-
-    InetLayer & inet = Layer();
-
-    OnComplete = nullptr;
-    AppState   = nullptr;
-    inet.mAsyncDNSResolver.Cancel(*this);
-
-#endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
     return CHIP_NO_ERROR;
 }
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  *  This method is called by InetLayer on success, failure, or timeout of a
@@ -346,6 +223,47 @@ void DNSResolver::LwIPHandleResolveComplete(const char * name, ip_addr_t * ipadd
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+CHIP_ERROR DNSResolver::ResolveImpl(char * hostNameBuf)
+{
+    struct addrinfo gaiHints;
+    struct addrinfo * gaiResults = nullptr;
+    int gaiReturnCode;
+
+    // Configure the hints argument for getaddrinfo()
+    InitAddrInfoHints(gaiHints);
+
+    // Call getaddrinfo() to perform the name resolution.
+    gaiReturnCode = getaddrinfo(hostNameBuf, nullptr, &gaiHints, &gaiResults);
+
+    // Process the return code and results list returned by getaddrinfo(). If the call
+    // was successful this will copy the resultant addresses into the caller's array.
+    CHIP_ERROR res = ProcessGetAddrInfoResult(gaiReturnCode, gaiResults);
+
+    // Invoke the caller's completion function.
+    OnComplete(AppState, res, NumAddrs, AddrArray);
+
+    // Release DNSResolver object.
+    Release();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DNSResolver::Cancel()
+{
+#if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+    // NOTE: DNS lookups can be canceled only when using the asynchronous mode.
+
+    InetLayer & inet = Layer();
+
+    OnComplete = nullptr;
+    AppState   = nullptr;
+    inet.mAsyncDNSResolver.Cancel(*this);
+
+#endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+
+    return CHIP_NO_ERROR;
+}
 
 void DNSResolver::InitAddrInfoHints(struct addrinfo & hints)
 {
@@ -523,7 +441,6 @@ uint8_t DNSResolver::CountAddresses(int family, const struct addrinfo * addrs)
 }
 
 #if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
 void DNSResolver::HandleAsyncResolveComplete()
 {
     // Copy the resolved address to the application supplied buffer, but only if the request hasn't been canceled.
@@ -535,7 +452,41 @@ void DNSResolver::HandleAsyncResolveComplete()
     Release();
 }
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
+                                IPAddress * addrArray, DNSResolver::OnResolveCompleteFunct onComplete, void * appState)
+{
+    uint8_t addrFamilyOption = (options & kDNSOption_AddrFamily_Mask);
+    uint8_t optionFlags      = (options & kDNSOption_Flags_Mask);
+
+    // Check that the supplied options are valid.
+    if ((addrFamilyOption != kDNSOption_AddrFamily_Any
+#if INET_CONFIG_ENABLE_IPV4
+         && addrFamilyOption != kDNSOption_AddrFamily_IPv4Only && addrFamilyOption != kDNSOption_AddrFamily_IPv4Preferred
+#endif
+         && addrFamilyOption != kDNSOption_AddrFamily_IPv6Only && addrFamilyOption != kDNSOption_AddrFamily_IPv6Preferred) ||
+        (optionFlags & ~kDNSOption_ValidFlags) != 0)
+    {
+        Release();
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    char hostNameBuf[NL_DNS_HOSTNAME_MAX_LEN + 1]; // DNS limits hostnames to 253 max characters.
+
+    memcpy(hostNameBuf, hostName, hostNameLen);
+    hostNameBuf[hostNameLen] = 0;
+
+    AppState   = appState;
+    AddrArray  = addrArray;
+    MaxAddrs   = maxAddrs;
+    NumAddrs   = 0;
+    DNSOptions = options;
+    OnComplete = onComplete;
+
+    return ResolveImpl(hostNameBuf);
+}
 
 } // namespace Inet
 } // namespace chip

@@ -151,6 +151,11 @@ public:
     virtual CHIP_ERROR SubscriptionEstablished(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
+     * Notification that Subscription has been terminated in handler side.
+     */
+    virtual CHIP_ERROR SubscriptionTerminated(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
      * Notification that a read interaction was completed on the client successfully.
      * @param[in]  apReadClient  A current read client which can identify the read client to the consumer, particularly
      * during multiple read interactions

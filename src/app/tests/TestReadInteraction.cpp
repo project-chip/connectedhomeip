@@ -206,13 +206,24 @@ public:
     CHIP_ERROR SubscriptionEstablished(const chip::app::ReadHandler * apReadHandler) override
     {
         mpReadHandler = const_cast<chip::app::ReadHandler *>(apReadHandler);
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        mNumSubscriptions++;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SubscriptionTerminated(const chip::app::ReadHandler * apReadHandler) override
+    {
+        if (apReadHandler->IsActiveSubscription())
+        {
+            mNumSubscriptions--;
+        }
+        return CHIP_NO_ERROR;
     }
 
     bool mGotEventResponse                 = false;
     int mNumAttributeResponse              = 0;
     bool mGotReport                        = false;
     bool mReadError                        = false;
+    uint32_t mNumSubscriptions             = 0;
     chip::app::ReadHandler * mpReadHandler = nullptr;
 };
 } // namespace
@@ -815,7 +826,7 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     subscribeRequestBuilder.MaxIntervalSeconds(3);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.KeepExistingSubscriptions(true);
+    subscribeRequestBuilder.KeepSubscriptions(true);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeRequestBuilder.IsProxy(true);
@@ -890,10 +901,16 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
     err = engine->SendSubscribeRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    delegate.mNumAttributeResponse       = 0;
+    readPrepareParams.mKeepSubscriptions = false;
+    err                                  = engine->SendSubscribeRequest(readPrepareParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     delegate.mGotReport = false;
     engine->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+    NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
 
     chip::app::ClusterInfo dirtyPath1;
     dirtyPath1.mClusterId  = kTestClusterId;
@@ -1011,7 +1028,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     engine->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
-
+    NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 2);
     // Test report with 1 path modification for 2 subscription
     delegate.mpReadHandler->mHoldReport = false;
     delegate.mGotReport                 = false;
