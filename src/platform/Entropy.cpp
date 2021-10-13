@@ -70,8 +70,7 @@ void TemporaryAuditRandomNumberGenerator()
     uint32_t r2 = GetRandU32();
 
     ChipLogProgress(DeviceLayer, "AUDIT: * r1: 0x%08" PRIX32 " r2: 0x%08" PRIX32, r1, r2);
-    VerifyOrDieWithMsg(r1 != r2, DeviceLayer,
-                       "AUDIT: FAILED: buf1, buf2 are equal: random number generator does not function!");
+    VerifyOrDieWithMsg(r1 != r2, DeviceLayer, "AUDIT: FAILED: buf1, buf2 are equal: random number generator does not function!");
     ChipLogProgress(DeviceLayer, "AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====");
 }
 
