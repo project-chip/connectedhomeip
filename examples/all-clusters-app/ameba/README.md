@@ -24,7 +24,7 @@ The CHIP demo application is supported on
 -   Pull docker image:
 
           $ docker pull pankore/chip-build-ameba:latest
-          
+
 -   Run docker container:
 
           $ docker run -it -v ${CHIP_DIR}:/root/chip pankore/chip-build-ameba:latest
@@ -37,7 +37,8 @@ The CHIP demo application is supported on
 
           $ ./scripts/build/build_examples.py --target ameba-amebad-all-clusters build
 
-    The output image files are stored in `out/ameba-amebad-all-clusters/asdk/image` folder.
+    The output image files are stored in
+    `out/ameba-amebad-all-clusters/asdk/image` folder.
 
 -   After building the application, **Ameba Image Tool** is used to flash it to
     Ameba board.
