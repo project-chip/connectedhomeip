@@ -128,9 +128,9 @@ union SockAddr
 class DLL_EXPORT IPAddress
 {
 public:
-/**
- * Maximum length of the string representation of an IP address.
- */
+    /**
+     * Maximum length of the string representation of an IP address, including a terminating NUL.
+     */
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static constexpr uint16_t kMaxStringLength = IP6ADDR_STRLEN_MAX;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

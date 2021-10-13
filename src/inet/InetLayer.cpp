@@ -241,7 +241,7 @@ void InetLayer::DroppableEventDequeued(void)
 CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 {
     Inet::RegisterLayerErrorFormatter();
-    VerifyOrReturnError(mLayerState.Initializing(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     // Platform-specific initialization may elect to set this data
     // member. Ensure it is set to a sane default value before
@@ -258,7 +258,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    mLayerState.Initialized();
+    mLayerState.SetInitialized();
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     ReturnErrorOnFailure(mAsyncDNSResolver.Init(this));
@@ -277,7 +277,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
  */
 CHIP_ERROR InetLayer::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.ShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -320,7 +320,7 @@ CHIP_ERROR InetLayer::Shutdown()
     });
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-    mLayerState.Shutdown();
+    mLayerState.SetShutdown();
     mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return err;
 }

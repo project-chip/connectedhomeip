@@ -67,13 +67,13 @@ public:
     /*
      * State transitions.
      *
-     * Typical use is `VerifyOrReturnError(state.Initializing(), CHIP_ERROR_INCORRECT_STATE)`; these functions return `bool`
+     * Typical use is `VerifyOrReturnError(state.SetInitializing(), CHIP_ERROR_INCORRECT_STATE)`; these functions return `bool`
      * rather than a `CHIP_ERROR` so that error source tracking will record the call point rather than this function itself.
      */
-    bool Initializing() { return Transition<State::Uninitialized, State::Initializing>(); }
-    bool Initialized() { return Transition<State::Initializing, State::Initialized>(); }
-    bool ShuttingDown() { return Transition<State::Initialized, State::ShuttingDown>(); }
-    bool Shutdown() { return Transition<State::ShuttingDown, State::Shutdown>(); }
+    bool SetInitializing() { return Transition<State::Uninitialized, State::Initializing>(); }
+    bool SetInitialized() { return Transition<State::Initializing, State::Initialized>(); }
+    bool SetShuttingDown() { return Transition<State::Initialized, State::ShuttingDown>(); }
+    bool SetShutdown() { return Transition<State::ShuttingDown, State::Shutdown>(); }
 
     /**
      * Transition from Shutdown back to Uninitialized, or remain Uninitialized.
