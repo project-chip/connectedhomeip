@@ -136,27 +136,12 @@ static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
     return error;
 }
 
-static CHIP_ERROR ConfigGetFabricId(bool printHeader)
-{
-    streamer_t * sout = streamer_get();
-    uint64_t value64;
-
-    ReturnErrorOnFailure(ConfigurationMgr().GetFabricId(value64));
-    if (printHeader)
-    {
-        streamer_printf(sout, "FabricId:        ");
-    }
-    streamer_printf(sout, "%" PRIu64 " (0x" ChipLogFormatX64 ")\r\n", value64, ChipLogValueX64(value64));
-    return CHIP_NO_ERROR;
-}
-
 static CHIP_ERROR PrintAllConfigs()
 {
     ReturnErrorOnFailure(ConfigGetVendorId(true));
     ReturnErrorOnFailure(ConfigGetProductId(true));
     ReturnErrorOnFailure(ConfigGetProductRevision(true));
 
-    ReturnErrorOnFailure(ConfigGetFabricId(true));
     ReturnErrorOnFailure(ConfigGetSetupPinCode(true));
     ReturnErrorOnFailure(ConfigGetSetupDiscriminator(true));
 
@@ -195,10 +180,6 @@ static CHIP_ERROR ConfigHandler(int argc, char ** argv)
         else if (strcmp(argv[0], "discriminator") == 0)
         {
             return ConfigGetSetupDiscriminator(false);
-        }
-        else if (strcmp(argv[0], "fabricid") == 0)
-        {
-            return ConfigGetFabricId(false);
         }
         else
         {

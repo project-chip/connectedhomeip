@@ -136,22 +136,6 @@ static void TestConfigurationMgr_ManufacturerDeviceId(nlTestSuite * inSuite, voi
     NL_TEST_ASSERT(inSuite, deviceId == 7212064004600625234);
 }
 
-static void TestConfigurationMgr_FabricId(nlTestSuite * inSuite, void * inContext)
-{
-#if CHIP_CONFIG_ENABLE_FABRIC_STATE
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    uint64_t fabricId = 0;
-
-    err = ConfigurationMgr().StoreFabricId(2006255910626445ULL);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetFabricId(fabricId);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, fabricId == 2006255910626445ULL);
-#endif
-}
-
 static void TestConfigurationMgr_SetupPinCode(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -285,7 +269,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturerDeviceId", TestConfigurationMgr_ManufacturerDeviceId),
     NL_TEST_DEF("Test ConfigurationMgr::SetupPinCode", TestConfigurationMgr_SetupPinCode),
     NL_TEST_DEF("Test ConfigurationMgr::SetupDiscriminator", TestConfigurationMgr_SetupDiscriminator),
-    NL_TEST_DEF("Test ConfigurationMgr::FabricId", TestConfigurationMgr_FabricId),
     NL_TEST_DEF("Test ConfigurationMgr::RegulatoryLocation", TestConfigurationMgr_RegulatoryLocation),
     NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
     NL_TEST_DEF("Test ConfigurationMgr::Breadcrumb", TestConfigurationMgr_Breadcrumb),

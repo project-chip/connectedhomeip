@@ -79,8 +79,6 @@ public:
     CHIP_ERROR _StoreSetupPinCode(uint32_t setupPinCode);
     CHIP_ERROR _GetSetupDiscriminator(uint16_t & setupDiscriminator);
     CHIP_ERROR _StoreSetupDiscriminator(uint16_t setupDiscriminator);
-    CHIP_ERROR _GetFabricId(uint64_t & fabricId);
-    CHIP_ERROR _StoreFabricId(uint64_t fabricId);
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     CHIP_ERROR _GetLifetimeCounter(uint16_t & lifetimeCounter);
     CHIP_ERROR _IncrementLifetimeCounter();
@@ -107,20 +105,10 @@ public:
 #if !defined(NDEBUG)
     CHIP_ERROR _RunUnitTests(void);
 #endif
-    bool _IsMemberOfFabric();
     bool _IsFullyProvisioned();
     void _LogDeviceConfig();
 
 protected:
-    enum class Flags : uint8_t
-    {
-        kIsServiceProvisioned                    = 0x01,
-        kIsMemberOfFabric                        = 0x02,
-        kIsPairedToAccount                       = 0x04,
-        kUseManufacturerCredentialsAsOperational = 0x08,
-    };
-
-    BitFlags<Flags> mFlags;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     chip::LifetimePersistedCounter mLifetimePersistedCounter;
 #endif

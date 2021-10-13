@@ -59,8 +59,6 @@ private:
     CHIP_ERROR _StoreSetupPinCode(uint32_t setupPinCode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetSetupDiscriminator(uint16_t & setupDiscriminator) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreSetupDiscriminator(uint16_t setupDiscriminator) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetFabricId(uint64_t & fabricId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreFabricId(uint64_t fabricId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     CHIP_ERROR _GetLifetimeCounter(uint16_t & lifetimeCounter) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _IncrementLifetimeCounter() { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -87,9 +85,7 @@ private:
 #if !defined(NDEBUG)
     CHIP_ERROR _RunUnitTests(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
-    bool _IsMemberOfFabric() { return false; }
     bool _IsFullyProvisioned() { return false; }
-    void _UseManufacturerCredentialsAsOperational(bool val) {}
     void _LogDeviceConfig() {}
     bool _CanFactoryReset() { return true; }
     void _InitiateFactoryReset() {}

@@ -85,7 +85,6 @@ public:
     CHIP_ERROR GetManufacturerDeviceId(uint64_t & deviceId);
     CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode);
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator);
-    CHIP_ERROR GetFabricId(uint64_t & fabricId);
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter);
@@ -98,7 +97,6 @@ public:
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf);
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen);
     CHIP_ERROR StoreProductRevision(uint16_t productRev);
-    CHIP_ERROR StoreFabricId(uint64_t fabricId);
     CHIP_ERROR StoreManufacturerDeviceId(uint64_t deviceId);
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode);
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator);
@@ -116,7 +114,6 @@ public:
     CHIP_ERROR RunUnitTests();
 #endif
 
-    bool IsMemberOfFabric();
     bool IsFullyProvisioned();
     void InitiateFactoryReset();
 
@@ -298,11 +295,6 @@ inline CHIP_ERROR ConfigurationManager::GetSetupDiscriminator(uint16_t & setupDi
     return static_cast<ImplClass *>(this)->_GetSetupDiscriminator(setupDiscriminator);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetFabricId(uint64_t & fabricId)
-{
-    return static_cast<ImplClass *>(this)->_GetFabricId(fabricId);
-}
-
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
 inline CHIP_ERROR ConfigurationManager::GetLifetimeCounter(uint16_t & lifetimeCounter)
 {
@@ -348,11 +340,6 @@ inline CHIP_ERROR ConfigurationManager::StoreManufacturingDate(const char * mfgD
 inline CHIP_ERROR ConfigurationManager::StoreProductRevision(uint16_t productRev)
 {
     return static_cast<ImplClass *>(this)->_StoreProductRevision(productRev);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreFabricId(uint64_t fabricId)
-{
-    return static_cast<ImplClass *>(this)->_StoreFabricId(fabricId);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreManufacturerDeviceId(uint64_t deviceId)
@@ -408,11 +395,6 @@ inline CHIP_ERROR ConfigurationManager::GetWiFiAPSSID(char * buf, size_t bufSize
 inline CHIP_ERROR ConfigurationManager::GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
 {
     return static_cast<ImplClass *>(this)->_GetBLEDeviceIdentificationInfo(deviceIdInfo);
-}
-
-inline bool ConfigurationManager::IsMemberOfFabric()
-{
-    return static_cast<ImplClass *>(this)->_IsMemberOfFabric();
 }
 
 inline bool ConfigurationManager::IsFullyProvisioned()

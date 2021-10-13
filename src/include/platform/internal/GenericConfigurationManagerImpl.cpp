@@ -47,13 +47,6 @@ namespace Internal {
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
 {
-    // Cache flags indicating whether the device is currently service provisioned, is a member of a fabric,
-    // is paired to an account, and/or provisioned with operational credentials.
-    mFlags.ClearAll()
-        .Set(Flags::kIsServiceProvisioned, Impl()->ConfigValueExists(ImplClass::kConfigKey_ServiceConfig))
-        .Set(Flags::kIsMemberOfFabric, Impl()->ConfigValueExists(ImplClass::kConfigKey_FabricId))
-        .Set(Flags::kIsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId));
-
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 #endif
@@ -331,46 +324,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupDiscriminator(
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFabricId(uint64_t & fabricId)
-{
-    CHIP_ERROR err = Impl()->ReadConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_KEY_NOT_FOUND)
-    {
-        fabricId = TestFabricId;
-        err      = CHIP_NO_ERROR;
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
-    return err;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFabricId(uint64_t fabricId)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-#if CHIP_CONFIG_ENABLE_FABRIC_STATE
-    if (fabricId != kFabricIdNotSpecified)
-    {
-        err = Impl()->WriteConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
-        SuccessOrExit(err);
-        mFlags.Set(Flags::kIsMemberOfFabric);
-    }
-    else
-    {
-        mFlags.Clear(Flags::kIsMemberOfFabric);
-        err = Impl()->ClearConfigValue(ImplClass::kConfigKey_FabricId);
-        SuccessOrExit(err);
-    }
-
-exit:
-#endif
-
-    return err;
-}
-
-template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetRegulatoryLocation(uint32_t & location)
 {
     return Impl()->ReadConfigValue(ImplClass::kConfigKey_RegulatoryLocation, location);
@@ -493,12 +446,6 @@ exit:
 }
 
 template <class ImplClass>
-bool GenericConfigurationManagerImpl<ImplClass>::_IsMemberOfFabric()
-{
-    return mFlags.Has(Flags::kIsMemberOfFabric);
-}
-
-template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 {
 #if CHIP_BYPASS_RENDEZVOUS
@@ -512,8 +459,6 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         ConnectivityMgr().IsThreadProvisioned() &&
 #endif
-        // TODO: Add checks regarding fabric membership (IsMemberOfFabric()) and account pairing (IsPairedToAccount()),
-        // when functionalities will be implemented.
         true;
 #endif // CHIP_BYPASS_RENDEZVOUS
 }
@@ -571,10 +516,6 @@ void GenericConfigurationManagerImpl<ImplClass>::_LogDeviceConfig()
     CHIP_ERROR err;
 
     ChipLogProgress(DeviceLayer, "Device Configuration:");
-
-#if CHIP_CONFIG_ENABLE_FABRIC_STATE
-    ChipLogProgress(DeviceLayer, "  Device Id: 0x" ChipLogFormatX64, ChipLogValueX64(FabricState.LocalNodeId));
-#endif
 
     {
         char serialNum[ConfigurationManager::kMaxSerialNumberLength + 1];
@@ -641,19 +582,6 @@ void GenericConfigurationManagerImpl<ImplClass>::_LogDeviceConfig()
             ChipLogProgress(DeviceLayer, "  Manufacturing Date: (not set)");
         }
     }
-
-#if CHIP_CONFIG_ENABLE_FABRIC_STATE
-    if (FabricState.FabricId != kFabricIdNotSpecified)
-    {
-        ChipLogProgress(DeviceLayer, "  Fabric Id: 0x" ChipLogFormatX64, ChipLogValueX64(FabricState.FabricId));
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "  Fabric Id: (none)");
-    }
-
-    ChipLogProgress(DeviceLayer, "  Pairing Code: %s", (FabricState.PairingCode != NULL) ? FabricState.PairingCode : "(none)");
-#endif // CHIP_CONFIG_ENABLE_FABRIC_STATE
 
     {
         uint16_t deviceType;
