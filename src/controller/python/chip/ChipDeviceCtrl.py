@@ -373,7 +373,8 @@ class ChipDeviceController(object):
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
-        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
+        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(
+            self.device)
         im.ClearCommandStatus(commandSenderHandle)
         res = self._Cluster.SubscribeAttribute(
             self.device, cluster, attribute, endpoint, minInterval, maxInterval, commandSenderHandle != 0)
