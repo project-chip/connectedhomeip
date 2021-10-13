@@ -123,32 +123,27 @@ namespace Attributes {
 {{/first}}
 {{#if clusterRef}}
 namespace {{asUpperCamelCase label}} {
-    {{#if arrayType}}
+    {{#if entryType}}
     struct TypeInfo {
-        using Type = DataModel::List<{{#if_is_enum type}}{{arrayType}}{{else}}{{zapTypeToEncodableClusterObjectType arrayType}}{{/if_is_enum}}>;
-        static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
-        static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
-    };
-    
-    struct DecodableTypeInfo {
-        using Type = DataModel::DecodableList<{{#if_is_enum type}}{{arrayType}}{{else}}{{zapTypeToDecodableClusterObjectType arrayType}}{{/if_is_enum}}>;
-        static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
-        static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
+        using Type = DataModel::List<{{zapTypeToEncodableClusterObjectType entryType}}>;
+        using DecodableType = DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType entryType}}>;
 
+        static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+        static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
     };
     {{else}}
     struct TypeInfo {
         using Type = {{zapTypeToEncodableClusterObjectType type}};
+        using DecodableType = Type;
+
         static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
         static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
     };
-    
-    using DecodableTypeInfo = TypeInfo;
     {{/if}}
-} // namespace for {{asUpperCamelCase label}}
+} // namespace {{asUpperCamelCase label}}
 {{/if}}
 {{#last}}
-} // Attributes
+} // namespace Attributes
 {{/last}}
 {{/if}}
 {{/zcl_attributes_server}}
