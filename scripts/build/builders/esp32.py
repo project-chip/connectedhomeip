@@ -105,13 +105,15 @@ class Esp32Builder(Builder):
             cwd=cwd,
             title=title)
 
+    @property
+    def ExamplePath(self):
+        return os.path.join('examples', self.app.ExampleName, 'esp32')
+
     def generate(self):
         if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
             return
 
-        example_path = os.path.join('examples', self.app.ExampleName, 'esp32')
-
-        defaults = os.path.join(example_path, DefaultsFileName(self.board, self.app, self.enable_rpcs))
+        defaults = os.path.join(self.ExamplePath, DefaultsFileName(self.board, self.app, self.enable_rpcs))
 
         if not os.path.exists(defaults):
             raise Exception('SDK defaults file missing: %s' % defaults)
@@ -120,14 +122,14 @@ class Esp32Builder(Builder):
 
         self._Execute(['mkdir', '-p', self.output_dir])
         self._Execute(['cp', defaults, defaults_out])
-        self._Execute(['rm', os.path.join(example_path, 'sdkconfig')])
+        self._Execute(['rm', os.path.join(self.ExamplePath, 'sdkconfig')])
 
         if not self.enable_ipv4:
             self._Execute(['bash', '-c', 'echo CONFIG_DISABLE_IPV4=y >>%s' % shlex.quote(defaults_out)])
 
         cmd =  "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} reconfigure".format(
             defaults=shlex.quote(defaults_out),
-            example_path=example_path,
+            example_path=self.ExamplePath,
             out=shlex.quote(self.output_dir)
         )
 
@@ -138,7 +140,7 @@ class Esp32Builder(Builder):
         logging.info('Compiling Esp32 at %s', self.output_dir)
 
         # Unfortunately sdkconfig is sticky and needs reset on every build
-        self._Execute(['rm', os.path.join(example_path, 'sdkconfig')])
+        self._Execute(['rm', os.path.join(self.ExamplePath, 'sdkconfig')])
         self._IdfEnvExecute(
             "ninja -C '%s'" % self.output_dir, title='Building ' + self.identifier)
 
