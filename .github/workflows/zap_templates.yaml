@@ -46,7 +46,7 @@ jobs:
                 java-version: '11'
                 java-package: jre
             - run: sudo apt-get update
-            - run: sudo apt-get install --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev
+            - run: sudo apt-get install --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
             - name: Setup ZAP
               timeout-minutes: 5
               run: |
