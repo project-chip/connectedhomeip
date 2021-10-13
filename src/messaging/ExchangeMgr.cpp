@@ -33,6 +33,13 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+// Temporary includes for TemporaryAuditRandomPerformance()
+// TODO: remove once https://github.com/project-chip/connectedhomeip/issues/10454 is done.
+#if 1
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/BytesToHex.h>
+#endif
+
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPFaultInjection.h>
@@ -49,6 +56,49 @@ using namespace chip::System;
 
 namespace chip {
 namespace Messaging {
+
+namespace {
+
+// Audit random number generator proper initialization with prints.
+// TODO: remove once https://github.com/project-chip/connectedhomeip/issues/10454 is done.
+void TemporaryAuditRandomNumberGenerator()
+{
+    uint8_t buf1[16];
+    uint8_t buf2[16];
+
+    memset(&buf1[0], 0, sizeof(buf1));
+    memset(&buf2[0], 0, sizeof(buf2));
+
+    VerifyOrDie(chip::Crypto::DRBG_get_bytes(&buf1[0], sizeof(buf1)) == CHIP_NO_ERROR);
+    VerifyOrDie(chip::Crypto::DRBG_get_bytes(&buf2[0], sizeof(buf2)) == CHIP_NO_ERROR);
+
+    char hex_buf[sizeof(buf1) * 2 + 1];
+
+    ChipLogProgress(ExchangeManager, "AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT START ====");
+    ChipLogProgress(ExchangeManager, "AUDIT: * Validate buf1 and buf2 are <<<different every run/boot!>>>");
+    ChipLogProgress(ExchangeManager, "AUDIT: * Validate r1 and r2 are <<<different every run/boot!>>>");
+
+    memset(&hex_buf[0], 0, sizeof(hex_buf));
+    VerifyOrDie(Encoding::BytesToUppercaseHexString(&buf1[0], sizeof(buf1), &hex_buf[0], sizeof(hex_buf)) == CHIP_NO_ERROR);
+    ChipLogProgress(ExchangeManager, "AUDIT: * buf1: %s", &hex_buf[0]);
+
+    memset(&hex_buf[0], 0, sizeof(hex_buf));
+    VerifyOrDie(Encoding::BytesToUppercaseHexString(&buf2[0], sizeof(buf2), &hex_buf[0], sizeof(hex_buf)) == CHIP_NO_ERROR);
+    ChipLogProgress(ExchangeManager, "AUDIT: * buf2: %s", &hex_buf[0]);
+
+    VerifyOrDieWithMsg(memcmp(&buf1[0], &buf2[0], sizeof(buf1)) != 0, ExchangeManager,
+                       "AUDIT: FAILED: buf1, buf2 are equal: DRBG_get_bytes() does not function!");
+
+    uint32_t r1 = GetRandU32();
+    uint32_t r2 = GetRandU32();
+
+    ChipLogProgress(ExchangeManager, "AUDIT: * r1: 0x%08" PRIX32 " r2: 0x%08" PRIX32, r1, r2);
+    VerifyOrDieWithMsg(r1 != r2, ExchangeManager,
+                       "AUDIT: FAILED: buf1, buf2 are equal: random number generator does not function!");
+    ChipLogProgress(ExchangeManager, "AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====");
+}
+
+} // namespace
 
 /**
  *  Constructor for the ExchangeManager class.
@@ -71,6 +121,11 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
     VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     mSessionManager = sessionManager;
+
+    {
+        // TODO: remove once https://github.com/project-chip/connectedhomeip/issues/10454 is done.
+        TemporaryAuditRandomNumberGenerator();
+    }
 
     mNextExchangeId = GetRandU16();
     mNextKeyId      = 0;
