@@ -98,13 +98,13 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 #if INET_CONFIG_ENABLE_IPV4
 void CheckSimpleInitTest4(nlTestSuite * inSuite, void * inContext)
 {
-    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv4);
+    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv4);
 }
 #endif
 
 void CheckSimpleInitTest6(nlTestSuite * inSuite, void * inContext)
 {
-    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv6);
+    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv6);
 }
 
 /////////////////////////// Messaging test

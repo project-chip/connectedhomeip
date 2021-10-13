@@ -106,7 +106,7 @@ public:
     }
 
 private:
-    char ipAddressBuf[Inet::kMaxIPAddressStringLength];
+    char ipAddressBuf[Inet::IPAddress::kMaxStringLength];
 };
 
 DnsShellResolverDelegate sDnsShellResolverDelegate;
@@ -121,7 +121,7 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
     peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
     peerId.SetNodeId(strtoull(argv[1], NULL, 10));
 
-    return Dnssd::Resolver::Instance().ResolveNodeId(peerId, Inet::kIPAddressType_Any);
+    return Dnssd::Resolver::Instance().ResolveNodeId(peerId, Inet::IPAddressType::kAny);
 }
 
 bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)

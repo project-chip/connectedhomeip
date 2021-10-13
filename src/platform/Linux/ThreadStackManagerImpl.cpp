@@ -181,7 +181,7 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
                 continue;
 
             Inet::IPPrefix p;
-            p.IPAddr = Inet::IPAddress::FromIPv6(*reinterpret_cast<const struct in6_addr *>(data));
+            p.IPAddr = Inet::IPAddress(*reinterpret_cast<const struct in6_addr *>(data));
             p.Length = prefixLength;
 
             if (p.MatchAddress(destAddr))

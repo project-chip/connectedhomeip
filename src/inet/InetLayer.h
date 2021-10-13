@@ -81,6 +81,7 @@
 #include <system/SystemStats.h>
 
 #include <lib/support/DLLUtil.h>
+#include <lib/support/ObjectLifeCycle.h>
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS
 
@@ -143,16 +144,6 @@ class DLL_EXPORT InetLayer
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 public:
-    /**
-     *  The current state of the InetLayer object.
-     *
-     */
-    volatile enum {
-        kState_NotInitialized     = 0, /**< Not initialized state. */
-        kState_Initialized        = 1, /**< Initialized state. */
-        kState_ShutdownInProgress = 2, /**< State where Shutdown has been triggered. */
-    } State;                           /**< [READ-ONLY] Current state. */
-
     InetLayer();
 
     CHIP_ERROR Init(chip::System::Layer & aSystemLayer, void * aContext);
@@ -257,6 +248,7 @@ public:
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 
 private:
+    ObjectLifeCycle mLayerState;
     void * mContext;
     void * mPlatformData;
     chip::System::Layer * mSystemLayer;

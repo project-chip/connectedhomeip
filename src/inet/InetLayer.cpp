@@ -61,7 +61,9 @@
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/netif.h>
 #include <lwip/sys.h>
-#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <fcntl.h>
 #include <net/if.h>
 #include <unistd.h>
@@ -70,7 +72,7 @@
 #elif CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 #include <ifaddrs.h>
 #endif
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 #include <net/net_if.h>
@@ -105,8 +107,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  */
 InetLayer::InetLayer()
 {
-    State = kState_NotInitialized;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sInetEventHandlerDelegate.IsInitialized())
         sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
@@ -241,9 +241,7 @@ void InetLayer::DroppableEventDequeued(void)
 CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 {
     Inet::RegisterLayerErrorFormatter();
-
-    if (State != kState_NotInitialized)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(mLayerState.Initializing(), CHIP_ERROR_INCORRECT_STATE);
 
     // Platform-specific initialization may elect to set this data
     // member. Ensure it is set to a sane default value before
@@ -260,7 +258,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    State = kState_Initialized;
+    mLayerState.Initialized();
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     ReturnErrorOnFailure(mAsyncDNSResolver.Init(this));
@@ -279,52 +277,51 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
  */
 CHIP_ERROR InetLayer::Shutdown()
 {
+    VerifyOrReturnError(mLayerState.ShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (State == kState_Initialized)
-    {
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
-        // Cancel all DNS resolution requests owned by this instance.
-        DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
-            if ((lResolver != nullptr) && lResolver->IsCreatedByInetLayer(*this))
-            {
-                lResolver->Cancel();
-            }
-            return true;
-        });
+    // Cancel all DNS resolution requests owned by this instance.
+    DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
+        if ((lResolver != nullptr) && lResolver->IsCreatedByInetLayer(*this))
+        {
+            lResolver->Cancel();
+        }
+        return true;
+    });
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
-        err = mAsyncDNSResolver.Shutdown();
+    err = mAsyncDNSResolver.Shutdown();
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        // Abort all TCP endpoints owned by this instance.
-        TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Abort();
-            }
-            return true;
-        });
+    // Abort all TCP endpoints owned by this instance.
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        {
+            lEndPoint->Abort();
+        }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        // Close all UDP endpoints owned by this instance.
-        UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Close();
-            }
-            return true;
-        });
+    // Close all UDP endpoints owned by this instance.
+    UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        {
+            lEndPoint->Close();
+        }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-    }
 
-    State = kState_NotInitialized;
-
+    mLayerState.Shutdown();
+    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return err;
 }
 
@@ -405,7 +402,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
         {
             if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
             {
-                (*llAddr) = IPAddress::FromIPv6(*netif_ip6_addr(intf, j));
+                (*llAddr) = IPAddress(*netif_ip6_addr(intf, j));
                 return CHIP_NO_ERROR;
             }
         }
@@ -434,7 +431,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
                 struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
                 if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
                 {
-                    (*llAddr) = IPAddress::FromIPv6((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
+                    (*llAddr) = IPAddress((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
                     break;
                 }
             }
@@ -450,7 +447,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
     in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
     VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
 
-    *llAddr = IPAddress::FromIPv6(*ip6_addr);
+    *llAddr = IPAddress(*ip6_addr);
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
     return CHIP_NO_ERROR;
@@ -480,7 +477,7 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     *retEndPoint = TCPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
@@ -520,7 +517,7 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     *retEndPoint = UDPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
@@ -689,7 +686,7 @@ CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
     CHIP_ERROR err         = CHIP_NO_ERROR;
     DNSResolver * resolver = nullptr;
 
-    VerifyOrExit(State == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mLayerState.IsInitialized(), err = CHIP_ERROR_INCORRECT_STATE);
 
     INET_FAULT_INJECT(FaultInjection::kFault_DNSResolverNew, return CHIP_ERROR_NO_MEMORY);
 
@@ -715,9 +712,9 @@ CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
         uint8_t addrTypeOption = (options & kDNSOption_AddrFamily_Mask);
         IPAddressType addrType = addrArray->Type();
 
-        if ((addrTypeOption == kDNSOption_AddrFamily_IPv6Only && addrType != kIPAddressType_IPv6)
+        if ((addrTypeOption == kDNSOption_AddrFamily_IPv6Only && addrType != IPAddressType::kIPv6)
 #if INET_CONFIG_ENABLE_IPV4
-            || (addrTypeOption == kDNSOption_AddrFamily_IPv4Only && addrType != kIPAddressType_IPv4)
+            || (addrTypeOption == kDNSOption_AddrFamily_IPv4Only && addrType != IPAddressType::kIPv4)
 #endif
         )
         {
@@ -778,8 +775,7 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
 {
     assertChipStackLockedByCurrentThread();
 
-    if (State != kState_Initialized)
-        return;
+    VerifyOrReturn(mLayerState.IsInitialized());
 
     DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
         if (!lResolver->IsCreatedByInetLayer(*this))
@@ -787,7 +783,7 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
             return true;
         }
 
-        if (lResolver->OnComplete != onComplete)
+        if (lResolver->mOnComplete != onComplete)
         {
             return true;
         }
@@ -798,7 +794,7 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
         }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-        if (lResolver->mState == DNSResolver::kState_Canceled)
+        if (lResolver->mState == DNSResolver::State::kCanceled)
         {
             return true;
         }

@@ -118,11 +118,11 @@ CHIP_ERROR DNSResolver::ResolveImpl(char * hostNameBuf)
         chip::System::Layer & lSystemLayer = SystemLayer();
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        AddrArray[0] = IPAddress::FromLwIPAddr(lwipAddr);
+        mAddrArray[0] = IPAddress(lwipAddr);
 #else
-        AddrArray[0] = IPAddress::FromIPv4(lwipAddr);
+        mAddrArray[0] = IPAddress(lwipAddr);
 #endif
-        NumAddrs = 1;
+        mNumAddrs = 1;
 
         lSystemLayer.PostEvent(*this, kInetEvent_DNSResolveComplete, 0);
     }
@@ -144,22 +144,22 @@ CHIP_ERROR DNSResolver::Cancel()
     // NOTE: LwIP does not support canceling DNS requests that are in progress.  As a consequence,
     // we can't release the DNSResolver object until LwIP calls us back (because LwIP retains a
     // pointer to the DNSResolver object while the request is active).  However, now that the
-    // application has called Cancel() we have to make sure to NOT call their OnComplete function
+    // application has called Cancel() we have to make sure to NOT call their mOnComplete function
     // when the request completes.
     //
-    // To ensure the right thing happens, we NULL the OnComplete pointer here, which signals the
+    // To ensure the right thing happens, we nullptr the mOnComplete pointer here, which signals the
     // code in HandleResolveComplete() and LwIPHandleResolveComplete() to not interact with the
-    // application's state data (AddrArray) and to not call the application's callback. This has
+    // application's state data (mAddrArray) and to not call the application's callback. This has
     // to happen with the LwIP lock held, since LwIPHandleResolveComplete() runs on LwIP's thread.
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
     // Signal that the request has been canceled by clearing the state of the resolver object.
-    OnComplete = NULL;
-    AddrArray  = NULL;
-    MaxAddrs   = 0;
-    NumAddrs   = 0;
+    mOnComplete = nullptr;
+    mAddrArray  = nullptr;
+    mMaxAddrs   = 0;
+    mNumAddrs   = 0;
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
@@ -175,8 +175,10 @@ CHIP_ERROR DNSResolver::Cancel()
 void DNSResolver::HandleResolveComplete()
 {
     // Call the application's completion handler if the request hasn't been canceled.
-    if (OnComplete != NULL)
-        OnComplete(AppState, (NumAddrs > 0) ? CHIP_NO_ERROR : INET_ERROR_HOST_NOT_FOUND, NumAddrs, AddrArray);
+    if (mOnComplete != nullptr)
+    {
+        mOnComplete(AppState, (mNumAddrs > 0) ? CHIP_NO_ERROR : INET_ERROR_HOST_NOT_FOUND, mNumAddrs, mAddrArray);
+    }
 
     // Release the resolver object.
     Release();
@@ -186,7 +188,7 @@ void DNSResolver::HandleResolveComplete()
  *  This method is called by LwIP network stack on success, failure, or timeout
  *  of a DNS request.
  *
- *  @param[in]  name            A pointer to a NULL-terminated C string
+ *  @param[in]  name            A pointer to a nullptr-terminated C string
  *                              representing the host name that is queried.
  *  @param[in]  ipaddr          A pointer to a list of resolved IP addresses.
  *  @param[in]  callback_arg    A pointer to the arguments that are passed to
@@ -201,19 +203,19 @@ void DNSResolver::LwIPHandleResolveComplete(const char * name, ip_addr_t * ipadd
 {
     DNSResolver * resolver = (DNSResolver *) callback_arg;
 
-    if (resolver != NULL)
+    if (resolver != nullptr)
     {
         chip::System::Layer & lSystemLayer = resolver->SystemLayer();
 
         // Copy the resolved address to the application supplied buffer, but only if the request hasn't been canceled.
-        if (resolver->OnComplete != NULL && ipaddr != NULL)
+        if (resolver->mOnComplete != nullptr && ipaddr != nullptr)
         {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-            resolver->AddrArray[0] = IPAddress::FromLwIPAddr(*ipaddr);
+            resolver->mAddrArray[0] = IPAddress(*ipaddr);
 #else
-            resolver->AddrArray[0] = IPAddress::FromIPv4(*ipaddr);
+            resolver->mAddrArray[0] = IPAddress(*ipaddr);
 #endif
-            resolver->NumAddrs = 1;
+            resolver->mNumAddrs = 1;
         }
 
         lSystemLayer.PostEvent(*resolver, kInetEvent_DNSResolveComplete, 0);
@@ -241,7 +243,7 @@ CHIP_ERROR DNSResolver::ResolveImpl(char * hostNameBuf)
     CHIP_ERROR res = ProcessGetAddrInfoResult(gaiReturnCode, gaiResults);
 
     // Invoke the caller's completion function.
-    OnComplete(AppState, res, NumAddrs, AddrArray);
+    mOnComplete(AppState, res, mNumAddrs, mAddrArray);
 
     // Release DNSResolver object.
     Release();
@@ -256,8 +258,8 @@ CHIP_ERROR DNSResolver::Cancel()
 
     InetLayer & inet = Layer();
 
-    OnComplete = nullptr;
-    AppState   = nullptr;
+    mOnComplete = nullptr;
+    AppState    = nullptr;
     inet.mAsyncDNSResolver.Cancel(*this);
 
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
@@ -270,7 +272,7 @@ void DNSResolver::InitAddrInfoHints(struct addrinfo & hints)
     memset(&hints, 0, sizeof(hints));
 
 #if INET_CONFIG_ENABLE_IPV4
-    uint8_t addrFamilyOption = (DNSOptions & kDNSOption_AddrFamily_Mask);
+    uint8_t addrFamilyOption = (mDNSOptions & kDNSOption_AddrFamily_Mask);
 
     if (addrFamilyOption == kDNSOption_AddrFamily_IPv4Only)
     {
@@ -298,13 +300,13 @@ CHIP_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
     // application's output array...
     if (returnCode == 0)
     {
-        NumAddrs = 0;
+        mNumAddrs = 0;
 
 #if INET_CONFIG_ENABLE_IPV4
 
         // Based on the address family option specified by the application, determine which
         // types of addresses should be returned and the order in which they should appear.
-        uint8_t addrFamilyOption = (DNSOptions & kDNSOption_AddrFamily_Mask);
+        uint8_t addrFamilyOption = (mDNSOptions & kDNSOption_AddrFamily_Mask);
         int primaryFamily, secondaryFamily;
         switch (addrFamilyOption)
         {
@@ -346,9 +348,9 @@ CHIP_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
         // the max is set to 1).
         // This ensures the application will try at least one secondary address
         // when attempting to communicate with the host.
-        if (numAddrs > MaxAddrs && MaxAddrs > 1 && numPrimaryAddrs > 0 && numSecondaryAddrs > 0)
+        if (numAddrs > mMaxAddrs && mMaxAddrs > 1 && numPrimaryAddrs > 0 && numSecondaryAddrs > 0)
         {
-            numPrimaryAddrs = ::chip::min(numPrimaryAddrs, static_cast<uint8_t>(MaxAddrs - 1));
+            numPrimaryAddrs = ::chip::min(numPrimaryAddrs, static_cast<uint8_t>(mMaxAddrs - 1));
         }
 
         // Copy the primary addresses into the beginning of the application's output array,
@@ -370,7 +372,7 @@ CHIP_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
 #endif // INET_CONFIG_ENABLE_IPV4
 
         // If in the end no addresses were returned, treat this as a "host not found" error.
-        if (NumAddrs == 0)
+        if (mNumAddrs == 0)
         {
             err = INET_ERROR_HOST_NOT_FOUND;
         }
@@ -415,11 +417,11 @@ CHIP_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
 
 void DNSResolver::CopyAddresses(int family, uint8_t count, const struct addrinfo * addrs)
 {
-    for (const struct addrinfo * addr = addrs; addr != nullptr && NumAddrs < MaxAddrs && count > 0; addr = addr->ai_next)
+    for (const struct addrinfo * addr = addrs; addr != nullptr && mNumAddrs < mMaxAddrs && count > 0; addr = addr->ai_next)
     {
         if (family == AF_UNSPEC || addr->ai_addr->sa_family == family)
         {
-            AddrArray[NumAddrs++] = IPAddress::FromSockAddr(*addr->ai_addr);
+            mAddrArray[mNumAddrs++] = IPAddress::FromSockAddr(*addr->ai_addr);
             count--;
         }
     }
@@ -444,9 +446,9 @@ uint8_t DNSResolver::CountAddresses(int family, const struct addrinfo * addrs)
 void DNSResolver::HandleAsyncResolveComplete()
 {
     // Copy the resolved address to the application supplied buffer, but only if the request hasn't been canceled.
-    if (OnComplete && mState != kState_Canceled)
+    if (mOnComplete && mState != State::kCanceled)
     {
-        OnComplete(AppState, asyncDNSResolveResult, NumAddrs, AddrArray);
+        mOnComplete(AppState, mAsyncDNSResolveResult, mNumAddrs, mAddrArray);
     }
 
     Release();
@@ -478,12 +480,12 @@ CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
     memcpy(hostNameBuf, hostName, hostNameLen);
     hostNameBuf[hostNameLen] = 0;
 
-    AppState   = appState;
-    AddrArray  = addrArray;
-    MaxAddrs   = maxAddrs;
-    NumAddrs   = 0;
-    DNSOptions = options;
-    OnComplete = onComplete;
+    AppState    = appState;
+    mAddrArray  = addrArray;
+    mMaxAddrs   = maxAddrs;
+    mNumAddrs   = 0;
+    mDNSOptions = options;
+    mOnComplete = onComplete;
 
     return ResolveImpl(hostNameBuf);
 }

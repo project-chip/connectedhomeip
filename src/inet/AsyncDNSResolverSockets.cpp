@@ -90,7 +90,11 @@ CHIP_ERROR AsyncDNSResolverSockets::Shutdown()
 
     AsyncMutexLock();
 
-    mInet->State = InetLayer::kState_ShutdownInProgress;
+    if (mInet->mLayerState.GetState() != ObjectLifeCycle::State::ShuttingDown)
+    {
+        AsyncMutexUnlock();
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     pthreadErr = pthread_cond_broadcast(&mAsyncDNSCondVar);
     VerifyOrDie(pthreadErr == 0);
@@ -142,17 +146,17 @@ CHIP_ERROR AsyncDNSResolverSockets::PrepareDNSResolver(DNSResolver & resolver, c
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    memcpy(resolver.asyncHostNameBuf, hostName, hostNameLen);
-    resolver.asyncHostNameBuf[hostNameLen] = 0;
-    resolver.MaxAddrs                      = maxAddrs;
-    resolver.NumAddrs                      = 0;
-    resolver.DNSOptions                    = options;
-    resolver.AddrArray                     = addrArray;
-    resolver.AppState                      = appState;
-    resolver.OnComplete                    = onComplete;
-    resolver.asyncDNSResolveResult         = CHIP_NO_ERROR;
-    resolver.mState                        = DNSResolver::kState_Active;
-    resolver.pNextAsyncDNSResolver         = nullptr;
+    memcpy(resolver.mAsyncHostNameBuf, hostName, hostNameLen);
+    resolver.mAsyncHostNameBuf[hostNameLen] = 0;
+    resolver.mMaxAddrs                      = maxAddrs;
+    resolver.mNumAddrs                      = 0;
+    resolver.mDNSOptions                    = options;
+    resolver.mAddrArray                     = addrArray;
+    resolver.AppState                       = appState;
+    resolver.mOnComplete                    = onComplete;
+    resolver.mAsyncDNSResolveResult         = CHIP_NO_ERROR;
+    resolver.mState                         = DNSResolver::State::kActive;
+    resolver.mNextAsyncDNSResolver          = nullptr;
 
     return err;
 }
@@ -184,7 +188,7 @@ CHIP_ERROR AsyncDNSResolverSockets::EnqueueRequest(DNSResolver & resolver)
 
     if (mAsyncDNSQueueTail != nullptr)
     {
-        mAsyncDNSQueueTail->pNextAsyncDNSResolver = &resolver;
+        mAsyncDNSQueueTail->mNextAsyncDNSResolver = &resolver;
     }
 
     mAsyncDNSQueueTail = &resolver;
@@ -210,7 +214,7 @@ CHIP_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver ** outResolver)
     AsyncMutexLock();
 
     // block until there is work to do or we detect a shutdown
-    while ((mAsyncDNSQueueHead == nullptr) && (mInet->State == InetLayer::kState_Initialized))
+    while ((mAsyncDNSQueueHead == nullptr) && mInet->mLayerState.IsInitialized())
     {
         pthreadErr = pthread_cond_wait(&mAsyncDNSCondVar, &mAsyncDNSMutex);
         VerifyOrDie(pthreadErr == 0);
@@ -219,7 +223,7 @@ CHIP_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver ** outResolver)
     ChipLogDetail(Inet, "Async DNS worker thread woke up.");
 
     // on shutdown, return NULL. Otherwise, pop the head of the DNS request queue
-    if (mInet->State != InetLayer::kState_Initialized)
+    if (!mInet->mLayerState.IsInitialized())
     {
         *outResolver = nullptr;
     }
@@ -227,7 +231,7 @@ CHIP_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver ** outResolver)
     {
         *outResolver = const_cast<DNSResolver *>(mAsyncDNSQueueHead);
 
-        mAsyncDNSQueueHead = mAsyncDNSQueueHead->pNextAsyncDNSResolver;
+        mAsyncDNSQueueHead = mAsyncDNSQueueHead->mNextAsyncDNSResolver;
 
         if (mAsyncDNSQueueHead == nullptr)
         {
@@ -252,7 +256,7 @@ CHIP_ERROR AsyncDNSResolverSockets::Cancel(DNSResolver & resolver)
 
     AsyncMutexLock();
 
-    resolver.mState = DNSResolver::kState_Canceled;
+    resolver.mState = DNSResolver::State::kCanceled;
 
     AsyncMutexUnlock();
 
@@ -261,12 +265,12 @@ CHIP_ERROR AsyncDNSResolverSockets::Cancel(DNSResolver & resolver)
 
 void AsyncDNSResolverSockets::UpdateDNSResult(DNSResolver & resolver, struct addrinfo * inLookupRes)
 {
-    resolver.NumAddrs = 0;
+    resolver.mNumAddrs = 0;
 
-    for (struct addrinfo * addr = inLookupRes; addr != nullptr && resolver.NumAddrs < resolver.MaxAddrs;
-         addr                   = addr->ai_next, resolver.NumAddrs++)
+    for (struct addrinfo * addr = inLookupRes; addr != nullptr && resolver.mNumAddrs < resolver.mMaxAddrs;
+         addr                   = addr->ai_next, resolver.mNumAddrs++)
     {
-        resolver.AddrArray[resolver.NumAddrs] = IPAddress::FromSockAddr(*addr->ai_addr);
+        resolver.mAddrArray[resolver.mNumAddrs] = IPAddress::FromSockAddr(*addr->ai_addr);
     }
 }
 
@@ -280,17 +284,17 @@ void AsyncDNSResolverSockets::Resolve(DNSResolver & resolver)
     resolver.InitAddrInfoHints(gaiHints);
 
     // Call getaddrinfo() to perform the name resolution.
-    gaiReturnCode = getaddrinfo(resolver.asyncHostNameBuf, nullptr, &gaiHints, &gaiResults);
+    gaiReturnCode = getaddrinfo(resolver.mAsyncHostNameBuf, nullptr, &gaiHints, &gaiResults);
 
     // Mutex protects the read and write operation on resolver->mState
     AsyncMutexLock();
 
     // Process the return code and results list returned by getaddrinfo(). If the call
     // was successful this will copy the resultant addresses into the caller's array.
-    resolver.asyncDNSResolveResult = resolver.ProcessGetAddrInfoResult(gaiReturnCode, gaiResults);
+    resolver.mAsyncDNSResolveResult = resolver.ProcessGetAddrInfoResult(gaiReturnCode, gaiResults);
 
     // Set the DNS resolver state.
-    resolver.mState = DNSResolver::kState_Complete;
+    resolver.mState = DNSResolver::State::kComplete;
 
     // Release lock.
     AsyncMutexUnlock();
@@ -334,7 +338,7 @@ void * AsyncDNSResolverSockets::AsyncDNSThreadRun(void * args)
         // In that case, break out of the loop and exit thread.
         VerifyOrExit(err == CHIP_NO_ERROR && request != nullptr, );
 
-        if (request->mState != DNSResolver::kState_Canceled)
+        if (request->mState != DNSResolver::State::kCanceled)
         {
             asyncResolver->Resolve(*request);
         }

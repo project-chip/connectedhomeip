@@ -877,7 +877,7 @@ IPAddress InterfaceAddressIterator::GetAddress()
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-        return IPAddress::FromIPv6(mIpv6->unicast[mCurAddrIndex].address.in6_addr);
+        return IPAddress(mIpv6->unicast[mCurAddrIndex].address.in6_addr);
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -885,12 +885,12 @@ IPAddress InterfaceAddressIterator::GetAddress()
 
         if (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
         {
-            return IPAddress::FromIPv6(*netif_ip6_addr(curIntf, mCurAddrIndex));
+            return IPAddress(*netif_ip6_addr(curIntf, mCurAddrIndex));
         }
 #if INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
         else
         {
-            return IPAddress::FromIPv4(*netif_ip4_addr(curIntf));
+            return IPAddress(*netif_ip4_addr(curIntf));
         }
 #endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -596,9 +596,9 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
         for (uint8_t i = 0; i < addrCount; i++)
         {
 #if INET_CONFIG_ENABLE_IPV4
-            respContainsIPv4Addrs = respContainsIPv4Addrs || (addrArray[i].Type() == kIPAddressType_IPv4);
+            respContainsIPv4Addrs = respContainsIPv4Addrs || (addrArray[i].Type() == IPAddressType::kIPv4);
 #endif
-            respContainsIPv6Addrs = respContainsIPv6Addrs || (addrArray[i].Type() == kIPAddressType_IPv6);
+            respContainsIPv6Addrs = respContainsIPv6Addrs || (addrArray[i].Type() == IPAddressType::kIPv6);
         }
 
         // Verify the expected address types were returned.
@@ -641,7 +641,7 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
         case kDNSOption_AddrFamily_IPv4Preferred:
             if (respContainsIPv4Addrs)
             {
-                NL_TEST_ASSERT(testSuite, addrArray[0].Type() == kIPAddressType_IPv4);
+                NL_TEST_ASSERT(testSuite, addrArray[0].Type() == IPAddressType::kIPv4);
             }
             break;
 #endif
@@ -651,7 +651,7 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
         case kDNSOption_AddrFamily_IPv6Preferred:
             if (respContainsIPv6Addrs)
             {
-                NL_TEST_ASSERT(testSuite, addrArray[0].Type() == kIPAddressType_IPv6);
+                NL_TEST_ASSERT(testSuite, addrArray[0].Type() == IPAddressType::kIPv6);
             }
             break;
         default:

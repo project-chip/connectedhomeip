@@ -83,11 +83,11 @@ protected:
 
     enum class LwIPEndPointType : uint8_t
     {
-        Unknown = 0,
-        Raw     = 1,
-        UDP     = 2,
-        UCP     = 3,
-        TCP     = 4
+        kUnknown = 0,
+        kRaw     = 1,
+        kUDP     = 2,
+        kUCP     = 3,
+        kTCP     = 4
     } mLwIPEndPointType;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 };

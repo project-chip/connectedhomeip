@@ -41,7 +41,7 @@ struct ResolvedNodeData
     void LogNodeIdResolved()
     {
 #if CHIP_PROGRESS_LOGGING
-        char addrBuffer[Inet::kMaxIPAddressStringLength + 1];
+        char addrBuffer[Inet::IPAddress::kMaxStringLength + 1];
         mAddress.ToString(addrBuffer);
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
@@ -185,7 +185,7 @@ struct DiscoveredNodeData
         for (int j = 0; j < numIPs; j++)
         {
 #if CHIP_DETAIL_LOGGING
-            char buf[Inet::kMaxIPAddressStringLength];
+            char buf[Inet::IPAddress::kMaxStringLength];
             char * ipAddressOut = ipAddress[j].ToString(buf);
             ChipLogDetail(Discovery, "\tIP Address #%d: %s", j + 1, ipAddressOut);
             (void) ipAddressOut;

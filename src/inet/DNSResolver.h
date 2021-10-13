@@ -80,14 +80,14 @@ private:
     friend class AsyncDNSResolverSockets;
 
     /// States of the DNSResolver object with respect to hostname resolution.
-    typedef enum DNSResolverState{
-        kState_Unused   = 0, ///< Used to indicate that the DNSResolver object is not used.
-        kState_Active   = 2, ///< Used to indicate that a DNS resolution is being performed on the DNSResolver object.
-        kState_Complete = 3, ///< Used to indicate that the DNS resolution on the DNSResolver object is complete.
-        kState_Canceled = 4, ///< Used to indicate that the DNS resolution on the DNSResolver has been canceled.
-    } DNSResolverState;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    enum class State : uint8_t{
+        kUnused   = 0, ///< Used to indicate that the DNSResolver object is not used.
+        kActive   = 2, ///< Used to indicate that a DNS resolution is being performed on the DNSResolver object.
+        kComplete = 3, ///< Used to indicate that the DNS resolution on the DNSResolver object is complete.
+        kCanceled = 4, ///< Used to indicate that the DNS resolution on the DNSResolver has been canceled.
+    };
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     /**
      * @brief   Type of event handling function called when a DNS request completes.
@@ -146,27 +146,27 @@ private:
     /**
      *  A pointer to the callback function when a DNS request is complete.
      */
-    OnResolveCompleteFunct OnComplete;
+    OnResolveCompleteFunct mOnComplete;
 
     /**
      *  A pointer to the DNS table that stores a list of resolved addresses.
      */
-    IPAddress * AddrArray;
+    IPAddress * mAddrArray;
 
     /**
      *  The maximum number of addresses that could be stored in the DNS table.
      */
-    uint8_t MaxAddrs;
+    uint8_t mMaxAddrs;
 
     /**
      *  The actual number of addresses that are stored in the DNS table.
      */
-    uint8_t NumAddrs;
+    uint8_t mNumAddrs;
 
     /**
      * DNS options for the current request.
      */
-    uint8_t DNSOptions;
+    uint8_t mDNSOptions;
 
     CHIP_ERROR ResolveImpl(char * hostNameBuf);
 
@@ -180,13 +180,13 @@ private:
 #if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
     /* Hostname that requires resolution */
-    char asyncHostNameBuf[NL_DNS_HOSTNAME_MAX_LEN + 1]; // DNS limits hostnames to 253 max characters.
+    char mAsyncHostNameBuf[NL_DNS_HOSTNAME_MAX_LEN + 1]; // DNS limits hostnames to 253 max characters.
 
-    CHIP_ERROR asyncDNSResolveResult;
+    CHIP_ERROR mAsyncDNSResolveResult;
     /* The next DNSResolver object in the asynchronous DNS resolution queue. */
-    DNSResolver * pNextAsyncDNSResolver;
+    DNSResolver * mNextAsyncDNSResolver;
 
-    DNSResolverState mState;
+    State mState;
 
     void HandleAsyncResolveComplete();
 

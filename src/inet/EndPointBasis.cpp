@@ -35,12 +35,12 @@ namespace Inet {
 void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 {
     InitInetLayerBasis(aInetLayer, aAppState);
-    mLwIPEndPointType = LwIPEndPointType::Unknown;
+    mLwIPEndPointType = LwIPEndPointType::kUnknown;
 }
 
 void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
 {
-    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || (mVoid != nullptr))
+    if (mVoid != nullptr)
     {
         DeferredRelease(static_cast<System::LayerLwIP *>(Layer().SystemLayer()), aTactic);
     }

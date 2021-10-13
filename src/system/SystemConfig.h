@@ -611,7 +611,8 @@ struct LwIPEvent;
  *  or sockets, this setting allows the platform layer to inject handlers
  *  which achieve the goal by other means.
  *
- *  Defaults to enabled on Zephyr platforms using sockets
+ *  Defaults to enabled on Zephyr platforms using sockets.
+ *  Only supported for CHIP_SYSTEM_CONFIG_USE_SOCKETS.
  */
 #ifndef CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && __ZEPHYR__
