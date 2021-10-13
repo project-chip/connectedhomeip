@@ -113,9 +113,9 @@ public:
     virtual void LogDeviceConfig() = 0;
 
     virtual bool IsCommissionableDeviceTypeEnabled()                              = 0;
-    virtual CHIP_ERROR GetDeviceType(uint16_t & deviceType)                       = 0;
+    virtual CHIP_ERROR GetDeviceTypeId(uint16_t & deviceType)                     = 0;
     virtual bool IsCommissionableDeviceNameEnabled()                              = 0;
-    virtual CHIP_ERROR GetDeviceName(char * buf, size_t bufSize)                  = 0;
+    virtual CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize)    = 0;
     virtual CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint)              = 0;
     virtual CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize)   = 0;
     virtual CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint)            = 0;

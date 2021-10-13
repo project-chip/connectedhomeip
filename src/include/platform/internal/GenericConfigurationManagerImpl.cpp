@@ -426,7 +426,7 @@ bool GenericConfigurationManagerImpl<ImplClass>::IsCommissionableDeviceNameEnabl
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetDeviceName(char * buf, size_t bufSize)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetCommissionableDeviceName(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
@@ -535,7 +535,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint16_t deviceType;
-        if (GetDeviceType(deviceType) != CHIP_NO_ERROR)
+        if (GetDeviceTypeId(deviceType) != CHIP_NO_ERROR)
         {
             deviceType = 0;
         }

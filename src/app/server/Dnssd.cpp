@@ -320,14 +320,14 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscriminator(value);
 
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
-        DeviceLayer::ConfigurationMgr().GetDeviceType(value) == CHIP_NO_ERROR)
+        DeviceLayer::ConfigurationMgr().GetDeviceTypeId(value) == CHIP_NO_ERROR)
     {
         advertiseParameters.SetDeviceType(chip::Optional<uint16_t>::Value(value));
     }
 
     char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 1];
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() &&
-        DeviceLayer::ConfigurationMgr().GetDeviceName(deviceName, sizeof(deviceName)) == CHIP_NO_ERROR)
+        DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) == CHIP_NO_ERROR)
     {
         advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
     }

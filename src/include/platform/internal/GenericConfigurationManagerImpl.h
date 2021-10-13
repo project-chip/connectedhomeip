@@ -84,9 +84,9 @@ public:
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
     bool IsCommissionableDeviceTypeEnabled() override;
-    CHIP_ERROR GetDeviceType(uint16_t & deviceType) override;
+    CHIP_ERROR GetDeviceTypeId(uint16_t & deviceType) override;
     bool IsCommissionableDeviceNameEnabled() override;
-    CHIP_ERROR GetDeviceName(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override;
     CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override;
@@ -141,7 +141,7 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFirmwareRevisio
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetDeviceType(uint16_t & deviceType)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetDeviceTypeId(uint16_t & deviceType)
 {
     deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
     return CHIP_NO_ERROR;
