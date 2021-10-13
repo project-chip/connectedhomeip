@@ -45,7 +45,7 @@ CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements,
     ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
-    int count = 0;
+    size_t count = 0;
     CHIP_ERROR error;
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {

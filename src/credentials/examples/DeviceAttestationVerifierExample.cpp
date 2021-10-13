@@ -204,8 +204,6 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
     ByteSpan attestationNonceSpan;
     uint32_t timestampDeconstructed;
     ByteSpan firmwareInfoSpan;
-    // TODO: refactor once final vendor-specific data tags is handled.
-    //    CREATE_VENDOR_RESERVED(vendorReservedDeconstructed, 10);
     DeviceAttestationVendorReservedDeconstructor vendorReserved;
 
     VerifyOrReturnError(DeconstructAttestationElements(attestationInfoBuffer, certificationDeclarationSpan, attestationNonceSpan,

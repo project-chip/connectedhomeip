@@ -31,8 +31,6 @@ struct VendorReservedElement
     uint16_t profileNum;
     uint32_t tagNum;
     ByteSpan vendorReservedData;
-    //    struct VendorReservedElement * next; // for linking sorted construction list
-    //   bool used;                           // when sorting, this element is already used
 };
 
 // extract elements out of the device attestation bytespan
