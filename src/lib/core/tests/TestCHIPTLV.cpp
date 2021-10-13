@@ -35,13 +35,13 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 
 #include <system/TLVPacketBufferBackingStore.h>
 
+#include <stdlib.h>
 #include <string.h>
 
 using namespace chip;
@@ -4081,7 +4081,7 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
             {
                 uint8_t fuzzMask = sFixedFuzzMask;
                 while (fuzzMask == 0)
-                    fuzzMask = GetRandU8();
+                    fuzzMask = static_cast<uint8_t>(rand() & 0xFF);
 
                 fuzzedData[i] ^= fuzzMask;
             }
