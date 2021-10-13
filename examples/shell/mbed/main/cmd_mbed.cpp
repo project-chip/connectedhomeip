@@ -27,7 +27,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -68,7 +68,7 @@ CHIP_ERROR cmd_common_help_iterator(shell_command_t * command, void * arg)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR cmd_date(int argc, char ** argv)
+CHIP_ERROR cmd_time(int argc, char ** argv)
 {
     uint16_t year;
     uint8_t month, dayOfMonth;
@@ -78,7 +78,7 @@ CHIP_ERROR cmd_date(int argc, char ** argv)
 
     streamer_t * sout = streamer_get();
 
-    currTimeMS = chip::System::Clock::GetMonotonicMicroseconds();
+    currTimeMS = chip::System::SystemClock().GetMonotonicMicroseconds();
 
     SecondsSinceUnixEpochToCalendarTime(currTimeMS / kMicrosecondsPerSecond, year, month, dayOfMonth, hour, minute, second);
     streamer_printf(sout, "%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8 " %02" PRIu8 ":%02" PRIu8 ":%02" PRIu8 "\r\n", year, month,
@@ -594,7 +594,7 @@ public:
 
     EchoServer echoServer;
     SecurePairingUsingTestSecret testPairing;
-    SecureSessionMgr sessionManager;
+    SessionManager sessionManager;
     Messaging::ExchangeManager exchangeManager;
     MessageCounterManager messageCounterManager;
 
@@ -641,8 +641,8 @@ CHIP_ERROR cmd_server_help(int argc, char ** argv)
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && buffer)
 {
     char peerAddrStr[PeerAddress::kMaxToStringSize];
-    auto state = ec->GetExchangeMgr()->GetSessionMgr()->GetPeerConnectionState(ec->GetSecureSession());
-    state->GetPeerAddress().ToString(peerAddrStr, sizeof(peerAddrStr));
+    SecureSession * session = ec->GetExchangeMgr()->GetSessionManager()->GetSecureSession(ec->GetSecureSession());
+    session->GetPeerAddress().ToString(peerAddrStr, sizeof(peerAddrStr));
     streamer_printf(streamer_get(), "INFO: Received echo request from %s\r\n", peerAddrStr);
     HandleMessageReceived(std::move(buffer));
 }
@@ -652,7 +652,6 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
     InterfaceIterator networkInterface;
     CHIP_ERROR error = CHIP_NO_ERROR;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
-    FabricTable fabrics;
     const chip::FabricIndex gFabricIndex = 0;
 
     streamer_t * sout = streamer_get();
@@ -703,8 +702,7 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
                                           .SetListenPort(gChipServer.port));
         SuccessOrExit(error);
 
-        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer(), gChipServer.udp, &fabrics,
-                                                &gChipServer.messageCounterManager);
+        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer(), gChipServer.udp, &gChipServer.messageCounterManager);
         SuccessOrExit(error);
     }
     else
@@ -720,8 +718,7 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
                                           .SetListenPort(gChipServer.port));
         SuccessOrExit(error);
 
-        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer(), gChipServer.tcp, &fabrics,
-                                                &gChipServer.messageCounterManager);
+        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer(), gChipServer.tcp, &gChipServer.messageCounterManager);
         SuccessOrExit(error);
     }
 
@@ -735,7 +732,7 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
     SuccessOrExit(error);
 
     error = gChipServer.sessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gChipServer.testPairing,
-                                                  chip::SecureSession::SessionRole::kResponder, gFabricIndex);
+                                                  chip::CryptoContext::SessionRole::kResponder, gFabricIndex);
     SuccessOrExit(error);
 
     gChipServer.echoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
@@ -795,7 +792,7 @@ CHIP_ERROR cmd_server_off(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static const shell_command_t cmds_date_root = { &cmd_date, "date", "Display the current time." };
+static const shell_command_t cmds_date_root = { &cmd_time, "time", "Display the current time." };
 
 static const shell_command_t cmds_test_config = { &cmd_device_test_config, "testconfig",
                                                   "Test the configuration implementation. Usage: device testconfig" };
