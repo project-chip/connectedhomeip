@@ -444,7 +444,8 @@ CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName,
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    return chip::Encoding::BytesToUppercaseHexString(&mCommissionableInstanceName[0], sizeof(mCommissionableInstanceName), instanceName, maxLength);
+    return chip::Encoding::BytesToUppercaseHexString(&mCommissionableInstanceName[0], sizeof(mCommissionableInstanceName),
+                                                     instanceName, maxLength);
 }
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)

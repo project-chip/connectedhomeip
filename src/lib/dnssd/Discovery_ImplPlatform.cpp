@@ -119,7 +119,8 @@ CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceN
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    return chip::Encoding::BytesToUppercaseHexString(&mCommissionableInstanceName[0], sizeof(mCommissionableInstanceName), instanceName, maxLength);
+    return chip::Encoding::BytesToUppercaseHexString(&mCommissionableInstanceName[0], sizeof(mCommissionableInstanceName),
+                                                     instanceName, maxLength);
 }
 
 template <class Derived, size_t N_idle, size_t N_active, size_t N_tcp>

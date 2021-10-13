@@ -22,8 +22,8 @@
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandPathParams.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
-#include <crypto/RandUtils.h>
 #include <app/util/af.h>
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
