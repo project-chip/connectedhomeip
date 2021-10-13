@@ -28,6 +28,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Dnssd.h>
@@ -50,6 +52,7 @@
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
+using namespace chip::app;
 using namespace chip::app::Clusters::OperationalCredentials;
 
 namespace {
@@ -57,11 +60,70 @@ namespace {
 constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
 
-} // namespace
+class OperationalCredentialsAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the OperationalCredentials cluster on all endpoints.
+    OperationalCredentialsAttrAccess() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::OperationalCredentials::Id)
+    {}
+
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+};
+
+CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        {
+            if (!fabricInfo.IsInitialized())
+                continue;
+
+            Clusters::OperationalCredentials::Structs::FabricDescriptor::Type fabricDescriptor;
+
+            fabricDescriptor.fabricIndex = fabricInfo.GetFabricIndex();
+            fabricDescriptor.nodeId      = fabricInfo.GetPeerId().GetNodeId();
+            fabricDescriptor.vendorId    = fabricInfo.GetVendorId();
+            fabricDescriptor.fabricId    = fabricInfo.GetFabricId();
+
+            // TODO: The type of 'label' should be 'CharSpan', need to fix the XML defination for broken member type.
+            fabricDescriptor.label =
+                ByteSpan(Uint8::from_const_char(fabricInfo.GetFabricLabel().data()), fabricInfo.GetFabricLabel().size());
+            fabricDescriptor.rootPublicKey = fabricInfo.GetRootPubkey();
+
+            ReturnErrorOnFailure(encoder.Encode(fabricDescriptor));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
+
+OperationalCredentialsAttrAccess gAttrAccess;
+
+CHIP_ERROR OperationalCredentialsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aClusterInfo.mClusterId == Clusters::OperationalCredentials::Id);
+
+    switch (aClusterInfo.mFieldId)
+    {
+    case Attributes::FabricsList::Id: {
+        return ReadFabricsList(aClusterInfo.mEndpointId, aEncoder);
+    }
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // anonymous namespace
 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr uint16_t kMaxRspLen = 900;
 
+#if !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 /*
  * Temporary flow for fabric management until addOptCert + fabric index are implemented:
  * 1) When Commissioner pairs with CHIP device, store device nodeId in Fabric table as NodeId
@@ -187,6 +249,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
 
     return err;
 }
+#endif // !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 
 static FabricInfo * retrieveCurrentFabric()
 {
@@ -200,6 +263,7 @@ static FabricInfo * retrieveCurrentFabric()
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
+#if !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 // TODO: The code currently has two sources of truths for fabrics, the fabricInfo table + the attributes. There should only be one,
 // the attributes list. Currently the attributes are not persisted so we are keeping the fabric table to have the
 // fabrics/admrins be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and
@@ -240,12 +304,18 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
 };
 
 OpCredsFabricTableDelegate gFabricDelegate;
+#endif // !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 
 void MatterOperationalCredentialsPluginServerInitCallback(void)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster.");
+
+#if CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+    registerAttributeAccessOverride(&gAttrAccess);
+#else
     Server::GetInstance().GetFabricTable().SetFabricDelegate(&gFabricDelegate);
     writeFabricsIntoFabricsListAttribute();
+#endif
 }
 
 namespace {
@@ -282,7 +352,9 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
+#if !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
     writeFabricsIntoFabricsListAttribute();
+#endif
     emberAfSendImmediateDefaultResponse(status);
     if (err == CHIP_NO_ERROR)
     {
@@ -330,7 +402,9 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
+#if !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
     writeFabricsIntoFabricsListAttribute();
+#endif
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
