@@ -490,19 +490,15 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Device Attestation Credentials");
 
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                                         ZCL_CERTIFICATE_CHAIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-
-    TLV::TLVWriter * writer = nullptr;
     uint8_t derBuf[Credentials::kMaxDERCertLength];
     MutableByteSpan derBufSpan(derBuf);
+
+    Commands::CertificateChainResponse::Type response;
 
     Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-    writer = commandObj->GetCommandDataElementTLVWriter();
     if (certificateType == kDACCertificate)
     {
         SuccessOrExit(err = dacProvider->GetDeviceAttestationCert(derBufSpan));
@@ -524,10 +520,9 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     {
         SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-    // TODO: Update ZAP Templates to parse TLVs starting with Tag ID 1 in order for this be spec compliant.
-    // TODO: Use ContextTag(1) instead
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), derBufSpan));
-    SuccessOrExit(err = commandObj->FinishCommand());
+
+    response.certificate = derBufSpan;
+    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -545,16 +540,14 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 {
     auto & attestationNonce = commandData.attestationNonce;
 
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
     size_t attestationElementsLen;
     Crypto::P256ECDSASignature signature;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Attestation");
 
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                                         ZCL_ATTESTATION_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    Commands::AttestationResponse::Type response;
 
     Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
@@ -610,11 +603,9 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
         SuccessOrExit(err = signature.SetLength(signatureSpan.size()));
     }
 
-    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-    writer = commandObj->GetCommandDataElementTLVWriter();
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(attestationElements.Get(), attestationElementsLen)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), ByteSpan(signature, signature.Length())));
-    SuccessOrExit(err = commandObj->FinishCommand());
+    response.attestationElements = ByteSpan(attestationElements.Get(), attestationElementsLen);
+    response.signature           = ByteSpan(signature, signature.Length());
+    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -641,10 +632,8 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested an OpCSR");
 
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                                         ZCL_OP_CSR_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    Commands::OpCSRResponse::Type response;
 
-    TLV::TLVWriter * writer = nullptr;
     TLV::TLVWriter csrElementWriter;
     TLV::TLVType containerType;
 
@@ -676,15 +665,11 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-    writer = commandObj->GetCommandDataElementTLVWriter();
-
     // Write CSR Elements
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten())));
-
+    response.NOCSRElements = ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten());
     // TODO - Write attestation signature using attestation key
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), ByteSpan()));
-    SuccessOrExit(err = commandObj->FinishCommand());
+    response.attestationSignature = ByteSpan();
+    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
 
 exit:
     if (err != CHIP_NO_ERROR)
