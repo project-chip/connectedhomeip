@@ -73,8 +73,8 @@ public:
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
 
     CHIP_ERROR AddAttributeStatusCode(const AttributePathParams & aAttributePathParams,
-                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                      const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus);
+                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralStatus,
+                                      const Protocols::InteractionModel::Status aStatus);
 
 private:
     enum class State

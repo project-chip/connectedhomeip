@@ -73,7 +73,7 @@ public:
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                       System::PacketBufferHandle && payload);
     CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,
-                             const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
+                             const Protocols::SecureChannel::GeneralStatusCode aGeneralStatus,
                              const Protocols::InteractionModel::Status aStatus) override;
 
     /**

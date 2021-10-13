@@ -114,7 +114,7 @@ void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apCo
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     err = aWriteHandler.AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                               Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::Success);
+                                               Protocols::InteractionModel::Status::Success);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -188,7 +188,10 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
 
     StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateStatusIBBuilder();
     NL_TEST_ASSERT(apSuite, statusIBBuilder.GetError() == CHIP_NO_ERROR);
-    statusIBBuilder.EncodeStatusIB(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3).EndOfStatusIB();
+    statusIBBuilder
+        .EncodeStatusIB(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
+                        chip::Protocols::InteractionModel::Status::InvalidSubscription)
+        .EndOfStatusIB();
     err = statusIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -269,17 +272,16 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     return aWriteHandler->AddAttributeStatusCode(
         AttributePathParams(aClusterInfo.mNodeId, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId,
                             aClusterInfo.mListIndex, AttributePathParams::Flags::kFieldIdValid),
-        Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-        Protocols::InteractionModel::Status::Success);
+        Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::InteractionModel::Status::Success);
 }
 
 class RoundtripDelegate : public chip::app::InteractionModelDelegate
 {
 public:
     CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
-                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                   const uint16_t aProtocolCode, AttributePathParams & aAttributePathParams,
-                                   uint8_t aCommandIndex) override
+                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralStatus,
+                                   const Protocols::InteractionModel::Status aClusterStatus,
+                                   AttributePathParams & aAttributePathParams, uint8_t aCommandIndex) override
     {
         mGotResponse = true;
         return CHIP_NO_ERROR;

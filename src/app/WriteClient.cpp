@@ -329,9 +329,8 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePath::Parser attributePath;
-    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
-    uint32_t protocolId                                     = 0;
-    uint16_t protocolCode                                   = 0;
+    Protocols::SecureChannel::GeneralStatusCode generalStatus = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
+    Protocols::InteractionModel::Status clusterStatus         = Protocols::InteractionModel::Status::Success;
     StatusIB::Parser StatusIBParser;
     AttributePathParams attributePathParams;
 
@@ -367,12 +366,11 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
     err = aAttributeStatusIB.GetStatusIB(&(StatusIBParser));
     if (CHIP_NO_ERROR == err)
     {
-        err = StatusIBParser.DecodeStatusIB(&generalCode, &protocolId, &protocolCode);
+        err = StatusIBParser.DecodeStatusIB(&generalStatus, &clusterStatus);
         SuccessOrExit(err);
         if (mpDelegate != nullptr)
         {
-            mpDelegate->WriteResponseStatus(this, generalCode, protocolId, protocolCode, attributePathParams,
-                                            mAttributeStatusIndex);
+            mpDelegate->WriteResponseStatus(this, generalStatus, clusterStatus, attributePathParams, mAttributeStatusIndex);
         }
     }
 

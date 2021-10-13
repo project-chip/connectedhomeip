@@ -225,8 +225,8 @@ CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAtt
 }
 
 CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAttributePathParams,
-                                                const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
+                                                const Protocols::SecureChannel::GeneralStatusCode aGeneralStatus,
+                                                const Protocols::InteractionModel::Status aClusterStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusIB::Builder statusIBBuilder;
@@ -239,8 +239,7 @@ CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAtt
     SuccessOrExit(err);
 
     statusIBBuilder = attributeStatusIB.CreateStatusIBBuilder();
-    statusIBBuilder.EncodeStatusIB(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
-        .EndOfStatusIB();
+    statusIBBuilder.EncodeStatusIB(aGeneralStatus, aClusterStatus).EndOfStatusIB();
     err = statusIBBuilder.GetError();
     SuccessOrExit(err);
 

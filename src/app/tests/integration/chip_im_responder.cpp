@@ -81,7 +81,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         );
         printf("responder constructing status code in command");
         apCommandObj->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
+                                    Protocols::InteractionModel::Status::Success);
     }
     else
     {
@@ -138,7 +138,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     err = apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::Success);
+                                                 Protocols::InteractionModel::Status::Success);
     return err;
 }
 } // namespace app

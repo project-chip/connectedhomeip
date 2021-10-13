@@ -26,12 +26,11 @@
 #include "Command.h"
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
-#include "protocols/Protocols.h"
-#include "protocols/interaction_model/Constants.h"
-
+#include <protocols/Protocols.h>
+#include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/Constants.h>
 
-using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
+using GeneralStatus = chip::Protocols::SecureChannel::GeneralStatusCode;
 
 namespace chip {
 namespace app {
@@ -145,9 +144,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         chip::TLV::TLVReader commandDataReader;
 
         // Default to success when an invoke response is received.
-        StatusIB::Type statusIB{ chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                 chip::Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
-                                 to_underlying(Protocols::InteractionModel::Status::Success) };
+        StatusIB::Type statusIB{ Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                 Protocols::InteractionModel::Status::Success };
         StatusIB::Parser statusIBParser;
         err = aCommandElement.GetStatusIB(&statusIBParser);
         if (CHIP_NO_ERROR == err)
@@ -163,22 +161,14 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
 
         if (mpCallback != nullptr)
         {
-            if (statusIB.protocolId == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm())
+            if (statusIB.clusterStatus == Protocols::InteractionModel::Status::Success)
             {
-                if (statusIB.protocolCode == to_underlying(Protocols::InteractionModel::Status::Success))
-                {
-                    mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId),
-                                           hasDataResponse ? &commandDataReader : nullptr);
-                }
-                else
-                {
-                    mpCallback->OnError(this, static_cast<Protocols::InteractionModel::Status>(statusIB.protocolCode),
-                                        CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
-                }
+                mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId),
+                                       hasDataResponse ? &commandDataReader : nullptr);
             }
             else
             {
-                mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+                mpCallback->OnError(this, statusIB.clusterStatus, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
             }
         }
     }

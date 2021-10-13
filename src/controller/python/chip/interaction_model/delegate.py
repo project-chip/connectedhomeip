@@ -29,7 +29,7 @@ from dataclasses import dataclass
 # CommandStatus should not contain padding
 IMCommandStatus = Struct(
     "ProtocolId" / Int32ul,
-    "ProtocolCode" / Int16ul,
+    "ClusterStatus" / Int16ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "CommandId" / Int32ul,
@@ -40,7 +40,7 @@ IMWriteStatus = Struct(
     "NodeId" / Int64ul,
     "AppIdentifier" / Int64ul,
     "ProtocolId" / Int32ul,
-    "ProtocolCode" / Int16ul,
+    "ClusterStatus" / Int16ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "AttributeId" / Int32ul,
@@ -197,7 +197,7 @@ def _OnWriteResponseStatus(IMAttributeWriteResult, IMAttributeWriteResultLen):
 
     with _writeStatusDictLock:
         _writeStatusDict[appId] = AttributeWriteResult(AttributePath(
-            status["NodeId"], status["EndpointId"], status["ClusterId"], status["AttributeId"]), status["ProtocolCode"])
+            status["NodeId"], status["EndpointId"], status["ClusterId"], status["AttributeId"]), status["ClusterStatus"])
 
 
 def InitIMDelegate():

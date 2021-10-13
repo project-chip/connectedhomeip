@@ -31,7 +31,7 @@
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
 
-using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
+using GeneralStatus = chip::Protocols::SecureChannel::GeneralStatusCode;
 
 namespace chip {
 namespace app {
@@ -140,9 +140,8 @@ exit:
                           endpointId);
         }
 
-        AddStatusCode(path,
-                      err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
-                      Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        AddStatusCode(path, err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatus::kNotFound : GeneralStatus::kInvalidArgument,
+                      Protocols::InteractionModel::Status::InvalidCommand);
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
@@ -151,8 +150,8 @@ exit:
 }
 
 CHIP_ERROR CommandHandler::AddStatusCode(const ConcreteCommandPath & aCommandPath,
-                                         const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                         const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
+                                         const Protocols::SecureChannel::GeneralStatusCode aGeneralStatus,
+                                         const Protocols::InteractionModel::Status aStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusIB::Builder statusIBBuilder;
@@ -172,9 +171,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const ConcreteCommandPath & aCommandPat
     // above is always an IM code. Instead of fixing all the callers (which is a fairly sizeable change), we'll embark on fixing
     // this more completely when we fix #9530.
     //
-    statusIBBuilder
-        .EncodeStatusIB(aGeneralCode, Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
-        .EndOfStatusIB();
+    statusIBBuilder.EncodeStatusIB(aGeneralStatus, aStatus).EndOfStatusIB();
     err = statusIBBuilder.GetError();
     SuccessOrExit(err);
 

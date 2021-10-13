@@ -165,7 +165,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
         commandPath,
         status == EMBER_ZCL_STATUS_SUCCESS ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                            : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
-        chip::Protocols::InteractionModel::Id, static_cast<Protocols::InteractionModel::Status>(ToInteractionModelStatus(status)));
+        static_cast<Protocols::InteractionModel::Status>(ToInteractionModelStatus(status)));
     return CHIP_NO_ERROR == err;
 }
 
@@ -477,7 +477,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
                                                   imCode == Protocols::InteractionModel::Status::Success
                                                       ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                                       : Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                  Protocols::SecureChannel::Id, imCode);
+                                                  imCode);
 }
 } // namespace app
 } // namespace chip

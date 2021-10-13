@@ -69,7 +69,7 @@ public:
 
     /**
      * Notification that the interaction model has received a list of attribute data in response to a Read request. apData might be
-     * nullptr if status is not ProtocolCode::Success.
+     * nullptr if status is not ClusterStatus::Success.
      *
      * @param[in]  apReadClient   The read client object, the application can use GetAppIdentifier() for the read client to
      *                            distinguish different read requests.
@@ -106,8 +106,8 @@ public:
      * same attribute path
      */
     virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
-                                           const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                           const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                                           const Protocols::SecureChannel::GeneralStatusCode aGeneralStatus,
+                                           const Protocols::InteractionModel::Status aClusterStatus,
                                            AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;

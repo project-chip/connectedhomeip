@@ -50,33 +50,29 @@ exit:
     return err;
 }
 
-CHIP_ERROR StatusIB::Parser::DecodeStatusIB(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode, uint32_t * apProtocolId,
-                                            uint16_t * apProtocolCode) const
+CHIP_ERROR StatusIB::Parser::DecodeStatusIB(Protocols::SecureChannel::GeneralStatusCode * apGeneralStatus,
+                                            Protocols::InteractionModel::Status * apClusterStatus) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader lReader;
 
-    uint16_t generalCode;
+    uint16_t generalStatus;
+    uint16_t clusterStatus;
     lReader.Init(mReader);
 
     err = lReader.Next();
     SuccessOrExit(err);
     VerifyOrExit(lReader.GetType() == chip::TLV::kTLVType_UnsignedInteger, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    err = lReader.Get(generalCode);
+    err = lReader.Get(generalStatus);
     SuccessOrExit(err);
-    *apGeneralCode = static_cast<Protocols::SecureChannel::GeneralStatusCode>(generalCode);
+    *apGeneralStatus = static_cast<Protocols::SecureChannel::GeneralStatusCode>(generalStatus);
 
     err = lReader.Next();
     SuccessOrExit(err);
     VerifyOrExit(lReader.GetType() == chip::TLV::kTLVType_UnsignedInteger, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    err = lReader.Get(*apProtocolId);
+    err = lReader.Get(clusterStatus);
     SuccessOrExit(err);
-
-    err = lReader.Next();
-    SuccessOrExit(err);
-    VerifyOrExit(lReader.GetType() == chip::TLV::kTLVType_UnsignedInteger, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    err = lReader.Get(*apProtocolCode);
-    SuccessOrExit(err);
+    *apClusterStatus = static_cast<Protocols::InteractionModel::Status>(clusterStatus);
 
 exit:
     return err;
@@ -100,48 +96,33 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
         // This is an array; all elements are anonymous.
         VerifyOrExit(chip::TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
 
-        if (!(TagPresenceMask & (1 << kCsTag_GeneralCode)))
+        if (!(TagPresenceMask & (1 << kCsTag_GeneralStatus)))
         {
-            TagPresenceMask |= (1 << kCsTag_GeneralCode);
+            TagPresenceMask |= (1 << kCsTag_GeneralStatus);
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
-                uint16_t generalCode;
-                err = reader.Get(generalCode);
+                uint16_t generalStatus;
+                err = reader.Get(generalStatus);
                 SuccessOrExit(err);
 
-                PRETTY_PRINT("\tGeneralCode = 0x%" PRIx16 ",", generalCode);
+                PRETTY_PRINT("\tStatus = 0x%" PRIx16 ",", generalStatus);
             }
 #endif // CHIP_DETAIL_LOGGING
         }
-        else if (!(TagPresenceMask & (1 << kCsTag_ProtocolId)))
+        else if (!(TagPresenceMask & (1 << kCsTag_ClusterStatus)))
         {
-            TagPresenceMask |= (1 << kCsTag_ProtocolId);
+            TagPresenceMask |= (1 << kCsTag_ClusterStatus);
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
-                uint32_t kCsTag_ProtocolId;
-                err = reader.Get(kCsTag_ProtocolId);
+                uint16_t clusterStatus;
+                err = reader.Get(clusterStatus);
                 SuccessOrExit(err);
 
-                PRETTY_PRINT("\tProtocolId = 0x%" PRIx32 ",", kCsTag_ProtocolId);
-            }
-#endif // CHIP_DETAIL_LOGGING
-        }
-        else if (!(TagPresenceMask & (1 << kCsTag_ProtocolCode)))
-        {
-            TagPresenceMask |= (1 << kCsTag_ProtocolCode);
-            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-#if CHIP_DETAIL_LOGGING
-            {
-                uint16_t protocolCode;
-                err = reader.Get(protocolCode);
-                SuccessOrExit(err);
-
-                PRETTY_PRINT("\tprotocolCode = 0x%" PRIx16 ",", protocolCode);
+                PRETTY_PRINT("\tclusterStatus = 0x%" PRIx16 ",", clusterStatus);
             }
 #endif // CHIP_DETAIL_LOGGING
         }
@@ -157,7 +138,7 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const uint16_t RequiredFields = (1 << kCsTag_GeneralCode) | (1 << kCsTag_ProtocolId) | (1 << kCsTag_ProtocolCode);
+        const uint16_t RequiredFields = (1 << kCsTag_GeneralStatus) | (1 << kCsTag_ClusterStatus);
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -187,20 +168,17 @@ CHIP_ERROR StatusIB::Builder::Init(chip::TLV::TLVWriter * const apWriter, const 
     return ListBuilder::Init(apWriter, aContextTagToUse);
 }
 
-StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                      const uint32_t aProtocolId, const uint16_t aProtocolCode)
+StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const Protocols::SecureChannel::GeneralStatusCode aGeneralStatus,
+                                                      const Protocols::InteractionModel::Status aClusterStatus)
 {
     Tag tag = chip::TLV::AnonymousTag;
 
     SuccessOrExit(mError);
 
-    mError = mpWriter->Put(tag, static_cast<uint16_t>(aGeneralCode));
+    mError = mpWriter->Put(tag, static_cast<uint16_t>(aGeneralStatus));
     SuccessOrExit(mError);
 
-    mError = mpWriter->Put(tag, aProtocolId);
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(tag, aProtocolCode);
+    mError = mpWriter->Put(tag, static_cast<uint16_t>(aClusterStatus));
     SuccessOrExit(mError);
 
 exit:

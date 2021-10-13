@@ -79,8 +79,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to decode the request");
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Failure);
             return;
         }
 
@@ -106,13 +105,11 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         }
         else if (responseDirective == kSendSuccessStatusCode)
         {
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
+            apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::Success);
         }
         else if (responseDirective == kSendError)
         {
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::Failure);
         }
     }
 }

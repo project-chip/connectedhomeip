@@ -78,8 +78,8 @@ public:
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
     virtual CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,
-                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                     const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
+                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralStatus,
+                                     const Protocols::InteractionModel::Status aStatus)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     };
