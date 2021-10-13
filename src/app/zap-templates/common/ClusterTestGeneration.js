@@ -28,6 +28,7 @@ const templateUtil = require(zapPath + 'dist/src-electron/generator/template-uti
 
 const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
+const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templates/templates/app/helper.js');
 
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
@@ -342,6 +343,20 @@ function isTestOnlyCluster(name)
   return name == DelayCommands.name;
 }
 
+function chip_tests_item_response_type(options)
+{
+  const promise = assertCommandOrAttribute(this).then(item => {
+    if (item.hasSpecificResponse) {
+      return 'Clusters::' + asUpperCamelCase(this.cluster) + '::Commands::' + asUpperCamelCase(item.response.name)
+          + '::DecodableType';
+    }
+
+    return 'DataModel::NullObjectType';
+  });
+
+  return asPromise.call(this, promise, options);
+}
+
 function chip_tests_item_parameters(options)
 {
   const commandValues = this.arguments.values;
@@ -356,7 +371,7 @@ function chip_tests_item_parameters(options)
       return [];
     }
 
-    const commandArgs = item.expandedArguments || item.arguments;
+    const commandArgs = item.arguments;
     const commands    = commandArgs.map(commandArg => {
       commandArg = JSON.parse(JSON.stringify(commandArg));
 
@@ -366,7 +381,37 @@ function chip_tests_item_parameters(options)
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
       }
-      commandArg.definedValue = expected.value;
+      // test_cluster_command_value is a recursive partial using #each. At some point the |global|
+      // context is lost and it fails. Make sure to attach the global context as a property of the | value |
+      // that is evaluated.
+      function attachGlobal(global, value)
+      {
+        if (Array.isArray(value)) {
+          value = value.map(v => attachGlobal(global, v));
+        } else if (value instanceof Object) {
+          for (key in value) {
+            value[key] = attachGlobal(global, value[key]);
+          }
+        } else {
+          switch (typeof value) {
+          case 'number':
+            value = new Number(value);
+            break;
+          case 'string':
+            value = new String(value);
+            break;
+          case 'boolean':
+            value = new Boolean(value);
+            break;
+          default:
+            throw new Error('Unsupported value: ', value);
+          }
+        }
+
+        value.global = global;
+        return value;
+      }
+      commandArg.definedValue = attachGlobal(this.global, expected.value);
 
       return commandArg;
     });
@@ -423,5 +468,6 @@ function chip_tests_item_response_parameters(options)
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
+exports.chip_tests_item_response_type       = chip_tests_item_response_type;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;

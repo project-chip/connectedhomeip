@@ -58,13 +58,16 @@ class {{filename}}: public TestCommand
 
     {{#chip_tests_items}}
     {{#unless (isTestOnlyCluster cluster)}}
+    {{#unless isCommand}}
     chip::Callback::Callback<void (*) ({{>failureArguments}})> {{>failureCallback}} { {{>failureResponse}}, this };
     chip::Callback::Callback<void (*) ({{>successArguments}})> {{>successCallback}} { {{>successResponse}}, this };
+    {{/unless}}
     {{/unless}}
     {{/chip_tests_items}}
 
     {{#chip_tests_items}}
     {{#unless (isTestOnlyCluster cluster)}}
+    {{#unless isCommand}}
     static void {{>failureResponse}}({{> failureArguments}})
     {
         (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
@@ -80,6 +83,7 @@ class {{filename}}: public TestCommand
     bool mReceivedReport_{{index}} = false;
     {{/if}}
 
+    {{/unless}}
     {{/unless}}
     {{/chip_tests_items}}
 
@@ -105,12 +109,40 @@ class {{filename}}: public TestCommand
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
         cluster.Associate(mDevice, {{endpoint}});
 
+        {{#if isCommand}}
+        using requestType  = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
+        using responseType = chip::app::{{chip_tests_item_response_type}};
+        chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type request;
+        {{#chip_tests_item_parameters}}
+        request.{{asLowerCamelCase label}} =
+        {{#if_is_enum type}}
+        static_cast<{{zapTypeToEncodableClusterObjectType type ns=parent.cluster}}>({{definedValue}})
+        {{else if (isCharString type)}}
+        chip::Span<const char>("{{definedValue}}", strlen("{{definedValue}}"))
+        {{else if (isOctetString type)}})
+        chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"))
+        {{else}}
+        {{definedValue}}{{asTypeLiteralSuffix chipType}}
+        {{/if_is_enum}};
+        {{/chip_tests_item_parameters}}
+
+        auto success = [](void * context, const responseType & data) {
+            {{! TODO Update CHAR_STRING to be of type chip::CharSpan instead of chip::ByteSpan }}
+            (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{#if (isCharString type)}}chip::ByteSpan(reinterpret_cast<const unsigned char *>(data.{{asLowerCamelCase name}}.data()), data.{{asLowerCamelCase name}}.size()){{else}}data.{{asLowerCamelCase name}}{{/if}}{{/chip_tests_item_response_parameters}});
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
+        };
+        {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.InvokeCommand<requestType, responseType>(request, this, success, failure){{#if async}}){{/if}};
+        {{else}}
         {{#chip_tests_item_parameters}}
         {{chipType}} {{asLowerCamelCase name}}Argument = {{#if (isString type)}}chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}")){{else}}{{definedValue}}{{asTypeLiteralSuffix chipType}}{{/if}};
         {{/chip_tests_item_parameters}}
 
         {{~#*inline "commandName"}}{{asUpperCamelCase commandName}}{{#if isAttribute}}Attribute{{asUpperCamelCase attribute}}{{/if}}{{/inline}}
         {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.{{>commandName}}({{>successCallback}}.Cancel(){{#unless isWaitForReport}}, {{>failureCallback}}.Cancel(){{/unless}}{{#chip_tests_item_parameters}}, {{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}}){{#if async}}){{/if}};
+        {{/if}}
         {{#if async}}return WaitForMs(0);{{/if}}
     }
 

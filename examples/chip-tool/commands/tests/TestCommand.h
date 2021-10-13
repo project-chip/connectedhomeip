@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include <app-common/zap-generated/cluster-objects.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/support/UnitTestUtils.h>
 #include <zap-generated/tests/CHIPClustersTest.h>
