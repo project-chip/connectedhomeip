@@ -41,7 +41,6 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-event.h>
@@ -2440,7 +2439,7 @@ bool emberAfColorControlClusterColorLoopSetCallback(app::CommandHandler * comman
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
-    return ColorControlServer::Instance().colorLoopCommand(updateFlags, action, direction, time, startHue, optionsMask,
+    return ColorControlServer::Instance().colorLoopCommand(updateFlags.Raw(), action, direction, time, startHue, optionsMask,
                                                            optionsOverride);
 }
 
