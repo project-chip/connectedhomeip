@@ -55,10 +55,8 @@ class AmebaBuilder(Builder):
         self.app = app
 
     def generate(self):
-        cmd = '''
-        export AMEBA_BUILD="$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE"
-        export AMEBA_MATTER="%s"
-        $AMEBA_BUILD/build.sh ninja %s''' % (self.root, self.output_dir)
+        cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh %s ninja %s'
+        % (self.root, self.output_dir)
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
