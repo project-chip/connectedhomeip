@@ -241,7 +241,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
 
 OpCredsFabricTableDelegate gFabricDelegate;
 
-void emberAfPluginOperationalCredentialsServerInitCallback(void)
+void MatterOperationalCredentialsPluginServerInitCallback(void)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
     Server::GetInstance().GetFabricTable().SetFabricDelegate(&gFabricDelegate);

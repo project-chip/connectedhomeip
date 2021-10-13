@@ -1,0 +1,9 @@
+{{> header}}
+
+#pragma once
+
+{{#zcl_clusters}}
+{{#*inline "callbackName"}}void __attribute__((weak)) Matter{{asUpperCamelCase label}}{{> @partial-block}}InitCallback() {};{{/inline}}
+{{#>callbackName}}PluginClient{{/callbackName}}
+{{#>callbackName}}PluginServer{{/callbackName}}
+{{/zcl_clusters}}
