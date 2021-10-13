@@ -147,7 +147,7 @@ CHIP_ERROR DNSResolver::Cancel()
     // application has called Cancel() we have to make sure to NOT call their mOnComplete function
     // when the request completes.
     //
-    // To ensure the right thing happens, we nullptr the mOnComplete pointer here, which signals the
+    // To ensure the right thing happens, we null out the mOnComplete pointer here, which signals the
     // code in HandleResolveComplete() and LwIPHandleResolveComplete() to not interact with the
     // application's state data (mAddrArray) and to not call the application's callback. This has
     // to happen with the LwIP lock held, since LwIPHandleResolveComplete() runs on LwIP's thread.
@@ -188,7 +188,7 @@ void DNSResolver::HandleResolveComplete()
  *  This method is called by LwIP network stack on success, failure, or timeout
  *  of a DNS request.
  *
- *  @param[in]  name            A pointer to a nullptr-terminated C string
+ *  @param[in]  name            A pointer to a null-terminated C string
  *                              representing the host name that is queried.
  *  @param[in]  ipaddr          A pointer to a list of resolved IP addresses.
  *  @param[in]  callback_arg    A pointer to the arguments that are passed to
