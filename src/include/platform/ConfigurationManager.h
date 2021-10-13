@@ -82,16 +82,8 @@ public:
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
     CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize);
     CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev);
-    CHIP_ERROR GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
-                                    uint8_t & second);
     CHIP_ERROR GetDeviceId(uint64_t & deviceId);
-    CHIP_ERROR GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
-    CHIP_ERROR GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
-    CHIP_ERROR GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen);
     CHIP_ERROR GetManufacturerDeviceId(uint64_t & deviceId);
-    CHIP_ERROR GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
-    CHIP_ERROR GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
-    CHIP_ERROR GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen);
     CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode);
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator);
     CHIP_ERROR GetServiceId(uint64_t & serviceId);
@@ -112,9 +104,6 @@ public:
     CHIP_ERROR StoreProductRevision(uint16_t productRev);
     CHIP_ERROR StoreFabricId(uint64_t fabricId);
     CHIP_ERROR StoreManufacturerDeviceId(uint64_t deviceId);
-    CHIP_ERROR StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen);
-    CHIP_ERROR StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen);
-    CHIP_ERROR StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen);
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode);
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator);
     CHIP_ERROR StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
@@ -142,8 +131,6 @@ public:
     bool IsFullyProvisioned();
     void InitiateFactoryReset();
 
-    CHIP_ERROR ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize);
-
     void LogDeviceConfig();
 
     bool IsCommissionableDeviceTypeEnabled();
@@ -170,7 +157,6 @@ private:
     using ImplClass = ::chip::DeviceLayer::ConfigurationManagerImpl;
 
     CHIP_ERROR Init();
-    CHIP_ERROR ConfigureChipStack();
     bool CanFactoryReset();
     CHIP_ERROR GetFailSafeArmed(bool & val);
     CHIP_ERROR SetFailSafeArmed(bool val);
@@ -303,50 +289,14 @@ inline CHIP_ERROR ConfigurationManager::GetFirmwareRevision(uint32_t & firmwareR
     return static_cast<ImplClass *>(this)->_GetFirmwareRevision(firmwareRev);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour,
-                                                             uint8_t & minute, uint8_t & second)
-{
-    return static_cast<ImplClass *>(this)->_GetFirmwareBuildTime(year, month, dayOfMonth, hour, minute, second);
-}
-
 inline CHIP_ERROR ConfigurationManager::GetDeviceId(uint64_t & deviceId)
 {
     return static_cast<ImplClass *>(this)->_GetDeviceId(deviceId);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
-{
-    return static_cast<ImplClass *>(this)->_GetDeviceCertificate(buf, bufSize, certLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
-{
-    return static_cast<ImplClass *>(this)->_GetDeviceIntermediateCACerts(buf, bufSize, certsLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
-{
-    return static_cast<ImplClass *>(this)->_GetDevicePrivateKey(buf, bufSize, keyLen);
-}
-
 inline CHIP_ERROR ConfigurationManager::GetManufacturerDeviceId(uint64_t & deviceId)
 {
     return static_cast<ImplClass *>(this)->_GetManufacturerDeviceId(deviceId);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
-{
-    return static_cast<ImplClass *>(this)->_GetManufacturerDeviceCertificate(buf, bufSize, certLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
-{
-    return static_cast<ImplClass *>(this)->_GetManufacturerDeviceIntermediateCACerts(buf, bufSize, certsLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
-{
-    return static_cast<ImplClass *>(this)->_GetManufacturerDevicePrivateKey(buf, bufSize, keyLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetSetupPinCode(uint32_t & setupPinCode)
@@ -434,21 +384,6 @@ inline CHIP_ERROR ConfigurationManager::StoreFabricId(uint64_t fabricId)
 inline CHIP_ERROR ConfigurationManager::StoreManufacturerDeviceId(uint64_t deviceId)
 {
     return static_cast<ImplClass *>(this)->_StoreManufacturerDeviceId(deviceId);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreManufacturerDeviceCertificate(cert, certLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreManufacturerDeviceIntermediateCACerts(certs, certsLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreManufacturerDevicePrivateKey(key, keyLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreSetupPinCode(uint32_t setupPinCode)
@@ -559,19 +494,9 @@ inline CHIP_ERROR ConfigurationManager::RunUnitTests()
 }
 #endif
 
-inline CHIP_ERROR ConfigurationManager::ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize)
-{
-    return static_cast<ImplClass *>(this)->_ComputeProvisioningHash(hashBuf, hashBufSize);
-}
-
 inline CHIP_ERROR ConfigurationManager::Init()
 {
     return static_cast<ImplClass *>(this)->_Init();
-}
-
-inline CHIP_ERROR ConfigurationManager::ConfigureChipStack()
-{
-    return static_cast<ImplClass *>(this)->_ConfigureChipStack();
 }
 
 inline bool ConfigurationManager::CanFactoryReset()

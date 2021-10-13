@@ -42,11 +42,6 @@ private:
     CHIP_ERROR _StoreProductRevision(uint16_t productRev) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetFirmwareRevisionString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetFirmwareRevision(uint32_t & firmwareRev) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
-                                     uint8_t & second)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
     CHIP_ERROR _GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreSerialNumber(const char * serialNum, size_t serialNumLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetPrimaryMACAddress(MutableByteSpan buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -58,32 +53,8 @@ private:
     CHIP_ERROR _GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetDeviceId(uint64_t & deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetManufacturerDeviceId(uint64_t & deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreManufacturerDeviceId(uint64_t deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetSetupPinCode(uint32_t & setupPinCode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreSetupPinCode(uint32_t setupPinCode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetSetupDiscriminator(uint16_t & setupDiscriminator) { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -124,7 +95,6 @@ private:
     CHIP_ERROR _StoreCountryCode(const char * code, size_t codeLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetBreadcrumb(uint64_t & breadcrumb) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreBreadcrumb(uint64_t breadcrumb) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _ConfigureChipStack() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if !defined(NDEBUG)
     CHIP_ERROR _RunUnitTests(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
@@ -132,7 +102,6 @@ private:
     bool _IsMemberOfFabric() { return false; }
     bool _IsPairedToAccount() { return false; }
     bool _IsFullyProvisioned() { return false; }
-    CHIP_ERROR _ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     void _UseManufacturerCredentialsAsOperational(bool val) {}
     void _LogDeviceConfig() {}
     bool _CanFactoryReset() { return true; }

@@ -62,8 +62,6 @@ public:
     CHIP_ERROR _StoreProductRevision(uint16_t productRev);
     CHIP_ERROR _GetFirmwareRevisionString(char * buf, size_t bufSize);
     CHIP_ERROR _GetFirmwareRevision(uint32_t & firmwareRev);
-    CHIP_ERROR _GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
-                                     uint8_t & second);
     CHIP_ERROR _GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
     CHIP_ERROR _StoreSerialNumber(const char * serialNum, size_t serialNumLen);
     CHIP_ERROR _GetPrimaryMACAddress(MutableByteSpan buf);
@@ -75,17 +73,8 @@ public:
     CHIP_ERROR _GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
     CHIP_ERROR _StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen);
     CHIP_ERROR _GetDeviceId(uint64_t & deviceId);
-    CHIP_ERROR _GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
-    CHIP_ERROR _GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
-    CHIP_ERROR _GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen);
     CHIP_ERROR _GetManufacturerDeviceId(uint64_t & deviceId);
     CHIP_ERROR _StoreManufacturerDeviceId(uint64_t deviceId);
-    CHIP_ERROR _GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
-    CHIP_ERROR _StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen);
-    CHIP_ERROR _GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
-    CHIP_ERROR _StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen);
-    CHIP_ERROR _GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen);
-    CHIP_ERROR _StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen);
     CHIP_ERROR _GetSetupPinCode(uint32_t & setupPinCode);
     CHIP_ERROR _StoreSetupPinCode(uint32_t setupPinCode);
     CHIP_ERROR _GetSetupDiscriminator(uint16_t & setupDiscriminator);
@@ -123,7 +112,6 @@ public:
     CHIP_ERROR _StoreCountryCode(const char * code, size_t codeLen);
     CHIP_ERROR _GetBreadcrumb(uint64_t & breadcrumb);
     CHIP_ERROR _StoreBreadcrumb(uint64_t breadcrumb);
-    CHIP_ERROR _ConfigureChipStack();
 #if !defined(NDEBUG)
     CHIP_ERROR _RunUnitTests(void);
 #endif
@@ -131,7 +119,6 @@ public:
     bool _IsMemberOfFabric();
     bool _IsPairedToAccount();
     bool _IsFullyProvisioned();
-    CHIP_ERROR _ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize);
     void _LogDeviceConfig();
 
 protected:
