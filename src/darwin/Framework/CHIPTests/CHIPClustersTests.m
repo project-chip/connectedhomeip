@@ -4238,7 +4238,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: FeatureMap"];
 
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
@@ -4259,7 +4259,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: FeatureMap"];
 
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
@@ -16015,7 +16015,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"WindowCoveringReadAttributeFeatureMapWithResponseHandler"];
 
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
