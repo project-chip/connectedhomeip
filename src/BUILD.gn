@@ -101,8 +101,7 @@ if (chip_build_tests) {
     }
 
     if (current_os != "zephyr" && current_os != "mbed" &&
-        chip_device_platform != "esp32" &&
-        chip_device_platform != "ameba") {
+        chip_device_platform != "esp32" && chip_device_platform != "ameba") {
       deps += [ "${chip_root}/src/lib/shell/tests" ]
     }
 
