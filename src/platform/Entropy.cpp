@@ -28,9 +28,7 @@
 
 // Temporary includes for TemporaryAuditRandomPerformance()
 // TODO: remove once https://github.com/project-chip/connectedhomeip/issues/10454 is done.
-#if 1
 #include <lib/support/BytesToHex.h>
-#endif
 
 namespace chip {
 
@@ -40,11 +38,8 @@ namespace {
 // TODO: remove once https://github.com/project-chip/connectedhomeip/issues/10454 is done.
 void TemporaryAuditRandomNumberGenerator()
 {
-    uint8_t buf1[16];
-    uint8_t buf2[16];
-
-    memset(&buf1[0], 0, sizeof(buf1));
-    memset(&buf2[0], 0, sizeof(buf2));
+    uint8_t buf1[16] = { 0 };
+    uint8_t buf2[16] = { 0 };
 
     VerifyOrDie(chip::Crypto::DRBG_get_bytes(&buf1[0], sizeof(buf1)) == CHIP_NO_ERROR);
     VerifyOrDie(chip::Crypto::DRBG_get_bytes(&buf2[0], sizeof(buf2)) == CHIP_NO_ERROR);
@@ -70,7 +65,7 @@ void TemporaryAuditRandomNumberGenerator()
     uint32_t r2 = GetRandU32();
 
     ChipLogProgress(DeviceLayer, "AUDIT: * r1: 0x%08" PRIX32 " r2: 0x%08" PRIX32, r1, r2);
-    VerifyOrDieWithMsg(r1 != r2, DeviceLayer, "AUDIT: FAILED: buf1, buf2 are equal: random number generator does not function!");
+    VerifyOrDieWithMsg(r1 != r2, DeviceLayer, "AUDIT: FAILED: r1, r2 are equal: random number generator does not function!");
     ChipLogProgress(DeviceLayer, "AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====");
 }
 
@@ -85,10 +80,8 @@ CHIP_ERROR InitEntropy()
     ReturnErrorOnFailure(chip::Crypto::DRBG_get_bytes((uint8_t *) &seed, sizeof(seed)));
     srand(seed);
 
-    {
-        // TODO: remove once https://github.com/project-chip/connectedhomeip/issues/10454 is done.
-        TemporaryAuditRandomNumberGenerator();
-    }
+    // TODO: remove once https://github.com/project-chip/connectedhomeip/issues/10454 is done.
+    TemporaryAuditRandomNumberGenerator();
     return CHIP_NO_ERROR;
 }
 
