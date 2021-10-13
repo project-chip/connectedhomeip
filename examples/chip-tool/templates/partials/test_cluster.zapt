@@ -112,18 +112,10 @@ class {{filename}}: public TestCommand
         {{#if isCommand}}
         using requestType  = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
         using responseType = chip::app::{{chip_tests_item_response_type}};
+
         chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type request;
         {{#chip_tests_item_parameters}}
-        request.{{asLowerCamelCase label}} =
-        {{#if_is_enum type}}
-        static_cast<{{zapTypeToEncodableClusterObjectType type ns=parent.cluster}}>({{definedValue}})
-        {{else if (isCharString type)}}
-        chip::Span<const char>("{{definedValue}}", strlen("{{definedValue}}"))
-        {{else if (isOctetString type)}})
-        chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"))
-        {{else}}
-        {{definedValue}}{{asTypeLiteralSuffix chipType}}
-        {{/if_is_enum}};
+        {{>commandValue ns=parent.cluster container="request" definedValue=definedValue}}
         {{/chip_tests_item_parameters}}
 
         auto success = [](void * context, const responseType & data) {
