@@ -521,11 +521,7 @@ JNI_METHOD(jlong, {{asUpperCamelCase name}}Cluster, initWithDevice)(JNIEnv * env
 }
 
 {{#chip_cluster_commands}}
-{{#if (zcl_command_arguments_count this.id)}}
-JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{#chip_cluster_command_arguments}}{{asJniBasicType type}} {{asLowerCamelCase label}}{{#not_last}}, {{/not_last}}{{/chip_cluster_command_arguments}})
-{{else}}
-JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-{{/if}}
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback{{#chip_cluster_command_arguments}}, {{asJniBasicType type}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}})
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
