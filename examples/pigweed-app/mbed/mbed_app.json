@@ -11,7 +11,6 @@
             "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
             "mbed-trace.enable": true,
             "target.printf_lib": "std"
-
         },
         "CY8CPROTO_062_4343W": {
             "target.network-default-interface-type": "WIFI",

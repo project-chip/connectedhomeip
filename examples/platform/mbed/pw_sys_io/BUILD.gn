@@ -29,9 +29,9 @@ pw_source_set("pw_sys_io_mbed") {
 
   cflags = [ "-Wconversion" ]
 
-  cflags_cc = [ 
+  cflags_cc = [
     "-Wno-error=undef",
-    "-Wno-error=cast-qual"
+    "-Wno-error=cast-qual",
   ]
 
   public_configs = [ ":default_config" ]
