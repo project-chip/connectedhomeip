@@ -88,7 +88,7 @@ jobs:
                   scripts/examples/mbed_example.sh -a=pigweed-app -b=$APP_TARGET -p=$APP_PROFILE
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     mbed $APP_TARGET+$APP_PROFILE pigweed-app \
-                    examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-pigweed-app-example.elf \
+                    examples/pigweed-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-pigweed-app-example.elf \
                     /tmp/bloat_reports/
 
             - name: Build unit tests
