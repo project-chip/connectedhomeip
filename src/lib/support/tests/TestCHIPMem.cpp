@@ -95,12 +95,39 @@ static void TestMemAlloc_Realloc(nlTestSuite * inSuite, void * inContext)
     chip::Platform::MemoryFree(pb);
 }
 
+static void TestMemAlloc_UniquePtr(nlTestSuite * inSuite, void * inContext)
+{
+    // UniquePtr is a wrapper of std::unique_ptr for platform allocators, we just check if we created a correct wrapper here.
+    int constructorCalled = 0;
+    int destructorCalled  = 0;
+
+    class Cls
+    {
+    public:
+        Cls(int * constructCtr, int * desctructorCtr) : mpDestructorCtr(desctructorCtr) { (*constructCtr)++; }
+        ~Cls() { (*mpDestructorCtr)++; }
+
+    private:
+        int * mpDestructorCtr;
+    };
+
+    {
+        auto ptr = MakeUnique<Cls>(&constructorCalled, &destructorCalled);
+        NL_TEST_ASSERT(inSuite, constructorCalled == 1);
+        NL_TEST_ASSERT(inSuite, destructorCalled == 0);
+        IgnoreUnusedVariable(ptr);
+    }
+
+    NL_TEST_ASSERT(inSuite, destructorCalled == 1);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF("Test MemAlloc::Malloc", TestMemAlloc_Malloc),
                                  NL_TEST_DEF("Test MemAlloc::Calloc", TestMemAlloc_Calloc),
-                                 NL_TEST_DEF("Test MemAlloc::Realloc", TestMemAlloc_Realloc), NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF("Test MemAlloc::Realloc", TestMemAlloc_Realloc),
+                                 NL_TEST_DEF("Test MemAlloc::UniquePtr", TestMemAlloc_UniquePtr), NL_TEST_SENTINEL() };
 
 /**
  *  Set up the test suite.

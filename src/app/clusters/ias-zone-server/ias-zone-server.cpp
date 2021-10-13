@@ -212,22 +212,23 @@ static void enrollWithClient(EndpointId endpoint)
     }
 }
 
-EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint16_t size,
-                                                                     uint8_t * value)
+Protocols::InteractionModel::Status
+MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     uint8_t i;
     bool zeroAddress;
     EmberBindingTableEntry bindingEntry;
     EmberBindingTableEntry currentBind;
     NodeId destNodeId;
+    EndpointId endpoint   = attributePath.mEndpointId;
     uint8_t ieeeAddress[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
     // If this is not a CIE Address write, the CIE address has already been
     // written, or the IAS Zone server is already enrolled, do nothing.
-    if (attributeId != ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID || emberAfCurrentCommand() == NULL)
+    if (attributePath.mAttributeId != ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID || emberAfCurrentCommand() == NULL)
     {
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return Protocols::InteractionModel::Status::Success;
     }
 
     memcpy(&destNodeId, value, sizeof(NodeId));
@@ -295,7 +296,7 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId 
                                           EMBER_AF_STAY_AWAKE);
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(EndpointId endpoint, EmberAfIasZoneEnrollmentMode method)
@@ -352,9 +353,11 @@ static void updateEnrollState(EndpointId endpoint, bool enrolled)
 }
 
 bool emberAfIasZoneClusterZoneEnrollResponseCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                     EndpointId aEndpoint, uint8_t enrollResponseCode, uint8_t zoneId,
-                                                     Commands::ZoneEnrollResponse::DecodableType & commandData)
+                                                     const Commands::ZoneEnrollResponse::DecodableType & commandData)
 {
+    auto & enrollResponseCode = commandData.enrollResponseCode;
+    auto & zoneId             = commandData.zoneId;
+
     EndpointId endpoint;
     uint8_t epZoneId;
     EmberAfStatus status;

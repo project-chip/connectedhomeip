@@ -33,6 +33,10 @@
 
 namespace chip {
 
+namespace Dnssd {
+class DiscoveryImplPlatform;
+}
+
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -176,6 +180,7 @@ private:
     friend class PlatformManagerImpl;
     friend class ConnectivityManagerImpl;
     friend class ConfigurationManagerImpl;
+    friend class Dnssd::DiscoveryImplPlatform;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
@@ -252,6 +257,18 @@ public:
     StackLock() { PlatformMgr().LockChipStack(); }
 
     ~StackLock() { PlatformMgr().UnlockChipStack(); }
+};
+
+/**
+ * @brief
+ * RAII unlocking for PlatformManager to simplify management of
+ * LockChipStack()/UnlockChipStack calls.
+ */
+class StackUnlock
+{
+public:
+    StackUnlock() { PlatformMgr().UnlockChipStack(); }
+    ~StackUnlock() { PlatformMgr().LockChipStack(); }
 };
 
 } // namespace DeviceLayer

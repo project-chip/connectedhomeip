@@ -223,6 +223,16 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiStationMode                = kWiFiStationMode_Disabled;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
 
+    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get Ethernet interface");
+        mEthIfName[0] = '\0';
+    }
+
     if (ResetEthernetStatsCount() != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to reset Ethernet statistic counts");
@@ -1018,6 +1028,47 @@ exit:
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthPHYRate(uint8_t & pHYRate)
+{
+    int skfd;
+
+    if (mEthIfName[0] == '\0')
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
+
+    return ConnectivityUtils::GetEthPHYRate(skfd, mEthIfName, pHYRate);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthFullDuplex(bool & fullDuplex)
+{
+    int skfd;
+
+    if (mEthIfName[0] == '\0')
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
+
+    return ConnectivityUtils::GetEthFullDuplex(skfd, mEthIfName, fullDuplex);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthTimeSinceReset(uint64_t & timeSinceReset)
+{
+    return PlatformMgr().GetUpTime(timeSinceReset);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketRxCount(uint64_t & packetRxCount)

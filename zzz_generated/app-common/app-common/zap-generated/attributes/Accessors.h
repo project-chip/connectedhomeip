@@ -1313,8 +1313,8 @@ namespace EthernetNetworkDiagnostics {
 namespace Attributes {
 
 namespace PHYRate {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * pHYRate); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t pHYRate);
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * PHYRate); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t PHYRate);
 } // namespace PHYRate
 
 namespace FullDuplex {

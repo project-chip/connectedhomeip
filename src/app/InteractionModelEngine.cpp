@@ -61,21 +61,23 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
-    for (auto & commandSender : mCommandSenderObjs)
-    {
-        if (!commandSender.IsFree())
-        {
-            commandSender.Shutdown();
-        }
-    }
-
-    for (auto & commandHandler : mCommandHandlerObjs)
-    {
-        if (!commandHandler.IsFree())
-        {
-            commandHandler.Shutdown();
-        }
-    }
+    //
+    // Since modifying the pool during iteration is generally frowned upon,
+    // I've chosen to just destroy the object but not necessarily de-allocate it.
+    //
+    // This poses a problem when shutting down and restarting the stack, since the
+    // IMEngine is a statically constructed singleton, and this lingering state will
+    // cause issues.
+    //
+    // This doesn't pose a problem right now because there shouldn't be any actual objects
+    // left here due to the synchronous nature of command handling.
+    //
+    // Filed #10332 to track this.
+    //
+    mCommandHandlerObjs.ForEachActiveObject([](CommandHandler * obj) -> bool {
+        obj->~CommandHandler();
+        return true;
+    });
 
     for (auto & readClient : mReadClients)
     {
@@ -118,26 +120,6 @@ void InteractionModelEngine::Shutdown()
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 }
 
-CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCommandSender)
-{
-    *apCommandSender = nullptr;
-
-    for (auto & commandSender : mCommandSenderObjs)
-    {
-        if (commandSender.IsFree())
-        {
-            const CHIP_ERROR err = commandSender.Init(mpExchangeMgr, mpDelegate);
-            if (err == CHIP_NO_ERROR)
-            {
-                *apCommandSender = &commandSender;
-            }
-            return err;
-        }
-    }
-
-    return CHIP_ERROR_NO_MEMORY;
-}
-
 CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
                                                  uint64_t aAppIdentifier)
 {
@@ -154,6 +136,22 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
                 *apReadClient = nullptr;
             }
             return err;
+        }
+    }
+
+    return err;
+}
+
+CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
+{
+    CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
+
+    for (auto & readClient : mReadClients)
+    {
+        if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.IsMatchingClient(aSubscriptionId))
+        {
+            readClient.Shutdown();
+            err = CHIP_NO_ERROR;
         }
     }
 
@@ -200,31 +198,21 @@ CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext *
     return err;
 }
 
+void InteractionModelEngine::OnDone(CommandHandler * apCommandObj)
+{
+    mCommandHandlerObjs.ReleaseObject(apCommandObj);
+}
+
 CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
                                                           const PayloadHeader & aPayloadHeader,
                                                           System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    for (auto & commandHandler : mCommandHandlerObjs)
+    CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(this);
+    if (commandHandler == nullptr)
     {
-        if (commandHandler.IsFree())
-        {
-            err = commandHandler.Init(mpExchangeMgr, mpDelegate);
-            SuccessOrExit(err);
-            err               = commandHandler.OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
-            apExchangeContext = nullptr;
-            break;
-        }
+        return CHIP_ERROR_NO_MEMORY;
     }
-
-exit:
-
-    if (nullptr != apExchangeContext)
-    {
-        apExchangeContext->Abort();
-    }
-    return err;
+    return commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
 }
 
 CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -236,6 +224,26 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
 
     ChipLogDetail(InteractionModel, "Receive %s request",
                   aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
+
+    for (auto & readHandler : mReadHandlers)
+    {
+        if (!readHandler.IsFree() && readHandler.IsSubscriptionType() &&
+            readHandler.GetInitiatorNodeId() == apExchangeContext->GetSecureSession().GetPeerNodeId() &&
+            readHandler.GetFabricIndex() == apExchangeContext->GetSecureSession().GetFabricIndex())
+        {
+            bool keepSubscriptions = true;
+            System::PacketBufferTLVReader reader;
+            reader.Init(aPayload.Retain());
+            SuccessOrExit(err = reader.Next());
+            SubscribeRequest::Parser subscribeRequestParser;
+            SuccessOrExit(err = subscribeRequestParser.Init(reader));
+            err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
+            if (err == CHIP_NO_ERROR && !keepSubscriptions)
+            {
+                readHandler.Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
+            }
+        }
+    }
 
     for (auto & readHandler : mReadHandlers)
     {

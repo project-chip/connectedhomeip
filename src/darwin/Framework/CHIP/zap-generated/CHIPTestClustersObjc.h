@@ -283,11 +283,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestEthernetNetworkDiagnostics : CHIPEthernetNetworkDiagnostics
 
+- (void)writeAttributePHYRateWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeFullDuplexWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributePacketRxCountWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributePacketTxCountWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeTxErrCountWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCollisionCountWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOverrunCountWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeCarrierDetectWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeTimeSinceResetWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

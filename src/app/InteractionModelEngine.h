@@ -29,6 +29,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -62,7 +63,7 @@ static constexpr size_t kMaxSecureSduLengthBytes = 1024;
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeDelegate
+class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback
 {
 public:
     /**
@@ -93,17 +94,6 @@ public:
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
     /**
-     *  Retrieve a CommandSender that the SDK consumer can use to send a set of commands.  If the call succeeds,
-     *  see CommandSender documentation for lifetime handling.
-     *
-     *  @param[out]    apCommandSender    A pointer to the CommandSender object.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no CommandSender available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR NewCommandSender(CommandSender ** const apCommandSender);
-
-    /**
      *  Creates a new read client and send ReadRequest message to the node using the read client,
      *  shutdown if fail to send it out
      *
@@ -120,6 +110,14 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
+
+    /**
+     * Tears down an active subscription.
+     *
+     * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
+     * @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR ShutdownSubscription(uint64_t aSubscriptionId);
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
      *  see WriteClient documentation for lifetime handling.
@@ -157,6 +155,10 @@ public:
 
 private:
     friend class reporting::Engine;
+    friend class TestCommandInteraction;
+
+    void OnDone(CommandHandler * apCommandObj);
+
     CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                 System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -200,8 +202,7 @@ private:
 
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
-    CommandHandler mCommandHandlerObjs[CHIP_IM_MAX_NUM_COMMAND_HANDLER];
-    CommandSender mCommandSenderObjs[CHIP_IM_MAX_NUM_COMMAND_SENDER];
+    BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
     ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
     WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];

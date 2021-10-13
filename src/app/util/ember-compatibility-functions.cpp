@@ -76,6 +76,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:   // Vendor Id
     case ZCL_ENUM16_ATTRIBUTE_TYPE:      // 16-bit enumeration
     case ZCL_BITMAP16_ATTRIBUTE_TYPE:    // 16-bit bitmap
+    case ZCL_STATUS_ATTRIBUTE_TYPE:      // Status Code
         static_assert(std::is_same<chip::EndpointId, uint16_t>::value,
                       "chip::EndpointId is expected to be uint8_t, change this when necessary");
         static_assert(std::is_same<chip::GroupId, uint16_t>::value,
@@ -89,7 +90,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_COMMAND_ID_ATTRIBUTE_TYPE: // Command Id
     case ZCL_TRANS_ID_ATTRIBUTE_TYPE:   // Transaction Id
     case ZCL_DEVTYPE_ID_ATTRIBUTE_TYPE: // Device Type Id
-    case ZCL_STATUS_ATTRIBUTE_TYPE:     // Status Code
     case ZCL_DATA_VER_ATTRIBUTE_TYPE:   // Data Version
     case ZCL_BITMAP32_ATTRIBUTE_TYPE:   // 32-bit bitmap
     case ZCL_EPOCH_S_ATTRIBUTE_TYPE:    // Epoch Seconds
@@ -107,8 +107,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::TransactionId is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::DeviceTypeId, uint32_t>::value,
                       "chip::DeviceTypeId is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::StatusCode, uint32_t>::value,
-                      "chip::StatusCode is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::DataVersion, uint32_t>::value,
                       "chip::DataVersion is expected to be uint32_t, change this when necessary");
         return ZCL_INT32U_ATTRIBUTE_TYPE;
@@ -484,9 +482,8 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 } // namespace app
 } // namespace chip
 
-void InteractionModelReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                      uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type,
-                                                      uint8_t * data)
+void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                            uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
 {
     IgnoreUnusedVariable(manufacturerCode);
     IgnoreUnusedVariable(type);

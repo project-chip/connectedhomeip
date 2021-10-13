@@ -5851,6 +5851,189 @@ private:
     CHIP_ERROR TestWait100ms_0() { return WaitForMs(100); }
 };
 
+class TestDescriptorCluster : public TestCommand
+{
+public:
+    TestDescriptorCluster() : TestCommand("TestDescriptorCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestDescriptorCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestDescriptorCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Read attribute Device list\n");
+            err = TestReadAttributeDeviceList_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read attribute Server list\n");
+            err = TestReadAttributeServerList_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read attribute Client list\n");
+            err = TestReadAttributeClientList_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read attribute Parts list\n");
+            err = TestReadAttributePartsList_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t count, _DeviceType * deviceList)> mOnSuccessCallback_0{
+        OnSuccessCallback_0, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t count, chip::ClusterId * serverList)> mOnSuccessCallback_1{
+        OnSuccessCallback_1, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t count, chip::ClusterId * clientList)> mOnSuccessCallback_2{
+        OnSuccessCallback_2, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t count, chip::EndpointId * partsList)> mOnSuccessCallback_3{
+        OnSuccessCallback_3, this
+    };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<TestDescriptorCluster *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint16_t count, _DeviceType * deviceList)
+    {
+        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_0(count, deviceList);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<TestDescriptorCluster *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t count, chip::ClusterId * serverList)
+    {
+        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_1(count, serverList);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<TestDescriptorCluster *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t count, chip::ClusterId * clientList)
+    {
+        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_2(count, clientList);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<TestDescriptorCluster *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint16_t count, chip::EndpointId * partsList)
+    {
+        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_3(count, partsList);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadAttributeDeviceList_0()
+    {
+        chip::Controller::DescriptorClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeDeviceList(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint16_t count, _DeviceType * deviceList)
+    {
+        VerifyOrReturn(CheckValueAsList("deviceList", count, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeServerList_1()
+    {
+        chip::Controller::DescriptorClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeServerList(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t count, chip::ClusterId * serverList)
+    {
+        VerifyOrReturn(CheckValueAsList("serverList", count, 18));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeClientList_2()
+    {
+        chip::Controller::DescriptorClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeClientList(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t count, chip::ClusterId * clientList)
+    {
+        VerifyOrReturn(CheckValueAsList("clientList", count, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributePartsList_3()
+    {
+        chip::Controller::DescriptorClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributePartsList(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint16_t count, chip::EndpointId * partsList)
+    {
+        VerifyOrReturn(CheckValueAsList("partsList", count, 2));
+        NextTest();
+    }
+};
+
 class TestSubscribe_OnOff : public TestCommand
 {
 public:
@@ -15828,6 +16011,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestCluster>(),
         make_unique<TestConstraints>(),
         make_unique<TestDelayCommands>(),
+        make_unique<TestDescriptorCluster>(),
         make_unique<TestSubscribe_OnOff>(),
         make_unique<Test_TC_OO_1_1>(),
         make_unique<Test_TC_OO_2_1>(),

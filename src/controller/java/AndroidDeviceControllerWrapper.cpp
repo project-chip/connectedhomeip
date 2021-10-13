@@ -17,7 +17,6 @@
  */
 #include "AndroidDeviceControllerWrapper.h"
 #include <lib/support/CHIPJNIError.h>
-#include <lib/support/StackLock.h>
 
 #include <algorithm>
 #include <memory>
@@ -169,8 +168,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
-                                                                             pthread_mutex_t * stackLock, chip::NodeId nodeId,
-                                                                             chip::System::Layer * systemLayer,
+                                                                             chip::NodeId nodeId, chip::System::Layer * systemLayer,
                                                                              chip::Inet::InetLayer * inetLayer,
                                                                              CHIP_ERROR * errInfoOnFailure)
 {
@@ -201,7 +199,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
         return nullptr;
     }
-    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller), stackLock));
+    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller)));
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
 
@@ -274,25 +272,25 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    chip::DeviceLayer::StackUnlock unlock;
     CallJavaMethod("onStatusUpdate", static_cast<jint>(status));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    chip::DeviceLayer::StackUnlock unlock;
     CallJavaMethod("onPairingComplete", static_cast<jint>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    chip::DeviceLayer::StackUnlock unlock;
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningCompleteMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningComplete", "(JI)V",

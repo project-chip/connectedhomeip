@@ -113,6 +113,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     uint16_t mGAPConns;
     char mDeviceName[kMaxDeviceNameLength + 1];
     uint8_t mAdvertisingDataBuffer[kAdvertisingDataSize];
+    bool mInitialized = false;
 
     static void DoBLEProcessing(intptr_t arg);
     void HandleInitComplete(bool no_error);

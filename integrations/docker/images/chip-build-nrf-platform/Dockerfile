@@ -2,7 +2,7 @@ ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=v1.7.0
+ARG NCS_REVISION=ffcf07fe4586634a6793a48e5444a7196e7ebac6
 
 # ==================================================
 # nRF Connect SDK dependencies
@@ -12,7 +12,7 @@ ARG NCS_REVISION=v1.7.0
 WORKDIR /opt/NordicSemiconductor/nRF5_tools/install
 RUN set -x \
     && apt-get update \
-    && apt-get install --no-install-recommends -fy device-tree-compiler \
+    && apt-get install --no-install-recommends -fy device-tree-compiler ccache \
     && curl https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64.tar.gz \
     | tar zxvf - \
     && cd .. \

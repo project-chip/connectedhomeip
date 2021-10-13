@@ -54,6 +54,7 @@ class DLL_EXPORT EndPointBasis : public InetLayerBasis
 {
 protected:
     void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
+    void DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic);
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     nw_parameters_t mParameters;
@@ -88,8 +89,6 @@ protected:
         UCP     = 3,
         TCP     = 4
     } mLwIPEndPointType;
-
-    void DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 };
 

@@ -59,7 +59,7 @@ function(chip_configure_data_model APP_TARGET)
     if (ARG_INCLUDE_SERVER)
         target_sources(${APP_TARGET} PRIVATE
             ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
-            ${CHIP_APP_BASE_DIR}/server/Mdns.cpp
+            ${CHIP_APP_BASE_DIR}/server/Dnssd.cpp
             ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp
             ${CHIP_APP_BASE_DIR}/server/Server.cpp
             ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
@@ -72,8 +72,7 @@ function(chip_configure_data_model APP_TARGET)
 
     target_sources(${APP_TARGET} PRIVATE
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
-        ${CHIP_APP_BASE_DIR}/reporting/reporting-default-configuration.cpp
-        ${CHIP_APP_BASE_DIR}/reporting/reporting.cpp
+        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
         ${CHIP_APP_BASE_DIR}/util/af-event.cpp
         ${CHIP_APP_BASE_DIR}/util/af-main-common.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-list-byte-span.cpp

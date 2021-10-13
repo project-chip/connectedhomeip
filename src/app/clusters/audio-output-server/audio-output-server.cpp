@@ -31,12 +31,14 @@ using namespace chip;
 using namespace chip::app::Clusters::AudioOutput;
 
 bool audioOutputClusterSelectOutput(uint8_t index);
-bool audioOutputClusterRenameOutput(uint8_t index, uint8_t * name);
+bool audioOutputClusterRenameOutput(uint8_t index, const CharSpan & name);
 
 bool emberAfAudioOutputClusterRenameOutputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                   EndpointId endpoint, uint8_t index, uint8_t * name,
-                                                   Commands::RenameOutput::DecodableType & commandData)
+                                                   const Commands::RenameOutput::DecodableType & commandData)
 {
+    auto & index = commandData.index;
+    auto & name  = commandData.name;
+
     bool success         = audioOutputClusterRenameOutput(index, name);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
@@ -44,9 +46,10 @@ bool emberAfAudioOutputClusterRenameOutputCallback(app::CommandHandler * command
 }
 
 bool emberAfAudioOutputClusterSelectOutputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                   EndpointId endpoint, uint8_t index,
-                                                   Commands::SelectOutput::DecodableType & commandData)
+                                                   const Commands::SelectOutput::DecodableType & commandData)
 {
+    auto & index = commandData.index;
+
     bool success         = audioOutputClusterSelectOutput(index);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

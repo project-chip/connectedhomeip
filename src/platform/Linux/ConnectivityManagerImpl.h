@@ -150,6 +150,9 @@ private:
     static std::mutex mWpaSupplicantMutex;
 #endif
 
+    CHIP_ERROR _GetEthPHYRate(uint8_t & pHYRate);
+    CHIP_ERROR _GetEthFullDuplex(bool & fullDuplex);
+    CHIP_ERROR _GetEthTimeSinceReset(uint64_t & timeSinceReset);
     CHIP_ERROR _GetEthPacketRxCount(uint64_t & packetRxCount);
     CHIP_ERROR _GetEthPacketTxCount(uint64_t & packetTxCount);
     CHIP_ERROR _GetEthTxErrCount(uint64_t & txErrCount);
@@ -199,6 +202,7 @@ private:
     uint64_t mEthTxErrCount     = 0;
     uint64_t mEthCollisionCount = 0;
     uint64_t mEthOverrunCount   = 0;
+    char mEthIfName[IFNAMSIZ];
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;

@@ -131,147 +131,10 @@ namespace {
         return true;                                                                                                               \
     }
 
-#define GET_ATTRIBUTE_RESPONSE_CALLBACKS(name)
-
-#define GET_REPORT_CALLBACK(name)                                                                                                  \
-    Callback::Cancelable * onReportCallback = nullptr;                                                                             \
-    CHIP_ERROR err = gCallbacks.GetReportCallback(sourceId, endpointId, clusterId, attributeId, &onReportCallback);                \
-                                                                                                                                   \
-    if (CHIP_NO_ERROR != err)                                                                                                      \
-    {                                                                                                                              \
-        if (onReportCallback == nullptr)                                                                                           \
-        {                                                                                                                          \
-            ChipLogDetail(Zcl, "%s: Missing report callback", name);                                                               \
-        }                                                                                                                          \
-                                                                                                                                   \
-        return true;                                                                                                               \
-    }
-
 // TODO: These IM related callbacks contains small or no generated code, should be put into seperate file to reduce the size of
 // template. Singleton instance of the callbacks manager
 
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
-
-bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
-{
-    ChipLogProgress(Zcl, "ConfigureReportingResponseCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    GET_RESPONSE_CALLBACKS("emberAfConfigureReportingResponseCallback");
-
-    // struct configureReportingResponseRecord[]
-    while (messageLen)
-    {
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t status = Encoding::Read8(message); // zclStatus
-        LogStatus(status);
-
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
-        {
-            Callback::Callback<DefaultSuccessCallback> * cb =
-                Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-            cb->mCall(cb->mContext);
-        }
-        else
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t direction = Encoding::Read8(message); // reportingRole
-            ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
-            // Silence unused var warning if progress logging is disabled.  Note
-            // that we _do_ want to call Read8 unconditionally here, because we
-            // want to advance the 'message' pointer even if we don't use
-            // direction.
-            UNUSED_VAR(direction);
-
-            CHECK_MESSAGE_LENGTH(4);
-            AttributeId attributeId = Encoding::LittleEndian::Read32(message); // attribId
-            ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-            // Silence unused var warning if progress logging is disabled.  Note
-            // that we _do_ want to call Read32 unconditionally here, because we
-            // want to advance the 'message' pointer even if we don't use
-            // direction.
-            UNUSED_VAR(attributeId);
-
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, status);
-        }
-
-        // The current code is written matching the current API where there is a single attribute report
-        // per configure command. So if multiple attributes are configured at the same time, something is wrong
-        // somewhere.
-        if (messageLen)
-        {
-            ChipLogError(Zcl, "Multiple attributes reports configured at the same time. Something went wrong.");
-            break;
-        }
-    }
-
-    return true;
-}
-
-bool emberAfReadReportingConfigurationResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
-{
-    ChipLogProgress(Zcl, "ReadReportingConfigurationResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    GET_RESPONSE_CALLBACKS("emberAfReadReportingConfigurationResponseCallback");
-
-    // struct readReportingConfigurationResponseRecord[]
-    while (messageLen)
-    {
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t direction = Encoding::Read8(message); // reportingRole
-        ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
-
-        CHECK_MESSAGE_LENGTH(4);
-        AttributeId attributeId = Encoding::LittleEndian::Read32(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-        // Silence unused var warning if progress logging is disabled.  Note
-        // that we _do_ want to call Read32 unconditionally here, because we
-        // want to advance the 'message' pointer even if we don't use
-        // attributeId.
-        UNUSED_VAR(attributeId);
-
-        if (direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t attributeType = Encoding::Read8(message); // zclType
-            ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
-            // Silence unused var warning if progress logging is disabled.  Note
-            // that we _do_ want to call Read8 unconditionally here, because we
-            // want to advance the 'message' pointer even if we don't use
-            // attributeType.
-            UNUSED_VAR(attributeType);
-
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t minimumReportingInterval = Encoding::LittleEndian::Read16(message); // uint16
-            ChipLogProgress(Zcl, "  minimumReportingInterval: %" PRIu16, minimumReportingInterval);
-
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t maximumReportingInterval = Encoding::LittleEndian::Read16(message); // uint16
-            ChipLogProgress(Zcl, "  maximumReportingInterval: %" PRIu16, maximumReportingInterval);
-
-            // FIXME: unk is not supported yet.
-
-            Callback::Callback<ReadReportingConfigurationReportedCallback> * cb =
-                Callback::Callback<ReadReportingConfigurationReportedCallback>::FromCancelable(onSuccessCallback);
-            cb->mCall(cb->mContext, minimumReportingInterval, maximumReportingInterval);
-        }
-        else
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t timeout = Encoding::LittleEndian::Read16(message); // uint16
-            ChipLogProgress(Zcl, "  timeout: %" PRIu16, timeout);
-
-            Callback::Callback<ReadReportingConfigurationReceivedCallback> * cb =
-                Callback::Callback<ReadReportingConfigurationReceivedCallback>::FromCancelable(onSuccessCallback);
-            cb->mCall(cb->mContext, timeout);
-        }
-    }
-
-    return true;
-}
 
 bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discoveryComplete, uint8_t * message, uint16_t messageLen,
                                                bool extended)
@@ -1822,7 +1685,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(EndpointId endpoin
 
 bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t logEntryId,
                                                         uint32_t timestamp, uint8_t eventType, uint8_t source,
-                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
 {
     ChipLogProgress(Zcl, "GetLogRecordResponse:");
     ChipLogProgress(Zcl, "  logEntryId: %" PRIu16 "", logEntryId);
@@ -1831,8 +1694,7 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app
     ChipLogProgress(Zcl, "  source: %" PRIu8 "", source);
     ChipLogProgress(Zcl, "  eventIdOrAlarmCode: %" PRIu8 "", eventIdOrAlarmCode);
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  pin: %.*s", pin.size(), pin.data());
+    ChipLogProgress(Zcl, "  pin: %zu", pin.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetLogRecordResponseCallback");
 
@@ -1843,14 +1705,13 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app
 }
 
 bool emberAfDoorLockClusterGetPinResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                  uint8_t userStatus, uint8_t userType, uint8_t * pin)
+                                                  uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
 {
     ChipLogProgress(Zcl, "GetPinResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  pin: %.*s", pin.size(), pin.data());
+    ChipLogProgress(Zcl, "  pin: %zu", pin.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetPinResponseCallback");
 
@@ -1861,14 +1722,13 @@ bool emberAfDoorLockClusterGetPinResponseCallback(EndpointId endpoint, app::Comm
 }
 
 bool emberAfDoorLockClusterGetRfidResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                   uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+                                                   uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid)
 {
     ChipLogProgress(Zcl, "GetRfidResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  rfid: %.*s", rfid.size(), rfid.data());
+    ChipLogProgress(Zcl, "  rfid: %zu", rfid.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetRfidResponseCallback");
 
