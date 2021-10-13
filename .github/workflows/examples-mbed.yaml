@@ -94,7 +94,6 @@ jobs:
             - name: Build unit tests
               timeout-minutes: 10
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
-            
 
             - name: Copy aside build products
               run: |

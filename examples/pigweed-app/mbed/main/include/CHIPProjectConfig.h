@@ -26,10 +26,3 @@
  */
 
 #pragma once
-
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
-
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
