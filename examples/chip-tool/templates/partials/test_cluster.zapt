@@ -137,7 +137,7 @@ class {{filename}}: public TestCommand
         {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.InvokeCommand<requestType, responseType>(request, this, success, failure){{#if async}}){{/if}};
         {{else}}
         {{#chip_tests_item_parameters}}
-        {{chipType}} {{asLowerCamelCase name}}Argument = {{#if (isString type)}}chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}")){{else}}{{definedValue}}{{asTypeLiteralSuffix chipType}}{{/if}};
+        {{chipType}} {{asLowerCamelCase name}}Argument = {{#if (isString type)}}chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}")){{else}}{{definedValue}}{{asTypeLiteralSuffix type}}{{/if}};
         {{/chip_tests_item_parameters}}
 
         {{~#*inline "commandName"}}{{asUpperCamelCase commandName}}{{#if isAttribute}}Attribute{{asUpperCamelCase attribute}}{{/if}}{{/inline}}
@@ -174,7 +174,7 @@ class {{filename}}: public TestCommand
               VerifyOrReturn(CheckValue
                 {{~#if isList}}AsList("{{>item}}", count, {{expectedValue.length}})
                 {{else if (isString type)}}AsString("{{>item}}", {{>item}}, "{{expectedValue}}")
-                {{else}}<{{chipType}}>("{{>item}}", {{>item}}, {{expectedValue}}{{asTypeLiteralSuffix chipType}})
+                {{else}}<{{chipType}}>("{{>item}}", {{>item}}, {{expectedValue}}{{asTypeLiteralSuffix type}})
                 {{/if}}
               );
             {{/if}}

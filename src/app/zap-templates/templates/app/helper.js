@@ -310,20 +310,33 @@ function asPrintFormat(type)
 
 function asTypeLiteralSuffix(type)
 {
-  switch (type) {
-  case 'int32_t':
-    return 'L';
-  case 'int64_t':
-    return 'LL';
-  case 'uint16_t':
-    return 'U';
-  case 'uint32_t':
-    return 'UL';
-  case 'uint64_t':
-    return 'ULL';
-  default:
-    return '';
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
+      case 'int32_t':
+        return 'L';
+      case 'int64_t':
+        return 'LL';
+      case 'uint16_t':
+        return 'U';
+      case 'uint32_t':
+        return 'UL';
+      case 'uint64_t':
+        return 'ULL';
+      default:
+        return '';
+      }
+    })
   }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
+  return templateUtil.templatePromise(this.global, promise)
 }
 
 function hasSpecificAttributes(options)
