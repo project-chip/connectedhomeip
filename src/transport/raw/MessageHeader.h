@@ -95,7 +95,7 @@ enum class MsgFlagValues : uint8_t
 
 // Security flags 8-bit value of the form
 //  | 1 | 1 | 1  | 3 | 2 bits |
-//  +---------+-------+--------|
+//  +------------+---+--------|
 //  | P | C | MX | - | SessionType
 //
 // With :

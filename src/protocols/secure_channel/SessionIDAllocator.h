@@ -46,7 +46,7 @@ public:
 private:
 
     static constexpr uint16_t kMaxSessionID      = UINT16_MAX;
-    static constexpr uint16_t kUnsecureSessionId = 0;
+    static constexpr uint16_t kUnsecuredSessionId = 0;
 
     uint16_t mNextAvailable = 1;
 };

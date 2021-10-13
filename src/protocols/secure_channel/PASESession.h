@@ -339,8 +339,10 @@ class SecurePairingUsingTestSecret : public PairingSession
 public:
     SecurePairingUsingTestSecret()
     {
-        SetLocalSessionId(0);
-        SetPeerSessionId(0);
+        // Do not set to 0 to prevent unwanted unsecured session
+        // since the session type is unknown.
+        SetLocalSessionId(1);
+        SetPeerSessionId(1);
     }
 
     SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId)
