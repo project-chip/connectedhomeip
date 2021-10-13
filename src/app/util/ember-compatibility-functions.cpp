@@ -161,11 +161,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
     chip::app::ConcreteCommandPath commandPath(imCompatibilityEmberApsFrame.destinationEndpoint,
                                                imCompatibilityEmberApsFrame.clusterId, imCompatibilityEmberAfCluster.commandId);
 
-    CHIP_ERROR err = currentCommandObject->AddStatusCode(
-        commandPath,
-        status == EMBER_ZCL_STATUS_SUCCESS ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
-                                           : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
-        chip::Protocols::InteractionModel::Id, static_cast<Protocols::InteractionModel::Status>(ToInteractionModelStatus(status)));
+    CHIP_ERROR err = currentCommandObject->AddStatus(commandPath, ToInteractionModelStatus(status));
     return CHIP_NO_ERROR == err;
 }
 
@@ -473,11 +469,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
-    return apWriteHandler->AddAttributeStatusCode(attributePathParams,
-                                                  imCode == Protocols::InteractionModel::Status::Success
-                                                      ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
-                                                      : Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                  Protocols::SecureChannel::Id, imCode);
+    return apWriteHandler->AddStatus(attributePathParams, imCode);
 }
 } // namespace app
 } // namespace chip
