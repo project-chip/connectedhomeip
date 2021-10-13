@@ -480,7 +480,7 @@ static IPAddress MakeIPv4Multicast(uint32_t aGroupIdentifier)
     lAddress.Addr[0] = 0;
     lAddress.Addr[1] = 0;
     lAddress.Addr[2] = nlByteOrderSwap32HostToBig(0xFFFF);
-    lAddress.Addr[3] = nlByteOrderSwap32HostToBig((239 << 24) | (aGroupIdentifier & 0xFFFFFF));
+    lAddress.Addr[3] = nlByteOrderSwap32HostToBig((239u << 24) | (aGroupIdentifier & 0xFFFFFF));
 
     return (lAddress);
 }
@@ -489,9 +489,7 @@ static IPAddress MakeIPv4Multicast(uint32_t aGroupIdentifier)
 
 static IPAddress MakeIPv6Multicast(uint32_t aGroupIdentifier)
 {
-    const uint8_t lFlags = IPv6MulticastFlag::kTransient;
-
-    return (IPAddress::MakeIPv6Multicast(lFlags, kIPv6MulticastScope_Site, aGroupIdentifier));
+    return (IPAddress::MakeIPv6Multicast(IPv6MulticastFlag::kTransient, kIPv6MulticastScope_Site, aGroupIdentifier));
 }
 
 static void SetGroup(GroupAddress & aGroupAddress, uint32_t aGroupIdentifier, uint32_t aExpectedRx, uint32_t aExpectedTx)

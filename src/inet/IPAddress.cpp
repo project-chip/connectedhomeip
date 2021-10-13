@@ -179,6 +179,7 @@ ip6_addr_t IPAddress::ToIPv6() const
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
+#if INET_CONFIG_ENABLE_IPV4
 IPAddress::IPAddress(const struct in_addr & ipv4Addr)
 {
     Addr[0] = 0;
@@ -186,6 +187,7 @@ IPAddress::IPAddress(const struct in_addr & ipv4Addr)
     Addr[2] = htonl(0xFFFF);
     Addr[3] = ipv4Addr.s_addr;
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 IPAddress::IPAddress(const struct in6_addr & ipv6Addr)
 {

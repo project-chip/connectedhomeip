@@ -531,8 +531,10 @@ public:
      */
     static IPAddress FromSockAddr(const SockAddr & sockaddr);
     static IPAddress FromSockAddr(const sockaddr & sockaddr) { return FromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr)); }
-    static IPAddress FromSockAddr(const sockaddr_in & sockaddr) { return IPAddress(sockaddr.sin_addr); }
     static IPAddress FromSockAddr(const sockaddr_in6 & sockaddr) { return IPAddress(sockaddr.sin6_addr); }
+#if INET_CONFIG_ENABLE_IPV4
+    static IPAddress FromSockAddr(const sockaddr_in & sockaddr) { return IPAddress(sockaddr.sin_addr); }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
 
