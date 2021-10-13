@@ -380,7 +380,9 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
   if (StringHelper.isCharString(type)) {
     return 'chip::Span<const char>';
-  } else if (type == 'single') {
+  }
+  
+  if (type == 'single') {
     return 'float';
   }
 

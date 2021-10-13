@@ -123,23 +123,18 @@ namespace Attributes {
 {{/first}}
 {{#if clusterRef}}
 namespace {{asUpperCamelCase label}} {
-    {{#if entryType}}
     struct TypeInfo {
+    {{#if entryType}}
         using Type = DataModel::List<{{zapTypeToEncodableClusterObjectType entryType}}>;
         using DecodableType = DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType entryType}}>;
-
-        static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
-        static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
-    };
     {{else}}
-    struct TypeInfo {
         using Type = {{zapTypeToEncodableClusterObjectType type}};
-        using DecodableType = Type;
+        using DecodableType = {{zapTypeToDecodableClusterObjectType type}};;
+    {{/if}}
 
         static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
         static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
     };
-    {{/if}}
 } // namespace {{asUpperCamelCase label}}
 {{/if}}
 {{#last}}
