@@ -30,20 +30,14 @@
 namespace chip {
 namespace Inet {
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+
 void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 {
     InitInetLayerBasis(aInetLayer, aAppState);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
     mLwIPEndPointType = LwIPEndPointType::Unknown;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    mSocket = kInvalidSocketFd;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
 void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
 {
     if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || (mVoid != nullptr))
@@ -55,7 +49,37 @@ void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTac
         Release();
     }
 }
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
+{
+    InitInetLayerBasis(aInetLayer, aAppState);
+    mSocket = kInvalidSocketFd;
+}
+
+void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
+{
+    Release();
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
+{
+    InitInetLayerBasis(aInetLayer, aAppState);
+}
+
+void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
+{
+    Release();
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 } // namespace Inet
 } // namespace chip
