@@ -21,4 +21,8 @@
 
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
-#define MATTER_PLUGINS_INIT MatterOtaSoftwareUpdateProviderPluginClientInitCallback();
+#define MATTER_PLUGINS_INIT                                                                                                        \
+    MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
+    MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
+    MatterOperationalCredentialsPluginServerInitCallback();
