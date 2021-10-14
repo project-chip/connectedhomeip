@@ -89,7 +89,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
             fabricDescriptor.vendorId    = fabricInfo.GetVendorId();
             fabricDescriptor.fabricId    = fabricInfo.GetFabricId();
 
-            // TODO: The type of 'label' should be 'CharSpan', need to fix the XML defination for broken member type.
+            // TODO: The type of 'label' should be 'CharSpan', need to fix the XML definition for broken member type.
             fabricDescriptor.label =
                 ByteSpan(Uint8::from_const_char(fabricInfo.GetFabricLabel().data()), fabricInfo.GetFabricLabel().size());
             fabricDescriptor.rootPublicKey = fabricInfo.GetRootPubkey();
