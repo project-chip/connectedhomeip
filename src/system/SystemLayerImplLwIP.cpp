@@ -34,19 +34,20 @@ LayerImplLwIP::LayerImplLwIP() : mHandlingTimerComplete(false), mEventDelegateLi
 
 CHIP_ERROR LayerImplLwIP::Init()
 {
-    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterLwIPErrorFormatter();
 
     ReturnErrorOnFailure(mTimerList.Init());
 
-    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LayerImplLwIP::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+    mLayerState.SetShutdown();
     mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }

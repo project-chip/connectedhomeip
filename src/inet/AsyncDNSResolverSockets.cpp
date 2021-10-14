@@ -90,7 +90,11 @@ CHIP_ERROR AsyncDNSResolverSockets::Shutdown()
 
     AsyncMutexLock();
 
-    mInet->State = InetLayer::kState_ShutdownInProgress;
+    if (mInet->mLayerState.GetState() != ObjectLifeCycle::State::ShuttingDown)
+    {
+        AsyncMutexUnlock();
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     pthreadErr = pthread_cond_broadcast(&mAsyncDNSCondVar);
     VerifyOrDie(pthreadErr == 0);
@@ -210,7 +214,7 @@ CHIP_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver ** outResolver)
     AsyncMutexLock();
 
     // block until there is work to do or we detect a shutdown
-    while ((mAsyncDNSQueueHead == nullptr) && (mInet->State == InetLayer::kState_Initialized))
+    while ((mAsyncDNSQueueHead == nullptr) && mInet->mLayerState.IsInitialized())
     {
         pthreadErr = pthread_cond_wait(&mAsyncDNSCondVar, &mAsyncDNSMutex);
         VerifyOrDie(pthreadErr == 0);
@@ -219,7 +223,7 @@ CHIP_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver ** outResolver)
     ChipLogDetail(Inet, "Async DNS worker thread woke up.");
 
     // on shutdown, return NULL. Otherwise, pop the head of the DNS request queue
-    if (mInet->State != InetLayer::kState_Initialized)
+    if (!mInet->mLayerState.IsInitialized())
     {
         *outResolver = nullptr;
     }

@@ -42,7 +42,7 @@ namespace System {
 
 CHIP_ERROR LayerImplSelect::Init()
 {
-    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterPOSIXErrorFormatter();
 
@@ -60,13 +60,13 @@ CHIP_ERROR LayerImplSelect::Init()
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
     ReturnErrorOnFailure(mWakeEvent.Open(*this));
 
-    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LayerImplSelect::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
 
     Timer * timer;
     while ((timer = mTimerList.PopEarliest()) != nullptr)
@@ -84,6 +84,8 @@ CHIP_ERROR LayerImplSelect::Shutdown()
         timer->Release();
     }
     mWakeEvent.Close(*this);
+
+    mLayerState.SetShutdown();
     mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
