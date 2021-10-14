@@ -237,13 +237,7 @@ void MatterDescriptorPluginServerInitCallback(void)
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
 #if CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
-    static bool attrAccessRegistered = false;
-
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gAttrAccess);
-        attrAccessRegistered = true;
-    }
+    registerAttributeAccessOverride(&gAttrAccess);
 #endif
 
     /*
