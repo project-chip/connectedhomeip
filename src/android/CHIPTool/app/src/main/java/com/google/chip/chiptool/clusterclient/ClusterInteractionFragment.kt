@@ -18,11 +18,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+<<<<<<< HEAD
 import chip.devicecontroller.ClusterInfoMapping
 import java.lang.Exception
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getClusterMappingBtn
 import kotlinx.coroutines.launch
 
+=======
+import
+>>>>>>> 505e97db3 (change package)
 
 class ClusterInteractionFragment : Fragment() {
   private val deviceController: ChipDeviceController
