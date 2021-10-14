@@ -246,7 +246,7 @@ CHIP_ERROR IPEndPointBasis::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfa
 
 void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle && aBuffer)
 {
-    if ((mState == kState_Listening) && (OnMessageReceived != NULL))
+    if ((mState == State::kListening) && (OnMessageReceived != NULL))
     {
         const IPPacketInfo * pktInfo = GetPacketInfo(aBuffer);
 
@@ -504,7 +504,7 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
 {
     CHIP_ERROR lRetval = CHIP_NO_ERROR;
 
-    if (aAddressType == kIPAddressType_IPv6)
+    if (aAddressType == IPAddressType::kIPv6)
     {
         struct sockaddr_in6 sa;
 
@@ -537,7 +537,7 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
 #endif // defined(IPV6_MULTICAST_HOPS)
     }
 #if INET_CONFIG_ENABLE_IPV4
-    else if (aAddressType == kIPAddressType_IPv4)
+    else if (aAddressType == IPAddressType::kIPv4)
     {
         struct sockaddr_in sa;
         int enable = 1;
@@ -642,7 +642,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     PeerSockAddr peerSockAddr;
     memset(&peerSockAddr, 0, sizeof(peerSockAddr));
     msgHeader.msg_name = &peerSockAddr;
-    if (mAddrType == kIPAddressType_IPv6)
+    if (mAddrType == IPAddressType::kIPv6)
     {
         peerSockAddr.in6.sin6_family = AF_INET6;
         peerSockAddr.in6.sin6_port   = htons(aPktInfo->DestPort);
@@ -675,7 +675,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     // address, construct an IP_PKTINFO/IPV6_PKTINFO "control message" to that effect
     // add add it to the message header.  If the local OS doesn't support IP_PKTINFO/IPV6_PKTINFO
     // fail with an error.
-    if (intfId != INET_NULL_INTERFACEID || aPktInfo->SrcAddress.Type() != kIPAddressType_Any)
+    if (intfId != INET_NULL_INTERFACEID || aPktInfo->SrcAddress.Type() != IPAddressType::kAny)
     {
 #if defined(IP_PKTINFO) || defined(IPV6_PKTINFO)
         msgHeader.msg_control    = controlData;
@@ -685,7 +685,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 
 #if INET_CONFIG_ENABLE_IPV4
 
-        if (mAddrType == kIPAddressType_IPv4)
+        if (mAddrType == IPAddressType::kIPv4)
         {
 #if defined(IP_PKTINFO)
             controlHdr->cmsg_level = IPPROTO_IP;
@@ -709,7 +709,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        if (mAddrType == kIPAddressType_IPv6)
+        if (mAddrType == IPAddressType::kIPv6)
         {
 #if defined(IPV6_PKTINFO)
             controlHdr->cmsg_level = IPPROTO_IPV6;
@@ -753,12 +753,12 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 
         switch (aAddressType)
         {
-        case kIPAddressType_IPv6:
+        case IPAddressType::kIPv6:
             family = PF_INET6;
             break;
 
 #if INET_CONFIG_ENABLE_IPV4
-        case kIPAddressType_IPv4:
+        case IPAddressType::kIPv4:
             family = PF_INET;
             break;
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -799,7 +799,7 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
         // the same port, one for IPv4 and one for IPv6.
 
 #ifdef IPV6_V6ONLY
-        if (aAddressType == kIPAddressType_IPv6)
+        if (aAddressType == IPAddressType::kIPv6)
         {
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
             if (res != 0)
@@ -811,7 +811,7 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 
 #if INET_CONFIG_ENABLE_IPV4
 #ifdef IP_PKTINFO
-        if (aAddressType == kIPAddressType_IPv4)
+        if (aAddressType == IPAddressType::kIPv4)
         {
             res = setsockopt(mSocket, IPPROTO_IP, IP_PKTINFO, &one, sizeof(one));
             if (res != 0)
@@ -823,7 +823,7 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #ifdef IPV6_RECVPKTINFO
-        if (aAddressType == kIPAddressType_IPv6)
+        if (aAddressType == IPAddressType::kIPv6)
         {
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_RECVPKTINFO, &one, sizeof(one));
             if (res != 0)
@@ -1011,12 +1011,12 @@ CHIP_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, const 
     switch (aAddressType)
     {
 
-    case kIPAddressType_IPv6:
+    case IPAddressType::kIPv6:
         nw_ip_options_set_version(ipOptions, nw_ip_version_6);
         break;
 
 #if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4:
+    case IPAddressType::kIPv4:
         nw_ip_options_set_version(ipOptions, nw_ip_version_4);
         break;
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -1173,7 +1173,7 @@ CHIP_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddre
 
     // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
     // we want if the locale endpoint is IPv4.
-    if (aAddressType == kIPAddressType_IPv4 && aAddress.Type() == kIPAddressType_Any)
+    if (aAddressType == IPAddressType::kIPv4 && aAddress.Type() == IPAddressType::kAny)
     {
         const IPAddress anyAddr = IPAddress::FromIPv4(aAddress.ToIPv4());
         anyAddr.ToString(addrStr, sizeof(addrStr));
@@ -1439,13 +1439,13 @@ CHIP_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
     {
 
 #if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4: {
+    case IPAddressType::kIPv4: {
         return IPv4JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, true);
     }
     break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    case kIPAddressType_IPv6: {
+    case IPAddressType::kIPv6: {
         return IPv6JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, true);
     }
     break;
@@ -1471,13 +1471,13 @@ CHIP_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
     {
 
 #if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4: {
+    case IPAddressType::kIPv4: {
         return IPv4JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, false);
     }
     break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    case kIPAddressType_IPv6: {
+    case IPAddressType::kIPv6: {
         return IPv6JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, false);
     }
     break;

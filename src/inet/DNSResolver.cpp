@@ -444,7 +444,7 @@ uint8_t DNSResolver::CountAddresses(int family, const struct addrinfo * addrs)
 void DNSResolver::HandleAsyncResolveComplete()
 {
     // Copy the resolved address to the application supplied buffer, but only if the request hasn't been canceled.
-    if (OnComplete && mState != kState_Canceled)
+    if (OnComplete && mState != State::kCanceled)
     {
         OnComplete(AppState, asyncDNSResolveResult, NumAddrs, AddrArray);
     }

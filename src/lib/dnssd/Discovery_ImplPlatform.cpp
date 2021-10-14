@@ -348,7 +348,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
-    service.mAddressType   = Inet::kIPAddressType_Any;
+    service.mAddressType   = Inet::IPAddressType::kAny;
     error                  = ChipDnssdPublishService(&service);
 
     if (error == CHIP_NO_ERROR)
@@ -428,7 +428,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mTextEntries   = txtEntries;
     service.mTextEntrySize = textEntrySize;
     service.mInterface     = INET_NULL_INTERFACEID;
-    service.mAddressType   = Inet::kIPAddressType_Any;
+    service.mAddressType   = Inet::IPAddressType::kAny;
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
     error                  = ChipDnssdPublishService(&service);
@@ -542,7 +542,7 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
     char serviceName[kMaxCommisisonableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
-    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
+    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny, INET_NULL_INTERFACEID,
                            HandleNodeBrowse, this);
 }
 
@@ -552,7 +552,7 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
     char serviceName[kMaxCommisisonerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
-    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
+    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny, INET_NULL_INTERFACEID,
                            HandleNodeBrowse, this);
 }
 

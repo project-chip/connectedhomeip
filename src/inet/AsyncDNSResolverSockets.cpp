@@ -151,7 +151,7 @@ CHIP_ERROR AsyncDNSResolverSockets::PrepareDNSResolver(DNSResolver & resolver, c
     resolver.AppState                      = appState;
     resolver.OnComplete                    = onComplete;
     resolver.asyncDNSResolveResult         = CHIP_NO_ERROR;
-    resolver.mState                        = DNSResolver::kState_Active;
+    resolver.mState                        = DNSResolver::State::kActive;
     resolver.pNextAsyncDNSResolver         = nullptr;
 
     return err;
@@ -252,7 +252,7 @@ CHIP_ERROR AsyncDNSResolverSockets::Cancel(DNSResolver & resolver)
 
     AsyncMutexLock();
 
-    resolver.mState = DNSResolver::kState_Canceled;
+    resolver.mState = DNSResolver::State::kCanceled;
 
     AsyncMutexUnlock();
 
@@ -290,7 +290,7 @@ void AsyncDNSResolverSockets::Resolve(DNSResolver & resolver)
     resolver.asyncDNSResolveResult = resolver.ProcessGetAddrInfoResult(gaiReturnCode, gaiResults);
 
     // Set the DNS resolver state.
-    resolver.mState = DNSResolver::kState_Complete;
+    resolver.mState = DNSResolver::State::kComplete;
 
     // Release lock.
     AsyncMutexUnlock();
@@ -334,7 +334,7 @@ void * AsyncDNSResolverSockets::AsyncDNSThreadRun(void * args)
         // In that case, break out of the loop and exit thread.
         VerifyOrExit(err == CHIP_NO_ERROR && request != nullptr, );
 
-        if (request->mState != DNSResolver::kState_Canceled)
+        if (request->mState != DNSResolver::State::kCanceled)
         {
             asyncResolver->Resolve(*request);
         }

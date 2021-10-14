@@ -67,25 +67,24 @@ public:
     bool ReceiveEnabled;
 
     /**
-     * @brief   Basic dynamic state of the underlying endpoint.
+     * Basic dynamic state of the underlying endpoint.
      *
-     * @details
      *  Objects are initialized in the "ready" state, proceed to subsequent
      *  states corresponding to a simplification of the states of the TCP
      *  transport state machine.
      */
-    enum
+    enum class State : uint8_t
     {
-        kState_Ready           = 0, /**< Endpoint initialized, but not bound. */
-        kState_Bound           = 1, /**< Endpoint bound, but not listening. */
-        kState_Listening       = 2, /**< Endpoint receiving connections. */
-        kState_Connecting      = 3, /**< Endpoint attempting to connect. */
-        kState_Connected       = 4, /**< Endpoint connected, ready for tx/rx. */
-        kState_SendShutdown    = 5, /**< Endpoint initiated its half-close. */
-        kState_ReceiveShutdown = 6, /**< Endpoint responded to half-close. */
-        kState_Closing         = 7, /**< Endpoint closing bidirectionally. */
-        kState_Closed          = 8  /**< Endpoint closed, ready for release. */
-    } State;
+        kReady           = 0, /**< Endpoint initialized, but not bound. */
+        kBound           = 1, /**< Endpoint bound, but not listening. */
+        kListening       = 2, /**< Endpoint receiving connections. */
+        kConnecting      = 3, /**< Endpoint attempting to connect. */
+        kConnected       = 4, /**< Endpoint connected, ready for tx/rx. */
+        kSendShutdown    = 5, /**< Endpoint initiated its half-close. */
+        kReceiveShutdown = 6, /**< Endpoint responded to half-close. */
+        kClosing         = 7, /**< Endpoint closing bidirectionally. */
+        kClosed          = 8  /**< Endpoint closed, ready for release. */
+    } mState;
 
     TCPEndPoint() = default;
 
@@ -105,7 +104,7 @@ public:
      *      \c addrType does not match \c IPVer.
      *
      * @retval  INET_ERROR_WRONG_ADDRESS_TYPE
-     *      \c addrType is \c kIPAddressType_Any, or the type of \c addr is not
+     *      \c addrType is \c IPAddressType::kAny, or the type of \c addr is not
      *      equal to \c addrType.
      *
      * @retval  other                   another system or platform error
@@ -127,8 +126,8 @@ public:
      * @retval  CHIP_ERROR_INCORRECT_STATE  endpoint is already listening.
      *
      * @details
-     *  If \c State is already \c kState_Listening, then no operation is
-     *  performed, otherwise the \c State is set to \c kState_Listening and
+     *  If \c mState is already \c State::kListening, then no operation is
+     *  performed, otherwise the \c mState is set to \c State::kListening and
      *  the endpoint is prepared to received TCP messages, according to the
      *  semantics of the platform.
      *
@@ -380,7 +379,7 @@ public:
     /**
      * @brief   Extract whether TCP connection is established.
      */
-    bool IsConnected() const { return IsConnected(State); }
+    bool IsConnected() const { return IsConnected(mState); }
 
     /**
      * Set timeout for Connect to succeed or return an error.
@@ -666,7 +665,7 @@ private:
     void HandleConnectComplete(CHIP_ERROR err);
     void HandleAcceptError(CHIP_ERROR err);
     CHIP_ERROR DoClose(CHIP_ERROR err, bool suppressCallback);
-    static bool IsConnected(int state);
+    static bool IsConnected(State state);
 
     static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
 
@@ -682,7 +681,7 @@ private:
     void InitImpl();
     CHIP_ERROR DriveSendingImpl();
     void HandleConnectCompleteImpl();
-    void DoCloseImpl(CHIP_ERROR err, int oldState);
+    void DoCloseImpl(CHIP_ERROR err, State oldState);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     struct BufferOffset

@@ -715,9 +715,9 @@ CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
         uint8_t addrTypeOption = (options & kDNSOption_AddrFamily_Mask);
         IPAddressType addrType = addrArray->Type();
 
-        if ((addrTypeOption == kDNSOption_AddrFamily_IPv6Only && addrType != kIPAddressType_IPv6)
+        if ((addrTypeOption == kDNSOption_AddrFamily_IPv6Only && addrType != IPAddressType::kIPv6)
 #if INET_CONFIG_ENABLE_IPV4
-            || (addrTypeOption == kDNSOption_AddrFamily_IPv4Only && addrType != kIPAddressType_IPv4)
+            || (addrTypeOption == kDNSOption_AddrFamily_IPv4Only && addrType != IPAddressType::kIPv4)
 #endif
         )
         {
@@ -798,7 +798,7 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
         }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-        if (lResolver->mState == DNSResolver::kState_Canceled)
+        if (lResolver->mState == DNSResolver::State::kCanceled)
         {
             return true;
         }

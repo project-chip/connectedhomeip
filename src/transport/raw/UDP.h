@@ -72,7 +72,7 @@ public:
 
 private:
     Inet::InetLayer * mLayer         = nullptr;                   ///< Associated inet layer
-    Inet::IPAddressType mAddressType = Inet::kIPAddressType_IPv6; ///< type of listening socket
+    Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
     uint16_t mListenPort             = CHIP_PORT;                 ///< UDP listen port
     Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;     ///< Interface to listen on
 };
@@ -126,7 +126,7 @@ private:
                              const Inet::IPPacketInfo * pktInfo);
 
     Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
-    Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
+    Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
     State mState                         = State::kNotReady;                            ///< State of the UDP transport
 };
 

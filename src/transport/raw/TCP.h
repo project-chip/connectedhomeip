@@ -75,7 +75,7 @@ public:
 
 private:
     Inet::InetLayer * mLayer         = nullptr;                   ///< Associated inet layer
-    Inet::IPAddressType mAddressType = Inet::kIPAddressType_IPv6; ///< type of listening socket
+    Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
     uint16_t mListenPort             = CHIP_PORT;                 ///< TCP listen port
     Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;     ///< Interface to listen on
 };
@@ -256,7 +256,7 @@ private:
     static void OnAcceptError(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
 
     Inet::TCPEndPoint * mListenSocket = nullptr;                                     ///< TCP socket used by the transport
-    Inet::IPAddressType mEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
+    Inet::IPAddressType mEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
     State mState                      = State::kNotReady;                            ///< State of the TCP transport
 
     // Number of active and 'pending connection' endpoints

@@ -60,7 +60,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mPort      = 80;
     strcpy(service.mName, "test");
     strcpy(service.mType, "_mock");
-    service.mAddressType   = chip::Inet::kIPAddressType_Any;
+    service.mAddressType   = chip::Inet::IPAddressType::kAny;
     service.mProtocol      = DnssdServiceProtocol::kDnssdProtocolTcp;
     entry.mKey             = key;
     entry.mData            = reinterpret_cast<const uint8_t *>(val);
@@ -71,7 +71,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mSubTypeSize   = 0;
 
     NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service) == CHIP_NO_ERROR);
-    ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
+    ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny, INET_NULL_INTERFACEID,
                     HandleBrowse, suite);
 }
 

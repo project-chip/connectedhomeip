@@ -246,7 +246,7 @@ private:
 void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
 #ifdef DETAIL_LOGGING
-    char srcAddressString[chip::Inet::kMaxIPAddressStringLength];
+    char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
     VerifyOrDie(info->SrcAddress.ToString(srcAddressString) != nullptr);
     ChipLogDetail(Discovery, "Received an mDNS query from %s", srcAddressString);
 #endif
