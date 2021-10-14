@@ -27,7 +27,7 @@ namespace device {
 /**
  * This struct contains device specific parameters that are needed to establish a secure session. The
  * pointers passed in are not owned by this object and should have a lifetime beyond this object.
-*/
+ */
 struct OperationalDeviceProxyInitParams
 {
     SessionManager * sessionManager          = nullptr;
@@ -42,7 +42,8 @@ class OperationalDeviceProxy;
 // class. When that happens, the type of the last param for this callback may change as the registrar of this
 // callback would need to be able to associate the peer device with the cluster command being setn.
 typedef void (*OnOperationalDeviceConnected)(void * context, OperationalDeviceProxy * operationalDeviceProxy);
-typedef void (*OnOperationalDeviceConnectionFailure)(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error);
+typedef void (*OnOperationalDeviceConnectionFailure)(void * context, OperationalDeviceProxy * operationalDeviceProxy,
+                                                     CHIP_ERROR error);
 
 /**
  * @class OperationalDeviceProxy
@@ -52,7 +53,7 @@ typedef void (*OnOperationalDeviceConnectionFailure)(void * context, Operational
  * must supply the node ID, fabric index, as well as other device specific parameters to the peer node
  * it wants to communicate with.
  */
-class DLL_EXPORT OperationalDeviceProxy : public Messaging::ExchangeMgrDelegate
+class DLL_EXPORT OperationalDeviceProxy
 {
 public:
     virtual ~OperationalDeviceProxy() {}
@@ -106,6 +107,22 @@ public:
     // TODO: After a requested CHIP node ID has been successfully resolved, call this to update
     CHIP_ERROR UpdateAddress(const Transport::PeerAddress & address);
 
+    /**
+     * @brief
+     *   Called when a secure session is being established
+     *
+     * @param[in] session  The handle to the secure session
+     */
+    void OnNewConnection(SessionHandle session);
+
+    /**
+     * @brief
+     *   Called when a secure session is closing
+     *
+     * @param[in] session  The handle to the secure session
+     */
+    void OnConnectionExpired(SessionHandle session);
+
     chip::Controller::Device & GetDevice() { return mDevice; }
 
 private:
@@ -138,12 +155,6 @@ private:
 
     void DequeueConnectionSuccessCallbacks(bool executeCallback);
     void DequeueConnectionFailureCallbacks(CHIP_ERROR error, bool executeCallback);
-
-    /**
-     * ----- ExchangeMgrDelegate Implementation -----
-     */
-    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     /**
      * ----- Wrapper callbacks for Device class -----

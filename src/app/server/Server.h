@@ -50,7 +50,7 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #endif
                                               >;
 
-class Server : public Messaging::ExchangeDelegate
+class Server : public Messaging::ExchangeDelegate, public Messaging::ExchangeMgrDelegate
 {
 public:
     CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
@@ -113,10 +113,18 @@ private:
         }
     };
 
-    // Messaging::ExchangeDelegate
+    /**
+     * ----- ExchangeDelegate Implementation -----
+     */
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+
+    /**
+     * ----- ExchangeMgrDelegate Implementation -----
+     */
+    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     AppDelegate * mAppDelegate = nullptr;
 
