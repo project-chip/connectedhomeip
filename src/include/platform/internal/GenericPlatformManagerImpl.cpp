@@ -45,8 +45,6 @@ namespace Internal {
 extern chip::System::Layer * gSystemLayer;
 extern chip::System::LayerImpl gSystemLayerImpl;
 
-extern CHIP_ERROR InitEntropy();
-
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 {
@@ -59,13 +57,6 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     // Arrange for Device Layer errors to be translated to text.
     RegisterDeviceLayerErrorFormatter();
-
-    err = InitEntropy();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Entropy initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
 
     err = ConfigurationMgr().Init();
     if (err != CHIP_NO_ERROR)
