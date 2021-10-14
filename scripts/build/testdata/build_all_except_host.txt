@@ -95,6 +95,19 @@ bash -c 'source $IDF_PATH/export.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters reconfigure'
 
+# Generating esp32-devkitc-all-clusters-ipv6only
+mkdir -p {out}/esp32-devkitc-all-clusters-ipv6only
+
+cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only reconfigure'
+
 # Generating esp32-devkitc-bridge
 mkdir -p {out}/esp32-devkitc-bridge
 
@@ -370,6 +383,13 @@ rm -f examples/all-clusters-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters build'
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+# Building esp32-devkitc-all-clusters-ipv6only
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only build'
 
 rm -f examples/bridge-app/esp32/sdkconfig
 
