@@ -23,8 +23,8 @@
  */
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <crypto/RandUtils.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 
 // Temporary includes for TemporaryAuditRandomPerformance()
 // TODO: remove once https://github.com/project-chip/connectedhomeip/issues/10454 is done.
@@ -61,8 +61,8 @@ void TemporaryAuditRandomNumberGenerator()
     VerifyOrDieWithMsg(memcmp(&buf1[0], &buf2[0], sizeof(buf1)) != 0, DeviceLayer,
                        "AUDIT: FAILED: buf1, buf2 are equal: DRBG_get_bytes() does not function!");
 
-    uint32_t r1 = GetRandU32();
-    uint32_t r2 = GetRandU32();
+    uint32_t r1 = chip::Crypto::GetRandU32();
+    uint32_t r2 = chip::Crypto::GetRandU32();
 
     ChipLogProgress(DeviceLayer, "AUDIT: * r1: 0x%08" PRIX32 " r2: 0x%08" PRIX32, r1, r2);
     VerifyOrDieWithMsg(r1 != r2, DeviceLayer, "AUDIT: FAILED: r1, r2 are equal: random number generator does not function!");
