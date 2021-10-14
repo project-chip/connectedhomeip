@@ -39,8 +39,7 @@ namespace app {
 namespace {
 void ReportCommandUnsupported(Command * aCommandObj, const ConcreteCommandPath & aCommandPath)
 {
-    aCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-                               Protocols::InteractionModel::Status::UnsupportedCommand);
+    aCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
     ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                  ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
 }
@@ -103,8 +102,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -152,8 +150,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -210,8 +207,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -367,8 +363,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -407,8 +402,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -645,8 +639,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -704,8 +697,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -789,8 +781,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -829,8 +820,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -878,8 +868,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -981,8 +970,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -1094,8 +1082,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -1154,8 +1141,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -1212,8 +1198,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -1328,8 +1313,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -1422,8 +1406,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -1480,8 +1463,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -1555,8 +1537,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::UnsupportedCluster);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCluster);
         break;
     }
 
@@ -1577,8 +1558,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     {
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::UnsupportedCluster);
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCluster);
         break;
     }
 
