@@ -23,6 +23,7 @@ import java.lang.Exception
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getClusterMappingBtn
 import kotlinx.coroutines.launch
 
+
 class ClusterInteractionFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())

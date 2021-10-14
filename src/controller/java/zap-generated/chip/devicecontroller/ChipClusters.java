@@ -3695,6 +3695,8 @@ public class ChipClusters {
       reportCurrentLevelAttribute(chipClusterPtr, callback);
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
     public void readRemainingTimeAttribute(IntegerAttributeCallback callback) {
       readRemainingTimeAttribute(chipClusterPtr, callback);
     }
@@ -3776,18 +3778,31 @@ public class ChipClusters {
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+=======
+    public void readClusterRevisionAttribute(
+      IntegerAttributeCallback callback
+    ) {
+>>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
+=======
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+>>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
     private native void readCurrentLevelAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
     private native void subscribeCurrentLevelAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
 
     private native void reportCurrentLevelAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
+<<<<<<< HEAD
     private native void readRemainingTimeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -3850,6 +3865,17 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+=======
+    private native void reportCurrentLevelAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+  
+    private native void readClusterRevisionAttribute(long chipClusterPtr,
+      IntegerAttributeCallback callback
+    );
+>>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
+=======
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+>>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
   }
 
   public static class LowPowerCluster extends BaseChipCluster {
@@ -5937,10 +5963,15 @@ public class ChipClusters {
       testAddArguments(chipClusterPtr, callback, arg1, arg2);
     }
 
+<<<<<<< HEAD
     public void testEnumsRequest(TestEnumsResponseCallback callback, int arg1, int arg2) {
       testEnumsRequest(chipClusterPtr, callback, arg1, arg2);
     }
 
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
     public void testListInt8UArgumentRequest(DefaultClusterCallback callback, int arg1) {
       testListInt8UArgumentRequest(chipClusterPtr, callback, arg1);
     }
@@ -5954,7 +5985,11 @@ public class ChipClusters {
         DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
       testListStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
     }
+=======
+>>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
 
+=======
+>>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
     public void testNotHandled(DefaultClusterCallback callback) {
       testNotHandled(chipClusterPtr, callback);
     }
@@ -5968,23 +6003,37 @@ public class ChipClusters {
       testSpecific(chipClusterPtr, callback);
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
     public void testStructArgumentRequest(
         DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
       testStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
     }
+=======
+>>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
 
+=======
+>>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
     public void testUnknownCommand(DefaultClusterCallback callback) {
       testUnknownCommand(chipClusterPtr, callback);
     }
 
     private native void test(long chipClusterPtr, DefaultClusterCallback callback);
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
 
     private native void testAddArguments(
         long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
 
+<<<<<<< HEAD
     private native void testEnumsRequest(
         long chipClusterPtr, TestEnumsResponseCallback callback, int arg1, int arg2);
 
+=======
+<<<<<<< HEAD
+>>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
     private native void testListInt8UArgumentRequest(
         long chipClusterPtr, DefaultClusterCallback callback, int arg1);
 
@@ -6001,12 +6050,19 @@ public class ChipClusters {
         String e,
         int f);
 
+=======
+    private native void testAddArguments(long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
+>>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
+=======
+>>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
 
     private native void testNullableOptionalRequest(
         long chipClusterPtr, TestNullableOptionalResponseCallback callback, int arg1);
 
     private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback callback);
+<<<<<<< HEAD
+<<<<<<< HEAD
 
     private native void testStructArgumentRequest(
         long chipClusterPtr,
@@ -6018,6 +6074,11 @@ public class ChipClusters {
         String e,
         int f);
 
+=======
+>>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
+=======
+
+>>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback callback);
 
     public interface TestAddArgumentsResponseCallback {

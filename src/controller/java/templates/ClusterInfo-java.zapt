@@ -3,6 +3,7 @@
 
 package chip.devicecontroller;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -147,6 +148,43 @@ public class ClusterInfoMapping {
      clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInfo);
      {{/chip_client_clusters}}
      return clusterMap;
+=======
+import java.util.List;
+
+public class ClusterInfoMapping {
+
+ public Map<String, ClusterInfo> getClusterMap() {
+     Map<String, ClusterInfo> clusterInfoMapping = new Hashmap<>();
+     {{#chip_client_clusters}}
+     ClusterInfo {{asLowerCamelCase name}}_clusterInfo = new ClusterInfo("{{asLowerCamelCase name}}");
+     {{#chip_cluster_commands}}
+           List<CommandParameter> {{asLowerCamelCase name}}_parametersList = new ArrayList<>();
+           CommandInfo {{asLowerCamelCase name}}_commandInfo = new CommandInfo();
+           {{asLowerCamelCase name}}_commandInfo.name = "{{asLowerCamelCase name}}";
+           {{#if (zcl_command_arguments_count this.id)}}
+               {{#if hasSpecificResponse}}
+                 {{asLowerCamelCase ../name}}_commandInfo.callbackClass = {{asUpperCamelCase responseName}}Callback.class;
+               {{else}}
+                 {{asLowerCamelCase ../name}}_commandInfo.callbackClass = DefaultClusterCallback.class;
+               {{/if}}
+               {{#chip_cluster_command_arguments}}
+                 CommandParameter {{asLowerCamelCase label}}_commandParameter = new CommandParameter("{{asLowerCamelCase label}}", {{asJavaBasicType type}}.class);
+                 {{asLowerCamelCase ../name}}_parametersList.add({{asLowerCamelCase label}}_commandParameter);
+                 {{#not_last}} {{/not_last}}
+               {{/chip_cluster_command_arguments}}
+           {{else}}
+             {{#if hasSpecificResponse}}
+               {{asLowerCamelCase ../name}}_commandInfo.callbackClass = {{asUpperCamelCase responseName}}Callback.class;
+             {{else}}
+               {{asLowerCamelCase ../name}}_commandInfo.callbackClass = DefaultClusterCallback.class;
+             {{/if}}
+           {{/if}}
+           {{asLowerCamelCase name}}_commandInfo.parameters = {{asLowerCamelCase name}}_parametersList;
+           {{asLowerCamelCase ../name}}_clusterInfo.commands.add({{asLowerCamelCase name}}_commandInfo);
+     {{/chip_cluster_commands}}
+     clusterInfoMapping.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}_clusterInfo);
+     {{/chip_client_clusters}}
+>>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
   }
 }
 
