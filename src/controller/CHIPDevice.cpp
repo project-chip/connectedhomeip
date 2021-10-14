@@ -309,14 +309,10 @@ void Device::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
     ChipLogError(Controller, "Failed to open pairing window on the device. Status %d", status);
 }
 
-CHIP_ERROR Device::ComputePASEVerifier(uint32_t iterations,
-                                       uint32_t setupPincode,
-                                       const ByteSpan & salt,
-                                       PASEVerifier & outVerifier,
-                                       uint32_t & outPasscodeId)
+CHIP_ERROR Device::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
+                                       PASEVerifier & outVerifier, uint32_t & outPasscodeId)
 {
-    ReturnErrorOnFailure( PASESession::GeneratePASEVerifier(
-        outVerifier, iterations, salt, /* useRandomPIN= */ false, setupPincode));
+    ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(outVerifier, iterations, salt, /* useRandomPIN= */ false, setupPincode));
 
     outPasscodeId = mPAKEVerifierID++;
     return CHIP_NO_ERROR;

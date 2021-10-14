@@ -330,9 +330,8 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode,
-        const ByteSpan & salt, PASEVerifier & outVerifier,
-        uint32_t & outPasscodeId);
+    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
+                                   uint32_t & outPasscodeId);
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
