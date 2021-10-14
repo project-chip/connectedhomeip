@@ -1047,7 +1047,7 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
         if (err == CHIP_NO_ERROR)
         {
             // Put the new end point into the Connected state.
-            conEP->mState             = State::kConnected;
+            conEP->mState            = State::kConnected;
             conEP->mTCP              = tpcb;
             conEP->mLwIPEndPointType = LwIPEndPointType::TCP;
             conEP->Retain();
@@ -2576,7 +2576,8 @@ void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, v
 
 bool TCPEndPoint::IsConnected(State state)
 {
-    return state == State::kConnected || state == State::kSendShutdown || state == State::kReceiveShutdown || state == State::kClosing;
+    return state == State::kConnected || state == State::kSendShutdown || state == State::kReceiveShutdown ||
+        state == State::kClosing;
 }
 
 void TCPEndPoint::Init(InetLayer * inetLayer)

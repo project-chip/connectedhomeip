@@ -60,15 +60,14 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
 
     systemLayer.Init();
     inetLayer.Init(systemLayer, nullptr);
-    transportMgr.Init(
-        UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv6).SetListenPort(CHIP_PORT)
+    transportMgr.Init(UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv6).SetListenPort(CHIP_PORT)
 #if INET_CONFIG_ENABLE_IPV4
-            ,
-        UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT)
+                          ,
+                      UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-            ,
-        BleListenParameters(&blelayer)
+                          ,
+                      BleListenParameters(&blelayer)
 #endif
     );
     sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);

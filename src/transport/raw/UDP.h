@@ -71,10 +71,10 @@ public:
     }
 
 private:
-    Inet::InetLayer * mLayer         = nullptr;                   ///< Associated inet layer
+    Inet::InetLayer * mLayer         = nullptr;                    ///< Associated inet layer
     Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
-    uint16_t mListenPort             = CHIP_PORT;                 ///< UDP listen port
-    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;     ///< Interface to listen on
+    uint16_t mListenPort             = CHIP_PORT;                  ///< UDP listen port
+    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;      ///< Interface to listen on
 };
 
 /** Implements a transport using UDP. */
@@ -125,9 +125,9 @@ private:
     static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer,
                              const Inet::IPPacketInfo * pktInfo);
 
-    Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
+    Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                       ///< UDP socket used by the transport
     Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
-    State mState                         = State::kNotReady;                            ///< State of the UDP transport
+    State mState                         = State::kNotReady;              ///< State of the UDP transport
 };
 
 } // namespace Transport
