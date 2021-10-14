@@ -48,7 +48,6 @@ private:
     CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StorePrimaryWiFiMACAddress(const uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetPollPeriod(uint32_t & buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StorePrimary802154MACAddress(const uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -62,8 +61,6 @@ private:
 #endif
     CHIP_ERROR _GetFailSafeArmed(bool & val) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _SetFailSafeArmed(bool val) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetQRCodeString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetWiFiAPSSID(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
     bool _IsCommissionableDeviceTypeEnabled() { return false; }
     CHIP_ERROR _GetDeviceType(uint16_t & deviceType) { return CHIP_ERROR_NOT_IMPLEMENTED; }

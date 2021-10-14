@@ -357,39 +357,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_SetFailSafeArmed(bool va
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetQRCodeString(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetWiFiAPSSID(char * buf, size_t bufSize)
-{
-    CHIP_ERROR err;
-
-#ifdef CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
-
-    uint8_t mac[6];
-
-    VerifyOrExit(bufSize >= sizeof(CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX) + 4, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    err = Impl()->_GetPrimaryWiFiMACAddress(mac);
-    SuccessOrExit(err);
-
-    snprintf(buf, bufSize, "%s%02X%02X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, mac[4], mac[5]);
-    buf[bufSize - 1] = 0;
-
-#else // CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
-
-    ExitNow(err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
-
-#endif // CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
-
-exit:
-    return err;
-}
-
-template <class ImplClass>
 CHIP_ERROR
 GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
 {

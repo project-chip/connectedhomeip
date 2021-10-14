@@ -101,10 +101,6 @@ public:
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen);
     CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb);
 
-    CHIP_ERROR GetQRCodeString(char * buf, size_t bufSize);
-
-    CHIP_ERROR GetWiFiAPSSID(char * buf, size_t bufSize);
-
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
 
 #if !defined(NDEBUG)
@@ -362,16 +358,6 @@ inline CHIP_ERROR ConfigurationManager::ReadPersistedStorageValue(::chip::Platfo
 inline CHIP_ERROR ConfigurationManager::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     return static_cast<ImplClass *>(this)->_WritePersistedStorageValue(key, value);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetQRCodeString(char * buf, size_t bufSize)
-{
-    return static_cast<ImplClass *>(this)->_GetQRCodeString(buf, bufSize);
-}
-
-inline CHIP_ERROR ConfigurationManager::GetWiFiAPSSID(char * buf, size_t bufSize)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiAPSSID(buf, bufSize);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
