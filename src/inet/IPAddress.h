@@ -108,9 +108,8 @@ enum class IPv6MulticastFlag : uint8_t
 using IPv6MulticastFlags = BitFlags<IPv6MulticastFlag>;
 
 /**
- * @brief   Internet protocol address
+ * Internet protocol address
  *
- * @details
  *  The CHIP Inet Layer uses objects of this class to represent Internet
  *  protocol addresses (independent of protocol version).
  */
