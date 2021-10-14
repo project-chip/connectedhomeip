@@ -754,6 +754,64 @@ bool ParseInt(const char * str, int32_t & output, int base)
 }
 
 /**
+ * Parse and attempt to convert a string to a 16-bit unsigned integer,
+ * applying the appropriate interpretation based on the base parameter.
+ *
+ * @param[in]  str    A pointer to a NULL-terminated C string representing
+ *                    the integer to parse.
+ * @param[out] output A reference to storage for a 16-bit unsigned integer
+ *                    to which the parsed value will be stored on success.
+ * @param[in]  base   The base according to which the string should be
+ *                    interpreted and parsed. If 0 or 16, the string may
+ *                    be hexadecimal and prefixed with "0x". Otherwise, a 0
+ *                    is implied as 10 unless a leading 0 is encountered in
+ *                    which 8 is implied.
+ *
+ * @return true on success; otherwise, false on failure.
+ */
+bool ParseInt(const char * str, uint16_t & output, int base)
+{
+    uint32_t v;
+
+    if (!ParseInt(str, v, base) || !CanCastTo<uint16_t>(v))
+    {
+        return false;
+    }
+    output = static_cast<uint16_t>(v);
+
+    return true;
+}
+
+/**
+ * Parse and attempt to convert a string to a 8-bit unsigned integer,
+ * applying the appropriate interpretation based on the base parameter.
+ *
+ * @param[in]  str    A pointer to a NULL-terminated C string representing
+ *                    the integer to parse.
+ * @param[out] output A reference to storage for a 8-bit unsigned integer
+ *                    to which the parsed value will be stored on success.
+ * @param[in]  base   The base according to which the string should be
+ *                    interpreted and parsed. If 0 or 16, the string may
+ *                    be hexadecimal and prefixed with "0x". Otherwise, a 0
+ *                    is implied as 10 unless a leading 0 is encountered in
+ *                    which 8 is implied.
+ *
+ * @return true on success; otherwise, false on failure.
+ */
+bool ParseInt(const char * str, uint8_t & output, int base)
+{
+    uint32_t v;
+
+    if (!ParseInt(str, v, base) || !CanCastTo<uint8_t>(v))
+    {
+        return false;
+    }
+    output = static_cast<uint8_t>(v);
+
+    return true;
+}
+
+/**
  * Parse and attempt to convert a string interpreted as a decimal
  * value to a 64-bit unsigned integer, applying the appropriate
  * interpretation based on the base parameter.
