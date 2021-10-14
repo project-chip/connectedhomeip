@@ -80,7 +80,9 @@ CHIP_ERROR SecureSessionMgr::Init(System::Layer * systemLayer, TransportMgrBase 
     mFabrics               = fabrics;
     mMessageCounterManager = messageCounterManager;
 
-    mGlobalEncryptedMessageCounter.Init();
+    // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
+    (void) mGlobalEncryptedMessageCounter.Init();
+    mGlobalUnencryptedMessageCounter.Init();
 
     ScheduleExpiryTimer();
 

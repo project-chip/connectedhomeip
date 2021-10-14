@@ -47,7 +47,7 @@ public:
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
-    UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) {}
+    UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) { mLocalMessageCounter.Init(); }
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
