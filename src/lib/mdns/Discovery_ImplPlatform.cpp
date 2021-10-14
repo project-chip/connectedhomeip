@@ -19,6 +19,7 @@
 
 #include <inttypes.h>
 
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/mdns/MdnsCache.h>
@@ -28,7 +29,6 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -48,7 +48,8 @@ CHIP_ERROR DiscoveryImplPlatform::Init()
     if (!mMdnsInitialized)
     {
         ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
-        mCommissionInstanceName = GetRandU64();
+        uint64_t random_instance_name = chip::Crypto::GetRandU64();
+        memcpy(&mCommissionableInstanceName[0], &random_instance_name, sizeof(mCommissionableInstanceName));
         mMdnsInitialized        = true;
     }
 
@@ -114,13 +115,9 @@ CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceN
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    size_t len = snprintf(instanceName, maxLength, "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
-                          static_cast<uint32_t>(mCommissionInstanceName));
-    if (len >= maxLength)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    return CHIP_NO_ERROR;
+
+    return chip::Encoding::BytesToUppercaseHexString(&mCommissionableInstanceName[0], sizeof(mCommissionableInstanceName),
+                                                     instanceName, maxLength);
 }
 
 template <class Derived, size_t N_idle, size_t N_active, size_t N_tcp>
