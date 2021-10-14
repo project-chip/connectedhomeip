@@ -1082,6 +1082,21 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t nameSupport)
 
 } // namespace NameSupport
 
+namespace LastConfiguredBy {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * lastConfiguredBy)
+{
+    return emberAfReadServerAttribute(endpoint, Scenes::Id, LastConfiguredBy::Id, (uint8_t *) lastConfiguredBy,
+                                      sizeof(*lastConfiguredBy));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId lastConfiguredBy)
+{
+    return emberAfWriteServerAttribute(endpoint, Scenes::Id, LastConfiguredBy::Id, (uint8_t *) &lastConfiguredBy,
+                                       ZCL_NODE_ID_ATTRIBUTE_TYPE);
+}
+
+} // namespace LastConfiguredBy
+
 } // namespace Attributes
 } // namespace Scenes
 

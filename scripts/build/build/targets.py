@@ -73,21 +73,27 @@ def HostTargets():
             HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName()):
         targets.append(target.Extend('arm64', board=HostBoard.ARM64))
 
+    app_targets = []
     for target in targets:
-        yield target.Extend('all-clusters', app=HostApp.ALL_CLUSTERS)
-        yield target.Extend('chip-tool', app=HostApp.CHIP_TOOL)
-        yield target.Extend('thermostat', app=HostApp.THERMOSTAT)
+        app_targets.append(target.Extend(
+            'all-clusters', app=HostApp.ALL_CLUSTERS))
+        app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
+        app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
+
+    for target in app_targets:
+        yield target
+        yield target.Extend('ipv6only', enable_ipv4=False)
 
 
 def Esp32Targets():
-    target = Target('esp32', Esp32Builder)
+    esp32_target = Target('esp32', Esp32Builder)
 
-    yield target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
-    yield target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
-    yield target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True)
-    yield target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
+    yield esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
+    yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
+    yield esp32_target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True)
+    yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
-    devkitc = target.Extend('devkitc', board=Esp32Board.DevKitC)
+    devkitc = esp32_target.Extend('devkitc', board=Esp32Board.DevKitC)
 
     yield devkitc.Extend('all-clusters', app=Esp32App.ALL_CLUSTERS)
     yield devkitc.Extend('shell', app=Esp32App.SHELL)

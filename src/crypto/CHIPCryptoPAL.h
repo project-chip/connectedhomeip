@@ -1199,6 +1199,11 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
 
 /**
+ * @brief Extracts the Subject Key Identifier from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & skid);
+
+/**
  * @brief Extracts the Authority Key Identifier from an X509 Certificate.
  **/
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);

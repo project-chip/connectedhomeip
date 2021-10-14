@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1816,8 +1816,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
     P256PublicKey publicKey;
 
     ByteSpan cert;
-    const uint8_t * certPubkey;
-    uint32_t certPubkeyLen;
+    ByteSpan pubkeySpan;
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
@@ -1825,12 +1824,13 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        err = GetTestCertPubkey(certType, &certPubkey, certPubkeyLen);
+        err = GetTestCertPubkey(certType, pubkeySpan);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = ExtractPubkeyFromX509Cert(cert, publicKey);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(publicKey.ConstBytes(), certPubkey, certPubkeyLen) == 0);
+        NL_TEST_ASSERT(inSuite, publicKey.Length() == pubkeySpan.size());
+        NL_TEST_ASSERT(inSuite, memcmp(publicKey.ConstBytes(), pubkeySpan.data(), pubkeySpan.size()) == 0);
     }
 }
 
@@ -1866,6 +1866,33 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
 
     err = ValidateCertificateChain(root_cert.data(), root_cert.size(), nullptr, 0, leaf_cert.data(), leaf_cert.size());
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
+static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t skidBuf[Credentials::kKeyIdentifierLength];
+    MutableByteSpan skidOut(skidBuf);
+
+    ByteSpan cert;
+    ByteSpan skidSpan;
+
+    for (size_t i = 0; i < gNumTestCerts; i++)
+    {
+        uint8_t certType = gTestCerts[i];
+
+        err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        err = GetTestCertSKID(certType, skidSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = ExtractSKIDFromX509Cert(cert, skidOut);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, skidSpan.data_equal(skidOut));
+    }
 }
 
 static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
@@ -2020,6 +2047,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test x509 Certificate Extraction from PKCS7", TestX509_PKCS7Extraction),
 #endif // CHIP_CRYPTO_OPENSSL
     NL_TEST_DEF("Test x509 Certificate Chain Validation", TestX509_CertChainValidation),
+    NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
     NL_TEST_DEF("Test Vendor ID Extraction from x509 Attestation Certificate", TestVID_x509Extraction),
     NL_TEST_SENTINEL()

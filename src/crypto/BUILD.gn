@@ -58,6 +58,8 @@ static_library("crypto") {
   sources = [
     "CHIPCryptoPAL.cpp",
     "CHIPCryptoPAL.h",
+    "RandUtils.cpp",
+    "RandUtils.h",
   ]
 
   cflags = [ "-Wconversion" ]

@@ -36,7 +36,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters::TestCluster;
+using namespace chip::app::Clusters::TestCluster::Commands;
 
 constexpr const char * kErrorStr = "Test Cluster: List Octet cluster (0x%02x) Error setting '%s' attribute: 0x%02x";
 
@@ -128,28 +130,18 @@ EmberAfStatus writeTestListStructOctetAttribute(EndpointId endpoint)
 } // namespace
 
 bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
-                                           const Commands::Test::DecodableType & commandData)
+                                           const Test::DecodableType & commandData)
 {
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool sendNumericResponse(EndpointId endpoint, app::CommandHandler * apCommandObj, CommandId responseCommand, uint8_t returnValue)
+bool emberAfTestClusterClusterTestSpecificCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
+                                                   const TestSpecific::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    app::CommandPathParams cmdParams = { endpoint, /* group id */ 0, ZCL_TEST_CLUSTER_ID, responseCommand,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
-
-    VerifyOrExit(apCommandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    SuccessOrExit(err = apCommandObj->PrepareCommand(cmdParams));
-    writer = apCommandObj->GetCommandDataElementTLVWriter();
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), returnValue));
-    SuccessOrExit(err = apCommandObj->FinishCommand());
-
-exit:
+    TestSpecificResponse::Type responseData;
+    responseData.returnValue = 7;
+    CHIP_ERROR err           = apCommandObj->AddResponseData(commandPath, responseData);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: %" CHIP_ERROR_FORMAT, err.Format());
@@ -157,32 +149,28 @@ exit:
     return true;
 }
 
-bool emberAfTestClusterClusterTestSpecificCallback(app::CommandHandler * apCommandObj, const app::ConcreteCommandPath & commandPath,
-                                                   const Commands::TestSpecific::DecodableType & commandData)
-{
-    return sendNumericResponse(commandPath.mEndpointId, apCommandObj, Commands::TestSpecificResponse::Id, 7);
-}
-
-bool emberAfTestClusterClusterTestNotHandledCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::TestNotHandled::DecodableType & commandData)
+bool emberAfTestClusterClusterTestNotHandledCallback(CommandHandler *, const ConcreteCommandPath & commandPath,
+                                                     const TestNotHandled::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfTestClusterClusterTestAddArgumentsCallback(app::CommandHandler * apCommandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::TestAddArguments::DecodableType & commandData)
+bool emberAfTestClusterClusterTestAddArgumentsCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
+                                                       const TestAddArguments::DecodableType & commandData)
 {
-    auto & arg1 = commandData.arg1;
-    auto & arg2 = commandData.arg2;
-
-    if (arg1 > UINT8_MAX - arg2)
+    if (commandData.arg1 > UINT8_MAX - commandData.arg2)
     {
         return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    return sendNumericResponse(commandPath.mEndpointId, apCommandObj, Commands::TestAddArgumentsResponse::Id,
-                               static_cast<uint8_t>(arg1 + arg2));
+    TestAddArgumentsResponse::Type responseData;
+    responseData.returnValue = static_cast<uint8_t>(commandData.arg1 + commandData.arg2);
+    CHIP_ERROR err           = apCommandObj->AddResponseData(commandPath, responseData);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(Zcl, "Test Cluster: failed to send TestAddArguments response: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return true;
 }
 
 // -----------------------------------------------------------------------------
