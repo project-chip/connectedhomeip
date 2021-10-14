@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 
+
 class ClusterInteractionFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())

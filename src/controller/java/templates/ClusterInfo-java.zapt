@@ -5,11 +5,8 @@ package chip.devicecontroller;
 
 import java.util.List;
 
-public class ClusterInfo {
- String name;
- Class<T> clusterClass;
- List<CommandInfo> commands;
- Map<String, ParameterType> typeMap;
+public class ClusterInfoMapping {
+
  public Map<String, ClusterInfo> getClusterMap() {
      Map<String, ClusterInfo> clusterInfoMapping = new Hashmap<>();
      {{#chip_client_clusters}}
@@ -43,55 +40,5 @@ public class ClusterInfo {
      {{/chip_client_clusters}}
   }
 }
-
-
-
-public class CommandParameter {
- public CommandParameter() {
-
- }
-
- public CommandParameter(String name, ParameterType type) {
-   this.name = name;
-   this.type = type;
- }
-
- public String name;
- public ParameterType type;
-}
-
-public class CommandInfo {
- public CommandInfo(String name, Function<List<CommandParameter>, ClusterResponse> fn, List<CommandParameter> parameters, Class callbackClass) {
-   this.name = name;
-   this.fn = fn;
-   this.parameters = parameters;
-   this.callbackClass = callbackClass;
- }
- public CommandInfo() {
- }
-
- public String name;
- public Function<List<CommandParameter>, ClusterResponse> fn;
- public List<CommandParameter> parameters;
- public Class callbackClass;
-}
-
-public class ClusterInfo {
-
- public ClusterInfo(String name) {
-   this.name = name;
-   this.commands = new ArrayList<CommandInfo>();
- }
- public String name;
- public Class<T> clusterClass;
- public List<CommandInfo> commands;
-
-}
-
-
-enum ParameterType {
- CALLBACK, INT, LONG, BOOLEAN, STRUCT
-}
-
 
 {{/if}}
