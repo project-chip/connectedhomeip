@@ -382,6 +382,10 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     return 'chip::Span<const char>';
   }
 
+  if (type == 'single') {
+    return 'float';
+  }
+
   async function fn(pkgId)
   {
     const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
