@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 package chip.clusterinfo;
 
+<<<<<<< HEAD
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -54,10 +55,15 @@ package chip.devicecontroller;
 =======
 package chip.clusterinfo;
 >>>>>>> 505e97db3 (change package)
+=======
+import java.util.function.Function;
+import java.util.*;
+>>>>>>> a4fd0282e (no error code generation)
 
 
 public class CommandInfo {
-  public CommandInfo(String name, Function<List<CommandParameter>, ClusterResponse> fn, List<CommandParameter> parameters, Class callbackClass) {
+  // TODO make Class<?> to ClusterResponse
+  public CommandInfo(String name, Function<List<CommandParameter>, Class<?>> fn, List<CommandParameter> parameters, Class<?> callbackClass) {
     this.name = name;
     this.fn = fn;
     this.parameters = parameters;
@@ -66,8 +72,13 @@ public class CommandInfo {
   public CommandInfo() {}
 
   public String name;
-  public Function<List<CommandParameter>, ClusterResponse> fn;
+  public Function<List<CommandParameter>, Class<?>> fn;
   public List<CommandParameter> parameters;
+<<<<<<< HEAD
   public Class callbackClass;
 }
 >>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
+=======
+  public Class<?> callbackClass;
+}
+>>>>>>> a4fd0282e (no error code generation)

@@ -75,10 +75,14 @@ android_library("java") {
     "src/chip/clusterinfo/ParameterType.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
 =======
     "zap-generated/chip/devicecontroller/ClusterInfo.java",
 >>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
+=======
+    "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
+>>>>>>> a4fd0282e (no error code generation)
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

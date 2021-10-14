@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 package chip.clusterinfo;
 
+<<<<<<< HEAD
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
 import java.util.Map;
 
@@ -38,6 +39,9 @@ package chip.devicecontroller;
 =======
 package chip.clusterinfo;
 >>>>>>> 505e97db3 (change package)
+=======
+import java.util.*;
+>>>>>>> a4fd0282e (no error code generation)
 
 public class ClusterInfo {
 
@@ -46,7 +50,7 @@ public class ClusterInfo {
     this.commands = new ArrayList<CommandInfo>();
   }
   public String name;
-  public Class<T> clusterClass;
+  public Class<?> clusterClass;
   public List<CommandInfo> commands;
 
 }
