@@ -18,8 +18,9 @@
 
 #
 #    Description:
-#      This script can be used to build an image file containing multiple
-#      source binaries at specific offset in the image
+#      This script can be used to build an RPC console - the python application
+#      that provides a console for interacting with rpc-enabled chip devices.
+#      You can specify a output directory as an argument, the default is out/rpc_console
 #
 
 set -e
@@ -31,17 +32,17 @@ source "$DIR/../activate.sh"
 
 # Set RPC console directory
 RPC_CONSOLE_DIR="$DIR/../../examples/common/pigweed/rpc_console"
-OUTPUT_DIR=rpc_console_out
+OUTPUT_DIR=out/rpc_console
 
 for i in "$@"; do
     case $i in
-    -o=* | --output=*)
-        OUTPUT_DIR="${i#*=}"
-        shift
-        ;;
-    *)
-        # unknown option
-        ;;
+        -o=* | --output=*)
+            OUTPUT_DIR="${i#*=}"
+            shift
+            ;;
+        *)
+            # unknown option
+            ;;
     esac
 done
 
