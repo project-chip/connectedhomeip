@@ -96,7 +96,7 @@ class {{filename}}: public TestCommand
     {{#if (isTestOnlyCluster cluster)}}
     CHIP_ERROR {{>testCommand}}()
     {
-        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{definedValue}}{{/chip_tests_item_parameters}});
+        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{#if (isString type)}}"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
     }
     {{else}}
     {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}
