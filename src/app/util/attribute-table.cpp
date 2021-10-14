@@ -49,8 +49,10 @@
 #include "app/util/common.h"
 #include <app-common/zap-generated/callback.h>
 #include <app/util/af-main.h>
+#include <app/util/error-mapping.h>
 
 #include <app/reporting/reporting.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 
@@ -566,19 +568,21 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     // write the data unless this is only a test
     if (!justTest)
     {
+        const app::ConcreteAttributePath attributePath(endpoint, cluster, attributeID);
+
         // Pre write attribute callback for all attribute changes,
         // regardless of cluster.
-        EmberAfStatus status = emberAfPreAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType,
-                                                                 emberAfAttributeSize(metadata), data);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        Protocols::InteractionModel::Status imStatus =
+            MatterPreAttributeChangeCallback(attributePath, mask, dataType, emberAfAttributeSize(metadata), data);
+        if (imStatus != Protocols::InteractionModel::Status::Success)
         {
-            return status;
+            return app::ToEmberAfStatus(imStatus);
         }
 
         // Pre-write attribute callback specific
         // to the cluster that the attribute lives in.
-        status = emAfClusterPreAttributeChangedCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType,
-                                                        emberAfAttributeSize(metadata), data);
+        EmberAfStatus status =
+            emAfClusterPreAttributeChangedCallback(attributePath, mask, dataType, emberAfAttributeSize(metadata), data);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             return status;
@@ -600,16 +604,15 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // Function itself will weed out tokens that are not tokenized.
         emAfSaveAttributeToToken(data, endpoint, cluster, metadata);
 
-        InteractionModelReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
+        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
 
         // Post write attribute callback for all attributes changes, regardless
         // of cluster.
-        emberAfPostAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType,
-                                           emberAfAttributeSize(metadata), data);
+        MatterPostAttributeChangeCallback(attributePath, mask, dataType, emberAfAttributeSize(metadata), data);
 
         // Post-write attribute callback specific
         // to the cluster that the attribute lives in.
-        emAfClusterAttributeChangedCallback(endpoint, cluster, attributeID, mask, manufacturerCode);
+        emAfClusterAttributeChangedCallback(attributePath, mask);
     }
     else
     {

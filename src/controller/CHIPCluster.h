@@ -26,10 +26,17 @@
 
 #pragma once
 
+#include "app/ConcreteCommandPath.h"
+#include <app/util/error-mapping.h>
 #include <controller/CHIPDevice.h>
+#include <controller/InvokeInteraction.h>
 
 namespace chip {
 namespace Controller {
+
+template <typename T>
+using CommandResponseSuccessCallback = void(void * context, const T & responseObject);
+using CommandResponseFailureCallback = void(void * context, EmberAfStatus status);
 
 class DLL_EXPORT ClusterBase
 {
@@ -41,6 +48,31 @@ public:
     void Dissociate();
 
     ClusterId GetClusterId() const { return mClusterId; }
+
+    /*
+     * This function permits sending an invoke request using cluster objects that represent the request and response data payloads.
+     *
+     * Success and Failure callbacks must be passed in through which the decoded response is provided as well as notification of any
+     * failure.
+     */
+    template <typename RequestDataT, typename ResponseDataT>
+    CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
+                             CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
+
+        auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
+            successCb(context, responseData);
+        };
+
+        auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+            failureCb(context, app::ToEmberAfStatus(aIMStatus));
+        };
+
+        return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                                   requestData, onSuccessCb, onFailureCb);
+    }
 
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}

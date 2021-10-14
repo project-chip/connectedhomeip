@@ -22,7 +22,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
@@ -116,9 +115,10 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, Attrib
 } // anonymous namespace
 
 bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
-                                                                 const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                                 Commands::ResetCounts::DecodableType & commandData)
+                                                                 const app::ConcreteCommandPath & commandPath,
+                                                                 const Commands::ResetCounts::DecodableType & commandData)
 {
+    EndpointId endpoint  = commandPath.mEndpointId;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,

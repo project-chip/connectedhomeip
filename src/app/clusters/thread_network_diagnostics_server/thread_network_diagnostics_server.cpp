@@ -22,7 +22,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPEncoding.h>
@@ -80,10 +79,10 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, Attribut
 } // anonymous namespace
 
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
-                                                               const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                               Commands::ResetCounts::DecodableType & commandData)
+                                                               const app::ConcreteCommandPath & commandPath,
+                                                               const Commands::ResetCounts::DecodableType & commandData)
 {
-    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
+    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::OverrunCount::Set(commandPath.mEndpointId, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to reset OverrunCount attribute");

@@ -123,6 +123,10 @@ def main():
     FailIfNot(test.TestSubscription(nodeid=1, endpoint=LIGHTING_ENDPOINT_ID),
               "Failed to subscribe attributes.")
 
+    logger.info("Testing another subscription that kills previous subscriptions")
+    FailIfNot(test.TestSubscription(nodeid=1, endpoint=LIGHTING_ENDPOINT_ID),
+              "Failed to subscribe attributes.")
+
     logger.info("Testing closing sessions")
     FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
 

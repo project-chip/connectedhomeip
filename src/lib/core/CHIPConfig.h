@@ -864,6 +864,28 @@
 #endif
 
 /**
+ *  @def CHIP_CONFIG_SHA256_CONTEXT_SIZE
+ *
+ *  @brief
+ *    Size of the statically allocated context for SHA256 operations in CryptoPAL
+ *
+ *    The default size is based on the Worst software implementation, OpenSSL. A
+ *    static assert will tell us if we are wrong, since `typedef SHA_LONG unsigned
+ *    int` is default.
+ *      SHA_LONG h[8];
+ *      SHA_LONG Nl, Nh;
+ *      SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
+ *      unsigned int num, md_len;
+ *
+ *    We also have to account for possibly some custom extensions on some targets,
+ *    especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
+ *
+ */
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t))
+#endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+
+/**
  *  @name chip key export protocol configuration.
  *
  *  @brief
@@ -2557,6 +2579,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
 #define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 2
+#endif
+
+/**
+ * @def CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+ *
+ * @brief Enable or disable attribute read with complex type.
+ *
+ */
+#ifndef CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+#define CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ 0
 #endif
 
 /**

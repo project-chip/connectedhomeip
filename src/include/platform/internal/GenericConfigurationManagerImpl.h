@@ -66,6 +66,7 @@ public:
                                      uint8_t & second);
     CHIP_ERROR _GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
     CHIP_ERROR _StoreSerialNumber(const char * serialNum, size_t serialNumLen);
+    CHIP_ERROR _GetPrimaryMACAddress(MutableByteSpan buf);
     CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
     CHIP_ERROR _StorePrimaryWiFiMACAddress(const uint8_t * buf);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);

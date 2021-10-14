@@ -16,35 +16,24 @@
  *    limitations under the License.
  */
 
-#include <lib/support/logging/CHIPLogging.h>
-
 #include "AppTask.h"
 #include "BoltLockManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app/util/af-types.h>
-#include <app/util/af.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
+using namespace ::chip::app::Clusters;
 
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
-    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
+    if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
-        return;
+        BoltLockMgr().InitiateAction(0, *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
     }
-
-    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
-    {
-        ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
-        return;
-    }
-
-    BoltLockMgr().InitiateAction(0, *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
 }
 
 /** @brief OnOff Cluster Init

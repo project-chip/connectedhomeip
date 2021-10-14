@@ -17,15 +17,17 @@
  */
 
 #include <app-common/zap-generated/enums.h>
+#include <app/server/Server.h>
 #include <app/util/util.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeDelegate.h>
@@ -160,7 +162,12 @@ chip::Protocols::Id FromFullyQualified(uint32_t rawProtocolId)
 }
 
 constexpr uint16_t kOptionProviderLocation = 'p';
-chip::NodeId providerNodeId                = 0x0;
+constexpr uint16_t kOptionUdpPort          = 'u';
+constexpr uint16_t kOptionDiscriminator    = 'd';
+
+chip::NodeId providerNodeId  = 0x0;
+uint16_t requestorSecurePort = 0;
+uint16_t setupDiscriminator  = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -174,6 +181,24 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             PrintArgError("%s: unable to parse Node ID: %s\n", aProgram, aValue);
         }
         break;
+    case kOptionUdpPort:
+        requestorSecurePort = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+
+        if (requestorSecurePort == 0)
+        {
+            PrintArgError("%s: Input ERROR: udpPort may not be zero\n", aProgram);
+            retval = false;
+        }
+        break;
+    case kOptionDiscriminator:
+        setupDiscriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+
+        if (setupDiscriminator > 0xFFF)
+        {
+            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
+            retval = false;
+        }
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -185,15 +210,23 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 OptionDef cmdLineOptionsDef[] = {
     { "providerLocation", chip::ArgParser::kArgumentRequired, kOptionProviderLocation },
+    { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
+    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -p <node ID>\n"
-                             "  --providerLocation <node ID>\n"
+                             "  -p/--providerLocation <node ID>\n"
                              "        Node ID of the OTA Provider to connect to (hex format)\n\n"
                              "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
-                             "        See README.md for more info.\n" };
+                             "        See README.md for more info.\n"
+                             "  -u/--udpPort <UDP port number>\n"
+                             "        UDP Port that the Requestor listens on for secure connections.\n"
+                             "        When this parameter is present the Requestor skips self-commissioning.\n"
+                             "        See README.md for more info.\n"
+                             "  -d/--discriminator <discriminator>\n"
+                             "        A 12-bit value used to discern between multiple commissionable CHIP device"
+                             "        advertisements. Default value is 3840\n" };
 
 HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
 
@@ -231,25 +264,56 @@ int main(int argc, char * argv[])
 
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
 
-    // Until #9518 is fixed, the only way to open a CASE session to another node is to commission it first using the
-    // DeviceController API. Thus, the ota-requestor-app must do self commissioning and then read CASE credentials from persistent
-    // storage to connect to the Provider node. See README.md for instructions.
-    // NOTE: Controller is initialized in this call
-    err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId(), mStorage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "example self-commissioning failed: %s", chip::ErrorStr(err)));
+    err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(SoftwareUpdate, "Setup discriminator set to: %d \n", setupDiscriminator);
+    }
+    else
+    {
+        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %s \n", chip::ErrorStr(err));
+        goto exit;
+    }
 
-    err = chip::Controller::DeviceControllerFactory::GetInstance().ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %s", chip::ErrorStr(err)));
+    // When the udpPort command line parameter is not present the Requestor self-commissions and automatically requests
+    // an image from the Provider. When the parameter is present the Requestor initializes like any other application and
+    // does not perform any automatic actions.
+    if (requestorSecurePort != 0)
+    {
+        uint16_t unsecurePort = CHIP_UDC_PORT;
 
-    ChipLogProgress(SoftwareUpdate, "Attempting to connect to device 0x%" PRIX64, providerNodeId);
+        ChipLogProgress(SoftwareUpdate, "Initializing the Application Server. Listening on UDP port %d", requestorSecurePort);
 
-    // WARNING: In order for this to work, you must first commission the OTA Provider device using chip-tool.
-    // Currently, that pairing action will persist the CASE session in persistent memory, which will then be read by the following
-    // call.
-    err = mController.GetDevice(providerNodeId, &providerDevice);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %s", chip::ErrorStr(err)));
+        // Init ZCL Data Model and CHIP App Server
+        chip::Server::GetInstance().Init(nullptr, requestorSecurePort, unsecurePort);
 
-    err = providerDevice->EstablishConnectivity(&mConnectionCallback, &mConnectFailCallback);
+        // Initialize device attestation config
+        SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    }
+    else
+    {
+        // Until #9518 is fixed, the only way to open a CASE session to another node is to commission it first using the
+        // DeviceController API. Thus, the ota-requestor-app must do self commissioning and then read CASE credentials from
+        // persistent storage to connect to the Provider node. See README.md for instructions. NOTE: Controller is initialized in
+        // this call
+        err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId(),
+                                         mStorage.GetListenPort());
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(SoftwareUpdate, "example self-commissioning failed: %s", chip::ErrorStr(err)));
+
+        err = chip::Controller::DeviceControllerFactory::GetInstance().ServiceEvents();
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %s", chip::ErrorStr(err)));
+
+        ChipLogProgress(SoftwareUpdate, "Attempting to connect to device 0x%" PRIX64, providerNodeId);
+
+        // WARNING: In order for this to work, you must first commission the OTA Provider device using chip-tool.
+        // Currently, that pairing action will persist the CASE session in persistent memory, which will then be read by the
+        // following call.
+        err = mController.GetDevice(providerNodeId, &providerDevice);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %s", chip::ErrorStr(err)));
+
+        err = providerDevice->EstablishConnectivity(&mConnectionCallback, &mConnectFailCallback);
+    }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

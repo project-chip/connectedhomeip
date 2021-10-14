@@ -71,12 +71,15 @@ bool SendStatusIfDelegateNull(EndpointId endpoint)
  * @param newVersion The SoftwareVersion value of the new Software Image that the client is ready to apply.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(app::CommandHandler * commandObj,
-                                                                       const app::ConcreteCommandPath & commandPath,
-                                                                       EndpointId endpoint, ByteSpan updateToken,
-                                                                       uint32_t newVersion,
-                                                                       Commands::ApplyUpdateRequest::DecodableType & commandData)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::ApplyUpdateRequest::DecodableType & commandData)
 {
+    auto & updateToken = commandData.updateToken;
+    auto & newVersion  = commandData.newVersion;
+
+    EndpointId endpoint = commandPath.mEndpointId;
+
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
@@ -111,12 +114,15 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(app::Comm
  *                       OTA Requestor's Basic Information Cluster.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(app::CommandHandler * commandObj,
-                                                                        const app::ConcreteCommandPath & commandPath,
-                                                                        EndpointId endpoint, chip::ByteSpan updateToken,
-                                                                        uint32_t softwareVersion,
-                                                                        Commands::NotifyUpdateApplied::DecodableType & commandData)
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::NotifyUpdateApplied::DecodableType & commandData)
 {
+    auto & updateToken     = commandData.updateToken;
+    auto & softwareVersion = commandData.softwareVersion;
+
+    EndpointId endpoint = commandPath.mEndpointId;
+
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
@@ -159,11 +165,20 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(app::Com
  * @param metadataForProvider Optional, max 512 octets. A TLV-encoded Vendor-specific payload.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint16_t vendorId,
-    uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported, uint8_t * location,
-    bool requestorCanConsent, chip::ByteSpan metadataForProvider, Commands::QueryImage::DecodableType & commandData)
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandler * commandObj,
+                                                               const app::ConcreteCommandPath & commandPath,
+                                                               const Commands::QueryImage::DecodableType & commandData)
 {
+    auto & vendorId            = commandData.vendorId;
+    auto & productId           = commandData.productId;
+    auto & hardwareVersion     = commandData.hardwareVersion;
+    auto & softwareVersion     = commandData.softwareVersion;
+    auto & protocolsSupported  = commandData.protocolsSupported;
+    auto & requestorCanConsent = commandData.requestorCanConsent;
+    auto & metadataForProvider = commandData.metadataForProvider;
+
+    EndpointId endpoint = commandPath.mEndpointId;
+
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 

@@ -22,11 +22,14 @@
 #include <cstdint>
 
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/basic-types.h>
+#include <controller/CommandSenderAllocator.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -50,10 +53,9 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancel
                                                                 Callback::Cancelable * onFailureCallback,
                                                                 chip::ByteSpan updateToken, uint32_t newVersion)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    app::CommandSender * sender = nullptr;
-    TLV::TLVWriter * writer     = nullptr;
-    uint8_t argSeqNumber        = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
 
     // Used when encoding non-empty command. Suppress error message when encoding empty commands.
     (void) writer;
@@ -65,7 +67,10 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancel
                                          OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -78,16 +83,14 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancel
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    err = mDevice->SendCommands(sender);
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
 
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
 exit:
-    // On error, we are responsible to close the sender.
-    if (err != CHIP_NO_ERROR && sender != nullptr)
-    {
-        sender->Shutdown();
-    }
     return err;
 }
 
@@ -95,10 +98,9 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cance
                                                                  Callback::Cancelable * onFailureCallback,
                                                                  chip::ByteSpan updateToken, uint32_t softwareVersion)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    app::CommandSender * sender = nullptr;
-    TLV::TLVWriter * writer     = nullptr;
-    uint8_t argSeqNumber        = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
 
     // Used when encoding non-empty command. Suppress error message when encoding empty commands.
     (void) writer;
@@ -110,7 +112,10 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cance
                                          OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -123,16 +128,14 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cance
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    err = mDevice->SendCommands(sender);
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
 
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
 exit:
-    // On error, we are responsible to close the sender.
-    if (err != CHIP_NO_ERROR && sender != nullptr)
-    {
-        sender->Shutdown();
-    }
     return err;
 }
 
@@ -142,10 +145,9 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
                                                         uint8_t protocolsSupported, chip::ByteSpan location,
                                                         bool requestorCanConsent, chip::ByteSpan metadataForProvider)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    app::CommandSender * sender = nullptr;
-    TLV::TLVWriter * writer     = nullptr;
-    uint8_t argSeqNumber        = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
 
     // Used when encoding non-empty command. Suppress error message when encoding empty commands.
     (void) writer;
@@ -157,7 +159,10 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
                                          OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -183,16 +188,14 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    err = mDevice->SendCommands(sender);
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
 
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
 exit:
-    // On error, we are responsible to close the sender.
-    if (err != CHIP_NO_ERROR && sender != nullptr)
-    {
-        sender->Shutdown();
-    }
     return err;
 }
 

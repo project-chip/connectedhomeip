@@ -98,10 +98,17 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
-    case ArgumentType::CharString: {
+    case ArgumentType::String: {
         const char ** value = reinterpret_cast<const char **>(arg.value);
         *value              = argValue;
         isValidArgument     = true;
+        break;
+    }
+
+    case ArgumentType::CharString: {
+        auto * value    = static_cast<chip::Span<const char> *>(arg.value);
+        *value          = chip::Span<const char>(argValue, strlen(argValue));
+        isValidArgument = true;
         break;
     }
 
@@ -314,6 +321,17 @@ size_t Command::AddArgument(const char * name, char ** value)
     return mArgs.size();
 }
 
+size_t Command::AddArgument(const char * name, chip::CharSpan * value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::CharString;
+    arg.name  = name;
+    arg.value = reinterpret_cast<void *>(value);
+
+    mArgs.emplace_back(arg);
+    return mArgs.size();
+}
+
 size_t Command::AddArgument(const char * name, chip::ByteSpan * value)
 {
     Argument arg;
@@ -386,58 +404,3 @@ const char * Command::GetAttribute(void) const
 
     return nullptr;
 }
-
-void Command::UpdateWaitForResponse(bool value)
-{
-#if CONFIG_USE_SEPARATE_EVENTLOOP
-    {
-        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-        mWaitingForResponse = value;
-    }
-    cvWaitingForResponse.notify_all();
-#else  // CONFIG_USE_SEPARATE_EVENTLOOP
-    if (value == false)
-    {
-        if (mCommandExitStatus != CHIP_NO_ERROR)
-        {
-            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(mCommandExitStatus));
-        }
-
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    }
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
-}
-
-#if CONFIG_USE_SEPARATE_EVENTLOOP
-
-void Command::WaitForResponse(uint16_t seconds)
-{
-    std::chrono::seconds waitingForResponseTimeout(seconds);
-    std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
-    auto waitingUntil = std::chrono::system_clock::now() + waitingForResponseTimeout;
-    if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
-    {
-        ChipLogError(chipTool, "No response from device");
-    }
-}
-
-#else // CONFIG_USE_SEPARATE_EVENTLOOP
-
-static void OnResponseTimeout(chip::System::Layer *, void *)
-{
-    ChipLogError(chipTool, "No response from device");
-
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-}
-
-CHIP_ERROR Command::ScheduleWaitForResponse(uint16_t seconds)
-{
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(seconds * 1000, OnResponseTimeout, this);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(chipTool, "Failed to allocate timer %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    return err;
-}
-
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP

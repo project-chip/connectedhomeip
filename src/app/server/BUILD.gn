@@ -29,10 +29,10 @@ static_library("server") {
   sources = [
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",
+    "Dnssd.cpp",
+    "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
-    "Mdns.cpp",
-    "Mdns.h",
     "OnboardingCodesUtil.cpp",
     "OnboardingCodesUtil.h",
     "Server.cpp",
@@ -45,7 +45,7 @@ static_library("server") {
 
   public_deps = [
     "${chip_root}/src/app",
-    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",

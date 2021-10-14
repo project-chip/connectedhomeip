@@ -46,7 +46,7 @@ static_library("ESP32") {
     "nimble/BLEManagerImpl.cpp",
   ]
 
-  deps = [ "${chip_root}/src/lib/mdns:platform_header" ]
+  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
 
   public_deps = [
     "${chip_root}/src/crypto",

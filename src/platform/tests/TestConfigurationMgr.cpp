@@ -441,6 +441,46 @@ static void TestConfigurationMgr_Breadcrumb(nlTestSuite * inSuite, void * inCont
     NL_TEST_ASSERT(inSuite, breadcrumb == 12345);
 }
 
+static void TestConfigurationMgr_GetPrimaryMACAddress(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    const uint8_t defaultMacAddress[8] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0, 0xDD, 0xCA };
+    uint8_t macBuffer8Bytes[8];
+    uint8_t macBuffer6Bytes[6];
+    MutableByteSpan mac8Bytes(macBuffer8Bytes);
+    MutableByteSpan mac6Bytes(macBuffer6Bytes);
+
+    err = ConfigurationMgr().GetPrimaryMACAddress(mac8Bytes);
+    if (mac8Bytes.size() != ConfigurationManager::kPrimaryMACAddressLength)
+    {
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        // Verify default MAC address value
+        NL_TEST_ASSERT(inSuite,
+                       strncmp(reinterpret_cast<char *>(mac8Bytes.data()), reinterpret_cast<const char *>(defaultMacAddress),
+                               mac8Bytes.size()) == 0);
+    }
+
+    err = ConfigurationMgr().GetPrimaryMACAddress(mac6Bytes);
+    if (mac6Bytes.size() != ConfigurationManager::kPrimaryMACAddressLength)
+    {
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        // Verify default MAC address value
+        NL_TEST_ASSERT(inSuite,
+                       strncmp(reinterpret_cast<char *>(mac6Bytes.data()), reinterpret_cast<const char *>(defaultMacAddress),
+                               mac6Bytes.size()) == 0);
+    }
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -467,6 +507,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::RegulatoryLocation", TestConfigurationMgr_RegulatoryLocation),
     NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
     NL_TEST_DEF("Test ConfigurationMgr::Breadcrumb", TestConfigurationMgr_Breadcrumb),
+    NL_TEST_DEF("Test ConfigurationMgr::GetPrimaryMACAddress", TestConfigurationMgr_GetPrimaryMACAddress),
     NL_TEST_SENTINEL()
 };
 

@@ -753,6 +753,7 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
     params.mAttributePathParamsListSize = 1;
     params.mMinIntervalFloorSeconds     = mMinIntervalFloorSeconds;
     params.mMaxIntervalCeilingSeconds   = mMaxIntervalCeilingSeconds;
+    params.mKeepSubscriptions           = false;
 
     CHIP_ERROR err =
         chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(params, seqNum /* application context */);
