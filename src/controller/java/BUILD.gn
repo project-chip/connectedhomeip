@@ -64,6 +64,7 @@ android_library("java") {
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
+    "zap-generated/chip/devicecontroller/ClusterInfo.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
