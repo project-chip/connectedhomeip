@@ -120,7 +120,8 @@ class Esp32Builder(Builder):
 
         defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
 
-        self._Execute(['mkdir', '-p', self.output_dir], title='Generating ' + self.identifier)
+        self._Execute(['mkdir', '-p', self.output_dir],
+                      title='Generating ' + self.identifier)
         self._Execute(['cp', defaults, defaults_out])
         self._Execute(
             ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])

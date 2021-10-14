@@ -82,7 +82,7 @@ class TestBuilder(unittest.TestCase):
         diffs = [line for line in difflib.unified_diff(expected, actual)]
 
         if diffs:
-            reference = os.path.basename(expected_file) + '.actual' 
+            reference = os.path.basename(expected_file) + '.actual'
             with open(reference, 'wt') as fo:
                 for l in build_actual_output(ROOT, OUT, args):
                     fo.write(l.replace(ROOT, '{root}').replace(OUT, '{out}'))
