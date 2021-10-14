@@ -44,7 +44,6 @@ static_library("k32w0") {
     "NFCManagerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "SoftwareUpdateManagerImpl.h",
     "ble_function_mux.c",
   ]
 

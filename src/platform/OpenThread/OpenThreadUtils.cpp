@@ -172,7 +172,7 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 
     char srcStr[50], destStr[50], typeBuf[20];
     const char * type = typeBuf;
-    IPAddress addr;
+    Inet::IPAddress addr;
     uint8_t headerData[44];
     uint16_t pktLen;
 

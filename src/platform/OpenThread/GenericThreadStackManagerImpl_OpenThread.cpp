@@ -73,6 +73,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
+using chip::Inet::IPPrefix;
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
