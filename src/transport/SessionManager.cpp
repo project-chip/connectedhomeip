@@ -79,7 +79,8 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mTransportMgr          = transportMgr;
     mMessageCounterManager = messageCounterManager;
 
-    mGlobalEncryptedMessageCounter.Init();
+    ReturnErrorOnFailure(mGlobalEncryptedMessageCounter.Init());
+    mGlobalUnencryptedMessageCounter.Init();
 
     ScheduleExpiryTimer();
 
