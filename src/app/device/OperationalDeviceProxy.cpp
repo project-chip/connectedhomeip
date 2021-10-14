@@ -36,7 +36,6 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnOperationalDevic
     }
 
     VerifyOrReturnError(mInitParams.exchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
-    mInitParams.exchangeMgr->SetDelegate(this);
 
     Controller::ControllerDeviceInitParams initParams = {
         .sessionManager  = mInitParams.sessionManager,
@@ -117,12 +116,17 @@ void OperationalDeviceProxy::DequeueConnectionFailureCallbacks(CHIP_ERROR error,
     }
 }
 
-void OperationalDeviceProxy::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr)
+void OperationalDeviceProxy::OnNewConnection(SessionHandle session)
 {
+    // If the secure session established is initiated by another device
+    if (!mDevice.IsActive() || mDevice.IsSecureConnected()) {
+        return;
+    }
+
     mDevice.OnNewConnection(session);
 }
 
-void OperationalDeviceProxy::OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr)
+void OperationalDeviceProxy::OnConnectionExpired(SessionHandle session)
 {
     mDevice.OnConnectionExpired(session);
 }
