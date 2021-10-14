@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 package chip.clusterinfo;
 
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
@@ -34,6 +35,9 @@ public class ClusterInfo {
 }
 =======
 package chip.devicecontroller;
+=======
+package chip.clusterinfo;
+>>>>>>> 505e97db3 (change package)
 
 public class ClusterInfo {
 
