@@ -24,6 +24,7 @@
 
 #include "OpenThreadUtils.h"
 
+#include <inet/IPAddress.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
