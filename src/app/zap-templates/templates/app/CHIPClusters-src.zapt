@@ -104,18 +104,23 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelC
 {{#if isWritableAttribute}}
 CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
 {
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId         = mDevice->GetDeviceId();
-    attributePath.mEndpointId     = mEndpoint;
-    attributePath.mClusterId      = mClusterId;
-    attributePath.mFieldId        = {{ asHex code 8 }};
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
+    {
+        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
+        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
+{{#if (isCharString type)}}
+{{! TODO: Emit CharSpan for CHAR_STRING}}
+        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
+{{else}}
+        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
+{{/if}}
+    } else {
+{{#if (isCharString type)}}
+        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+{{else}}
+        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(value, nullptr, nullptr, nullptr);
+{{/if}}
+    }
 }
 
 {{/if}}

@@ -132,7 +132,7 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no WriteClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier = 0);
+    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * callback);
 
     /**
      *  Allocate a ReadClient that can be used to do a read interaction.  If the call succeeds, the consumer

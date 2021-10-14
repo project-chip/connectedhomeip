@@ -7,6 +7,7 @@
 #include <app/util/basic-types.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 using namespace chip::app::Clusters;
@@ -22,20 +23,25 @@ namespace Controller {
 {{#unless isWritableAttribute}}
 {{#unless isList}}
 {{#unless isStruct}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}ClusterTest::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} {{asLowerCamelCase name}})
+CHIP_ERROR {{asUpperCamelCase parent.name}}ClusterTest::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
 {
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId         = mDevice->GetDeviceId();
-    attributePath.mEndpointId     = mEndpoint;
-    attributePath.mClusterId      = mClusterId;
-    attributePath.mFieldId        = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, {{asLowerCamelCase name}}));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
+    {
+        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
+        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
+        // TYPE: {{ type }}
+{{#if (isCharString type)}}
+        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
+{{else}}
+        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
+{{/if}}
+    } else {
+{{#if (isCharString type)}}
+        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+{{else}}
+        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(value, nullptr, nullptr, nullptr);
+{{/if}}
+    }
 }
 
 {{/unless}}

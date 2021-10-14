@@ -129,11 +129,9 @@ public:
 {{/zcl_commands}}
 
 {{#zcl_attributes_server}}
-{{#if (hasSpecificAttributes)}}
 {{#first}}
 namespace Attributes {
 {{/first}}
-{{#if clusterRef}}
 namespace {{asUpperCamelCase label}} {
     struct TypeInfo {
     {{#if entryType}}
@@ -144,15 +142,17 @@ namespace {{asUpperCamelCase label}} {
         using DecodableType = {{zapTypeToDecodableClusterObjectType type}};
     {{/if}}
 
-        static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+{{#if clusterRef}}
         static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
+{{else}}
+        static constexpr AttributeId GetAttributeId() { return Globals::Attributes::{{asUpperCamelCase label}}::Id; }
+{{/if}}
     };
 } // namespace {{asUpperCamelCase label}}
-{{/if}}
 {{#last}}
 } // namespace Attributes
 {{/last}}
-{{/if}}
 {{/zcl_attributes_server}}
 {{#zcl_events}}
 {{#first}}

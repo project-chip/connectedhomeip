@@ -32,7 +32,9 @@ namespace Attributes {
 
 {{/first}}
 {{#unless clusterRef}}
-namespace {{asUpperCamelCase label}} = Globals::Attributes::{{asUpperCamelCase label}};
+namespace {{asUpperCamelCase label}} {
+using namespace Globals::Attributes::{{asUpperCamelCase label}};
+}
 {{/unless}}
 {{#if clusterRef}}
 namespace {{asUpperCamelCase label}} {
