@@ -3,9 +3,7 @@ package chip.devicecontroller;
 import java.util.Arrays;
 import java.util.Objects;
 
-/**
- * Parameters representing a generated PASE verifier for a setup PIN code.
- */
+/** Parameters representing a generated PASE verifier for a setup PIN code. */
 public final class PaseVerifierParams {
 
   private final long setupPincode;
@@ -25,16 +23,12 @@ public final class PaseVerifierParams {
     this.pakeVerifier = pakeVerifier.clone();
   }
 
-  /**
-   * Returns the PIN code associated with this verifier.
-   */
+  /** Returns the PIN code associated with this verifier. */
   public long getSetupPincode() {
     return setupPincode;
   }
 
-  /**
-   * Returns the passcode ID for this generated verifier.
-   */
+  /** Returns the passcode ID for this generated verifier. */
   public int getPasscodeId() {
     return passcodeId;
   }
