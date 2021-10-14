@@ -25,6 +25,7 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <cstdio>
 #include <nlunit-test.h>
 
 using namespace chip;
@@ -243,6 +244,43 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
     }
 }
 
+static void TestVendorReservedData(nlTestSuite * inSuite, void * inContext)
+{
+
+    struct VendorReservedElement inputArray[] = { { 3000, 100, 10 }, { 2999, 99, 10 },  { 10, 20, 100 },
+                                                  { 100, 50, 200 },  { 3000, 100, 11 }, { 3000, 100, 9 } };
+
+    CREATE_VENDOR_RESERVED(vendorReserved, 6);
+    size_t i;
+    uint8_t strings[6][50];
+    for (i = 0; i < ArraySize(inputArray); i++)
+    {
+        snprintf(reinterpret_cast<char *>(strings[i]), 50, "Vendor Reserved Data #%d", (int) i); // for debugging use
+        CHIP_ERROR err = vendorReserved.addVendorReservedElement(inputArray[i].vendorId, inputArray[i].profileNum,
+                                                                 inputArray[i].tagNum, ByteSpan(strings[i]));
+
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+
+    // manually figure out the order these should be read out in when sorted
+    struct VendorReservedElement * desiredOrder[] = {
+        &inputArray[2], &inputArray[3], &inputArray[1], &inputArray[5], &inputArray[0], &inputArray[4],
+    };
+
+    const struct VendorReservedElement * element;
+    for (element = vendorReserved.cbegin(), i = 0; element; element = vendorReserved.Next(), i++)
+    {
+        NL_TEST_ASSERT(inSuite,
+                       element->vendorId == desiredOrder[i]->vendorId && element->profileNum == desiredOrder[i]->profileNum &&
+                           element->tagNum == desiredOrder[i]->tagNum);
+    }
+
+    // add another element, it should fail
+    uint8_t testByteSpan[] = { 0x1, 0x2, 0x3 };
+    CHIP_ERROR err         = vendorReserved.addVendorReservedElement(5, 10, 20, ByteSpan(testByteSpan));
+    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+}
+
 static void TestAttestationElements_DeconstructionWithFirmwareInfo(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -374,9 +412,10 @@ static void TestAttestationElements_DeconstructionUnordered(nlTestSuite * inSuit
  */
 // clang-format off
 static const nlTest sTests[] = {
-    NL_TEST_DEF("Test Device Attestation Elements Deconstruction", TestAttestationElements_Deconstruction), // ml
+    NL_TEST_DEF("Test Device Attestation Elements Deconstruction", TestAttestationElements_Deconstruction), 
+    NL_TEST_DEF("Test Vendor Reserved Data Ordering",   TestVendorReservedData),
     NL_TEST_DEF("Test Device Attestation Elements Roundtrip", TestAttestationElements_Roundtrip),
-   NL_TEST_DEF("Test Device Attestation Elements Construction", TestAttestationElements_Construction),
+    NL_TEST_DEF("Test Device Attestation Elements Construction", TestAttestationElements_Construction),
     NL_TEST_DEF("Test Device Attestation Elements Deconstruction", TestAttestationElements_Deconstruction),
     NL_TEST_DEF("Test Device Attestation Elements Deconstruction with Firmware Information", TestAttestationElements_DeconstructionWithFirmwareInfo),
     NL_TEST_DEF("Test Device Attestation Elements Deconstruction - Corrupted/Out of Order TLV", TestAttestationElements_DeconstructionUnordered),
