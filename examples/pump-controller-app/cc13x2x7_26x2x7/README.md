@@ -1,7 +1,7 @@
 # Matter CC1352 CC2652 Pump Controller Example Application
 
-An example application showing the use of [Matter][matter] on the Texas Instruments
-CC13X2_26X2 family of Wireless MCUs.
+An example application showing the use of [Matter][matter] on the Texas
+Instruments CC13X2_26X2 family of Wireless MCUs.
 
 ---
 
@@ -28,9 +28,10 @@ CC13X2_26X2 family of Wireless MCUs.
 
 ![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
 
-The CC13X2_26X2 pump controller example application provides a working demonstration of a
-connected pump controller device. This uses the open-source Matter implementation and
-the Texas Instruments SimpleLink™ CC13x2 and CC26x2 software development kit.
+The CC13X2_26X2 pump controller example application provides a working
+demonstration of a connected pump controller device. This uses the open-source
+Matter implementation and the Texas Instruments SimpleLink™ CC13x2 and CC26x2
+software development kit.
 
 This example is enabled to build for CC2652R7 devices. This upcoming devices are
 currently not yet in full production. For more information on device
@@ -44,19 +45,20 @@ Instruments devices.
 ## Device UI
 
 This example application has a simple User Interface to depict the state of the
-pump and to control the state. The user LEDs on the LaunchPad are set on
-when the pump is started, and are set off when stopped. The LEDs will flash when
-in the transition state between started and stopped.
+pump and to control the state. The user LEDs on the LaunchPad are set on when
+the pump is started, and are set off when stopped. The LEDs will flash when in
+the transition state between started and stopped.
 
-Short presses (less than 1000ms) of the left user button (`BTN-1`) are used for 
+Short presses (less than 1000ms) of the left user button (`BTN-1`) are used for
 toggeling the pump state.
 
-Short presses (less than 1000ms) of the right user button (`BTN-2`) are used for 
+Short presses (less than 1000ms) of the right user button (`BTN-2`) are used for
 toggeling Matter BLE advertisements.
 
 Long presses (greater than 5000ms) of the right user button (`BTN-2`) will
-initiate a factory reset of the device clearing all stored provisioning information
-to allow for a new network setup.
+initiate a factory reset of the device clearing all stored provisioning
+information to allow for a new network setup.
+
 ## Building
 
 ### Preparation
@@ -168,22 +170,22 @@ Router][ot_border_router_setup].
 
 ### Provisioning
 
-The first step to bring the Matter device onto the network is to provision it. Our
-example accomplishes this with Bluetooth Low Energy (BLE) and the
+The first step to bring the Matter device onto the network is to provision it.
+Our example accomplishes this with Bluetooth Low Energy (BLE) and the
 [CHIPTool](../../../src/android/CHIPTool/README.md) mobile app.
 
 #### Bluetooth LE Advertising
 
 To provision this example onto a Thread network, the device must be discoverable
-over Bluetooth LE. BLE advertising is started by pressing the right button
-(less than 1000ms), labeled `BTN-2` on the silkscreen. Once the device is
-fully provisioned, BLE advertising will stop.
+over Bluetooth LE. BLE advertising is started by pressing the right button (less
+than 1000ms), labeled `BTN-2` on the silkscreen. Once the device is fully
+provisioned, BLE advertising will stop.
 
 #### Bluetooth LE Rendezvous
 
 In this example, the provisioning procedure (called Rendezvous) is done over
-Bluetooth LE between a Matter device (pump-controller-app) and the Matter controller
-(CHIPTool), where the controller has the commissioner role.
+Bluetooth LE between a Matter device (pump-controller-app) and the Matter
+controller (CHIPTool), where the controller has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the Matter device.
@@ -205,8 +207,8 @@ generator][qr_code_generator] and enter in the payload shown in `SetupQRCode`
 ### Matter Remote Commands
 
 Once the Matter device is provisioned and operating on the network, CHIPTool can
-be used to control the device. During the provisioning process, the Matter device
-would have sent one of its newly assigned IPv6 addresses to the CHIPTool.
+be used to control the device. During the provisioning process, the Matter
+device would have sent one of its newly assigned IPv6 addresses to the CHIPTool.
 
 In the app, you should see an On/Off cluster; this corresponds to the pump-app.
 You can now control the pump-controller-app Matter device from the smartphone!

@@ -360,6 +360,4 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState()
-{
-}
+void AppTask::UpdateClusterState() {}
