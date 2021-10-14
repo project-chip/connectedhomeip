@@ -195,7 +195,7 @@ commissioning and cluster control.
 -   After successful commissioning, use the OnOff cluster commands to control
     the OnOff attribute on different light devices connected on specific
     endpoints. This allows you to toggle a parameter implemented by the device
-    to be On or Off. 
+    to be On or Off.
 
     `chip-device-ctrl > zcl OnOff On 135246 2 0`
 
