@@ -122,7 +122,7 @@ class Esp32Builder(Builder):
 
         self._Execute(['mkdir', '-p', self.output_dir])
         self._Execute(['cp', defaults, defaults_out])
-        self._Execute(['rm', os.path.join(self.ExamplePath, 'sdkconfig')])
+        self._Execute(['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
 
         if not self.enable_ipv4:
             self._Execute(['bash', '-c', 'echo CONFIG_DISABLE_IPV4=y >>%s' % shlex.quote(defaults_out)])
@@ -140,9 +140,21 @@ class Esp32Builder(Builder):
         logging.info('Compiling Esp32 at %s', self.output_dir)
 
         # Unfortunately sdkconfig is sticky and needs reset on every build
-        self._Execute(['rm', os.path.join(self.ExamplePath, 'sdkconfig')])
-        self._IdfEnvExecute(
-            "ninja -C '%s'" % self.output_dir, title='Building ' + self.identifier)
+        self._Execute(['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
+
+        defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
+
+        # "ninja -C" is insufficient because sdkconfig changes on every 'config' and results
+        # in a full reconfiguration with default values
+        #
+        # This does a regen + reconfigure.
+        cmd =  "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} build".format(
+            defaults=shlex.quote(defaults_out),
+            example_path=self.ExamplePath,
+            out=shlex.quote(self.output_dir)
+        )
+
+        self._IdfEnvExecute(cmd, title='Building ' + self.identifier)
 
     def build_outputs(self):
         return {
