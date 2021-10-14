@@ -50,7 +50,6 @@ namespace {
 chip::TransportMgrBase gTransportManager;
 chip::Test::LoopbackTransport gLoopback;
 chip::Test::IOContext gIOContext;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
 uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];

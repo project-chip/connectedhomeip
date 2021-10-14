@@ -68,7 +68,11 @@ constexpr bool isRendezvousBypassed()
 
 namespace chip {
 
-Server Server::sServer;
+Server & Server::GetInstance()
+{
+    static Server sServer;
+    return sServer;
+}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
 {

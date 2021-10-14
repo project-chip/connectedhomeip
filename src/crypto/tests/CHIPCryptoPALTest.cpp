@@ -46,6 +46,8 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
+#include <algorithm>
+#include <ctime>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -2061,6 +2063,19 @@ int TestCHIPCryptoPAL_Setup(void * inContext)
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
         return FAILURE;
+
+    unsigned seed = static_cast<unsigned>(std::time(nullptr));
+    printf("Running " __FILE__ " using seed %d", seed);
+    std::srand(seed);
+
+    Crypto::add_entropy_source(
+        [](void * data, unsigned char * output, size_t len, size_t * olen) {
+            std::generate(output, output + len, std::rand);
+            *olen = len;
+            return 0;
+        },
+        NULL, 16);
+
     return SUCCESS;
 }
 

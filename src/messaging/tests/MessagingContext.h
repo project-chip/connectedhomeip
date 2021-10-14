@@ -27,6 +27,13 @@
 namespace chip {
 namespace Test {
 
+// Prepare random seed before initialize MessagingContext
+class MessagingContextPrepare
+{
+public:
+    MessagingContextPrepare();
+};
+
 /**
  * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
  *        two secure sessions, connected with each other. Exchanges can be created for each secure session.
@@ -34,11 +41,7 @@ namespace Test {
 class MessagingContext
 {
 public:
-    MessagingContext() :
-        mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingAliceToBob(GetBobKeyId(), GetAliceKeyId()),
-        mPairingBobToAlice(GetAliceKeyId(), GetBobKeyId())
-    {}
+    MessagingContext();
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
     /// Initialize the underlying layers and test suite pointer
@@ -89,6 +92,7 @@ public:
 
 private:
     bool mInitialized;
+    MessagingContextPrepare mDummy;
     SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;

@@ -44,10 +44,6 @@ will have parallels in any new adaptation.
 -   Implements CHIP-compatible BLE advertising and GATT service using the
     Softdevice BLE stack
 
-`Entropy.cpp`
-
--   Implements interface to platform entropy source
-
 `Logging.cpp`
 
 -   Adaption of chip debug logging to platform logging facility

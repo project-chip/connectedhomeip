@@ -15,10 +15,14 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
+#include <ctime>
+
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 #include <controller/CHIPDevice.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <inet/IPAddress.h>
 #include <inet/InetLayer.h>
 #include <lib/support/CHIPMem.h>
@@ -118,6 +122,18 @@ const nlTest sTests[] =
 
 int TestDevice()
 {
+    unsigned seed = static_cast<unsigned>(std::time(nullptr));
+    printf("Running " __FILE__ " using seed %d", seed);
+    std::srand(seed);
+
+    Crypto::add_entropy_source(
+        [](void * data, unsigned char * output, size_t len, size_t * olen) {
+            std::generate(output, output + len, std::rand);
+            *olen = len;
+            return 0;
+        },
+        NULL, 16);
+
     nlTestSuite theSuite = { "Device", &sTests[0], NULL, NULL };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);

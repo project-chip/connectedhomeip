@@ -58,15 +58,17 @@ namespace Crypto {
 #define MAX_ERROR_STR_LEN 128
 #define NUM_BYTES_IN_SHA256_HASH 32
 
-typedef struct
+class EntropyContext
 {
-    bool mInitialized;
-    bool mDRBGSeeded;
+public:
+    EntropyContext() : mInitialized(false), mDRBGSeeded(false), mEntropyAdded(false) {}
+
+    bool mInitialized : 1;
+    bool mDRBGSeeded : 1;
+    bool mEntropyAdded : 1;
     mbedtls_ctr_drbg_context mDRBGCtxt;
     mbedtls_entropy_context mEntropy;
-} EntropyContext;
-
-static EntropyContext gsEntropyContext;
+};
 
 static void _log_mbedTLS_error(int error_code)
 {
@@ -378,6 +380,8 @@ exit:
 
 static EntropyContext * get_entropy_context()
 {
+    static EntropyContext gsEntropyContext;
+
     if (!gsEntropyContext.mInitialized)
     {
         mbedtls_entropy_init(&gsEntropyContext.mEntropy);
@@ -420,11 +424,17 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
     const int result =
         mbedtls_entropy_add_source(&entropy_ctxt->mEntropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+
+    entropy_ctxt->mEntropyAdded = true;
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
+    EntropyContext * const entropy_ctxt = get_entropy_context();
+    VerifyOrReturnError(entropy_ctxt->mEntropyAdded, CHIP_ERROR_INCORRECT_STATE);
+
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
 

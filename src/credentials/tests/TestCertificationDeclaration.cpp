@@ -22,6 +22,8 @@
  *      declaration classes and APIs.
  */
 
+#include <algorithm>
+#include <ctime>
 #include <inttypes.h>
 #include <stddef.h>
 
@@ -230,6 +232,18 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCertificationElements), NL_T
 int TestCertificationDeclaration(void)
 {
     nlTestSuite theSuite = { "CHIP Certification Declaration tests", &sTests[0], nullptr, nullptr };
+
+    unsigned seed = static_cast<unsigned>(std::time(nullptr));
+    printf("Running " __FILE__ " using seed %d", seed);
+    std::srand(seed);
+
+    Crypto::add_entropy_source(
+        [](void * data, unsigned char * output, size_t len, size_t * olen) {
+            std::generate(output, output + len, std::rand);
+            *olen = len;
+            return 0;
+        },
+        NULL, 16);
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);

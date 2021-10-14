@@ -79,12 +79,10 @@ public:
 
     void Shutdown();
 
-    static Server & GetInstance() { return sServer; }
+    static Server & GetInstance();
 
 private:
     Server() : mCommissioningWindowManager(this) {}
-
-    static Server sServer;
 
     class ServerStorageDelegate : public PersistentStorageDelegate
     {

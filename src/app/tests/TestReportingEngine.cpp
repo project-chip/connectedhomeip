@@ -33,23 +33,21 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <messaging/tests/MessagingContext.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemLayerImpl.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SessionManager.h>
-#include <transport/raw/UDP.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlunit-test.h>
 
+using TestContext = chip::Test::MessagingContext;
+
 namespace chip {
-static System::LayerImpl gSystemLayer;
-static SessionManager gSessionManager;
-static Messaging::ExchangeManager gExchangeManager;
-static TransportMgr<Transport::UDP> gTransportManager;
-static secure_channel::MessageCounterManager gMessageCounterManager;
+
 constexpr ClusterId kTestClusterId        = 6;
 constexpr EndpointId kTestEndpointId      = 1;
 constexpr chip::AttributeId kTestFieldId1 = 1;
@@ -98,8 +96,9 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
-void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext)
+void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * aContext)
 {
+    auto * ctx     = static_cast<TestContext *>(aContext);
     CHIP_ERROR err = CHIP_NO_ERROR;
     app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
@@ -108,9 +107,9 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     AttributePathList::Builder attributePathListBuilder;
     AttributePath::Builder attributePathBuilder;
 
-    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    err = InteractionModelEngine::GetInstance()->Init(&ctx->GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    Messaging::ExchangeContext * exchangeCtx = gExchangeManager.NewContext(SessionHandle(0, 0, 0, 0), nullptr);
+    Messaging::ExchangeContext * exchangeCtx = ctx->GetExchangeManager().NewContext(SessionHandle(0, 0, 0, 0), nullptr);
     TestExchangeDelegate delegate;
     exchangeCtx->SetDelegate(&delegate);
 
@@ -143,7 +142,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    readHandler.Init(&gExchangeManager, nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
+    readHandler.Init(&ctx->GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
     readHandler.OnReadInitialRequest(std::move(readRequestbuf));
     err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
@@ -154,25 +153,6 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
 } // namespace chip
 
 namespace {
-void InitializeChip(nlTestSuite * apSuite)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-
-    err = chip::Platform::MemoryInit();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    chip::gSystemLayer.Init();
-
-    err = chip::gSessionManager.Init(&chip::gSystemLayer, &chip::gTransportManager, &chip::gMessageCounterManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = chip::gExchangeManager.Init(&chip::gSessionManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = chip::gMessageCounterManager.Init(&chip::gExchangeManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-}
 
 // clang-format off
 const nlTest sTests[] =
@@ -181,27 +161,53 @@ const nlTest sTests[] =
                 NL_TEST_SENTINEL()
         };
 // clang-format on
+
+int Initialize(void * aContext);
+int Finalize(void * aContext);
+
+// clang-format off
+nlTestSuite sSuite =
+{
+    "TestReportingEngine",
+    &sTests[0],
+    Initialize,
+    Finalize
+};
+// clang-format on
+
+chip::TransportMgrBase gTransportManager;
+chip::Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
+
+int Initialize(void * aContext)
+{
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportManager.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
+
+    auto * ctx = static_cast<TestContext *>(aContext);
+    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
+
+    gTransportManager.SetSessionManager(&ctx->GetSecureSessionManager());
+    return SUCCESS;
+}
+
+int Finalize(void * aContext)
+{
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    gIOContext.Shutdown();
+    chip::Platform::MemoryShutdown();
+    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+}
+
 } // namespace
 
 int TestReportingEngine()
 {
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "TestReportingEngine",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    InitializeChip(&theSuite);
-
-    nlTestRunner(&theSuite, nullptr);
-
-    chip::gSystemLayer.Shutdown();
-
-    return (nlTestRunnerStats(&theSuite));
+    TestContext sContext;
+    nlTestRunner(&sSuite, &sContext);
+    return (nlTestRunnerStats(&sSuite));
 }
 
 CHIP_REGISTER_TEST_SUITE(TestReportingEngine)

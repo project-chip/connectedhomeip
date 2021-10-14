@@ -32,27 +32,22 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <messaging/tests/MessagingContext.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemLayerImpl.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SessionManager.h>
-#include <transport/raw/UDP.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlunit-test.h>
 
-namespace {
-static chip::System::LayerImpl gSystemLayer;
-static chip::SessionManager gSessionManager;
-static chip::Messaging::ExchangeManager gExchangeManager;
-static chip::secure_channel::MessageCounterManager gMessageCounterManager;
-static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-} // namespace
+using TestContext = chip::Test::MessagingContext;
 
 namespace chip {
 namespace app {
+
 class TestInteractionModelEngine
 {
 public:
@@ -73,10 +68,11 @@ int TestInteractionModelEngine::GetClusterInfoListLength(ClusterInfo * apCluster
     return length;
 }
 
-void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuite, void * apContext)
+void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuite, void * aContext)
 {
+    auto * ctx     = static_cast<TestContext *>(aContext);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    err            = InteractionModelEngine::GetInstance()->Init(&ctx->GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo * clusterInfoList = nullptr;
     ClusterInfo clusterInfo1;
@@ -103,10 +99,11 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
     NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 0);
 }
 
-void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext)
+void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * aContext)
 {
+    auto * ctx     = static_cast<TestContext *>(aContext);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    err            = InteractionModelEngine::GetInstance()->Init(&ctx->GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo clusterInfoList[2];
 
@@ -131,25 +128,6 @@ void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * 
 } // namespace chip
 
 namespace {
-void InitializeChip(nlTestSuite * apSuite)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-
-    err = chip::Platform::MemoryInit();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    gSystemLayer.Init();
-
-    err = gSessionManager.Init(&gSystemLayer, &gTransportManager, &gMessageCounterManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gExchangeManager.Init(&gSessionManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-}
 
 // clang-format off
 const nlTest sTests[] =
@@ -159,27 +137,53 @@ const nlTest sTests[] =
                 NL_TEST_SENTINEL()
         };
 // clang-format on
+
+int Initialize(void * aContext);
+int Finalize(void * aContext);
+
+// clang-format off
+nlTestSuite sSuite =
+{
+    "TestInteractionModelEngine",
+    &sTests[0],
+    Initialize,
+    Finalize
+};
+// clang-format on
+
+chip::TransportMgrBase gTransportManager;
+chip::Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
+
+int Initialize(void * aContext)
+{
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportManager.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
+
+    auto * ctx = static_cast<TestContext *>(aContext);
+    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
+
+    gTransportManager.SetSessionManager(&ctx->GetSecureSessionManager());
+    return SUCCESS;
+}
+
+int Finalize(void * aContext)
+{
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    gIOContext.Shutdown();
+    chip::Platform::MemoryShutdown();
+    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+}
+
 } // namespace
 
 int TestInteractionModelEngine()
 {
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "TestInteractionModelEngine",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    InitializeChip(&theSuite);
-
-    nlTestRunner(&theSuite, nullptr);
-
-    gSystemLayer.Shutdown();
-
-    return (nlTestRunnerStats(&theSuite));
+    TestContext sContext;
+    nlTestRunner(&sSuite, &sContext);
+    return (nlTestRunnerStats(&sSuite));
 }
 
 CHIP_REGISTER_TEST_SUITE(TestInteractionModelEngine)

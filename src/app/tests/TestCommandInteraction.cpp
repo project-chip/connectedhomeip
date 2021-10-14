@@ -58,7 +58,6 @@ chip::TransportMgrBase gTransportManager;
 chip::Test::LoopbackTransport gLoopback;
 chip::Test::IOContext gIOContext;
 Messaging::ExchangeManager * gExchangeManager;
-secure_channel::MessageCounterManager gMessageCounterManager;
 FabricIndex gFabricIndex = 0;
 bool isCommandDispatched = false;
 

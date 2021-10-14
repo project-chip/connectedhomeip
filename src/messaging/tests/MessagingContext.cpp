@@ -23,6 +23,27 @@
 namespace chip {
 namespace Test {
 
+MessagingContextPrepare::MessagingContextPrepare()
+{
+    unsigned seed = static_cast<unsigned>(std::time(nullptr));
+    printf("Running " __FILE__ " using seed %d", seed);
+    std::srand(seed);
+
+    Crypto::add_entropy_source(
+        [](void * data, unsigned char * output, size_t len, size_t * olen) {
+            std::generate(output, output + len, std::rand);
+            *olen = len;
+            return 0;
+        },
+        NULL, 16);
+}
+
+MessagingContext::MessagingContext() :
+    mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
+    mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingAliceToBob(GetBobKeyId(), GetAliceKeyId()),
+    mPairingBobToAlice(GetAliceKeyId(), GetBobKeyId())
+{}
+
 CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport, IOContext * ioContext)
 {
     VerifyOrReturnError(mInitialized == false, CHIP_ERROR_INTERNAL);

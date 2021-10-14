@@ -22,11 +22,15 @@
  *
  */
 
+#include <algorithm>
+#include <ctime>
+
 #include <app/ClusterInfo.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -36,6 +40,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <messaging/tests/MessagingContext.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -43,7 +48,7 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
-#include <transport/raw/UDP.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlunit-test.h>
 
@@ -55,39 +60,15 @@ static const chip::ClusterId kLivenessClusterId   = 0x00000022;
 static const uint32_t kLivenessChangeEvent        = 1;
 static const chip::EndpointId kTestEndpointId     = 2;
 static const chip::TLV::Tag kLivenessDeviceStatus = chip::TLV::ContextTag(1);
-static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-static chip::System::LayerImpl gSystemLayer;
+
+using TestContext = chip::Test::MessagingContext;
 
 static uint8_t gDebugEventBuffer[128];
 static uint8_t gInfoEventBuffer[128];
 static uint8_t gCritEventBuffer[128];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-chip::SessionManager gSessionManager;
-chip::Messaging::ExchangeManager gExchangeManager;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
-
-void InitializeChip(nlTestSuite * apSuite)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-
-    err = chip::Platform::MemoryInit();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    gSystemLayer.Init();
-
-    err = gSessionManager.Init(&gSystemLayer, &gTransportManager, &gMessageCounterManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gExchangeManager.Init(&gSessionManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-}
-
-void InitializeEventLogging()
+void InitializeEventLogging(chip::Messaging::ExchangeManager & aExchangeManager)
 {
     chip::app::LogStorageResources logStorageResources[] = {
         { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
@@ -96,7 +77,7 @@ void InitializeEventLogging()
     };
 
     chip::app::EventManagement::CreateEventManagement(
-        &gExchangeManager, sizeof(logStorageResources) / sizeof(logStorageResources[0]), gCircularEventBuffer, logStorageResources);
+        &aExchangeManager, sizeof(logStorageResources) / sizeof(logStorageResources[0]), gCircularEventBuffer, logStorageResources);
 }
 
 void SimpleDumpWriter(const char * aFormat, ...)
@@ -293,27 +274,55 @@ static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apCon
 
 const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithEvictToNextBuffer", CheckLogEventWithEvictToNextBuffer),
                           NL_TEST_DEF("CheckLogEventWithDiscardLowEvent", CheckLogEventWithDiscardLowEvent), NL_TEST_SENTINEL() };
+
+int Initialize(void * aContext);
+int Finalize(void * aContext);
+
+// clang-format off
+nlTestSuite sSuite =
+{
+    "EventLogging",
+    &sTests[0],
+    Initialize,
+    Finalize
+};
+// clang-format on
+
+chip::TransportMgrBase gTransportManager;
+chip::Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
+
+int Initialize(void * aContext)
+{
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportManager.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
+
+    auto * ctx = static_cast<TestContext *>(aContext);
+    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
+
+    InitializeEventLogging(ctx->GetExchangeManager());
+    gTransportManager.SetSessionManager(&ctx->GetSecureSessionManager());
+    return SUCCESS;
+}
+
+int Finalize(void * aContext)
+{
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    gIOContext.Shutdown();
+    chip::Platform::MemoryShutdown();
+    chip::app::EventManagement::DestroyEventManagement();
+    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+}
+
 } // namespace
 
 int TestEventLogging()
 {
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "EventLogging",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    InitializeChip(&theSuite);
-    InitializeEventLogging();
-    nlTestRunner(&theSuite, nullptr);
-
-    gSystemLayer.Shutdown();
-
-    return (nlTestRunnerStats(&theSuite));
+    TestContext sContext;
+    nlTestRunner(&sSuite, &sContext);
+    return (nlTestRunnerStats(&sSuite));
 }
 
 CHIP_REGISTER_TEST_SUITE(TestEventLogging)

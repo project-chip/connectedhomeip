@@ -41,6 +41,8 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 
+namespace {
+
 using TestContext = chip::Test::MessagingContext;
 
 class PASETestLoopbackTransport : public Test::LoopbackTransport
@@ -399,6 +401,8 @@ int TestSecurePairing_Teardown(void * inContext)
 }
 
 // TODO: TestPASESession is currently disabled due to lacking convenient way of creating exchange context
+
+} // namespace
 
 /**
  *  Main

@@ -44,10 +44,6 @@ code will have parallels in any new adaptation.
     BleApplicationDelegate) onto the platform's native BLE services
 -   Implements chip-compatible BLE advertising.
 
-`platform/Linux/Entropy.cpp`
-
--   Implements interface to platform entropy source
-
 `platform/Linux/Logging.cpp`
 
 -   Adaption of chip debug logging to platform logging facility.

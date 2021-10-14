@@ -16,9 +16,12 @@
  */
 #include <lib/dnssd/Advertiser.h>
 
+#include <algorithm>
+#include <ctime>
 #include <string>
 #include <utility>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
@@ -549,6 +552,19 @@ const nlTest sTests[] = {
 int TestAdvertiser(void)
 {
     chip::Platform::MemoryInit();
+
+    unsigned seed = static_cast<unsigned>(std::time(nullptr));
+    printf("Running " __FILE__ " using seed %d", seed);
+    std::srand(seed);
+
+    Crypto::add_entropy_source(
+        [](void * data, unsigned char * output, size_t len, size_t * olen) {
+            std::generate(output, output + len, std::rand);
+            *olen = len;
+            return 0;
+        },
+        NULL, 16);
+
     nlTestSuite theSuite = { "AdvertiserImplMinimal", sTests, nullptr, nullptr };
     CheckOnlyServer server(&theSuite);
     test::ServerSwapper swapper(&server);
