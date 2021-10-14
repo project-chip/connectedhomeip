@@ -1,4 +1,4 @@
-package chip.devicecontroller;
+package chip.clusterinfo;
 
 public class ClusterInfo {
 
