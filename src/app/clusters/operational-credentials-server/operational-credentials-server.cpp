@@ -123,7 +123,6 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(ClusterInfo & aClusterInfo, At
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr uint16_t kMaxRspLen = 900;
 
-#if !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 /*
  * Temporary flow for fabric management until addOptCert + fabric index are implemented:
  * 1) When Commissioner pairs with CHIP device, store device nodeId in Fabric table as NodeId
@@ -249,7 +248,6 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
 
     return err;
 }
-#endif // !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 
 static FabricInfo * retrieveCurrentFabric()
 {
@@ -263,7 +261,6 @@ static FabricInfo * retrieveCurrentFabric()
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
-#if !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 // TODO: The code currently has two sources of truths for fabrics, the fabricInfo table + the attributes. There should only be one,
 // the attributes list. Currently the attributes are not persisted so we are keeping the fabric table to have the
 // fabrics/admrins be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and
@@ -304,18 +301,17 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
 };
 
 OpCredsFabricTableDelegate gFabricDelegate;
-#endif // !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 
 void MatterOperationalCredentialsPluginServerInitCallback(void)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster.");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
 
 #if CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
     registerAttributeAccessOverride(&gAttrAccess);
-#else
+#endif
+
     Server::GetInstance().GetFabricTable().SetFabricDelegate(&gFabricDelegate);
     writeFabricsIntoFabricsListAttribute();
-#endif
 }
 
 namespace {
@@ -352,9 +348,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
-#if !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
     writeFabricsIntoFabricsListAttribute();
-#endif
     emberAfSendImmediateDefaultResponse(status);
     if (err == CHIP_NO_ERROR)
     {
@@ -402,9 +396,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
-#if !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
     writeFabricsIntoFabricsListAttribute();
-#endif
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
