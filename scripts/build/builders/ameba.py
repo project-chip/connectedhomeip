@@ -63,6 +63,7 @@ class AmebaBuilder(Builder):
     def _build(self):
         self._Execute(['ninja', '-C', self.output_dir],
                       title='Building ' + self.identifier)
+
     def build_outputs(self):
         return {
             self.app.AppNamePrefix + '.axf':
