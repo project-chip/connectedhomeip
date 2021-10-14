@@ -196,7 +196,7 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier)
+CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback)
 {
     apWriteClient.SetWriteClient(nullptr);
 
@@ -207,7 +207,7 @@ CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteCli
             continue;
         }
 
-        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, mpDelegate, aApplicationIdentifier));
+        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, apCallback));
         apWriteClient.SetWriteClient(&writeClient);
         return CHIP_NO_ERROR;
     }

@@ -1727,30 +1727,6 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(app::ReadClient * 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                                                         const app::StatusIB & aStatusIB,
-                                                                         app::AttributePathParams & aAttributePathParams,
-                                                                         uint8_t aAttributeIndex)
-{
-    IMWriteResponseCallback(apWriteClient, chip::app::ToEmberAfStatus(aStatusIB.mStatus));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseProtocolError(const app::WriteClient * apWriteClient,
-                                                                                uint8_t aAttributeIndex)
-{
-    // When WriteResponseProtocolError occurred, it means server returned an invalid packet.
-    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
-{
-    // When WriteResponseError occurred, it means we failed to receive the response from server.
-    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceControllerInteractionModelDelegate::SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient)
 {
 #if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)

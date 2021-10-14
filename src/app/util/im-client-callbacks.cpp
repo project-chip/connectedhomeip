@@ -321,48 +321,6 @@ bool IMDefaultResponseCallback(const app::Command * commandObj, EmberAfStatus st
     return true;
 }
 
-bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, EmberAfStatus status)
-{
-    ChipLogProgress(Zcl, "WriteResponse:");
-    LogStatus(status);
-
-    Callback::Cancelable * onSuccessCallback = nullptr;
-    Callback::Cancelable * onFailureCallback = nullptr;
-    NodeId sourceNodeId                      = writeClient->GetSourceNodeId();
-    uint8_t seq                              = static_cast<uint8_t>(writeClient->GetAppIdentifier());
-    CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceNodeId, seq, &onSuccessCallback, &onFailureCallback);
-
-    if (CHIP_NO_ERROR != err)
-    {
-        if (onSuccessCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
-        }
-
-        if (onFailureCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
-        }
-
-        return true;
-    }
-
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        Callback::Callback<DefaultSuccessCallback> * cb =
-            Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-        cb->mCall(cb->mContext);
-    }
-    else
-    {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, static_cast<uint8_t>(status));
-    }
-
-    return true;
-}
-
 bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
                                             TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
 {

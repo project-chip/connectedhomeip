@@ -27,13 +27,6 @@ public:
                       Protocols::InteractionModel::Status status) override;
     CHIP_ERROR ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError) override;
 
-    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient, const app::StatusIB & aStatusIB,
-                                   app::AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex) override;
-
-    CHIP_ERROR WriteResponseProtocolError(const app::WriteClient * apWriteClient, uint8_t aAttributeIndex) override;
-
-    CHIP_ERROR WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override;
-
     CHIP_ERROR SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient) override;
 
     CHIP_ERROR ReadDone(app::ReadClient * apReadClient) override;
