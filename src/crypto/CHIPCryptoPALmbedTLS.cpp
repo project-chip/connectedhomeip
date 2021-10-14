@@ -63,9 +63,9 @@ class EntropyContext
 public:
     EntropyContext() : mInitialized(false), mDRBGSeeded(false), mEntropyAdded(false) {}
 
-    bool mInitialized:1;
-    bool mDRBGSeeded:1;
-    bool mEntropyAdded:1;
+    bool mInitialized : 1;
+    bool mDRBGSeeded : 1;
+    bool mEntropyAdded : 1;
     mbedtls_ctr_drbg_context mDRBGCtxt;
     mbedtls_entropy_context mEntropy;
 };
