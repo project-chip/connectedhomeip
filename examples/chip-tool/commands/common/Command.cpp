@@ -98,10 +98,17 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
-    case ArgumentType::CharString: {
+    case ArgumentType::String: {
         const char ** value = reinterpret_cast<const char **>(arg.value);
         *value              = argValue;
         isValidArgument     = true;
+        break;
+    }
+
+    case ArgumentType::CharString: {
+        auto * value    = static_cast<chip::Span<const char> *>(arg.value);
+        *value          = chip::Span<const char>(argValue, strlen(argValue));
+        isValidArgument = true;
         break;
     }
 
@@ -304,6 +311,17 @@ size_t Command::AddArgument(const char * name, const char * value)
 }
 
 size_t Command::AddArgument(const char * name, char ** value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::CharString;
+    arg.name  = name;
+    arg.value = reinterpret_cast<void *>(value);
+
+    mArgs.emplace_back(arg);
+    return mArgs.size();
+}
+
+size_t Command::AddArgument(const char * name, chip::CharSpan * value)
 {
     Argument arg;
     arg.type  = ArgumentType::CharString;
