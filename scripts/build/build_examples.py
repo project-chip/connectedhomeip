@@ -134,7 +134,7 @@ before running this script.
 """.strip())
 
     if dry_run:
-        runner = PrintOnlyRunner(dry_run_output)
+        runner = PrintOnlyRunner(dry_run_output, root=repo)
     else:
         runner = ShellRunner(root=repo)
 

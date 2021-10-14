@@ -99,10 +99,9 @@ class Esp32Builder(Builder):
         self.enable_rpcs = enable_rpcs
         self.enable_ipv4 = enable_ipv4
 
-    def _IdfEnvExecute(self, cmd, cwd=None, title=None):
+    def _IdfEnvExecute(self, cmd, title=None):
         self._Execute(
             ['bash', '-c', 'source $IDF_PATH/export.sh; %s' % cmd],
-            cwd=cwd,
             title=title)
 
     @property
@@ -116,12 +115,12 @@ class Esp32Builder(Builder):
         defaults = os.path.join(self.ExamplePath, DefaultsFileName(
             self.board, self.app, self.enable_rpcs))
 
-        if not os.path.exists(defaults):
+        if not self._runner.dry_run and not os.path.exists(defaults):
             raise Exception('SDK defaults file missing: %s' % defaults)
 
         defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
 
-        self._Execute(['mkdir', '-p', self.output_dir])
+        self._Execute(['mkdir', '-p', self.output_dir], title='Generating ' + self.identifier)
         self._Execute(['cp', defaults, defaults_out])
         self._Execute(
             ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
@@ -137,7 +136,7 @@ class Esp32Builder(Builder):
         )
 
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
-        self._IdfEnvExecute(cmd, title='Generating ' + self.identifier)
+        self._IdfEnvExecute(cmd)
 
     def _build(self):
         logging.info('Compiling Esp32 at %s', self.output_dir)
