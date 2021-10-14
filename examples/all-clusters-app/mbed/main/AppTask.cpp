@@ -35,7 +35,6 @@ static bool sIsWiFiStationConnected   = false;
 static bool sIsPairedToAccount        = false;
 static bool sHaveBLEConnections       = false;
 
-// TODO: change EventQueue default event size
 static events::EventQueue sAppEventQueue;
 
 using namespace ::chip::DeviceLayer;
