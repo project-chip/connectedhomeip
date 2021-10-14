@@ -1,11 +1,11 @@
 package com.google.chip.chiptool.clusterclient
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
@@ -15,13 +15,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import
+import chip.devicecontroller.ClusterInfoMapping
+import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getClusterMappingBtn
+import kotlinx.coroutines.launch
 
 class ClusterInteractionFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private lateinit var addressUpdateFragment: AddressUpdateFragment
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -30,12 +33,17 @@ class ClusterInteractionFragment : Fragment() {
   ): View {
     return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
+      addressUpdateFragment =
+        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+      getClusterMappingBtn.setOnClickListener { getClusterMapping()}
     }
   }
 
-  private fun showMessage(msg: String) {
-    requireActivity().runOnUiThread {
-      Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+  private fun getClusterMapping() {
+    val clusterInfoMapping = ClusterInfoMapping();
+    val test = clusterInfoMapping.clusterMap;
+    for ((key, value) in test.entries) {
+      println("${key}=$value")
     }
   }
 

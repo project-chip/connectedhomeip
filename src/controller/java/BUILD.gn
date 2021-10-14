@@ -69,7 +69,7 @@ android_library("java") {
     "src/chip/clusterinfo/CommandParameter.java",
     "src/chip/clusterinfo/ParameterType.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
-    "zap-generated/chip/devicecontroller/ClusterInfo.java",
+    "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
