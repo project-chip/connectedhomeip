@@ -44,6 +44,8 @@ parser.add_argument('--dist_dir', help='directory to place distribution in')
 parser.add_argument('--manifest', help='list of files to package')
 parser.add_argument(
     '--plat-name', help='platform name to embed in generated filenames')
+parser.add_argument(
+    '--server', help='build the server variant', default=False, type=bool)
 
 args = parser.parse_args()
 
@@ -56,14 +58,20 @@ class InstalledScriptInfo:
         self.installName = os.path.splitext(name)[0]
 
 
-chipDLLName = "_ChipDeviceCtrl.so"
+if args.server:
+    chipDLLName = "_ChipServer.so"
+else:
+    chipDLLName = "_ChipDeviceCtrl.so"
 packageName = args.package_name
 chipPackageVer = args.build_number
 
-installScripts = [
-    InstalledScriptInfo("chip-device-ctrl.py"),
-    InstalledScriptInfo("chip-repl.py"),
-]
+if args.server:
+    installScripts = []
+else:
+    installScripts = [
+        InstalledScriptInfo("chip-device-ctrl.py"),
+        InstalledScriptInfo("chip-repl.py"),
+    ]
 
 # Record the current directory at the start of execution.
 curDir = os.curdir
@@ -145,8 +153,15 @@ try:
         'chip.clusters',
         'chip.tlv',
         'chip.setup_payload',
-        'chip.server',
     ]
+    #print ("Server: {}".format(args.server))
+    if args.server:
+        packages.append('chip.server')
+
+    #print("packages: {}".format(packages))
+
+    print("packageName: {}".format(packageName))
+    print("chipDLLName: {}".format(chipDLLName))
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.

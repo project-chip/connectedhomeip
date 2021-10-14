@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/python.gni")
 
 config("config") {
   # TODO: this should be a dependency on src/controller/data_model however this is circular:
@@ -28,6 +30,12 @@ static_library("controller") {
     "AbstractDnssdDiscoveryController.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
+    "EmptyDataModelHandler.cpp",
+  ]
+
+  if (chip_python_controller) {
+    sources += [
+      "AbstractMdnsDiscoveryController.cpp",
     "CHIPCommissionableNodeController.cpp",
     "CHIPCommissionableNodeController.h",
     "CHIPDevice.cpp",
@@ -44,6 +52,8 @@ static_library("controller") {
     "SetUpCodePairer.cpp",
     "SetUpCodePairer.h",
   ]
+  }
+
 
   cflags = [ "-Wconversion" ]
 

@@ -5,8 +5,7 @@ import platform
 
 from chip.server.types import PostAttributeChangeCallback
 
-# NATIVE_LIBRARY_BASE_NAME = "_ChipServer.so"
-NATIVE_LIBRARY_BASE_NAME = "_ChipDeviceCtrl.so"
+NATIVE_LIBRARY_BASE_NAME = "_ChipServer.so"
 
 
 def _AllDirsToRoot(dir):
@@ -39,7 +38,8 @@ def FindNativeLibraryPath() -> str:
     # running script looking for an CHIP build directory containing the Chip Device
     # Manager DLL. This makes it possible to import and use the ChipDeviceMgr module
     # directly from a built copy of the CHIP source tree.
-    buildMachineGlob = "%s-*-%s*" % (platform.machine(), platform.system().lower())
+    buildMachineGlob = "%s-*-%s*" % (platform.machine(),
+                                     platform.system().lower())
     relDMDLLPathGlob = os.path.join(
         "build",
         buildMachineGlob,
@@ -53,7 +53,7 @@ def FindNativeLibraryPath() -> str:
                 return dmDLLPath
 
     raise Exception(
-        "Unable to locate Chip Device Manager DLL (%s); expected location: %s"
+        "Unable to locate Chip Server DLL (%s); expected location: %s"
         % (NATIVE_LIBRARY_BASE_NAME, scriptDir)
     )
 
@@ -82,7 +82,8 @@ def GetLibraryHandle(cb: PostAttributeChangeCallback) -> ctypes.CDLL:
 
         setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
         setter.Set("pychip_server_native_init", None, [])
-        setter.Set("pychip_server_set_callbacks", None, [PostAttributeChangeCallback])
+        setter.Set("pychip_server_set_callbacks",
+                   None, [PostAttributeChangeCallback])
 
         _nativeLibraryHandle.pychip_server_native_init()
         _nativeLibraryHandle.pychip_server_set_callbacks(cb)

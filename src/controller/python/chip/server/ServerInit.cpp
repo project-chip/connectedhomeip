@@ -79,8 +79,7 @@ extern "C" {
 //     return CHIP_NO_ERROR;
 // }
 
-
-using PostAttributeChangeCallback = void (*)(uint16_t endpoint, uint16_t clusterId, uint16_t attributeId, uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
+using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
 
 class PythonServerDelegate// : public ServerDelegate
 {
