@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 name: 21.3.1. [TC-MC-3.1] Navigation Keycode Verification
 
 config:
@@ -35,7 +34,6 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x01
-
 
     - label: "Send Down"
       disabled: true
@@ -108,7 +106,6 @@ tests:
               - name: "keyCode"
                 value: 0x0A
 
-
     - label: "Send ContentsMenu"
       disabled: true
       command: "SendKey"
@@ -142,5 +139,4 @@ tests:
                 value: 0xFF
       response:
           error: 1
-
- # TODO: Add Step 10 (TH sends <Any Navigation> Keycode to DUT, when DUT in a processing state)
+    # TODO: Add Step 10 (TH sends <Any Navigation> Keycode to DUT, when DUT in a processing state)

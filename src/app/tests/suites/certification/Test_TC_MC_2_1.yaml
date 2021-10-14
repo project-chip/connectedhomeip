@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
 name: 21.2.1. [TC-MC-2.1] Low Power Mode Verification (DUT as Server)
 
 config:
