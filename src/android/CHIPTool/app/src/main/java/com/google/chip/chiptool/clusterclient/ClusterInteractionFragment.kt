@@ -1,11 +1,11 @@
 package com.google.chip.chiptool.clusterclient
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import chip.clusterinfo.ClusterCommandCallback
 import chip.clusterinfo.ClusterInfo
@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 <<<<<<< HEAD
+<<<<<<< HEAD
 import chip.devicecontroller.ClusterInfoMapping
 import java.lang.Exception
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getClusterMappingBtn
@@ -27,6 +28,11 @@ import kotlinx.coroutines.launch
 =======
 import
 >>>>>>> 505e97db3 (change package)
+=======
+import chip.devicecontroller.ClusterInfoMapping
+import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getClusterMappingBtn
+import kotlinx.coroutines.launch
+>>>>>>> a4fd0282e (no error code generation)
 
 class ClusterInteractionFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -34,7 +40,10 @@ class ClusterInteractionFragment : Fragment() {
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
   private lateinit var addressUpdateFragment: AddressUpdateFragment
+<<<<<<< HEAD
   private lateinit var clusterMap: Map<String, ClusterInfo>
+=======
+>>>>>>> a4fd0282e (no error code generation)
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -45,6 +54,7 @@ class ClusterInteractionFragment : Fragment() {
       deviceController.setCompletionListener(ChipControllerCallback())
       addressUpdateFragment =
         childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+<<<<<<< HEAD
       clusterMap = ClusterInfoMapping().clusterMap;
       getClusterMappingBtn.setOnClickListener { scope.launch { getClusterMapping() } }
     }
@@ -83,6 +93,17 @@ class ClusterInteractionFragment : Fragment() {
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
       Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+=======
+      getClusterMappingBtn.setOnClickListener { getClusterMapping()}
+    }
+  }
+
+  private fun getClusterMapping() {
+    val clusterInfoMapping = ClusterInfoMapping();
+    val test = clusterInfoMapping.clusterMap;
+    for ((key, value) in test.entries) {
+      println("${key}=$value")
+>>>>>>> a4fd0282e (no error code generation)
     }
   }
 
