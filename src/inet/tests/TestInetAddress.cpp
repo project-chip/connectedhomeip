@@ -1557,7 +1557,7 @@ void CheckMakeIPv6TransientMulticast(nlTestSuite * inSuite, void * inContext)
     const struct TestContext * lContext = static_cast<const struct TestContext *>(inContext);
     IPAddressContextIterator lCurrent   = lContext->mIPv6TransientMulticastContextRange.mBegin;
     IPAddressContextIterator lEnd       = lContext->mIPv6TransientMulticastContextRange.mEnd;
-    const IPv6MulticastFlags lFlags;
+    constexpr IPv6MulticastFlags lFlags;
     size_t lScopeIndex;
     IPAddress lAddress;
 

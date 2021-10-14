@@ -418,7 +418,7 @@ IPAddress IPAddress::MakeIPv6Multicast(IPv6MulticastFlags aFlags, uint8_t aScope
 
 IPAddress IPAddress::MakeIPv6WellKnownMulticast(uint8_t aScope, uint32_t aGroupId)
 {
-    const IPv6MulticastFlags lFlags;
+    constexpr IPv6MulticastFlags lFlags;
 
     return (MakeIPv6Multicast(lFlags, aScope, aGroupId));
 }
@@ -433,7 +433,7 @@ IPAddress IPAddress::MakeIPv6TransientMulticast(IPv6MulticastFlags aFlags, uint8
 IPAddress IPAddress::MakeIPv6PrefixMulticast(uint8_t aScope, uint8_t aPrefixLength, const uint64_t & aPrefix, uint32_t aGroupId)
 {
     const uint8_t lReserved                                       = 0;
-    const IPv6MulticastFlag lFlags                                = IPv6MulticastFlag::kPrefix;
+    const IPv6MulticastFlags lFlags                               = IPv6MulticastFlag::kPrefix;
     const uint8_t lGroupId[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES] = { lReserved,
                                                                       aPrefixLength,
                                                                       static_cast<uint8_t>((aPrefix & 0xFF00000000000000ULL) >> 56),
