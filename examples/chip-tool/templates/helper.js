@@ -104,7 +104,8 @@ function addTestName(names)
 
 function getTestNames()
 {
-  return this._allTestNames.slice(0, -1).replace('undefined','');;
+  return this._allTestNames.slice(0, -1).replace('undefined', '');
+  ;
 }
 
 //
