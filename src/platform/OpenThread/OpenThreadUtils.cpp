@@ -249,7 +249,7 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 #endif // CHIP_DETAIL_LOGGING
 }
 
-bool IsOpenThreadMeshLocalAddress(otInstance * otInst, const IPAddress & addr)
+bool IsOpenThreadMeshLocalAddress(otInstance * otInst, const Inet::IPAddress & addr)
 {
     const otMeshLocalPrefix * otMeshPrefix = otThreadGetMeshLocalPrefix(otInst);
 
