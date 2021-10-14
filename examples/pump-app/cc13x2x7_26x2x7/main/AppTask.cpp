@@ -22,18 +22,22 @@
 #include "AppEvent.h"
 #include <app/server/Server.h>
 
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+
+#include "FreeRTOS.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include "FreeRTOS.h"
+#include <app/util/af-types.h>
+#include <app/util/af.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/server/OnboardingCodesUtil.h>
-
-//#include <app/server/DataModelHandler.h>
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
@@ -84,7 +88,7 @@ int AppTask::StartAppTask()
 int AppTask::Init()
 {
     LED_Params ledParams;
-    Button_Params buttionParams;
+    Button_Params buttonParams;
     ConnectivityManager::ThreadPollingConfig pollingConfig;
 
     cc13x2_26x2LogInit();
@@ -167,18 +171,18 @@ int AppTask::Init()
     PLAT_LOG("Initialize buttons");
     Button_init();
 
-    Button_Params_init(&buttionParams);
-    buttionParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttionParams.longPressDuration = 1000U; // ms
-    sAppLeftHandle                  = Button_open(CONFIG_BTN_LEFT, ButtonLeftEventHandler, &buttionParams);
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
+    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, ButtonLeftEventHandler, &buttonParams);
 
-    Button_Params_init(&buttionParams);
-    buttionParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttionParams.longPressDuration = 1000U; // ms
-    sAppRightHandle                 = Button_open(CONFIG_BTN_RIGHT, ButtonRightEventHandler, &buttionParams);
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGPRESSED;
+    buttonParams.longPressDuration = 5000U; // ms
+    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, ButtonRightEventHandler, &buttonParams);
 
-    // Initialize BoltLock module
-    PLAT_LOG("Initialize BoltLock");
+    // Initialize Pump module
+    PLAT_LOG("Initialize Pump");
     PumpMgr().Init();
 
     PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
@@ -224,10 +228,7 @@ void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask even
     {
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
     }
-    else if (events & Button_EV_LONGCLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
-    }
+
     // button callbacks are in ISR context
     if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
     {
@@ -244,9 +245,9 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
     {
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
     }
-    else if (events & Button_EV_LONGCLICKED)
+    else if (events & Button_EV_LONGPRESSED)
     {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongPressed;
     }
     // button callbacks are in ISR context
     if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
@@ -257,16 +258,16 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
 
 void AppTask::ActionInitiated(PumpManager::Action_t aAction, int32_t aActor)
 {
-    // If the action has been initiated by the lock, update the bolt lock trait
+    // If the action has been initiated by the pump, update the pump trait
     // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == PumpManager::LOCK_ACTION)
+    if (aAction == PumpManager::START_ACTION)
     {
-        PLAT_LOG("Lock initiated");
+        PLAT_LOG("Pump start initiated");
         ; // TODO
     }
-    else if (aAction == PumpManager::UNLOCK_ACTION)
+    else if (aAction == PumpManager::STOP_ACTION)
     {
-        PLAT_LOG("Unlock initiated");
+        PLAT_LOG("Stop initiated");
         ; // TODO
     }
 
@@ -278,20 +279,20 @@ void AppTask::ActionInitiated(PumpManager::Action_t aAction, int32_t aActor)
 
 void AppTask::ActionCompleted(PumpManager::Action_t aAction)
 {
-    // if the action has been completed by the lock, update the bolt lock trait.
-    // Turn on the lock LED if in a LOCKED state OR
-    // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == PumpManager::LOCK_ACTION)
+    // if the action has been completed by the pump, update the pump trait.
+    // Turn on the pump state LED if in a STARTED state OR
+    // Turn off the pump state LED if in an STOPPED state.
+    if (aAction == PumpManager::START_ACTION)
     {
-        PLAT_LOG("Lock completed");
+        PLAT_LOG("Pump start completed");
         LED_stopBlinking(sAppGreenHandle);
         LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
         LED_stopBlinking(sAppRedHandle);
         LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
     }
-    else if (aAction == PumpManager::UNLOCK_ACTION)
+    else if (aAction == PumpManager::STOP_ACTION)
     {
-        PLAT_LOG("Unlock completed");
+        PLAT_LOG("Pump stop completed");
         LED_stopBlinking(sAppGreenHandle);
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
@@ -306,18 +307,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            if (!PumpMgr().IsUnlocked())
+            // Toggle Pump state
+            if (!PumpMgr().IsStopped())
             {
-                PumpMgr().InitiateAction(0, PumpManager::UNLOCK_ACTION);
+                PumpMgr().InitiateAction(0, PumpManager::STOP_ACTION);
             }
-        }
-        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
-        {
-            // Disable BLE advertisements
-            if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+            else
             {
-                ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-                PLAT_LOG("Disabled BLE Advertisements");
+                PumpMgr().InitiateAction(0, PumpManager::START_ACTION);
             }
         }
         break;
@@ -325,14 +322,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonRight:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            if (PumpMgr().IsUnlocked())
-            {
-                PumpMgr().InitiateAction(0, PumpManager::LOCK_ACTION);
-            }
-        }
-        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
-        {
-            // Enable BLE advertisements
+            // Toggle BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
                 if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
@@ -344,6 +334,16 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
                     PLAT_LOG("OpenBasicCommissioningWindow() failed");
                 }
             }
+            else
+            {
+                // Disable BLE advertisements
+                ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+                PLAT_LOG("Disabled BLE Advertisements");
+            }
+        }
+        else if (AppEvent::kAppEventButtonType_LongPressed == aEvent->ButtonEvent.Type)
+        {
+            ConfigurationMgr().InitiateFactoryReset();
         }
         break;
 
@@ -357,5 +357,117 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_None:
     default:
         break;
+    }
+}
+
+void AppTask::UpdateClusterState()
+{
+    EmberStatus status;
+
+    ChipLogProgress(NotSpecified, "UpdateClusterState");
+
+    // write the new values
+    int16_t maxPressure = PumpMgr().GetMaxPressure();
+    status              = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MAX_PRESSURE_ATTRIBUTE_ID,
+                                                      (uint8_t *) &maxPressure, ZCL_INT16S_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %" PRIx8, status);
+    }
+
+    uint16_t maxSpeed = PumpMgr().GetMaxSpeed();
+    status = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MAX_SPEED_ATTRIBUTE_ID, (uint8_t *) &maxSpeed,
+                                         ZCL_INT16U_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %" PRIx8, status);
+    }
+
+    uint16_t maxFlow = PumpMgr().GetMaxFlow();
+    status = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MAX_FLOW_ATTRIBUTE_ID, (uint8_t *) &maxFlow,
+                                         ZCL_INT16U_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %" PRIx8, status);
+    }
+
+    int16_t minConstPress = PumpMgr().GetMinConstPressure();
+    status                = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MIN_CONST_PRESSURE_ATTRIBUTE_ID,
+                                                        (uint8_t *) &minConstPress, ZCL_INT16S_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %" PRIx8, status);
+    }
+
+    int16_t maxConstPress = PumpMgr().GetMaxConstPressure();
+    status                = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MAX_CONST_PRESSURE_ATTRIBUTE_ID,
+                                                        (uint8_t *) &maxConstPress, ZCL_INT16S_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %" PRIx8, status);
+    }
+
+    int16_t minCompPress = PumpMgr().GetMinCompPressure();
+    status               = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MIN_COMP_PRESSURE_ATTRIBUTE_ID,
+                                                       (uint8_t *) &minCompPress, ZCL_INT16S_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %" PRIx8, status);
+    }
+
+    int16_t maxCompPress = PumpMgr().GetMaxCompPressure();
+    status               = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MAX_COMP_PRESSURE_ATTRIBUTE_ID,
+                                                       (uint8_t *) &maxCompPress, ZCL_INT16S_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %" PRIx8, status);
+    }
+
+    uint16_t minConstSpeed = PumpMgr().GetMinConstSpeed();
+    status                 = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MIN_CONST_SPEED_ATTRIBUTE_ID,
+                                                         (uint8_t *) &minConstSpeed, ZCL_INT16U_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %" PRIx8, status);
+    }
+
+    uint16_t maxConstSpeed = PumpMgr().GetMaxConstSpeed();
+    status                 = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MAX_CONST_SPEED_ATTRIBUTE_ID,
+                                                         (uint8_t *) &maxConstSpeed, ZCL_INT16U_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %" PRIx8, status);
+    }
+
+    uint16_t minConstFlow = PumpMgr().GetMinConstFlow();
+    status                = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MIN_CONST_FLOW_ATTRIBUTE_ID,
+                                                        (uint8_t *) &minConstFlow, ZCL_INT16U_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %" PRIx8, status);
+    }
+
+    uint16_t maxConstFlow = PumpMgr().GetMaxConstFlow();
+    status                = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MAX_CONST_FLOW_ATTRIBUTE_ID,
+                                                        (uint8_t *) &maxConstFlow, ZCL_INT16U_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %" PRIx8, status);
+    }
+
+    int16_t minConstTemp = PumpMgr().GetMinConstTemp();
+    status               = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MIN_CONST_TEMP_ATTRIBUTE_ID,
+                                                       (uint8_t *) &minConstTemp, ZCL_INT16S_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %" PRIx8, status);
+    }
+
+    int16_t maxConstTemp = PumpMgr().GetMaxConstTemp();
+    status               = emberAfWriteServerAttribute(1, ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, ZCL_MAX_CONST_TEMP_ATTRIBUTE_ID,
+                                                       (uint8_t *) &maxConstTemp, ZCL_INT16S_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %" PRIx8, status);
     }
 }
