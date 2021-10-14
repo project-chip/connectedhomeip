@@ -558,7 +558,6 @@ public:
 #if INET_CONFIG_ENABLE_IPV4
     ip4_addr_t ToIPv4(void) const;
     static IPAddress FromIPv4(const ip4_addr_t & addr);
-#error UNEXPECTED: IPV4 enabled!!!
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
