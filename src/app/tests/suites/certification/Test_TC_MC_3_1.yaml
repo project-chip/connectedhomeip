@@ -36,7 +36,7 @@ tests:
               - name: "keyCode"
                 value: 0x01
 
-          
+
     - label: "Send Down"
       disabled: true
       command: "SendKey"
@@ -108,7 +108,7 @@ tests:
               - name: "keyCode"
                 value: 0x0A
 
-        
+
     - label: "Send ContentsMenu"
       disabled: true
       command: "SendKey"
