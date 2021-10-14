@@ -12,7 +12,6 @@
 out/
 /src/test_driver/nrfconnect/build/
 /src/darwin/Framework/build/
-rpc_console_out/
 
 # Environment directory
 .environment/
