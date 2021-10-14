@@ -52,13 +52,16 @@ enum class AttestationVerificationResult : uint16_t
     kFirmwareInformationMismatch = 400,
     kFirmwareInformationMissing  = 401,
 
-    kCertificationDeclarationMissing   = 500,
-    kAttestationSignatureInvalid       = 501,
-    kAttestationElementsMalformed      = 502,
-    kAttestationNonceMismatch          = 503,
-    kAttestationSignatureInvalidFormat = 504,
+    kAttestationSignatureInvalid       = 500,
+    kAttestationElementsMalformed      = 501,
+    kAttestationNonceMismatch          = 502,
+    kAttestationSignatureInvalidFormat = 503,
 
-    kNoMemory = 600,
+    kCertificationDeclarationNoKeyId            = 600,
+    kCertificationDeclarationNoCertificateFound = 601,
+    kCertificationDeclarationInvalidSignature   = 602,
+
+    kNoMemory = 700,
 
     kNotImplemented = 0xFFFFU,
 
@@ -101,7 +104,9 @@ public:
                                  const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiCertDerBuffer,
                                  const ByteSpan & dacCertDerBuffer, const ByteSpan & attestationNonce) = 0;
 
-    // TODO: Validate Certification Declaration
+    virtual AttestationVerificationResult ValidateCertificationDeclaration(const ByteSpan & cmsEnvelopeBuffer,
+                                                                           ByteSpan & certDeclBuffer) = 0;
+
     // TODO: Validate Firmware Information
 
 protected:
