@@ -28,11 +28,11 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/Command.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
-#include <lib/mdns/Advertiser.h>
+#include <lib/dnssd/Advertiser.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <support/logging/Constants.h>
