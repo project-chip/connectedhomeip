@@ -70,7 +70,11 @@ android_library("java") {
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
+<<<<<<< HEAD
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
+=======
+    "zap-generated/chip/devicecontroller/ClusterInfo.java",
+>>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

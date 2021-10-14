@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package chip.clusterinfo;
 
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
@@ -47,3 +48,22 @@ public class CommandInfo {
         BaseChipCluster cluster, Object callback, Map<String, Object> commandArguments);
   }
 }
+=======
+package chip.devicecontroller;
+
+
+public class CommandInfo {
+  public CommandInfo(String name, Function<List<CommandParameter>, ClusterResponse> fn, List<CommandParameter> parameters, Class callbackClass) {
+    this.name = name;
+    this.fn = fn;
+    this.parameters = parameters;
+    this.callbackClass = callbackClass;
+  }
+  public CommandInfo() {}
+
+  public String name;
+  public Function<List<CommandParameter>, ClusterResponse> fn;
+  public List<CommandParameter> parameters;
+  public Class callbackClass;
+}
+>>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)

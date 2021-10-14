@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package chip.clusterinfo;
 
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
@@ -31,3 +32,18 @@ public class ClusterInfo {
     BaseChipCluster create(Long devicePtr, int endpointId);
   }
 }
+=======
+package chip.devicecontroller;
+
+public class ClusterInfo {
+
+  public ClusterInfo(String name) {
+    this.name = name;
+    this.commands = new ArrayList<CommandInfo>();
+  }
+  public String name;
+  public Class<T> clusterClass;
+  public List<CommandInfo> commands;
+
+}
+>>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
