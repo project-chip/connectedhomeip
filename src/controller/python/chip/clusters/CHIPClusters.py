@@ -4195,7 +4195,9 @@ class ChipClusters:
         if not func:
             raise UnknownAttribute(cluster, attribute)
         funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
-        funcCaller(lambda: func(device, endpoint, groupid, value))
+        res = funcCaller(lambda: func(device, endpoint, groupid, value))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
 
     # Cluster commands
 
