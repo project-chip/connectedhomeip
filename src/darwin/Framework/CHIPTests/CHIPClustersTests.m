@@ -5104,7 +5104,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000009_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 10ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 1);
@@ -5129,6 +5129,41 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
         [expectation fulfill];
     }];
 
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_2_1_000011_MoveToLevel
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reset level to 0"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t levelArgument = 0;
+    uint16_t transitionTimeArgument = 0U;
+    uint8_t optionMaskArgument = 1;
+    uint8_t optionOverrideArgument = 1;
+    [cluster moveToLevel:levelArgument
+          transitionTime:transitionTimeArgument
+              optionMask:optionMaskArgument
+          optionOverride:optionOverrideArgument
+         responseHandler:^(NSError * err, NSDictionary * values) {
+             NSLog(@"Reset level to 0 Error: %@", err);
+
+             XCTAssertEqual(err.code, 0);
+
+             [expectation fulfill];
+         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_2_1_000012_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 10ms"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 10);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -5203,10 +5238,10 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000003_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 2000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 2500ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
+    WaitForMs(expectation, queue, 2500);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000004_ReadAttribute
@@ -5280,10 +5315,10 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000007_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 2000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 2500ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
+    WaitForMs(expectation, queue, 2500);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000008_ReadAttribute

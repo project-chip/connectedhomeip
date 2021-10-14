@@ -9795,12 +9795,20 @@ public:
             err = TestSendsAMoveToLevelCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 10ms\n");
-            err = TestWait10ms_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 1ms\n");
+            err = TestWait1ms_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : reads current Level attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Reset level to 0\n");
+            err = TestResetLevelTo0_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
+            err = TestWait10ms_12();
             break;
         }
 
@@ -9813,7 +9821,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 11;
+    const uint16_t mTestCount = 13;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
@@ -9832,6 +9840,8 @@ private:
     chip::Callback::Callback<void (*)(void * context)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
+    chip::Callback::Callback<void (*)(void * context)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
@@ -9903,6 +9913,13 @@ private:
     {
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_10(currentLevel);
     }
+
+    static void OnFailureCallback_11(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_11(status);
+    }
+
+    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_11(); }
 
     //
     // Tests methods
@@ -10030,7 +10047,7 @@ private:
 
     void OnSuccessResponse_8() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_9() { return WaitForMs(1); }
+    CHIP_ERROR TestWait1ms_9() { return WaitForMs(1); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
     {
@@ -10047,6 +10064,26 @@ private:
         VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 254));
         NextTest();
     }
+
+    CHIP_ERROR TestResetLevelTo0_11()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t levelArgument           = 0;
+        uint16_t transitionTimeArgument = 0U;
+        uint8_t optionMaskArgument      = 1;
+        uint8_t optionOverrideArgument  = 1;
+
+        return cluster.MoveToLevel(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel(), levelArgument,
+                                   transitionTimeArgument, optionMaskArgument, optionOverrideArgument);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestWait10ms_12() { return WaitForMs(10); }
 };
 
 class Test_TC_LVL_3_1 : public TestCommand
@@ -10090,8 +10127,8 @@ public:
             err = TestSendsAMoveUpCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 2000ms\n");
-            err = TestWait2000ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 2500ms\n");
+            err = TestWait2500ms_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : reads current level attribute from DUT\n");
@@ -10106,8 +10143,8 @@ public:
             err = TestSendsAMoveDownCommand_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 2000ms\n");
-            err = TestWait2000ms_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 2500ms\n");
+            err = TestWait2500ms_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : reads current level attribute from DUT\n");
@@ -10324,7 +10361,7 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait2000ms_3() { return WaitForMs(2000); }
+    CHIP_ERROR TestWait2500ms_3() { return WaitForMs(2500); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
@@ -10376,7 +10413,7 @@ private:
 
     void OnSuccessResponse_6() { NextTest(); }
 
-    CHIP_ERROR TestWait2000ms_7() { return WaitForMs(2000); }
+    CHIP_ERROR TestWait2500ms_7() { return WaitForMs(2500); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_8()
     {

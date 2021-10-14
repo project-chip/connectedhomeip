@@ -98,7 +98,7 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 10ms"
+    - label: "Wait 1ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -111,3 +111,24 @@ tests:
       attribute: "current Level"
       response:
           value: 254
+
+    - label: "Reset level to 0"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 0
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 10ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10
