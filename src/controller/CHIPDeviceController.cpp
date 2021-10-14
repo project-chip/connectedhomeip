@@ -1990,8 +1990,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
         ChipLogProgress(Controller, "Finding node on operational network");
         Dnssd::Resolver::Instance().ResolveNodeId(
-            PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(device->GetDeviceId()),
-            Inet::IPAddressType::kAny);
+            PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(device->GetDeviceId()), Inet::IPAddressType::kAny);
 #endif
     }
     break;

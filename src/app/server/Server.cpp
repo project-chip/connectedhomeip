@@ -95,19 +95,16 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
-    err = mTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(IPAddressType::kIPv6)
-                               .SetListenPort(mSecuredServicePort)
+    err = mTransports.Init(
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(IPAddressType::kIPv6).SetListenPort(mSecuredServicePort)
 
 #if INET_CONFIG_ENABLE_IPV4
-                               ,
-                           UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(IPAddressType::kIPv4)
-                               .SetListenPort(mSecuredServicePort)
+            ,
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(IPAddressType::kIPv4).SetListenPort(mSecuredServicePort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                               ,
-                           BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
+            ,
+        BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
 #endif
     );
 
