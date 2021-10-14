@@ -136,7 +136,6 @@ public:
      * @param[in]   port        Destination UDP port.
      * @param[in]   msg         Packet buffer containing the UDP message.
      * @param[in]   intfId      Optional network interface indicator.
-     * @param[in]   sendFlags   Unused and will be removed.
      *
      * @retval  CHIP_NO_ERROR                       Success: \c msg is queued for transmit.
      * @retval  CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE The system does not support the requested operation.
@@ -146,9 +145,8 @@ public:
      * @retval  CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG Only a truncated portion of \c msg was queued for transmit.
      * @retval  other                               Another system or platform error.
      */
-    CHIP_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
-                      uint16_t sendFlags = 0);
-    CHIP_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
+    CHIP_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg,
+                      InterfaceId intfId = INET_NULL_INTERFACEID);
 
     /**
      * Send a UDP message to a specified destination.
@@ -159,7 +157,6 @@ public:
      *
      * @param[in]   pktInfo     Source and destination information for the UDP message.
      * @param[in]   msg         Packet buffer containing the UDP message.
-     * @param[in]   sendFlags   Unused and will be removed.
      *
      * @retval  CHIP_NO_ERROR                       Success: \c msg is queued for transmit.
      * @retval  CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE The system does not support the requested operation.
@@ -169,7 +166,7 @@ public:
      * @retval  CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG Only a truncated portion of \c msg was queued for transmit.
      * @retval  other                               Another system or platform error.
      */
-    CHIP_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
+    CHIP_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg);
 
     /**
      * Close the endpoint.
@@ -199,7 +196,7 @@ private:
     CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId);
     CHIP_ERROR BindInterfaceImpl(IPAddressType addrType, InterfaceId intfId);
     CHIP_ERROR ListenImpl();
-    CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg, uint16_t sendFlags);
+    CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg);
     void CloseImpl();
 
     void Init(InetLayer * inetLayer);
