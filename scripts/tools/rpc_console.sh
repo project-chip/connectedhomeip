@@ -15,8 +15,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
-#
 #    Description:
 #      This script can be used to build an RPC console - the python application
 #      that provides a console for interacting with rpc-enabled chip devices.
