@@ -72,7 +72,7 @@ CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     int TagPresenceMask = 0;
     TLV::TLVReader reader;
 
