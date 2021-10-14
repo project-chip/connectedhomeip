@@ -32,6 +32,7 @@ pw_python_package("build_examples") {
     "build/targets.py",
     "build_examples.py",
     "builders/__init__.py",
+    "builders/ameba.py",
     "builders/builder.py",
     "builders/efr32.py",
     "builders/esp32.py",
