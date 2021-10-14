@@ -224,7 +224,6 @@ CHIP_ERROR UDPEndPoint::ListenImpl()
 
 CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg, uint16_t sendFlags)
 {
-    CHIP_ERROR res             = CHIP_NO_ERROR;
     const IPAddress & destAddr = pktInfo->DestAddress;
 
     if (!msg.HasSoleOwnership())
@@ -242,8 +241,12 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
     LOCK_TCPIP_CORE();
 
     // Make sure we have the appropriate type of PCB based on the destination address.
-    res = GetPCB(destAddr.Type());
-    ReturnErrorOnFailure(res);
+    CHIP_ERROR res = GetPCB(destAddr.Type());
+    if (res != CHIP_NO_ERROR)
+    {
+        UNLOCK_TCPIP_CORE();
+        return res;
+    }
 
     // Send the message to the specified address/port.
     // If an outbound interface has been specified, call a specific version of the UDP sendto()
