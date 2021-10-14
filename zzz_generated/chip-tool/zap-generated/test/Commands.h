@@ -16568,6 +16568,60 @@ private:
     CHIP_ERROR TestWait100ms_0() { return WaitForMs(100); }
 };
 
+class TestLogCommands : public TestCommand
+{
+public:
+    TestLogCommands() : TestCommand("TestLogCommands"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestLogCommands\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestLogCommands\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Log a simple message\n");
+            err = TestLogASimpleMessage_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestLogASimpleMessage_0() { return Log("This is a simple message"); }
+};
+
 class TestDescriptorCluster : public TestCommand
 {
 public:
@@ -17216,6 +17270,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestClusterComplexTypes>(),
         make_unique<TestConstraints>(),
         make_unique<TestDelayCommands>(),
+        make_unique<TestLogCommands>(),
         make_unique<TestDescriptorCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestSubscribe_OnOff>(),
