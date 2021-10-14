@@ -1,0 +1,97 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+
+package chip.devicecontroller;
+
+import java.util.List;
+
+public class ClusterInfo {
+ String name;
+ Class<T> clusterClass;
+ List<CommandInfo> commands;
+ Map<String, ParameterType> typeMap;
+ public Map<String, ClusterInfo> getClusterMap() {
+     Map<String, ClusterInfo> clusterInfoMapping = new Hashmap<>();
+     {{#chip_client_clusters}}
+     ClusterInfo {{asLowerCamelCase name}}_clusterInfo = new ClusterInfo("{{asLowerCamelCase name}}");
+     {{#chip_cluster_commands}}
+           List<CommandParameter> {{asLowerCamelCase name}}_parametersList = new ArrayList<>();
+           CommandInfo {{asLowerCamelCase name}}_commandInfo = new CommandInfo();
+           {{asLowerCamelCase name}}_commandInfo.name = "{{asLowerCamelCase name}}";
+           {{#if (zcl_command_arguments_count this.id)}}
+               {{#if hasSpecificResponse}}
+                 {{asLowerCamelCase ../name}}_commandInfo.callbackClass = {{asUpperCamelCase responseName}}Callback.class;
+               {{else}}
+                 {{asLowerCamelCase ../name}}_commandInfo.callbackClass = DefaultClusterCallback.class;
+               {{/if}}
+               {{#chip_cluster_command_arguments}}
+                 CommandParameter {{asLowerCamelCase label}}_commandParameter = new CommandParameter("{{asLowerCamelCase label}}", {{asJavaBasicType type}}.class);
+                 {{asLowerCamelCase ../name}}_parametersList.add({{asLowerCamelCase label}}_commandParameter);
+                 {{#not_last}} {{/not_last}}
+               {{/chip_cluster_command_arguments}}
+           {{else}}
+             {{#if hasSpecificResponse}}
+               {{asLowerCamelCase ../name}}_commandInfo.callbackClass = {{asUpperCamelCase responseName}}Callback.class;
+             {{else}}
+               {{asLowerCamelCase ../name}}_commandInfo.callbackClass = DefaultClusterCallback.class;
+             {{/if}}
+           {{/if}}
+           {{asLowerCamelCase name}}_commandInfo.parameters = {{asLowerCamelCase name}}_parametersList;
+           {{asLowerCamelCase ../name}}_clusterInfo.commands.add({{asLowerCamelCase name}}_commandInfo);
+     {{/chip_cluster_commands}}
+     clusterInfoMapping.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}_clusterInfo);
+     {{/chip_client_clusters}}
+  }
+}
+
+
+
+public class CommandParameter {
+ public CommandParameter() {
+
+ }
+
+ public CommandParameter(String name, ParameterType type) {
+   this.name = name;
+   this.type = type;
+ }
+
+ public String name;
+ public ParameterType type;
+}
+
+public class CommandInfo {
+ public CommandInfo(String name, Function<List<CommandParameter>, ClusterResponse> fn, List<CommandParameter> parameters, Class callbackClass) {
+   this.name = name;
+   this.fn = fn;
+   this.parameters = parameters;
+   this.callbackClass = callbackClass;
+ }
+ public CommandInfo() {
+ }
+
+ public String name;
+ public Function<List<CommandParameter>, ClusterResponse> fn;
+ public List<CommandParameter> parameters;
+ public Class callbackClass;
+}
+
+public class ClusterInfo {
+
+ public ClusterInfo(String name) {
+   this.name = name;
+   this.commands = new ArrayList<CommandInfo>();
+ }
+ public String name;
+ public Class<T> clusterClass;
+ public List<CommandInfo> commands;
+
+}
+
+
+enum ParameterType {
+ CALLBACK, INT, LONG, BOOLEAN, STRUCT
+}
+
+
+{{/if}}
