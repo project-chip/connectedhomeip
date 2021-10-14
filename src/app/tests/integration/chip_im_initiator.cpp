@@ -112,17 +112,6 @@ void HandleReadComplete()
            static_cast<double>(gReadRespCount) * 100 / static_cast<double>(gReadCount), static_cast<double>(transitTime) / 1000);
 }
 
-void HandleWriteComplete()
-{
-    auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
-    auto transitTime = respTime - gLastMessageTime;
-
-    gWriteRespCount++;
-
-    printf("Write Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gWriteRespCount, gWriteCount,
-           static_cast<double>(gWriteRespCount) * 100 / static_cast<double>(gWriteCount), static_cast<double>(transitTime) / 1000);
-}
-
 void HandleSubscribeReportComplete()
 {
     auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
@@ -134,14 +123,11 @@ void HandleSubscribeReportComplete()
            static_cast<double>(gSubRespCount) * 100 / static_cast<double>(gSubCount), static_cast<double>(transitTime) / 1000);
 }
 
-class MockInteractionModelApp : public chip::app::InteractionModelDelegate, public ::chip::app::CommandSender::Callback
+class MockInteractionModelApp : public chip::app::InteractionModelDelegate,
+                                public ::chip::app::CommandSender::Callback,
+                                public ::chip::app::WriteClient::Callback
 {
 public:
-    CHIP_ERROR WriteResponseProcessed(const chip::app::WriteClient * apWriteClient) override
-    {
-        HandleWriteComplete();
-        return CHIP_NO_ERROR;
-    }
     CHIP_ERROR EventStreamReceived(const chip::Messaging::ExchangeContext * apExchangeContext,
                                    chip::TLV::TLVReader * apEventListReader) override
     {
@@ -199,6 +185,24 @@ public:
         printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
     void OnDone(chip::app::CommandSender * apCommandSender) override {}
+
+    void OnResponse(const chip::app::WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path) override
+    {
+        auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
+        auto transitTime = respTime - gLastMessageTime;
+
+        gWriteRespCount++;
+
+        printf("Write Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gWriteRespCount, gWriteCount,
+               static_cast<double>(gWriteRespCount) * 100 / static_cast<double>(gWriteCount),
+               static_cast<double>(transitTime) / 1000);
+    }
+    void OnError(const chip::app::WriteClient * apCommandSender, chip::Protocols::InteractionModel::Status aProtocolCode,
+                 CHIP_ERROR aError) override
+    {
+        printf("WriteClient::OnError happens with %" CHIP_ERROR_FORMAT, aError.Format());
+    }
+    void OnDone(chip::app::WriteClient * apWriteClient) override {}
 };
 
 MockInteractionModelApp gMockDelegate;
@@ -547,7 +551,7 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
     if (gWriteRespCount < kMaxWriteMessageCount)
     {
         chip::app::WriteClientHandle writeClient;
-        err = chip::app::InteractionModelEngine::GetInstance()->NewWriteClient(writeClient);
+        err = chip::app::InteractionModelEngine::GetInstance()->NewWriteClient(writeClient, &gMockDelegate);
         SuccessOrExit(err);
 
         err = SendWriteRequest(writeClient);

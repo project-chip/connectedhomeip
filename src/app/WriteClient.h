@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/AttributeDataList.h>
 #include <app/MessageDef/AttributeStatusIB.h>
@@ -51,6 +52,63 @@ class InteractionModelEngine;
 class WriteClient : public Messaging::ExchangeDelegate
 {
 public:
+public:
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+
+        /**
+         * OnResponse will be called when a successful response from server has been received and processed. Specifically:
+         *  - When a status code is received and it is IM::Success, aData will be nullptr.
+         *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
+         *    that contains the data payload (callee will still need to open and process the container).
+         *
+         * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param[in] apWriteClient: The write client object that initiated the write transaction.
+         * @param[in] aPath: The attribute path field in write response.
+         */
+        virtual void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath) {}
+
+        /**
+         * OnError will be called when an error occurr *after* a successful call to SendWriteRequest(). The following
+         * errors will be delivered through this call in the aError field:
+         *
+         * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
+         * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR_IM_STATUS_CODE_RECEIVED: An invoke response containing a status code denoting an error was received.
+         *                  When the protocol ID in the received status is IM, aInteractionModelStatus will contain the IM status
+         *                  code. Otherwise, aInteractionModelStatus will always be set to IM::Status::Failure.
+         * - CHIP_ERROR*: All other cases.
+         *
+         * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy and free the object.
+         *
+         * @param[in] apWriteClient: The write client object that initiated the attribute write transaction.
+         * @param[in] aInteractionModelStatus: Contains an IM status code. This SHALL never be IM::Success, and will contain a valid
+         * server-side emitted error if aProtocolError == CHIP_ERROR_IM_STATUS_CODE_RECEIVED.
+         * @param[in] aError: A system error code that conveys the overall error code.
+         */
+        virtual void OnError(const WriteClient * apWriteClient, Protocols::InteractionModel::Status aInteractionModelStatus,
+                             CHIP_ERROR aError)
+        {}
+
+        /**
+         * OnDone will be called when WriteClient has finished all work and is reserved for future WriteClient ownership change.
+         * Users may use this function to release their own objects related to this write interaction.
+         *
+         * This function will:
+         *      - Always be called exactly *once* for a given WriteClient instance.
+         *      - Be called even in error circumstances.
+         *      - Only be called after a successful call to SendWriteRequest as been made.
+         *
+         * @param[in] apWriteClient: The write client object of the terminated invoke write transaction.
+         */
+        virtual void OnDone(WriteClient * apWriteClient) = 0;
+    };
+
     /**
      *  Shutdown the WriteClient. This terminates this instance
      *  of the object and releases all held resources.
@@ -61,8 +119,6 @@ public:
     CHIP_ERROR FinishAttribute();
     TLV::TLVWriter * GetAttributeDataElementTLVWriter();
 
-    uint64_t GetAppIdentifier() const { return mAppIdentifier; }
-    void SetAppIdentifier(uint64_t aAppIdentifier) { mAppIdentifier = aAppIdentifier; }
     NodeId GetSourceNodeId() const
     {
         return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSecureSession().GetPeerNodeId() : kUndefinedNodeId;
@@ -109,8 +165,7 @@ private:
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                    uint64_t aApplicationIdentifier);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apDelegate);
 
     virtual ~WriteClient() = default;
 
@@ -140,12 +195,11 @@ private:
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
+    Callback * mpCallback                      = nullptr;
     State mState                               = State::Uninitialized;
     System::PacketBufferTLVWriter mMessageWriter;
     WriteRequest::Builder mWriteRequestBuilder;
     uint8_t mAttributeStatusIndex = 0;
-    uint64_t mAppIdentifier       = 0;
 };
 
 class WriteClientHandle

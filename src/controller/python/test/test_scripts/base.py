@@ -279,17 +279,18 @@ class BaseTestHelper:
         failed_zcl = []
         for req in requests:
             try:
-                res = self.devCtrl.ZCLWriteAttribute(cluster=req.cluster,
-                                                     attribute=req.attribute,
-                                                     nodeid=nodeid,
-                                                     endpoint=endpoint,
-                                                     groupid=group,
-                                                     value=req.value)
-                TestResult(f"Write attribute {req.cluster}.{req.attribute}", res).assertStatusEqual(
-                    req.expected_status)
-                if req.expected_status != IM.Status.Success:
-                    # If the write interaction is expected to success, proceed to verify it.
-                    continue
+                try:
+                    self.devCtrl.ZCLWriteAttribute(cluster=req.cluster,
+                                                   attribute=req.attribute,
+                                                   nodeid=nodeid,
+                                                   endpoint=endpoint,
+                                                   groupid=group,
+                                                   value=req.value)
+                except Exception as ex:
+                    if req.expected_status != IM.ProtocolCode.Success:
+                        continue
+                    else:
+                        raise ex
                 res = self.devCtrl.ZCLReadAttribute(
                     cluster=req.cluster, attribute=req.attribute, nodeid=nodeid, endpoint=endpoint, groupid=group)
                 TestResult(f"Read attribute {req.cluster}.{req.attribute}", res).assertValueEqual(

@@ -139,9 +139,6 @@ public:
                                              uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
                                              Callback::Cancelable * onFailureCallback);
 
-    CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
-                                         Callback::Cancelable * onFailureCallback);
-
     /**
      * @brief
      *   Send the command in internal command sender.

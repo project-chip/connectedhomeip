@@ -632,12 +632,12 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->InetLayer())
                                                     .SetAddressType(Inet::kIPAddressType_IPv6)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mSystemState->InetLayer())
                                                     .SetAddressType(Inet::kIPAddressType_IPv4)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
                                                     ));
 
@@ -1724,30 +1724,6 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(app::ReadClient * 
     {
         FreeAttributePathParam(apReadClient->GetAppIdentifier());
     }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                                                         const app::StatusIB & aStatusIB,
-                                                                         app::AttributePathParams & aAttributePathParams,
-                                                                         uint8_t aAttributeIndex)
-{
-    IMWriteResponseCallback(apWriteClient, chip::app::ToEmberAfStatus(aStatusIB.mStatus));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseProtocolError(const app::WriteClient * apWriteClient,
-                                                                                uint8_t aAttributeIndex)
-{
-    // When WriteResponseProtocolError occurred, it means server returned an invalid packet.
-    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
-{
-    // When WriteResponseError occurred, it means we failed to receive the response from server.
-    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
     return CHIP_NO_ERROR;
 }
 

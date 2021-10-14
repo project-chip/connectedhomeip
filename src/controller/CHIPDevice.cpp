@@ -785,27 +785,6 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
-                                             Callback::Cancelable * onFailureCallback)
-{
-    bool loadedSecureSession = false;
-    uint8_t seqNum           = GetNextSequenceNumber();
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-
-    aHandle->SetAppIdentifier(seqNum);
-    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
-
-    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
-    {
-        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
-    }
-    if ((err = aHandle.SendWriteRequest(GetDeviceId(), 0, mSecureSession)) != CHIP_NO_ERROR)
-    {
-        CancelResponseHandler(seqNum);
-    }
-    return err;
-}
-
 Device::~Device()
 {
     if (mExchangeMgr)
