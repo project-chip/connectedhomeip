@@ -52,8 +52,7 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
 
     if (gDelegate == nullptr)
     {
-        ChipLogError(Zcl, "No OTARequestorDelegate set");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
+        ChipLogDetail(Zcl, "No OTARequestorDelegate set");
         return true;
     }
 
@@ -70,7 +69,7 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "failed to parse providerLocation as uint64_t: %s", chip::ErrorStr(bufReader.StatusCode()));
+        ChipLogError(SoftwareUpdate, "Failed to parse providerLocation as uint64_t: %s", chip::ErrorStr(bufReader.StatusCode()));
         return false;
     }
 

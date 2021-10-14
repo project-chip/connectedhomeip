@@ -42,10 +42,11 @@ void ExampleRequestorDelegate::Init(chip::Controller::ControllerDeviceInitParams
 
 void ExampleRequestorDelegate::ConnectAndBeginOTA()
 {
-    VerifyOrReturn(mProviderId.HasValue(), ChipLogError(SoftwareUpdate, "%s: missing Provider ID", __FUNCTION__));
-    VerifyOrReturn(mProviderFabricIndex.HasValue(), ChipLogError(SoftwareUpdate, "%s: missing Provider FabricIndex", __FUNCTION__));
+    VerifyOrReturn(mProviderId.HasValue(), ChipLogError(SoftwareUpdate, "Missing Provider ID"));
+    VerifyOrReturn(mProviderFabricIndex.HasValue(), ChipLogError(SoftwareUpdate, "Missing Provider FabricIndex"));
 
-    ChipLogProgress(SoftwareUpdate, "When #7976 is fixed, this will attempt to connect to 0x" ChipLogFormatX64 " on FabricId %u",
+    ChipLogProgress(SoftwareUpdate,
+                    "Once #7976 is fixed, this would attempt to connect to 0x" ChipLogFormatX64 " of FabricIndex 0x" PRIu8,
                     ChipLogValueX64(mProviderId.Value()), mProviderFabricIndex.Value());
 
     // TODO: uncomment and fill in after #7976 is fixed
@@ -59,7 +60,8 @@ EmberAfStatus ExampleRequestorDelegate::HandleAnnounceOTAProvider(chip::app::Com
 {
     mProviderId.SetValue(providerLocation);
 
-    ChipLogDetail(SoftwareUpdate, "notified of Provider at NodeID: 0x" ChipLogFormatX64, ChipLogValueX64(mProviderId.Value()));
+    ChipLogDetail(SoftwareUpdate, "Notified of Provider at NodeID: 0x" ChipLogFormatX64 "on FabricIndex 0x" PRIu8,
+                  ChipLogValueX64(mProviderId.Value()), mProviderFabricIndex.Value());
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
