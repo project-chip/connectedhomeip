@@ -1,8 +1,12 @@
 package chip.clusterinfo;
 
+import java.util.function.Function;
+import java.util.*;
+
 
 public class CommandInfo {
-  public CommandInfo(String name, Function<List<CommandParameter>, ClusterResponse> fn, List<CommandParameter> parameters, Class callbackClass) {
+  // TODO make Class<?> to ClusterResponse
+  public CommandInfo(String name, Function<List<CommandParameter>, Class<?>> fn, List<CommandParameter> parameters, Class<?> callbackClass) {
     this.name = name;
     this.fn = fn;
     this.parameters = parameters;
@@ -11,7 +15,7 @@ public class CommandInfo {
   public CommandInfo() {}
 
   public String name;
-  public Function<List<CommandParameter>, ClusterResponse> fn;
+  public Function<List<CommandParameter>, Class<?>> fn;
   public List<CommandParameter> parameters;
-  public Class callbackClass;
+  public Class<?> callbackClass;
 }

@@ -39,7 +39,7 @@
         {
             "path": "ClusterInfo-java.zapt",
             "name": "ClusterInfo Maping for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfo.java"
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfoMapping.java"
         }
     ]
 }
