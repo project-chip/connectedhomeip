@@ -80,7 +80,7 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mMessageCounterManager = messageCounterManager;
 
     // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
-    (void)mGlobalEncryptedMessageCounter.Init();
+    (void) mGlobalEncryptedMessageCounter.Init();
     mGlobalUnencryptedMessageCounter.Init();
 
     ScheduleExpiryTimer();
