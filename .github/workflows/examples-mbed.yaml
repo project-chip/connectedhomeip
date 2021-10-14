@@ -102,8 +102,6 @@ jobs:
                      /tmp/output_binaries/$BUILD_TYPE-build/lock-app-$APP_TARGET-$APP_PROFILE.hex
                   cp examples/lighting-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lighting-app-example.hex \
                      /tmp/output_binaries/$BUILD_TYPE-build/lighting-app-$APP_TARGET-$APP_PROFILE.hex
-                  cp examples/pigweed-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-pigweed-app-example.hex \
-                     /tmp/output_binaries/$BUILD_TYPE-build/pigweed-app-$APP_TARGET-$APP_PROFILE.hex
 
             - name: Binary artifacts suffix
               id: outsuffix
