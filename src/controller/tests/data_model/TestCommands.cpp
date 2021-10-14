@@ -79,7 +79,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to decode the request");
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatusCode(aCommandPath, Protocols::InteractionModel::Id,
+                                        Protocols::InteractionModel::Status::Failure);
             return;
         }
 
