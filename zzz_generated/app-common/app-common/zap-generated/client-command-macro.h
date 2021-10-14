@@ -4856,23 +4856,27 @@
  *
  * Command: GetAlertsResponse
  * @param alertsCount AlertCount
+ * @param alertStructures AlertStructure []
+ * @param alertStructuresLen int
  */
 #define emberAfFillCommandAppliance                                                                                                \
-    Events and AlertClusterGetAlertsResponse(alertsCount)                                                                          \
+    Events and AlertClusterGetAlertsResponse(alertsCount, alertStructures, alertStructuresLen)                                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_GET_ALERTS_RESPONSE_COMMAND_ID, "u", alertsCount);
+                                  ZCL_GET_ALERTS_RESPONSE_COMMAND_ID, "ub", alertsCount, alertStructures, alertStructuresLen);
 
 /** @brief Command description for AlertsNotification
  *
  * Command: AlertsNotification
  * @param alertsCount AlertCount
+ * @param alertStructures AlertStructure []
+ * @param alertStructuresLen int
  */
 #define emberAfFillCommandAppliance                                                                                                \
-    Events and AlertClusterAlertsNotification(alertsCount)                                                                         \
+    Events and AlertClusterAlertsNotification(alertsCount, alertStructures, alertStructuresLen)                                    \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ALERTS_NOTIFICATION_COMMAND_ID, "u", alertsCount);
+                                  ZCL_ALERTS_NOTIFICATION_COMMAND_ID, "ub", alertsCount, alertStructures, alertStructuresLen);
 
 /** @brief Command description for EventsNotification
  *

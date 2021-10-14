@@ -36,6 +36,7 @@ typedef struct _SimpleStruct
     uint8_t c;
     chip::ByteSpan d;
     uint8_t * e;
+    uint8_t f;
 } SimpleStruct;
 
 // Struct for NestedStruct
