@@ -113,7 +113,8 @@ class Esp32Builder(Builder):
         if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
             return
 
-        defaults = os.path.join(self.ExamplePath, DefaultsFileName(self.board, self.app, self.enable_rpcs))
+        defaults = os.path.join(self.ExamplePath, DefaultsFileName(
+            self.board, self.app, self.enable_rpcs))
 
         if not os.path.exists(defaults):
             raise Exception('SDK defaults file missing: %s' % defaults)
@@ -122,12 +123,14 @@ class Esp32Builder(Builder):
 
         self._Execute(['mkdir', '-p', self.output_dir])
         self._Execute(['cp', defaults, defaults_out])
-        self._Execute(['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
+        self._Execute(
+            ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
 
         if not self.enable_ipv4:
-            self._Execute(['bash', '-c', 'echo CONFIG_DISABLE_IPV4=y >>%s' % shlex.quote(defaults_out)])
+            self._Execute(
+                ['bash', '-c', 'echo CONFIG_DISABLE_IPV4=y >>%s' % shlex.quote(defaults_out)])
 
-        cmd =  "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} reconfigure".format(
+        cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} reconfigure".format(
             defaults=shlex.quote(defaults_out),
             example_path=self.ExamplePath,
             out=shlex.quote(self.output_dir)
@@ -140,7 +143,8 @@ class Esp32Builder(Builder):
         logging.info('Compiling Esp32 at %s', self.output_dir)
 
         # Unfortunately sdkconfig is sticky and needs reset on every build
-        self._Execute(['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
+        self._Execute(
+            ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
 
         defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
 
@@ -148,7 +152,7 @@ class Esp32Builder(Builder):
         # in a full reconfiguration with default values
         #
         # This does a regen + reconfigure.
-        cmd =  "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} build".format(
+        cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} build".format(
             defaults=shlex.quote(defaults_out),
             example_path=self.ExamplePath,
             out=shlex.quote(self.output_dir)
