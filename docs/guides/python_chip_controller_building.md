@@ -1,6 +1,6 @@
 # Working with Python CHIP Controller
 
-The Python CHIP controller is a tool that allows to commission a Matter device
+The Python CHIP Controller is a tool that allows to commission a Matter device
 into the network and to communicate with it using the Zigbee Cluster Library
 (ZCL) messages.
 
