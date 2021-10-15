@@ -36,6 +36,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include "platform/PlatformManager.h"
 #include "shell_extension/launch.h"
 
 #include <cmath>
@@ -583,7 +584,22 @@ public:
     void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
 };
 
+AppCallbacks sCallbacks;
+
 } // namespace
+
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model and CHIP App Server
+    chip::Server::GetInstance().Init(&sCallbacks);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    SetupPretendDevices();
+    SetupInitialLevelControlValues(/* endpointId = */ 1);
+    SetupInitialLevelControlValues(/* endpointId = */ 2);
+}
 
 extern "C" void app_main()
 {
@@ -638,23 +654,14 @@ extern "C" void app_main()
     wifiLED.Init();
     pairingWindowLED.Init();
 
-    // Init ZCL Data Model and CHIP App Server
-    AppCallbacks callbacks;
-    chip::Server::GetInstance().Init(&callbacks);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    SetupPretendDevices();
-    SetupInitialLevelControlValues(/* endpointId = */ 1);
-    SetupInitialLevelControlValues(/* endpointId = */ 2);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     std::string qrCodeText = createSetupPayload();
     ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
 
     {
         std::vector<char> qrCode(3 * qrCodeText.size() + 1);
-        error = EncodeQRCodeToUrl(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
+        CHIP_ERROR error = EncodeQRCodeToUrl(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
         if (error == CHIP_NO_ERROR)
         {
             ESP_LOGI(TAG, "Copy/paste the below URL in a browser to see the QR CODE:\n\t%s?data=%s", QRCODE_BASE_URL,
