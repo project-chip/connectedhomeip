@@ -80,7 +80,8 @@ def HostTargets():
             'all-clusters', app=HostApp.ALL_CLUSTERS))
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
-        app_targets.append(target.Extend('rpc-console', app=HostApp.RPC_CONSOLE))
+        app_targets.append(target.Extend(
+            'rpc-console', app=HostApp.RPC_CONSOLE))
 
     for target in app_targets:
         yield target
