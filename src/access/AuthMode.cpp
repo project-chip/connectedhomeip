@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control auth mode.
- */
-
 #include "AuthMode.h"
 
 namespace chip {

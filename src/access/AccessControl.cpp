@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control module.
- */
-
 #include "AccessControl.h"
 
 #include "Config.h"

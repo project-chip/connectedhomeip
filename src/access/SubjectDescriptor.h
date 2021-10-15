@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control subject descriptor.
- */
-
 #pragma once
 
 #include "AuthMode.h"

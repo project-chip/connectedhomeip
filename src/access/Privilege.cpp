@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control privileges.
- */
-
 #include "Privilege.h"
 
 namespace chip {

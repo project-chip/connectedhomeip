@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control request path.
- */
-
 #pragma once
 
 #include "BasicTypes.h"

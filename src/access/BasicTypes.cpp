@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Basic types used by access control.
- */
-
 #include "BasicTypes.h"
 
 namespace chip {

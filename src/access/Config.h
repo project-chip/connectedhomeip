@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control configuration.
- */
-
 #pragma once
 
 #include "DataProviderImpl.h"

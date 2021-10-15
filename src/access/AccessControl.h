@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control module.
- */
-
 #pragma once
 
 #include "Privilege.h"
