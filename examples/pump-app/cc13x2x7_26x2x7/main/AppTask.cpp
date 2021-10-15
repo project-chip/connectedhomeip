@@ -375,7 +375,7 @@ void AppTask::UpdateClusterState()
     status = OnOff::Attributes::OnOff::Set(1, onOffState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %" PRIx8, status);
     }
 
     int16_t maxPressure = PumpMgr().GetMaxPressure();
