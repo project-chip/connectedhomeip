@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control request path.
- */
-
 #include "RequestPath.h"
 
 namespace chip {

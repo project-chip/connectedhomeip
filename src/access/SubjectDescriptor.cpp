@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control subject descriptor.
- */
-
 #include "SubjectDescriptor.h"
 
 namespace chip {

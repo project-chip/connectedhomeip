@@ -16,9 +16,4 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control data provider interface.
- */
-
 #include "DataProvider.h"

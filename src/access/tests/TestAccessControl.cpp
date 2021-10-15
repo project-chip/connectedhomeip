@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control unit tests.
- */
-
 #include "access/AccessControl.h"
 #include "access/Config.h"
 #include "access/DataProvider.h"

@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control auth mode.
- */
-
 #pragma once
 
 namespace chip {

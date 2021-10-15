@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Access control data provider interface.
- */
-
 #pragma once
 
 #include "AuthMode.h"
