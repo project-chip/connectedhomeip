@@ -43,7 +43,6 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    CHIP_ERROR err       = CHIP_NO_ERROR;
 
     auto providerLocation   = commandData.providerLocation;
     auto vendorId           = commandData.vendorId;
@@ -56,24 +55,7 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
         return true;
     }
 
-    // This is temporary code that will be changed once the definiton of AnnounceOTAProvider is updated to no longer use ByteSpan
-    // for the serverLocation field. Note: NodeID is stored as little-endian but in bytes, where the first byte in the ByteSpan is
-    // also the most significant byte in the ID.
-    chip::NodeId providerLocationInt = 0;
-    uint8_t temp                     = 0;
-    chip::Encoding::LittleEndian::Reader bufReader(providerLocation);
-    for (size_t i = 0; i < sizeof(chip::NodeId); i++)
-    {
-        err = bufReader.Read8(&temp).StatusCode();
-        providerLocationInt += (static_cast<uint64_t>(temp) << ((sizeof(chip::NodeId) - 1 - i) * 8));
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Failed to parse providerLocation as uint64_t: %s", chip::ErrorStr(bufReader.StatusCode()));
-        return false;
-    }
-
-    status = gDelegate->HandleAnnounceOTAProvider(commandObj, providerLocationInt, vendorId, announcementReason, metadataForNode);
+    status = gDelegate->HandleAnnounceOTAProvider(commandObj, providerLocation, vendorId, announcementReason, metadataForNode);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

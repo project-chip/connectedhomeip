@@ -13383,7 +13383,7 @@ class OtaSoftwareUpdateRequestorAnnounceOtaProvider : public ModelCommand
 public:
     OtaSoftwareUpdateRequestorAnnounceOtaProvider() : ModelCommand("announce-ota-provider")
     {
-        AddArgument("ProviderLocation", &mProviderLocation);
+        AddArgument("ProviderLocation", 0, UINT64_MAX, &mProviderLocation);
         AddArgument("VendorId", 0, UINT16_MAX, &mVendorId);
         AddArgument("AnnouncementReason", 0, UINT8_MAX, &mAnnouncementReason);
         AddArgument("MetadataForNode", &mMetadataForNode);
@@ -13410,8 +13410,8 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mProviderLocation;
-    uint16_t mVendorId;
+    chip::NodeId mProviderLocation;
+    chip::VendorId mVendorId;
     uint8_t mAnnouncementReason;
     chip::ByteSpan mMetadataForNode;
 };

@@ -1,5 +1,5 @@
 {
-  "featureLevel": 55,
+  "featureLevel": 62,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1087,7 +1087,16 @@
           "define": "OTA_REQUESTOR_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "AnnounceOtaProvider",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -1113,16 +1122,7 @@
           "define": "OTA_REQUESTOR_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "AnnounceOtaProvider",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "default ota provider",

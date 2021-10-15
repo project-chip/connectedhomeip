@@ -1733,8 +1733,8 @@
 /** @brief Command description for AnnounceOtaProvider
  *
  * Command: AnnounceOtaProvider
- * @param providerLocation OCTET_STRING
- * @param vendorId INT16U
+ * @param providerLocation NODE_ID
+ * @param vendorId VENDOR_ID
  * @param announcementReason OTAAnnouncementReason
  * @param metadataForNode OCTET_STRING
  */

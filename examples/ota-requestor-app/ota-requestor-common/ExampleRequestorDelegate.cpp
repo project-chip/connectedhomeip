@@ -111,7 +111,7 @@ EmberAfStatus ExampleRequestorDelegate::HandleAnnounceOTAProvider(chip::app::Com
 void ExampleRequestorDelegate::StartDelayTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     VerifyOrReturn(appState != nullptr);
-    static_cast<ExampleRequestorDelegate *>(appState)->ConnectAndBeginOTA();
+    static_cast<ExampleRequestorDelegate *>(appState)->ConnectToProvider();
 }
 
 chip::FabricInfo * ExampleRequestorDelegate::GetProviderFabricInfo()
