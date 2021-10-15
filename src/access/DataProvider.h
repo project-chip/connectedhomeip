@@ -28,23 +28,20 @@
 namespace chip {
 namespace access {
 
-/**
- * @class Entry
- *
- * @brief Interface for checking against an access control entry.
- */
 class Entry
 {
 public:
     virtual ~Entry() = default;
 
     /**
-     * Whether the auth mode matches the entry.
+     * Whether the auth mode matches the entry. Must be called before calling
+     * MatchesSubject.
      */
     virtual bool MatchesAuthMode(AuthMode authMode) const = 0;
 
     /**
-     * Whether the fabric matches the entry.
+     * Whether the fabric matches the entry. Entries with fabric index 0 will
+     * match all fabrics.
      */
     virtual bool MatchesFabric(FabricIndex fabricIndex) const = 0;
 
@@ -60,16 +57,12 @@ public:
     virtual bool MatchesSubject(SubjectId subject) const = 0;
 
     /**
-     * Whether the target matches the entry.
+     * Whether the target matches the entry. Some entries may match all
+     * endpoints or all clusters.
      */
     virtual bool MatchesTarget(EndpointId endpoint, ClusterId cluster) const = 0;
 };
 
-/**
- * @class EntryIterator
- *
- * @brief Interface for iterating over access control entries.
- */
 class EntryIterator
 {
 public:
@@ -102,12 +95,6 @@ public:
     virtual void Release() = 0;
 };
 
-/**
- * @class DataProvider
- *
- * @brief Interface for managing and querying access control data (entries,
- * extensions, etc.)
- */
 class DataProvider
 {
 public:
@@ -126,7 +113,6 @@ public:
      * Initialize the data provider.
      *
      * @retval various errors, probably fatal.
-     * @retval #CHIP_NO_ERROR on success.
      */
     virtual CHIP_ERROR Init() = 0;
 

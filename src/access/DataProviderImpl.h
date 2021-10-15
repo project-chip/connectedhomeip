@@ -23,11 +23,6 @@
 namespace chip {
 namespace access {
 
-/**
- * @class DataProviderImpl
- *
- * @brief Access control data provider implementation.
- */
 class DataProviderImpl : public DataProvider
 {
 public:

@@ -21,12 +21,6 @@
 namespace chip {
 namespace access {
 
-/**
- * @enum Privilege
- *
- * @brief Access control privileges. Expressed as bit flags so they can be
- * combined with auth mode.
- */
 enum Privilege
 {
     kView       = 1 << 0,
