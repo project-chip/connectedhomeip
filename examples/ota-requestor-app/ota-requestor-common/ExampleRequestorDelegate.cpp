@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/enums.h>
 #include <app/util/af-enums.h>
 #include <controller/CHIPDevice.h>
+#include <lib/core/NodeId.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -33,8 +34,9 @@ constexpr uint32_t kImmediateStartDelayMs = 1;
 
 ExampleRequestorDelegate::ExampleRequestorDelegate()
 {
-    mOtaStartDelayMs = 0;
-    mProviderFabricIndex.SetValue(0);
+    mOtaStartDelayMs     = 0;
+    mProviderId          = chip::kUndefinedNodeId;
+    mProviderFabricIndex = chip::kUndefinedFabricIndex;
 }
 
 void ExampleRequestorDelegate::Init(chip::Controller::ControllerDeviceInitParams connectParams, uint32_t startDelayMs)
@@ -45,21 +47,17 @@ void ExampleRequestorDelegate::Init(chip::Controller::ControllerDeviceInitParams
 
 void ExampleRequestorDelegate::ConnectToProvider()
 {
-    VerifyOrReturn(mProviderId.HasValue(), ChipLogError(SoftwareUpdate, "Missing Provider ID"));
-    VerifyOrReturn(mProviderFabricIndex.HasValue(), ChipLogError(SoftwareUpdate, "Missing Provider FabricIndex"));
-
     FabricInfo * providerFabric = GetProviderFabricInfo();
     VerifyOrReturn(providerFabric != nullptr,
-                   ChipLogError(SoftwareUpdate, "No Fabric found for index %" PRIu8, mProviderFabricIndex.Value()));
+                   ChipLogError(SoftwareUpdate, "No Fabric found for index %" PRIu8, mProviderFabricIndex));
 
     ChipLogProgress(SoftwareUpdate,
                     "Once #7976 is fixed, this would attempt to connect to 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8
                     " (" ChipLogFormatX64 ")",
-                    ChipLogValueX64(mProviderId.Value()), mProviderFabricIndex.Value(),
-                    ChipLogValueX64(providerFabric->GetFabricId()));
+                    ChipLogValueX64(mProviderId), mProviderFabricIndex, ChipLogValueX64(providerFabric->GetFabricId()));
 
     // TODO: uncomment and fill in after #7976 is fixed
-    // mProviderDevice.Init(mConnectParams, mProviderId.Value(), address, mProviderFabricIndex.Value());
+    // mProviderDevice.Init(mConnectParams, mProviderId, address, mProviderFabricIndex);
     // mProviderDevice.EstablishConnectivity();
 }
 
@@ -73,19 +71,19 @@ EmberAfStatus ExampleRequestorDelegate::HandleAnnounceOTAProvider(chip::app::Com
         return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
     }
 
-    mProviderId.SetValue(providerLocation);
-    mProviderFabricIndex.SetValue(commandObj->GetExchangeContext()->GetSecureSession().GetFabricIndex());
+    mProviderId          = providerLocation;
+    mProviderFabricIndex = commandObj->GetExchangeContext()->GetSecureSession().GetFabricIndex();
 
     FabricInfo * providerFabric = GetProviderFabricInfo();
     if (providerFabric == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "No Fabric found for index %" PRIu8, mProviderFabricIndex.Value());
+        ChipLogError(SoftwareUpdate, "No Fabric found for index %" PRIu8, mProviderFabricIndex);
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
-    ChipLogProgress(
-        SoftwareUpdate, "Notified of Provider at NodeID: 0x" ChipLogFormatX64 "on FabricIndex 0x%" PRIu8 " (" ChipLogFormatX64 ")",
-        ChipLogValueX64(mProviderId.Value()), mProviderFabricIndex.Value(), ChipLogValueX64(providerFabric->GetFabricId()));
+    ChipLogProgress(SoftwareUpdate,
+                    "Notified of Provider at NodeID: 0x" ChipLogFormatX64 "on FabricIndex 0x%" PRIu8 " (" ChipLogFormatX64 ")",
+                    ChipLogValueX64(mProviderId), mProviderFabricIndex, ChipLogValueX64(providerFabric->GetFabricId()));
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
@@ -122,11 +120,6 @@ chip::FabricInfo * ExampleRequestorDelegate::GetProviderFabricInfo()
         ChipLogError(SoftwareUpdate, "FabricTable is null!");
         return nullptr;
     }
-    if (!mProviderFabricIndex.HasValue())
-    {
-        ChipLogError(SoftwareUpdate, "No FabricIndex value stored!");
-        return nullptr;
-    }
 
-    return mConnectParams.fabricsTable->FindFabricWithIndex(mProviderFabricIndex.Value());
+    return mConnectParams.fabricsTable->FindFabricWithIndex(mProviderFabricIndex);
 }

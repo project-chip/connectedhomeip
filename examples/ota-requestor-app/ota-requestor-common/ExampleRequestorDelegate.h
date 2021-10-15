@@ -48,7 +48,7 @@ private:
 
     chip::Controller::Device mProviderDevice;
     chip::Controller::ControllerDeviceInitParams mConnectParams;
-    chip::Optional<chip::NodeId> mProviderId;
-    chip::Optional<chip::FabricIndex> mProviderFabricIndex;
+    chip::NodeId mProviderId;
+    chip::FabricIndex mProviderFabricIndex;
     uint32_t mOtaStartDelayMs;
 };
