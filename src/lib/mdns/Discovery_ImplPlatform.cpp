@@ -50,7 +50,7 @@ CHIP_ERROR DiscoveryImplPlatform::Init()
         ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
         uint64_t random_instance_name = chip::Crypto::GetRandU64();
         memcpy(&mCommissionableInstanceName[0], &random_instance_name, sizeof(mCommissionableInstanceName));
-        mMdnsInitialized        = true;
+        mMdnsInitialized = true;
     }
 
     return CHIP_NO_ERROR;
