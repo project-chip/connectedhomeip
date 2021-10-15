@@ -49,7 +49,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 {
     CHIP_ERROR err = CHIP_ERROR_ACCESS_DENIED;
 
-    EntryIterator* iterator = mDataProvider.Entries(subjectDescriptor.fabricIndex);
+    EntryIterator * iterator = mDataProvider.Entries(subjectDescriptor.fabricIndex);
 #if 0
     ReturnErrorCodeIf(iterator == nullptr, CHIP_ERROR_INTERNAL);
 #else
