@@ -17,13 +17,10 @@ import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.util.DeviceIdUtil
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlinx.android.synthetic.main.on_off_client_fragment.commandStatusTv
-import kotlinx.android.synthetic.main.on_off_client_fragment.deviceIdEd
-import kotlinx.android.synthetic.main.on_off_client_fragment.fabricIdEd
 import kotlinx.android.synthetic.main.on_off_client_fragment.levelBar
 import kotlinx.android.synthetic.main.on_off_client_fragment.reportStatusTv
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.levelBar
@@ -32,7 +29,6 @@ import kotlinx.android.synthetic.main.on_off_client_fragment.view.onBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.readBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.showSubscribeDialogBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.toggleBtn
-import kotlinx.android.synthetic.main.on_off_client_fragment.view.updateAddressBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -45,6 +41,8 @@ class OnOffClientFragment : Fragment() {
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
+  private lateinit var addressUpdateFragment: AddressUpdateFragment
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -53,7 +51,9 @@ class OnOffClientFragment : Fragment() {
     return inflater.inflate(R.layout.on_off_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
-      updateAddressBtn.setOnClickListener { updateAddressClick() }
+      addressUpdateFragment =
+        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+
       onBtn.setOnClickListener { scope.launch { sendOnCommandClick() } }
       offBtn.setOnClickListener { scope.launch { sendOffCommandClick() } }
       toggleBtn.setOnClickListener { scope.launch { sendToggleCommandClick() } }
@@ -145,14 +145,6 @@ class OnOffClientFragment : Fragment() {
     onOffCluster.subscribeOnOffAttribute(subscribeCallback, minInterval, maxInterval)
   }
 
-  override fun onStart() {
-    super.onStart()
-    // TODO: use the fabric ID that was used to commission the device
-    val testFabricId = "5544332211"
-    fabricIdEd.setText(testFabricId)
-    deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
-  }
-
   inner class ChipControllerCallback : GenericChipDeviceListener() {
     override fun onConnectDeviceComplete() {}
 
@@ -179,21 +171,9 @@ class OnOffClientFragment : Fragment() {
     scope.cancel()
   }
 
-  private fun updateAddressClick() {
-    try {
-      deviceController.updateDevice(
-        fabricIdEd.text.toString().toULong().toLong(),
-        deviceIdEd.text.toString().toULong().toLong()
-      )
-      showMessage("Address update started")
-    } catch (ex: Exception) {
-      showMessage("Address update failed: $ex")
-    }
-  }
-
   private suspend fun sendLevelCommandClick() {
     val cluster = ChipClusters.LevelControlCluster(
-      ChipClient.getConnectedDevicePointer(requireContext(), deviceIdEd.text.toString().toLong()),
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
       LEVEL_CONTROL_CLUSTER_ENDPOINT
     )
     cluster.moveToLevel(object : ChipClusters.DefaultClusterCallback {
@@ -251,7 +231,7 @@ class OnOffClientFragment : Fragment() {
 
   private suspend fun getOnOffClusterForDevice(): OnOffCluster {
     return OnOffCluster(
-      ChipClient.getConnectedDevicePointer(requireContext(), deviceIdEd.text.toString().toLong()),
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
       ON_OFF_CLUSTER_ENDPOINT
     )
   }

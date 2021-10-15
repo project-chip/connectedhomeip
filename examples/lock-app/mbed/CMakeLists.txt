@@ -77,6 +77,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
+               ${CHIP_ROOT}/src/app/clusters/descriptor/descriptor.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ethernet_network_diagnostics_server/ethernet_network_diagnostics_server.cpp
                ${CHIP_ROOT}/src/app/clusters/thread_network_diagnostics_server/thread_network_diagnostics_server.cpp

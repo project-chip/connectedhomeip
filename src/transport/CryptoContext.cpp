@@ -22,11 +22,14 @@
  *
  */
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
+
+#include <lib/support/BytesToHex.h>
 
 #include <string.h>
 
@@ -54,6 +57,14 @@ using HKDF_sha_crypto = HKDF_sha;
 #endif
 
 CryptoContext::CryptoContext() : mKeyAvailable(false) {}
+
+CryptoContext::~CryptoContext()
+{
+    for (auto & key : mKeys)
+    {
+        ClearSecretData(key, sizeof(CryptoKey));
+    }
+}
 
 CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
 {

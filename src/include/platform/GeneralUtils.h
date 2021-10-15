@@ -28,8 +28,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-extern CHIP_ERROR ParseCompilerDateStr(const char * dateStr, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
-extern CHIP_ERROR Parse24HourTimeStr(const char * timeStr, uint8_t & hour, uint8_t & minute, uint8_t & second);
 extern const char * CharacterizeIPv6Address(const chip::Inet::IPAddress & ipAddr);
 extern const char * CharacterizeIPv6Prefix(const chip::Inet::IPPrefix & inPrefix);
 extern void RegisterDeviceLayerErrorFormatter();

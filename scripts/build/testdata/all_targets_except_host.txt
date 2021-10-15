@@ -1,4 +1,3 @@
-android-androidstudio-chip-tool
 android-arm-chip-tool
 android-arm64-chip-test
 android-arm64-chip-tool
@@ -15,6 +14,7 @@ esp32-devkitc-lock
 esp32-devkitc-shell
 esp32-devkitc-temperature-measurement
 esp32-m5stack-all-clusters
+esp32-m5stack-all-clusters-rpc
 infineon-p6-lock
 nrf-nrf52840-light
 nrf-nrf52840-lock

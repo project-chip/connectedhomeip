@@ -25,7 +25,6 @@ class AdditionalDataParseCommand : public Command
 public:
     AdditionalDataParseCommand() : Command("parse-additional-data-payload") { AddArgument("payload", &mPayload); }
     CHIP_ERROR Run() override;
-    uint16_t GetWaitDurationInSeconds() const override { return 5; }
 
 private:
     char * mPayload;

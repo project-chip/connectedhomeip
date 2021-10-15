@@ -37,6 +37,8 @@ chip_data_model("ota-requestor-common") {
     "ExampleRequestorDelegate.h",
   ]
 
+  is_server = true
+
   public_configs = [ ":config" ]
 
   is_server = true

@@ -16,37 +16,9 @@ RUN set -x \
     && : # last line
 
 # ------------------------------------------------------------------------------
-# Install Mbed-OS sources
-RUN set -x \
-    && (mkdir -p /opt/mbed-os \
-    && cd /opt/mbed-os \
-    && wget --progress=dot:giga https://github.com/ARMmbed/mbed-os/archive/mbed-os-6.7.0.tar.gz \
-    && tar --strip-components=1 -xzf mbed-os-6.7.0.tar.gz \
-    && rm mbed-os-6.7.0.tar.gz) \
-    && : # last line
-
-# ------------------------------------------------------------------------------
 # Install Python modules
 RUN set -x \
     && pip3 install --no-cache-dir -U mbed-cli mbed-tools \
-    && pip3 install --no-cache-dir --ignore-installed -r /opt/mbed-os/requirements.txt \
-    && : # last line
-
-# ------------------------------------------------------------------------------
-# Install ARM Toolchain (gcc-arm-none-eabi-9-2019-q4)
-RUN set -x \
-    && (mkdir -p /opt/mbed-os-toolchain \
-    && cd /opt/mbed-os-toolchain \
-    && wget --progress=dot:giga https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 \
-    && tar -xjf gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 \
-    && rm gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 \
-    && : ) # last line
-
-# ------------------------------------------------------------------------------
-# Configure mbed build system
-RUN set -x \
-    && mbed config -G GCC_ARM_PATH /opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
-    && mbed toolchain -G -s GCC_ARM \
     && : # last line
 
 # ------------------------------------------------------------------------------
@@ -61,8 +33,7 @@ RUN set -x \
 
 # ------------------------------------------------------------------------------
 # Configure environment variables
-ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/
-ENV MBED_OS_PATH=/opt/mbed-os/
 ENV OPENOCD_PATH=/opt/openocd/
+ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 
-ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}:${OPENOCD_PATH}/bin"
+ENV PATH="${PATH}:${OPENOCD_PATH}/bin"

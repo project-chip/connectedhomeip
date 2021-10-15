@@ -31,6 +31,7 @@
 #include <lib/core/CHIPTLVTags.h>
 #include <lib/core/CHIPTLVTypes.h>
 
+#include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
@@ -475,12 +476,23 @@ public:
     CHIP_ERROR Get(T & v)
     {
         std::underlying_type_t<T> val;
-        CHIP_ERROR err = Get(val);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(Get(val));
         v = static_cast<T>(val);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Get the value of the current element as a BitFlags value, if it's an integer
+     * value that fits in the BitFlags type.
+     *
+     * @param[out] v Receives the value associated with current TLV element.
+     */
+    template <typename T>
+    CHIP_ERROR Get(BitFlags<T> & v)
+    {
+        std::underlying_type_t<T> val;
+        ReturnErrorOnFailure(Get(val));
+        v.SetRaw(val);
         return CHIP_NO_ERROR;
     }
 
@@ -1285,6 +1297,16 @@ public:
     CHIP_ERROR Put(Tag tag, T data)
     {
         return Put(tag, to_underlying(data));
+    }
+
+    /**
+     *
+     * Encodes an unsigned integer with bits corresponding to the flags set when data is a BitFlags
+     */
+    template <typename T>
+    CHIP_ERROR Put(Tag tag, BitFlags<T> data)
+    {
+        return Put(tag, data.Raw());
     }
 
     /**

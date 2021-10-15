@@ -4,18 +4,6 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
-# Generating android-androidstudio-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-androidstudio-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
-
-# Accepting NDK licenses
-bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
-# Setting up Android deps through Gradle
-python3 third_party/android_deps/set_up_android_deps.py
-
 # Generating android-arm-chip-tool
 gn gen --check --fail-on-unused-args {out}/android-arm-chip-tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
@@ -117,6 +105,11 @@ cd "{root}"
 bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_m5stack.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters reconfigure'
 cd -
 
+# Generating esp32-m5stack-all-clusters-rpc
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_m5stack_rpc.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc reconfigure'
+cd -
+
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
 
@@ -182,9 +175,6 @@ west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {
 
 # Generating tizen-arm-light
 gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
-
-# Building APP android-androidstudio-chip-tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-chip-tool -PmatterSdkSourceBuild=true assembleDebug
 
 # Building JNI android-arm-chip-tool
 ninja -C {out}/android-arm-chip-tool
@@ -323,6 +313,9 @@ bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-temperatu
 
 # Building esp32-m5stack-all-clusters
 bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-m5stack-all-clusters'"'"''
+
+# Building esp32-m5stack-all-clusters-rpc
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-m5stack-all-clusters-rpc'"'"''
 
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock

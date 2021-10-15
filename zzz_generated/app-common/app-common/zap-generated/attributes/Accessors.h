@@ -403,6 +403,11 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * nameSupport); // bitmap8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t nameSupport);
 } // namespace NameSupport
 
+namespace LastConfiguredBy {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * lastConfiguredBy); // node_id
+EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId lastConfiguredBy);
+} // namespace LastConfiguredBy
+
 } // namespace Attributes
 } // namespace Scenes
 

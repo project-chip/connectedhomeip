@@ -30,6 +30,13 @@ limitations under the License.
     <item name="ValueC" value="0x03"/>
   </enum>
 
+  <bitmap name="SimpleBitmap" type="BITMAP8">
+    <cluster code="0x050F"/>
+    <field name="ValueA" mask="0x1"/>
+    <field name="ValueB" mask="0x2"/>
+    <field name="ValueC" mask="0x4"/>
+  </bitmap>
+
   <struct name="SimpleStruct">
     <cluster code="0x050F"/>
     <item name="a" type="INT8U" optional="false"/>
@@ -37,6 +44,7 @@ limitations under the License.
     <item name="c" type="SimpleEnum" optional="false"/>
     <item name="d" type="OCTET_STRING" optional="false"/>
     <item name="e" type="CHAR_STRING" optional="false"/>
+    <item name="f" type="SimpleBitmap" optional="false"/>
   </struct>
 
   <struct name="NestedStruct">

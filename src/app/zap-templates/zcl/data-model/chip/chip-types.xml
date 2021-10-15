@@ -21,6 +21,7 @@ limitations under the License.
     <type id="0x10" description="Boolean"                  name="boolean"           size="1"  discrete="true" />
     <type id="0x18" description="8-bit bitmap"             name="bitmap8"           size="1"  discrete="true" />
     <type id="0x19" description="16-bit bitmap"            name="bitmap16"          size="2"  discrete="true" />
+    <type id="0x1A" description="24-bit bitmap"            name="bitmap24"          size="3"  discrete="true" />
     <type id="0x1B" description="32-bit bitmap"            name="bitmap32"          size="4"  discrete="true" />
     <type id="0x1F" description="64-bit bitmap"            name="bitmap64"          size="8"  discrete="true" />
     <type id="0x20" description="Unsigned 8-bit integer"   name="int8u"             size="1"  analog="true"   />

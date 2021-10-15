@@ -25,6 +25,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ClusterInfo.h>
+#include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
@@ -69,7 +70,7 @@ public:
 
     /**
      * Notification that the interaction model has received a list of attribute data in response to a Read request. apData might be
-     * nullptr if status is not ProtocolCode::Success.
+     * nullptr if status is not Status::Success.
      *
      * @param[in]  apReadClient   The read client object, the application can use GetAppIdentifier() for the read client to
      *                            distinguish different read requests.
@@ -105,9 +106,7 @@ public:
      * aAttributeIndex is processing attribute index which can identify attribute if there exists multiple attribute changes with
      * same attribute path
      */
-    virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
-                                           const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                           const uint32_t aProtocolId, const uint16_t aProtocolCode,
+    virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient, const StatusIB & aStatusIB,
                                            AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -149,6 +148,11 @@ public:
      * Notification that Subscription has been established successfully and application can do further work in handler.
      */
     virtual CHIP_ERROR SubscriptionEstablished(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that Subscription has been terminated in handler side.
+     */
+    virtual CHIP_ERROR SubscriptionTerminated(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * Notification that a read interaction was completed on the client successfully.

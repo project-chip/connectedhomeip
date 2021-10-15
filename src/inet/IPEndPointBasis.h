@@ -101,8 +101,36 @@ public:
     typedef void (*OnReceiveErrorFunct)(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 
     IPEndPointBasis() = default;
+
+    /**
+     * Set whether IP multicast traffic should be looped back.
+     */
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback);
+
+    /**
+     * Join an IP multicast group.
+     *
+     *  @param[in]   aInterfaceId   The indicator of the network interface to add to the multicast group.
+     *  @param[in]   aAddress       The multicast group to add the interface to.
+     *
+     *  @retval  CHIP_NO_ERROR                  Success: multicast group removed.
+     *  @retval  INET_ERROR_UNKNOWN_INTERFACE   Unknown network interface, \c aInterfaceId.
+     *  @retval  INET_ERROR_WRONG_ADDRESS_TYPE  \c aAddress is not \c kIPv4 or \c kIPv6 or is not multicast.
+     *  @retval  other                          Another system or platform error.
+     */
     CHIP_ERROR JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
+
+    /**
+     * Leave an IP multicast group.
+     *
+     *  @param[in]   aInterfaceId   The indicator of the network interface to remove from the multicast group.
+     *  @param[in]   aAddress       The multicast group to remove the interface from.
+     *
+     *  @retval  CHIP_NO_ERROR                  Success: multicast group removed
+     *  @retval  INET_ERROR_UNKNOWN_INTERFACE   Unknown network interface, \c aInterfaceId
+     *  @retval  INET_ERROR_WRONG_ADDRESS_TYPE  \c aAddress is not \c kIPv4 or \c kIPv6 or is not multicast.
+     *  @retval  other                          Another system or platform error
+     */
     CHIP_ERROR LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
 
 protected:
@@ -113,6 +141,13 @@ protected:
 
     /** The endpoint's receive error event handling function delegate. */
     OnReceiveErrorFunct OnReceiveError;
+
+private:
+    IPEndPointBasis(const IPEndPointBasis &) = delete;
+
+    void InitImpl();
+    CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join);
+    CHIP_ERROR IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 public:
@@ -127,13 +162,26 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+protected:
     InterfaceId mBoundIntfId;
 
     CHIP_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId);
     CHIP_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
-    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags);
+    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer);
     CHIP_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
     void HandlePendingIO(uint16_t aPort);
+
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+public:
+    using MulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &);
+    static void SetJoinMulticastGroupHandler(MulticastGroupHandler handler) { sJoinMulticastGroupHandler = handler; }
+    static void SetLeaveMulticastGroupHandler(MulticastGroupHandler handler) { sLeaveMulticastGroupHandler = handler; }
+
+private:
+    static MulticastGroupHandler sJoinMulticastGroupHandler;
+    static MulticastGroupHandler sLeaveMulticastGroupHandler;
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -148,7 +196,7 @@ protected:
 
     CHIP_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, const nw_parameters_t & aParameters);
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
-    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags);
+    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer);
     CHIP_ERROR StartListener();
     CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
     CHIP_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort);
@@ -159,44 +207,7 @@ protected:
     CHIP_ERROR ReleaseConnection();
     void ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-public:
-    using JoinMulticastGroupHandler  = CHIP_ERROR (*)(InterfaceId, const IPAddress &);
-    using LeaveMulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &);
-    static void SetJoinMulticastGroupHandler(JoinMulticastGroupHandler handler) { sJoinMulticastGroupHandler = handler; }
-    static void SetLeaveMulticastGroupHandler(LeaveMulticastGroupHandler handler) { sLeaveMulticastGroupHandler = handler; }
-
-private:
-    static JoinMulticastGroupHandler sJoinMulticastGroupHandler;
-    static LeaveMulticastGroupHandler sLeaveMulticastGroupHandler;
-#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-
-private:
-    IPEndPointBasis(const IPEndPointBasis &) = delete;
 };
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-
-inline struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
-{
-    struct netif * lRetval = NULL;
-
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
-    NETIF_FOREACH(lRetval)
-    {
-        if (lRetval == aInterfaceId)
-            break;
-    }
-#else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
-    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId; lRetval = lRetval->next)
-        ;
-#endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
-
-    return (lRetval);
-}
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Inet
 } // namespace chip

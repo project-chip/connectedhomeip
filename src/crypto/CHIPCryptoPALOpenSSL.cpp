@@ -1004,7 +1004,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     }
 
 exit:
-    memset(privkey, 0, sizeof(privkey));
+    ClearSecretData(privkey, sizeof(privkey));
     _logSSLError();
     return error;
 }
@@ -1062,7 +1062,6 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     ec_key       = nullptr;
 
 exit:
-
     if (ec_key != nullptr)
     {
         EC_KEY_free(ec_key);
@@ -1734,27 +1733,44 @@ exit:
     return err;
 }
 
-CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+namespace {
+
+CHIP_ERROR ExtractKIDFromX509Cert(bool isSKID, const ByteSpan & certificate, MutableByteSpan & kid)
 {
     CHIP_ERROR err                       = CHIP_NO_ERROR;
     X509 * x509certificate               = nullptr;
     const unsigned char * pCertificate   = certificate.data();
     const unsigned char ** ppCertificate = &pCertificate;
-    const ASN1_OCTET_STRING * akidString = nullptr;
+    const ASN1_OCTET_STRING * kidString  = nullptr;
 
     x509certificate = d2i_X509(NULL, ppCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    akidString = X509_get0_authority_key_id(x509certificate);
+    kidString = isSKID ? X509_get0_subject_key_id(x509certificate) : X509_get0_authority_key_id(x509certificate);
+    VerifyOrExit(kidString != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(kidString->length <= static_cast<int>(kid.size()), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(CanCastTo<size_t>(kidString->length), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(akidString->length == static_cast<int>(akid.size()), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    memcpy(kid.data(), kidString->data, static_cast<size_t>(kidString->length));
 
-    memcpy(akid.data(), akidString->data, static_cast<size_t>(akidString->length));
+    kid.reduce_size(static_cast<size_t>(kidString->length));
 
 exit:
     X509_free(x509certificate);
 
     return err;
+}
+
+} // namespace
+
+CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & skid)
+{
+    return ExtractKIDFromX509Cert(true, certificate, skid);
+}
+
+CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+{
+    return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
 CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)

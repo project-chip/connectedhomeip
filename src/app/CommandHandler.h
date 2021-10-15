@@ -72,9 +72,7 @@ public:
      */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                       System::PacketBufferHandle && payload);
-    CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,
-                             const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
-                             const Protocols::InteractionModel::Status aStatus) override;
+    CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus) override;
 
     /**
      * API for adding a data response.  The template parameter T is generally
@@ -89,7 +87,7 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        ReturnErrorOnFailure(PrepareResponse(aRequestCommandPath, CommandData::CommandId));
+        ReturnErrorOnFailure(PrepareResponse(aRequestCommandPath, CommandData::GetCommandId()));
         TLV::TLVWriter * writer = GetCommandDataElementTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataElement::kCsTag_Data), aData));

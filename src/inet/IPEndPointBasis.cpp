@@ -49,6 +49,31 @@
 #include <lwip/netif.h>
 #include <lwip/raw.h>
 #include <lwip/udp.h>
+
+#if INET_CONFIG_ENABLE_IPV4
+#define LWIP_IPV4_ADDR_T ip4_addr_t
+#define IPV4_TO_LWIPADDR(aAddress) (aAddress).ToIPv4()
+#endif // INET_CONFIG_ENABLE_IPV4
+#define LWIP_IPV6_ADDR_T ip6_addr_t
+#define IPV6_TO_LWIPADDR(aAddress) (aAddress).ToIPv6()
+
+#if !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) ||                       \
+    !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
+#define HAVE_LWIP_MULTICAST_LOOP 0
+#else
+#define HAVE_LWIP_MULTICAST_LOOP 1
+#endif // !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) ||
+       // !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
+
+// unusual define check for LWIP_IPV6_ND is because espressif fork
+// of LWIP does not define the _ND constant.
+#if LWIP_IPV6_MLD && (!defined(LWIP_IPV6_ND) || LWIP_IPV6_ND) && LWIP_IPV6
+#define HAVE_IPV6_MULTICAST
+#else
+// Within Project CHIP multicast support is highly desirable: used for mDNS
+// as well as group communication.
+#undef HAVE_IPV6_MULTICAST
+#endif
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -86,49 +111,18 @@
 #error                                                                                                                             \
     "Neither IPV6_DROP_MEMBERSHIP nor IPV6_LEAVE_GROUP are defined which are required for generalized IPv6 multicast group support."
 #endif // IPV6_DROP_MEMBERSHIP
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+#include "ZephyrSocket.h"
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #define INET_PORTSTRLEN 6
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
-#include "ZephyrSocket.h"
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
-
 namespace chip {
 namespace Inet {
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-union PeerSockAddr
-{
-    sockaddr any;
-    sockaddr_in in;
-    sockaddr_in6 in6;
-};
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-IPEndPointBasis::JoinMulticastGroupHandler IPEndPointBasis::sJoinMulticastGroupHandler;
-IPEndPointBasis::LeaveMulticastGroupHandler IPEndPointBasis::sLeaveMulticastGroupHandler;
-#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if INET_CONFIG_ENABLE_IPV4
-#define LWIP_IPV4_ADDR_T ip4_addr_t
-#define IPV4_TO_LWIPADDR(aAddress) (aAddress).ToIPv4()
-#endif // INET_CONFIG_ENABLE_IPV4
-#define LWIP_IPV6_ADDR_T ip6_addr_t
-#define IPV6_TO_LWIPADDR(aAddress) (aAddress).ToIPv6()
-
-#if !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) ||                       \
-    !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
-#define HAVE_LWIP_MULTICAST_LOOP 0
-#else
-#define HAVE_LWIP_MULTICAST_LOOP 1
-#endif // !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) ||
-       // !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 static CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & aAddress)
@@ -142,6 +136,7 @@ static CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddr
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+
 #if INET_CONFIG_ENABLE_IPV4
 #if LWIP_IPV4 && LWIP_IGMP
 static CHIP_ERROR LwIPIPv4JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
@@ -162,16 +157,6 @@ static CHIP_ERROR LwIPIPv4JoinLeaveMulticastGroup(InterfaceId aInterfaceId, cons
 #endif // LWIP_IPV4 && LWIP_IGMP
 #endif // INET_CONFIG_ENABLE_IPV4
 
-// unusual define check for LWIP_IPV6_ND is because espressif fork
-// of LWIP does not define the _ND constant.
-#if LWIP_IPV6_MLD && (!defined(LWIP_IPV6_ND) || LWIP_IPV6_ND) && LWIP_IPV6
-#define HAVE_IPV6_MULTICAST
-#else
-// Within Project CHIP multicast support is highly desirable: used for mDNS
-// as well as group communication.
-#undef HAVE_IPV6_MULTICAST
-#endif
-
 #ifdef HAVE_IPV6_MULTICAST
 static CHIP_ERROR LwIPIPv6JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                   err_t (*aMethod)(struct netif *, const LWIP_IPV6_ADDR_T *))
@@ -189,9 +174,191 @@ static CHIP_ERROR LwIPIPv6JoinLeaveMulticastGroup(InterfaceId aInterfaceId, cons
     return chip::System::MapErrorLwIP(lStatus);
 }
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+
+CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
+{
+    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
+
+#if !HAVE_LWIP_MULTICAST_LOOP
+    lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else
+    if (aLoopback)
+    {
+        switch (mLwIPEndPointType)
+        {
+
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
+        case LwIPEndPointType::UDP:
+            udp_set_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
+            break;
+#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
+
+        default:
+            lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+            break;
+        }
+    }
+    else
+    {
+        switch (mLwIPEndPointType)
+        {
+
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
+        case LwIPEndPointType::UDP:
+            udp_clear_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
+            break;
+#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
+
+        default:
+            lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+            break;
+        }
+    }
+
+    lRetval = CHIP_NO_ERROR;
+#endif // !HAVE_LWIP_MULTICAST_LOOP
+    return (lRetval);
+}
+
+void IPEndPointBasis::InitImpl() {}
+
+#if INET_CONFIG_ENABLE_IPV4
+CHIP_ERROR IPEndPointBasis::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+{
+#if LWIP_IPV4 && LWIP_IGMP
+    const auto method = join ? igmp_joingroup_netif : igmp_leavegroup_netif;
+    return LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, method);
+#else  // LWIP_IPV4 && LWIP_IGMP
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // LWIP_IPV4 && LWIP_IGMP
+}
+#endif // INET_CONFIG_ENABLE_IPV4
+
+CHIP_ERROR IPEndPointBasis::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+{
+#ifdef HAVE_IPV6_MULTICAST
+    const auto method = join ? mld6_joingroup_netif : mld6_leavegroup_netif;
+    return LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, method);
+#else  // HAVE_IPV6_MULTICAST
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // HAVE_IPV6_MULTICAST
+}
+
+void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle && aBuffer)
+{
+    if ((mState == kState_Listening) && (OnMessageReceived != NULL))
+    {
+        const IPPacketInfo * pktInfo = GetPacketInfo(aBuffer);
+
+        if (pktInfo != NULL)
+        {
+            const IPPacketInfo pktInfoCopy = *pktInfo; // copy the address info so that the app can free the
+                                                       // PacketBuffer without affecting access to address info.
+            OnMessageReceived(this, std::move(aBuffer), &pktInfoCopy);
+        }
+        else
+        {
+            if (OnReceiveError != NULL)
+                OnReceiveError(this, CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG, NULL);
+        }
+    }
+}
+
+/**
+ *  @brief Get LwIP IP layer source and destination addressing information.
+ *
+ *  @param[in]   aBuffer       the packet buffer containing the IP message
+ *
+ *  @returns  a pointer to the address information on success; otherwise,
+ *            NULL if there is insufficient space in the packet for
+ *            the address information.
+ *
+ *  @details
+ *     When using LwIP information about the packet is 'hidden' in the
+ *     reserved space before the start of the data in the packet
+ *     buffer. This is necessary because the system layer events only
+ *     have two arguments, which in this case are used to convey the
+ *     pointer to the end point and the pointer to the buffer.
+ *
+ *     In most cases this trick of storing information before the data
+ *     works because the first buffer in an LwIP IP message contains
+ *     the space that was used for the Ethernet/IP/UDP headers. However,
+ *     given the current size of the IPPacketInfo structure (40 bytes),
+ *     it is possible for there to not be enough room to store the
+ *     structure along with the payload in a single packet buffer. In
+ *     practice, this should only happen for extremely large IPv4
+ *     packets that arrive without an Ethernet header.
+ *
+ */
+IPPacketInfo * IPEndPointBasis::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
+{
+    uintptr_t lStart;
+    uintptr_t lPacketInfoStart;
+    IPPacketInfo * lPacketInfo = NULL;
+
+    if (!aBuffer->EnsureReservedSize(sizeof(IPPacketInfo) + 3))
+        goto done;
+
+    lStart           = (uintptr_t) aBuffer->Start();
+    lPacketInfoStart = lStart - sizeof(IPPacketInfo);
+
+    // Align to a 4-byte boundary
+
+    lPacketInfo = reinterpret_cast<IPPacketInfo *>(lPacketInfoStart & ~(sizeof(uint32_t) - 1));
+
+done:
+    return (lPacketInfo);
+}
+
+CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::LayerLwIP * aLayer, System::Object & aTarget,
+                                                  System::EventType aEventType, System::PacketBufferHandle && aBuffer)
+{
+    VerifyOrReturnError(aLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const CHIP_ERROR error =
+        aLayer->PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
+    if (error == CHIP_NO_ERROR)
+    {
+        // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
+        static_cast<void>(std::move(aBuffer).UnsafeRelease());
+    }
+    return error;
+}
+
+struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
+{
+    struct netif * lRetval = NULL;
+
+#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+    NETIF_FOREACH(lRetval)
+    {
+        if (lRetval == aInterfaceId)
+            break;
+    }
+#else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
+    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId; lRetval = lRetval->next)
+        ;
+#endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+
+    return (lRetval);
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+union PeerSockAddr
+{
+    sockaddr any;
+    sockaddr_in in;
+    sockaddr_in6 in6;
+};
+
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+IPEndPointBasis::MulticastGroupHandler IPEndPointBasis::sJoinMulticastGroupHandler;
+IPEndPointBasis::MulticastGroupHandler IPEndPointBasis::sLeaveMulticastGroupHandler;
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+
 #if IP_MULTICAST_LOOP || IPV6_MULTICAST_LOOP
 static CHIP_ERROR SocketsSetMulticastLoopback(int aSocket, bool aLoopback, int aProtocol, int aOption)
 {
@@ -293,377 +460,46 @@ static CHIP_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
 }
 #endif // INET_IPV6_ADD_MEMBERSHIP || INET_IPV6_DROP_MEMBERSHIP
 
-static CHIP_ERROR SocketsIPv6JoinMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress)
-{
-#if INET_IPV6_ADD_MEMBERSHIP
-    return SocketsIPv6JoinLeaveMulticastGroup(aSocket, aInterfaceId, aAddress, INET_IPV6_ADD_MEMBERSHIP);
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
-}
-
-static CHIP_ERROR SocketsIPv6LeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress)
-{
-#if INET_IPV6_DROP_MEMBERSHIP
-    return SocketsIPv6JoinLeaveMulticastGroup(aSocket, aInterfaceId, aAddress, INET_IPV6_DROP_MEMBERSHIP);
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
-}
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-/**
- *  @brief Set whether IP multicast traffic should be looped back.
- *
- *  @param[in]   aIPVersion
- *
- *  @param[in]   aLoopback
- *
- *  @retval  CHIP_NO_ERROR
- *       success: multicast loopback behavior set
- *  @retval  other
- *       another system or platform error
- *
- *  @details
- *     Set whether or not IP multicast traffic should be looped back
- *     to this endpoint.
- *
- */
 CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
 {
     CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !HAVE_LWIP_MULTICAST_LOOP
-    lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#else
-    if (aLoopback)
-    {
-        switch (mLwIPEndPointType)
-        {
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        case LwIPEndPointType::UDP:
-            udp_set_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-        default:
-            lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-            break;
-        }
-    }
-    else
-    {
-        switch (mLwIPEndPointType)
-        {
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        case LwIPEndPointType::UDP:
-            udp_clear_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-        default:
-            lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-            break;
-        }
-    }
-
-    lRetval = CHIP_NO_ERROR;
-#endif // !HAVE_LWIP_MULTICAST_LOOP
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     lRetval = SocketsSetMulticastLoopback(mSocket, aIPVersion, aLoopback);
     SuccessOrExit(lRetval);
 
 exit:
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return (lRetval);
 }
 
-/**
- *  @brief Join an IP multicast group.
- *
- *  @param[in]   aInterfaceId  the indicator of the network interface to
- *                             add to the multicast group
- *
- *  @param[in]   aAddress      the multicast group to add the
- *                             interface to
- *
- *  @retval  CHIP_NO_ERROR
- *       success: multicast group removed
- *
- *  @retval  INET_ERROR_UNKNOWN_INTERFACE
- *       unknown network interface, \c aInterfaceId
- *
- *  @retval  INET_ERROR_WRONG_ADDRESS_TYPE
- *       \c aAddress is not \c kIPAddressType_IPv4 or
- *       \c kIPAddressType_IPv6 or is not multicast
- *
- *  @retval  other
- *       another system or platform error
- *
- *  @details
- *     Join the endpoint to the supplied multicast group on the
- *     specified interface.
- *
- */
-CHIP_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
+void IPEndPointBasis::InitImpl()
 {
-    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    const IPAddressType lAddrType = aAddress.Type();
-    lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);
-    SuccessOrExit(lRetval);
-
-    switch (lAddrType)
-    {
-
-#if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4: {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_IPV4 && LWIP_IGMP
-        lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_joingroup_netif);
-#else  // LWIP_IPV4 && LWIP_IGMP
-        lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // LWIP_IPV4 && LWIP_IGMP
-        SuccessOrExit(lRetval);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-        lRetval = SocketsIPv4JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, IP_ADD_MEMBERSHIP);
-        SuccessOrExit(lRetval);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    }
-    break;
-#endif // INET_CONFIG_ENABLE_IPV4
-
-    case kIPAddressType_IPv6: {
-#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-        if (sJoinMulticastGroupHandler != nullptr)
-        {
-            return sJoinMulticastGroupHandler(aInterfaceId, aAddress);
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#ifdef HAVE_IPV6_MULTICAST
-        lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_joingroup_netif);
-#else  // HAVE_IPV6_MULTICAST
-        lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // HAVE_IPV6_MULTICAST
-        SuccessOrExit(lRetval);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-        lRetval = SocketsIPv6JoinMulticastGroup(mSocket, aInterfaceId, aAddress);
-        SuccessOrExit(lRetval);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    }
-    break;
-
-    default:
-        lRetval = INET_ERROR_WRONG_ADDRESS_TYPE;
-        break;
-    }
-
-exit:
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    return (lRetval);
-}
-
-/**
- *  @brief Leave an IP multicast group.
- *
- *  @param[in]   aInterfaceId  the indicator of the network interface to
- *                             remove from the multicast group
- *
- *  @param[in]   aAddress      the multicast group to remove the
- *                             interface from
- *
- *  @retval  CHIP_NO_ERROR
- *       success: multicast group removed
- *
- *  @retval  INET_ERROR_UNKNOWN_INTERFACE
- *       unknown network interface, \c aInterfaceId
- *
- *  @retval  INET_ERROR_WRONG_ADDRESS_TYPE
- *       \c aAddress is not \c kIPAddressType_IPv4 or
- *       \c kIPAddressType_IPv6 or is not multicast
- *
- *  @retval  other
- *       another system or platform error
- *
- *  @details
- *     Remove the endpoint from the supplied multicast group on the
- *     specified interface.
- *
- */
-CHIP_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
-{
-    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    const IPAddressType lAddrType = aAddress.Type();
-    lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);
-    SuccessOrExit(lRetval);
-
-    switch (lAddrType)
-    {
-
-#if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4: {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_IPV4 && LWIP_IGMP
-        lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_leavegroup_netif);
-#else  // LWIP_IPV4 && LWIP_IGMP
-        lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // LWIP_IPV4 && LWIP_IGMP
-        SuccessOrExit(lRetval);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-        lRetval = SocketsIPv4JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, IP_DROP_MEMBERSHIP);
-        SuccessOrExit(lRetval);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    }
-    break;
-#endif // INET_CONFIG_ENABLE_IPV4
-
-    case kIPAddressType_IPv6: {
-#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-        if (sLeaveMulticastGroupHandler != nullptr)
-        {
-            return sLeaveMulticastGroupHandler(aInterfaceId, aAddress);
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
-        lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_leavegroup_netif);
-#else  // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
-        lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
-        SuccessOrExit(lRetval);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-        lRetval = SocketsIPv6LeaveMulticastGroup(mSocket, aInterfaceId, aAddress);
-        SuccessOrExit(lRetval);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    }
-    break;
-
-    default:
-        lRetval = INET_ERROR_WRONG_ADDRESS_TYPE;
-        break;
-    }
-
-exit:
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    return (lRetval);
-}
-
-void IPEndPointBasis::Init(InetLayer * aInetLayer)
-{
-    InitEndPointBasis(*aInetLayer);
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     mBoundIntfId = INET_NULL_INTERFACEID;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle && aBuffer)
+#if INET_CONFIG_ENABLE_IPV4
+CHIP_ERROR IPEndPointBasis::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
-    if ((mState == kState_Listening) && (OnMessageReceived != NULL))
+    return SocketsIPv4JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP);
+}
+#endif // INET_CONFIG_ENABLE_IPV4
+
+CHIP_ERROR IPEndPointBasis::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+{
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+    MulticastGroupHandler handler = join ? sJoinMulticastGroupHandler : sLeaveMulticastGroupHandler;
+    if (handler != nullptr)
     {
-        const IPPacketInfo * pktInfo = GetPacketInfo(aBuffer);
-
-        if (pktInfo != NULL)
-        {
-            const IPPacketInfo pktInfoCopy = *pktInfo; // copy the address info so that the app can free the
-                                                       // PacketBuffer without affecting access to address info.
-            OnMessageReceived(this, std::move(aBuffer), &pktInfoCopy);
-        }
-        else
-        {
-            if (OnReceiveError != NULL)
-                OnReceiveError(this, CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG, NULL);
-        }
+        return handler(aInterfaceId, aAddress);
     }
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+#if defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
+    return SocketsIPv6JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress,
+                                              join ? INET_IPV6_ADD_MEMBERSHIP : INET_IPV6_DROP_MEMBERSHIP);
+#else  // defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
 }
 
-/**
- *  @brief Get LwIP IP layer source and destination addressing information.
- *
- *  @param[in]   aBuffer       the packet buffer containing the IP message
- *
- *  @returns  a pointer to the address information on success; otherwise,
- *            NULL if there is insufficient space in the packet for
- *            the address information.
- *
- *  @details
- *     When using LwIP information about the packet is 'hidden' in the
- *     reserved space before the start of the data in the packet
- *     buffer. This is necessary because the system layer events only
- *     have two arguments, which in this case are used to convey the
- *     pointer to the end point and the pointer to the buffer.
- *
- *     In most cases this trick of storing information before the data
- *     works because the first buffer in an LwIP IP message contains
- *     the space that was used for the Ethernet/IP/UDP headers. However,
- *     given the current size of the IPPacketInfo structure (40 bytes),
- *     it is possible for there to not be enough room to store the
- *     structure along with the payload in a single packet buffer. In
- *     practice, this should only happen for extremely large IPv4
- *     packets that arrive without an Ethernet header.
- *
- */
-IPPacketInfo * IPEndPointBasis::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
-{
-    uintptr_t lStart;
-    uintptr_t lPacketInfoStart;
-    IPPacketInfo * lPacketInfo = NULL;
-
-    if (!aBuffer->EnsureReservedSize(sizeof(IPPacketInfo) + 3))
-        goto done;
-
-    lStart           = (uintptr_t) aBuffer->Start();
-    lPacketInfoStart = lStart - sizeof(IPPacketInfo);
-
-    // Align to a 4-byte boundary
-
-    lPacketInfo = reinterpret_cast<IPPacketInfo *>(lPacketInfoStart & ~(sizeof(uint32_t) - 1));
-
-done:
-    return (lPacketInfo);
-}
-
-CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::LayerLwIP * aLayer, System::Object & aTarget,
-                                                  System::EventType aEventType, System::PacketBufferHandle && aBuffer)
-{
-    VerifyOrReturnError(aLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    const CHIP_ERROR error =
-        aLayer->PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
-    if (error == CHIP_NO_ERROR)
-    {
-        // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
-        static_cast<void>(std::move(aBuffer).UnsafeRelease());
-    }
-    return error;
-}
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId)
 {
     CHIP_ERROR lRetval = CHIP_NO_ERROR;
@@ -780,7 +616,7 @@ CHIP_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
     return (lRetval);
 }
 
-CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags)
+CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer)
 {
     // Ensure the destination address type is compatible with the endpoint address type.
     VerifyOrReturnError(mAddrType == aPktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1140,9 +976,31 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
         }
     }
 }
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
+{
+    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
+    return (lRetval);
+}
+
+void IPEndPointBasis::InitImpl() {}
+
+#if INET_CONFIG_ENABLE_IPV4
+CHIP_ERROR IPEndPointBasis::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+#endif // INET_CONFIG_ENABLE_IPV4
+
+CHIP_ERROR IPEndPointBasis::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters)
 {
     CHIP_ERROR res = CHIP_NO_ERROR;
@@ -1205,7 +1063,7 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags)
+CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer)
 {
     dispatch_data_t content;
 
@@ -1568,6 +1426,76 @@ CHIP_ERROR IPEndPointBasis::ReleaseConnection()
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+CHIP_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
+{
+    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
+
+    const IPAddressType lAddrType = aAddress.Type();
+    lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);
+    SuccessOrExit(lRetval);
+
+    switch (lAddrType)
+    {
+
+#if INET_CONFIG_ENABLE_IPV4
+    case kIPAddressType_IPv4: {
+        return IPv4JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, true);
+    }
+    break;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    case kIPAddressType_IPv6: {
+        return IPv6JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, true);
+    }
+    break;
+
+    default:
+        lRetval = INET_ERROR_WRONG_ADDRESS_TYPE;
+        break;
+    }
+
+exit:
+    return (lRetval);
+}
+
+CHIP_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
+{
+    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
+
+    const IPAddressType lAddrType = aAddress.Type();
+    lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);
+    SuccessOrExit(lRetval);
+
+    switch (lAddrType)
+    {
+
+#if INET_CONFIG_ENABLE_IPV4
+    case kIPAddressType_IPv4: {
+        return IPv4JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, false);
+    }
+    break;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    case kIPAddressType_IPv6: {
+        return IPv6JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, false);
+    }
+    break;
+
+    default:
+        lRetval = INET_ERROR_WRONG_ADDRESS_TYPE;
+        break;
+    }
+
+exit:
+    return (lRetval);
+}
+
+void IPEndPointBasis::Init(InetLayer * aInetLayer)
+{
+    InitEndPointBasis(*aInetLayer);
+    InitImpl();
+}
 
 } // namespace Inet
 } // namespace chip

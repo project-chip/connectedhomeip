@@ -7,10 +7,12 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/util/basic-types.h>
+#include <lib/support/BitFlags.h>
 #include <protocols/interaction_model/Constants.h>
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 
 namespace chip {
 namespace app {
@@ -25,13 +27,23 @@ namespace {{asUpperCamelCase name}} {
 // Enum for {{label}}
 enum class {{asType label}} : {{asUnderlyingZclType type}} {
 {{#zcl_enum_items}}
-{{ident}}{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{asHex value 2}},
+k{{asUpperCamelCase label}} = {{asHex value 2}},
 {{/zcl_enum_items}}
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using {{asType label}} = EmberAf{{asType label}};
 #endif
 {{/zcl_enums}}
+
+{{#zcl_bitmaps}}
+
+// Bitmap for {{label}}
+enum class {{asType label}} : {{asUnderlyingZclType type}} {
+{{#zcl_bitmap_items}}
+k{{asUpperCamelCase label}} = {{asOffset mask}},
+{{/zcl_bitmap_items}}
+};
+{{/zcl_bitmaps}}
 
 {{#zcl_structs}}
 {{#first}}
@@ -114,6 +126,33 @@ public:
 } // namespace Commands
 {{/last}}
 {{/zcl_commands}}
+
+{{#zcl_attributes_server}}
+{{#if (hasSpecificAttributes)}}
+{{#first}}
+namespace Attributes {
+{{/first}}
+{{#if clusterRef}}
+namespace {{asUpperCamelCase label}} {
+    struct TypeInfo {
+    {{#if entryType}}
+        using Type = DataModel::List<{{zapTypeToEncodableClusterObjectType entryType}}>;
+        using DecodableType = DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType entryType}}>;
+    {{else}}
+        using Type = {{zapTypeToEncodableClusterObjectType type}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType type}};;
+    {{/if}}
+
+        static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+        static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
+    };
+} // namespace {{asUpperCamelCase label}}
+{{/if}}
+{{#last}}
+} // namespace Attributes
+{{/last}}
+{{/if}}
+{{/zcl_attributes_server}}
 } // namespace {{asUpperCamelCase name}}
 {{/zcl_clusters}}
 

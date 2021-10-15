@@ -338,7 +338,9 @@ void BuildStatusIB(nlTestSuite * apSuite, StatusIB::Builder & aStatusIBBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    aStatusIBBuilder.EncodeStatusIB(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3).EndOfStatusIB();
+    StatusIB statusIB;
+    statusIB.mStatus = chip::Protocols::InteractionModel::Status::InvalidSubscription;
+    aStatusIBBuilder.EncodeStatusIB(statusIB);
     err = aStatusIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
@@ -347,21 +349,16 @@ void ParseStatusIB(nlTestSuite * apSuite, StatusIB::Parser & aStatusIBParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusIB::Parser StatusIBParser;
-
-    chip::Protocols::SecureChannel::GeneralStatusCode generalCode = chip::Protocols::SecureChannel::GeneralStatusCode::kFailure;
-    uint32_t protocolId                                           = 0;
-    uint16_t protocolCode                                         = 0;
+    StatusIB statusIB;
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aStatusIBParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
-    err = aStatusIBParser.DecodeStatusIB(&generalCode, &protocolId, &protocolCode);
+    err = aStatusIBParser.DecodeStatusIB(statusIB);
     NL_TEST_ASSERT(apSuite,
-                   err == CHIP_NO_ERROR &&
-                       static_cast<uint16_t>(generalCode) ==
-                           static_cast<uint16_t>(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure) &&
-                       protocolId == 2 && protocolCode == 3);
+                   err == CHIP_NO_ERROR && statusIB.mStatus == chip::Protocols::InteractionModel::Status::InvalidSubscription &&
+                       !statusIB.mClusterStatus.HasValue());
 }
 
 void BuildAttributeStatusIB(nlTestSuite * apSuite, AttributeStatusIB::Builder & aAttributeStatusIBBuilder)
@@ -914,7 +911,7 @@ void BuildSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter
     subscribeRequestBuilder.MaxIntervalSeconds(3);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.KeepExistingSubscriptions(true);
+    subscribeRequestBuilder.KeepSubscriptions(true);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeRequestBuilder.IsProxy(true);
@@ -962,7 +959,7 @@ void ParseSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader
     err = subscribeRequestParser.GetMaxIntervalSeconds(&maxIntervalSeconds);
     NL_TEST_ASSERT(apSuite, maxIntervalSeconds == 3 && err == CHIP_NO_ERROR);
 
-    err = subscribeRequestParser.GetKeepExistingSubscriptions(&keepExistingSubscription);
+    err = subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscription);
     NL_TEST_ASSERT(apSuite, keepExistingSubscription && err == CHIP_NO_ERROR);
 
     err = subscribeRequestParser.GetIsProxy(&isProxy);

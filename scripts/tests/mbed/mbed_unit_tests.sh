@@ -117,5 +117,5 @@ if [[ "$COMMAND" == *"flash"* ]]; then
     MBED_FLASH_SCRIPTS_PATH=$CHIP_ROOT/config/mbed/scripts
 
     # Flash application
-    openocd -f "$MBED_FLASH_SCRIPTS_PATH/$TARGET_BOARD".tcl -c "program $BUILD_DIRECTORY/chip-mbed-unit-tests.elf verify reset exit"
+    "$OPENOCD_PATH"/bin/openocd -f "$MBED_FLASH_SCRIPTS_PATH/$TARGET_BOARD".tcl -c "program $BUILD_DIRECTORY/chip-mbed-unit-tests.elf verify reset exit"
 fi

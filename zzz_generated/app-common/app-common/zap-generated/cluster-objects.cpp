@@ -14468,6 +14468,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kC)), c));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kD)), d));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kE)), e));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kF)), f));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -14498,6 +14499,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kE):
             ReturnErrorOnFailure(DataModel::Decode(reader, e));
+            break;
+        case to_underlying(Fields::kF):
+            ReturnErrorOnFailure(DataModel::Decode(reader, f));
             break;
         default:
             break;
@@ -15465,6 +15469,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAlertsCount)), alertsCount));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAlertStructures)), alertStructures));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -15483,6 +15488,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
         case to_underlying(Fields::kAlertsCount):
             ReturnErrorOnFailure(DataModel::Decode(reader, alertsCount));
+            break;
+        case to_underlying(Fields::kAlertStructures):
+            ReturnErrorOnFailure(DataModel::Decode(reader, alertStructures));
             break;
         default:
             break;
@@ -15500,6 +15508,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAlertsCount)), alertsCount));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAlertStructures)), alertStructures));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -15518,6 +15527,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
         case to_underlying(Fields::kAlertsCount):
             ReturnErrorOnFailure(DataModel::Decode(reader, alertsCount));
+            break;
+        case to_underlying(Fields::kAlertStructures):
+            ReturnErrorOnFailure(DataModel::Decode(reader, alertStructures));
             break;
         default:
             break;

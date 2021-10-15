@@ -70,7 +70,6 @@ CHIP_ERROR AttributeStatusList::Parser::CheckSchemaValidity() const
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrExit(chip::TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
         {
             AttributeStatusIB::Parser status;

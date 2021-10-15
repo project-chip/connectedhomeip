@@ -28,6 +28,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Dnssd.h>
@@ -50,6 +52,7 @@
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
+using namespace chip::app;
 using namespace chip::app::Clusters::OperationalCredentials;
 
 namespace {
@@ -57,7 +60,65 @@ namespace {
 constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
 
-} // namespace
+class OperationalCredentialsAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the OperationalCredentials cluster on all endpoints.
+    OperationalCredentialsAttrAccess() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::OperationalCredentials::Id)
+    {}
+
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+};
+
+CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        {
+            if (!fabricInfo.IsInitialized())
+                continue;
+
+            Clusters::OperationalCredentials::Structs::FabricDescriptor::Type fabricDescriptor;
+
+            fabricDescriptor.fabricIndex = fabricInfo.GetFabricIndex();
+            fabricDescriptor.nodeId      = fabricInfo.GetPeerId().GetNodeId();
+            fabricDescriptor.vendorId    = fabricInfo.GetVendorId();
+            fabricDescriptor.fabricId    = fabricInfo.GetFabricId();
+
+            // TODO: The type of 'label' should be 'CharSpan', need to fix the XML definition for broken member type.
+            fabricDescriptor.label =
+                ByteSpan(Uint8::from_const_char(fabricInfo.GetFabricLabel().data()), fabricInfo.GetFabricLabel().size());
+            fabricDescriptor.rootPublicKey = fabricInfo.GetRootPubkey();
+
+            ReturnErrorOnFailure(encoder.Encode(fabricDescriptor));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
+
+OperationalCredentialsAttrAccess gAttrAccess;
+
+CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aPath.mClusterId == Clusters::OperationalCredentials::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::FabricsList::Id: {
+        return ReadFabricsList(aPath.mEndpointId, aEncoder);
+    }
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // anonymous namespace
 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr uint16_t kMaxRspLen = 900;
@@ -241,9 +302,14 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
 
 OpCredsFabricTableDelegate gFabricDelegate;
 
-void emberAfPluginOperationalCredentialsServerInitCallback(void)
+void MatterOperationalCredentialsPluginServerInitCallback(void)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
+
+#if CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+    registerAttributeAccessOverride(&gAttrAccess);
+#endif
+
     Server::GetInstance().GetFabricTable().SetFabricDelegate(&gFabricDelegate);
     writeFabricsIntoFabricsListAttribute();
 }
@@ -280,6 +346,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     CHIP_ERROR err       = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+    app::DnssdServer::Instance().StartServer();
 
 exit:
     writeFabricsIntoFabricsListAttribute();
@@ -490,19 +558,15 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Device Attestation Credentials");
 
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                                         ZCL_CERTIFICATE_CHAIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-
-    TLV::TLVWriter * writer = nullptr;
     uint8_t derBuf[Credentials::kMaxDERCertLength];
     MutableByteSpan derBufSpan(derBuf);
+
+    Commands::CertificateChainResponse::Type response;
 
     Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-    writer = commandObj->GetCommandDataElementTLVWriter();
     if (certificateType == kDACCertificate)
     {
         SuccessOrExit(err = dacProvider->GetDeviceAttestationCert(derBufSpan));
@@ -524,10 +588,9 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     {
         SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-    // TODO: Update ZAP Templates to parse TLVs starting with Tag ID 1 in order for this be spec compliant.
-    // TODO: Use ContextTag(1) instead
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), derBufSpan));
-    SuccessOrExit(err = commandObj->FinishCommand());
+
+    response.certificate = derBufSpan;
+    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -545,16 +608,14 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 {
     auto & attestationNonce = commandData.attestationNonce;
 
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
     size_t attestationElementsLen;
     Crypto::P256ECDSASignature signature;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Attestation");
 
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                                         ZCL_ATTESTATION_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    Commands::AttestationResponse::Type response;
 
     Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
@@ -610,11 +671,9 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
         SuccessOrExit(err = signature.SetLength(signatureSpan.size()));
     }
 
-    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-    writer = commandObj->GetCommandDataElementTLVWriter();
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(attestationElements.Get(), attestationElementsLen)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), ByteSpan(signature, signature.Length())));
-    SuccessOrExit(err = commandObj->FinishCommand());
+    response.attestationElements = ByteSpan(attestationElements.Get(), attestationElementsLen);
+    response.signature           = ByteSpan(signature, signature.Length());
+    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -641,10 +700,8 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested an OpCSR");
 
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                                         ZCL_OP_CSR_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    Commands::OpCSRResponse::Type response;
 
-    TLV::TLVWriter * writer = nullptr;
     TLV::TLVWriter csrElementWriter;
     TLV::TLVType containerType;
 
@@ -676,15 +733,11 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-    writer = commandObj->GetCommandDataElementTLVWriter();
-
     // Write CSR Elements
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten())));
-
+    response.NOCSRElements = ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten());
     // TODO - Write attestation signature using attestation key
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), ByteSpan()));
-    SuccessOrExit(err = commandObj->FinishCommand());
+    response.attestationSignature = ByteSpan();
+    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
 
 exit:
     if (err != CHIP_NO_ERROR)
