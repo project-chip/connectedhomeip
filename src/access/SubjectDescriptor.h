@@ -26,7 +26,7 @@ namespace access {
 
 /**
  * @typedef SubjectId
- * 
+ *
  * @brief Access control subject identifier. Can store a PasscodeId, NodeId,
  * CatId, GroupId, etc. as appropriate.
  */
@@ -34,7 +34,7 @@ typedef uint64_t SubjectId;
 
 /**
  * @class SubjectDescriptor
- * 
+ *
  * @brief Access control subject descriptor.
  */
 struct SubjectDescriptor

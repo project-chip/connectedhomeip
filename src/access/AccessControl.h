@@ -54,7 +54,7 @@ public:
     /**
      * Initialize the access control module. Will also initialize its data
      * provider.
-     * 
+     *
      * @retval various errors, probably fatal.
      * @retval #CHIP_NO_ERROR on success.
      */
