@@ -30,8 +30,8 @@ namespace {
 
 void TestFoldMax(nlTestSuite * inSuite, void * inContext)
 {
-    using List   = std::initializer_list<int>;
-    using Limits = std::numeric_limits<int>;
+    using List     = std::initializer_list<int>;
+    using Limits   = std::numeric_limits<int>;
     const auto max = [](int left, int right) { return std::max(left, right); };
 
     // Test empty list
