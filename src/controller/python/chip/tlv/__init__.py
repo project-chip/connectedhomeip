@@ -112,6 +112,10 @@ TagControls = {
 }
 
 
+class uint(int):
+    pass
+
+
 class TLVWriter(object):
     def __init__(self, encoding=None, implicitProfile=None):
         self._encoding = encoding if encoding is not None else bytearray()
@@ -177,11 +181,10 @@ class TLVWriter(object):
             self.putNull(tag)
         elif isinstance(val, bool):
             self.putBool(tag, val)
+        elif isinstance(val, uint):
+            self.putUnsignedInt(tag, val)
         elif isinstance(val, int):
-            if val < 0:
-                self.putSignedInt(tag, val)
-            else:
-                self.putUnsignedInt(tag, val)
+            self.putSignedInt(tag, val)
         elif isinstance(val, float):
             self.putFloat(tag, val)
         elif isinstance(val, str):
@@ -553,6 +556,7 @@ class TLVReader(object):
             (decoding["value"],) = struct.unpack(
                 "<B", tlv[self._bytesRead: self._bytesRead + 1]
             )
+            decoding["value"] = uint(decoding["value"])
             self._bytesRead += 1
         elif decoding["type"] == "Signed Integer 1-byte value":
             (decoding["value"],) = struct.unpack(
@@ -563,6 +567,7 @@ class TLVReader(object):
             (decoding["value"],) = struct.unpack(
                 "<H", tlv[self._bytesRead: self._bytesRead + 2]
             )
+            decoding["value"] = uint(decoding["value"])
             self._bytesRead += 2
         elif decoding["type"] == "Signed Integer 2-byte value":
             (decoding["value"],) = struct.unpack(
@@ -573,6 +578,7 @@ class TLVReader(object):
             (decoding["value"],) = struct.unpack(
                 "<L", tlv[self._bytesRead: self._bytesRead + 4]
             )
+            decoding["value"] = uint(decoding["value"])
             self._bytesRead += 4
         elif decoding["type"] == "Signed Integer 4-byte value":
             (decoding["value"],) = struct.unpack(
@@ -583,6 +589,7 @@ class TLVReader(object):
             (decoding["value"],) = struct.unpack(
                 "<Q", tlv[self._bytesRead: self._bytesRead + 8]
             )
+            decoding["value"] = uint(decoding["value"])
             self._bytesRead += 8
         elif decoding["type"] == "Signed Integer 8-byte value":
             (decoding["value"],) = struct.unpack(
