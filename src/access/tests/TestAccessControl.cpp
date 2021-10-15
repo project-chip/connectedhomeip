@@ -199,15 +199,15 @@ public:
         case Privilege::kView:
             if (delegate->privilege == Privilege::kView)
                 return true;
-        // fall through
+        FALLTHROUGH; // fall through
         case Privilege::kOperate:
             if (delegate->privilege == Privilege::kOperate)
                 return true;
-        // fall through
+        FALLTHROUGH; // fall through
         case Privilege::kManage:
             if (delegate->privilege == Privilege::kManage)
                 return true;
-        // fall through
+        FALLTHROUGH; // fall through
         case Privilege::kAdminister:
             return delegate->privilege == Privilege::kAdminister;
         }
