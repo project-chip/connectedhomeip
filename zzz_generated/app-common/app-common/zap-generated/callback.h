@@ -13945,13 +13945,15 @@ bool emberAfApplianceEventsAndAlertClusterGetAlertsCallback(
 /**
  * @brief Appliance Events and Alert Cluster GetAlertsResponse Command callback (from server)
  */
-bool emberAfApplianceEventsAndAlertClusterGetAlertsResponseCallback(chip::EndpointId endpoint,
-                                                                    chip::app::CommandSender * commandObj, uint8_t alertsCount);
+bool emberAfApplianceEventsAndAlertClusterGetAlertsResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t alertsCount,
+    /* TYPE WARNING: array array defaults to */ uint8_t * alertStructures);
 /**
  * @brief Appliance Events and Alert Cluster AlertsNotification Command callback (from server)
  */
-bool emberAfApplianceEventsAndAlertClusterAlertsNotificationCallback(chip::EndpointId endpoint,
-                                                                     chip::app::CommandSender * commandObj, uint8_t alertsCount);
+bool emberAfApplianceEventsAndAlertClusterAlertsNotificationCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t alertsCount,
+    /* TYPE WARNING: array array defaults to */ uint8_t * alertStructures);
 /**
  * @brief Appliance Events and Alert Cluster EventsNotification Command callback (from server)
  */

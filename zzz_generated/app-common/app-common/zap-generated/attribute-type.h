@@ -27,6 +27,7 @@ enum
     ZCL_BOOLEAN_ATTRIBUTE_TYPE           = 0x10, // Boolean
     ZCL_BITMAP8_ATTRIBUTE_TYPE           = 0x18, // 8-bit bitmap
     ZCL_BITMAP16_ATTRIBUTE_TYPE          = 0x19, // 16-bit bitmap
+    ZCL_BITMAP24_ATTRIBUTE_TYPE          = 0x1A, // 24-bit bitmap
     ZCL_BITMAP32_ATTRIBUTE_TYPE          = 0x1B, // 32-bit bitmap
     ZCL_BITMAP64_ATTRIBUTE_TYPE          = 0x1F, // 64-bit bitmap
     ZCL_INT8U_ATTRIBUTE_TYPE             = 0x20, // Unsigned 8-bit integer
