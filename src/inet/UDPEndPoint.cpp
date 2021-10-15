@@ -146,11 +146,6 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
             ipAddr = *IP6_ADDR_ANY;
         }
 
-#if INET_CONFIG_ENABLE_IPV4
-        lwip_ip_addr_type lType = IPAddress::ToLwIPAddrType(addrType);
-        IP_SET_TYPE_VAL(ipAddr, lType);
-#endif // INET_CONFIG_ENABLE_IPV4
-
         res = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipAddr, port));
 #else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
         if (addrType == kIPAddressType_IPv6)
