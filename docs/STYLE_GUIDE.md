@@ -47,8 +47,8 @@ The text of a link should be descriptive, so it's clear what the link is for:
 
 ## Markdown guidelines
 
-Use standard Markdown when authoring Matter documentation. While HTML may be used
-for more complex content such as tables, use Markdown as much as possible.
+Use standard Markdown when authoring Matter documentation. While HTML may be
+used for more complex content such as tables, use Markdown as much as possible.
 
 > Note: Edit this file to see the Markdown behind the examples.
 

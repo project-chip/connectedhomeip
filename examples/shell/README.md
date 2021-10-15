@@ -2,8 +2,8 @@
 
 The `chip-shell` firmware exposes configuration and management APIs via a
 command line interface (CLI). Use the shell CLI to experiment with Matter
-interactively, which can also be used with additional application code. The Matter
-functional test scripts use the shell CLI to execute test cases.
+interactively, which can also be used with additional application code. The
+Matter functional test scripts use the shell CLI to execute test cases.
 
 ## Separator and escaping characters
 

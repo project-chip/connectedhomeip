@@ -4,11 +4,11 @@ There are following Apps on Android
 
 -   CHIPTool - Android CHIPTool is an application for Android for commissioning
     and controlling Matter accessory devices. It offers the following features:
-    - Scan a Matter QR code and display payload information to the user
-    - Read the NFC tag containing Matter onboarding information
-    - Commission a Matter device
-    - Send echo requests to the Matter echo server
-    - Send on/off cluster requests to a Matter device
+    -   Scan a Matter QR code and display payload information to the user
+    -   Read the NFC tag containing Matter onboarding information
+    -   Commission a Matter device
+    -   Send echo requests to the Matter echo server
+    -   Send on/off cluster requests to a Matter device
 -   CHIPTest
     -   Android CHIPTest is an application for Android for running Matter's unit
         tests
@@ -98,15 +98,15 @@ adb install out/android-$TARGET_CPU-chip-tool/outputs/apk/debug/app-debug.apk
 ```
 
 You can use Android Studio to edit the Android CHIPTool app itself and run it
-after build_examples.py, but you will not be able to edit Matter Android code from
-`src/controller/java`, or other Matter C++ code within Android Studio.
+after build_examples.py, but you will not be able to edit Matter Android code
+from `src/controller/java`, or other Matter C++ code within Android Studio.
 
 <a name="building-studio"></a>
 
 ## Building Android CHIPTool from Android Studio
 
-This option allows Android Studio to build the core Matter code from source, which
-allows us to directly edit core Matter code in-IDE.
+This option allows Android Studio to build the core Matter code from source,
+which allows us to directly edit core Matter code in-IDE.
 
 1. In the command line, run the following command from the top Matter directory:
 
@@ -151,8 +151,8 @@ or
 
 ## Building Android CHIPTest from scripts
 
-Currently, the CHIPTest can only be built from scripts.
-The steps are similar to [building CHIPTool from scripts](#building-scripts).
+Currently, the CHIPTest can only be built from scripts. The steps are similar to
+[building CHIPTool from scripts](#building-scripts).
 
 ```shell
 ./scripts/build/build_examples.py --target android-arm64-chip-test build
