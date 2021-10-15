@@ -27,6 +27,7 @@
 #include "system/SystemClock.h"
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <chrono>
@@ -635,7 +636,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     // We do not really care about the value, just return a not found status code.
     VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
