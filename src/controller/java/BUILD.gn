@@ -68,6 +68,8 @@ android_library("java") {
     "src/chip/clusterinfo/CommandInfo.java",
     "src/chip/clusterinfo/CommandParameter.java",
     "src/chip/clusterinfo/ParameterType.java",
+    "src/chip/clusterinfo/ClusterCommandCallback.java",
+    "src/chip/clusterinfo/DelegatedClusterCallback.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
   ]
