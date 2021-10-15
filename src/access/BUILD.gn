@@ -20,21 +20,14 @@ static_library("access") {
   sources = [
     "AccessControl.cpp",
     "AccessControl.h",
-    "AuthMode.cpp",
     "AuthMode.h",
-    "BasicTypes.cpp",
     "BasicTypes.h",
-    "Config.cpp",
     "Config.h",
-    "DataProvider.cpp",
     "DataProvider.h",
     "DataProviderImpl.cpp",
     "DataProviderImpl.h",
-    "Privilege.cpp",
     "Privilege.h",
-    "RequestPath.cpp",
     "RequestPath.h",
-    "SubjectDescriptor.cpp",
     "SubjectDescriptor.h",
   ]
 
