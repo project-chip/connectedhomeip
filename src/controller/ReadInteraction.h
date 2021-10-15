@@ -32,12 +32,12 @@ namespace Controller {
  * of the requested attribute through the provided success callback or calls the provided failure callback.
  *
  * The AttributeTypeInfo is generally expected to be a ClusterName::Attributes::AttributeName::TypeInfo struct, but any
- * object that can contains type information exposed through a 'using Type = ...' declaration as well as GetClusterId() and
- * GetAttributeId() functions is expected to work.
+ * object that contains type information exposed through a 'using Type = ...' declaration as well as GetClusterId() and
+ * GetAttributeId() methods is expected to work.
  *
  */
 template <typename AttributeTypeInfo>
-CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, SessionHandle & sessionHandle, chip::EndpointId endpointId,
+CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                          typename TypedReadCallback<AttributeTypeInfo>::OnSuccessCallbackType onSuccessCb,
                          typename TypedReadCallback<AttributeTypeInfo>::OnErrorCallbackType onErrorCb)
 {
@@ -70,7 +70,7 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, SessionHandl
         SuccessOrExit(err);
 
         //
-        // At this point, we'll get a callback through the OnDone callback above regardless of success of failure
+        // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
         // of the read operation to permit us to free up the callback object. So, release ownership of the callback
         // object now to prevent it from being reclaimed at the end of this scoped block.
         //
@@ -84,7 +84,7 @@ exit:
         readClient->Shutdown();
     }
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 } // namespace Controller
