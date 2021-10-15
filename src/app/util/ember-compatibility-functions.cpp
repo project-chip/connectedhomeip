@@ -241,7 +241,7 @@ CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescr
     // TODO: get required privilege from yet-to-be-written ember api
 #else
     // TEMP: assume view privilege required
-    Privilege privilege = Privilege::View;
+    Privilege privilege = Privilege::kView;
 #endif
 
     {
@@ -480,7 +480,7 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(const 
     // TODO: get required privilege from yet-to-be-written ember api
 #else
     // TEMP: assume operate privilege required
-    Privilege privilege = Privilege::Operate;
+    Privilege privilege = Privilege::kOperate;
 #endif
 
     {
