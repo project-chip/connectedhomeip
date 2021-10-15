@@ -100,7 +100,8 @@ EmberAfStatus ExampleRequestorDelegate::HandleAnnounceOTAProvider(chip::app::Com
         msToStart = kImmediateStartDelayMs;
         break;
     default:
-        break;
+        ChipLogError(SoftwareUpdate, "Unexpected announcementReason: %" PRIu8, static_cast<uint8_t>(announcementReason));
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
     }
 
     chip::DeviceLayer::SystemLayer().StartTimer(msToStart, StartDelayTimerHandler, this);

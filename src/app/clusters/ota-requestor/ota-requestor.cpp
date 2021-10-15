@@ -44,10 +44,10 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    auto providerLocation   = commandData.providerLocation;
-    auto vendorId           = commandData.vendorId;
-    auto announcementReason = commandData.announcementReason;
-    auto metadataForNode    = commandData.metadataForNode;
+    auto & providerLocation   = commandData.providerLocation;
+    auto & vendorId           = commandData.vendorId;
+    auto & announcementReason = commandData.announcementReason;
+    auto & metadataForNode    = commandData.metadataForNode;
 
     if (gDelegate == nullptr)
     {
