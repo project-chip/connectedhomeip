@@ -75,19 +75,18 @@ class DNSResolver : public InetLayerBasis
 private:
     friend class InetLayer;
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     friend class AsyncDNSResolverSockets;
 
     /// States of the DNSResolver object with respect to hostname resolution.
-    enum class State : uint8_t{
+    enum class State : uint8_t
+    {
         kUnused   = 0, ///< Used to indicate that the DNSResolver object is not used.
         kActive   = 2, ///< Used to indicate that a DNS resolution is being performed on the DNSResolver object.
         kComplete = 3, ///< Used to indicate that the DNS resolution on the DNSResolver object is complete.
         kCanceled = 4, ///< Used to indicate that the DNS resolution on the DNSResolver has been canceled.
     };
-#endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
     /**
      * @brief   Type of event handling function called when a DNS request completes.

@@ -86,9 +86,11 @@ namespace Inet {
 enum class IPAddressType : uint8_t
 {
     kUnknown = 0, ///< Not used.
-    kIPv4    = 1, ///< Internet protocol version 4.
-    kIPv6    = 2, ///< Internet protocol version 6.
-    kAny     = 3  ///< The unspecified internet address (independent of protocol version).
+#if INET_CONFIG_ENABLE_IPV4
+    kIPv4 = 1, ///< Internet protocol version 4.
+#endif         // INET_CONFIG_ENABLE_IPV4
+    kIPv6 = 2, ///< Internet protocol version 6.
+    kAny  = 3  ///< The unspecified internet address (independent of protocol version).
 };
 
 /**
