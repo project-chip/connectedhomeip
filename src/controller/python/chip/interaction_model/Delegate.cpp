@@ -71,7 +71,7 @@ void PythonInteractionModelDelegate::OnError(const app::CommandSender * apComman
 CHIP_ERROR PythonInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
                                                                const app::StatusIB & aStatusIB,
                                                                app::AttributePathParams & aAttributePathParams,
-                                                               uint8_t aCommandIndex)
+                                                               uint8_t aAttributeIndex)
 {
     if (onWriteResponseFunct != nullptr)
     {
@@ -81,7 +81,7 @@ CHIP_ERROR PythonInteractionModelDelegate::WriteResponseStatus(const app::WriteC
         };
         onWriteResponseFunct(&status, sizeof(status));
     }
-    DeviceControllerInteractionModelDelegate::WriteResponseStatus(apWriteClient, aStatusIB, aAttributePathParams, aCommandIndex);
+    DeviceControllerInteractionModelDelegate::WriteResponseStatus(apWriteClient, aStatusIB, aAttributePathParams, aAttributeIndex);
     return CHIP_NO_ERROR;
 }
 

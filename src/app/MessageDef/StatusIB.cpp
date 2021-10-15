@@ -55,9 +55,7 @@ CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Tag::kStatus):
-            uint16_t status;
-            ReturnErrorOnFailure(reader.Get(status));
-            aStatusIB.mStatus = static_cast<Protocols::InteractionModel::Status>(status);
+            ReturnErrorOnFailure(reader.Get(aStatusIB.mStatus));
             break;
         case to_underlying(Tag::kClusterStatus):
             ClusterStatus clusterStatus;

@@ -76,7 +76,7 @@ struct StatusIB
 #endif
 
         /**
-        `* Decode the StatusIB
+         * Decode the StatusIB
          *
          * @return       CHIP_ERROR codes returned by chip::TLV objects. CHIP_END_OF_TLV if either
          *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
@@ -109,7 +109,7 @@ struct StatusIB
         CHIP_ERROR Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
 
         /**
-        `* Read the GeneralStatus, ClusterStatus and close the container
+        `* Write the StatusIB into TLV and close the container
          *
          * @return       CHIP_ERROR codes returned by chip::TLV objects. CHIP_END_OF_TLV if either
          *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
