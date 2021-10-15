@@ -21,7 +21,7 @@
 
 using namespace ::chip;
 
-CHIP_ERROR DiscoverCommissionersCommand::Run()
+CHIP_ERROR DiscoverCommissionersCommand::Run(NodeId remoteId)
 {
     return mCommissionableNodeController.DiscoverCommissioners();
 }

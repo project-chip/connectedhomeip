@@ -18,14 +18,16 @@
 
 #pragma once
 
-#include "../common/Command.h"
+#include "../common/CHIPCommand.h"
 #include <controller/CHIPCommissionableNodeController.h>
 
-class DiscoverCommissionersCommand : public Command
+class DiscoverCommissionersCommand : public CHIPCommand
 {
 public:
-    DiscoverCommissionersCommand() : Command("commissioners") {}
-    CHIP_ERROR Run() override;
+    DiscoverCommissionersCommand() : CHIPCommand("commissioners") {}
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR Run(NodeId remoteId) override;
     uint16_t GetWaitDurationInSeconds() const override { return 3; }
     void Shutdown() override;
 
