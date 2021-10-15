@@ -45,7 +45,7 @@ public:
         Session,
     };
 
-    virtual ~MessageCounter() = 0;
+    virtual ~MessageCounter() = default;
 
     virtual Type GetType()                        = 0;
     virtual uint32_t Value()                      = 0; /** Get current value */
@@ -53,13 +53,12 @@ public:
     virtual CHIP_ERROR SetCounter(uint32_t count) = 0; /** Set the counter to the specified value */
 };
 
-inline MessageCounter::~MessageCounter() {}
-
 class GlobalUnencryptedMessageCounter : public MessageCounter
 {
 public:
-    GlobalUnencryptedMessageCounter();
-    ~GlobalUnencryptedMessageCounter() override {}
+    GlobalUnencryptedMessageCounter() : value(0) {}
+
+    void Init();
 
     Type GetType() override { return GlobalUnencrypted; }
     uint32_t Value() override { return value; }
@@ -82,7 +81,6 @@ class GlobalEncryptedMessageCounter : public MessageCounter
 {
 public:
     GlobalEncryptedMessageCounter() {}
-    ~GlobalEncryptedMessageCounter() override {}
 
     CHIP_ERROR Init();
     Type GetType() override { return GlobalEncrypted; }
@@ -117,7 +115,6 @@ class LocalSessionMessageCounter : public MessageCounter
 public:
     static constexpr uint32_t kInitialValue = 1;
     LocalSessionMessageCounter() : value(kInitialValue) {}
-    ~LocalSessionMessageCounter() override {}
 
     Type GetType() override { return Session; }
     uint32_t Value() override { return value; }

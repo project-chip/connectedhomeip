@@ -153,6 +153,12 @@ enum class SupportedECPKeyTypes : uint8_t
     ECP256R1 = 0,
 };
 
+/** @brief Safely clears the first `len` bytes of memory area `buf`.
+ * @param buf Pointer to a memory buffer holding secret data that must be cleared.
+ * @param len Specifies secret data size in bytes.
+ **/
+void ClearSecretData(uint8_t * buf, size_t len);
+
 template <typename Sig>
 class ECPKey
 {
@@ -175,6 +181,12 @@ template <size_t Cap>
 class CapacityBoundBuffer
 {
 public:
+    ~CapacityBoundBuffer()
+    {
+        // Sanitize after use
+        ClearSecretData(&bytes[0], Cap);
+    }
+
     /** @brief Set current length of the buffer that's being used
      * @return Returns error if new length is > capacity
      **/
@@ -337,7 +349,7 @@ class P256Keypair : public P256KeypairBase
 {
 public:
     P256Keypair() {}
-    ~P256Keypair();
+    virtual ~P256Keypair();
 
     /**
      * @brief Initialize the keypair.
@@ -1178,12 +1190,6 @@ private:
  */
 CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
                                       MutableByteSpan & out_compressed_fabric_id);
-
-/** @brief Safely clears the first `len` bytes of memory area `buf`.
- * @param buf Pointer to a memory buffer holding secret data that must be cleared.
- * @param len Specifies secret data size in bytes.
- **/
-void ClearSecretData(uint8_t * buf, size_t len);
 
 typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
 

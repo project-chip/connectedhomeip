@@ -32,6 +32,8 @@ declare_args() {
 executable("chip-tool") {
   sources = [
     "commands/clusters/ModelCommand.cpp",
+    "commands/common/CHIPCommand.cpp",
+    "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
     "commands/discover/DiscoverCommand.cpp",
