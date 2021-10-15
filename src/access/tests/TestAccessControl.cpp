@@ -186,7 +186,8 @@ public:
 
     bool MatchesAuthMode(AuthMode authMode) const override { return delegate->authMode == authMode; }
 
-    bool MatchesFabric(FabricIndex fabricIndex) const override {
+    bool MatchesFabric(FabricIndex fabricIndex) const override
+    {
         return (delegate->fabricIndex == 0) || (delegate->fabricIndex == fabricIndex);
     }
 
@@ -199,15 +200,15 @@ public:
         case Privilege::kView:
             if (delegate->privilege == Privilege::kView)
                 return true;
-        FALLTHROUGH; // fall through
+            FALLTHROUGH; // fall through
         case Privilege::kOperate:
             if (delegate->privilege == Privilege::kOperate)
                 return true;
-        FALLTHROUGH; // fall through
+            FALLTHROUGH; // fall through
         case Privilege::kManage:
             if (delegate->privilege == Privilege::kManage)
                 return true;
-        FALLTHROUGH; // fall through
+            FALLTHROUGH; // fall through
         case Privilege::kAdminister:
             return delegate->privilege == Privilege::kAdminister;
         }
@@ -383,7 +384,7 @@ void TestInstance(nlTestSuite * inSuite, void * inContext)
 int Setup(void * inContext)
 {
     AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
-    CHIP_ERROR err = context.Init();
+    CHIP_ERROR err          = context.Init();
     return err == CHIP_NO_ERROR ? SUCCESS : FAILURE;
 }
 
