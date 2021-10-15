@@ -76,9 +76,9 @@ struct TestTarget
 {
     enum Flag
     {
-        DeviceType = 1 << 0,
-        Endpoint = 1 << 1,
-        Cluster = 1 << 2,
+        kDeviceType = 1 << 0,
+        kEndpoint = 1 << 1,
+        kCluster = 1 << 2,
     };
 
     int flags = SENTINEL;
@@ -90,7 +90,7 @@ struct TestTarget
 TestTarget Target(EndpointId endpoint, ClusterId cluster)
 {
     return {
-        .flags = TestTarget::Endpoint | TestTarget::Cluster,
+        .flags = TestTarget::kEndpoint | TestTarget::kCluster,
         .endpoint = endpoint,
         .cluster = cluster
     };
@@ -99,20 +99,20 @@ TestTarget Target(EndpointId endpoint, ClusterId cluster)
 #if 0
 TestTarget Target(EndpointId endpoint)
 {
-    return { .flags = TestTarget::Endpoint, .endpoint = endpoint };
+    return { .flags = TestTarget::kEndpoint, .endpoint = endpoint };
 }
 
 TestTarget Target(ClusterId cluster)
 {
-    return { .flags = TestTarget::Cluster, .cluster = cluster };
+    return { .flags = TestTarget::kCluster, .cluster = cluster };
 }
 #endif
 
 struct TestEntryDelegate
 {
     FabricIndex fabricIndex = 0;
-    AuthMode authMode = AuthMode::None; // aka SENTINEL
-    Privilege privilege = Privilege::View;
+    AuthMode authMode = AuthMode::kNone; // aka SENTINEL
+    Privilege privilege = Privilege::kView;
     TestSubject subjects[Config::kSubjectsPerEntry + 1];
     TestTarget targets[Config::kTargetsPerEntry + 1];
 };
@@ -121,43 +121,43 @@ TestEntryDelegate entries[] =
 {
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::Case,
-        .privilege = Privilege::Administer,
+        .authMode = AuthMode::kCase,
+        .privilege = Privilege::kAdminister,
         .subjects = { Node(0x1122334455667788) },
     },
     {
         .fabricIndex = 2,
-        .authMode = AuthMode::Case,
-        .privilege = Privilege::Administer,
+        .authMode = AuthMode::kCase,
+        .privilege = Privilege::kAdminister,
         .subjects = { Node(0x8877665544332211) },
     },
     {
         .fabricIndex = 2,
-        .authMode = AuthMode::Case,
-        .privilege = Privilege::View,
+        .authMode = AuthMode::kCase,
+        .privilege = Privilege::kView,
     },
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::Pase,
-        .privilege = Privilege::View,
+        .authMode = AuthMode::kPase,
+        .privilege = Privilege::kView,
         .targets = { Target(2, ONOFF )},
     },
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::Case,
-        .privilege = Privilege::View,
+        .authMode = AuthMode::kCase,
+        .privilege = Privilege::kView,
         .targets = { Target(1, LEVELCONTROL )},
     },
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::Case,
-        .privilege = Privilege::Operate,
+        .authMode = AuthMode::kCase,
+        .privilege = Privilege::kOperate,
         .targets = { Target(1, COLORCONTROL )},
     },
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::Case,
-        .privilege = Privilege::View,
+        .authMode = AuthMode::kCase,
+        .privilege = Privilege::kView,
         .targets = { Target(2, ONOFF )},
     },
     {} // sentinel entry
@@ -182,16 +182,16 @@ public:
     {
         switch (privilege)
         {
-            case Privilege::ProxyView:
-                return (delegate->privilege == Privilege::ProxyView)
-                        || (delegate->privilege == Privilege::Administer);
-            case Privilege::View: if (delegate->privilege == Privilege::View) return true;
+            case Privilege::kProxyView:
+                return (delegate->privilege == Privilege::kProxyView)
+                        || (delegate->privilege == Privilege::kAdminister);
+            case Privilege::kView: if (delegate->privilege == Privilege::kView) return true;
             // fall through
-            case Privilege::Operate: if (delegate->privilege == Privilege::Operate) return true;
+            case Privilege::kOperate: if (delegate->privilege == Privilege::kOperate) return true;
             // fall through
-            case Privilege::Manage: if (delegate->privilege == Privilege::Manage) return true;
+            case Privilege::kManage: if (delegate->privilege == Privilege::kManage) return true;
             // fall through
-            case Privilege::Administer: return delegate->privilege == Privilege::Administer;
+            case Privilege::kAdminister: return delegate->privilege == Privilege::kAdminister;
         }
         return false;
     }
@@ -216,8 +216,8 @@ public:
             return true;
         for (; p->flags != SENTINEL; ++p)
         {
-            if (((p->flags & TestTarget::Endpoint) == 0 || p->endpoint == endpoint)
-                    && ((p->flags & TestTarget::Cluster) == 0 || p->cluster == cluster))
+            if (((p->flags & TestTarget::kEndpoint) == 0 || p->endpoint == endpoint)
+                    && ((p->flags & TestTarget::kCluster) == 0 || p->cluster == cluster))
                 return true;
         }
         return false;
@@ -250,12 +250,12 @@ public:
     {
         next = (entry.delegate == nullptr) ? entries : next + 1;
 
-        while (next->authMode != AuthMode::None && fabricFiltered && next->fabricIndex != fabricIndex)
+        while (next->authMode != AuthMode::kNone && fabricFiltered && next->fabricIndex != fabricIndex)
         {
             ++next;
         }
 
-        if (next->authMode == AuthMode::None)
+        if (next->authMode == AuthMode::kNone)
         {
             next = nullptr;
         }
@@ -348,15 +348,15 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
     // TODO: make this table driven, add a bunch more test cases
 
     err = context.Check(
-            {.subject = 0x1122334455667788, .authMode = AuthMode::Case, .fabricIndex = 1},
+            {.subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1},
             {.endpoint = 1, .cluster = ONOFF},
-            Privilege::Administer);
+            Privilege::kAdminister);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = context.Check(
-            {.subject = 0x8877665544332211, .authMode = AuthMode::Case, .fabricIndex = 1},
+            {.subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1},
             {.endpoint = 1, .cluster = ONOFF},
-            Privilege::Administer);
+            Privilege::kAdminister);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ACCESS_DENIED);
 }
 

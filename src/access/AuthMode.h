@@ -29,10 +29,10 @@ namespace access {
  */
 enum AuthMode
 {
-    None = 0,
-    Pase = 1 << 5,
-    Case = 1 << 6,
-    Group = 1 << 7
+    kNone = 0,
+    kPase = 1 << 5,
+    kCase = 1 << 6,
+    kGroup = 1 << 7
 };
 
 } // namespace access

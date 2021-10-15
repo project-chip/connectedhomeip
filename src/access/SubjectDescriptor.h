@@ -39,17 +39,17 @@ typedef uint64_t SubjectId;
  */
 struct SubjectDescriptor
 {
-    // Holds PasscodeId if Pase, NodeId if Case, GroupId if Group
+    // Holds PasscodeId if kPase, NodeId if kCase, GroupId if kGroup
     SubjectId subject = 0;
 
-    // Holds (optional) CAT1/CAT2 if Case
+    // Holds (optional) CAT1/CAT2 if kCase
     SubjectId subject1 = 0;
 
-    // Holds (optional) CAT1/CAT2 if Case
+    // Holds (optional) CAT1/CAT2 if kCase
     SubjectId subject2 = 0;
 
-    // Holds AuthMode of subject(s), None if no access
-    AuthMode authMode = AuthMode::None;
+    // Holds AuthMode of subject(s), kNone if no access
+    AuthMode authMode = AuthMode::kNone;
 
     // Holds FabricIndex of fabric, 0 if no fabric
     FabricIndex fabricIndex = 0;
