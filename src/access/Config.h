@@ -26,15 +26,14 @@ namespace access {
 struct Config
 {
 
-// Data provider implementation used by AccessControl configured instance.
-typedef DataProviderImpl DataProvider;
+    // Data provider implementation used by AccessControl configured instance.
+    typedef DataProviderImpl DataProvider;
 
-static const int kSubjectsPerEntry = 4;
+    static const int kSubjectsPerEntry = 4;
 
-static const int kTargetsPerEntry = 3;
+    static const int kTargetsPerEntry = 3;
 
-static const int kEntriesPerFabric = 3;
-
+    static const int kEntriesPerFabric = 3;
 };
 
 } // namespace access

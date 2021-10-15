@@ -31,14 +31,14 @@ namespace access {
 class DataProviderImpl : public DataProvider
 {
 public:
-    DataProviderImpl() = default;
+    DataProviderImpl()          = default;
     virtual ~DataProviderImpl() = default;
 
     CHIP_ERROR Init() override;
     void Finish() override;
 
-    EntryIterator* Entries() const override;
-    EntryIterator* Entries(FabricIndex fabricIndex) const override;
+    EntryIterator * Entries() const override;
+    EntryIterator * Entries(FabricIndex fabricIndex) const override;
 };
 
 } // namespace access

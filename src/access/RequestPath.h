@@ -32,7 +32,7 @@ struct RequestPath
 {
     // TODO: don't worry about node for now (proxy source)
     EndpointId endpoint = 0;
-    ClusterId cluster = 0;
+    ClusterId cluster   = 0;
 };
 
 } // namespace access
