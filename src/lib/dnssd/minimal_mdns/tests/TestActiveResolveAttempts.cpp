@@ -24,11 +24,11 @@ namespace {
 
 using namespace chip;
 
-class MockClock : public System::ClockBase
+class MockClock : public System::Clock::ClockBase
 {
 public:
-    MonotonicMicroseconds GetMonotonicMicroseconds() override { return mUsec; }
-    MonotonicMilliseconds GetMonotonicMilliseconds() override { return mUsec / 1000; }
+    System::Clock::Microseconds64 GetMonotonicMicroseconds64() override { return System::Clock::Microseconds64(mUsec); }
+    System::Clock::Milliseconds64 GetMonotonicMilliseconds64() override { return System::Clock::Milliseconds64(mUsec / 1000); }
 
     void AdvanceMs(MonotonicMilliseconds ms) { mUsec += ms * 1000L; }
     void AdvanceSec(uint32_t s) { AdvanceMs(s * 1000); }
