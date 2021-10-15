@@ -49,11 +49,14 @@ constexpr size_t kSubTypeCompressedFabricIdMaxLength      = 18; // _I<16-hex-dig
 
 namespace Operational {
 
-constexpr auto kSubTypeLengths          = { kSubTypeCompressedFabricIdMaxLength };
+#define SUBTYPES (std::initializer_list<size_t>{ kSubTypeCompressedFabricIdMaxLength })
+
 constexpr size_t kInstanceNameMaxLength = 33; // <NodeId>-<FabricId> in hex (16 + 1 + 16)
-constexpr size_t kSubTypeMaxNumber      = kSubTypeLengths.size();
-constexpr size_t kSubTypeMaxLength      = std::max(kSubTypeLengths);
-constexpr size_t kSubTypeTotalLength    = chip::Sum(kSubTypeLengths);
+constexpr size_t kSubTypeMaxNumber      = SUBTYPES.size();
+constexpr size_t kSubTypeMaxLength      = std::max(SUBTYPES);
+constexpr size_t kSubTypeTotalLength    = chip::Sum(SUBTYPES);
+
+#undef SUBTYPES
 
 } // namespace Operational
 
@@ -63,14 +66,17 @@ constexpr size_t kSubTypeTotalLength    = chip::Sum(kSubTypeLengths);
 
 namespace Commissionable {
 
-constexpr auto kSubTypeLengths = {
-    kSubTypeShortDiscriminatorMaxLength, kSubTypeLongDiscriminatorMaxLength, kSubTypeVendorMaxLength,
-    kSubTypeDeviceTypeMaxLength,         kSubTypeCommissioningModeMaxLength, kSubTypeAdditionalCommissioningMaxLength
-};
+#define SUBTYPES                                                                                                                   \
+    (std::initializer_list<size_t>{ kSubTypeShortDiscriminatorMaxLength, kSubTypeLongDiscriminatorMaxLength,                       \
+                                    kSubTypeVendorMaxLength, kSubTypeDeviceTypeMaxLength, kSubTypeCommissioningModeMaxLength,      \
+                                    kSubTypeAdditionalCommissioningMaxLength })
+
 constexpr size_t kInstanceNameMaxLength = 16; // 64-bit random number in hex
-constexpr size_t kSubTypeMaxNumber      = kSubTypeLengths.size();
-constexpr size_t kSubTypeMaxLength      = std::max(kSubTypeLengths);
-constexpr size_t kSubTypeTotalLength    = chip::Sum(kSubTypeLengths);
+constexpr size_t kSubTypeMaxNumber      = SUBTYPES.size();
+constexpr size_t kSubTypeMaxLength      = std::max(SUBTYPES);
+constexpr size_t kSubTypeTotalLength    = chip::Sum(SUBTYPES);
+
+#undef SUBTYPES
 
 } // namespace Commissionable
 
