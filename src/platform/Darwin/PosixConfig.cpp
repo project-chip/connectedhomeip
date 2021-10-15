@@ -73,6 +73,8 @@ const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 CHIP_ERROR PosixConfig::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    mPosixSetupDiscriminator = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
     return err;
 }
 
@@ -88,7 +90,16 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
+
+    if (key == kConfigKey_SetupDiscriminator)
+        {
+            val = mPosixSetupDiscriminator;
+            err = CHIP_NO_ERROR;
+        }
+    else
+        {
+            SuccessOrExit(err);
+        }
 
 exit:
     return err;
@@ -133,8 +144,16 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
 
+    if (key == kConfigKey_SetupDiscriminator)
+        {
+            mPosixSetupDiscriminator = val;
+            err = CHIP_NO_ERROR;
+        }
+    else
+        {
+            SuccessOrExit(err);
+        }
 exit:
     return err;
 }
