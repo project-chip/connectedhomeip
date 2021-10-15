@@ -70,7 +70,7 @@ const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNam
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
-uint16_t  PosixConfig::mPosixSetupDiscriminator;
+uint16_t PosixConfig::mPosixSetupDiscriminator;
 
 CHIP_ERROR PosixConfig::Init()
 {
