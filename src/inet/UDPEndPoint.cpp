@@ -222,7 +222,7 @@ CHIP_ERROR UDPEndPoint::ListenImpl()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg, uint16_t sendFlags)
+CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
 {
     const IPAddress & destAddr = pktInfo->DestAddress;
 
@@ -582,18 +582,13 @@ CHIP_ERROR UDPEndPoint::ListenImpl()
     return layer->RequestCallbackOnPendingRead(mWatch);
 }
 
-CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg, uint16_t sendFlags)
+CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
 {
-    CHIP_ERROR res             = CHIP_NO_ERROR;
-    const IPAddress & destAddr = pktInfo->DestAddress;
-
     // Make sure we have the appropriate type of socket based on the
     // destination address.
+    ReturnErrorOnFailure(GetSocket(pktInfo->DestAddress.Type()));
 
-    res = GetSocket(destAddr.Type());
-    ReturnErrorOnFailure(res);
-
-    return IPEndPointBasis::SendMsg(pktInfo, std::move(msg), sendFlags);
+    return IPEndPointBasis::SendMsg(pktInfo, std::move(msg));
 }
 
 void UDPEndPoint::CloseImpl()
@@ -688,9 +683,9 @@ CHIP_ERROR UDPEndPoint::ListenImpl()
     return StartListener();
 }
 
-CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg, uint16_t sendFlags)
+CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
 {
-    return IPEndPointBasis::SendMsg(pktInfo, std::move(msg), sendFlags);
+    return IPEndPointBasis::SendMsg(pktInfo, std::move(msg));
 }
 
 void UDPEndPoint::CloseImpl()
@@ -762,35 +757,26 @@ CHIP_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnRecei
     return CHIP_NO_ERROR;
 }
 
-/**
- *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
- */
-CHIP_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, uint16_t sendFlags)
-{
-    return SendTo(addr, port, INET_NULL_INTERFACEID, std::move(msg), sendFlags);
-}
-
-CHIP_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
-                               uint16_t sendFlags)
+CHIP_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, InterfaceId intfId)
 {
     IPPacketInfo pktInfo;
     pktInfo.Clear();
     pktInfo.DestAddress = addr;
     pktInfo.DestPort    = port;
     pktInfo.Interface   = intfId;
-    return SendMsg(&pktInfo, std::move(msg), sendFlags);
+    return SendMsg(&pktInfo, std::move(msg));
 }
 
-CHIP_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg, uint16_t sendFlags)
+CHIP_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
 {
     INET_FAULT_INJECT(FaultInjection::kFault_Send, return INET_ERROR_UNKNOWN_INTERFACE;);
     INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical, return CHIP_ERROR_NO_MEMORY;);
 
-    CHIP_ERROR res = SendMsgImpl(pktInfo, std::move(msg), sendFlags);
+    ReturnErrorOnFailure(SendMsgImpl(pktInfo, std::move(msg)));
 
     CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT();
 
-    return res;
+    return CHIP_NO_ERROR;
 }
 
 void UDPEndPoint::Close()
