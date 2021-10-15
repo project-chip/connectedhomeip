@@ -174,7 +174,7 @@ static const struct pbkdf2_test_vector chiptest_test_vector_12 = { .password = c
 static const struct pbkdf2_test_vector chiptest_test_vector_13 = { .password = chip::Uint8::from_const_char("password"),
                                                                    .plen     = 8,
                                                                    .salt     = chip::Uint8::from_const_char(
-                                                                           "saltSALTsaltSALTsaltSALTsaltSALTs"),
+                                                                       "saltSALTsaltSALTsaltSALTsaltSALTs"),
                                                                    .slen    = 33,
                                                                    .iter    = 1,
                                                                    .key_len = 20,
