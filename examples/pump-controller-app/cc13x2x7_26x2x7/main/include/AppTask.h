@@ -47,7 +47,7 @@ private:
 
     // should this be done by BoltLock Manager? I don't want to unravel this spaghetti quite yet
     static void ActionInitiated(PumpManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(PumpManager::Action_t aAction);
+    static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);
 
     void DispatchEvent(AppEvent * event);
 

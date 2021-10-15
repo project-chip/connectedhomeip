@@ -44,6 +44,8 @@
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
 
+#define ONOFF_CLUSTER_ENDPOINT 1
+
 LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
@@ -500,13 +502,17 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState()
 {
-    uint8_t newValue = !PumpMgr().IsStopped();
+    EmberStatus status;
 
-    // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    ChipLogProgress(NotSpecified, "UpdateClusterState");
+
+    // Write the new values
+
+    bool onOffState = !PumpMgr().IsStopped();
+
+    status = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, onOffState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        LOG_ERR("Updating on/off %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating On/Off state %" PRIx8, status);
     }
 }

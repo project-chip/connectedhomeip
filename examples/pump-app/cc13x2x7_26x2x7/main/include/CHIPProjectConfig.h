@@ -41,8 +41,8 @@
 // authentication in various protocols.
 // WARNING: These options make it possible to circumvent basic CHIP security functionality,
 // including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
-#define CHIP_CONFIG_SECURITY_TEST_MODE 1
-#define CHIP_CONFIG_REQUIRE_AUTH 0
+#define CHIP_CONFIG_SECURITY_TEST_MODE 0
+#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY

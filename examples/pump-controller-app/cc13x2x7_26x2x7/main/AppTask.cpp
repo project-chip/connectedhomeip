@@ -45,6 +45,8 @@
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
+#define ONOFF_CLUSTER_ENDPOINT 1
+
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -276,7 +278,7 @@ void AppTask::ActionInitiated(PumpManager::Action_t aAction, int32_t aActor)
     LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
 }
 
-void AppTask::ActionCompleted(PumpManager::Action_t aAction)
+void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
 {
     // if the action has been completed by the lock, update the bolt lock trait.
     // Turn on the lock LED if in a LOCKED state OR
@@ -296,6 +298,10 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction)
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
         LED_setOff(sAppRedHandle);
+    }
+    if (aActor == AppEvent::kEventType_ButtonLeft)
+    {
+        sAppTask.UpdateClusterState();
     }
 }
 
@@ -357,5 +363,22 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_None:
     default:
         break;
+    }
+}
+
+void AppTask::UpdateClusterState()
+{
+    EmberStatus status;
+
+    ChipLogProgress(NotSpecified, "UpdateClusterState");
+
+    // Write the new values
+
+    bool onOffState = !PumpMgr().IsStopped();
+
+    status = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, onOffState);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating On/Off state %" PRIx8, status);
     }
 }

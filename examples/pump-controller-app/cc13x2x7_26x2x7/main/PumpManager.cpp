@@ -82,13 +82,13 @@ bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
     if (mState == kState_LockingCompleted && aAction == UNLOCK_ACTION)
     {
         action_initiated = true;
-
+        mCurrentActor    = aActor;
         new_state = kState_UnlockingInitiated;
     }
     else if (mState == kState_UnlockingCompleted && aAction == LOCK_ACTION)
     {
         action_initiated = true;
-
+        mCurrentActor    = aActor;
         new_state = kState_LockingInitiated;
     }
 
@@ -188,7 +188,7 @@ void PumpManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
     {
         if (lock->mActionCompleted_CB)
         {
-            lock->mActionCompleted_CB(actionCompleted);
+            pump->mActionCompleted_CB(actionCompleted, pump->mCurrentActor);
         }
 
         if (lock->mAutoRelock && actionCompleted == UNLOCK_ACTION)
