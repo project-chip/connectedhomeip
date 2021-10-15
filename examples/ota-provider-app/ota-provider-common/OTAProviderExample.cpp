@@ -23,9 +23,9 @@
 #include <app/CommandPathParams.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/util/af.h>
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/RandUtils.h>
 #include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
 
 #include <string.h>
@@ -56,7 +56,7 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
 {
     for (size_t i = 0; i < bufSize; ++i)
     {
-        buf[i] = chip::GetRandU8();
+        buf[i] = chip::Crypto::GetRandU8();
     }
 }
 

@@ -27,6 +27,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
+#include <crypto/RandUtils.h>
+
 #include <lib/core/CHIPCore.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/PlatformManager.h>
@@ -35,7 +37,6 @@
 #include <platform/internal/GenericSoftwareUpdateManagerImpl.h>
 
 #include <lib/support/FibonacciUtils.h>
-#include <lib/support/RandUtils.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -724,7 +725,7 @@ uint32_t GenericSoftwareUpdateManagerImpl<ImplClass>::GetNextWaitTimeInterval()
 template <class ImplClass>
 uint32_t GenericSoftwareUpdateManagerImpl<ImplClass>::ComputeNextScheduledWaitTimeInterval(void)
 {
-    uint32_t timeOutMsecs = (mMinWaitTimeMs + (GetRandU32() % (mMaxWaitTimeMs - mMinWaitTimeMs)));
+    uint32_t timeOutMsecs = (mMinWaitTimeMs + (chip::Crypto::GetRandU32() % (mMaxWaitTimeMs - mMinWaitTimeMs)));
 
     ChipLogProgress(DeviceLayer, "Next Scheduled Software Update Check in %ums", timeOutMsecs);
 
@@ -1044,7 +1045,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DefaultRetryPolicyCallback(voi
     if (maxWaitTimeInMsec != 0)
     {
         minWaitTimeInMsec = (CHIP_DEVICE_CONFIG_SWU_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP * maxWaitTimeInMsec) / 100;
-        waitTimeInMsec    = minWaitTimeInMsec + (GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
+        waitTimeInMsec    = minWaitTimeInMsec + (chip::Crypto::GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
 
         ChipLogDetail(DeviceLayer,
                       "Computing swu retry policy: attempts %" PRIu32 ", max wait time %" PRIu32 " ms, selected wait time %" PRIu32

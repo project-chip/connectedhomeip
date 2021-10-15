@@ -16,21 +16,12 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines utility functions for deriving random integers.
- *
- *  @note These utility functions do not generate cryptographically strong
- *        random number. To get cryptographically strong random data use
- *        chip::Platform::Security::GetSecureRandomData().
- *
- */
-
 #pragma once
 
 #include <stdint.h>
 
 namespace chip {
+namespace Crypto {
 
 /**
  *  This function generates 64-bit unsigned random number.
@@ -64,4 +55,5 @@ extern uint16_t GetRandU16();
  */
 extern uint8_t GetRandU8();
 
+} // namespace Crypto
 } // namespace chip
