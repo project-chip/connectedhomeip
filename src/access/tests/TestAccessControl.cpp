@@ -168,7 +168,7 @@ TestEntryDelegate entries[] = {
         .authMode    = AuthMode::kCase,
         .privilege   = Privilege::kView,
         .subjects    = { CAT1(86), CAT2(99) },
-        .targets     = { Target(kEndpoint1), Target(kOnOffCluster) },
+        .targets     = { Target(kEndpoint0), Target(kAccessControlCluster) },
     },
     {
         .fabricIndex = 1,
