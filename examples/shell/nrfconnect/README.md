@@ -1,6 +1,6 @@
-# CHIP nRF Connect SDK Shell Application
+# Matter nRF Connect SDK Shell Application
 
-A [chip-shell](../README.md) project for the Nordic nRF52840 and nRF5340
+A [Matter shell](../README.md) project for the Nordic nRF52840 and nRF5340
 development kits, built using the nRF Connect SDK.
 
 ## Building

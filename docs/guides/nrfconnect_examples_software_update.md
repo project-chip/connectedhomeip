@@ -54,7 +54,7 @@ Complete the following steps to perform DFU using mcumgr:
 
 > **_NOTE:_** In all of the commands listed in the following steps, replace
 > `ble-hci-number` with the Bluetooth hci integer value (for example, `0`) and
-> `ble-device-name` with the CHIP device name advertised over Bluetooth LE (for
+> `ble-device-name` with the Matter device name advertised over Bluetooth LE (for
 > example, `MatterLock`).
 
 1.  Install the tool by following the

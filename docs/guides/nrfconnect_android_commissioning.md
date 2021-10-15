@@ -2,7 +2,7 @@
 
 You can use [CHIPTool](android_chiptool_building.md) for Android smartphones to
 commission a Nordic Semiconductor device running an nRF Connect platform example
-onto a CHIP-enabled Thread network.
+onto a Matter-enabled Thread network.
 
 This guide references the nRF52840 DK and the door lock example application
 based on the nRF Connect platform, but the instructions are also valid for the
@@ -18,7 +18,7 @@ and applications as well.
 -   [Building and installing Android CHIPTool](#building-chiptool)
 -   [Preparing accessory device](#preparing-accessory)
 -   [Commissioning accessory device](#commissioning-accessory)
--   [Sending CHIP commands](#sending-chip-commands)
+-   [Sending Matter commands](#sending-chip-commands)
 
 <hr>
 
@@ -28,10 +28,10 @@ and applications as well.
 
 The commissioning process is composed of the following main stages:
 
-1.  CHIPTool discovers a CHIP accessory device over Bluetooth LE.
+1.  CHIPTool discovers a Matter accessory device over Bluetooth LE.
 2.  CHIPTool establishes a secure channel to the device over Bluetooth LE, and
-    sends CHIP operational credentials and Thread provisioning data.
-3.  The accessory device joins a CHIP-enabled Thread network.
+    sends Matter operational credentials and Thread provisioning data.
+3.  The accessory device joins a Matter-enabled Thread network.
 
 CHIPTool uses both Bluetooth LE and the IPv6 connectivity. Bluetooth LE is used
 only during the commissioning phase. Afterwards, only the IPv6 connectivity
@@ -49,7 +49,7 @@ The following diagram shows the connectivity between network components required
 to allow communication between devices running the CHIPTool and Lock
 applications:
 
-![CHIP nodes connectivity](./images/nrfconnect_android_connectivity.png)
+![Matter nodes connectivity](./images/nrfconnect_android_connectivity.png)
 
 <hr>
 
@@ -120,7 +120,7 @@ After building, install the application by completing the following steps:
     turn it on.
 4.  Plug the smartphone into a USB port on your PC.
 5.  Run the following command to install the application, with _chip-dir_
-    replaced with the path to the CHIP source directory:
+    replaced with the path to the Matter source directory:
 
         $ adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
 
@@ -183,7 +183,7 @@ device successfully joins the Thread network.
 
 <a name="sending-commands"></a>
 
-## Sending CHIP commands
+## Sending Matter commands
 
 Once the device is commissioned, the main application screen appears.
 
