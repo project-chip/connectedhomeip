@@ -30,9 +30,9 @@ namespace {
 using namespace chip::access;
 
 // Some cluster IDs
-const ClusterId ONOFF = 0x00000006;
-const ClusterId LEVELCONTROL = 0x00000008;
-const ClusterId COLORCONTROL = 0x00000300;
+const ClusterId ONOFF         = 0x00000006;
+const ClusterId LEVELCONTROL  = 0x00000008;
+const ClusterId COLORCONTROL  = 0x00000300;
 const ClusterId ACCESSCONTROL = 0x0000001F;
 
 // Used to detect empty subjects, targets, etc.
@@ -77,8 +77,8 @@ struct TestTarget
     enum Flag
     {
         kDeviceType = 1 << 0,
-        kEndpoint = 1 << 1,
-        kCluster = 1 << 2,
+        kEndpoint   = 1 << 1,
+        kCluster    = 1 << 2,
     };
 
     int flags = SENTINEL;
@@ -89,11 +89,7 @@ struct TestTarget
 
 TestTarget Target(EndpointId endpoint, ClusterId cluster)
 {
-    return {
-        .flags = TestTarget::kEndpoint | TestTarget::kCluster,
-        .endpoint = endpoint,
-        .cluster = cluster
-    };
+    return { .flags = TestTarget::kEndpoint | TestTarget::kCluster, .endpoint = endpoint, .cluster = cluster };
 }
 
 #if 0
@@ -111,54 +107,53 @@ TestTarget Target(ClusterId cluster)
 struct TestEntryDelegate
 {
     FabricIndex fabricIndex = 0;
-    AuthMode authMode = AuthMode::kNone; // aka SENTINEL
-    Privilege privilege = Privilege::kView;
+    AuthMode authMode       = AuthMode::kNone; // aka SENTINEL
+    Privilege privilege     = Privilege::kView;
     TestSubject subjects[Config::kSubjectsPerEntry + 1];
     TestTarget targets[Config::kTargetsPerEntry + 1];
 };
 
-TestEntryDelegate entries[] =
-{
+TestEntryDelegate entries[] = {
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::kCase,
-        .privilege = Privilege::kAdminister,
-        .subjects = { Node(0x1122334455667788) },
+        .authMode    = AuthMode::kCase,
+        .privilege   = Privilege::kAdminister,
+        .subjects    = { Node(0x1122334455667788) },
     },
     {
         .fabricIndex = 2,
-        .authMode = AuthMode::kCase,
-        .privilege = Privilege::kAdminister,
-        .subjects = { Node(0x8877665544332211) },
+        .authMode    = AuthMode::kCase,
+        .privilege   = Privilege::kAdminister,
+        .subjects    = { Node(0x8877665544332211) },
     },
     {
         .fabricIndex = 2,
-        .authMode = AuthMode::kCase,
-        .privilege = Privilege::kView,
+        .authMode    = AuthMode::kCase,
+        .privilege   = Privilege::kView,
     },
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::kPase,
-        .privilege = Privilege::kView,
-        .targets = { Target(2, ONOFF )},
+        .authMode    = AuthMode::kPase,
+        .privilege   = Privilege::kView,
+        .targets     = { Target(2, ONOFF) },
     },
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::kCase,
-        .privilege = Privilege::kView,
-        .targets = { Target(1, LEVELCONTROL )},
+        .authMode    = AuthMode::kCase,
+        .privilege   = Privilege::kView,
+        .targets     = { Target(1, LEVELCONTROL) },
     },
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::kCase,
-        .privilege = Privilege::kOperate,
-        .targets = { Target(1, COLORCONTROL )},
+        .authMode    = AuthMode::kCase,
+        .privilege   = Privilege::kOperate,
+        .targets     = { Target(1, COLORCONTROL) },
     },
     {
         .fabricIndex = 1,
-        .authMode = AuthMode::kCase,
-        .privilege = Privilege::kView,
-        .targets = { Target(2, ONOFF )},
+        .authMode    = AuthMode::kCase,
+        .privilege   = Privilege::kView,
+        .targets     = { Target(2, ONOFF) },
     },
     {} // sentinel entry
 };
@@ -168,37 +163,37 @@ class TestEntry : public Entry
 public:
     virtual ~TestEntry() = default;
 
-    bool MatchesAuthMode(AuthMode authMode) const override
-    {
-        return delegate->authMode == authMode;
-    }
+    bool MatchesAuthMode(AuthMode authMode) const override { return delegate->authMode == authMode; }
 
-    bool MatchesFabric(FabricIndex fabricIndex) const override
-    {
-        return delegate->fabricIndex == fabricIndex;
-    }
+    bool MatchesFabric(FabricIndex fabricIndex) const override { return delegate->fabricIndex == fabricIndex; }
 
     bool MatchesPrivilege(Privilege privilege) const override
     {
         switch (privilege)
         {
-            case Privilege::kProxyView:
-                return (delegate->privilege == Privilege::kProxyView)
-                        || (delegate->privilege == Privilege::kAdminister);
-            case Privilege::kView: if (delegate->privilege == Privilege::kView) return true;
-            // fall through
-            case Privilege::kOperate: if (delegate->privilege == Privilege::kOperate) return true;
-            // fall through
-            case Privilege::kManage: if (delegate->privilege == Privilege::kManage) return true;
-            // fall through
-            case Privilege::kAdminister: return delegate->privilege == Privilege::kAdminister;
+        case Privilege::kProxyView:
+            return (delegate->privilege == Privilege::kProxyView) || (delegate->privilege == Privilege::kAdminister);
+        case Privilege::kView:
+            if (delegate->privilege == Privilege::kView)
+                return true;
+        // fall through
+        case Privilege::kOperate:
+            if (delegate->privilege == Privilege::kOperate)
+                return true;
+        // fall through
+        case Privilege::kManage:
+            if (delegate->privilege == Privilege::kManage)
+                return true;
+        // fall through
+        case Privilege::kAdminister:
+            return delegate->privilege == Privilege::kAdminister;
         }
         return false;
     }
 
     bool MatchesSubject(SubjectId subject) const override
     {
-        TestSubject* p = delegate->subjects;
+        TestSubject * p = delegate->subjects;
         if (p->id == SENTINEL)
             return true;
         for (; p->id != SENTINEL; ++p)
@@ -211,13 +206,13 @@ public:
 
     bool MatchesTarget(EndpointId endpoint, ClusterId cluster) const override
     {
-        TestTarget* p = delegate->targets;
+        TestTarget * p = delegate->targets;
         if (p->flags == SENTINEL)
             return true;
         for (; p->flags != SENTINEL; ++p)
         {
-            if (((p->flags & TestTarget::kEndpoint) == 0 || p->endpoint == endpoint)
-                    && ((p->flags & TestTarget::kCluster) == 0 || p->cluster == cluster))
+            if (((p->flags & TestTarget::kEndpoint) == 0 || p->endpoint == endpoint) &&
+                ((p->flags & TestTarget::kCluster) == 0 || p->cluster == cluster))
                 return true;
         }
         return false;
@@ -240,9 +235,9 @@ public:
 
     void Initialize(FabricIndex fabricIndex_)
     {
-        fabricFiltered = true;
+        fabricFiltered    = true;
         this->fabricIndex = fabricIndex_;
-        entry.delegate = nullptr;
+        entry.delegate    = nullptr;
         FindNext();
     }
 
@@ -261,7 +256,7 @@ public:
         }
     }
 
-    Entry& Next() override
+    Entry & Next() override
     {
         if (HasNext())
         {
@@ -271,14 +266,9 @@ public:
         return entry;
     }
 
-    bool HasNext() override
-    {
-        return next != nullptr;
-    }
+    bool HasNext() override { return next != nullptr; }
 
-    void Release() override
-    {
-    }
+    void Release() override {}
 
     bool fabricFiltered;
     FabricIndex fabricIndex;
@@ -290,25 +280,20 @@ public:
 class TestDataProvider : public DataProvider
 {
 public:
-    TestDataProvider() = default;
+    TestDataProvider()          = default;
     virtual ~TestDataProvider() = default;
 
-    CHIP_ERROR Init() override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
 
-    void Finish() override
-    {
-    }
+    void Finish() override {}
 
-    EntryIterator* Entries() const override
+    EntryIterator * Entries() const override
     {
         iterator.Initialize();
         return &iterator;
     }
 
-    EntryIterator* Entries(FabricIndex fabricIndex) const override
+    EntryIterator * Entries(FabricIndex fabricIndex) const override
     {
         iterator.Initialize(fabricIndex);
         return &iterator;
@@ -320,23 +305,22 @@ public:
 TestDataProvider testDataProvider;
 AccessControl testAccessControl(testDataProvider);
 
-#define USE_CONTEXT() \
-        AccessControl & context = *reinterpret_cast<AccessControl*>(inContext);
+#define USE_CONTEXT() AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
 
 void MetaTestIterator(nlTestSuite * inSuite, void * inContext)
 {
-    EntryIterator* iterator = testDataProvider.Entries();
+    EntryIterator * iterator = testDataProvider.Entries();
     NL_TEST_ASSERT(inSuite, iterator != nullptr);
 
-    TestEntryDelegate* p = entries;
+    TestEntryDelegate * p = entries;
     while (iterator->HasNext())
     {
         auto & entry = iterator->Next();
-        NL_TEST_ASSERT_LOOP(inSuite, int(p - entries), static_cast<TestEntry&>(entry).delegate == p);
+        NL_TEST_ASSERT_LOOP(inSuite, int(p - entries), static_cast<TestEntry &>(entry).delegate == p);
         ++p;
     }
 
-    NL_TEST_ASSERT(inSuite, p == entries + sizeof(entries)/sizeof(entries[0]) - 1);
+    NL_TEST_ASSERT(inSuite, p == entries + sizeof(entries) / sizeof(entries[0]) - 1);
 }
 
 void TestCheck(nlTestSuite * inSuite, void * inContext)
@@ -347,16 +331,12 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
 
     // TODO: make this table driven, add a bunch more test cases
 
-    err = context.Check(
-            {.subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1},
-            {.endpoint = 1, .cluster = ONOFF},
-            Privilege::kAdminister);
+    err = context.Check({ .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+                        { .endpoint = 1, .cluster = ONOFF }, Privilege::kAdminister);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = context.Check(
-            {.subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1},
-            {.endpoint = 1, .cluster = ONOFF},
-            Privilege::kAdminister);
+    err = context.Check({ .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+                        { .endpoint = 1, .cluster = ONOFF }, Privilege::kAdminister);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ACCESS_DENIED);
 }
 
@@ -405,22 +385,16 @@ int Terminate(void * inContext)
 
 int TestAccessControl()
 {
-    const nlTest tests[] =
-    {
-        NL_TEST_DEF("MetaTestIterator", MetaTestIterator),
-        NL_TEST_DEF("TestInstance", TestInstance),
-        NL_TEST_DEF("TestCheck", TestCheck),
-        NL_TEST_SENTINEL()
-    };
+    const nlTest tests[] = { NL_TEST_DEF("MetaTestIterator", MetaTestIterator), NL_TEST_DEF("TestInstance", TestInstance),
+                             NL_TEST_DEF("TestCheck", TestCheck), NL_TEST_SENTINEL() };
 
-    nlTestSuite suite =
-    {
-        .name = "AccessControl",
-        .tests = tests,
-        .setup = Setup,
-        .tear_down = Teardown,
+    nlTestSuite suite = {
+        .name       = "AccessControl",
+        .tests      = tests,
+        .setup      = Setup,
+        .tear_down  = Teardown,
         .initialize = Initialize,
-        .terminate = Terminate,
+        .terminate  = Terminate,
     };
 
     nlTestRunner(&suite, &testAccessControl);

@@ -29,9 +29,9 @@ namespace access {
  */
 enum AuthMode
 {
-    kNone = 0,
-    kPase = 1 << 5,
-    kCase = 1 << 6,
+    kNone  = 0,
+    kPase  = 1 << 5,
+    kCase  = 1 << 6,
     kGroup = 1 << 7
 };
 

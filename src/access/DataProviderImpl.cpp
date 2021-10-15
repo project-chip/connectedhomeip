@@ -26,17 +26,15 @@ CHIP_ERROR DataProviderImpl::Init()
     return CHIP_NO_ERROR;
 }
 
-void DataProviderImpl::Finish()
-{
-}
+void DataProviderImpl::Finish() {}
 
-EntryIterator* DataProviderImpl::Entries() const
+EntryIterator * DataProviderImpl::Entries() const
 {
     // TODO: provide iterator
     return nullptr;
 }
 
-EntryIterator* DataProviderImpl::Entries(FabricIndex fabricIndex) const
+EntryIterator * DataProviderImpl::Entries(FabricIndex fabricIndex) const
 {
     // TODO: provide iterator
     return nullptr;

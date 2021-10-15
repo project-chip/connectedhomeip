@@ -86,7 +86,7 @@ public:
      *
      * @retval the next entry.
      */
-    virtual Entry& Next() = 0;
+    virtual Entry & Next() = 0;
 
     /**
      * Whether a next entry exists.
@@ -141,7 +141,7 @@ public:
      * @retval iterator, release when finished.
      * @retval nullptr if error, probably fatal, generally should not happen.
      */
-    virtual EntryIterator* Entries() const = 0;
+    virtual EntryIterator * Entries() const = 0;
 
     /**
      * Get an iterator over all entries for a particular fabric.
@@ -149,7 +149,7 @@ public:
      * @retval iterator, release when finished.
      * @retval nullptr if error, probably fatal, generally should not happen.
      */
-    virtual EntryIterator* Entries(FabricIndex fabricIndex) const = 0;
+    virtual EntryIterator * Entries(FabricIndex fabricIndex) const = 0;
 };
 
 } // namespace access

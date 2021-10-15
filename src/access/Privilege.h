@@ -29,10 +29,10 @@ namespace access {
  */
 enum Privilege
 {
-    kView = 1 << 0,
-    kProxyView = 1 << 1,
-    kOperate = 1 << 2,
-    kManage = 1 << 3,
+    kView       = 1 << 0,
+    kProxyView  = 1 << 1,
+    kOperate    = 1 << 2,
+    kManage     = 1 << 3,
     kAdminister = 1 << 4
 };
 

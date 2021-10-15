@@ -43,10 +43,7 @@ public:
      * uninitialized DataProvider must be provided, and the module must then be
      * initialized before use, and deinitialized when finished.
      */
-    AccessControl(DataProvider & dataProvider)
-        : mDataProvider(dataProvider)
-    {
-    }
+    AccessControl(DataProvider & dataProvider) : mDataProvider(dataProvider) {}
 
     AccessControl(const AccessControl &) = delete;
     AccessControl & operator=(const AccessControl &) = delete;
@@ -84,20 +81,14 @@ public:
      *
      * @retval nullptr if configured so.
      */
-    static AccessControl * GetInstance()
-    {
-        return mInstance;
-    }
+    static AccessControl * GetInstance() { return mInstance; }
 
     /**
      * Set the configured instance, for advanced use (e.g. testing). Does not
      * call Init or Finish (so ensure that happens appropriately). The
      * configured instance can be cleared (by setting to nullptr).
      */
-    static void SetInstance(AccessControl * instance)
-    {
-        mInstance = instance;
-    }
+    static void SetInstance(AccessControl * instance) { mInstance = instance; }
 
 private:
     DataProvider & mDataProvider;
