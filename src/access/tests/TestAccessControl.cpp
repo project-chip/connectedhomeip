@@ -29,48 +29,57 @@ namespace {
 
 using namespace chip::access;
 
-// Some cluster IDs
-const ClusterId ONOFF         = 0x00000006;
-const ClusterId LEVELCONTROL  = 0x00000008;
-const ClusterId COLORCONTROL  = 0x00000300;
-const ClusterId ACCESSCONTROL = 0x0000001F;
+constexpr EndpointId kEndpoint0 = 0;
+constexpr EndpointId kEndpoint1 = 1;
+constexpr EndpointId kEndpoint2 = 2;
+
+const ClusterId kOnOffCluster         = 0x00000006;
+const ClusterId kLevelControlCluster  = 0x00000008;
+const ClusterId kColorControlCluster  = 0x00000300;
+const ClusterId kAccessControlCluster = 0x0000001F;
 
 // Used to detect empty subjects, targets, etc.
 const int SENTINEL = 0;
 
 struct TestSubject
 {
-    SubjectId id = SENTINEL;
+    enum Flag
+    {
+        kPasscode = 1 << 0,
+        kNode     = 1 << 1,
+        kCAT1     = 1 << 2,
+        kCAT2     = 1 << 3,
+        kGroup    = 1 << 4,
+    };
+
+    int flags = SENTINEL;
+    SubjectId id;
 };
 
-#if 0
 TestSubject Passcode(PasscodeId id)
 {
-    return { .id = id };
+    return { .flags = TestSubject::kPasscode, .id = id };
 }
-#endif
 
 TestSubject Node(NodeId id)
 {
-    return { .id = id };
+    return { .flags = TestSubject::kNode, .id = id };
 }
 
-#if 0
-TestSubject CAT1()
+TestSubject CAT1(CatId id)
 {
-    return {};
+    return { .flags = TestSubject::kCAT1, .id = id };
 }
 
-TestSubject CAT2()
+TestSubject CAT2(CatId id)
 {
-    return {};
+    return { .flags = TestSubject::kCAT2, .id = id };
 }
 
 TestSubject Group(GroupId id)
 {
-    return { .id = id };
+    return { .flags = TestSubject::kGroup, .id = id };
 }
-#endif
 
 struct TestTarget
 {
@@ -92,7 +101,6 @@ TestTarget Target(EndpointId endpoint, ClusterId cluster)
     return { .flags = TestTarget::kEndpoint | TestTarget::kCluster, .endpoint = endpoint, .cluster = cluster };
 }
 
-#if 0
 TestTarget Target(EndpointId endpoint)
 {
     return { .flags = TestTarget::kEndpoint, .endpoint = endpoint };
@@ -102,7 +110,6 @@ TestTarget Target(ClusterId cluster)
 {
     return { .flags = TestTarget::kCluster, .cluster = cluster };
 }
-#endif
 
 struct TestEntryDelegate
 {
@@ -135,25 +142,39 @@ TestEntryDelegate entries[] = {
         .fabricIndex = 1,
         .authMode    = AuthMode::kPase,
         .privilege   = Privilege::kView,
-        .targets     = { Target(2, ONOFF) },
+        .subjects    = { Passcode(0) },
+        .targets     = { Target(kEndpoint2, kOnOffCluster) },
     },
     {
         .fabricIndex = 1,
         .authMode    = AuthMode::kCase,
         .privilege   = Privilege::kView,
-        .targets     = { Target(1, LEVELCONTROL) },
+        .targets     = { Target(kEndpoint1, kLevelControlCluster) },
     },
     {
         .fabricIndex = 1,
         .authMode    = AuthMode::kCase,
         .privilege   = Privilege::kOperate,
-        .targets     = { Target(1, COLORCONTROL) },
+        .targets     = { Target(kEndpoint1, kColorControlCluster) },
     },
     {
         .fabricIndex = 1,
         .authMode    = AuthMode::kCase,
         .privilege   = Privilege::kView,
-        .targets     = { Target(2, ONOFF) },
+        .targets     = { Target(kEndpoint2, kOnOffCluster) },
+    },
+    {
+        .fabricIndex = 1,
+        .authMode    = AuthMode::kCase,
+        .privilege   = Privilege::kView,
+        .subjects    = { CAT1(86), CAT2(99) },
+        .targets     = { Target(kEndpoint1), Target(kOnOffCluster) },
+    },
+    {
+        .fabricIndex = 1,
+        .authMode    = AuthMode::kGroup,
+        .privilege   = Privilege::kView,
+        .subjects    = { Group(7) },
     },
     {} // sentinel entry
 };
@@ -194,9 +215,9 @@ public:
     bool MatchesSubject(SubjectId subject) const override
     {
         TestSubject * p = delegate->subjects;
-        if (p->id == SENTINEL)
+        if (p->flags == SENTINEL)
             return true;
-        for (; p->id != SENTINEL; ++p)
+        for (; p->flags != SENTINEL; ++p)
         {
             if (p->id == subject)
                 return true;
@@ -305,8 +326,6 @@ public:
 TestDataProvider testDataProvider;
 AccessControl testAccessControl(testDataProvider);
 
-#define USE_CONTEXT() AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
-
 void MetaTestIterator(nlTestSuite * inSuite, void * inContext)
 {
     EntryIterator * iterator = testDataProvider.Entries();
@@ -325,24 +344,24 @@ void MetaTestIterator(nlTestSuite * inSuite, void * inContext)
 
 void TestCheck(nlTestSuite * inSuite, void * inContext)
 {
-    USE_CONTEXT();
+    AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
 
     CHIP_ERROR err;
 
     // TODO: make this table driven, add a bunch more test cases
 
     err = context.Check({ .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
-                        { .endpoint = 1, .cluster = ONOFF }, Privilege::kAdminister);
+                        { .endpoint = kEndpoint1, .cluster = kOnOffCluster }, Privilege::kAdminister);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = context.Check({ .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1 },
-                        { .endpoint = 1, .cluster = ONOFF }, Privilege::kAdminister);
+                        { .endpoint = kEndpoint1, .cluster = kOnOffCluster }, Privilege::kAdminister);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ACCESS_DENIED);
 }
 
 void TestInstance(nlTestSuite * inSuite, void * inContext)
 {
-    USE_CONTEXT();
+    AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
 
     AccessControl * instance = AccessControl::GetInstance();
     NL_TEST_ASSERT(inSuite, instance != nullptr);
@@ -359,14 +378,14 @@ void TestInstance(nlTestSuite * inSuite, void * inContext)
 
 int Setup(void * inContext)
 {
-    USE_CONTEXT();
+    AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
     CHIP_ERROR err = context.Init();
     return err == CHIP_NO_ERROR ? SUCCESS : FAILURE;
 }
 
 int Teardown(void * inContext)
 {
-    USE_CONTEXT();
+    AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
     context.Finish();
     return SUCCESS;
 }
