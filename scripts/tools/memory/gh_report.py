@@ -478,7 +478,8 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame,
                               tabulate={'floatfmt': '5.1f'})
 
     count = len(df.attrs['things'])
-    summary = f'{count} build{"" if count == 1 else "s"}'
+    platforms = ', '.join(set(df['platform']))
+    summary = f'{count} build{"" if count == 1 else "s"} (for {platforms})'
     md.write(f'\n<details>\n<summary>{summary}</summary>\n\n')
     memdf.report.write_df(db.config,
                           df,
