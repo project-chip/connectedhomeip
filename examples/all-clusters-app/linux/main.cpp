@@ -30,7 +30,6 @@
 #include <app/util/util.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/RandUtils.h>
 
 #include "AppMain.h"
 
