@@ -1,6 +1,6 @@
-# CHIP Shell - Device Layer module
+# Matter Shell - Device Layer module
 
-The chip::DeviceLayer APIs may be invoked via the CHIP Shell CLI.
+The chip::DeviceLayer APIs may be invoked via the Matter Shell CLI.
 
 ## Command List
 
@@ -75,7 +75,7 @@ Done
 
 ### start
 
-Initialize the chip stack and start the device layer event loop.
+Initialize the Matter stack and start the device layer event loop.
 
 ```bash
 > device start
