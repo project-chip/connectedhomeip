@@ -20,6 +20,8 @@
 
 #include "DataProviderImpl.h"
 
+#include <cstddef>
+
 namespace chip {
 namespace access {
 
@@ -29,11 +31,11 @@ struct Config
     // Data provider implementation used by AccessControl configured instance.
     typedef DataProviderImpl DataProvider;
 
-    static const int kSubjectsPerEntry = 4;
+    static constexpr size_t kSubjectsPerEntry = 4;
 
-    static const int kTargetsPerEntry = 3;
+    static constexpr size_t kTargetsPerEntry = 3;
 
-    static const int kEntriesPerFabric = 3;
+    static constexpr size_t kEntriesPerFabric = 3;
 };
 
 } // namespace access

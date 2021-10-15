@@ -24,19 +24,9 @@
 namespace chip {
 namespace access {
 
-/**
- * @typedef SubjectId
- *
- * @brief Access control subject identifier. Can store a PasscodeId, NodeId,
- * CatId, GroupId, etc. as appropriate.
- */
+// Can store a PasscodeId, NodeId, CatId, GroupId, etc. as appropriate.
 typedef uint64_t SubjectId;
 
-/**
- * @class SubjectDescriptor
- *
- * @brief Access control subject descriptor.
- */
 struct SubjectDescriptor
 {
     // Holds PasscodeId if kPase, NodeId if kCase, GroupId if kGroup

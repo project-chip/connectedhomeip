@@ -33,13 +33,13 @@ constexpr EndpointId kEndpoint0 = 0;
 constexpr EndpointId kEndpoint1 = 1;
 constexpr EndpointId kEndpoint2 = 2;
 
-const ClusterId kOnOffCluster         = 0x00000006;
-const ClusterId kLevelControlCluster  = 0x00000008;
-const ClusterId kColorControlCluster  = 0x00000300;
-const ClusterId kAccessControlCluster = 0x0000001F;
+constexpr ClusterId kOnOffCluster         = 0x00000006;
+constexpr ClusterId kLevelControlCluster  = 0x00000008;
+constexpr ClusterId kColorControlCluster  = 0x00000300;
+constexpr ClusterId kAccessControlCluster = 0x0000001F;
 
 // Used to detect empty subjects, targets, etc.
-const int SENTINEL = 0;
+constexpr int kEmptyFlags = 0;
 
 struct TestSubject
 {
@@ -52,7 +52,7 @@ struct TestSubject
         kGroup    = 1 << 4,
     };
 
-    int flags = SENTINEL;
+    int flags = kEmptyFlags;
     SubjectId id;
 };
 
@@ -90,7 +90,7 @@ struct TestTarget
         kCluster    = 1 << 2,
     };
 
-    int flags = SENTINEL;
+    int flags = kEmptyFlags;
     DeviceTypeId deviceType;
     EndpointId endpoint;
     ClusterId cluster;
@@ -114,7 +114,7 @@ TestTarget Target(ClusterId cluster)
 struct TestEntryDelegate
 {
     FabricIndex fabricIndex = 0;
-    AuthMode authMode       = AuthMode::kNone; // aka SENTINEL
+    AuthMode authMode       = AuthMode::kNone; // kNone used as sentinel
     Privilege privilege     = Privilege::kView;
     TestSubject subjects[Config::kSubjectsPerEntry + 1];
     TestTarget targets[Config::kTargetsPerEntry + 1];
@@ -186,7 +186,9 @@ public:
 
     bool MatchesAuthMode(AuthMode authMode) const override { return delegate->authMode == authMode; }
 
-    bool MatchesFabric(FabricIndex fabricIndex) const override { return delegate->fabricIndex == fabricIndex; }
+    bool MatchesFabric(FabricIndex fabricIndex) const override {
+        return (delegate->fabricIndex == 0) || (delegate->fabricIndex == fabricIndex);
+    }
 
     bool MatchesPrivilege(Privilege privilege) const override
     {
@@ -215,9 +217,9 @@ public:
     bool MatchesSubject(SubjectId subject) const override
     {
         TestSubject * p = delegate->subjects;
-        if (p->flags == SENTINEL)
+        if (p->flags == kEmptyFlags)
             return true;
-        for (; p->flags != SENTINEL; ++p)
+        for (; p->flags != kEmptyFlags; ++p)
         {
             if (p->id == subject)
                 return true;
@@ -228,9 +230,9 @@ public:
     bool MatchesTarget(EndpointId endpoint, ClusterId cluster) const override
     {
         TestTarget * p = delegate->targets;
-        if (p->flags == SENTINEL)
+        if (p->flags == kEmptyFlags)
             return true;
-        for (; p->flags != SENTINEL; ++p)
+        for (; p->flags != kEmptyFlags; ++p)
         {
             if (((p->flags & TestTarget::kEndpoint) == 0 || p->endpoint == endpoint) &&
                 ((p->flags & TestTarget::kCluster) == 0 || p->cluster == cluster))
@@ -340,6 +342,8 @@ void MetaTestIterator(nlTestSuite * inSuite, void * inContext)
     }
 
     NL_TEST_ASSERT(inSuite, p == entries + sizeof(entries) / sizeof(entries[0]) - 1);
+
+    iterator->Release();
 }
 
 void TestCheck(nlTestSuite * inSuite, void * inContext)

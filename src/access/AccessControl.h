@@ -29,11 +29,6 @@ namespace access {
 
 class DataProvider;
 
-/**
- * @class AccessControl
- *
- * @brief Access control module.
- */
 class AccessControl
 {
 public:
@@ -53,7 +48,6 @@ public:
      * provider.
      *
      * @retval various errors, probably fatal.
-     * @retval #CHIP_NO_ERROR on success.
      */
     CHIP_ERROR Init();
 

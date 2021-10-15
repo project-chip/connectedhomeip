@@ -23,11 +23,6 @@
 namespace chip {
 namespace access {
 
-/**
- * @struct RequestPath
- *
- * @brief Access control request path.
- */
 struct RequestPath
 {
     // TODO: don't worry about node for now (proxy source)
