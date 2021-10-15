@@ -21,6 +21,11 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-ipv6only'
 
+# Generating linux-arm64-rpc-console
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/common/pigweed/rpc_console '"'"'--args=target_cpu="arm64"'"'"' {out}/linux-arm64-rpc-console'
+
 # Generating linux-arm64-thermostat
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
@@ -43,6 +48,9 @@ gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool {out}/linu
 # Generating linux-x64-chip-tool-ipv6only
 gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-chip-tool-ipv6only
 
+# Generating linux-x64-rpc-console
+gn gen --check --fail-on-unused-args --root={root}/examples/common/pigweed/rpc_console {out}/linux-x64-rpc-console
+
 # Generating linux-x64-thermostat
 gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux {out}/linux-x64-thermostat
 
@@ -61,6 +69,9 @@ ninja -C {out}/linux-arm64-chip-tool
 # Building linux-arm64-chip-tool-ipv6only
 ninja -C {out}/linux-arm64-chip-tool-ipv6only
 
+# Building linux-arm64-rpc-console
+ninja -C {out}/linux-arm64-rpc-console
+
 # Building linux-arm64-thermostat
 ninja -C {out}/linux-arm64-thermostat
 
@@ -78,6 +89,9 @@ ninja -C {out}/linux-x64-chip-tool
 
 # Building linux-x64-chip-tool-ipv6only
 ninja -C {out}/linux-x64-chip-tool-ipv6only
+
+# Building linux-x64-rpc-console
+ninja -C {out}/linux-x64-rpc-console
 
 # Building linux-x64-thermostat
 ninja -C {out}/linux-x64-thermostat
