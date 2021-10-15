@@ -52,9 +52,9 @@ void PythonInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSe
 }
 
 void PythonInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender,
-                                             Protocols::InteractionModel::Status aClusterStatus, CHIP_ERROR aError)
+                                             Protocols::InteractionModel::Status aStatus, CHIP_ERROR aError)
 {
-    CommandStatus status{ aClusterStatus, 0, 0, 0, 1 };
+    CommandStatus status{ aStatus, 0, 0, 0, 1 };
 
     if (commandResponseStatusFunct != nullptr)
     {
@@ -65,7 +65,7 @@ void PythonInteractionModelDelegate::OnError(const app::CommandSender * apComman
     {
         commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aError.AsInteger());
     }
-    DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aClusterStatus, aError);
+    DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aStatus, aError);
 }
 
 CHIP_ERROR PythonInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
