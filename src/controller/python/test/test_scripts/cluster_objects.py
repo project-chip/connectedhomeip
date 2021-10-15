@@ -42,30 +42,30 @@ class ClusterObjectTests:
             raise ValueError()
 
     @classmethod
-    async def RoundTripTest(cls):
+    async def RoundTripTest(cls, devCtrl):
         req = TestObjects.OnOff.Commands.On()
-        res = await req.send(nodeId=NODE_ID, endpointId=LIGHTING_ENDPOINT_ID)
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
         if res is not None:
             logger.error(
                 f"Got {res} Response from server, but None is expected.")
             raise ValueError()
 
     @classmethod
-    async def RoundTripTestWithBadEndpoint(cls):
+    async def RoundTripTestWithBadEndpoint(cls, devCtrl):
         req = TestObjects.OnOff.Commands.On()
         try:
-            await req.send(nodeId=NODE_ID, endpointId=233)
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=233, payload=req)
             raise ValueError(f"Failure expected")
         except IMExceptions.InteractionModelError as ex:
             logger.info(f"Recevied {ex} from server.")
             return
 
     @classmethod
-    async def RunTest(cls):
+    async def RunTest(cls, devCtrl):
         try:
             cls.TestAPI()
-            await cls.RoundTripTest()
-            await cls.RoundTripTestWithBadEndpoint()
+            await cls.RoundTripTest(devCtrl)
+            await cls.RoundTripTestWithBadEndpoint(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")

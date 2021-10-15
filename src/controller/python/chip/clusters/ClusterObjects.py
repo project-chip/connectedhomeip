@@ -130,9 +130,3 @@ class ClusterCommand(ClusterObject):
     @ChipUtility.classproperty
     def command_id(self) -> int:
         raise NotImplementedError()
-
-    async def send(self, nodeId: int, endpointId: int, responseType: typing.Union[typing.Type, None] = None) -> typing.Union['ClusterCommand', None]:
-        from . import Command as cmd
-        if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
-            raise ValueError("responseType must be a ClusterCommand or None")
-        return await cmd.GetDeviceController().SendCommand(nodeId=nodeId, endpointId=endpointId, payload=self, responseType=responseType)

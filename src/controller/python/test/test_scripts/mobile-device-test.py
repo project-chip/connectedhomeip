@@ -143,7 +143,7 @@ def main():
 
     # Test experimental Python cluster objects API
     logger.info("Testing cluster objects API")
-    FailIfNot(asyncio.run(ClusterObjectTests.RunTest()),
+    FailIfNot(asyncio.run(ClusterObjectTests.RunTest(test.devCtrl)),
               "Failed when testing Python Cluster Object APIs")
 
     logger.info("Testing non-controller APIs")
