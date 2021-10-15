@@ -149,7 +149,7 @@ static void printUserTables(void)
         EmberAfPluginDoorLockServerUser * user = &pinUserTable[i];
         emberAfDoorLockClusterPrint("%2x %x %x ", i, user->status, user->type);
         printPin(user->code.pin);
-        emberAfDoorLockClusterPrintln("");
+        emberAfDoorLockClusterPrintln("%s", "");
     }
     emberAfDoorLockClusterPrintln("RFID:");
     for (i = 0; i < EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE; i++)
@@ -157,7 +157,7 @@ static void printUserTables(void)
         EmberAfPluginDoorLockServerUser * user = &rfidUserTable[i];
         emberAfDoorLockClusterPrint("%2x %x %x ", i, user->status, user->type);
         printPin(user->code.rfid);
-        emberAfDoorLockClusterPrintln("");
+        emberAfDoorLockClusterPrintln("%s", "");
     }
 }
 

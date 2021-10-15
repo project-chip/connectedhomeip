@@ -215,7 +215,7 @@ void emAfPluginScenesServerPrintInfo(void)
                              entry.targetPositionTiltPercent100thsValue);
 #endif
         }
-        emberAfCorePrintln("");
+        emberAfCorePrintln("%s", "");
     }
 }
 

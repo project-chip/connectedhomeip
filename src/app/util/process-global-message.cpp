@@ -119,7 +119,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         clusterId != ZCL_IDENTIFY_CLUSTER_ID)
     {
         emberAfCorePrintln("disabled");
-        emberAfDebugPrintln("%pd, dropping global cmd:%x", "disable", zclCmd);
+        emberAfDebugPrintln("%pd, dropping global cmd:" ChipLogFormatMEI, "disable", ChipLogValueMEI(zclCmd));
         emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_FAILURE);
         return true;
     }
@@ -164,8 +164,8 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         uint8_t numberAttributes;
         uint8_t * complete;
 
-        emberAfAttributesPrintln("%p%p: clus %2x", "DISC_ATTR",
-                                 (zclCmd == ZCL_DISCOVER_ATTRIBUTES_EXTENDED_COMMAND_ID ? "_EXT" : ""), clusterId);
+        emberAfAttributesPrintln("%p%p: clus " ChipLogFormatMEI, "DISC_ATTR",
+                                 (zclCmd == ZCL_DISCOVER_ATTRIBUTES_EXTENDED_COMMAND_ID ? "_EXT" : ""), ChipLogValueMEI(clusterId));
 
         // set the cmd byte - this is byte 3 index 2, but since we have
         // already incremented past the 3 byte ZCL header (our index is at 3),

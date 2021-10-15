@@ -256,7 +256,7 @@ uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterComma
     // The source ESI is not in the ESI table.
     if (esiEntry == NULL)
     {
-        emberAfDebugPrintln("source ESI 0x%x not found in table", cmd->SourceNodeId());
+        emberAfDebugPrintln("source ESI " ChipLogFormatX64 " not found in table", ChipLogValueX64(cmd->SourceNodeId()));
         // We add the ESI to the table.
         esiEntry = emberAfPluginEsiManagementGetFreeEntry();
         if (esiEntry != NULL)
