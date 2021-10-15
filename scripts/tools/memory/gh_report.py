@@ -239,7 +239,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         artifact_limit = self.config['github.limit-artifacts']
         artifact_pages = self.config['github.limit-artifact-pages']
 
-        # Size artifacts have names of the form
+        # Size artifacts have names of the form:
         #   Size,{group},{pr},{commit_hash},{parent_hash}
         # Record them keyed by group and commit_hash to match them up
         # after we have the entire list.
