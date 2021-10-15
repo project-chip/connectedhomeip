@@ -40,16 +40,14 @@ class TypedReadCallback final : public app::InteractionModelDelegate
 {
 public:
     using OnSuccessCallbackType =
-        std::function<void(const app::ConcreteAttributePath & aPath, const AttributeTypeInfo::DecodableType & aData)>;
+        std::function<void(const app::ConcreteAttributePath & aPath, const typename AttributeTypeInfo::DecodableType & aData)>;
     using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * aPath,
                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
-    using OnDoneCallbackType  = std::function<void()>;
+    using OnDoneCallbackType  = std::function<void(app::ReadClient * client, TypedReadCallback * callback)>;
 
-    TypedReadCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone = {}) :
+    TypedReadCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
         mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
     {}
-
-    void SetOnDoneCallback(OnDoneCallbackType callback) { mOnDone = callback; }
 
 private:
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
@@ -57,7 +55,7 @@ private:
     {
         CHIP_ERROR err                           = CHIP_NO_ERROR;
         app::ConcreteAttributePath attributePath = { aPath.mEndpointId, aPath.mClusterId, aPath.mFieldId };
-        AttributeTypeInfo::DecodableType value;
+        typename AttributeTypeInfo::DecodableType value;
 
         VerifyOrExit(status == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
         VerifyOrExit(aPath.mClusterId == AttributeTypeInfo::GetClusterId() && aPath.mFieldId == AttributeTypeInfo::GetAttributeId(),
@@ -90,9 +88,9 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadDone(const app::ReadClient * apReadClient) override
+    CHIP_ERROR ReadDone(app::ReadClient * apReadClient) override
     {
-        mOnDone();
+        mOnDone(apReadClient, this);
         return CHIP_NO_ERROR;
     }
 

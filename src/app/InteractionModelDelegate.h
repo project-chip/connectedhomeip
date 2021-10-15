@@ -162,7 +162,7 @@ public:
      * @param[in]  aError  notify final error regarding the current read interaction
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR ReadDone(const ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR ReadDone(ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     virtual ~InteractionModelDelegate() = default;
 };

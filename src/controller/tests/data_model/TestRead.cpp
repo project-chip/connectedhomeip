@@ -127,6 +127,8 @@ void TestReadInteraction::TestDataResponse(nlTestSuite * apSuite, void * apConte
 
     responseDirective = kSendDataResponse;
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
         uint8_t i = 0;
 
@@ -138,9 +140,14 @@ void TestReadInteraction::TestDataResponse(nlTestSuite * apSuite, void * apConte
             i++;
         }
 
+        NL_TEST_ASSERT(apSuite, i == 4);
+        NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
+
         onSuccessCbInvoked = true;
     };
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath,
                                              Protocols::InteractionModel::Status aIMStatus,
                                              CHIP_ERROR aError) { onFailureCbInvoked = true; };
@@ -164,10 +171,14 @@ void TestReadInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCon
 
     responseDirective = kSendDataError;
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
         onSuccessCbInvoked = true;
     };
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath,
                                                       Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
         NL_TEST_ASSERT(apSuite, (aError != CHIP_NO_ERROR) && (aIMStatus == Protocols::InteractionModel::Status::Busy));
@@ -193,10 +204,14 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
 
     responseDirective = kSendDataError;
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
         onSuccessCbInvoked = true;
     };
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath,
                                                       Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
         NL_TEST_ASSERT(apSuite, aError == CHIP_ERROR_TIMEOUT);

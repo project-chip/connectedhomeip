@@ -38,7 +38,7 @@ public:
 
     CHIP_ERROR SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient) override;
 
-    CHIP_ERROR ReadDone(const app::ReadClient * apReadClient) override;
+    CHIP_ERROR ReadDone(app::ReadClient * apReadClient) override;
 
     // TODO: FreeAttributePathParam and AllocateAttributePathParam are used by CHIPDevice.cpp for getting a long-live attribute path
     // object.

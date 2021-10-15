@@ -31,11 +31,29 @@ struct AttributePathParams
         kListIndexValid = 0x02,
     };
 
+    //
+    // TODO: (Issue #10596) Need to ensure that we do not encode the NodeId over the wire
+    // if it is either not 'set', or is set to a value that matches accessing fabric
+    // on which the interaction is undertaken.
+    //
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) : AttributePathParams(0, aEndpointId, aClusterId, 0, 0, {}) {}
+
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId) :
+        AttributePathParams(0, aEndpointId, aClusterId, aFieldId, 0, chip::app::AttributePathParams::Flags::kFieldIdValid)
+    {}
+
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId, ListIndex aListIndex) :
+        AttributePathParams(0, aEndpointId, aClusterId, aFieldId, aListIndex,
+                            BitFlags<Flags>(chip::app::AttributePathParams::Flags::kFieldIdValid,
+                                            chip::app::AttributePathParams::Flags::kListIndexValid))
+    {}
+
     AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId, ListIndex aListIndex,
                         const BitFlags<Flags> aFlags) :
         mNodeId(aNodeId),
         mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
     {}
+
     AttributePathParams() {}
     NodeId mNodeId         = 0;
     EndpointId mEndpointId = 0;
