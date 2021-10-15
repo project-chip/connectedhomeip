@@ -119,7 +119,8 @@ void OperationalDeviceProxy::DequeueConnectionFailureCallbacks(CHIP_ERROR error,
 void OperationalDeviceProxy::OnNewConnection(SessionHandle session)
 {
     // If the secure session established is initiated by another device
-    if (!mDevice.IsActive() || mDevice.IsSecureConnected()) {
+    if (!mDevice.IsActive() || mDevice.IsSecureConnected())
+    {
         return;
     }
 
