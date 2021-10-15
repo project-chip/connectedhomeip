@@ -79,6 +79,7 @@ target_sources(app PRIVATE
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
 
 chip_configure_data_model(app
+    INCLUDE_DEVICE
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
 )

@@ -49,12 +49,19 @@ endfunction()
 #
 # Configure ${APP_TARGET} based on the selected data model configuration.
 # Available options are:
+#   INCLUDE_DEVICE  Include source files from src/app/device directory
 #   INCLUDE_SERVER  Include source files from src/app/server directory
 #   ZAP_FILE        Path to the ZAP file, used to determine the list of clusters
 #                   supported by the application.
 #
 function(chip_configure_data_model APP_TARGET)
-    cmake_parse_arguments(ARG "INCLUDE_SERVER" "ZAP_FILE" "" ${ARGN})
+    cmake_parse_arguments(ARG "INCLUDE_DEVICE;INCLUDE_SERVER" "ZAP_FILE" "" ${ARGN})
+
+    if (ARG_INCLUDE_DEVICE)
+        target_sources(${APP_TARGET} PRIVATE
+            ${CHIP_APP_BASE_DIR}/device/OperationalDeviceProxy.cpp
+        )
+    endif()
 
     if (ARG_INCLUDE_SERVER)
         target_sources(${APP_TARGET} PRIVATE
