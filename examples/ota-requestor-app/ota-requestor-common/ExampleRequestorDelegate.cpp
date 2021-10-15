@@ -25,6 +25,9 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <transport/FabricTable.h>
+
+using chip::FabricInfo;
 
 constexpr uint32_t kImmediateStartDelayMs = 1;
 
@@ -40,14 +43,20 @@ void ExampleRequestorDelegate::Init(chip::Controller::ControllerDeviceInitParams
     mOtaStartDelayMs = startDelayMs;
 }
 
-void ExampleRequestorDelegate::ConnectAndBeginOTA()
+void ExampleRequestorDelegate::ConnectToProvider()
 {
     VerifyOrReturn(mProviderId.HasValue(), ChipLogError(SoftwareUpdate, "Missing Provider ID"));
     VerifyOrReturn(mProviderFabricIndex.HasValue(), ChipLogError(SoftwareUpdate, "Missing Provider FabricIndex"));
 
+    FabricInfo * providerFabric = GetProviderFabricInfo();
+    VerifyOrReturn(providerFabric != nullptr,
+                   ChipLogError(SoftwareUpdate, "No Fabric found for index %" PRIu8, mProviderFabricIndex.Value()));
+
     ChipLogProgress(SoftwareUpdate,
-                    "Once #7976 is fixed, this would attempt to connect to 0x" ChipLogFormatX64 " of FabricIndex 0x" PRIu8,
-                    ChipLogValueX64(mProviderId.Value()), mProviderFabricIndex.Value());
+                    "Once #7976 is fixed, this would attempt to connect to 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8
+                    " (" ChipLogFormatX64 ")",
+                    ChipLogValueX64(mProviderId.Value()), mProviderFabricIndex.Value(),
+                    ChipLogValueX64(providerFabric->GetFabricId()));
 
     // TODO: uncomment and fill in after #7976 is fixed
     // mProviderDevice.Init(mConnectParams, mProviderId.Value(), address, mProviderFabricIndex.Value());
@@ -58,10 +67,25 @@ EmberAfStatus ExampleRequestorDelegate::HandleAnnounceOTAProvider(chip::app::Com
                                                                   chip::NodeId providerLocation, uint16_t vendorId,
                                                                   uint8_t announcementReason, chip::ByteSpan metadataForNode)
 {
-    mProviderId.SetValue(providerLocation);
+    if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot access ExchangeContext for FabricIndex");
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
 
-    ChipLogDetail(SoftwareUpdate, "Notified of Provider at NodeID: 0x" ChipLogFormatX64 "on FabricIndex 0x" PRIu8,
-                  ChipLogValueX64(mProviderId.Value()), mProviderFabricIndex.Value());
+    mProviderId.SetValue(providerLocation);
+    mProviderFabricIndex.SetValue(commandObj->GetExchangeContext()->GetSecureSession().GetFabricIndex());
+
+    FabricInfo * providerFabric = GetProviderFabricInfo();
+    if (providerFabric == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "No Fabric found for index %" PRIu8, mProviderFabricIndex.Value());
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
+    ChipLogProgress(
+        SoftwareUpdate, "Notified of Provider at NodeID: 0x" ChipLogFormatX64 "on FabricIndex 0x%" PRIu8 " (" ChipLogFormatX64 ")",
+        ChipLogValueX64(mProviderId.Value()), mProviderFabricIndex.Value(), ChipLogValueX64(providerFabric->GetFabricId()));
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
@@ -88,4 +112,20 @@ void ExampleRequestorDelegate::StartDelayTimerHandler(chip::System::Layer * syst
 {
     VerifyOrReturn(appState != nullptr);
     static_cast<ExampleRequestorDelegate *>(appState)->ConnectAndBeginOTA();
+}
+
+chip::FabricInfo * ExampleRequestorDelegate::GetProviderFabricInfo()
+{
+    if (mConnectParams.fabricsTable == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "FabricTable is null!");
+        return nullptr;
+    }
+    if (!mProviderFabricIndex.HasValue())
+    {
+        ChipLogError(SoftwareUpdate, "No FabricIndex value stored!");
+        return nullptr;
+    }
+
+    return mConnectParams.fabricsTable->FindFabricWithIndex(mProviderFabricIndex.Value());
 }

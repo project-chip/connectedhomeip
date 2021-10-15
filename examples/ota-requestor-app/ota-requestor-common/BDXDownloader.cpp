@@ -55,7 +55,7 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         break;
     case TransferSession::OutputEventType::kMsgToSend: {
         chip::Messaging::SendFlags sendFlags;
-        VerifyOrReturn(mExchangeCtx != nullptr, ChipLogError(BDX, "%s: mExchangeContext is null", __FUNCTION__));
+        VerifyOrReturn(mExchangeCtx != nullptr, ChipLogError(BDX, "mExchangeContext is null, cannot proceed"));
         if (event.msgTypeData.MessageType == static_cast<uint8_t>(MessageType::ReceiveInit))
         {
             sendFlags.Set(chip::Messaging::SendMessageFlags::kFromInitiator);
@@ -66,12 +66,11 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         }
         err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
                                         sendFlags);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "%s: SendMessage failed: %s", __FUNCTION__, chip::ErrorStr(err)));
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "SendMessage failed: %s", err.Format()));
         break;
     }
     case TransferSession::OutputEventType::kAcceptReceived:
-        VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlockQuery(),
-                       ChipLogError(BDX, "%s: PrepareBlockQuery failed", __FUNCTION__));
+        VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlockQuery(), ChipLogError(BDX, "PrepareBlockQuery failed"));
         break;
     case TransferSession::OutputEventType::kBlockReceived: {
         ChipLogDetail(BDX, "Got block length %zu", event.blockdata.Length);
@@ -84,15 +83,13 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         if (event.blockdata.IsEof)
         {
             err = mTransfer.PrepareBlockAck();
-            VerifyOrReturn(err == CHIP_NO_ERROR,
-                           ChipLogError(BDX, "%s: PrepareBlockAck failed: %s", __FUNCTION__, chip::ErrorStr(err)));
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "PrepareBlockAck failed: %s", err.Format()));
             mIsTransferComplete = true;
         }
         else
         {
             err = mTransfer.PrepareBlockQuery();
-            VerifyOrReturn(err == CHIP_NO_ERROR,
-                           ChipLogError(BDX, "%s: PrepareBlockQuery failed: %s", __FUNCTION__, chip::ErrorStr(err)));
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "PrepareBlockQuery failed: %s", err.Format()));
         }
         break;
     }
@@ -116,6 +113,6 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     case TransferSession::OutputEventType::kQueryReceived:
     case TransferSession::OutputEventType::kAckEOFReceived:
     default:
-        ChipLogError(BDX, "%s: unexpected event type", __FUNCTION__);
+        ChipLogError(BDX, "Unexpected BDX event type: %" PRIu16, static_cast<uint16_t>(event.EventType));
     }
 }

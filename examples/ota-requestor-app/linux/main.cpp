@@ -70,7 +70,7 @@ void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedAction
                           uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
                           chip::ByteSpan metadataForRequestor)
 {
-    ChipLogDetail(SoftwareUpdate, "%s", __FUNCTION__);
+    ChipLogDetail(SoftwareUpdate, "QueryImageResponse responded with action %" PRIu8, status);
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
@@ -131,7 +131,7 @@ void OnConnection(void * context, Device * device)
     err = cluster.Associate(device, kOtaProviderEndpoint);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Associate() failed: %s", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "Associate() failed: %s", err.Format());
         return;
     }
     err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleHWVersion,
@@ -139,7 +139,7 @@ void OnConnection(void * context, Device * device)
                              metadata);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "QueryImage() failed: %s", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "QueryImage() failed: %s", err.Format());
     }
 }
 
@@ -231,21 +231,21 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     err = mStorage.Init();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", err.Format()));
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", err.Format()));
 
     // Until #9518 is fixed, the only way to open a CASE session to another node is to commission it first using the
     // DeviceController API. Thus, the ota-requestor-app must do self commissioning and then read CASE credentials from persistent
     // storage to connect to the Provider node. See README.md for instructions.
     // NOTE: Controller is initialized in this call
     err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId(), mStorage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "example self-commissioning failed: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "example self-commissioning failed: %s", err.Format()));
 
     err = chip::Controller::DeviceControllerFactory::GetInstance().ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %s", err.Format()));
 
     ChipLogProgress(SoftwareUpdate, "Attempting to connect to device 0x%" PRIX64, providerNodeId);
 
@@ -253,7 +253,7 @@ int main(int argc, char * argv[])
     // Currently, that pairing action will persist the CASE session in persistent memory, which will then be read by the following
     // call.
     err = mController.GetDevice(providerNodeId, &providerDevice);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %s", err.Format()));
 
     err = providerDevice->EstablishConnectivity(&mConnectionCallback, &mConnectFailCallback);
 
