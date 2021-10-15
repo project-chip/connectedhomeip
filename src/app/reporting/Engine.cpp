@@ -62,7 +62,7 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo)
+Engine::RetrieveClusterData(const access::SubjectDescriptor & aSubjectDescriptor, AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
@@ -79,7 +79,7 @@ Engine::RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, Clu
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
                   aClusterInfo.mFieldId);
 
-    err = ReadSingleClusterData(path, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
+    err = ReadSingleClusterData(aSubjectDescriptor, path, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
     SuccessOrExit(err);
     attributeDataElementBuilder.MoreClusterData(false);
     attributeDataElementBuilder.EndOfAttributeDataElement();
@@ -97,19 +97,21 @@ exit:
 
 CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    const access::SubjectDescriptor subjectDescriptor = apReadHandler->GetSubjectDescriptor();
     bool attributeClean = true;
     TLV::TLVWriter backup;
     aReportDataBuilder.Checkpoint(backup);
     AttributeDataList::Builder attributeDataList = aReportDataBuilder.CreateAttributeDataListBuilder();
     SuccessOrExit(err = aReportDataBuilder.GetError());
+
     // TODO: Need to handle multiple chunk of message
     for (auto clusterInfo = apReadHandler->GetAttributeClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
     {
         if (apReadHandler->IsInitialReport())
         {
             // Retrieve data for this cluster instance and clear its dirty flag.
-            err = RetrieveClusterData(attributeDataList, *clusterInfo);
+            err = RetrieveClusterData(subjectDescriptor, attributeDataList, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,
                          ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
             attributeClean = false;
@@ -120,11 +122,11 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
             {
                 if (clusterInfo->IsAttributePathSupersetOf(*path))
                 {
-                    err = RetrieveClusterData(attributeDataList, *path);
+                    err = RetrieveClusterData(subjectDescriptor, attributeDataList, *path);
                 }
                 else if (path->IsAttributePathSupersetOf(*clusterInfo))
                 {
-                    err = RetrieveClusterData(attributeDataList, *clusterInfo);
+                    err = RetrieveClusterData(subjectDescriptor, attributeDataList, *clusterInfo);
                 }
                 else
                 {

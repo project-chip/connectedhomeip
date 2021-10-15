@@ -21,6 +21,8 @@
  *          when calling ember callbacks.
  */
 
+#include <access/AccessControl.h>
+#include <access/Privilege.h>
 #include <app/ClusterInfo.h>
 #include <app/Command.h>
 #include <app/ConcreteAttributePath.h>
@@ -47,6 +49,9 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Compatibility;
+
+using chip::access::AccessControl;
+using chip::access::Privilege;
 
 namespace chip {
 namespace app {
@@ -186,7 +191,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
@@ -231,6 +236,37 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
     {
         return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status), ToInteractionModelStatus(status));
     }
+
+#if 0
+    // TODO: get required privilege from yet-to-be-written ember api
+#else
+    // TEMP: assume view privilege required
+    Privilege privilege = Privilege::View;
+#endif
+
+    {
+        access::RequestPath requestPath {
+            .endpoint = aPath.mEndpointId,
+            .cluster = aPath.mClusterId
+        };
+        CHIP_ERROR err = AccessControl::GetInstance()->Check(aSubjectDescriptor, requestPath, privilege);
+        if (err != CHIP_NO_ERROR)
+        {
+            if (err == CHIP_ERROR_ACCESS_DENIED)
+            {
+                ChipLogProgress(DataManagement, "ACCESS CONTROL --> DENIED");
+                // TODO: In some cases (wildcards) we'll want to just discard request path
+                return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status), Protocols::InteractionModel::Status::UnsupportedAccess);
+            }
+            else
+            {
+                return err;
+            }
+        }
+        ChipLogProgress(DataManagement, "ACCESS CONTROL --> ALLOWED");
+    }
+
+    // TODO: filter fabric sensitive data if fabric doesn't match
 
     // TODO: ZCL_STRUCT_ATTRIBUTE_TYPE is not included in this switch case currently, should add support for structures.
     switch (BaseType(attributeType))
@@ -426,7 +462,8 @@ CHIP_ERROR prepareWriteData(EmberAfAttributeType expectedType, TLV::TLVReader & 
 }
 } // namespace
 
-static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader,
+static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(const access::SubjectDescriptor & aSubjectDescriptor,
+                                                                          ClusterInfo & aClusterInfo, TLV::TLVReader & aReader,
                                                                           WriteHandler * apWriteHandler)
 {
     // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here, and ember will not do data read &
@@ -439,11 +476,42 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(Cluste
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 
+#if 0
+    // TODO: get required privilege from yet-to-be-written ember api
+#else
+    // TEMP: assume operate privilege required
+    Privilege privilege = Privilege::Operate;
+#endif
+
+    {
+        access::RequestPath requestPath {
+            .endpoint = aClusterInfo.mEndpointId,
+            .cluster = aClusterInfo.mClusterId
+        };
+        CHIP_ERROR err = AccessControl::GetInstance()->Check(aSubjectDescriptor, requestPath, privilege);
+        if (err != CHIP_NO_ERROR)
+        {
+            if (err == CHIP_ERROR_ACCESS_DENIED)
+            {
+                ChipLogProgress(DataManagement, "ACCESS CONTROL --> DENIED");
+                return Protocols::InteractionModel::Status::UnsupportedAccess;
+            }
+            else
+            {
+                // TODO: better mapping of chip error to IM status
+                return Protocols::InteractionModel::Status::Failure;
+            }
+        }
+        ChipLogProgress(DataManagement, "ACCESS CONTROL --> ALLOWED");
+    }
+
+    // TODO: don't write fabric scoped data if fabric doesn't match
+
     CHIP_ERROR preparationError = CHIP_NO_ERROR;
     uint16_t dataLen            = 0;
     if ((preparationError = prepareWriteData(attributeMetadata->attributeType, aReader, dataLen)) != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "Failed to preapre data to write: %s", ErrorStr(preparationError));
+        ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
@@ -458,7 +526,7 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(Cluste
                                                                   attributeMetadata->attributeType));
 }
 
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     AttributePathParams attributePathParams;
     attributePathParams.mNodeId     = aClusterInfo.mNodeId;
@@ -467,7 +535,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mFieldId    = aClusterInfo.mFieldId;
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
-    auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
+    auto imCode = WriteSingleClusterDataInternal(aSubjectDescriptor, aClusterInfo, aReader, apWriteHandler);
     return apWriteHandler->AddStatus(attributePathParams, imCode);
 }
 } // namespace app

@@ -136,6 +136,11 @@ public:
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
+    const access::SubjectDescriptor GetSubjectDescriptor() const
+    {
+        return mpExchangeCtx ? mpExchangeCtx->GetSubjectDescriptor() : access::SubjectDescriptor();
+    }
+
 private:
     friend class TestReadInteraction;
     enum class HandlerState
