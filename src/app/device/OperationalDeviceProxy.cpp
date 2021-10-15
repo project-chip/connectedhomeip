@@ -25,17 +25,17 @@ namespace device {
 CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnOperationalDeviceConnected> * onConnection,
                                            Callback::Callback<OnOperationalDeviceConnectionFailure> * onFailure)
 {
-    EnqueueConnectionCallbacks(onConnection, onFailure);
 
     // Secure session already established
     if (mDevice.IsSecureConnected())
     {
-        DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, false);
-        DequeueConnectionSuccessCallbacks(true);
+        onConnection->mCall(onConnection->mContext, this);
         return CHIP_NO_ERROR;
     }
 
     VerifyOrReturnError(mInitParams.exchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
+
+    EnqueueConnectionCallbacks(onConnection, onFailure);
 
     Controller::ControllerDeviceInitParams initParams = {
         .sessionManager  = mInitParams.sessionManager,
@@ -119,7 +119,8 @@ void OperationalDeviceProxy::DequeueConnectionFailureCallbacks(CHIP_ERROR error,
 void OperationalDeviceProxy::OnNewConnection(SessionHandle session)
 {
     // If the secure session established is initiated by another device
-    if (!mDevice.IsActive() || mDevice.IsSecureConnected()) {
+    if (!mDevice.IsActive() || mDevice.IsSecureConnected())
+    {
         return;
     }
 
