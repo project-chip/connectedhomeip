@@ -16,10 +16,9 @@
  */
 #pragma once
 
+#include <credentials/DeviceAttestationVendorReserved.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
-
-#include <vector>
 
 namespace chip {
 namespace Credentials {
@@ -34,15 +33,11 @@ namespace Credentials {
  *  @param[out]   timestamp
  *  @param[out]   firmwareInfo ByteSpan containing Firmware Information data if present within attestationElements.
  *                             Empty ByteSpan if not present in attestationElements.
- *  @param[out]   vendorReservedArray
- *  @param[inout] vendorReservedArraySize
- *  @param[out]   vendorId Vendor ID fetched from Attestation Elements data.
- *  @param[out]   profileNum Profile Number fetched from Attestation Elements data.
+ *  @param[out] DeviceAttestationVendorReserved
  */
 CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
                                           ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
-                                          ByteSpan * vendorReservedArray, size_t & vendorReservedArraySize, uint16_t & vendorId,
-                                          uint16_t & profileNum);
+                                          DeviceAttestationVendorReservedDeconstructor & vendorReserved);
 
 /**
  *  @brief Take each component separately and form the Attestation Elements buffer.
@@ -51,17 +46,23 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
  *  @param[in]  attestationNonce Attestation Nonce - 32 octets required.
  *  @param[in]  timestamp Timestamp data in epoch time format.
  *  @param[in]  firmwareInfo Optional Firmware Information data - Can be empty.
- *  @param[in]  vendorReservedArray Array of Vendor Reserved entries.
- *  @param[in]  vendorReservedArraySize Number of Vendor Reserved entries present in the array.
- *  @param[in]  vendorId Vendor ID to be written to Vendor Reserved entries' Qualified Tags
- *  @param[in]  profileNum Profile Number to be written to Vendor Reserved entries' Qualified Tags
+ *  @param[in]  DeviceAttestationVendorReserved
  *  @param[out] attestationElements Buffer used to write all AttestationElements data, formed with all the data fields above.
  *                                  Provided buffer needs to be capable to handle all data fields + tags.
  */
 CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
-                                        uint32_t timestamp, const ByteSpan & firmwareInfo, ByteSpan * vendorReservedArray,
-                                        size_t vendorReservedArraySize, uint16_t vendorId, uint16_t profileNum,
+                                        uint32_t timestamp, const ByteSpan & firmwareInfo,
+                                        DeviceAttestationVendorReservedConstructor & vendorReserved,
                                         MutableByteSpan & attestationElements);
+
+/***
+ *  @brief Count the number of VendorReservedElements in a DeviceAttestation blob
+ *
+ *  @param[in]   attestationElements ByeSpan conitaining source of Attestation Elements data
+ *  @param[out]
+ *  @returns CHIP_NO_ERROR on success
+ */
+CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements, size_t & numElements);
 
 } // namespace Credentials
 } // namespace chip
