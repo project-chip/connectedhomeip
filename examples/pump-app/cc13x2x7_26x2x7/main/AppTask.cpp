@@ -390,7 +390,12 @@ void AppTask::UpdateClusterState()
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %" PRIx8, status);
-        status = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(1, maxSpeed);
+    }
+
+    int16_t maxSpeed = PumpMgr().GetMaxSpeed();
+    status           = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(PCC_CLUSTER_ENDPOINT, maxSpeed);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
         ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %" PRIx8, status);
     }
 

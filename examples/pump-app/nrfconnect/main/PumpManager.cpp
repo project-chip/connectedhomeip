@@ -187,3 +187,133 @@ void PumpManager::PumpStartTimerEventHandler(AppEvent * aEvent)
         }
     }
 }
+
+int16_t PumpManager::GetMaxPressure()
+{
+    // 1.6.1. MaxPressure Attribute
+    // Range -3276.7 kPa to 3276.7 kPa (steps of 0.1 kPa)
+    // -3276.8 is invalid value - perhaps 'null'
+
+    // Return 2000.0 kPa as Max Pressure
+    return 20000;
+}
+
+uint16_t PumpManager::GetMaxSpeed()
+{
+    // 1.6.2. MaxSpeed Attribute
+    // Range 0 RPM to 65534 RPM (steps of 1 RPM)
+    // 65535 is invalid value - perhaps 'null'
+
+    // Return 1000 RPM as MaxSpeed
+    return 1000;
+}
+
+uint16_t PumpManager::GetMaxFlow()
+{
+    // 1.6.3. MaxFlow Attribute
+    // Range 0 m3/h to 6553.4 m3/h (steps of 0.1 m3/h)
+    // 6553.5 m3/h is invalid value - perhaps 'null'
+
+    // Return 200.0 m3/h as MaxFlow
+    return 2000;
+}
+
+int16_t PumpManager::GetMinConstPressure()
+{
+    // 1.6.4. MinConstPressure Attribute
+    // Range -3276.7 kPa to 3276.7 kPa (steps of 0.1 kPa)
+    // -3276.8 is invalid value - perhaps 'null'
+
+    // Return -100.0 kPa as MinConstPressure
+    return -1000;
+}
+
+int16_t PumpManager::GetMaxConstPressure()
+{
+    // 1.6.5. MaxConstPressure Attribute
+    // Range -3276.7 kPa to 3276.7 kPa (steps of 0.1 kPa)
+    // -3276.8 is invalid value - perhaps 'null'
+
+    // Return 100.0 kPa as MaxConstPressure
+    return 1000;
+}
+
+int16_t PumpManager::GetMinCompPressure()
+{
+    // 1.6.6. MinCompPressure Attribute
+    // Range -3276.7 kPa to 3276.7 kPa (steps of 0.1 kPa)
+    // -3276.8 is invalid value - perhaps 'null'
+
+    // Return -20.0 kPa as MinCompPressure
+    return -200;
+}
+
+int16_t PumpManager::GetMaxCompPressure()
+{
+    // 1.6.7. MaxCompPressure Attribute
+    // Range -3276.7 kPa to 3276.7 kPa (steps of 0.1 kPa)
+    // -3276.8 is invalid value - perhaps 'null'
+
+    // Return 20.0 kPa as MaxCompPressure
+    return 200;
+}
+
+uint16_t PumpManager::GetMinConstSpeed()
+{
+    // 1.6.8. MinConstSpeed Attribute
+    // Range 0 to 65534 RPM (steps of 1 RPM)
+    // 65535 RPM is invalid valud - perhaps 'null'
+
+    // Return 200 RPM as MinConstSpeed
+    return 200;
+}
+
+uint16_t PumpManager::GetMaxConstSpeed()
+{
+    // 1.6.9. MaxConstSpeed Attribute
+    // Range 0 to 65534 RPM (steps of 1 RPM)
+    // 65535 RPM is invalid valud - perhaps 'null'
+
+    // Return 2000 RPM as MaxConstSpeed
+    return 2000;
+}
+
+uint16_t PumpManager::GetMinConstFlow()
+{
+    // 1.6.10. MinConstFlow Attribute
+    // Range 0 m3/h to 6553.4 m3/h (steps of 0.1 m3/h)
+    // 6553.5 m3/h is invalid value - perhaps 'null'
+
+    // Return 12.5 m3/h as MinConstFlow
+    return 125;
+}
+
+uint16_t PumpManager::GetMaxConstFlow()
+{
+    // 1.6.11. MaxConstFlow Attribute
+    // Range 0 m3/h to 6553.4 m3/h (steps of 0.1 m3/h)
+    // 6553.5 m3/h is invalid value - perhaps 'null'
+
+    // Return 655.7 m3/h as MaxConstFlow
+    return 6557;
+}
+
+int16_t PumpManager::GetMinConstTemp()
+{
+    // 1.6.12. MinConstTemp Attribute
+    // Range -273.15 C to 327.67 C (steps of 0.01 C)
+    // All other values are invalid values - perhaps 'null'
+
+    // Return 30.00 C as MinConstTemp
+    return 3000;
+}
+
+int16_t PumpManager::GetMaxConstTemp()
+{
+    // 1.6.13. MaxConstTemp Attribute
+    // Range -273.15 C to 327.67 C (steps of 0.01 C)
+    // All other values are invalid values - perhaps 'null'
+
+    // Return 56.00 C as MaxConstTemp
+    return 5600;
+}
