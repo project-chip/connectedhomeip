@@ -54,7 +54,7 @@ public:
     // Register for the Test Cluster cluster on all endpoints.
     TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadListInt8uAttribute(AttributeValueEncoder & aEncoder);
@@ -64,9 +64,9 @@ private:
 
 TestAttrAccess gAttrAccess;
 
-CHIP_ERROR TestAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR TestAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case ListInt8u::Id: {
         return ReadListInt8uAttribute(aEncoder);

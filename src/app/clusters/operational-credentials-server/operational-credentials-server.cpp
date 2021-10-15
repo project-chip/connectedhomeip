@@ -68,7 +68,7 @@ public:
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::OperationalCredentials::Id)
     {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
@@ -103,14 +103,14 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
 OperationalCredentialsAttrAccess gAttrAccess;
 
-CHIP_ERROR OperationalCredentialsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aClusterInfo.mClusterId == Clusters::OperationalCredentials::Id);
+    VerifyOrDie(aPath.mClusterId == Clusters::OperationalCredentials::Id);
 
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case Attributes::FabricsList::Id: {
-        return ReadFabricsList(aClusterInfo.mEndpointId, aEncoder);
+        return ReadFabricsList(aPath.mEndpointId, aEncoder);
     }
     default:
         break;
