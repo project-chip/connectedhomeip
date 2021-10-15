@@ -41,17 +41,36 @@ package chip.clusterinfo;
 >>>>>>> 505e97db3 (change package)
 =======
 import java.util.*;
+<<<<<<< HEAD
 >>>>>>> a4fd0282e (no error code generation)
+=======
+import chip.devicecontroller.ChipClusters.BaseChipCluster;
+>>>>>>> 2d2bbd2e1 (new design solution)
 
 public class ClusterInfo {
+  private final ClusterConstructor createClusterFunction;
+  private final Map<String, CommandInfo> commands;
 
-  public ClusterInfo(String name) {
-    this.name = name;
-    this.commands = new ArrayList<CommandInfo>();
+  public ClusterInfo(ClusterConstructor createClusterFunction, Map<String, CommandInfo> commands) {
+    this.createClusterFunction = createClusterFunction;
+    this.commands = commands;
   }
-  public String name;
-  public Class<?> clusterClass;
-  public List<CommandInfo> commands;
 
+<<<<<<< HEAD
 }
 >>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
+=======
+  public ClusterConstructor getCreateClusterFunction() {
+    return createClusterFunction;
+  }
+
+  public Map<String, CommandInfo> getCommands() {
+    return commands;
+  }
+
+  @FunctionalInterface
+  public interface ClusterConstructor {
+    BaseChipCluster create(Long devicePtr, int endpointId);
+  }
+}
+>>>>>>> 2d2bbd2e1 (new design solution)

@@ -58,19 +58,21 @@ package chip.clusterinfo;
 =======
 import java.util.function.Function;
 import java.util.*;
+<<<<<<< HEAD
 >>>>>>> a4fd0282e (no error code generation)
 
+=======
+import java.util.function.Supplier;
+import chip.clusterinfo.DelegatedClusterCallback;
+import chip.devicecontroller.ChipClusters.BaseChipCluster;
+>>>>>>> 2d2bbd2e1 (new design solution)
 
 public class CommandInfo {
-  // TODO make Class<?> to ClusterResponse
-  public CommandInfo(String name, Function<List<CommandParameter>, Class<?>> fn, List<CommandParameter> parameters, Class<?> callbackClass) {
-    this.name = name;
-    this.fn = fn;
-    this.parameters = parameters;
-    this.callbackClass = callbackClass;
-  }
-  public CommandInfo() {}
+  public ClusterCommandFunction commandFunction;
+  private Supplier<DelegatedClusterCallback> commandCallbackSupplier;
+  private List<CommandParameter> commandParameters;
 
+<<<<<<< HEAD
   public String name;
   public Function<List<CommandParameter>, Class<?>> fn;
   public List<CommandParameter> parameters;
@@ -82,3 +84,30 @@ public class CommandInfo {
   public Class<?> callbackClass;
 }
 >>>>>>> a4fd0282e (no error code generation)
+=======
+
+  public CommandInfo(ClusterCommandFunction commandFunction,
+      Supplier<DelegatedClusterCallback> commandCallbackSupplier, List<CommandParameter> commandParameters) {
+    this.commandFunction = commandFunction;
+    this.commandCallbackSupplier = commandCallbackSupplier;
+    this.commandParameters = commandParameters;
+  }
+
+  public ClusterCommandFunction getCommandFunction() {
+    return commandFunction;
+  }
+
+  public Supplier<DelegatedClusterCallback> getCommandCallbackSupplier() {
+    return commandCallbackSupplier;
+  }
+
+  public List<CommandParameter> getCommandParameters() {
+    return commandParameters;
+  }
+
+  @FunctionalInterface
+  interface ClusterCommandFunction {
+    void invokeCommand(BaseChipCluster cluster, Object callback, List<Object> commandArguments);
+  }
+}
+>>>>>>> 2d2bbd2e1 (new design solution)
