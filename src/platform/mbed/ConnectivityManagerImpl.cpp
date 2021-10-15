@@ -111,7 +111,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
     mSecurityType                   = NSAPI_SECURITY_WPA_WPA2;
 
-    NetworkInterface * net_if = NetworkInterface::get_default_instance();
+    ::NetworkInterface * net_if = ::NetworkInterface::get_default_instance();
     if (net_if == nullptr)
     {
         ChipLogError(DeviceLayer, "No network interface available");

@@ -32,13 +32,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-enum class ConnectionType
-{
-    kConnectionUnknown,
-    kConnectionEthernet,
-    kConnectionWiFi
-};
-
 static constexpr uint16_t kWiFi_BAND_2_4_GHZ      = 2400;
 static constexpr uint16_t kWiFi_BAND_5_0_GHZ      = 5000;
 static constexpr char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
@@ -49,7 +42,10 @@ class ConnectivityUtils
 public:
     static uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel);
     static uint8_t MapFrequencyToChannel(const uint16_t frequency);
-    static ConnectionType GetInterfaceConnectionType(const char * ifname);
+    static bool CheckReachableIPv4(struct ifaddrs * ifap, const char * ifname);
+    static bool CheckReachableIPv6(struct ifaddrs * ifap, const char * ifname);
+    static InterfaceType GetInterfaceConnectionType(const char * ifname);
+    static CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, char * outMacAddr);
     static CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
     static CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
     static CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi);
