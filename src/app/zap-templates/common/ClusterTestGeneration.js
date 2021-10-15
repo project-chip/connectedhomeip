@@ -356,7 +356,7 @@ function chip_tests_item_parameters(options)
       return [];
     }
 
-    const commandArgs = item.arguments;
+    const commandArgs = item.expandedArguments || item.arguments;
     const commands    = commandArgs.map(commandArg => {
       commandArg = JSON.parse(JSON.stringify(commandArg));
 
