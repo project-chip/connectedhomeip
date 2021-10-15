@@ -28,6 +28,7 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/util/basic-types.h>
+#include <lib/support/BitFlags.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {
@@ -777,12 +778,12 @@ namespace Identify {
 // Enum for IdentifyEffectIdentifier
 enum class IdentifyEffectIdentifier : uint8_t
 {
-    IDENTIFY_EFFECT_IDENTIFIER_BLINK          = 0x00,
-    IDENTIFY_EFFECT_IDENTIFIER_BREATHE        = 0x01,
-    IDENTIFY_EFFECT_IDENTIFIER_OKAY           = 0x02,
-    IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE = 0x0B,
-    IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT  = 0xFE,
-    IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT    = 0xFF,
+    kBlink         = 0x00,
+    kBreathe       = 0x01,
+    kOkay          = 0x02,
+    kChannelChange = 0x0B,
+    kFinishEffect  = 0xFE,
+    kStopEffect    = 0xFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IdentifyEffectIdentifier             = EmberAfIdentifyEffectIdentifier;
@@ -793,7 +794,7 @@ using IdentifyEffectIdentifier             = EmberAfIdentifyEffectIdentifier;
 // Enum for IdentifyEffectVariant
 enum class IdentifyEffectVariant : uint8_t
 {
-    IDENTIFY_EFFECT_VARIANT_DEFAULT = 0x00,
+    kDefault = 0x00,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IdentifyEffectVariant                = EmberAfIdentifyEffectVariant;
@@ -804,12 +805,12 @@ using IdentifyEffectVariant                = EmberAfIdentifyEffectVariant;
 // Enum for IdentifyIdentifyType
 enum class IdentifyIdentifyType : uint8_t
 {
-    IDENTIFY_IDENTIFY_TYPE_NONE          = 0x00,
-    IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT = 0x01,
-    IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED   = 0x02,
-    IDENTIFY_IDENTIFY_TYPE_AUDIBLE_BEEP  = 0x03,
-    IDENTIFY_IDENTIFY_TYPE_DISPLAY       = 0x04,
-    IDENTIFY_IDENTIFY_TYPE_ACTUATOR      = 0x05,
+    kNone         = 0x00,
+    kVisibleLight = 0x01,
+    kVisibleLED   = 0x02,
+    kAudibleBeep  = 0x03,
+    kDisplay      = 0x04,
+    kActuator     = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IdentifyIdentifyType                 = EmberAfIdentifyIdentifyType;
@@ -1277,6 +1278,12 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Groups
 namespace Scenes {
+
+// Bitmap for ScenesCopyMode
+enum class ScenesCopyMode : uint8_t
+{
+    kCopyAllScenes = 0,
+};
 
 namespace Structs {
 namespace SceneExtensionFieldSet {
@@ -1908,7 +1915,7 @@ public:
     static constexpr CommandId GetCommandId() { return CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
 
-    uint8_t mode;
+    BitFlags<ScenesCopyMode> mode;
     uint16_t groupIdFrom;
     uint8_t sceneIdFrom;
     uint16_t groupIdTo;
@@ -1923,7 +1930,7 @@ public:
     static constexpr CommandId GetCommandId() { return CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
 
-    uint8_t mode;
+    BitFlags<ScenesCopyMode> mode;
     uint16_t groupIdFrom;
     uint8_t sceneIdFrom;
     uint16_t groupIdTo;
@@ -2043,9 +2050,9 @@ namespace OnOff {
 // Enum for OnOffDelayedAllOffEffectVariant
 enum class OnOffDelayedAllOffEffectVariant : uint8_t
 {
-    ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS                                        = 0x00,
-    ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE                                                           = 0x01,
-    ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS = 0x02,
+    kFadeToOffIn0p8Seconds                                = 0x00,
+    kNoFade                                               = 0x01,
+    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OnOffDelayedAllOffEffectVariant      = EmberAfOnOffDelayedAllOffEffectVariant;
@@ -2056,7 +2063,7 @@ using OnOffDelayedAllOffEffectVariant      = EmberAfOnOffDelayedAllOffEffectVari
 // Enum for OnOffDyingLightEffectVariant
 enum class OnOffDyingLightEffectVariant : uint8_t
 {
-    ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND = 0x00,
+    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OnOffDyingLightEffectVariant         = EmberAfOnOffDyingLightEffectVariant;
@@ -2067,12 +2074,18 @@ using OnOffDyingLightEffectVariant         = EmberAfOnOffDyingLightEffectVariant
 // Enum for OnOffEffectIdentifier
 enum class OnOffEffectIdentifier : uint8_t
 {
-    ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF = 0x00,
-    ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT     = 0x01,
+    kDelayedAllOff = 0x00,
+    kDyingLight    = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OnOffEffectIdentifier                = EmberAfOnOffEffectIdentifier;
 #endif
+
+// Bitmap for OnOffControl
+enum class OnOffControl : uint8_t
+{
+    kAcceptOnlyWhenOn = 0,
+};
 
 namespace Commands {
 namespace Off {
@@ -2337,7 +2350,7 @@ public:
     static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    uint8_t onOffControl;
+    BitFlags<OnOffControl> onOffControl;
     uint16_t onTime;
     uint16_t offWaitTime;
 
@@ -2350,7 +2363,7 @@ public:
     static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    uint8_t onOffControl;
+    BitFlags<OnOffControl> onOffControl;
     uint16_t onTime;
     uint16_t offWaitTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -2494,8 +2507,8 @@ namespace LevelControl {
 // Enum for MoveMode
 enum class MoveMode : uint8_t
 {
-    MOVE_MODE_UP   = 0x00,
-    MOVE_MODE_DOWN = 0x01,
+    kUp   = 0x00,
+    kDown = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using MoveMode                             = EmberAfMoveMode;
@@ -2506,8 +2519,8 @@ using MoveMode                             = EmberAfMoveMode;
 // Enum for StepMode
 enum class StepMode : uint8_t
 {
-    STEP_MODE_UP   = 0x00,
-    STEP_MODE_DOWN = 0x01,
+    kUp   = 0x00,
+    kDown = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using StepMode                             = EmberAfStepMode;
@@ -4107,21 +4120,21 @@ namespace ApplianceControl {
 // Enum for ApplianceStatus
 enum class ApplianceStatus : uint8_t
 {
-    APPLIANCE_STATUS_OFF                         = 0x01,
-    APPLIANCE_STATUS_STAND_BY                    = 0x02,
-    APPLIANCE_STATUS_PROGRAMMED                  = 0x03,
-    APPLIANCE_STATUS_PROGRAMMED_WAITING_TO_START = 0x04,
-    APPLIANCE_STATUS_RUNNING                     = 0x05,
-    APPLIANCE_STATUS_PAUSE                       = 0x06,
-    APPLIANCE_STATUS_END_PROGRAMMED              = 0x07,
-    APPLIANCE_STATUS_FAILURE                     = 0x08,
-    APPLIANCE_STATUS_PROGRAMME_INTERRUPTED       = 0x09,
-    APPLIANCE_STATUS_IDLE                        = 0x0A,
-    APPLIANCE_STATUS_RINSE_HOLD                  = 0x0B,
-    APPLIANCE_STATUS_SERVICE                     = 0x0C,
-    APPLIANCE_STATUS_SUPERFREEZING               = 0x0D,
-    APPLIANCE_STATUS_SUPERCOOLING                = 0x0E,
-    APPLIANCE_STATUS_SUPERHEATING                = 0x0F,
+    kOff                      = 0x01,
+    kStandBy                  = 0x02,
+    kProgrammed               = 0x03,
+    kProgrammedWaitingToStart = 0x04,
+    kRunning                  = 0x05,
+    kPause                    = 0x06,
+    kEndProgrammed            = 0x07,
+    kFailure                  = 0x08,
+    kProgrammeInterrupted     = 0x09,
+    kIdle                     = 0x0A,
+    kRinseHold                = 0x0B,
+    kService                  = 0x0C,
+    kSuperfreezing            = 0x0D,
+    kSupercooling             = 0x0E,
+    kSuperheating             = 0x0F,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ApplianceStatus                      = EmberAfApplianceStatus;
@@ -4132,17 +4145,17 @@ using ApplianceStatus                      = EmberAfApplianceStatus;
 // Enum for CommandIdentification
 enum class CommandIdentification : uint8_t
 {
-    COMMAND_IDENTIFICATION_START                  = 0x01,
-    COMMAND_IDENTIFICATION_STOP                   = 0x02,
-    COMMAND_IDENTIFICATION_PAUSE                  = 0x03,
-    COMMAND_IDENTIFICATION_START_SUPERFREEZING    = 0x04,
-    COMMAND_IDENTIFICATION_STOP_SUPERFREEZING     = 0x05,
-    COMMAND_IDENTIFICATION_START_SUPERCOOLING     = 0x06,
-    COMMAND_IDENTIFICATION_STOP_SUPERCOOLING      = 0x07,
-    COMMAND_IDENTIFICATION_DISABLE_GAS            = 0x08,
-    COMMAND_IDENTIFICATION_ENABLE_GAS             = 0x09,
-    COMMAND_IDENTIFICATION_ENABLE_ENERGY_CONTROL  = 0x0A,
-    COMMAND_IDENTIFICATION_DISABLE_ENERGY_CONTROL = 0x0B,
+    kStart                = 0x01,
+    kStop                 = 0x02,
+    kPause                = 0x03,
+    kStartSuperfreezing   = 0x04,
+    kStopSuperfreezing    = 0x05,
+    kStartSupercooling    = 0x06,
+    kStopSupercooling     = 0x07,
+    kDisableGas           = 0x08,
+    kEnableGas            = 0x09,
+    kEnableEnergyControl  = 0x0A,
+    kDisableEnergyControl = 0x0B,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using CommandIdentification                = EmberAfCommandIdentification;
@@ -4153,15 +4166,22 @@ using CommandIdentification                = EmberAfCommandIdentification;
 // Enum for WarningEvent
 enum class WarningEvent : uint8_t
 {
-    WARNING_EVENT_WARNING1_OVERALL_POWER_ABOVE_AVAILABLE_POWER_LEVEL                                             = 0x00,
-    WARNING_EVENT_WARNING2_OVERALL_POWER_ABOVE_POWER_THRESHOLD_LEVEL                                             = 0x01,
-    WARNING_EVENT_WARNING3_OVERALL_POWER_BACK_BELOW_THE_AVAILABLE_POWER_LEVEL                                    = 0x02,
-    WARNING_EVENT_WARNING4_OVERALL_POWER_BACK_BELOW_THE_POWER_THRESHOLD_LEVEL                                    = 0x03,
-    WARNING_EVENT_WARNING5_OVERALL_POWER_WILL_BE_POTENTIALLY_ABOVE_AVAILABLE_POWER_LEVEL_IF_THE_APPLIANCE_STARTS = 0x04,
+    kWarning1OverallPowerAboveAvailablePowerLevel                                      = 0x00,
+    kWarning2OverallPowerAbovePowerThresholdLevel                                      = 0x01,
+    kWarning3OverallPowerBackBelowTheAvailablePowerLevel                               = 0x02,
+    kWarning4OverallPowerBackBelowThePowerThresholdLevel                               = 0x03,
+    kWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 0x04,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using WarningEvent                         = EmberAfWarningEvent;
 #endif
+
+// Bitmap for RemoteEnableFlagsAndDeviceStatus2
+enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
+{
+    kRemoteEnableFlags      = 0,
+    kDeviceStatus2Structure = 4,
+};
 
 namespace Commands {
 namespace ExecutionOfACommand {
@@ -4208,7 +4228,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    uint8_t remoteEnableFlagsAndDeviceStatus2;
+    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -4221,7 +4241,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    uint8_t remoteEnableFlagsAndDeviceStatus2;
+    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4266,7 +4286,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    uint8_t remoteEnableFlagsAndDeviceStatus2;
+    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -4279,7 +4299,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    uint8_t remoteEnableFlagsAndDeviceStatus2;
+    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -5029,9 +5049,9 @@ namespace OtaSoftwareUpdateProvider {
 // Enum for OTAApplyUpdateAction
 enum class OTAApplyUpdateAction : uint8_t
 {
-    OTA_APPLY_UPDATE_ACTION_PROCEED           = 0x00,
-    OTA_APPLY_UPDATE_ACTION_AWAIT_NEXT_ACTION = 0x01,
-    OTA_APPLY_UPDATE_ACTION_DISCONTINUE       = 0x02,
+    kProceed         = 0x00,
+    kAwaitNextAction = 0x01,
+    kDiscontinue     = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OTAApplyUpdateAction                 = EmberAfOTAApplyUpdateAction;
@@ -5042,10 +5062,10 @@ using OTAApplyUpdateAction                 = EmberAfOTAApplyUpdateAction;
 // Enum for OTADownloadProtocol
 enum class OTADownloadProtocol : uint8_t
 {
-    OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS  = 0x00,
-    OTA_DOWNLOAD_PROTOCOL_BDX_ASYNCHRONOUS = 0x01,
-    OTA_DOWNLOAD_PROTOCOL_HTTPS            = 0x02,
-    OTA_DOWNLOAD_PROTOCOL_VENDOR_SPECIFIC  = 0x03,
+    kBDXSynchronous  = 0x00,
+    kBDXAsynchronous = 0x01,
+    kHttps           = 0x02,
+    kVendorSpecific  = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OTADownloadProtocol                  = EmberAfOTADownloadProtocol;
@@ -5056,9 +5076,9 @@ using OTADownloadProtocol                  = EmberAfOTADownloadProtocol;
 // Enum for OTAQueryStatus
 enum class OTAQueryStatus : uint8_t
 {
-    OTA_QUERY_STATUS_UPDATE_AVAILABLE = 0x00,
-    OTA_QUERY_STATUS_BUSY             = 0x01,
-    OTA_QUERY_STATUS_NOT_AVAILABLE    = 0x02,
+    kUpdateAvailable = 0x00,
+    kBusy            = 0x01,
+    kNotAvailable    = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OTAQueryStatus                       = EmberAfOTAQueryStatus;
@@ -5266,9 +5286,9 @@ namespace OtaSoftwareUpdateRequestor {
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
-    OTA_ANNOUNCEMENT_REASON_SIMPLE_ANNOUNCEMENT     = 0x00,
-    OTA_ANNOUNCEMENT_REASON_UPDATE_AVAILABLE        = 0x01,
-    OTA_ANNOUNCEMENT_REASON_URGENT_UPDATE_AVAILABLE = 0x02,
+    kSimpleAnnouncement    = 0x00,
+    kUpdateAvailable       = 0x01,
+    kUrgentUpdateAvailable = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OTAAnnouncementReason                = EmberAfOTAAnnouncementReason;
@@ -5689,9 +5709,9 @@ namespace GeneralCommissioning {
 // Enum for GeneralCommissioningError
 enum class GeneralCommissioningError : uint8_t
 {
-    GENERAL_COMMISSIONING_ERROR_OK                     = 0x00,
-    GENERAL_COMMISSIONING_ERROR_VALUE_OUTSIDE_RANGE    = 0x01,
-    GENERAL_COMMISSIONING_ERROR_INVALID_AUTHENTICATION = 0x02,
+    kOk                    = 0x00,
+    kValueOutsideRange     = 0x01,
+    kInvalidAuthentication = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using GeneralCommissioningError            = EmberAfGeneralCommissioningError;
@@ -5702,9 +5722,9 @@ using GeneralCommissioningError            = EmberAfGeneralCommissioningError;
 // Enum for RegulatoryLocationType
 enum class RegulatoryLocationType : uint8_t
 {
-    REGULATORY_LOCATION_TYPE_INDOOR         = 0x00,
-    REGULATORY_LOCATION_TYPE_OUTDOOR        = 0x01,
-    REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR = 0x02,
+    kIndoor        = 0x00,
+    kOutdoor       = 0x01,
+    kIndoorOutdoor = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using RegulatoryLocationType               = EmberAfRegulatoryLocationType;
@@ -5973,26 +5993,26 @@ namespace NetworkCommissioning {
 // Enum for NetworkCommissioningError
 enum class NetworkCommissioningError : uint8_t
 {
-    NETWORK_COMMISSIONING_ERROR_SUCCESS                  = 0x00,
-    NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE             = 0x01,
-    NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED          = 0x02,
-    NETWORK_COMMISSIONING_ERROR_NETWORK_ID_NOT_FOUND     = 0x03,
-    NETWORK_COMMISSIONING_ERROR_DUPLICATE_NETWORK_ID     = 0x04,
-    NETWORK_COMMISSIONING_ERROR_NETWORK_NOT_FOUND        = 0x05,
-    NETWORK_COMMISSIONING_ERROR_REGULATORY_ERROR         = 0x06,
-    NETWORK_COMMISSIONING_ERROR_AUTH_FAILURE             = 0x07,
-    NETWORK_COMMISSIONING_ERROR_UNSUPPORTED_SECURITY     = 0x08,
-    NETWORK_COMMISSIONING_ERROR_OTHER_CONNECTION_FAILURE = 0x09,
-    NETWORK_COMMISSIONING_ERROR_IPV6_FAILED              = 0x0A,
-    NETWORK_COMMISSIONING_ERROR_IP_BIND_FAILED           = 0x0B,
-    NETWORK_COMMISSIONING_ERROR_LABEL9                   = 0x0C,
-    NETWORK_COMMISSIONING_ERROR_LABEL10                  = 0x0D,
-    NETWORK_COMMISSIONING_ERROR_LABEL11                  = 0x0E,
-    NETWORK_COMMISSIONING_ERROR_LABEL12                  = 0x0F,
-    NETWORK_COMMISSIONING_ERROR_LABEL13                  = 0x10,
-    NETWORK_COMMISSIONING_ERROR_LABEL14                  = 0x11,
-    NETWORK_COMMISSIONING_ERROR_LABEL15                  = 0x12,
-    NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR            = 0x13,
+    kSuccess                = 0x00,
+    kOutOfRange             = 0x01,
+    kBoundsExceeded         = 0x02,
+    kNetworkIDNotFound      = 0x03,
+    kDuplicateNetworkID     = 0x04,
+    kNetworkNotFound        = 0x05,
+    kRegulatoryError        = 0x06,
+    kAuthFailure            = 0x07,
+    kUnsupportedSecurity    = 0x08,
+    kOtherConnectionFailure = 0x09,
+    kIPV6Failed             = 0x0A,
+    kIPBindFailed           = 0x0B,
+    kLabel9                 = 0x0C,
+    kLabel10                = 0x0D,
+    kLabel11                = 0x0E,
+    kLabel12                = 0x0F,
+    kLabel13                = 0x10,
+    kLabel14                = 0x11,
+    kLabel15                = 0x12,
+    kUnknownError           = 0x13,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using NetworkCommissioningError            = EmberAfNetworkCommissioningError;
@@ -6616,9 +6636,9 @@ namespace DiagnosticLogs {
 // Enum for LogsIntent
 enum class LogsIntent : uint8_t
 {
-    LOGS_INTENT_END_USER_SUPPORT = 0x00,
-    LOGS_INTENT_NETWORK_DIAG     = 0x01,
-    LOGS_INTENT_CRASH_LOGS       = 0x02,
+    kEndUserSupport = 0x00,
+    kNetworkDiag    = 0x01,
+    kCrashLogs      = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using LogsIntent                           = EmberAfLogsIntent;
@@ -6629,11 +6649,11 @@ using LogsIntent                           = EmberAfLogsIntent;
 // Enum for LogsStatus
 enum class LogsStatus : uint8_t
 {
-    LOGS_STATUS_SUCCESS   = 0x00,
-    LOGS_STATUS_EXHAUSTED = 0x01,
-    LOGS_STATUS_NO_LOGS   = 0x02,
-    LOGS_STATUS_BUSY      = 0x03,
-    LOGS_STATUS_DENIED    = 0x04,
+    kSuccess   = 0x00,
+    kExhausted = 0x01,
+    kNoLogs    = 0x02,
+    kBusy      = 0x03,
+    kDenied    = 0x04,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using LogsStatus                           = EmberAfLogsStatus;
@@ -6644,8 +6664,8 @@ using LogsStatus                           = EmberAfLogsStatus;
 // Enum for LogsTransferProtocol
 enum class LogsTransferProtocol : uint8_t
 {
-    LOGS_TRANSFER_PROTOCOL_RESPONSE_PAYLOAD = 0x00,
-    LOGS_TRANSFER_PROTOCOL_BDX              = 0x01,
+    kResponsePayload = 0x00,
+    kBdx             = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using LogsTransferProtocol                 = EmberAfLogsTransferProtocol;
@@ -6733,13 +6753,13 @@ namespace GeneralDiagnostics {
 // Enum for BootReasonType
 enum class BootReasonType : uint8_t
 {
-    BOOT_REASON_TYPE_UNSPECIFIED               = 0x00,
-    BOOT_REASON_TYPE_POWER_ON_REBOOT           = 0x01,
-    BOOT_REASON_TYPE_BROWN_OUT_RESET           = 0x02,
-    BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET   = 0x03,
-    BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET   = 0x04,
-    BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED = 0x05,
-    BOOT_REASON_TYPE_SOFTWARE_RESET            = 0x06,
+    kUnspecified             = 0x00,
+    kPowerOnReboot           = 0x01,
+    kBrownOutReset           = 0x02,
+    kSoftwareWatchdogReset   = 0x03,
+    kHardwareWatchdogReset   = 0x04,
+    kSoftwareUpdateCompleted = 0x05,
+    kSoftwareReset           = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using BootReasonType                       = EmberAfBootReasonType;
@@ -6750,17 +6770,17 @@ using BootReasonType                       = EmberAfBootReasonType;
 // Enum for HardwareFaultType
 enum class HardwareFaultType : uint8_t
 {
-    HARDWARE_FAULT_TYPE_UNSPECIFIED               = 0x00,
-    HARDWARE_FAULT_TYPE_RADIO                     = 0x01,
-    HARDWARE_FAULT_TYPE_SENSOR                    = 0x02,
-    HARDWARE_FAULT_TYPE_RESETTABLE_OVER_TEMP      = 0x03,
-    HARDWARE_FAULT_TYPE_NON_RESETTABLE_OVER_TEMP  = 0x04,
-    HARDWARE_FAULT_TYPE_POWER_SOURCE              = 0x05,
-    HARDWARE_FAULT_TYPE_VISUAL_DISPLAY_FAULT      = 0x06,
-    HARDWARE_FAULT_TYPE_AUDIO_OUTPUT_FAULT        = 0x07,
-    HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT      = 0x08,
-    HARDWARE_FAULT_TYPE_NON_VOLATILE_MEMORY_ERROR = 0x09,
-    HARDWARE_FAULT_TYPE_TAMPER_DETECTED           = 0x0A,
+    kUnspecified            = 0x00,
+    kRadio                  = 0x01,
+    kSensor                 = 0x02,
+    kResettableOverTemp     = 0x03,
+    kNonResettableOverTemp  = 0x04,
+    kPowerSource            = 0x05,
+    kVisualDisplayFault     = 0x06,
+    kAudioOutputFault       = 0x07,
+    kUserInterfaceFault     = 0x08,
+    kNonVolatileMemoryError = 0x09,
+    kTamperDetected         = 0x0A,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using HardwareFaultType                    = EmberAfHardwareFaultType;
@@ -6771,11 +6791,11 @@ using HardwareFaultType                    = EmberAfHardwareFaultType;
 // Enum for InterfaceType
 enum class InterfaceType : uint8_t
 {
-    INTERFACE_TYPE_UNSPECIFIED = 0x00,
-    INTERFACE_TYPE_WI_FI       = 0x01,
-    INTERFACE_TYPE_ETHERNET    = 0x02,
-    INTERFACE_TYPE_CELLULAR    = 0x03,
-    INTERFACE_TYPE_THREAD      = 0x04,
+    kUnspecified = 0x00,
+    kWiFi        = 0x01,
+    kEthernet    = 0x02,
+    kCellular    = 0x03,
+    kThread      = 0x04,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using InterfaceType                        = EmberAfInterfaceType;
@@ -6786,10 +6806,10 @@ using InterfaceType                        = EmberAfInterfaceType;
 // Enum for NetworkFaultType
 enum class NetworkFaultType : uint8_t
 {
-    NETWORK_FAULT_TYPE_UNSPECIFIED       = 0x00,
-    NETWORK_FAULT_TYPE_HARDWARE_FAILURE  = 0x01,
-    NETWORK_FAULT_TYPE_NETWORK_JAMMED    = 0x02,
-    NETWORK_FAULT_TYPE_CONNECTION_FAILED = 0x03,
+    kUnspecified      = 0x00,
+    kHardwareFailure  = 0x01,
+    kNetworkJammed    = 0x02,
+    kConnectionFailed = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using NetworkFaultType                     = EmberAfNetworkFaultType;
@@ -6800,13 +6820,13 @@ using NetworkFaultType                     = EmberAfNetworkFaultType;
 // Enum for RadioFaultType
 enum class RadioFaultType : uint8_t
 {
-    RADIO_FAULT_TYPE_UNSPECIFIED    = 0x00,
-    RADIO_FAULT_TYPE_WI_FI_FAULT    = 0x01,
-    RADIO_FAULT_TYPE_CELLULAR_FAULT = 0x02,
-    RADIO_FAULT_TYPE_THREAD_FAULT   = 0x03,
-    RADIO_FAULT_TYPE_NFC_FAULT      = 0x04,
-    RADIO_FAULT_TYPE_BLE_FAULT      = 0x05,
-    RADIO_FAULT_TYPE_ETHERNET_FAULT = 0x06,
+    kUnspecified   = 0x00,
+    kWiFiFault     = 0x01,
+    kCellularFault = 0x02,
+    kThreadFault   = 0x03,
+    kNFCFault      = 0x04,
+    kBLEFault      = 0x05,
+    kEthernetFault = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using RadioFaultType                       = EmberAfRadioFaultType;
@@ -7041,10 +7061,10 @@ namespace ThreadNetworkDiagnostics {
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
 {
-    NETWORK_FAULT_UNSPECIFIED      = 0x00,
-    NETWORK_FAULT_LINK_DOWN        = 0x01,
-    NETWORK_FAULT_HARDWARE_FAILURE = 0x02,
-    NETWORK_FAULT_NETWORK_JAMMED   = 0x03,
+    kUnspecified     = 0x00,
+    kLinkDown        = 0x01,
+    kHardwareFailure = 0x02,
+    kNetworkJammed   = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using NetworkFault                         = EmberAfNetworkFault;
@@ -7055,13 +7075,13 @@ using NetworkFault                         = EmberAfNetworkFault;
 // Enum for RoutingRole
 enum class RoutingRole : uint8_t
 {
-    ROUTING_ROLE_UNSPECIFIED       = 0x00,
-    ROUTING_ROLE_UNASSIGNED        = 0x01,
-    ROUTING_ROLE_SLEEPY_END_DEVICE = 0x02,
-    ROUTING_ROLE_END_DEVICE        = 0x03,
-    ROUTING_ROLE_REED              = 0x04,
-    ROUTING_ROLE_ROUTER            = 0x05,
-    ROUTING_ROLE_LEADER            = 0x06,
+    kUnspecified     = 0x00,
+    kUnassigned      = 0x01,
+    kSleepyEndDevice = 0x02,
+    kEndDevice       = 0x03,
+    kReed            = 0x04,
+    kRouter          = 0x05,
+    kLeader          = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using RoutingRole                          = EmberAfRoutingRole;
@@ -7935,12 +7955,12 @@ namespace WiFiNetworkDiagnostics {
 // Enum for SecurityType
 enum class SecurityType : uint8_t
 {
-    SECURITY_TYPE_UNSPECIFIED = 0x00,
-    SECURITY_TYPE_NONE        = 0x01,
-    SECURITY_TYPE_WEP         = 0x02,
-    SECURITY_TYPE_WPA         = 0x03,
-    SECURITY_TYPE_WPA2        = 0x04,
-    SECURITY_TYPE_WPA3        = 0x05,
+    kUnspecified = 0x00,
+    kNone        = 0x01,
+    kWep         = 0x02,
+    kWpa         = 0x03,
+    kWpa2        = 0x04,
+    kWpa3        = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SecurityType                         = EmberAfSecurityType;
@@ -7951,12 +7971,12 @@ using SecurityType                         = EmberAfSecurityType;
 // Enum for WiFiVersionType
 enum class WiFiVersionType : uint8_t
 {
-    WI_FI_VERSION_TYPE_802__11A  = 0x00,
-    WI_FI_VERSION_TYPE_802__11B  = 0x01,
-    WI_FI_VERSION_TYPE_802__11G  = 0x02,
-    WI_FI_VERSION_TYPE_802__11N  = 0x03,
-    WI_FI_VERSION_TYPE_802__11AC = 0x04,
-    WI_FI_VERSION_TYPE_802__11AX = 0x05,
+    k80211a  = 0x00,
+    k80211b  = 0x01,
+    k80211g  = 0x02,
+    k80211n  = 0x03,
+    k80211ac = 0x04,
+    k80211ax = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using WiFiVersionType                      = EmberAfWiFiVersionType;
@@ -8142,16 +8162,16 @@ namespace EthernetNetworkDiagnostics {
 // Enum for PHYRateType
 enum class PHYRateType : uint8_t
 {
-    PHY_RATE_TYPE_10_M   = 0x00,
-    PHY_RATE_TYPE_100_M  = 0x01,
-    PHY_RATE_TYPE_1000_M = 0x02,
-    PHY_RATE_TYPE_2__5_G = 0x03,
-    PHY_RATE_TYPE_5_G    = 0x04,
-    PHY_RATE_TYPE_10_G   = 0x05,
-    PHY_RATE_TYPE_40_G   = 0x06,
-    PHY_RATE_TYPE_100_G  = 0x07,
-    PHY_RATE_TYPE_200_G  = 0x08,
-    PHY_RATE_TYPE_400_G  = 0x09,
+    k10m   = 0x00,
+    k100m  = 0x01,
+    k1000m = 0x02,
+    k25g   = 0x03,
+    k5g    = 0x04,
+    k10g   = 0x05,
+    k40g   = 0x06,
+    k100g  = 0x07,
+    k200g  = 0x08,
+    k400g  = 0x09,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using PHYRateType                          = EmberAfPHYRateType;
@@ -8589,9 +8609,9 @@ namespace AdministratorCommissioning {
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
-    STATUS_CODE_SUCCESS       = 0x00,
-    STATUS_CODE_BUSY          = 0x01,
-    STATUS_CODE_GENERAL_ERROR = 0x02,
+    kSuccess      = 0x00,
+    kBusy         = 0x01,
+    kGeneralError = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using StatusCode                           = EmberAfStatusCode;
@@ -8703,16 +8723,16 @@ namespace OperationalCredentials {
 // Enum for NodeOperationalCertStatus
 enum class NodeOperationalCertStatus : uint8_t
 {
-    NODE_OPERATIONAL_CERT_STATUS_SUCCESS                = 0x00,
-    NODE_OPERATIONAL_CERT_STATUS_INVALID_PUBLIC_KEY     = 0x01,
-    NODE_OPERATIONAL_CERT_STATUS_INVALID_NODE_OP_ID     = 0x02,
-    NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC            = 0x03,
-    NODE_OPERATIONAL_CERT_STATUS_MISSING_CSR            = 0x04,
-    NODE_OPERATIONAL_CERT_STATUS_TABLE_FULL             = 0x05,
-    NODE_OPERATIONAL_CERT_STATUS_INSUFFICIENT_PRIVILEGE = 0x08,
-    NODE_OPERATIONAL_CERT_STATUS_FABRIC_CONFLICT        = 0x09,
-    NODE_OPERATIONAL_CERT_STATUS_LABEL_CONFLICT         = 0x0A,
-    NODE_OPERATIONAL_CERT_STATUS_INVALID_FABRIC_INDEX   = 0x0B,
+    kSuccess               = 0x00,
+    kInvalidPublicKey      = 0x01,
+    kInvalidNodeOpId       = 0x02,
+    kInvalidNOC            = 0x03,
+    kMissingCsr            = 0x04,
+    kTableFull             = 0x05,
+    kInsufficientPrivilege = 0x08,
+    kFabricConflict        = 0x09,
+    kLabelConflict         = 0x0A,
+    kInvalidFabricIndex    = 0x0B,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using NodeOperationalCertStatus            = EmberAfNodeOperationalCertStatus;
@@ -9313,21 +9333,21 @@ namespace DoorLock {
 // Enum for DoorLockOperationEventCode
 enum class DoorLockOperationEventCode : uint8_t
 {
-    DOOR_LOCK_OPERATION_EVENT_CODE_UNKNOWN_OR_MFG_SPECIFIC  = 0x00,
-    DOOR_LOCK_OPERATION_EVENT_CODE_LOCK                     = 0x01,
-    DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK                   = 0x02,
-    DOOR_LOCK_OPERATION_EVENT_CODE_LOCK_INVALID_PIN_OR_ID   = 0x03,
-    DOOR_LOCK_OPERATION_EVENT_CODE_LOCK_INVALID_SCHEDULE    = 0x04,
-    DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK_INVALID_PIN_OR_ID = 0x05,
-    DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK_INVALID_SCHEDULE  = 0x06,
-    DOOR_LOCK_OPERATION_EVENT_CODE_ONE_TOUCH_LOCK           = 0x07,
-    DOOR_LOCK_OPERATION_EVENT_CODE_KEY_LOCK                 = 0x08,
-    DOOR_LOCK_OPERATION_EVENT_CODE_KEY_UNLOCK               = 0x09,
-    DOOR_LOCK_OPERATION_EVENT_CODE_AUTO_LOCK                = 0x0A,
-    DOOR_LOCK_OPERATION_EVENT_CODE_SCHEDULE_LOCK            = 0x0B,
-    DOOR_LOCK_OPERATION_EVENT_CODE_SCHEDULE_UNLOCK          = 0x0C,
-    DOOR_LOCK_OPERATION_EVENT_CODE_MANUAL_LOCK              = 0x0D,
-    DOOR_LOCK_OPERATION_EVENT_CODE_MANUAL_UNLOCK            = 0x0E,
+    kUnknownOrMfgSpecific  = 0x00,
+    kLock                  = 0x01,
+    kUnlock                = 0x02,
+    kLockInvalidPinOrId    = 0x03,
+    kLockInvalidSchedule   = 0x04,
+    kUnlockInvalidPinOrId  = 0x05,
+    kUnlockInvalidSchedule = 0x06,
+    kOneTouchLock          = 0x07,
+    kKeyLock               = 0x08,
+    kKeyUnlock             = 0x09,
+    kAutoLock              = 0x0A,
+    kScheduleLock          = 0x0B,
+    kScheduleUnlock        = 0x0C,
+    kManualLock            = 0x0D,
+    kManualUnlock          = 0x0E,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using DoorLockOperationEventCode           = EmberAfDoorLockOperationEventCode;
@@ -9338,13 +9358,13 @@ using DoorLockOperationEventCode           = EmberAfDoorLockOperationEventCode;
 // Enum for DoorLockProgrammingEventCode
 enum class DoorLockProgrammingEventCode : uint8_t
 {
-    DOOR_LOCK_PROGRAMMING_EVENT_CODE_UNKNOWN_OR_MFG_SPECIFIC = 0x00,
-    DOOR_LOCK_PROGRAMMING_EVENT_CODE_MASTER_CODE_CHANGED     = 0x01,
-    DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_ADDED               = 0x02,
-    DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_DELETED             = 0x03,
-    DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_CHANGED             = 0x04,
-    DOOR_LOCK_PROGRAMMING_EVENT_CODE_ID_ADDED                = 0x05,
-    DOOR_LOCK_PROGRAMMING_EVENT_CODE_ID_DELETED              = 0x06,
+    kUnknownOrMfgSpecific = 0x00,
+    kMasterCodeChanged    = 0x01,
+    kPinAdded             = 0x02,
+    kPinDeleted           = 0x03,
+    kPinChanged           = 0x04,
+    kIdAdded              = 0x05,
+    kIdDeleted            = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using DoorLockProgrammingEventCode         = EmberAfDoorLockProgrammingEventCode;
@@ -9355,10 +9375,10 @@ using DoorLockProgrammingEventCode         = EmberAfDoorLockProgrammingEventCode
 // Enum for DoorLockSetPinOrIdStatus
 enum class DoorLockSetPinOrIdStatus : uint8_t
 {
-    DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS              = 0x00,
-    DOOR_LOCK_SET_PIN_OR_ID_STATUS_GENERAL_FAILURE      = 0x01,
-    DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL          = 0x02,
-    DOOR_LOCK_SET_PIN_OR_ID_STATUS_DUPLICATE_CODE_ERROR = 0x03,
+    kSuccess            = 0x00,
+    kGeneralFailure     = 0x01,
+    kMemoryFull         = 0x02,
+    kDuplicateCodeError = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using DoorLockSetPinOrIdStatus             = EmberAfDoorLockSetPinOrIdStatus;
@@ -9369,10 +9389,10 @@ using DoorLockSetPinOrIdStatus             = EmberAfDoorLockSetPinOrIdStatus;
 // Enum for DoorLockUserStatus
 enum class DoorLockUserStatus : uint8_t
 {
-    DOOR_LOCK_USER_STATUS_AVAILABLE         = 0x00,
-    DOOR_LOCK_USER_STATUS_OCCUPIED_ENABLED  = 0x01,
-    DOOR_LOCK_USER_STATUS_OCCUPIED_DISABLED = 0x03,
-    DOOR_LOCK_USER_STATUS_NOT_SUPPORTED     = 0xFF,
+    kAvailable        = 0x00,
+    kOccupiedEnabled  = 0x01,
+    kOccupiedDisabled = 0x03,
+    kNotSupported     = 0xFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using DoorLockUserStatus                   = EmberAfDoorLockUserStatus;
@@ -9383,16 +9403,28 @@ using DoorLockUserStatus                   = EmberAfDoorLockUserStatus;
 // Enum for DoorLockUserType
 enum class DoorLockUserType : uint8_t
 {
-    DOOR_LOCK_USER_TYPE_UNRESTRICTED           = 0x00,
-    DOOR_LOCK_USER_TYPE_YEAR_DAY_SCHEDULE_USER = 0x01,
-    DOOR_LOCK_USER_TYPE_WEEK_DAY_SCHEDULE_USER = 0x02,
-    DOOR_LOCK_USER_TYPE_MASTER_USER            = 0x03,
-    DOOR_LOCK_USER_TYPE_NON_ACCESS_USER        = 0x04,
-    DOOR_LOCK_USER_TYPE_NOT_SUPPORTED          = 0xFF,
+    kUnrestricted        = 0x00,
+    kYearDayScheduleUser = 0x01,
+    kWeekDayScheduleUser = 0x02,
+    kMasterUser          = 0x03,
+    kNonAccessUser       = 0x04,
+    kNotSupported        = 0xFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using DoorLockUserType                     = EmberAfDoorLockUserType;
 #endif
+
+// Bitmap for DoorLockDayOfWeek
+enum class DoorLockDayOfWeek : uint8_t
+{
+    kSunday    = 0,
+    kMonday    = 1,
+    kTuesday   = 2,
+    kWednesday = 3,
+    kThursday  = 4,
+    kFriday    = 5,
+    kSaturday  = 6,
+};
 
 namespace Commands {
 namespace LockDoor {
@@ -10073,7 +10105,7 @@ public:
 
     uint8_t scheduleId;
     uint16_t userId;
-    uint8_t daysMask;
+    BitFlags<DoorLockDayOfWeek> daysMask;
     uint8_t startHour;
     uint8_t startMinute;
     uint8_t endHour;
@@ -10090,7 +10122,7 @@ public:
 
     uint8_t scheduleId;
     uint16_t userId;
-    uint8_t daysMask;
+    BitFlags<DoorLockDayOfWeek> daysMask;
     uint8_t startHour;
     uint8_t startMinute;
     uint8_t endHour;
@@ -11582,31 +11614,31 @@ namespace WindowCovering {
 // Enum for WcEndProductType
 enum class WcEndProductType : uint8_t
 {
-    WC_END_PRODUCT_TYPE_ROLLER_SHADE                 = 0x00,
-    WC_END_PRODUCT_TYPE_ROMAN_SHADE                  = 0x01,
-    WC_END_PRODUCT_TYPE_BALLOON_SHADE                = 0x02,
-    WC_END_PRODUCT_TYPE_WOVEN_WOOD                   = 0x03,
-    WC_END_PRODUCT_TYPE_PLEATED_SHADE                = 0x04,
-    WC_END_PRODUCT_TYPE_CELLULAR_SHADE               = 0x05,
-    WC_END_PRODUCT_TYPE_LAYERED_SHADE                = 0x06,
-    WC_END_PRODUCT_TYPE_LAYERED_SHADE2_D             = 0x07,
-    WC_END_PRODUCT_TYPE_SHEER_SHADE                  = 0x08,
-    WC_END_PRODUCT_TYPE_TILT_ONLY_INTERIOR_BLIND     = 0x09,
-    WC_END_PRODUCT_TYPE_INTERIOR_BLIND               = 0x0A,
-    WC_END_PRODUCT_TYPE_VERTICAL_BLIND_STRIP_CURTAIN = 0x0B,
-    WC_END_PRODUCT_TYPE_INTERIOR_VENETIAN_BLIND      = 0x0C,
-    WC_END_PRODUCT_TYPE_EXTERIOR_VENETIAN_BLIND      = 0x0D,
-    WC_END_PRODUCT_TYPE_LATERAL_LEFT_CURTAIN         = 0x0E,
-    WC_END_PRODUCT_TYPE_LATERAL_RIGHT_CURTAIN        = 0x0F,
-    WC_END_PRODUCT_TYPE_CENTRAL_CURTAIN              = 0x10,
-    WC_END_PRODUCT_TYPE_ROLLER_SHUTTER               = 0x11,
-    WC_END_PRODUCT_TYPE_EXTERIOR_VERTICAL_SCREEN     = 0x12,
-    WC_END_PRODUCT_TYPE_AWNING_TERRACE_PATIO         = 0x13,
-    WC_END_PRODUCT_TYPE_AWNING_VERTICAL_SCREEN       = 0x14,
-    WC_END_PRODUCT_TYPE_TILT_ONLY_PERGOLA            = 0x15,
-    WC_END_PRODUCT_TYPE_SWINGING_SHUTTER             = 0x16,
-    WC_END_PRODUCT_TYPE_SLIDING_SHUTTER              = 0x17,
-    WC_END_PRODUCT_TYPE_UNKNOWN                      = 0xFF,
+    kRollerShade               = 0x00,
+    kRomanShade                = 0x01,
+    kBalloonShade              = 0x02,
+    kWovenWood                 = 0x03,
+    kPleatedShade              = 0x04,
+    kCellularShade             = 0x05,
+    kLayeredShade              = 0x06,
+    kLayeredShade2D            = 0x07,
+    kSheerShade                = 0x08,
+    kTiltOnlyInteriorBlind     = 0x09,
+    kInteriorBlind             = 0x0A,
+    kVerticalBlindStripCurtain = 0x0B,
+    kInteriorVenetianBlind     = 0x0C,
+    kExteriorVenetianBlind     = 0x0D,
+    kLateralLeftCurtain        = 0x0E,
+    kLateralRightCurtain       = 0x0F,
+    kCentralCurtain            = 0x10,
+    kRollerShutter             = 0x11,
+    kExteriorVerticalScreen    = 0x12,
+    kAwningTerracePatio        = 0x13,
+    kAwningVerticalScreen      = 0x14,
+    kTiltOnlyPergola           = 0x15,
+    kSwingingShutter           = 0x16,
+    kSlidingShutter            = 0x17,
+    kUnknown                   = 0xFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using WcEndProductType                     = EmberAfWcEndProductType;
@@ -11617,21 +11649,67 @@ using WcEndProductType                     = EmberAfWcEndProductType;
 // Enum for WcType
 enum class WcType : uint8_t
 {
-    WC_TYPE_ROLLERSHADE                 = 0x00,
-    WC_TYPE_ROLLERSHADE2_MOTOR          = 0x01,
-    WC_TYPE_ROLLERSHADE_EXTERIOR        = 0x02,
-    WC_TYPE_ROLLERSHADE_EXTERIOR2_MOTOR = 0x03,
-    WC_TYPE_DRAPERY                     = 0x04,
-    WC_TYPE_AWNING                      = 0x05,
-    WC_TYPE_SHUTTER                     = 0x06,
-    WC_TYPE_TILT_BLIND_TILT_ONLY        = 0x07,
-    WC_TYPE_TILT_BLIND_LIFT_AND_TILT    = 0x08,
-    WC_TYPE_PROJECTOR_SCREEN            = 0x09,
-    WC_TYPE_UNKNOWN                     = 0xFF,
+    kRollershade               = 0x00,
+    kRollershade2Motor         = 0x01,
+    kRollershadeExterior       = 0x02,
+    kRollershadeExterior2Motor = 0x03,
+    kDrapery                   = 0x04,
+    kAwning                    = 0x05,
+    kShutter                   = 0x06,
+    kTiltBlindTiltOnly         = 0x07,
+    kTiltBlindLiftAndTilt      = 0x08,
+    kProjectorScreen           = 0x09,
+    kUnknown                   = 0xFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using WcType                               = EmberAfWcType;
 #endif
+
+// Bitmap for WcConfigStatus
+enum class WcConfigStatus : uint8_t
+{
+    kOperational               = 0,
+    kOnline                    = 1,
+    kOpenAndUpCommandsReversed = 2,
+    kLiftPositionAware         = 3,
+    kTiltPositionAware         = 4,
+    kLiftEncoderControlled     = 5,
+    kTiltEncoderControlled     = 6,
+};
+
+// Bitmap for WcMode
+enum class WcMode : uint8_t
+{
+    kMotorDirectionReversed = 0,
+    kCalibrationMode        = 1,
+    kMaintenanceMode        = 2,
+    kLEDFeedback            = 3,
+};
+
+// Bitmap for WcOperationalStatus
+enum class WcOperationalStatus : uint8_t
+{
+    kGlobal = 0,
+    kLift   = 2,
+    kTilt   = 4,
+};
+
+// Bitmap for WcSafetyStatus
+enum class WcSafetyStatus : uint16_t
+{
+    kRemoteLockout       = 0,
+    kTamperDetection     = 1,
+    kFailedCommunication = 2,
+    kPositionFailure     = 3,
+    kThermalProtection   = 4,
+    kObstacleDetected    = 5,
+    kPower               = 6,
+    kStopInput           = 7,
+    kMotorJammed         = 8,
+    kHardwareFailure     = 9,
+    kManualOperation     = 10,
+    kProtection          = 11,
+};
 
 namespace Commands {
 namespace UpOrOpen {
@@ -12303,12 +12381,12 @@ namespace PumpConfigurationAndControl {
 // Enum for PumpControlMode
 enum class PumpControlMode : uint8_t
 {
-    PUMP_CONTROL_MODE_CONSTANT_SPEED        = 0x00,
-    PUMP_CONTROL_MODE_CONSTANT_PRESSURE     = 0x01,
-    PUMP_CONTROL_MODE_PROPORTIONAL_PRESSURE = 0x02,
-    PUMP_CONTROL_MODE_CONSTANT_FLOW         = 0x03,
-    PUMP_CONTROL_MODE_CONSTANT_TEMPERATURE  = 0x05,
-    PUMP_CONTROL_MODE_AUTOMATIC             = 0x07,
+    kConstantSpeed        = 0x00,
+    kConstantPressure     = 0x01,
+    kProportionalPressure = 0x02,
+    kConstantFlow         = 0x03,
+    kConstantTemperature  = 0x05,
+    kAutomatic            = 0x07,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using PumpControlMode                      = EmberAfPumpControlMode;
@@ -12319,14 +12397,28 @@ using PumpControlMode                      = EmberAfPumpControlMode;
 // Enum for PumpOperationMode
 enum class PumpOperationMode : uint8_t
 {
-    PUMP_OPERATION_MODE_NORMAL  = 0x00,
-    PUMP_OPERATION_MODE_MINIMUM = 0x01,
-    PUMP_OPERATION_MODE_MAXIMUM = 0x02,
-    PUMP_OPERATION_MODE_LOCAL   = 0x03,
+    kNormal  = 0x00,
+    kMinimum = 0x01,
+    kMaximum = 0x02,
+    kLocal   = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using PumpOperationMode                    = EmberAfPumpOperationMode;
 #endif
+
+// Bitmap for PumpStatus
+enum class PumpStatus : uint16_t
+{
+    kDeviceFault       = 0,
+    kSupplyfault       = 1,
+    kSpeedLow          = 2,
+    kSpeedHigh         = 3,
+    kLocalOverride     = 4,
+    kRunning           = 5,
+    kRemotePressure    = 6,
+    kRemoteFlow        = 7,
+    kRemoteTemperature = 8,
+};
 
 namespace Attributes {
 namespace MaxPressure {
@@ -12602,13 +12694,33 @@ namespace Thermostat {
 // Enum for SetpointAdjustMode
 enum class SetpointAdjustMode : uint8_t
 {
-    SETPOINT_ADJUST_MODE_HEAT_SETPOINT           = 0x00,
-    SETPOINT_ADJUST_MODE_COOL_SETPOINT           = 0x01,
-    SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS = 0x02,
+    kHeatSetpoint         = 0x00,
+    kCoolSetpoint         = 0x01,
+    kHeatAndCoolSetpoints = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SetpointAdjustMode                   = EmberAfSetpointAdjustMode;
 #endif
+
+// Bitmap for DayOfWeek
+enum class DayOfWeek : uint8_t
+{
+    kSunday         = 0,
+    kMonday         = 1,
+    kTuesday        = 2,
+    kWednesday      = 3,
+    kThursday       = 4,
+    kFriday         = 5,
+    kSaturday       = 6,
+    kAwayOrVacation = 7,
+};
+
+// Bitmap for ModeForSequence
+enum class ModeForSequence : uint8_t
+{
+    kHeatSetpointFieldPresent = 0,
+    kCoolSetpointFieldPresent = 1,
+};
 
 namespace Commands {
 namespace SetpointRaiseLower {
@@ -12659,8 +12771,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    uint8_t dayOfWeekForSequence;
-    uint8_t modeForSequence;
+    BitFlags<DayOfWeek> dayOfWeekForSequence;
+    BitFlags<ModeForSequence> modeForSequence;
     DataModel::List<uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -12673,8 +12785,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    uint8_t dayOfWeekForSequence;
-    uint8_t modeForSequence;
+    BitFlags<DayOfWeek> dayOfWeekForSequence;
+    BitFlags<ModeForSequence> modeForSequence;
     DataModel::DecodableList<uint8_t> payload;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12696,8 +12808,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    uint8_t dayOfWeekForSequence;
-    uint8_t modeForSequence;
+    BitFlags<DayOfWeek> dayOfWeekForSequence;
+    BitFlags<ModeForSequence> modeForSequence;
     DataModel::List<uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -12710,8 +12822,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    uint8_t dayOfWeekForSequence;
-    uint8_t modeForSequence;
+    BitFlags<DayOfWeek> dayOfWeekForSequence;
+    BitFlags<ModeForSequence> modeForSequence;
     DataModel::DecodableList<uint8_t> payload;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12773,8 +12885,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
-    uint8_t daysToReturn;
-    uint8_t modeToReturn;
+    BitFlags<DayOfWeek> daysToReturn;
+    BitFlags<ModeForSequence> modeToReturn;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12785,8 +12897,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
-    uint8_t daysToReturn;
-    uint8_t modeToReturn;
+    BitFlags<DayOfWeek> daysToReturn;
+    BitFlags<ModeForSequence> modeToReturn;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeeklySchedule
@@ -13481,9 +13593,9 @@ namespace ColorControl {
 // Enum for ColorLoopAction
 enum class ColorLoopAction : uint8_t
 {
-    COLOR_LOOP_ACTION_DEACTIVATE                                  = 0x00,
-    COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE = 0x01,
-    COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE          = 0x02,
+    kDeactivate                            = 0x00,
+    kActivateFromColorLoopStartEnhancedHue = 0x01,
+    kActivateFromEnhancedCurrentHue        = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ColorLoopAction                      = EmberAfColorLoopAction;
@@ -13494,8 +13606,8 @@ using ColorLoopAction                      = EmberAfColorLoopAction;
 // Enum for ColorLoopDirection
 enum class ColorLoopDirection : uint8_t
 {
-    COLOR_LOOP_DIRECTION_DECREMENT_HUE = 0x00,
-    COLOR_LOOP_DIRECTION_INCREMENT_HUE = 0x01,
+    kDecrementHue = 0x00,
+    kIncrementHue = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ColorLoopDirection                   = EmberAfColorLoopDirection;
@@ -13506,9 +13618,9 @@ using ColorLoopDirection                   = EmberAfColorLoopDirection;
 // Enum for ColorMode
 enum class ColorMode : uint8_t
 {
-    COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION = 0x00,
-    COLOR_MODE_CURRENT_X_AND_CURRENT_Y            = 0x01,
-    COLOR_MODE_COLOR_TEMPERATURE                  = 0x02,
+    kCurrentHueAndCurrentSaturation = 0x00,
+    kCurrentXAndCurrentY            = 0x01,
+    kColorTemperature               = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ColorMode                            = EmberAfColorMode;
@@ -13519,10 +13631,10 @@ using ColorMode                            = EmberAfColorMode;
 // Enum for HueDirection
 enum class HueDirection : uint8_t
 {
-    HUE_DIRECTION_SHORTEST_DISTANCE = 0x00,
-    HUE_DIRECTION_LONGEST_DISTANCE  = 0x01,
-    HUE_DIRECTION_UP                = 0x02,
-    HUE_DIRECTION_DOWN              = 0x03,
+    kShortestDistance = 0x00,
+    kLongestDistance  = 0x01,
+    kUp               = 0x02,
+    kDown             = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using HueDirection                         = EmberAfHueDirection;
@@ -13533,9 +13645,9 @@ using HueDirection                         = EmberAfHueDirection;
 // Enum for HueMoveMode
 enum class HueMoveMode : uint8_t
 {
-    HUE_MOVE_MODE_STOP = 0x00,
-    HUE_MOVE_MODE_UP   = 0x01,
-    HUE_MOVE_MODE_DOWN = 0x03,
+    kStop = 0x00,
+    kUp   = 0x01,
+    kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using HueMoveMode                          = EmberAfHueMoveMode;
@@ -13546,8 +13658,8 @@ using HueMoveMode                          = EmberAfHueMoveMode;
 // Enum for HueStepMode
 enum class HueStepMode : uint8_t
 {
-    HUE_STEP_MODE_UP   = 0x01,
-    HUE_STEP_MODE_DOWN = 0x03,
+    kUp   = 0x01,
+    kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using HueStepMode                          = EmberAfHueStepMode;
@@ -13558,9 +13670,9 @@ using HueStepMode                          = EmberAfHueStepMode;
 // Enum for SaturationMoveMode
 enum class SaturationMoveMode : uint8_t
 {
-    SATURATION_MOVE_MODE_STOP = 0x00,
-    SATURATION_MOVE_MODE_UP   = 0x01,
-    SATURATION_MOVE_MODE_DOWN = 0x03,
+    kStop = 0x00,
+    kUp   = 0x01,
+    kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SaturationMoveMode                   = EmberAfSaturationMoveMode;
@@ -13571,12 +13683,31 @@ using SaturationMoveMode                   = EmberAfSaturationMoveMode;
 // Enum for SaturationStepMode
 enum class SaturationStepMode : uint8_t
 {
-    SATURATION_STEP_MODE_UP   = 0x01,
-    SATURATION_STEP_MODE_DOWN = 0x03,
+    kUp   = 0x01,
+    kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SaturationStepMode                   = EmberAfSaturationStepMode;
 #endif
+
+// Bitmap for ColorCapabilities
+enum class ColorCapabilities : uint16_t
+{
+    kHueSaturationSupported    = 0,
+    kEnhancedHueSupported      = 1,
+    kColorLoopSupported        = 2,
+    kXYAttributesSupported     = 3,
+    kColorTemperatureSupported = 4,
+};
+
+// Bitmap for ColorLoopUpdateFlags
+enum class ColorLoopUpdateFlags : uint8_t
+{
+    kUpdateAction    = 0,
+    kUpdateDirection = 1,
+    kUpdateTime      = 2,
+    kUpdateStartHue  = 3,
+};
 
 namespace Commands {
 namespace MoveToHue {
@@ -14180,7 +14311,7 @@ public:
     static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
 
-    uint8_t updateFlags;
+    BitFlags<ColorLoopUpdateFlags> updateFlags;
     ColorLoopAction action;
     ColorLoopDirection direction;
     uint16_t time;
@@ -14197,7 +14328,7 @@ public:
     static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
 
-    uint8_t updateFlags;
+    BitFlags<ColorLoopUpdateFlags> updateFlags;
     ColorLoopAction action;
     ColorLoopDirection direction;
     uint16_t time;
@@ -17048,10 +17179,10 @@ namespace IasZone {
 // Enum for IasEnrollResponseCode
 enum class IasEnrollResponseCode : uint8_t
 {
-    IAS_ENROLL_RESPONSE_CODE_SUCCESS          = 0x00,
-    IAS_ENROLL_RESPONSE_CODE_NOT_SUPPORTED    = 0x01,
-    IAS_ENROLL_RESPONSE_CODE_NO_ENROLL_PERMIT = 0x02,
-    IAS_ENROLL_RESPONSE_CODE_TOO_MANY_ZONES   = 0x03,
+    kSuccess        = 0x00,
+    kNotSupported   = 0x01,
+    kNoEnrollPermit = 0x02,
+    kTooManyZones   = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasEnrollResponseCode                = EmberAfIasEnrollResponseCode;
@@ -17062,26 +17193,41 @@ using IasEnrollResponseCode                = EmberAfIasEnrollResponseCode;
 // Enum for IasZoneType
 enum class IasZoneType : uint16_t
 {
-    IAS_ZONE_TYPE_STANDARD_CIE              = 0x00,
-    IAS_ZONE_TYPE_MOTION_SENSOR             = 0x0D,
-    IAS_ZONE_TYPE_CONTACT_SWITCH            = 0x15,
-    IAS_ZONE_TYPE_FIRE_SENSOR               = 0x28,
-    IAS_ZONE_TYPE_WATER_SENSOR              = 0x2A,
-    IAS_ZONE_TYPE_GAS_SENSOR                = 0x2B,
-    IAS_ZONE_TYPE_PERSONAL_EMERGENCY_DEVICE = 0x2C,
-    IAS_ZONE_TYPE_VIBRATION_MOVEMENT_SENSOR = 0x2D,
-    IAS_ZONE_TYPE_REMOTE_CONTROL            = 0x10F,
-    IAS_ZONE_TYPE_KEY_FOB                   = 0x115,
-    IAS_ZONE_TYPE_KEYPAD                    = 0x21D,
-    IAS_ZONE_TYPE_STANDARD_WARNING_DEVICE   = 0x225,
-    IAS_ZONE_TYPE_GLASS_BREAK_SENSOR        = 0x226,
-    IAS_ZONE_TYPE_CARBON_MONOXIDE_SENSOR    = 0x227,
-    IAS_ZONE_TYPE_SECURITY_REPEATER         = 0x229,
-    IAS_ZONE_TYPE_INVALID_ZONE_TYPE         = 0xFFFF,
+    kStandardCie             = 0x00,
+    kMotionSensor            = 0x0D,
+    kContactSwitch           = 0x15,
+    kFireSensor              = 0x28,
+    kWaterSensor             = 0x2A,
+    kGasSensor               = 0x2B,
+    kPersonalEmergencyDevice = 0x2C,
+    kVibrationMovementSensor = 0x2D,
+    kRemoteControl           = 0x10F,
+    kKeyFob                  = 0x115,
+    kKeypad                  = 0x21D,
+    kStandardWarningDevice   = 0x225,
+    kGlassBreakSensor        = 0x226,
+    kCarbonMonoxideSensor    = 0x227,
+    kSecurityRepeater        = 0x229,
+    kInvalidZoneType         = 0xFFFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasZoneType                          = EmberAfIasZoneType;
 #endif
+
+// Bitmap for IasZoneStatus
+enum class IasZoneStatus : uint16_t
+{
+    kAlarm1             = 0,
+    kAlarm2             = 1,
+    kTamper             = 2,
+    kBattery            = 3,
+    kSupervisionReports = 4,
+    kRestoreReports     = 5,
+    kTrouble            = 6,
+    kAc                 = 7,
+    kTest               = 8,
+    kBatteryDefect      = 9,
+};
 
 namespace Commands {
 namespace ZoneEnrollResponse {
@@ -17131,7 +17277,7 @@ public:
     static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
 
-    uint16_t zoneStatus;
+    BitFlags<IasZoneStatus> zoneStatus;
     uint8_t extendedStatus;
     uint8_t zoneId;
     uint16_t delay;
@@ -17145,7 +17291,7 @@ public:
     static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
 
-    uint16_t zoneStatus;
+    BitFlags<IasZoneStatus> zoneStatus;
     uint8_t extendedStatus;
     uint8_t zoneId;
     uint16_t delay;
@@ -17375,13 +17521,13 @@ namespace IasAce {
 // Enum for IasAceAlarmStatus
 enum class IasAceAlarmStatus : uint8_t
 {
-    IAS_ACE_ALARM_STATUS_NO_ALARM        = 0x00,
-    IAS_ACE_ALARM_STATUS_BURGLAR         = 0x01,
-    IAS_ACE_ALARM_STATUS_FIRE            = 0x02,
-    IAS_ACE_ALARM_STATUS_EMERGENCY       = 0x03,
-    IAS_ACE_ALARM_STATUS_POLICE_PANIC    = 0x04,
-    IAS_ACE_ALARM_STATUS_FIRE_PANIC      = 0x05,
-    IAS_ACE_ALARM_STATUS_EMERGENCY_PANIC = 0x06,
+    kNoAlarm        = 0x00,
+    kBurglar        = 0x01,
+    kFire           = 0x02,
+    kEmergency      = 0x03,
+    kPolicePanic    = 0x04,
+    kFirePanic      = 0x05,
+    kEmergencyPanic = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasAceAlarmStatus                    = EmberAfIasAceAlarmStatus;
@@ -17392,10 +17538,10 @@ using IasAceAlarmStatus                    = EmberAfIasAceAlarmStatus;
 // Enum for IasAceArmMode
 enum class IasAceArmMode : uint8_t
 {
-    IAS_ACE_ARM_MODE_DISARM                     = 0x00,
-    IAS_ACE_ARM_MODE_ARM_DAY_HOME_ZONES_ONLY    = 0x01,
-    IAS_ACE_ARM_MODE_ARM_NIGHT_SLEEP_ZONES_ONLY = 0x02,
-    IAS_ACE_ARM_MODE_ARM_ALL_ZONES              = 0x03,
+    kDisarm                 = 0x00,
+    kArmDayHomeZonesOnly    = 0x01,
+    kArmNightSleepZonesOnly = 0x02,
+    kArmAllZones            = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasAceArmMode                        = EmberAfIasAceArmMode;
@@ -17406,13 +17552,13 @@ using IasAceArmMode                        = EmberAfIasAceArmMode;
 // Enum for IasAceArmNotification
 enum class IasAceArmNotification : uint8_t
 {
-    IAS_ACE_ARM_NOTIFICATION_ALL_ZONES_DISARMED           = 0x00,
-    IAS_ACE_ARM_NOTIFICATION_ONLY_DAY_HOME_ZONES_ARMED    = 0x01,
-    IAS_ACE_ARM_NOTIFICATION_ONLY_NIGHT_SLEEP_ZONES_ARMED = 0x02,
-    IAS_ACE_ARM_NOTIFICATION_ALL_ZONES_ARMED              = 0x03,
-    IAS_ACE_ARM_NOTIFICATION_INVALID_ARM_DISARM_CODE      = 0x04,
-    IAS_ACE_ARM_NOTIFICATION_NOT_READY_TO_ARM             = 0x05,
-    IAS_ACE_ARM_NOTIFICATION_ALREADY_DISARMED             = 0x06,
+    kAllZonesDisarmed         = 0x00,
+    kOnlyDayHomeZonesArmed    = 0x01,
+    kOnlyNightSleepZonesArmed = 0x02,
+    kAllZonesArmed            = 0x03,
+    kInvalidArmDisarmCode     = 0x04,
+    kNotReadyToArm            = 0x05,
+    kAlreadyDisarmed          = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasAceArmNotification                = EmberAfIasAceArmNotification;
@@ -17423,8 +17569,8 @@ using IasAceArmNotification                = EmberAfIasAceArmNotification;
 // Enum for IasAceAudibleNotification
 enum class IasAceAudibleNotification : uint8_t
 {
-    IAS_ACE_AUDIBLE_NOTIFICATION_MUTE          = 0x00,
-    IAS_ACE_AUDIBLE_NOTIFICATION_DEFAULT_SOUND = 0x01,
+    kMute         = 0x00,
+    kDefaultSound = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasAceAudibleNotification            = EmberAfIasAceAudibleNotification;
@@ -17435,12 +17581,12 @@ using IasAceAudibleNotification            = EmberAfIasAceAudibleNotification;
 // Enum for IasAceBypassResult
 enum class IasAceBypassResult : uint8_t
 {
-    IAS_ACE_BYPASS_RESULT_ZONE_BYPASSED           = 0x00,
-    IAS_ACE_BYPASS_RESULT_ZONE_NOT_BYPASSED       = 0x01,
-    IAS_ACE_BYPASS_RESULT_NOT_ALLOWED             = 0x02,
-    IAS_ACE_BYPASS_RESULT_INVALID_ZONE_ID         = 0x03,
-    IAS_ACE_BYPASS_RESULT_UNKNOWN_ZONE_ID         = 0x04,
-    IAS_ACE_BYPASS_RESULT_INVALID_ARM_DISARM_CODE = 0x05,
+    kZoneBypassed         = 0x00,
+    kZoneNotBypassed      = 0x01,
+    kNotAllowed           = 0x02,
+    kInvalidZoneId        = 0x03,
+    kUnknownZoneId        = 0x04,
+    kInvalidArmDisarmCode = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasAceBypassResult                   = EmberAfIasAceBypassResult;
@@ -17451,17 +17597,17 @@ using IasAceBypassResult                   = EmberAfIasAceBypassResult;
 // Enum for IasAcePanelStatus
 enum class IasAcePanelStatus : uint8_t
 {
-    IAS_ACE_PANEL_STATUS_PANEL_DISARMED   = 0x00,
-    IAS_ACE_PANEL_STATUS_ARMED_STAY       = 0x01,
-    IAS_ACE_PANEL_STATUS_ARMED_NIGHT      = 0x02,
-    IAS_ACE_PANEL_STATUS_ARMED_AWAY       = 0x03,
-    IAS_ACE_PANEL_STATUS_EXIT_DELAY       = 0x04,
-    IAS_ACE_PANEL_STATUS_ENTRY_DELAY      = 0x05,
-    IAS_ACE_PANEL_STATUS_NOT_READY_TO_ARM = 0x06,
-    IAS_ACE_PANEL_STATUS_IN_ALARM         = 0x07,
-    IAS_ACE_PANEL_STATUS_ARMING_STAY      = 0x08,
-    IAS_ACE_PANEL_STATUS_ARMING_NIGHT     = 0x09,
-    IAS_ACE_PANEL_STATUS_ARMING_AWAY      = 0x0A,
+    kPanelDisarmed = 0x00,
+    kArmedStay     = 0x01,
+    kArmedNight    = 0x02,
+    kArmedAway     = 0x03,
+    kExitDelay     = 0x04,
+    kEntryDelay    = 0x05,
+    kNotReadyToArm = 0x06,
+    kInAlarm       = 0x07,
+    kArmingStay    = 0x08,
+    kArmingNight   = 0x09,
+    kArmingAway    = 0x0A,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasAcePanelStatus                    = EmberAfIasAcePanelStatus;
@@ -17472,26 +17618,41 @@ using IasAcePanelStatus                    = EmberAfIasAcePanelStatus;
 // Enum for IasZoneType
 enum class IasZoneType : uint16_t
 {
-    IAS_ZONE_TYPE_STANDARD_CIE              = 0x00,
-    IAS_ZONE_TYPE_MOTION_SENSOR             = 0x0D,
-    IAS_ZONE_TYPE_CONTACT_SWITCH            = 0x15,
-    IAS_ZONE_TYPE_FIRE_SENSOR               = 0x28,
-    IAS_ZONE_TYPE_WATER_SENSOR              = 0x2A,
-    IAS_ZONE_TYPE_GAS_SENSOR                = 0x2B,
-    IAS_ZONE_TYPE_PERSONAL_EMERGENCY_DEVICE = 0x2C,
-    IAS_ZONE_TYPE_VIBRATION_MOVEMENT_SENSOR = 0x2D,
-    IAS_ZONE_TYPE_REMOTE_CONTROL            = 0x10F,
-    IAS_ZONE_TYPE_KEY_FOB                   = 0x115,
-    IAS_ZONE_TYPE_KEYPAD                    = 0x21D,
-    IAS_ZONE_TYPE_STANDARD_WARNING_DEVICE   = 0x225,
-    IAS_ZONE_TYPE_GLASS_BREAK_SENSOR        = 0x226,
-    IAS_ZONE_TYPE_CARBON_MONOXIDE_SENSOR    = 0x227,
-    IAS_ZONE_TYPE_SECURITY_REPEATER         = 0x229,
-    IAS_ZONE_TYPE_INVALID_ZONE_TYPE         = 0xFFFF,
+    kStandardCie             = 0x00,
+    kMotionSensor            = 0x0D,
+    kContactSwitch           = 0x15,
+    kFireSensor              = 0x28,
+    kWaterSensor             = 0x2A,
+    kGasSensor               = 0x2B,
+    kPersonalEmergencyDevice = 0x2C,
+    kVibrationMovementSensor = 0x2D,
+    kRemoteControl           = 0x10F,
+    kKeyFob                  = 0x115,
+    kKeypad                  = 0x21D,
+    kStandardWarningDevice   = 0x225,
+    kGlassBreakSensor        = 0x226,
+    kCarbonMonoxideSensor    = 0x227,
+    kSecurityRepeater        = 0x229,
+    kInvalidZoneType         = 0xFFFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IasZoneType                          = EmberAfIasZoneType;
 #endif
+
+// Bitmap for IasZoneStatus
+enum class IasZoneStatus : uint16_t
+{
+    kAlarm1             = 0,
+    kAlarm2             = 1,
+    kTamper             = 2,
+    kBattery            = 3,
+    kSupervisionReports = 4,
+    kRestoreReports     = 5,
+    kTrouble            = 6,
+    kAc                 = 7,
+    kTest               = 8,
+    kBatteryDefect      = 9,
+};
 
 namespace Structs {
 namespace IasAceZoneStatusResult {
@@ -17505,7 +17666,7 @@ struct Type
 {
 public:
     uint8_t zoneId;
-    uint16_t zoneStatus;
+    BitFlags<IasZoneStatus> zoneStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -18144,6 +18305,22 @@ public:
 } // namespace IasAce
 namespace IasWd {
 
+// Bitmap for SquawkInfo
+enum class SquawkInfo : uint8_t
+{
+    kMode   = 4,
+    kStrobe = 3,
+    kLevel  = 0,
+};
+
+// Bitmap for WarningInfo
+enum class WarningInfo : uint8_t
+{
+    kMode       = 4,
+    kStrobe     = 2,
+    kSirenLevel = 0,
+};
+
 namespace Commands {
 namespace StartWarning {
 enum class Fields
@@ -18161,7 +18338,7 @@ public:
     static constexpr CommandId GetCommandId() { return StartWarning::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    uint8_t warningInfo;
+    BitFlags<WarningInfo> warningInfo;
     uint16_t warningDuration;
     uint8_t strobeDutyCycle;
     uint8_t strobeLevel;
@@ -18175,7 +18352,7 @@ public:
     static constexpr CommandId GetCommandId() { return StartWarning::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    uint8_t warningInfo;
+    BitFlags<WarningInfo> warningInfo;
     uint16_t warningDuration;
     uint8_t strobeDutyCycle;
     uint8_t strobeLevel;
@@ -18195,7 +18372,7 @@ public:
     static constexpr CommandId GetCommandId() { return Squawk::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    uint8_t squawkInfo;
+    BitFlags<SquawkInfo> squawkInfo;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -18206,7 +18383,7 @@ public:
     static constexpr CommandId GetCommandId() { return Squawk::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    uint8_t squawkInfo;
+    BitFlags<SquawkInfo> squawkInfo;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Squawk
@@ -18249,8 +18426,8 @@ namespace TvChannel {
 // Enum for TvChannelErrorType
 enum class TvChannelErrorType : uint8_t
 {
-    TV_CHANNEL_ERROR_TYPE_MULTIPLE_MATCHES = 0x00,
-    TV_CHANNEL_ERROR_TYPE_NO_MATCHES       = 0x01,
+    kMultipleMatches = 0x00,
+    kNoMatches       = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using TvChannelErrorType                   = EmberAfTvChannelErrorType;
@@ -18261,7 +18438,7 @@ using TvChannelErrorType                   = EmberAfTvChannelErrorType;
 // Enum for TvChannelLineupInfoType
 enum class TvChannelLineupInfoType : uint8_t
 {
-    TV_CHANNEL_LINEUP_INFO_TYPE_MSO = 0x00,
+    kMso = 0x00,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using TvChannelLineupInfoType              = EmberAfTvChannelLineupInfoType;
@@ -18483,9 +18660,9 @@ namespace TargetNavigator {
 // Enum for NavigateTargetStatus
 enum class NavigateTargetStatus : uint8_t
 {
-    NAVIGATE_TARGET_STATUS_SUCCESS           = 0x00,
-    NAVIGATE_TARGET_STATUS_APP_NOT_AVAILABLE = 0x01,
-    NAVIGATE_TARGET_STATUS_SYSTEM_BUSY       = 0x02,
+    kSuccess         = 0x00,
+    kAppNotAvailable = 0x01,
+    kSystemBusy      = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using NavigateTargetStatus                 = EmberAfNavigateTargetStatus;
@@ -18610,10 +18787,10 @@ namespace MediaPlayback {
 // Enum for MediaPlaybackState
 enum class MediaPlaybackState : uint8_t
 {
-    MEDIA_PLAYBACK_STATE_PLAYING     = 0x00,
-    MEDIA_PLAYBACK_STATE_PAUSED      = 0x01,
-    MEDIA_PLAYBACK_STATE_NOT_PLAYING = 0x02,
-    MEDIA_PLAYBACK_STATE_BUFFERING   = 0x03,
+    kPlaying    = 0x00,
+    kPaused     = 0x01,
+    kNotPlaying = 0x02,
+    kBuffering  = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using MediaPlaybackState                   = EmberAfMediaPlaybackState;
@@ -18624,12 +18801,12 @@ using MediaPlaybackState                   = EmberAfMediaPlaybackState;
 // Enum for MediaPlaybackStatus
 enum class MediaPlaybackStatus : uint8_t
 {
-    MEDIA_PLAYBACK_STATUS_SUCCESS                   = 0x00,
-    MEDIA_PLAYBACK_STATUS_INVALID_STATE_FOR_COMMAND = 0x01,
-    MEDIA_PLAYBACK_STATUS_NOT_ALLOWED               = 0x02,
-    MEDIA_PLAYBACK_STATUS_NOT_ACTIVE                = 0x03,
-    MEDIA_PLAYBACK_STATUS_SPEED_OUT_OF_RANGE        = 0x04,
-    MEDIA_PLAYBACK_STATUS_SEEK_OUT_OF_RANGE         = 0x05,
+    kSuccess                = 0x00,
+    kInvalidStateForCommand = 0x01,
+    kNotAllowed             = 0x02,
+    kNotActive              = 0x03,
+    kSpeedOutOfRange        = 0x04,
+    kSeekOutOfRange         = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using MediaPlaybackStatus                  = EmberAfMediaPlaybackStatus;
@@ -19343,18 +19520,18 @@ namespace MediaInput {
 // Enum for MediaInputType
 enum class MediaInputType : uint8_t
 {
-    MEDIA_INPUT_TYPE_INTERNAL  = 0x00,
-    MEDIA_INPUT_TYPE_AUX       = 0x01,
-    MEDIA_INPUT_TYPE_COAX      = 0x02,
-    MEDIA_INPUT_TYPE_COMPOSITE = 0x03,
-    MEDIA_INPUT_TYPE_HDMI      = 0x04,
-    MEDIA_INPUT_TYPE_INPUT     = 0x05,
-    MEDIA_INPUT_TYPE_LINE      = 0x06,
-    MEDIA_INPUT_TYPE_OPTICAL   = 0x07,
-    MEDIA_INPUT_TYPE_VIDEO     = 0x08,
-    MEDIA_INPUT_TYPE_SCART     = 0x09,
-    MEDIA_INPUT_TYPE_USB       = 0x0A,
-    MEDIA_INPUT_TYPE_OTHER     = 0x0B,
+    kInternal  = 0x00,
+    kAux       = 0x01,
+    kCoax      = 0x02,
+    kComposite = 0x03,
+    kHdmi      = 0x04,
+    kInput     = 0x05,
+    kLine      = 0x06,
+    kOptical   = 0x07,
+    kVideo     = 0x08,
+    kScart     = 0x09,
+    kUsb       = 0x0A,
+    kOther     = 0x0B,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using MediaInputType                       = EmberAfMediaInputType;
@@ -19558,92 +19735,92 @@ namespace KeypadInput {
 // Enum for KeypadInputCecKeyCode
 enum class KeypadInputCecKeyCode : uint8_t
 {
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT                       = 0x00,
-    KEYPAD_INPUT_CEC_KEY_CODE_UP                           = 0x01,
-    KEYPAD_INPUT_CEC_KEY_CODE_DOWN                         = 0x02,
-    KEYPAD_INPUT_CEC_KEY_CODE_LEFT                         = 0x03,
-    KEYPAD_INPUT_CEC_KEY_CODE_RIGHT                        = 0x04,
-    KEYPAD_INPUT_CEC_KEY_CODE_RIGHT_UP                     = 0x05,
-    KEYPAD_INPUT_CEC_KEY_CODE_RIGHT_DOWN                   = 0x06,
-    KEYPAD_INPUT_CEC_KEY_CODE_LEFT_UP                      = 0x07,
-    KEYPAD_INPUT_CEC_KEY_CODE_LEFT_DOWN                    = 0x08,
-    KEYPAD_INPUT_CEC_KEY_CODE_ROOT_MENU                    = 0x09,
-    KEYPAD_INPUT_CEC_KEY_CODE_SETUP_MENU                   = 0x0A,
-    KEYPAD_INPUT_CEC_KEY_CODE_CONTENTS_MENU                = 0x0B,
-    KEYPAD_INPUT_CEC_KEY_CODE_FAVORITE_MENU                = 0x0C,
-    KEYPAD_INPUT_CEC_KEY_CODE_EXIT                         = 0x0D,
-    KEYPAD_INPUT_CEC_KEY_CODE_MEDIA_TOP_MENU               = 0x10,
-    KEYPAD_INPUT_CEC_KEY_CODE_MEDIA_CONTEXT_SENSITIVE_MENU = 0x11,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBER_ENTRY_MODE            = 0x1D,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBER11                     = 0x1E,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBER12                     = 0x1F,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBER0_OR_NUMBER10          = 0x20,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS1                     = 0x21,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS2                     = 0x22,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS3                     = 0x23,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS4                     = 0x24,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS5                     = 0x25,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS6                     = 0x26,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS7                     = 0x27,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS8                     = 0x28,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS9                     = 0x29,
-    KEYPAD_INPUT_CEC_KEY_CODE_DOT                          = 0x2A,
-    KEYPAD_INPUT_CEC_KEY_CODE_ENTER                        = 0x2B,
-    KEYPAD_INPUT_CEC_KEY_CODE_CLEAR                        = 0x2C,
-    KEYPAD_INPUT_CEC_KEY_CODE_NEXT_FAVORITE                = 0x2F,
-    KEYPAD_INPUT_CEC_KEY_CODE_CHANNEL_UP                   = 0x30,
-    KEYPAD_INPUT_CEC_KEY_CODE_CHANNEL_DOWN                 = 0x31,
-    KEYPAD_INPUT_CEC_KEY_CODE_PREVIOUS_CHANNEL             = 0x32,
-    KEYPAD_INPUT_CEC_KEY_CODE_SOUND_SELECT                 = 0x33,
-    KEYPAD_INPUT_CEC_KEY_CODE_INPUT_SELECT                 = 0x34,
-    KEYPAD_INPUT_CEC_KEY_CODE_DISPLAY_INFORMATION          = 0x35,
-    KEYPAD_INPUT_CEC_KEY_CODE_HELP                         = 0x36,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAGE_UP                      = 0x37,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAGE_DOWN                    = 0x38,
-    KEYPAD_INPUT_CEC_KEY_CODE_POWER                        = 0x40,
-    KEYPAD_INPUT_CEC_KEY_CODE_VOLUME_UP                    = 0x41,
-    KEYPAD_INPUT_CEC_KEY_CODE_VOLUME_DOWN                  = 0x42,
-    KEYPAD_INPUT_CEC_KEY_CODE_MUTE                         = 0x43,
-    KEYPAD_INPUT_CEC_KEY_CODE_PLAY                         = 0x44,
-    KEYPAD_INPUT_CEC_KEY_CODE_STOP                         = 0x45,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAUSE                        = 0x46,
-    KEYPAD_INPUT_CEC_KEY_CODE_RECORD                       = 0x47,
-    KEYPAD_INPUT_CEC_KEY_CODE_REWIND                       = 0x48,
-    KEYPAD_INPUT_CEC_KEY_CODE_FAST_FORWARD                 = 0x49,
-    KEYPAD_INPUT_CEC_KEY_CODE_EJECT                        = 0x4A,
-    KEYPAD_INPUT_CEC_KEY_CODE_FORWARD                      = 0x4B,
-    KEYPAD_INPUT_CEC_KEY_CODE_BACKWARD                     = 0x4C,
-    KEYPAD_INPUT_CEC_KEY_CODE_STOP_RECORD                  = 0x4D,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAUSE_RECORD                 = 0x4E,
-    KEYPAD_INPUT_CEC_KEY_CODE_RESERVED                     = 0x4F,
-    KEYPAD_INPUT_CEC_KEY_CODE_ANGLE                        = 0x50,
-    KEYPAD_INPUT_CEC_KEY_CODE_SUB_PICTURE                  = 0x51,
-    KEYPAD_INPUT_CEC_KEY_CODE_VIDEO_ON_DEMAND              = 0x52,
-    KEYPAD_INPUT_CEC_KEY_CODE_ELECTRONIC_PROGRAM_GUIDE     = 0x53,
-    KEYPAD_INPUT_CEC_KEY_CODE_TIMER_PROGRAMMING            = 0x54,
-    KEYPAD_INPUT_CEC_KEY_CODE_INITIAL_CONFIGURATION        = 0x55,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_BROADCAST_TYPE        = 0x56,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_SOUND_PRESENTATION    = 0x57,
-    KEYPAD_INPUT_CEC_KEY_CODE_PLAY_FUNCTION                = 0x60,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAUSE_PLAY_FUNCTION          = 0x61,
-    KEYPAD_INPUT_CEC_KEY_CODE_RECORD_FUNCTION              = 0x62,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAUSE_RECORD_FUNCTION        = 0x63,
-    KEYPAD_INPUT_CEC_KEY_CODE_STOP_FUNCTION                = 0x64,
-    KEYPAD_INPUT_CEC_KEY_CODE_MUTE_FUNCTION                = 0x65,
-    KEYPAD_INPUT_CEC_KEY_CODE_RESTORE_VOLUME_FUNCTION      = 0x66,
-    KEYPAD_INPUT_CEC_KEY_CODE_TUNE_FUNCTION                = 0x67,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_MEDIA_FUNCTION        = 0x68,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_AV_INPUT_FUNCTION     = 0x69,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_AUDIO_INPUT_FUNCTION  = 0x6A,
-    KEYPAD_INPUT_CEC_KEY_CODE_POWER_TOGGLE_FUNCTION        = 0x6B,
-    KEYPAD_INPUT_CEC_KEY_CODE_POWER_OFF_FUNCTION           = 0x6C,
-    KEYPAD_INPUT_CEC_KEY_CODE_POWER_ON_FUNCTION            = 0x6D,
-    KEYPAD_INPUT_CEC_KEY_CODE_F1_BLUE                      = 0x71,
-    KEYPAD_INPUT_CEC_KEY_CODE_F2_RED                       = 0x72,
-    KEYPAD_INPUT_CEC_KEY_CODE_F3_GREEN                     = 0x73,
-    KEYPAD_INPUT_CEC_KEY_CODE_F4_YELLOW                    = 0x74,
-    KEYPAD_INPUT_CEC_KEY_CODE_F5                           = 0x75,
-    KEYPAD_INPUT_CEC_KEY_CODE_DATA                         = 0x76,
+    kSelect                    = 0x00,
+    kUp                        = 0x01,
+    kDown                      = 0x02,
+    kLeft                      = 0x03,
+    kRight                     = 0x04,
+    kRightUp                   = 0x05,
+    kRightDown                 = 0x06,
+    kLeftUp                    = 0x07,
+    kLeftDown                  = 0x08,
+    kRootMenu                  = 0x09,
+    kSetupMenu                 = 0x0A,
+    kContentsMenu              = 0x0B,
+    kFavoriteMenu              = 0x0C,
+    kExit                      = 0x0D,
+    kMediaTopMenu              = 0x10,
+    kMediaContextSensitiveMenu = 0x11,
+    kNumberEntryMode           = 0x1D,
+    kNumber11                  = 0x1E,
+    kNumber12                  = 0x1F,
+    kNumber0OrNumber10         = 0x20,
+    kNumbers1                  = 0x21,
+    kNumbers2                  = 0x22,
+    kNumbers3                  = 0x23,
+    kNumbers4                  = 0x24,
+    kNumbers5                  = 0x25,
+    kNumbers6                  = 0x26,
+    kNumbers7                  = 0x27,
+    kNumbers8                  = 0x28,
+    kNumbers9                  = 0x29,
+    kDot                       = 0x2A,
+    kEnter                     = 0x2B,
+    kClear                     = 0x2C,
+    kNextFavorite              = 0x2F,
+    kChannelUp                 = 0x30,
+    kChannelDown               = 0x31,
+    kPreviousChannel           = 0x32,
+    kSoundSelect               = 0x33,
+    kInputSelect               = 0x34,
+    kDisplayInformation        = 0x35,
+    kHelp                      = 0x36,
+    kPageUp                    = 0x37,
+    kPageDown                  = 0x38,
+    kPower                     = 0x40,
+    kVolumeUp                  = 0x41,
+    kVolumeDown                = 0x42,
+    kMute                      = 0x43,
+    kPlay                      = 0x44,
+    kStop                      = 0x45,
+    kPause                     = 0x46,
+    kRecord                    = 0x47,
+    kRewind                    = 0x48,
+    kFastForward               = 0x49,
+    kEject                     = 0x4A,
+    kForward                   = 0x4B,
+    kBackward                  = 0x4C,
+    kStopRecord                = 0x4D,
+    kPauseRecord               = 0x4E,
+    kReserved                  = 0x4F,
+    kAngle                     = 0x50,
+    kSubPicture                = 0x51,
+    kVideoOnDemand             = 0x52,
+    kElectronicProgramGuide    = 0x53,
+    kTimerProgramming          = 0x54,
+    kInitialConfiguration      = 0x55,
+    kSelectBroadcastType       = 0x56,
+    kSelectSoundPresentation   = 0x57,
+    kPlayFunction              = 0x60,
+    kPausePlayFunction         = 0x61,
+    kRecordFunction            = 0x62,
+    kPauseRecordFunction       = 0x63,
+    kStopFunction              = 0x64,
+    kMuteFunction              = 0x65,
+    kRestoreVolumeFunction     = 0x66,
+    kTuneFunction              = 0x67,
+    kSelectMediaFunction       = 0x68,
+    kSelectAvInputFunction     = 0x69,
+    kSelectAudioInputFunction  = 0x6A,
+    kPowerToggleFunction       = 0x6B,
+    kPowerOffFunction          = 0x6C,
+    kPowerOnFunction           = 0x6D,
+    kF1Blue                    = 0x71,
+    kF2Red                     = 0x72,
+    kF3Green                   = 0x73,
+    kF4Yellow                  = 0x74,
+    kF5                        = 0x75,
+    kData                      = 0x76,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using KeypadInputCecKeyCode                = EmberAfKeypadInputCecKeyCode;
@@ -19654,9 +19831,9 @@ using KeypadInputCecKeyCode                = EmberAfKeypadInputCecKeyCode;
 // Enum for KeypadInputStatus
 enum class KeypadInputStatus : uint8_t
 {
-    KEYPAD_INPUT_STATUS_SUCCESS                      = 0x00,
-    KEYPAD_INPUT_STATUS_UNSUPPORTED_KEY              = 0x01,
-    KEYPAD_INPUT_STATUS_INVALID_KEY_IN_CURRENT_STATE = 0x02,
+    kSuccess                  = 0x00,
+    kUnsupportedKey           = 0x01,
+    kInvalidKeyInCurrentState = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using KeypadInputStatus                    = EmberAfKeypadInputStatus;
@@ -19729,8 +19906,8 @@ namespace ContentLauncher {
 // Enum for ContentLaunchMetricType
 enum class ContentLaunchMetricType : uint8_t
 {
-    CONTENT_LAUNCH_METRIC_TYPE_PIXELS     = 0x00,
-    CONTENT_LAUNCH_METRIC_TYPE_PERCENTAGE = 0x01,
+    kPixels     = 0x00,
+    kPercentage = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ContentLaunchMetricType              = EmberAfContentLaunchMetricType;
@@ -19741,17 +19918,17 @@ using ContentLaunchMetricType              = EmberAfContentLaunchMetricType;
 // Enum for ContentLaunchParameterEnum
 enum class ContentLaunchParameterEnum : uint8_t
 {
-    CONTENT_LAUNCH_PARAMETER_ENUM_ACTOR       = 0x00,
-    CONTENT_LAUNCH_PARAMETER_ENUM_CHANNEL     = 0x01,
-    CONTENT_LAUNCH_PARAMETER_ENUM_CHARACTER   = 0x02,
-    CONTENT_LAUNCH_PARAMETER_ENUM_EVENT       = 0x03,
-    CONTENT_LAUNCH_PARAMETER_ENUM_FRANCHISE   = 0x04,
-    CONTENT_LAUNCH_PARAMETER_ENUM_GENRE       = 0x05,
-    CONTENT_LAUNCH_PARAMETER_ENUM_LEAGUE      = 0x06,
-    CONTENT_LAUNCH_PARAMETER_ENUM_POPULARITY  = 0x07,
-    CONTENT_LAUNCH_PARAMETER_ENUM_SPORT       = 0x08,
-    CONTENT_LAUNCH_PARAMETER_ENUM_SPORTS_TEAM = 0x09,
-    CONTENT_LAUNCH_PARAMETER_ENUM_VIDEO       = 0x0A,
+    kActor      = 0x00,
+    kChannel    = 0x01,
+    kCharacter  = 0x02,
+    kEvent      = 0x03,
+    kFranchise  = 0x04,
+    kGenre      = 0x05,
+    kLeague     = 0x06,
+    kPopularity = 0x07,
+    kSport      = 0x08,
+    kSportsTeam = 0x09,
+    kVideo      = 0x0A,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ContentLaunchParameterEnum           = EmberAfContentLaunchParameterEnum;
@@ -19762,9 +19939,9 @@ using ContentLaunchParameterEnum           = EmberAfContentLaunchParameterEnum;
 // Enum for ContentLaunchStatus
 enum class ContentLaunchStatus : uint8_t
 {
-    CONTENT_LAUNCH_STATUS_SUCCESS           = 0x00,
-    CONTENT_LAUNCH_STATUS_URL_NOT_AVAILABLE = 0x01,
-    CONTENT_LAUNCH_STATUS_AUTH_FAILED       = 0x02,
+    kSuccess         = 0x00,
+    kUrlNotAvailable = 0x01,
+    kAuthFailed      = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ContentLaunchStatus                  = EmberAfContentLaunchStatus;
@@ -19775,8 +19952,8 @@ using ContentLaunchStatus                  = EmberAfContentLaunchStatus;
 // Enum for ContentLaunchStreamingType
 enum class ContentLaunchStreamingType : uint8_t
 {
-    CONTENT_LAUNCH_STREAMING_TYPE_DASH = 0x00,
-    CONTENT_LAUNCH_STREAMING_TYPE_HLS  = 0x01,
+    kDash = 0x00,
+    kHls  = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ContentLaunchStreamingType           = EmberAfContentLaunchStreamingType;
@@ -20062,12 +20239,12 @@ namespace AudioOutput {
 // Enum for AudioOutputType
 enum class AudioOutputType : uint8_t
 {
-    AUDIO_OUTPUT_TYPE_HDMI      = 0x00,
-    AUDIO_OUTPUT_TYPE_BT        = 0x01,
-    AUDIO_OUTPUT_TYPE_OPTICAL   = 0x02,
-    AUDIO_OUTPUT_TYPE_HEADPHONE = 0x03,
-    AUDIO_OUTPUT_TYPE_INTERNAL  = 0x04,
-    AUDIO_OUTPUT_TYPE_OTHER     = 0x05,
+    kHdmi      = 0x00,
+    kBt        = 0x01,
+    kOptical   = 0x02,
+    kHeadphone = 0x03,
+    kInternal  = 0x04,
+    kOther     = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using AudioOutputType                      = EmberAfAudioOutputType;
@@ -20191,9 +20368,9 @@ namespace ApplicationLauncher {
 // Enum for ApplicationLauncherStatus
 enum class ApplicationLauncherStatus : uint8_t
 {
-    APPLICATION_LAUNCHER_STATUS_SUCCESS           = 0x00,
-    APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE = 0x01,
-    APPLICATION_LAUNCHER_STATUS_SYSTEM_BUSY       = 0x02,
+    kSuccess         = 0x00,
+    kAppNotAvailable = 0x01,
+    kSystemBusy      = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ApplicationLauncherStatus            = EmberAfApplicationLauncherStatus;
@@ -20332,10 +20509,10 @@ namespace ApplicationBasic {
 // Enum for ApplicationBasicStatus
 enum class ApplicationBasicStatus : uint8_t
 {
-    APPLICATION_BASIC_STATUS_STOPPED                  = 0x00,
-    APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_FOCUS     = 0x01,
-    APPLICATION_BASIC_STATUS_ACTIVE_HIDDEN            = 0x02,
-    APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_NOT_FOCUS = 0x03,
+    kStopped               = 0x00,
+    kActiveVisibleFocus    = 0x01,
+    kActiveHidden          = 0x02,
+    kActiveVisibleNotFocus = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ApplicationBasicStatus               = EmberAfApplicationBasicStatus;
@@ -20552,14 +20729,22 @@ namespace TestCluster {
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
 {
-    SIMPLE_ENUM_UNSPECIFIED = 0x00,
-    SIMPLE_ENUM_VALUE_A     = 0x01,
-    SIMPLE_ENUM_VALUE_B     = 0x02,
-    SIMPLE_ENUM_VALUE_C     = 0x03,
+    kUnspecified = 0x00,
+    kValueA      = 0x01,
+    kValueB      = 0x02,
+    kValueC      = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SimpleEnum                           = EmberAfSimpleEnum;
 #endif
+
+// Bitmap for SimpleBitmap
+enum class SimpleBitmap : uint8_t
+{
+    kValueA = 0,
+    kValueB = 1,
+    kValueC = 2,
+};
 
 namespace Structs {
 namespace SimpleStruct {
@@ -20570,6 +20755,7 @@ enum class Fields
     kC = 2,
     kD = 3,
     kE = 4,
+    kF = 5,
 };
 
 struct Type
@@ -20580,6 +20766,7 @@ public:
     SimpleEnum c;
     chip::ByteSpan d;
     chip::Span<const char> e;
+    BitFlags<SimpleBitmap> f;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21304,87 +21491,87 @@ namespace Messaging {
 // Enum for EventId
 enum class EventId : uint8_t
 {
-    EVENT_ID_METER_COVER_REMOVED                   = 0x00,
-    EVENT_ID_METER_COVER_CLOSED                    = 0x01,
-    EVENT_ID_STRONG_MAGNETIC_FIELD                 = 0x02,
-    EVENT_ID_NO_STRONG_MAGNETIC_FIELD              = 0x03,
-    EVENT_ID_BATTERY_FAILURE                       = 0x04,
-    EVENT_ID_LOW_BATTERY                           = 0x05,
-    EVENT_ID_PROGRAM_MEMORY_ERROR                  = 0x06,
-    EVENT_ID_RAM_ERROR                             = 0x07,
-    EVENT_ID_NV_MEMORY_ERROR                       = 0x08,
-    EVENT_ID_MEASUREMENT_SYSTEM_ERROR              = 0x09,
-    EVENT_ID_WATCHDOG_ERROR                        = 0x0A,
-    EVENT_ID_SUPPLY_DISCONNECT_FAILURE             = 0x0B,
-    EVENT_ID_SUPPLY_CONNECT_FAILURE                = 0x0C,
-    EVENT_ID_MEASURMENT_SOFTWARE_CHANGED           = 0x0D,
-    EVENT_ID_DST_ENABLED                           = 0x0E,
-    EVENT_ID_DST_DISABLED                          = 0x0F,
-    EVENT_ID_CLOCK_ADJ_BACKWARD                    = 0x10,
-    EVENT_ID_CLOCK_ADJ_FORWARD                     = 0x11,
-    EVENT_ID_CLOCK_INVALID                         = 0x12,
-    EVENT_ID_COMMS_ERROR_HAN                       = 0x13,
-    EVENT_ID_COMMS_OK_HAN                          = 0x14,
-    EVENT_ID_FRAUD_ATTEMPT                         = 0x15,
-    EVENT_ID_POWER_LOSS                            = 0x16,
-    EVENT_ID_INCORRECT_PROTOCOL                    = 0x17,
-    EVENT_ID_UNUSUAL_HAN_TRAFFIC                   = 0x18,
-    EVENT_ID_UNEXPECTED_CLOCK_CHANGE               = 0x19,
-    EVENT_ID_COMMS_USING_UNAUTHENTICATED_COMPONENT = 0x1A,
-    EVENT_ID_ERROR_REG_CLEAR                       = 0x1B,
-    EVENT_ID_ALARM_REG_CLEAR                       = 0x1C,
-    EVENT_ID_UNEXPECTED_HW_RESET                   = 0x1D,
-    EVENT_ID_UNEXPECTED_PROGRAM_EXECUTION          = 0x1E,
-    EVENT_ID_EVENT_LOG_CLEARED                     = 0x1F,
-    EVENT_ID_MANUAL_DISCONNECT                     = 0x20,
-    EVENT_ID_MANUAL_CONNECT                        = 0x21,
-    EVENT_ID_REMOTE_DISCONNECTION                  = 0x22,
-    EVENT_ID_LOCAL_DISCONNECTION                   = 0x23,
-    EVENT_ID_LIMIT_THRESHOLD_EXCEEDED              = 0x24,
-    EVENT_ID_LIMIT_THRESHOLD_OK                    = 0x25,
-    EVENT_ID_LIMIT_THRESHOLD_CHANGED               = 0x26,
-    EVENT_ID_MAXIMUM_DEMAND_EXCEEDED               = 0x27,
-    EVENT_ID_PROFILE_CLEARED                       = 0x28,
-    EVENT_ID_FIRMWARE_READY_FOR_ACTIVATION         = 0x29,
-    EVENT_ID_FIRMWARE_ACTIVATED                    = 0x2A,
-    EVENT_ID_PATCH_FAILURE                         = 0x2B,
-    EVENT_ID_TOU_TARIFF_ACTIVATION                 = 0x2C,
-    EVENT_ID_8X8_TARIFFACTIVATED                   = 0x2D,
-    EVENT_ID_SINGLE_TARIFF_RATE_ACTIVATED          = 0x2E,
-    EVENT_ID_ASYNCHRONOUS_BILLING_OCCURRED         = 0x2F,
-    EVENT_ID_SYNCHRONOUS_BILLING_OCCURRED          = 0x30,
-    EVENT_ID_INCORRECT_POLARITY                    = 0x80,
-    EVENT_ID_CURRENT_NO_VOLTAGE                    = 0x81,
-    EVENT_ID_UNDER_VOLTAGE                         = 0x82,
-    EVENT_ID_OVER_VOLTAGE                          = 0x83,
-    EVENT_ID_NORMAL_VOLTAGE                        = 0x84,
-    EVENT_ID_PF_BELOW_THRESHOLD                    = 0x85,
-    EVENT_ID_PF_ABOVE_THRESHOLD                    = 0x86,
-    EVENT_ID_TERMINAL_COVER_REMOVED                = 0x87,
-    EVENT_ID_TERMINAL_COVER_CLOSED                 = 0x88,
-    EVENT_ID_REVERSE_FLOW                          = 0xA0,
-    EVENT_ID_TILT_TAMPER                           = 0xA1,
-    EVENT_ID_BATTERY_COVER_REMOVED                 = 0xA2,
-    EVENT_ID_BATTERY_COVER_CLOSED                  = 0xA3,
-    EVENT_ID_EXCESS_FLOW                           = 0xA4,
-    EVENT_ID_CREDIT_OK                             = 0xC0,
-    EVENT_ID_LOW_CREDIT                            = 0xC1,
-    EVENT_ID_EMERGENCY_CREDIT_IN_USE               = 0xC0,
-    EVENT_ID_EMERGENCY_CREDIT_EXHAUSTED            = 0xC1,
-    EVENT_ID_ZERO_CREDIT_EC_NOT_SELECTED           = 0xC2,
-    EVENT_ID_SUPPLY_ON                             = 0xC3,
-    EVENT_ID_SUPPLY_OFF_AARMED                     = 0xC4,
-    EVENT_ID_SUPPLY_OFF                            = 0xC5,
-    EVENT_ID_DISCOUNT_APPLIED                      = 0xC6,
-    EVENT_ID_MANUFACTURER_SPECIFIC_A               = 0xE0,
-    EVENT_ID_MANUFACTURER_SPECIFIC_B               = 0xE1,
-    EVENT_ID_MANUFACTURER_SPECIFIC_C               = 0xE2,
-    EVENT_ID_MANUFACTURER_SPECIFIC_D               = 0xE3,
-    EVENT_ID_MANUFACTURER_SPECIFIC_E               = 0xE4,
-    EVENT_ID_MANUFACTURER_SPECIFIC_F               = 0xE5,
-    EVENT_ID_MANUFACTURER_SPECIFIC_G               = 0xE6,
-    EVENT_ID_MANUFACTURER_SPECIFIC_H               = 0xE7,
-    EVENT_ID_MANUFACTURER_SPECIFIC_I               = 0xE8,
+    kMeterCoverRemoved                  = 0x00,
+    kMeterCoverClosed                   = 0x01,
+    kStrongMagneticField                = 0x02,
+    kNoStrongMagneticField              = 0x03,
+    kBatteryFailure                     = 0x04,
+    kLowBattery                         = 0x05,
+    kProgramMemoryError                 = 0x06,
+    kRamError                           = 0x07,
+    kNvMemoryError                      = 0x08,
+    kMeasurementSystemError             = 0x09,
+    kWatchdogError                      = 0x0A,
+    kSupplyDisconnectFailure            = 0x0B,
+    kSupplyConnectFailure               = 0x0C,
+    kMeasurmentSoftwareChanged          = 0x0D,
+    kDstEnabled                         = 0x0E,
+    kDstDisabled                        = 0x0F,
+    kClockAdjBackward                   = 0x10,
+    kClockAdjForward                    = 0x11,
+    kClockInvalid                       = 0x12,
+    kCommsErrorHan                      = 0x13,
+    kCommsOkHan                         = 0x14,
+    kFraudAttempt                       = 0x15,
+    kPowerLoss                          = 0x16,
+    kIncorrectProtocol                  = 0x17,
+    kUnusualHanTraffic                  = 0x18,
+    kUnexpectedClockChange              = 0x19,
+    kCommsUsingUnauthenticatedComponent = 0x1A,
+    kErrorRegClear                      = 0x1B,
+    kAlarmRegClear                      = 0x1C,
+    kUnexpectedHwReset                  = 0x1D,
+    kUnexpectedProgramExecution         = 0x1E,
+    kEventLogCleared                    = 0x1F,
+    kManualDisconnect                   = 0x20,
+    kManualConnect                      = 0x21,
+    kRemoteDisconnection                = 0x22,
+    kLocalDisconnection                 = 0x23,
+    kLimitThresholdExceeded             = 0x24,
+    kLimitThresholdOk                   = 0x25,
+    kLimitThresholdChanged              = 0x26,
+    kMaximumDemandExceeded              = 0x27,
+    kProfileCleared                     = 0x28,
+    kFirmwareReadyForActivation         = 0x29,
+    kFirmwareActivated                  = 0x2A,
+    kPatchFailure                       = 0x2B,
+    kTouTariffActivation                = 0x2C,
+    k8x8Tariffactivated                 = 0x2D,
+    kSingleTariffRateActivated          = 0x2E,
+    kAsynchronousBillingOccurred        = 0x2F,
+    kSynchronousBillingOccurred         = 0x30,
+    kIncorrectPolarity                  = 0x80,
+    kCurrentNoVoltage                   = 0x81,
+    kUnderVoltage                       = 0x82,
+    kOverVoltage                        = 0x83,
+    kNormalVoltage                      = 0x84,
+    kPfBelowThreshold                   = 0x85,
+    kPfAboveThreshold                   = 0x86,
+    kTerminalCoverRemoved               = 0x87,
+    kTerminalCoverClosed                = 0x88,
+    kReverseFlow                        = 0xA0,
+    kTiltTamper                         = 0xA1,
+    kBatteryCoverRemoved                = 0xA2,
+    kBatteryCoverClosed                 = 0xA3,
+    kExcessFlow                         = 0xA4,
+    kCreditOk                           = 0xC0,
+    kLowCredit                          = 0xC1,
+    kEmergencyCreditInUse               = 0xC0,
+    kEmergencyCreditExhausted           = 0xC1,
+    kZeroCreditEcNotSelected            = 0xC2,
+    kSupplyOn                           = 0xC3,
+    kSupplyOffAarmed                    = 0xC4,
+    kSupplyOff                          = 0xC5,
+    kDiscountApplied                    = 0xC6,
+    kManufacturerSpecificA              = 0xE0,
+    kManufacturerSpecificB              = 0xE1,
+    kManufacturerSpecificC              = 0xE2,
+    kManufacturerSpecificD              = 0xE3,
+    kManufacturerSpecificE              = 0xE4,
+    kManufacturerSpecificF              = 0xE5,
+    kManufacturerSpecificG              = 0xE6,
+    kManufacturerSpecificH              = 0xE7,
+    kManufacturerSpecificI              = 0xE8,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using EventId                              = EmberAfEventId;
@@ -21395,8 +21582,8 @@ using EventId                              = EmberAfEventId;
 // Enum for MessagingControlConfirmation
 enum class MessagingControlConfirmation : uint8_t
 {
-    MESSAGING_CONTROL_CONFIRMATION_NOT_REQUIRED = 0x00,
-    MESSAGING_CONTROL_CONFIRMATION_REQUIRED     = 0x80,
+    kNotRequired = 0x00,
+    kRequired    = 0x80,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using MessagingControlConfirmation         = EmberAfMessagingControlConfirmation;
@@ -21407,8 +21594,8 @@ using MessagingControlConfirmation         = EmberAfMessagingControlConfirmation
 // Enum for MessagingControlEnhancedConfirmation
 enum class MessagingControlEnhancedConfirmation : uint8_t
 {
-    MESSAGING_CONTROL_ENHANCED_CONFIRMATION_NOT_REQUIRED = 0x00,
-    MESSAGING_CONTROL_ENHANCED_CONFIRMATION_REQUIRED     = 0x20,
+    kNotRequired = 0x00,
+    kRequired    = 0x20,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using MessagingControlEnhancedConfirmation = EmberAfMessagingControlEnhancedConfirmation;
@@ -21419,10 +21606,10 @@ using MessagingControlEnhancedConfirmation = EmberAfMessagingControlEnhancedConf
 // Enum for MessagingControlImportance
 enum class MessagingControlImportance : uint8_t
 {
-    MESSAGING_CONTROL_IMPORTANCE_LOW      = 0x00,
-    MESSAGING_CONTROL_IMPORTANCE_MEDIUM   = 0x04,
-    MESSAGING_CONTROL_IMPORTANCE_HIGH     = 0x08,
-    MESSAGING_CONTROL_IMPORTANCE_CRITICAL = 0x0C,
+    kLow      = 0x00,
+    kMedium   = 0x04,
+    kHigh     = 0x08,
+    kCritical = 0x0C,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using MessagingControlImportance           = EmberAfMessagingControlImportance;
@@ -21433,14 +21620,36 @@ using MessagingControlImportance           = EmberAfMessagingControlImportance;
 // Enum for MessagingControlTransmission
 enum class MessagingControlTransmission : uint8_t
 {
-    MESSAGING_CONTROL_TRANSMISSION_NORMAL               = 0x00,
-    MESSAGING_CONTROL_TRANSMISSION_NORMAL_AND_ANONYMOUS = 0x01,
-    MESSAGING_CONTROL_TRANSMISSION_ANONYMOUS            = 0x02,
-    MESSAGING_CONTROL_TRANSMISSION_RESERVED             = 0x03,
+    kNormal             = 0x00,
+    kNormalAndAnonymous = 0x01,
+    kAnonymous          = 0x02,
+    kReserved           = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using MessagingControlTransmission         = EmberAfMessagingControlTransmission;
 #endif
+
+// Bitmap for MessagingConfirmationControl
+enum class MessagingConfirmationControl : uint8_t
+{
+    kNoReturned  = 0,
+    kYesReturned = 1,
+};
+
+// Bitmap for MessagingControlMask
+enum class MessagingControlMask : uint8_t
+{
+    kTransMechanism              = 0,
+    kMessageUrgency              = 2,
+    kEnhancedConfirmationRequest = 5,
+    kMessageConfirmation         = 7,
+};
+
+// Bitmap for MessagingExtendedControlMask
+enum class MessagingExtendedControlMask : uint8_t
+{
+    kMessageConfirmationStatus = 0,
+};
 
 namespace Commands {
 namespace DisplayMessage {
@@ -21462,11 +21671,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    uint8_t messageControl;
+    BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    uint8_t optionalExtendedMessageControl;
+    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21478,11 +21687,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    uint8_t messageControl;
+    BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    uint8_t optionalExtendedMessageControl;
+    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisplayMessage
@@ -21525,7 +21734,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    uint8_t messageControl;
+    BitFlags<MessagingControlMask> messageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21537,7 +21746,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    uint8_t messageControl;
+    BitFlags<MessagingControlMask> messageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CancelMessage
@@ -21597,11 +21806,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    uint8_t messageControl;
+    BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    uint8_t optionalExtendedMessageControl;
+    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21613,11 +21822,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    uint8_t messageControl;
+    BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    uint8_t optionalExtendedMessageControl;
+    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisplayProtectedMessage
@@ -21961,15 +22170,30 @@ namespace ApplianceEventsAndAlert {
 // Enum for EventIdentification
 enum class EventIdentification : uint8_t
 {
-    EVENT_IDENTIFICATION_END_OF_CYCLE        = 0x01,
-    EVENT_IDENTIFICATION_TEMPERATURE_REACHED = 0x04,
-    EVENT_IDENTIFICATION_END_OF_COOKING      = 0x05,
-    EVENT_IDENTIFICATION_SWITCHING_OFF       = 0x06,
-    EVENT_IDENTIFICATION_WRONG_DATA          = 0x07,
+    kEndOfCycle         = 0x01,
+    kTemperatureReached = 0x04,
+    kEndOfCooking       = 0x05,
+    kSwitchingOff       = 0x06,
+    kWrongData          = 0x07,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using EventIdentification                  = EmberAfEventIdentification;
 #endif
+
+// Bitmap for AlertCount
+enum class AlertCount : uint8_t
+{
+    kNumberOfAlerts = 0,
+    kTypeOfAlert    = 4,
+};
+
+// Bitmap for AlertStructure
+enum class AlertStructure : uint32_t
+{
+    kAlertId          = 0,
+    kCategory         = 8,
+    kPresenceRecovery = 12,
+};
 
 namespace Commands {
 namespace GetAlerts {
@@ -21999,7 +22223,8 @@ public:
 namespace GetAlertsResponse {
 enum class Fields
 {
-    kAlertsCount = 0,
+    kAlertsCount     = 0,
+    kAlertStructures = 1,
 };
 
 struct Type
@@ -22009,7 +22234,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    uint8_t alertsCount;
+    BitFlags<AlertCount> alertsCount;
+    DataModel::List<BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22020,14 +22246,16 @@ public:
     static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    uint8_t alertsCount;
+    BitFlags<AlertCount> alertsCount;
+    DataModel::DecodableList<BitFlags<AlertStructure>> alertStructures;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetAlertsResponse
 namespace AlertsNotification {
 enum class Fields
 {
-    kAlertsCount = 0,
+    kAlertsCount     = 0,
+    kAlertStructures = 1,
 };
 
 struct Type
@@ -22037,7 +22265,8 @@ public:
     static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    uint8_t alertsCount;
+    BitFlags<AlertCount> alertsCount;
+    DataModel::List<BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22048,7 +22277,8 @@ public:
     static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    uint8_t alertsCount;
+    BitFlags<AlertCount> alertsCount;
+    DataModel::DecodableList<BitFlags<AlertStructure>> alertStructures;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AlertsNotification
@@ -23945,8 +24175,8 @@ namespace GroupKeyManagement {
 // Enum for GroupKeySecurityPolicy
 enum class GroupKeySecurityPolicy : uint8_t
 {
-    GROUP_KEY_SECURITY_POLICY_STANDARD    = 0x00,
-    GROUP_KEY_SECURITY_POLICY_LOW_LATENCY = 0x01,
+    kStandard   = 0x00,
+    kLowLatency = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using GroupKeySecurityPolicy               = EmberAfGroupKeySecurityPolicy;

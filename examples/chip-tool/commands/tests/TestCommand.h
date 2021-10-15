@@ -18,20 +18,20 @@
 
 #pragma once
 
-#include "../common/Command.h"
+#include "../common/CHIPCommand.h"
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <zap-generated/tests/CHIPClustersTest.h>
 
-class TestCommand : public Command
+class TestCommand : public CHIPCommand
 {
 public:
     TestCommand(const char * commandName) :
-        Command(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {}
 
-    /////////// Command Interface /////////
-    CHIP_ERROR Run() override;
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR Run(NodeId remoteId) override;
     uint16_t GetWaitDurationInSeconds() const override { return 30; }
 
     virtual void NextTest() = 0;

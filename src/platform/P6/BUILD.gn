@@ -51,8 +51,6 @@ static_library("P6") {
     "P6Utils.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "SoftwareUpdateManagerImpl.cpp",
-    "SoftwareUpdateManagerImpl.h",
     "SystemPlatformConfig.h",
     "WarmPlatformConfig.h",
     "app_platform_cfg.c",

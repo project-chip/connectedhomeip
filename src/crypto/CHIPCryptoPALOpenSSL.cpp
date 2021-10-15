@@ -1004,7 +1004,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     }
 
 exit:
-    memset(privkey, 0, sizeof(privkey));
+    ClearSecretData(privkey, sizeof(privkey));
     _logSSLError();
     return error;
 }
@@ -1062,7 +1062,6 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     ec_key       = nullptr;
 
 exit:
-
     if (ec_key != nullptr)
     {
         EC_KEY_free(ec_key);

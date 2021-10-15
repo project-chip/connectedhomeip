@@ -19,13 +19,13 @@
 #pragma once
 
 #include "../../config/PersistentStorage.h"
-#include "../common/Command.h"
+#include "../common/CHIPCommand.h"
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 
-class DiscoverCommand : public Command, public chip::Controller::DeviceAddressUpdateDelegate
+class DiscoverCommand : public CHIPCommand, public chip::Controller::DeviceAddressUpdateDelegate
 {
 public:
-    DiscoverCommand(const char * commandName) : Command(commandName)
+    DiscoverCommand(const char * commandName) : CHIPCommand(commandName)
     {
         AddArgument("nodeid", 0, UINT64_MAX, &mNodeId);
         AddArgument("fabricid", 0, UINT64_MAX, &mFabricId);
@@ -34,8 +34,8 @@ public:
     /////////// DeviceAddressUpdateDelegate Interface /////////
     void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override{};
 
-    /////////// Command Interface /////////
-    CHIP_ERROR Run() override;
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR Run(NodeId remoteId) override;
     uint16_t GetWaitDurationInSeconds() const override { return 30; }
 
     virtual CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) = 0;

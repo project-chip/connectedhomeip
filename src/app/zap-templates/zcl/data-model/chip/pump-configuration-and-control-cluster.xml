@@ -103,6 +103,7 @@ limitations under the License.
   </cluster>
 
   <bitmap name="PumpStatus" type="BITMAP16">
+    <cluster code="0x0200"/>
     <field name="DeviceFault" mask="0x1"/>
     <field name="Supplyfault" mask="0x2"/>
     <field name="SpeedLow" mask="0x4"/>

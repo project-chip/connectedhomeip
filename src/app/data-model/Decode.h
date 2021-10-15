@@ -41,6 +41,12 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
     return reader.Get(x);
 }
 
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, BitFlags<X> & x)
+{
+    return reader.Get(x);
+}
+
 //
 // @brief
 //

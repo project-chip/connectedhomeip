@@ -24,15 +24,14 @@
 
 using namespace ::chip;
 
-CHIP_ERROR ReportingCommand::Run()
+CHIP_ERROR ReportingCommand::Run(NodeId remoteId)
 {
-    auto * ctx = GetExecContext();
+    CHIP_ERROR err = mController.GetConnectedDevice(remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %s", remoteId, ErrorStr(err)));
 
-    CHIP_ERROR err =
-        ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %s", ctx->remoteId,
-                              ErrorStr(err)));
+    mRemoteId = remoteId;
 
 exit:
     return err;
@@ -47,7 +46,7 @@ void ReportingCommand::OnDeviceConnectedFn(void * context, chip::Controller::Dev
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, command->mEndPointId);
 
-    command->AddReportCallbacks(command->mEndPointId);
+    command->AddReportCallbacks(command->mRemoteId, command->mEndPointId);
 
     CHIP_ERROR err = cluster.MfgSpecificPing(nullptr, nullptr);
     if (err != CHIP_NO_ERROR)

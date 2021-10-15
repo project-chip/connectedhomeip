@@ -23,8 +23,6 @@ COPY --from=nrf /opt/NordicSemiconductor/nrfconnect /opt/NordicSemiconductor/nrf
 COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r21b /opt/android/android-ndk-r21b
 
-COPY --from=mbedos /opt/mbed-os /opt/mbed-os
-COPY --from=mbedos /opt/mbed-os-toolchain/ /opt/mbed-os-toolchain/
 COPY --from=mbedos /opt/openocd/ /opt/openocd/
 
 COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
@@ -54,8 +52,6 @@ ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV EFR32_BOARD=BRD4161A
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b
-ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/
-ENV MBED_OS_PATH=/opt/mbed-os/
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
