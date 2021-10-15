@@ -108,7 +108,7 @@ exit:
 
 CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                    = CHIP_NO_ERROR;
     const access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataListReader.Next()))

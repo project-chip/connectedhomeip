@@ -110,7 +110,8 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     // Nothing todo.
 }
 
-CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath,
+                                 TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     uint64_t version = 0;
@@ -125,7 +126,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;

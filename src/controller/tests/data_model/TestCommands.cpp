@@ -120,12 +120,14 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath,
+                                 TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

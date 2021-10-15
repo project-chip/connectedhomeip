@@ -636,7 +636,8 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
-CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath,
+                                 TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     // We do not really care about the value, just return a not found status code.
     VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
@@ -644,7 +645,8 @@ CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescr
                          Protocols::InteractionModel::Status::UnsupportedAttribute);
 }
 
-CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler *)
+CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler *)
 {
     if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
     {

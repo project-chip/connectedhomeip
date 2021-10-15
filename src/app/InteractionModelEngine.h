@@ -249,11 +249,13 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists);
+CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath,
+                                 TLV::TLVWriter * apWriter, bool * apDataExists);
 
 /**
  * TODO: Document.
  */
-CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
+CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip

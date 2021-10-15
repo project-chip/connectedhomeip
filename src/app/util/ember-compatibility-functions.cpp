@@ -191,7 +191,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
-CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath,
+                                 TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
@@ -245,10 +246,7 @@ CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescr
 #endif
 
     {
-        access::RequestPath requestPath {
-            .endpoint = aPath.mEndpointId,
-            .cluster = aPath.mClusterId
-        };
+        access::RequestPath requestPath{ .endpoint = aPath.mEndpointId, .cluster = aPath.mClusterId };
         CHIP_ERROR err = AccessControl::GetInstance()->Check(aSubjectDescriptor, requestPath, privilege);
         if (err != CHIP_NO_ERROR)
         {
@@ -256,7 +254,8 @@ CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescr
             {
                 ChipLogProgress(DataManagement, "ACCESS CONTROL --> DENIED");
                 // TODO: In some cases (wildcards) we'll want to just discard request path
-                return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status), Protocols::InteractionModel::Status::UnsupportedAccess);
+                return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
+                                     Protocols::InteractionModel::Status::UnsupportedAccess);
             }
             else
             {
@@ -484,10 +483,7 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(const 
 #endif
 
     {
-        access::RequestPath requestPath {
-            .endpoint = aClusterInfo.mEndpointId,
-            .cluster = aClusterInfo.mClusterId
-        };
+        access::RequestPath requestPath{ .endpoint = aClusterInfo.mEndpointId, .cluster = aClusterInfo.mClusterId };
         CHIP_ERROR err = AccessControl::GetInstance()->Check(aSubjectDescriptor, requestPath, privilege);
         if (err != CHIP_NO_ERROR)
         {
@@ -526,7 +522,8 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(const 
                                                                   attributeMetadata->attributeType));
 }
 
-CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     AttributePathParams attributePathParams;
     attributePathParams.mNodeId     = aClusterInfo.mNodeId;

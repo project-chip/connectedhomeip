@@ -62,7 +62,8 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(const access::SubjectDescriptor & aSubjectDescriptor, AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo)
+Engine::RetrieveClusterData(const access::SubjectDescriptor & aSubjectDescriptor, AttributeDataList::Builder & aAttributeDataList,
+                            ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
@@ -97,9 +98,9 @@ exit:
 
 CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                    = CHIP_NO_ERROR;
     const access::SubjectDescriptor subjectDescriptor = apReadHandler->GetSubjectDescriptor();
-    bool attributeClean = true;
+    bool attributeClean                               = true;
     TLV::TLVWriter backup;
     aReportDataBuilder.Checkpoint(backup);
     AttributeDataList::Builder attributeDataList = aReportDataBuilder.CreateAttributeDataListBuilder();

@@ -165,9 +165,9 @@ public:
             // fields (auth mode, node id, etc.) from session handle (or whereever)
             // and put in SubjectDescriptor appropriately, and ensure it's correct for
             // all cases (e.g. peer node ID is good)
-            auto& session = mSecureSession.Value();
-            subjectDescriptor.authMode = access::AuthMode::kCase;
-            subjectDescriptor.subject = session.GetPeerNodeId();
+            auto & session                = mSecureSession.Value();
+            subjectDescriptor.authMode    = access::AuthMode::kCase;
+            subjectDescriptor.subject     = session.GetPeerNodeId();
             subjectDescriptor.fabricIndex = session.GetFabricIndex();
         }
 
