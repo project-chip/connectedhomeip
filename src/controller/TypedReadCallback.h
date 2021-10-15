@@ -40,7 +40,7 @@ class TypedReadCallback final : public app::InteractionModelDelegate
 {
 public:
     using OnSuccessCallbackType =
-        std::function<void(const app::ConcreteAttributePath & aPath, typename AttributeTypeInfo::DecodableType & aData)>;
+        std::function<void(const app::ConcreteAttributePath & aPath, const AttributeTypeInfo::DecodableType & aData)>;
     using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * aPath,
                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void()>;
@@ -57,7 +57,7 @@ private:
     {
         CHIP_ERROR err                           = CHIP_NO_ERROR;
         app::ConcreteAttributePath attributePath = { aPath.mEndpointId, aPath.mClusterId, aPath.mFieldId };
-        typename AttributeTypeInfo::DecodableType value;
+        AttributeTypeInfo::DecodableType value;
 
         VerifyOrExit(status == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
         VerifyOrExit(aPath.mClusterId == AttributeTypeInfo::GetClusterId() && aPath.mFieldId == AttributeTypeInfo::GetAttributeId(),
@@ -73,7 +73,7 @@ private:
         if (err != CHIP_NO_ERROR)
         {
             //
-            // Over-ride status to indicate an error if something bad happened above.
+            // Override status to indicate an error if something bad happened above.
             //
             if (status == Protocols::InteractionModel::Status::Success)
             {
