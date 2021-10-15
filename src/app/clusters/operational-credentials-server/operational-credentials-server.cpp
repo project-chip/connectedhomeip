@@ -347,6 +347,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     CHIP_ERROR err       = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
+    app::DnssdServer::Instance().StartServer();
+
 exit:
     writeFabricsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
