@@ -20,6 +20,7 @@
 package chip.devicecontroller;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import chip.clusterinfo.ClusterCommandCallback;
 import chip.clusterinfo.ClusterInfo;
 import chip.clusterinfo.CommandInfo;
@@ -7491,2632 +7492,3682 @@ public class ClusterInfoMapping {
     clusterMap.put("windowCovering", windowCoveringClusterInfo);
     return clusterMap;
 =======
+=======
+import chip.clusterinfo.ClusterCommandCallback;
+>>>>>>> 2d2bbd2e1 (new design solution)
 import chip.clusterinfo.ClusterInfo;
 import chip.clusterinfo.CommandInfo;
 import chip.clusterinfo.CommandParameter;
+import chip.clusterinfo.DelegatedClusterCallback;
+import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
 import java.util.*;
 
 public class ClusterInfoMapping {
 
+  class DelegatedDefaultClusterCallback
+      implements DefaultClusterCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    // Parameters and list-adds here should be generated - refer to the template code that creates
+    // each callback interface.
+    @Override
+    public void onSuccess() {
+      List<Object> responseValues = new ArrayList<>();
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception e) {
+      callback.onFailure(e);
+    }
+  }
+
   public Map<String, ClusterInfo> getClusterMap() {
-    Map<String, ClusterInfo> clusterInfoMapping = new HashMap<>();
-    ClusterInfo accountLogin_clusterInfo = new ClusterInfo("accountLogin");
-    List<CommandParameter> accountLogin_getSetupPIN_parametersList = new ArrayList<>();
-    CommandInfo accountLogin_getSetupPIN_commandInfo = new CommandInfo();
-    accountLogin_getSetupPIN_commandInfo.name = "getSetupPIN";
-    accountLogin_getSetupPIN_commandInfo.callbackClass =
-        ChipClusters.AccountLoginCluster.GetSetupPINResponseCallback.class;
+    Map<String, ClusterInfo> clusterMap = new HashMap<>();
+    Map<String, CommandInfo> accountLogin_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> accountLogin_getSetupPIN_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getSetupPIN_tempAccountIdentifier_commandParameter =
         new CommandParameter("tempAccountIdentifier", String.class);
-    accountLogin_getSetupPIN_parametersList.add(getSetupPIN_tempAccountIdentifier_commandParameter);
+    accountLogin_getSetupPIN_commandParams.add(getSetupPIN_tempAccountIdentifier_commandParameter);
 
-    accountLogin_getSetupPIN_commandInfo.parameters = accountLogin_getSetupPIN_parametersList;
-    accountLogin_clusterInfo.commands.add(accountLogin_getSetupPIN_commandInfo);
-    List<CommandParameter> accountLogin_login_parametersList = new ArrayList<>();
-    CommandInfo accountLogin_login_commandInfo = new CommandInfo();
-    accountLogin_login_commandInfo.name = "login";
-    accountLogin_login_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo accountLogin_getSetupPIN_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            accountLogin_getSetupPIN_commandParams);
+    accountLogin_ClusterCommandInfo.put("getSetupPIN", accountLogin_getSetupPIN_CommandInfo);
+    List<CommandParameter> accountLogin_login_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter login_tempAccountIdentifier_commandParameter =
         new CommandParameter("tempAccountIdentifier", String.class);
-    accountLogin_login_parametersList.add(login_tempAccountIdentifier_commandParameter);
+    accountLogin_login_commandParams.add(login_tempAccountIdentifier_commandParameter);
 
     CommandParameter login_setupPIN_commandParameter =
         new CommandParameter("setupPIN", String.class);
-    accountLogin_login_parametersList.add(login_setupPIN_commandParameter);
+    accountLogin_login_commandParams.add(login_setupPIN_commandParameter);
 
-    accountLogin_login_commandInfo.parameters = accountLogin_login_parametersList;
-    accountLogin_clusterInfo.commands.add(accountLogin_login_commandInfo);
-    clusterInfoMapping.put("accountLogin", accountLogin_clusterInfo);
-    ClusterInfo administratorCommissioning_clusterInfo =
-        new ClusterInfo("administratorCommissioning");
-    List<CommandParameter> administratorCommissioning_openBasicCommissioningWindow_parametersList =
+    // Populate commands
+    CommandInfo accountLogin_login_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            accountLogin_login_commandParams);
+    accountLogin_ClusterCommandInfo.put("login", accountLogin_login_CommandInfo);
+    // Populate cluster
+    ClusterInfo accountLogin_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.AccountLoginCluster(ptr, endpointId),
+            accountLogin_ClusterCommandInfo);
+    clusterMap.put("accountLogin", accountLogin_clusterInfo);
+    Map<String, CommandInfo> administratorCommissioning_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> administratorCommissioning_openBasicCommissioningWindow_commandParams =
         new ArrayList<>();
-    CommandInfo administratorCommissioning_openBasicCommissioningWindow_commandInfo =
-        new CommandInfo();
-    administratorCommissioning_openBasicCommissioningWindow_commandInfo.name =
-        "openBasicCommissioningWindow";
-    administratorCommissioning_openBasicCommissioningWindow_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter openBasicCommissioningWindow_commissioningTimeout_commandParameter =
         new CommandParameter("commissioningTimeout", int.class);
-    administratorCommissioning_openBasicCommissioningWindow_parametersList.add(
+    administratorCommissioning_openBasicCommissioningWindow_commandParams.add(
         openBasicCommissioningWindow_commissioningTimeout_commandParameter);
 
-    administratorCommissioning_openBasicCommissioningWindow_commandInfo.parameters =
-        administratorCommissioning_openBasicCommissioningWindow_parametersList;
-    administratorCommissioning_clusterInfo.commands.add(
-        administratorCommissioning_openBasicCommissioningWindow_commandInfo);
-    List<CommandParameter> administratorCommissioning_openCommissioningWindow_parametersList =
+    // Populate commands
+    CommandInfo administratorCommissioning_openBasicCommissioningWindow_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            administratorCommissioning_openBasicCommissioningWindow_commandParams);
+    administratorCommissioning_ClusterCommandInfo.put(
+        "openBasicCommissioningWindow",
+        administratorCommissioning_openBasicCommissioningWindow_CommandInfo);
+    List<CommandParameter> administratorCommissioning_openCommissioningWindow_commandParams =
         new ArrayList<>();
-    CommandInfo administratorCommissioning_openCommissioningWindow_commandInfo = new CommandInfo();
-    administratorCommissioning_openCommissioningWindow_commandInfo.name = "openCommissioningWindow";
-    administratorCommissioning_openCommissioningWindow_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter openCommissioningWindow_commissioningTimeout_commandParameter =
         new CommandParameter("commissioningTimeout", int.class);
-    administratorCommissioning_openCommissioningWindow_parametersList.add(
+    administratorCommissioning_openCommissioningWindow_commandParams.add(
         openCommissioningWindow_commissioningTimeout_commandParameter);
 
     CommandParameter openCommissioningWindow_PAKEVerifier_commandParameter =
         new CommandParameter("PAKEVerifier", byte[].class);
-    administratorCommissioning_openCommissioningWindow_parametersList.add(
+    administratorCommissioning_openCommissioningWindow_commandParams.add(
         openCommissioningWindow_PAKEVerifier_commandParameter);
 
     CommandParameter openCommissioningWindow_discriminator_commandParameter =
         new CommandParameter("discriminator", int.class);
-    administratorCommissioning_openCommissioningWindow_parametersList.add(
+    administratorCommissioning_openCommissioningWindow_commandParams.add(
         openCommissioningWindow_discriminator_commandParameter);
 
     CommandParameter openCommissioningWindow_iterations_commandParameter =
         new CommandParameter("iterations", long.class);
-    administratorCommissioning_openCommissioningWindow_parametersList.add(
+    administratorCommissioning_openCommissioningWindow_commandParams.add(
         openCommissioningWindow_iterations_commandParameter);
 
     CommandParameter openCommissioningWindow_salt_commandParameter =
         new CommandParameter("salt", byte[].class);
-    administratorCommissioning_openCommissioningWindow_parametersList.add(
+    administratorCommissioning_openCommissioningWindow_commandParams.add(
         openCommissioningWindow_salt_commandParameter);
 
     CommandParameter openCommissioningWindow_passcodeID_commandParameter =
         new CommandParameter("passcodeID", int.class);
-    administratorCommissioning_openCommissioningWindow_parametersList.add(
+    administratorCommissioning_openCommissioningWindow_commandParams.add(
         openCommissioningWindow_passcodeID_commandParameter);
 
-    administratorCommissioning_openCommissioningWindow_commandInfo.parameters =
-        administratorCommissioning_openCommissioningWindow_parametersList;
-    administratorCommissioning_clusterInfo.commands.add(
-        administratorCommissioning_openCommissioningWindow_commandInfo);
-    List<CommandParameter> administratorCommissioning_revokeCommissioning_parametersList =
+    // Populate commands
+    CommandInfo administratorCommissioning_openCommissioningWindow_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            administratorCommissioning_openCommissioningWindow_commandParams);
+    administratorCommissioning_ClusterCommandInfo.put(
+        "openCommissioningWindow", administratorCommissioning_openCommissioningWindow_CommandInfo);
+    List<CommandParameter> administratorCommissioning_revokeCommissioning_commandParams =
         new ArrayList<>();
-    CommandInfo administratorCommissioning_revokeCommissioning_commandInfo = new CommandInfo();
-    administratorCommissioning_revokeCommissioning_commandInfo.name = "revokeCommissioning";
-    administratorCommissioning_revokeCommissioning_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    administratorCommissioning_revokeCommissioning_commandInfo.parameters =
-        administratorCommissioning_revokeCommissioning_parametersList;
-    administratorCommissioning_clusterInfo.commands.add(
-        administratorCommissioning_revokeCommissioning_commandInfo);
-    clusterInfoMapping.put("administratorCommissioning", administratorCommissioning_clusterInfo);
-    ClusterInfo applicationBasic_clusterInfo = new ClusterInfo("applicationBasic");
-    List<CommandParameter> applicationBasic_changeStatus_parametersList = new ArrayList<>();
-    CommandInfo applicationBasic_changeStatus_commandInfo = new CommandInfo();
-    applicationBasic_changeStatus_commandInfo.name = "changeStatus";
-    applicationBasic_changeStatus_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo administratorCommissioning_revokeCommissioning_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            administratorCommissioning_revokeCommissioning_commandParams);
+    administratorCommissioning_ClusterCommandInfo.put(
+        "revokeCommissioning", administratorCommissioning_revokeCommissioning_CommandInfo);
+    // Populate cluster
+    ClusterInfo administratorCommissioning_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.AdministratorCommissioningCluster(ptr, endpointId),
+            administratorCommissioning_ClusterCommandInfo);
+    clusterMap.put("administratorCommissioning", administratorCommissioning_clusterInfo);
+    Map<String, CommandInfo> applicationBasic_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> applicationBasic_changeStatus_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter changeStatus_status_commandParameter =
         new CommandParameter("status", int.class);
-    applicationBasic_changeStatus_parametersList.add(changeStatus_status_commandParameter);
+    applicationBasic_changeStatus_commandParams.add(changeStatus_status_commandParameter);
 
-    applicationBasic_changeStatus_commandInfo.parameters =
-        applicationBasic_changeStatus_parametersList;
-    applicationBasic_clusterInfo.commands.add(applicationBasic_changeStatus_commandInfo);
-    clusterInfoMapping.put("applicationBasic", applicationBasic_clusterInfo);
-    ClusterInfo applicationLauncher_clusterInfo = new ClusterInfo("applicationLauncher");
-    List<CommandParameter> applicationLauncher_launchApp_parametersList = new ArrayList<>();
-    CommandInfo applicationLauncher_launchApp_commandInfo = new CommandInfo();
-    applicationLauncher_launchApp_commandInfo.name = "launchApp";
-    applicationLauncher_launchApp_commandInfo.callbackClass =
-        ChipClusters.ApplicationLauncherCluster.LaunchAppResponseCallback.class;
+    // Populate commands
+    CommandInfo applicationBasic_changeStatus_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            applicationBasic_changeStatus_commandParams);
+    applicationBasic_ClusterCommandInfo.put(
+        "changeStatus", applicationBasic_changeStatus_CommandInfo);
+    // Populate cluster
+    ClusterInfo applicationBasic_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ApplicationBasicCluster(ptr, endpointId),
+            applicationBasic_ClusterCommandInfo);
+    clusterMap.put("applicationBasic", applicationBasic_clusterInfo);
+    Map<String, CommandInfo> applicationLauncher_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> applicationLauncher_launchApp_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter launchApp_data_commandParameter = new CommandParameter("data", String.class);
-    applicationLauncher_launchApp_parametersList.add(launchApp_data_commandParameter);
+    applicationLauncher_launchApp_commandParams.add(launchApp_data_commandParameter);
 
     CommandParameter launchApp_catalogVendorId_commandParameter =
         new CommandParameter("catalogVendorId", int.class);
-    applicationLauncher_launchApp_parametersList.add(launchApp_catalogVendorId_commandParameter);
+    applicationLauncher_launchApp_commandParams.add(launchApp_catalogVendorId_commandParameter);
 
     CommandParameter launchApp_applicationId_commandParameter =
         new CommandParameter("applicationId", String.class);
-    applicationLauncher_launchApp_parametersList.add(launchApp_applicationId_commandParameter);
+    applicationLauncher_launchApp_commandParams.add(launchApp_applicationId_commandParameter);
 
-    applicationLauncher_launchApp_commandInfo.parameters =
-        applicationLauncher_launchApp_parametersList;
-    applicationLauncher_clusterInfo.commands.add(applicationLauncher_launchApp_commandInfo);
-    clusterInfoMapping.put("applicationLauncher", applicationLauncher_clusterInfo);
-    ClusterInfo audioOutput_clusterInfo = new ClusterInfo("audioOutput");
-    List<CommandParameter> audioOutput_renameOutput_parametersList = new ArrayList<>();
-    CommandInfo audioOutput_renameOutput_commandInfo = new CommandInfo();
-    audioOutput_renameOutput_commandInfo.name = "renameOutput";
-    audioOutput_renameOutput_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo applicationLauncher_launchApp_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            applicationLauncher_launchApp_commandParams);
+    applicationLauncher_ClusterCommandInfo.put(
+        "launchApp", applicationLauncher_launchApp_CommandInfo);
+    // Populate cluster
+    ClusterInfo applicationLauncher_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ApplicationLauncherCluster(ptr, endpointId),
+            applicationLauncher_ClusterCommandInfo);
+    clusterMap.put("applicationLauncher", applicationLauncher_clusterInfo);
+    Map<String, CommandInfo> audioOutput_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> audioOutput_renameOutput_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter renameOutput_index_commandParameter = new CommandParameter("index", int.class);
-    audioOutput_renameOutput_parametersList.add(renameOutput_index_commandParameter);
+    audioOutput_renameOutput_commandParams.add(renameOutput_index_commandParameter);
 
     CommandParameter renameOutput_name_commandParameter =
         new CommandParameter("name", String.class);
-    audioOutput_renameOutput_parametersList.add(renameOutput_name_commandParameter);
+    audioOutput_renameOutput_commandParams.add(renameOutput_name_commandParameter);
 
-    audioOutput_renameOutput_commandInfo.parameters = audioOutput_renameOutput_parametersList;
-    audioOutput_clusterInfo.commands.add(audioOutput_renameOutput_commandInfo);
-    List<CommandParameter> audioOutput_selectOutput_parametersList = new ArrayList<>();
-    CommandInfo audioOutput_selectOutput_commandInfo = new CommandInfo();
-    audioOutput_selectOutput_commandInfo.name = "selectOutput";
-    audioOutput_selectOutput_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo audioOutput_renameOutput_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            audioOutput_renameOutput_commandParams);
+    audioOutput_ClusterCommandInfo.put("renameOutput", audioOutput_renameOutput_CommandInfo);
+    List<CommandParameter> audioOutput_selectOutput_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter selectOutput_index_commandParameter = new CommandParameter("index", int.class);
-    audioOutput_selectOutput_parametersList.add(selectOutput_index_commandParameter);
+    audioOutput_selectOutput_commandParams.add(selectOutput_index_commandParameter);
 
-    audioOutput_selectOutput_commandInfo.parameters = audioOutput_selectOutput_parametersList;
-    audioOutput_clusterInfo.commands.add(audioOutput_selectOutput_commandInfo);
-    clusterInfoMapping.put("audioOutput", audioOutput_clusterInfo);
-    ClusterInfo barrierControl_clusterInfo = new ClusterInfo("barrierControl");
-    List<CommandParameter> barrierControl_barrierControlGoToPercent_parametersList =
+    // Populate commands
+    CommandInfo audioOutput_selectOutput_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            audioOutput_selectOutput_commandParams);
+    audioOutput_ClusterCommandInfo.put("selectOutput", audioOutput_selectOutput_CommandInfo);
+    // Populate cluster
+    ClusterInfo audioOutput_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.AudioOutputCluster(ptr, endpointId),
+            audioOutput_ClusterCommandInfo);
+    clusterMap.put("audioOutput", audioOutput_clusterInfo);
+    Map<String, CommandInfo> barrierControl_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> barrierControl_barrierControlGoToPercent_commandParams =
         new ArrayList<>();
-    CommandInfo barrierControl_barrierControlGoToPercent_commandInfo = new CommandInfo();
-    barrierControl_barrierControlGoToPercent_commandInfo.name = "barrierControlGoToPercent";
-    barrierControl_barrierControlGoToPercent_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter barrierControlGoToPercent_percentOpen_commandParameter =
         new CommandParameter("percentOpen", int.class);
-    barrierControl_barrierControlGoToPercent_parametersList.add(
+    barrierControl_barrierControlGoToPercent_commandParams.add(
         barrierControlGoToPercent_percentOpen_commandParameter);
 
-    barrierControl_barrierControlGoToPercent_commandInfo.parameters =
-        barrierControl_barrierControlGoToPercent_parametersList;
-    barrierControl_clusterInfo.commands.add(barrierControl_barrierControlGoToPercent_commandInfo);
-    List<CommandParameter> barrierControl_barrierControlStop_parametersList = new ArrayList<>();
-    CommandInfo barrierControl_barrierControlStop_commandInfo = new CommandInfo();
-    barrierControl_barrierControlStop_commandInfo.name = "barrierControlStop";
-    barrierControl_barrierControlStop_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    barrierControl_barrierControlStop_commandInfo.parameters =
-        barrierControl_barrierControlStop_parametersList;
-    barrierControl_clusterInfo.commands.add(barrierControl_barrierControlStop_commandInfo);
-    clusterInfoMapping.put("barrierControl", barrierControl_clusterInfo);
-    ClusterInfo basic_clusterInfo = new ClusterInfo("basic");
-    List<CommandParameter> basic_mfgSpecificPing_parametersList = new ArrayList<>();
-    CommandInfo basic_mfgSpecificPing_commandInfo = new CommandInfo();
-    basic_mfgSpecificPing_commandInfo.name = "mfgSpecificPing";
-    basic_mfgSpecificPing_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
-    basic_mfgSpecificPing_commandInfo.parameters = basic_mfgSpecificPing_parametersList;
-    basic_clusterInfo.commands.add(basic_mfgSpecificPing_commandInfo);
-    clusterInfoMapping.put("basic", basic_clusterInfo);
-    ClusterInfo binaryInputBasic_clusterInfo = new ClusterInfo("binaryInputBasic");
-    clusterInfoMapping.put("binaryInputBasic", binaryInputBasic_clusterInfo);
-    ClusterInfo binding_clusterInfo = new ClusterInfo("binding");
-    List<CommandParameter> binding_bind_parametersList = new ArrayList<>();
-    CommandInfo binding_bind_commandInfo = new CommandInfo();
-    binding_bind_commandInfo.name = "bind";
-    binding_bind_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo barrierControl_barrierControlGoToPercent_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            barrierControl_barrierControlGoToPercent_commandParams);
+    barrierControl_ClusterCommandInfo.put(
+        "barrierControlGoToPercent", barrierControl_barrierControlGoToPercent_CommandInfo);
+    List<CommandParameter> barrierControl_barrierControlStop_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo barrierControl_barrierControlStop_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            barrierControl_barrierControlStop_commandParams);
+    barrierControl_ClusterCommandInfo.put(
+        "barrierControlStop", barrierControl_barrierControlStop_CommandInfo);
+    // Populate cluster
+    ClusterInfo barrierControl_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BarrierControlCluster(ptr, endpointId),
+            barrierControl_ClusterCommandInfo);
+    clusterMap.put("barrierControl", barrierControl_clusterInfo);
+    Map<String, CommandInfo> basic_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> basic_mfgSpecificPing_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo basic_mfgSpecificPing_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            basic_mfgSpecificPing_commandParams);
+    basic_ClusterCommandInfo.put("mfgSpecificPing", basic_mfgSpecificPing_CommandInfo);
+    // Populate cluster
+    ClusterInfo basic_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BasicCluster(ptr, endpointId),
+            basic_ClusterCommandInfo);
+    clusterMap.put("basic", basic_clusterInfo);
+    Map<String, CommandInfo> binaryInputBasic_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo binaryInputBasic_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BinaryInputBasicCluster(ptr, endpointId),
+            binaryInputBasic_ClusterCommandInfo);
+    clusterMap.put("binaryInputBasic", binaryInputBasic_clusterInfo);
+    Map<String, CommandInfo> binding_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> binding_bind_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter bind_nodeId_commandParameter = new CommandParameter("nodeId", long.class);
-    binding_bind_parametersList.add(bind_nodeId_commandParameter);
+    binding_bind_commandParams.add(bind_nodeId_commandParameter);
 
     CommandParameter bind_groupId_commandParameter = new CommandParameter("groupId", int.class);
-    binding_bind_parametersList.add(bind_groupId_commandParameter);
+    binding_bind_commandParams.add(bind_groupId_commandParameter);
 
     CommandParameter bind_endpointId_commandParameter =
         new CommandParameter("endpointId", int.class);
-    binding_bind_parametersList.add(bind_endpointId_commandParameter);
+    binding_bind_commandParams.add(bind_endpointId_commandParameter);
 
     CommandParameter bind_clusterId_commandParameter =
         new CommandParameter("clusterId", long.class);
-    binding_bind_parametersList.add(bind_clusterId_commandParameter);
+    binding_bind_commandParams.add(bind_clusterId_commandParameter);
 
-    binding_bind_commandInfo.parameters = binding_bind_parametersList;
-    binding_clusterInfo.commands.add(binding_bind_commandInfo);
-    List<CommandParameter> binding_unbind_parametersList = new ArrayList<>();
-    CommandInfo binding_unbind_commandInfo = new CommandInfo();
-    binding_unbind_commandInfo.name = "unbind";
-    binding_unbind_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo binding_bind_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            binding_bind_commandParams);
+    binding_ClusterCommandInfo.put("bind", binding_bind_CommandInfo);
+    List<CommandParameter> binding_unbind_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter unbind_nodeId_commandParameter = new CommandParameter("nodeId", long.class);
-    binding_unbind_parametersList.add(unbind_nodeId_commandParameter);
+    binding_unbind_commandParams.add(unbind_nodeId_commandParameter);
 
     CommandParameter unbind_groupId_commandParameter = new CommandParameter("groupId", int.class);
-    binding_unbind_parametersList.add(unbind_groupId_commandParameter);
+    binding_unbind_commandParams.add(unbind_groupId_commandParameter);
 
     CommandParameter unbind_endpointId_commandParameter =
         new CommandParameter("endpointId", int.class);
-    binding_unbind_parametersList.add(unbind_endpointId_commandParameter);
+    binding_unbind_commandParams.add(unbind_endpointId_commandParameter);
 
     CommandParameter unbind_clusterId_commandParameter =
         new CommandParameter("clusterId", long.class);
-    binding_unbind_parametersList.add(unbind_clusterId_commandParameter);
+    binding_unbind_commandParams.add(unbind_clusterId_commandParameter);
 
-    binding_unbind_commandInfo.parameters = binding_unbind_parametersList;
-    binding_clusterInfo.commands.add(binding_unbind_commandInfo);
-    clusterInfoMapping.put("binding", binding_clusterInfo);
-    ClusterInfo bridgedDeviceBasic_clusterInfo = new ClusterInfo("bridgedDeviceBasic");
-    clusterInfoMapping.put("bridgedDeviceBasic", bridgedDeviceBasic_clusterInfo);
-    ClusterInfo colorControl_clusterInfo = new ClusterInfo("colorControl");
-    List<CommandParameter> colorControl_colorLoopSet_parametersList = new ArrayList<>();
-    CommandInfo colorControl_colorLoopSet_commandInfo = new CommandInfo();
-    colorControl_colorLoopSet_commandInfo.name = "colorLoopSet";
-    colorControl_colorLoopSet_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo binding_unbind_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            binding_unbind_commandParams);
+    binding_ClusterCommandInfo.put("unbind", binding_unbind_CommandInfo);
+    // Populate cluster
+    ClusterInfo binding_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BindingCluster(ptr, endpointId),
+            binding_ClusterCommandInfo);
+    clusterMap.put("binding", binding_clusterInfo);
+    Map<String, CommandInfo> bridgedDeviceBasic_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo bridgedDeviceBasic_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BridgedDeviceBasicCluster(ptr, endpointId),
+            bridgedDeviceBasic_ClusterCommandInfo);
+    clusterMap.put("bridgedDeviceBasic", bridgedDeviceBasic_clusterInfo);
+    Map<String, CommandInfo> colorControl_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> colorControl_colorLoopSet_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter colorLoopSet_updateFlags_commandParameter =
         new CommandParameter("updateFlags", int.class);
-    colorControl_colorLoopSet_parametersList.add(colorLoopSet_updateFlags_commandParameter);
+    colorControl_colorLoopSet_commandParams.add(colorLoopSet_updateFlags_commandParameter);
 
     CommandParameter colorLoopSet_action_commandParameter =
         new CommandParameter("action", int.class);
-    colorControl_colorLoopSet_parametersList.add(colorLoopSet_action_commandParameter);
+    colorControl_colorLoopSet_commandParams.add(colorLoopSet_action_commandParameter);
 
     CommandParameter colorLoopSet_direction_commandParameter =
         new CommandParameter("direction", int.class);
-    colorControl_colorLoopSet_parametersList.add(colorLoopSet_direction_commandParameter);
+    colorControl_colorLoopSet_commandParams.add(colorLoopSet_direction_commandParameter);
 
     CommandParameter colorLoopSet_time_commandParameter = new CommandParameter("time", int.class);
-    colorControl_colorLoopSet_parametersList.add(colorLoopSet_time_commandParameter);
+    colorControl_colorLoopSet_commandParams.add(colorLoopSet_time_commandParameter);
 
     CommandParameter colorLoopSet_startHue_commandParameter =
         new CommandParameter("startHue", int.class);
-    colorControl_colorLoopSet_parametersList.add(colorLoopSet_startHue_commandParameter);
+    colorControl_colorLoopSet_commandParams.add(colorLoopSet_startHue_commandParameter);
 
     CommandParameter colorLoopSet_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_colorLoopSet_parametersList.add(colorLoopSet_optionsMask_commandParameter);
+    colorControl_colorLoopSet_commandParams.add(colorLoopSet_optionsMask_commandParameter);
 
     CommandParameter colorLoopSet_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_colorLoopSet_parametersList.add(colorLoopSet_optionsOverride_commandParameter);
+    colorControl_colorLoopSet_commandParams.add(colorLoopSet_optionsOverride_commandParameter);
 
-    colorControl_colorLoopSet_commandInfo.parameters = colorControl_colorLoopSet_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_colorLoopSet_commandInfo);
-    List<CommandParameter> colorControl_enhancedMoveHue_parametersList = new ArrayList<>();
-    CommandInfo colorControl_enhancedMoveHue_commandInfo = new CommandInfo();
-    colorControl_enhancedMoveHue_commandInfo.name = "enhancedMoveHue";
-    colorControl_enhancedMoveHue_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_colorLoopSet_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_colorLoopSet_commandParams);
+    colorControl_ClusterCommandInfo.put("colorLoopSet", colorControl_colorLoopSet_CommandInfo);
+    List<CommandParameter> colorControl_enhancedMoveHue_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter enhancedMoveHue_moveMode_commandParameter =
         new CommandParameter("moveMode", int.class);
-    colorControl_enhancedMoveHue_parametersList.add(enhancedMoveHue_moveMode_commandParameter);
+    colorControl_enhancedMoveHue_commandParams.add(enhancedMoveHue_moveMode_commandParameter);
 
     CommandParameter enhancedMoveHue_rate_commandParameter =
         new CommandParameter("rate", int.class);
-    colorControl_enhancedMoveHue_parametersList.add(enhancedMoveHue_rate_commandParameter);
+    colorControl_enhancedMoveHue_commandParams.add(enhancedMoveHue_rate_commandParameter);
 
     CommandParameter enhancedMoveHue_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_enhancedMoveHue_parametersList.add(enhancedMoveHue_optionsMask_commandParameter);
+    colorControl_enhancedMoveHue_commandParams.add(enhancedMoveHue_optionsMask_commandParameter);
 
     CommandParameter enhancedMoveHue_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_enhancedMoveHue_parametersList.add(
+    colorControl_enhancedMoveHue_commandParams.add(
         enhancedMoveHue_optionsOverride_commandParameter);
 
-    colorControl_enhancedMoveHue_commandInfo.parameters =
-        colorControl_enhancedMoveHue_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_enhancedMoveHue_commandInfo);
-    List<CommandParameter> colorControl_enhancedMoveToHue_parametersList = new ArrayList<>();
-    CommandInfo colorControl_enhancedMoveToHue_commandInfo = new CommandInfo();
-    colorControl_enhancedMoveToHue_commandInfo.name = "enhancedMoveToHue";
-    colorControl_enhancedMoveToHue_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_enhancedMoveHue_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_enhancedMoveHue_commandParams);
+    colorControl_ClusterCommandInfo.put(
+        "enhancedMoveHue", colorControl_enhancedMoveHue_CommandInfo);
+    List<CommandParameter> colorControl_enhancedMoveToHue_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter enhancedMoveToHue_enhancedHue_commandParameter =
         new CommandParameter("enhancedHue", int.class);
-    colorControl_enhancedMoveToHue_parametersList.add(
+    colorControl_enhancedMoveToHue_commandParams.add(
         enhancedMoveToHue_enhancedHue_commandParameter);
 
     CommandParameter enhancedMoveToHue_direction_commandParameter =
         new CommandParameter("direction", int.class);
-    colorControl_enhancedMoveToHue_parametersList.add(enhancedMoveToHue_direction_commandParameter);
+    colorControl_enhancedMoveToHue_commandParams.add(enhancedMoveToHue_direction_commandParameter);
 
     CommandParameter enhancedMoveToHue_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_enhancedMoveToHue_parametersList.add(
+    colorControl_enhancedMoveToHue_commandParams.add(
         enhancedMoveToHue_transitionTime_commandParameter);
 
     CommandParameter enhancedMoveToHue_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_enhancedMoveToHue_parametersList.add(
+    colorControl_enhancedMoveToHue_commandParams.add(
         enhancedMoveToHue_optionsMask_commandParameter);
 
     CommandParameter enhancedMoveToHue_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_enhancedMoveToHue_parametersList.add(
+    colorControl_enhancedMoveToHue_commandParams.add(
         enhancedMoveToHue_optionsOverride_commandParameter);
 
-    colorControl_enhancedMoveToHue_commandInfo.parameters =
-        colorControl_enhancedMoveToHue_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_enhancedMoveToHue_commandInfo);
-    List<CommandParameter> colorControl_enhancedMoveToHueAndSaturation_parametersList =
+    // Populate commands
+    CommandInfo colorControl_enhancedMoveToHue_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_enhancedMoveToHue_commandParams);
+    colorControl_ClusterCommandInfo.put(
+        "enhancedMoveToHue", colorControl_enhancedMoveToHue_CommandInfo);
+    List<CommandParameter> colorControl_enhancedMoveToHueAndSaturation_commandParams =
         new ArrayList<>();
-    CommandInfo colorControl_enhancedMoveToHueAndSaturation_commandInfo = new CommandInfo();
-    colorControl_enhancedMoveToHueAndSaturation_commandInfo.name = "enhancedMoveToHueAndSaturation";
-    colorControl_enhancedMoveToHueAndSaturation_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter enhancedMoveToHueAndSaturation_enhancedHue_commandParameter =
         new CommandParameter("enhancedHue", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_parametersList.add(
+    colorControl_enhancedMoveToHueAndSaturation_commandParams.add(
         enhancedMoveToHueAndSaturation_enhancedHue_commandParameter);
 
     CommandParameter enhancedMoveToHueAndSaturation_saturation_commandParameter =
         new CommandParameter("saturation", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_parametersList.add(
+    colorControl_enhancedMoveToHueAndSaturation_commandParams.add(
         enhancedMoveToHueAndSaturation_saturation_commandParameter);
 
     CommandParameter enhancedMoveToHueAndSaturation_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_parametersList.add(
+    colorControl_enhancedMoveToHueAndSaturation_commandParams.add(
         enhancedMoveToHueAndSaturation_transitionTime_commandParameter);
 
     CommandParameter enhancedMoveToHueAndSaturation_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_parametersList.add(
+    colorControl_enhancedMoveToHueAndSaturation_commandParams.add(
         enhancedMoveToHueAndSaturation_optionsMask_commandParameter);
 
     CommandParameter enhancedMoveToHueAndSaturation_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_parametersList.add(
+    colorControl_enhancedMoveToHueAndSaturation_commandParams.add(
         enhancedMoveToHueAndSaturation_optionsOverride_commandParameter);
 
-    colorControl_enhancedMoveToHueAndSaturation_commandInfo.parameters =
-        colorControl_enhancedMoveToHueAndSaturation_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_enhancedMoveToHueAndSaturation_commandInfo);
-    List<CommandParameter> colorControl_enhancedStepHue_parametersList = new ArrayList<>();
-    CommandInfo colorControl_enhancedStepHue_commandInfo = new CommandInfo();
-    colorControl_enhancedStepHue_commandInfo.name = "enhancedStepHue";
-    colorControl_enhancedStepHue_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_enhancedMoveToHueAndSaturation_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_enhancedMoveToHueAndSaturation_commandParams);
+    colorControl_ClusterCommandInfo.put(
+        "enhancedMoveToHueAndSaturation", colorControl_enhancedMoveToHueAndSaturation_CommandInfo);
+    List<CommandParameter> colorControl_enhancedStepHue_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter enhancedStepHue_stepMode_commandParameter =
         new CommandParameter("stepMode", int.class);
-    colorControl_enhancedStepHue_parametersList.add(enhancedStepHue_stepMode_commandParameter);
+    colorControl_enhancedStepHue_commandParams.add(enhancedStepHue_stepMode_commandParameter);
 
     CommandParameter enhancedStepHue_stepSize_commandParameter =
         new CommandParameter("stepSize", int.class);
-    colorControl_enhancedStepHue_parametersList.add(enhancedStepHue_stepSize_commandParameter);
+    colorControl_enhancedStepHue_commandParams.add(enhancedStepHue_stepSize_commandParameter);
 
     CommandParameter enhancedStepHue_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_enhancedStepHue_parametersList.add(
-        enhancedStepHue_transitionTime_commandParameter);
+    colorControl_enhancedStepHue_commandParams.add(enhancedStepHue_transitionTime_commandParameter);
 
     CommandParameter enhancedStepHue_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_enhancedStepHue_parametersList.add(enhancedStepHue_optionsMask_commandParameter);
+    colorControl_enhancedStepHue_commandParams.add(enhancedStepHue_optionsMask_commandParameter);
 
     CommandParameter enhancedStepHue_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_enhancedStepHue_parametersList.add(
+    colorControl_enhancedStepHue_commandParams.add(
         enhancedStepHue_optionsOverride_commandParameter);
 
-    colorControl_enhancedStepHue_commandInfo.parameters =
-        colorControl_enhancedStepHue_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_enhancedStepHue_commandInfo);
-    List<CommandParameter> colorControl_moveColor_parametersList = new ArrayList<>();
-    CommandInfo colorControl_moveColor_commandInfo = new CommandInfo();
-    colorControl_moveColor_commandInfo.name = "moveColor";
-    colorControl_moveColor_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_enhancedStepHue_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_enhancedStepHue_commandParams);
+    colorControl_ClusterCommandInfo.put(
+        "enhancedStepHue", colorControl_enhancedStepHue_CommandInfo);
+    List<CommandParameter> colorControl_moveColor_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveColor_rateX_commandParameter = new CommandParameter("rateX", int.class);
-    colorControl_moveColor_parametersList.add(moveColor_rateX_commandParameter);
+    colorControl_moveColor_commandParams.add(moveColor_rateX_commandParameter);
 
     CommandParameter moveColor_rateY_commandParameter = new CommandParameter("rateY", int.class);
-    colorControl_moveColor_parametersList.add(moveColor_rateY_commandParameter);
+    colorControl_moveColor_commandParams.add(moveColor_rateY_commandParameter);
 
     CommandParameter moveColor_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveColor_parametersList.add(moveColor_optionsMask_commandParameter);
+    colorControl_moveColor_commandParams.add(moveColor_optionsMask_commandParameter);
 
     CommandParameter moveColor_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_moveColor_parametersList.add(moveColor_optionsOverride_commandParameter);
+    colorControl_moveColor_commandParams.add(moveColor_optionsOverride_commandParameter);
 
-    colorControl_moveColor_commandInfo.parameters = colorControl_moveColor_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_moveColor_commandInfo);
-    List<CommandParameter> colorControl_moveColorTemperature_parametersList = new ArrayList<>();
-    CommandInfo colorControl_moveColorTemperature_commandInfo = new CommandInfo();
-    colorControl_moveColorTemperature_commandInfo.name = "moveColorTemperature";
-    colorControl_moveColorTemperature_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_moveColor_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_moveColor_commandParams);
+    colorControl_ClusterCommandInfo.put("moveColor", colorControl_moveColor_CommandInfo);
+    List<CommandParameter> colorControl_moveColorTemperature_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveColorTemperature_moveMode_commandParameter =
         new CommandParameter("moveMode", int.class);
-    colorControl_moveColorTemperature_parametersList.add(
+    colorControl_moveColorTemperature_commandParams.add(
         moveColorTemperature_moveMode_commandParameter);
 
     CommandParameter moveColorTemperature_rate_commandParameter =
         new CommandParameter("rate", int.class);
-    colorControl_moveColorTemperature_parametersList.add(
-        moveColorTemperature_rate_commandParameter);
+    colorControl_moveColorTemperature_commandParams.add(moveColorTemperature_rate_commandParameter);
 
     CommandParameter moveColorTemperature_colorTemperatureMinimum_commandParameter =
         new CommandParameter("colorTemperatureMinimum", int.class);
-    colorControl_moveColorTemperature_parametersList.add(
+    colorControl_moveColorTemperature_commandParams.add(
         moveColorTemperature_colorTemperatureMinimum_commandParameter);
 
     CommandParameter moveColorTemperature_colorTemperatureMaximum_commandParameter =
         new CommandParameter("colorTemperatureMaximum", int.class);
-    colorControl_moveColorTemperature_parametersList.add(
+    colorControl_moveColorTemperature_commandParams.add(
         moveColorTemperature_colorTemperatureMaximum_commandParameter);
 
     CommandParameter moveColorTemperature_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveColorTemperature_parametersList.add(
+    colorControl_moveColorTemperature_commandParams.add(
         moveColorTemperature_optionsMask_commandParameter);
 
     CommandParameter moveColorTemperature_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_moveColorTemperature_parametersList.add(
+    colorControl_moveColorTemperature_commandParams.add(
         moveColorTemperature_optionsOverride_commandParameter);
 
-    colorControl_moveColorTemperature_commandInfo.parameters =
-        colorControl_moveColorTemperature_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_moveColorTemperature_commandInfo);
-    List<CommandParameter> colorControl_moveHue_parametersList = new ArrayList<>();
-    CommandInfo colorControl_moveHue_commandInfo = new CommandInfo();
-    colorControl_moveHue_commandInfo.name = "moveHue";
-    colorControl_moveHue_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_moveColorTemperature_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_moveColorTemperature_commandParams);
+    colorControl_ClusterCommandInfo.put(
+        "moveColorTemperature", colorControl_moveColorTemperature_CommandInfo);
+    List<CommandParameter> colorControl_moveHue_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveHue_moveMode_commandParameter =
         new CommandParameter("moveMode", int.class);
-    colorControl_moveHue_parametersList.add(moveHue_moveMode_commandParameter);
+    colorControl_moveHue_commandParams.add(moveHue_moveMode_commandParameter);
 
     CommandParameter moveHue_rate_commandParameter = new CommandParameter("rate", int.class);
-    colorControl_moveHue_parametersList.add(moveHue_rate_commandParameter);
+    colorControl_moveHue_commandParams.add(moveHue_rate_commandParameter);
 
     CommandParameter moveHue_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveHue_parametersList.add(moveHue_optionsMask_commandParameter);
+    colorControl_moveHue_commandParams.add(moveHue_optionsMask_commandParameter);
 
     CommandParameter moveHue_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_moveHue_parametersList.add(moveHue_optionsOverride_commandParameter);
+    colorControl_moveHue_commandParams.add(moveHue_optionsOverride_commandParameter);
 
-    colorControl_moveHue_commandInfo.parameters = colorControl_moveHue_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_moveHue_commandInfo);
-    List<CommandParameter> colorControl_moveSaturation_parametersList = new ArrayList<>();
-    CommandInfo colorControl_moveSaturation_commandInfo = new CommandInfo();
-    colorControl_moveSaturation_commandInfo.name = "moveSaturation";
-    colorControl_moveSaturation_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_moveHue_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_moveHue_commandParams);
+    colorControl_ClusterCommandInfo.put("moveHue", colorControl_moveHue_CommandInfo);
+    List<CommandParameter> colorControl_moveSaturation_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveSaturation_moveMode_commandParameter =
         new CommandParameter("moveMode", int.class);
-    colorControl_moveSaturation_parametersList.add(moveSaturation_moveMode_commandParameter);
+    colorControl_moveSaturation_commandParams.add(moveSaturation_moveMode_commandParameter);
 
     CommandParameter moveSaturation_rate_commandParameter = new CommandParameter("rate", int.class);
-    colorControl_moveSaturation_parametersList.add(moveSaturation_rate_commandParameter);
+    colorControl_moveSaturation_commandParams.add(moveSaturation_rate_commandParameter);
 
     CommandParameter moveSaturation_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveSaturation_parametersList.add(moveSaturation_optionsMask_commandParameter);
+    colorControl_moveSaturation_commandParams.add(moveSaturation_optionsMask_commandParameter);
 
     CommandParameter moveSaturation_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_moveSaturation_parametersList.add(moveSaturation_optionsOverride_commandParameter);
+    colorControl_moveSaturation_commandParams.add(moveSaturation_optionsOverride_commandParameter);
 
-    colorControl_moveSaturation_commandInfo.parameters = colorControl_moveSaturation_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_moveSaturation_commandInfo);
-    List<CommandParameter> colorControl_moveToColor_parametersList = new ArrayList<>();
-    CommandInfo colorControl_moveToColor_commandInfo = new CommandInfo();
-    colorControl_moveToColor_commandInfo.name = "moveToColor";
-    colorControl_moveToColor_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_moveSaturation_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_moveSaturation_commandParams);
+    colorControl_ClusterCommandInfo.put("moveSaturation", colorControl_moveSaturation_CommandInfo);
+    List<CommandParameter> colorControl_moveToColor_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveToColor_colorX_commandParameter =
         new CommandParameter("colorX", int.class);
-    colorControl_moveToColor_parametersList.add(moveToColor_colorX_commandParameter);
+    colorControl_moveToColor_commandParams.add(moveToColor_colorX_commandParameter);
 
     CommandParameter moveToColor_colorY_commandParameter =
         new CommandParameter("colorY", int.class);
-    colorControl_moveToColor_parametersList.add(moveToColor_colorY_commandParameter);
+    colorControl_moveToColor_commandParams.add(moveToColor_colorY_commandParameter);
 
     CommandParameter moveToColor_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToColor_parametersList.add(moveToColor_transitionTime_commandParameter);
+    colorControl_moveToColor_commandParams.add(moveToColor_transitionTime_commandParameter);
 
     CommandParameter moveToColor_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToColor_parametersList.add(moveToColor_optionsMask_commandParameter);
+    colorControl_moveToColor_commandParams.add(moveToColor_optionsMask_commandParameter);
 
     CommandParameter moveToColor_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_moveToColor_parametersList.add(moveToColor_optionsOverride_commandParameter);
+    colorControl_moveToColor_commandParams.add(moveToColor_optionsOverride_commandParameter);
 
-    colorControl_moveToColor_commandInfo.parameters = colorControl_moveToColor_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_moveToColor_commandInfo);
-    List<CommandParameter> colorControl_moveToColorTemperature_parametersList = new ArrayList<>();
-    CommandInfo colorControl_moveToColorTemperature_commandInfo = new CommandInfo();
-    colorControl_moveToColorTemperature_commandInfo.name = "moveToColorTemperature";
-    colorControl_moveToColorTemperature_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_moveToColor_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_moveToColor_commandParams);
+    colorControl_ClusterCommandInfo.put("moveToColor", colorControl_moveToColor_CommandInfo);
+    List<CommandParameter> colorControl_moveToColorTemperature_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveToColorTemperature_colorTemperature_commandParameter =
         new CommandParameter("colorTemperature", int.class);
-    colorControl_moveToColorTemperature_parametersList.add(
+    colorControl_moveToColorTemperature_commandParams.add(
         moveToColorTemperature_colorTemperature_commandParameter);
 
     CommandParameter moveToColorTemperature_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToColorTemperature_parametersList.add(
+    colorControl_moveToColorTemperature_commandParams.add(
         moveToColorTemperature_transitionTime_commandParameter);
 
     CommandParameter moveToColorTemperature_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToColorTemperature_parametersList.add(
+    colorControl_moveToColorTemperature_commandParams.add(
         moveToColorTemperature_optionsMask_commandParameter);
 
     CommandParameter moveToColorTemperature_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_moveToColorTemperature_parametersList.add(
+    colorControl_moveToColorTemperature_commandParams.add(
         moveToColorTemperature_optionsOverride_commandParameter);
 
-    colorControl_moveToColorTemperature_commandInfo.parameters =
-        colorControl_moveToColorTemperature_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_moveToColorTemperature_commandInfo);
-    List<CommandParameter> colorControl_moveToHue_parametersList = new ArrayList<>();
-    CommandInfo colorControl_moveToHue_commandInfo = new CommandInfo();
-    colorControl_moveToHue_commandInfo.name = "moveToHue";
-    colorControl_moveToHue_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_moveToColorTemperature_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_moveToColorTemperature_commandParams);
+    colorControl_ClusterCommandInfo.put(
+        "moveToColorTemperature", colorControl_moveToColorTemperature_CommandInfo);
+    List<CommandParameter> colorControl_moveToHue_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveToHue_hue_commandParameter = new CommandParameter("hue", int.class);
-    colorControl_moveToHue_parametersList.add(moveToHue_hue_commandParameter);
+    colorControl_moveToHue_commandParams.add(moveToHue_hue_commandParameter);
 
     CommandParameter moveToHue_direction_commandParameter =
         new CommandParameter("direction", int.class);
-    colorControl_moveToHue_parametersList.add(moveToHue_direction_commandParameter);
+    colorControl_moveToHue_commandParams.add(moveToHue_direction_commandParameter);
 
     CommandParameter moveToHue_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToHue_parametersList.add(moveToHue_transitionTime_commandParameter);
+    colorControl_moveToHue_commandParams.add(moveToHue_transitionTime_commandParameter);
 
     CommandParameter moveToHue_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToHue_parametersList.add(moveToHue_optionsMask_commandParameter);
+    colorControl_moveToHue_commandParams.add(moveToHue_optionsMask_commandParameter);
 
     CommandParameter moveToHue_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_moveToHue_parametersList.add(moveToHue_optionsOverride_commandParameter);
+    colorControl_moveToHue_commandParams.add(moveToHue_optionsOverride_commandParameter);
 
-    colorControl_moveToHue_commandInfo.parameters = colorControl_moveToHue_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_moveToHue_commandInfo);
-    List<CommandParameter> colorControl_moveToHueAndSaturation_parametersList = new ArrayList<>();
-    CommandInfo colorControl_moveToHueAndSaturation_commandInfo = new CommandInfo();
-    colorControl_moveToHueAndSaturation_commandInfo.name = "moveToHueAndSaturation";
-    colorControl_moveToHueAndSaturation_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_moveToHue_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_moveToHue_commandParams);
+    colorControl_ClusterCommandInfo.put("moveToHue", colorControl_moveToHue_CommandInfo);
+    List<CommandParameter> colorControl_moveToHueAndSaturation_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveToHueAndSaturation_hue_commandParameter =
         new CommandParameter("hue", int.class);
-    colorControl_moveToHueAndSaturation_parametersList.add(
+    colorControl_moveToHueAndSaturation_commandParams.add(
         moveToHueAndSaturation_hue_commandParameter);
 
     CommandParameter moveToHueAndSaturation_saturation_commandParameter =
         new CommandParameter("saturation", int.class);
-    colorControl_moveToHueAndSaturation_parametersList.add(
+    colorControl_moveToHueAndSaturation_commandParams.add(
         moveToHueAndSaturation_saturation_commandParameter);
 
     CommandParameter moveToHueAndSaturation_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToHueAndSaturation_parametersList.add(
+    colorControl_moveToHueAndSaturation_commandParams.add(
         moveToHueAndSaturation_transitionTime_commandParameter);
 
     CommandParameter moveToHueAndSaturation_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToHueAndSaturation_parametersList.add(
+    colorControl_moveToHueAndSaturation_commandParams.add(
         moveToHueAndSaturation_optionsMask_commandParameter);
 
     CommandParameter moveToHueAndSaturation_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_moveToHueAndSaturation_parametersList.add(
+    colorControl_moveToHueAndSaturation_commandParams.add(
         moveToHueAndSaturation_optionsOverride_commandParameter);
 
-    colorControl_moveToHueAndSaturation_commandInfo.parameters =
-        colorControl_moveToHueAndSaturation_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_moveToHueAndSaturation_commandInfo);
-    List<CommandParameter> colorControl_moveToSaturation_parametersList = new ArrayList<>();
-    CommandInfo colorControl_moveToSaturation_commandInfo = new CommandInfo();
-    colorControl_moveToSaturation_commandInfo.name = "moveToSaturation";
-    colorControl_moveToSaturation_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_moveToHueAndSaturation_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_moveToHueAndSaturation_commandParams);
+    colorControl_ClusterCommandInfo.put(
+        "moveToHueAndSaturation", colorControl_moveToHueAndSaturation_CommandInfo);
+    List<CommandParameter> colorControl_moveToSaturation_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveToSaturation_saturation_commandParameter =
         new CommandParameter("saturation", int.class);
-    colorControl_moveToSaturation_parametersList.add(moveToSaturation_saturation_commandParameter);
+    colorControl_moveToSaturation_commandParams.add(moveToSaturation_saturation_commandParameter);
 
     CommandParameter moveToSaturation_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToSaturation_parametersList.add(
+    colorControl_moveToSaturation_commandParams.add(
         moveToSaturation_transitionTime_commandParameter);
 
     CommandParameter moveToSaturation_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToSaturation_parametersList.add(moveToSaturation_optionsMask_commandParameter);
+    colorControl_moveToSaturation_commandParams.add(moveToSaturation_optionsMask_commandParameter);
 
     CommandParameter moveToSaturation_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_moveToSaturation_parametersList.add(
+    colorControl_moveToSaturation_commandParams.add(
         moveToSaturation_optionsOverride_commandParameter);
 
-    colorControl_moveToSaturation_commandInfo.parameters =
-        colorControl_moveToSaturation_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_moveToSaturation_commandInfo);
-    List<CommandParameter> colorControl_stepColor_parametersList = new ArrayList<>();
-    CommandInfo colorControl_stepColor_commandInfo = new CommandInfo();
-    colorControl_stepColor_commandInfo.name = "stepColor";
-    colorControl_stepColor_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_moveToSaturation_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_moveToSaturation_commandParams);
+    colorControl_ClusterCommandInfo.put(
+        "moveToSaturation", colorControl_moveToSaturation_CommandInfo);
+    List<CommandParameter> colorControl_stepColor_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter stepColor_stepX_commandParameter = new CommandParameter("stepX", int.class);
-    colorControl_stepColor_parametersList.add(stepColor_stepX_commandParameter);
+    colorControl_stepColor_commandParams.add(stepColor_stepX_commandParameter);
 
     CommandParameter stepColor_stepY_commandParameter = new CommandParameter("stepY", int.class);
-    colorControl_stepColor_parametersList.add(stepColor_stepY_commandParameter);
+    colorControl_stepColor_commandParams.add(stepColor_stepY_commandParameter);
 
     CommandParameter stepColor_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_stepColor_parametersList.add(stepColor_transitionTime_commandParameter);
+    colorControl_stepColor_commandParams.add(stepColor_transitionTime_commandParameter);
 
     CommandParameter stepColor_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stepColor_parametersList.add(stepColor_optionsMask_commandParameter);
+    colorControl_stepColor_commandParams.add(stepColor_optionsMask_commandParameter);
 
     CommandParameter stepColor_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_stepColor_parametersList.add(stepColor_optionsOverride_commandParameter);
+    colorControl_stepColor_commandParams.add(stepColor_optionsOverride_commandParameter);
 
-    colorControl_stepColor_commandInfo.parameters = colorControl_stepColor_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_stepColor_commandInfo);
-    List<CommandParameter> colorControl_stepColorTemperature_parametersList = new ArrayList<>();
-    CommandInfo colorControl_stepColorTemperature_commandInfo = new CommandInfo();
-    colorControl_stepColorTemperature_commandInfo.name = "stepColorTemperature";
-    colorControl_stepColorTemperature_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_stepColor_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_stepColor_commandParams);
+    colorControl_ClusterCommandInfo.put("stepColor", colorControl_stepColor_CommandInfo);
+    List<CommandParameter> colorControl_stepColorTemperature_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter stepColorTemperature_stepMode_commandParameter =
         new CommandParameter("stepMode", int.class);
-    colorControl_stepColorTemperature_parametersList.add(
+    colorControl_stepColorTemperature_commandParams.add(
         stepColorTemperature_stepMode_commandParameter);
 
     CommandParameter stepColorTemperature_stepSize_commandParameter =
         new CommandParameter("stepSize", int.class);
-    colorControl_stepColorTemperature_parametersList.add(
+    colorControl_stepColorTemperature_commandParams.add(
         stepColorTemperature_stepSize_commandParameter);
 
     CommandParameter stepColorTemperature_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_stepColorTemperature_parametersList.add(
+    colorControl_stepColorTemperature_commandParams.add(
         stepColorTemperature_transitionTime_commandParameter);
 
     CommandParameter stepColorTemperature_colorTemperatureMinimum_commandParameter =
         new CommandParameter("colorTemperatureMinimum", int.class);
-    colorControl_stepColorTemperature_parametersList.add(
+    colorControl_stepColorTemperature_commandParams.add(
         stepColorTemperature_colorTemperatureMinimum_commandParameter);
 
     CommandParameter stepColorTemperature_colorTemperatureMaximum_commandParameter =
         new CommandParameter("colorTemperatureMaximum", int.class);
-    colorControl_stepColorTemperature_parametersList.add(
+    colorControl_stepColorTemperature_commandParams.add(
         stepColorTemperature_colorTemperatureMaximum_commandParameter);
 
     CommandParameter stepColorTemperature_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stepColorTemperature_parametersList.add(
+    colorControl_stepColorTemperature_commandParams.add(
         stepColorTemperature_optionsMask_commandParameter);
 
     CommandParameter stepColorTemperature_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_stepColorTemperature_parametersList.add(
+    colorControl_stepColorTemperature_commandParams.add(
         stepColorTemperature_optionsOverride_commandParameter);
 
-    colorControl_stepColorTemperature_commandInfo.parameters =
-        colorControl_stepColorTemperature_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_stepColorTemperature_commandInfo);
-    List<CommandParameter> colorControl_stepHue_parametersList = new ArrayList<>();
-    CommandInfo colorControl_stepHue_commandInfo = new CommandInfo();
-    colorControl_stepHue_commandInfo.name = "stepHue";
-    colorControl_stepHue_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_stepColorTemperature_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_stepColorTemperature_commandParams);
+    colorControl_ClusterCommandInfo.put(
+        "stepColorTemperature", colorControl_stepColorTemperature_CommandInfo);
+    List<CommandParameter> colorControl_stepHue_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter stepHue_stepMode_commandParameter =
         new CommandParameter("stepMode", int.class);
-    colorControl_stepHue_parametersList.add(stepHue_stepMode_commandParameter);
+    colorControl_stepHue_commandParams.add(stepHue_stepMode_commandParameter);
 
     CommandParameter stepHue_stepSize_commandParameter =
         new CommandParameter("stepSize", int.class);
-    colorControl_stepHue_parametersList.add(stepHue_stepSize_commandParameter);
+    colorControl_stepHue_commandParams.add(stepHue_stepSize_commandParameter);
 
     CommandParameter stepHue_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_stepHue_parametersList.add(stepHue_transitionTime_commandParameter);
+    colorControl_stepHue_commandParams.add(stepHue_transitionTime_commandParameter);
 
     CommandParameter stepHue_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stepHue_parametersList.add(stepHue_optionsMask_commandParameter);
+    colorControl_stepHue_commandParams.add(stepHue_optionsMask_commandParameter);
 
     CommandParameter stepHue_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_stepHue_parametersList.add(stepHue_optionsOverride_commandParameter);
+    colorControl_stepHue_commandParams.add(stepHue_optionsOverride_commandParameter);
 
-    colorControl_stepHue_commandInfo.parameters = colorControl_stepHue_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_stepHue_commandInfo);
-    List<CommandParameter> colorControl_stepSaturation_parametersList = new ArrayList<>();
-    CommandInfo colorControl_stepSaturation_commandInfo = new CommandInfo();
-    colorControl_stepSaturation_commandInfo.name = "stepSaturation";
-    colorControl_stepSaturation_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_stepHue_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_stepHue_commandParams);
+    colorControl_ClusterCommandInfo.put("stepHue", colorControl_stepHue_CommandInfo);
+    List<CommandParameter> colorControl_stepSaturation_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter stepSaturation_stepMode_commandParameter =
         new CommandParameter("stepMode", int.class);
-    colorControl_stepSaturation_parametersList.add(stepSaturation_stepMode_commandParameter);
+    colorControl_stepSaturation_commandParams.add(stepSaturation_stepMode_commandParameter);
 
     CommandParameter stepSaturation_stepSize_commandParameter =
         new CommandParameter("stepSize", int.class);
-    colorControl_stepSaturation_parametersList.add(stepSaturation_stepSize_commandParameter);
+    colorControl_stepSaturation_commandParams.add(stepSaturation_stepSize_commandParameter);
 
     CommandParameter stepSaturation_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_stepSaturation_parametersList.add(stepSaturation_transitionTime_commandParameter);
+    colorControl_stepSaturation_commandParams.add(stepSaturation_transitionTime_commandParameter);
 
     CommandParameter stepSaturation_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stepSaturation_parametersList.add(stepSaturation_optionsMask_commandParameter);
+    colorControl_stepSaturation_commandParams.add(stepSaturation_optionsMask_commandParameter);
 
     CommandParameter stepSaturation_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_stepSaturation_parametersList.add(stepSaturation_optionsOverride_commandParameter);
+    colorControl_stepSaturation_commandParams.add(stepSaturation_optionsOverride_commandParameter);
 
-    colorControl_stepSaturation_commandInfo.parameters = colorControl_stepSaturation_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_stepSaturation_commandInfo);
-    List<CommandParameter> colorControl_stopMoveStep_parametersList = new ArrayList<>();
-    CommandInfo colorControl_stopMoveStep_commandInfo = new CommandInfo();
-    colorControl_stopMoveStep_commandInfo.name = "stopMoveStep";
-    colorControl_stopMoveStep_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo colorControl_stepSaturation_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_stepSaturation_commandParams);
+    colorControl_ClusterCommandInfo.put("stepSaturation", colorControl_stepSaturation_CommandInfo);
+    List<CommandParameter> colorControl_stopMoveStep_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter stopMoveStep_optionsMask_commandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stopMoveStep_parametersList.add(stopMoveStep_optionsMask_commandParameter);
+    colorControl_stopMoveStep_commandParams.add(stopMoveStep_optionsMask_commandParameter);
 
     CommandParameter stopMoveStep_optionsOverride_commandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_stopMoveStep_parametersList.add(stopMoveStep_optionsOverride_commandParameter);
+    colorControl_stopMoveStep_commandParams.add(stopMoveStep_optionsOverride_commandParameter);
 
-    colorControl_stopMoveStep_commandInfo.parameters = colorControl_stopMoveStep_parametersList;
-    colorControl_clusterInfo.commands.add(colorControl_stopMoveStep_commandInfo);
-    clusterInfoMapping.put("colorControl", colorControl_clusterInfo);
-    ClusterInfo contentLauncher_clusterInfo = new ClusterInfo("contentLauncher");
-    List<CommandParameter> contentLauncher_launchContent_parametersList = new ArrayList<>();
-    CommandInfo contentLauncher_launchContent_commandInfo = new CommandInfo();
-    contentLauncher_launchContent_commandInfo.name = "launchContent";
-    contentLauncher_launchContent_commandInfo.callbackClass =
-        ChipClusters.ContentLauncherCluster.LaunchContentResponseCallback.class;
+    // Populate commands
+    CommandInfo colorControl_stopMoveStep_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            colorControl_stopMoveStep_commandParams);
+    colorControl_ClusterCommandInfo.put("stopMoveStep", colorControl_stopMoveStep_CommandInfo);
+    // Populate cluster
+    ClusterInfo colorControl_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ColorControlCluster(ptr, endpointId),
+            colorControl_ClusterCommandInfo);
+    clusterMap.put("colorControl", colorControl_clusterInfo);
+    Map<String, CommandInfo> contentLauncher_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> contentLauncher_launchContent_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter launchContent_autoPlay_commandParameter =
         new CommandParameter("autoPlay", boolean.class);
-    contentLauncher_launchContent_parametersList.add(launchContent_autoPlay_commandParameter);
+    contentLauncher_launchContent_commandParams.add(launchContent_autoPlay_commandParameter);
 
     CommandParameter launchContent_data_commandParameter =
         new CommandParameter("data", String.class);
-    contentLauncher_launchContent_parametersList.add(launchContent_data_commandParameter);
+    contentLauncher_launchContent_commandParams.add(launchContent_data_commandParameter);
 
-    contentLauncher_launchContent_commandInfo.parameters =
-        contentLauncher_launchContent_parametersList;
-    contentLauncher_clusterInfo.commands.add(contentLauncher_launchContent_commandInfo);
-    List<CommandParameter> contentLauncher_launchURL_parametersList = new ArrayList<>();
-    CommandInfo contentLauncher_launchURL_commandInfo = new CommandInfo();
-    contentLauncher_launchURL_commandInfo.name = "launchURL";
-    contentLauncher_launchURL_commandInfo.callbackClass =
-        ChipClusters.ContentLauncherCluster.LaunchURLResponseCallback.class;
+    // Populate commands
+    CommandInfo contentLauncher_launchContent_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            contentLauncher_launchContent_commandParams);
+    contentLauncher_ClusterCommandInfo.put(
+        "launchContent", contentLauncher_launchContent_CommandInfo);
+    List<CommandParameter> contentLauncher_launchURL_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter launchURL_contentURL_commandParameter =
         new CommandParameter("contentURL", String.class);
-    contentLauncher_launchURL_parametersList.add(launchURL_contentURL_commandParameter);
+    contentLauncher_launchURL_commandParams.add(launchURL_contentURL_commandParameter);
 
     CommandParameter launchURL_displayString_commandParameter =
         new CommandParameter("displayString", String.class);
-    contentLauncher_launchURL_parametersList.add(launchURL_displayString_commandParameter);
+    contentLauncher_launchURL_commandParams.add(launchURL_displayString_commandParameter);
 
-    contentLauncher_launchURL_commandInfo.parameters = contentLauncher_launchURL_parametersList;
-    contentLauncher_clusterInfo.commands.add(contentLauncher_launchURL_commandInfo);
-    clusterInfoMapping.put("contentLauncher", contentLauncher_clusterInfo);
-    ClusterInfo descriptor_clusterInfo = new ClusterInfo("descriptor");
-    clusterInfoMapping.put("descriptor", descriptor_clusterInfo);
-    ClusterInfo diagnosticLogs_clusterInfo = new ClusterInfo("diagnosticLogs");
-    List<CommandParameter> diagnosticLogs_retrieveLogsRequest_parametersList = new ArrayList<>();
-    CommandInfo diagnosticLogs_retrieveLogsRequest_commandInfo = new CommandInfo();
-    diagnosticLogs_retrieveLogsRequest_commandInfo.name = "retrieveLogsRequest";
-    diagnosticLogs_retrieveLogsRequest_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo contentLauncher_launchURL_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            contentLauncher_launchURL_commandParams);
+    contentLauncher_ClusterCommandInfo.put("launchURL", contentLauncher_launchURL_CommandInfo);
+    // Populate cluster
+    ClusterInfo contentLauncher_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ContentLauncherCluster(ptr, endpointId),
+            contentLauncher_ClusterCommandInfo);
+    clusterMap.put("contentLauncher", contentLauncher_clusterInfo);
+    Map<String, CommandInfo> descriptor_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo descriptor_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.DescriptorCluster(ptr, endpointId),
+            descriptor_ClusterCommandInfo);
+    clusterMap.put("descriptor", descriptor_clusterInfo);
+    Map<String, CommandInfo> diagnosticLogs_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> diagnosticLogs_retrieveLogsRequest_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter retrieveLogsRequest_intent_commandParameter =
         new CommandParameter("intent", int.class);
-    diagnosticLogs_retrieveLogsRequest_parametersList.add(
+    diagnosticLogs_retrieveLogsRequest_commandParams.add(
         retrieveLogsRequest_intent_commandParameter);
 
     CommandParameter retrieveLogsRequest_requestedProtocol_commandParameter =
         new CommandParameter("requestedProtocol", int.class);
-    diagnosticLogs_retrieveLogsRequest_parametersList.add(
+    diagnosticLogs_retrieveLogsRequest_commandParams.add(
         retrieveLogsRequest_requestedProtocol_commandParameter);
 
     CommandParameter retrieveLogsRequest_transferFileDesignator_commandParameter =
         new CommandParameter("transferFileDesignator", byte[].class);
-    diagnosticLogs_retrieveLogsRequest_parametersList.add(
+    diagnosticLogs_retrieveLogsRequest_commandParams.add(
         retrieveLogsRequest_transferFileDesignator_commandParameter);
 
-    diagnosticLogs_retrieveLogsRequest_commandInfo.parameters =
-        diagnosticLogs_retrieveLogsRequest_parametersList;
-    diagnosticLogs_clusterInfo.commands.add(diagnosticLogs_retrieveLogsRequest_commandInfo);
-    clusterInfoMapping.put("diagnosticLogs", diagnosticLogs_clusterInfo);
-    ClusterInfo doorLock_clusterInfo = new ClusterInfo("doorLock");
-    List<CommandParameter> doorLock_clearAllPins_parametersList = new ArrayList<>();
-    CommandInfo doorLock_clearAllPins_commandInfo = new CommandInfo();
-    doorLock_clearAllPins_commandInfo.name = "clearAllPins";
-    doorLock_clearAllPins_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.ClearAllPinsResponseCallback.class;
-    doorLock_clearAllPins_commandInfo.parameters = doorLock_clearAllPins_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_clearAllPins_commandInfo);
-    List<CommandParameter> doorLock_clearAllRfids_parametersList = new ArrayList<>();
-    CommandInfo doorLock_clearAllRfids_commandInfo = new CommandInfo();
-    doorLock_clearAllRfids_commandInfo.name = "clearAllRfids";
-    doorLock_clearAllRfids_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.ClearAllRfidsResponseCallback.class;
-    doorLock_clearAllRfids_commandInfo.parameters = doorLock_clearAllRfids_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_clearAllRfids_commandInfo);
-    List<CommandParameter> doorLock_clearHolidaySchedule_parametersList = new ArrayList<>();
-    CommandInfo doorLock_clearHolidaySchedule_commandInfo = new CommandInfo();
-    doorLock_clearHolidaySchedule_commandInfo.name = "clearHolidaySchedule";
-    doorLock_clearHolidaySchedule_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.ClearHolidayScheduleResponseCallback.class;
+    // Populate commands
+    CommandInfo diagnosticLogs_retrieveLogsRequest_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            diagnosticLogs_retrieveLogsRequest_commandParams);
+    diagnosticLogs_ClusterCommandInfo.put(
+        "retrieveLogsRequest", diagnosticLogs_retrieveLogsRequest_CommandInfo);
+    // Populate cluster
+    ClusterInfo diagnosticLogs_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.DiagnosticLogsCluster(ptr, endpointId),
+            diagnosticLogs_ClusterCommandInfo);
+    clusterMap.put("diagnosticLogs", diagnosticLogs_clusterInfo);
+    Map<String, CommandInfo> doorLock_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> doorLock_clearAllPins_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo doorLock_clearAllPins_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_clearAllPins_commandParams);
+    doorLock_ClusterCommandInfo.put("clearAllPins", doorLock_clearAllPins_CommandInfo);
+    List<CommandParameter> doorLock_clearAllRfids_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo doorLock_clearAllRfids_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_clearAllRfids_commandParams);
+    doorLock_ClusterCommandInfo.put("clearAllRfids", doorLock_clearAllRfids_CommandInfo);
+    List<CommandParameter> doorLock_clearHolidaySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter clearHolidaySchedule_scheduleId_commandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_clearHolidaySchedule_parametersList.add(
+    doorLock_clearHolidaySchedule_commandParams.add(
         clearHolidaySchedule_scheduleId_commandParameter);
 
-    doorLock_clearHolidaySchedule_commandInfo.parameters =
-        doorLock_clearHolidaySchedule_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_clearHolidaySchedule_commandInfo);
-    List<CommandParameter> doorLock_clearPin_parametersList = new ArrayList<>();
-    CommandInfo doorLock_clearPin_commandInfo = new CommandInfo();
-    doorLock_clearPin_commandInfo.name = "clearPin";
-    doorLock_clearPin_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.ClearPinResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_clearHolidaySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_clearHolidaySchedule_commandParams);
+    doorLock_ClusterCommandInfo.put(
+        "clearHolidaySchedule", doorLock_clearHolidaySchedule_CommandInfo);
+    List<CommandParameter> doorLock_clearPin_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter clearPin_userId_commandParameter = new CommandParameter("userId", int.class);
-    doorLock_clearPin_parametersList.add(clearPin_userId_commandParameter);
+    doorLock_clearPin_commandParams.add(clearPin_userId_commandParameter);
 
-    doorLock_clearPin_commandInfo.parameters = doorLock_clearPin_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_clearPin_commandInfo);
-    List<CommandParameter> doorLock_clearRfid_parametersList = new ArrayList<>();
-    CommandInfo doorLock_clearRfid_commandInfo = new CommandInfo();
-    doorLock_clearRfid_commandInfo.name = "clearRfid";
-    doorLock_clearRfid_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.ClearRfidResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_clearPin_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_clearPin_commandParams);
+    doorLock_ClusterCommandInfo.put("clearPin", doorLock_clearPin_CommandInfo);
+    List<CommandParameter> doorLock_clearRfid_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter clearRfid_userId_commandParameter = new CommandParameter("userId", int.class);
-    doorLock_clearRfid_parametersList.add(clearRfid_userId_commandParameter);
+    doorLock_clearRfid_commandParams.add(clearRfid_userId_commandParameter);
 
-    doorLock_clearRfid_commandInfo.parameters = doorLock_clearRfid_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_clearRfid_commandInfo);
-    List<CommandParameter> doorLock_clearWeekdaySchedule_parametersList = new ArrayList<>();
-    CommandInfo doorLock_clearWeekdaySchedule_commandInfo = new CommandInfo();
-    doorLock_clearWeekdaySchedule_commandInfo.name = "clearWeekdaySchedule";
-    doorLock_clearWeekdaySchedule_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.ClearWeekdayScheduleResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_clearRfid_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_clearRfid_commandParams);
+    doorLock_ClusterCommandInfo.put("clearRfid", doorLock_clearRfid_CommandInfo);
+    List<CommandParameter> doorLock_clearWeekdaySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter clearWeekdaySchedule_scheduleId_commandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_clearWeekdaySchedule_parametersList.add(
+    doorLock_clearWeekdaySchedule_commandParams.add(
         clearWeekdaySchedule_scheduleId_commandParameter);
 
     CommandParameter clearWeekdaySchedule_userId_commandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_clearWeekdaySchedule_parametersList.add(clearWeekdaySchedule_userId_commandParameter);
+    doorLock_clearWeekdaySchedule_commandParams.add(clearWeekdaySchedule_userId_commandParameter);
 
-    doorLock_clearWeekdaySchedule_commandInfo.parameters =
-        doorLock_clearWeekdaySchedule_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_clearWeekdaySchedule_commandInfo);
-    List<CommandParameter> doorLock_clearYeardaySchedule_parametersList = new ArrayList<>();
-    CommandInfo doorLock_clearYeardaySchedule_commandInfo = new CommandInfo();
-    doorLock_clearYeardaySchedule_commandInfo.name = "clearYeardaySchedule";
-    doorLock_clearYeardaySchedule_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.ClearYeardayScheduleResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_clearWeekdaySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_clearWeekdaySchedule_commandParams);
+    doorLock_ClusterCommandInfo.put(
+        "clearWeekdaySchedule", doorLock_clearWeekdaySchedule_CommandInfo);
+    List<CommandParameter> doorLock_clearYeardaySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter clearYeardaySchedule_scheduleId_commandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_clearYeardaySchedule_parametersList.add(
+    doorLock_clearYeardaySchedule_commandParams.add(
         clearYeardaySchedule_scheduleId_commandParameter);
 
     CommandParameter clearYeardaySchedule_userId_commandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_clearYeardaySchedule_parametersList.add(clearYeardaySchedule_userId_commandParameter);
+    doorLock_clearYeardaySchedule_commandParams.add(clearYeardaySchedule_userId_commandParameter);
 
-    doorLock_clearYeardaySchedule_commandInfo.parameters =
-        doorLock_clearYeardaySchedule_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_clearYeardaySchedule_commandInfo);
-    List<CommandParameter> doorLock_getHolidaySchedule_parametersList = new ArrayList<>();
-    CommandInfo doorLock_getHolidaySchedule_commandInfo = new CommandInfo();
-    doorLock_getHolidaySchedule_commandInfo.name = "getHolidaySchedule";
-    doorLock_getHolidaySchedule_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.GetHolidayScheduleResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_clearYeardaySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_clearYeardaySchedule_commandParams);
+    doorLock_ClusterCommandInfo.put(
+        "clearYeardaySchedule", doorLock_clearYeardaySchedule_CommandInfo);
+    List<CommandParameter> doorLock_getHolidaySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getHolidaySchedule_scheduleId_commandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_getHolidaySchedule_parametersList.add(getHolidaySchedule_scheduleId_commandParameter);
+    doorLock_getHolidaySchedule_commandParams.add(getHolidaySchedule_scheduleId_commandParameter);
 
-    doorLock_getHolidaySchedule_commandInfo.parameters = doorLock_getHolidaySchedule_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_getHolidaySchedule_commandInfo);
-    List<CommandParameter> doorLock_getLogRecord_parametersList = new ArrayList<>();
-    CommandInfo doorLock_getLogRecord_commandInfo = new CommandInfo();
-    doorLock_getLogRecord_commandInfo.name = "getLogRecord";
-    doorLock_getLogRecord_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.GetLogRecordResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_getHolidaySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_getHolidaySchedule_commandParams);
+    doorLock_ClusterCommandInfo.put("getHolidaySchedule", doorLock_getHolidaySchedule_CommandInfo);
+    List<CommandParameter> doorLock_getLogRecord_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getLogRecord_logIndex_commandParameter =
         new CommandParameter("logIndex", int.class);
-    doorLock_getLogRecord_parametersList.add(getLogRecord_logIndex_commandParameter);
+    doorLock_getLogRecord_commandParams.add(getLogRecord_logIndex_commandParameter);
 
-    doorLock_getLogRecord_commandInfo.parameters = doorLock_getLogRecord_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_getLogRecord_commandInfo);
-    List<CommandParameter> doorLock_getPin_parametersList = new ArrayList<>();
-    CommandInfo doorLock_getPin_commandInfo = new CommandInfo();
-    doorLock_getPin_commandInfo.name = "getPin";
-    doorLock_getPin_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.GetPinResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_getLogRecord_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_getLogRecord_commandParams);
+    doorLock_ClusterCommandInfo.put("getLogRecord", doorLock_getLogRecord_CommandInfo);
+    List<CommandParameter> doorLock_getPin_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getPin_userId_commandParameter = new CommandParameter("userId", int.class);
-    doorLock_getPin_parametersList.add(getPin_userId_commandParameter);
+    doorLock_getPin_commandParams.add(getPin_userId_commandParameter);
 
-    doorLock_getPin_commandInfo.parameters = doorLock_getPin_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_getPin_commandInfo);
-    List<CommandParameter> doorLock_getRfid_parametersList = new ArrayList<>();
-    CommandInfo doorLock_getRfid_commandInfo = new CommandInfo();
-    doorLock_getRfid_commandInfo.name = "getRfid";
-    doorLock_getRfid_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.GetRfidResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_getPin_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_getPin_commandParams);
+    doorLock_ClusterCommandInfo.put("getPin", doorLock_getPin_CommandInfo);
+    List<CommandParameter> doorLock_getRfid_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getRfid_userId_commandParameter = new CommandParameter("userId", int.class);
-    doorLock_getRfid_parametersList.add(getRfid_userId_commandParameter);
+    doorLock_getRfid_commandParams.add(getRfid_userId_commandParameter);
 
-    doorLock_getRfid_commandInfo.parameters = doorLock_getRfid_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_getRfid_commandInfo);
-    List<CommandParameter> doorLock_getUserType_parametersList = new ArrayList<>();
-    CommandInfo doorLock_getUserType_commandInfo = new CommandInfo();
-    doorLock_getUserType_commandInfo.name = "getUserType";
-    doorLock_getUserType_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.GetUserTypeResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_getRfid_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_getRfid_commandParams);
+    doorLock_ClusterCommandInfo.put("getRfid", doorLock_getRfid_CommandInfo);
+    List<CommandParameter> doorLock_getUserType_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getUserType_userId_commandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_getUserType_parametersList.add(getUserType_userId_commandParameter);
+    doorLock_getUserType_commandParams.add(getUserType_userId_commandParameter);
 
-    doorLock_getUserType_commandInfo.parameters = doorLock_getUserType_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_getUserType_commandInfo);
-    List<CommandParameter> doorLock_getWeekdaySchedule_parametersList = new ArrayList<>();
-    CommandInfo doorLock_getWeekdaySchedule_commandInfo = new CommandInfo();
-    doorLock_getWeekdaySchedule_commandInfo.name = "getWeekdaySchedule";
-    doorLock_getWeekdaySchedule_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.GetWeekdayScheduleResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_getUserType_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_getUserType_commandParams);
+    doorLock_ClusterCommandInfo.put("getUserType", doorLock_getUserType_CommandInfo);
+    List<CommandParameter> doorLock_getWeekdaySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getWeekdaySchedule_scheduleId_commandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_getWeekdaySchedule_parametersList.add(getWeekdaySchedule_scheduleId_commandParameter);
+    doorLock_getWeekdaySchedule_commandParams.add(getWeekdaySchedule_scheduleId_commandParameter);
 
     CommandParameter getWeekdaySchedule_userId_commandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_getWeekdaySchedule_parametersList.add(getWeekdaySchedule_userId_commandParameter);
+    doorLock_getWeekdaySchedule_commandParams.add(getWeekdaySchedule_userId_commandParameter);
 
-    doorLock_getWeekdaySchedule_commandInfo.parameters = doorLock_getWeekdaySchedule_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_getWeekdaySchedule_commandInfo);
-    List<CommandParameter> doorLock_getYeardaySchedule_parametersList = new ArrayList<>();
-    CommandInfo doorLock_getYeardaySchedule_commandInfo = new CommandInfo();
-    doorLock_getYeardaySchedule_commandInfo.name = "getYeardaySchedule";
-    doorLock_getYeardaySchedule_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.GetYeardayScheduleResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_getWeekdaySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_getWeekdaySchedule_commandParams);
+    doorLock_ClusterCommandInfo.put("getWeekdaySchedule", doorLock_getWeekdaySchedule_CommandInfo);
+    List<CommandParameter> doorLock_getYeardaySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getYeardaySchedule_scheduleId_commandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_getYeardaySchedule_parametersList.add(getYeardaySchedule_scheduleId_commandParameter);
+    doorLock_getYeardaySchedule_commandParams.add(getYeardaySchedule_scheduleId_commandParameter);
 
     CommandParameter getYeardaySchedule_userId_commandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_getYeardaySchedule_parametersList.add(getYeardaySchedule_userId_commandParameter);
+    doorLock_getYeardaySchedule_commandParams.add(getYeardaySchedule_userId_commandParameter);
 
-    doorLock_getYeardaySchedule_commandInfo.parameters = doorLock_getYeardaySchedule_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_getYeardaySchedule_commandInfo);
-    List<CommandParameter> doorLock_lockDoor_parametersList = new ArrayList<>();
-    CommandInfo doorLock_lockDoor_commandInfo = new CommandInfo();
-    doorLock_lockDoor_commandInfo.name = "lockDoor";
-    doorLock_lockDoor_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.LockDoorResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_getYeardaySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_getYeardaySchedule_commandParams);
+    doorLock_ClusterCommandInfo.put("getYeardaySchedule", doorLock_getYeardaySchedule_CommandInfo);
+    List<CommandParameter> doorLock_lockDoor_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter lockDoor_pin_commandParameter = new CommandParameter("pin", byte[].class);
-    doorLock_lockDoor_parametersList.add(lockDoor_pin_commandParameter);
+    doorLock_lockDoor_commandParams.add(lockDoor_pin_commandParameter);
 
-    doorLock_lockDoor_commandInfo.parameters = doorLock_lockDoor_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_lockDoor_commandInfo);
-    List<CommandParameter> doorLock_setHolidaySchedule_parametersList = new ArrayList<>();
-    CommandInfo doorLock_setHolidaySchedule_commandInfo = new CommandInfo();
-    doorLock_setHolidaySchedule_commandInfo.name = "setHolidaySchedule";
-    doorLock_setHolidaySchedule_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.SetHolidayScheduleResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_lockDoor_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_lockDoor_commandParams);
+    doorLock_ClusterCommandInfo.put("lockDoor", doorLock_lockDoor_CommandInfo);
+    List<CommandParameter> doorLock_setHolidaySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter setHolidaySchedule_scheduleId_commandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_setHolidaySchedule_parametersList.add(setHolidaySchedule_scheduleId_commandParameter);
+    doorLock_setHolidaySchedule_commandParams.add(setHolidaySchedule_scheduleId_commandParameter);
 
     CommandParameter setHolidaySchedule_localStartTime_commandParameter =
         new CommandParameter("localStartTime", long.class);
-    doorLock_setHolidaySchedule_parametersList.add(
+    doorLock_setHolidaySchedule_commandParams.add(
         setHolidaySchedule_localStartTime_commandParameter);
 
     CommandParameter setHolidaySchedule_localEndTime_commandParameter =
         new CommandParameter("localEndTime", long.class);
-    doorLock_setHolidaySchedule_parametersList.add(
-        setHolidaySchedule_localEndTime_commandParameter);
+    doorLock_setHolidaySchedule_commandParams.add(setHolidaySchedule_localEndTime_commandParameter);
 
     CommandParameter setHolidaySchedule_operatingModeDuringHoliday_commandParameter =
         new CommandParameter("operatingModeDuringHoliday", int.class);
-    doorLock_setHolidaySchedule_parametersList.add(
+    doorLock_setHolidaySchedule_commandParams.add(
         setHolidaySchedule_operatingModeDuringHoliday_commandParameter);
 
-    doorLock_setHolidaySchedule_commandInfo.parameters = doorLock_setHolidaySchedule_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_setHolidaySchedule_commandInfo);
-    List<CommandParameter> doorLock_setPin_parametersList = new ArrayList<>();
-    CommandInfo doorLock_setPin_commandInfo = new CommandInfo();
-    doorLock_setPin_commandInfo.name = "setPin";
-    doorLock_setPin_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.SetPinResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_setHolidaySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_setHolidaySchedule_commandParams);
+    doorLock_ClusterCommandInfo.put("setHolidaySchedule", doorLock_setHolidaySchedule_CommandInfo);
+    List<CommandParameter> doorLock_setPin_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter setPin_userId_commandParameter = new CommandParameter("userId", int.class);
-    doorLock_setPin_parametersList.add(setPin_userId_commandParameter);
+    doorLock_setPin_commandParams.add(setPin_userId_commandParameter);
 
     CommandParameter setPin_userStatus_commandParameter =
         new CommandParameter("userStatus", int.class);
-    doorLock_setPin_parametersList.add(setPin_userStatus_commandParameter);
+    doorLock_setPin_commandParams.add(setPin_userStatus_commandParameter);
 
     CommandParameter setPin_userType_commandParameter = new CommandParameter("userType", int.class);
-    doorLock_setPin_parametersList.add(setPin_userType_commandParameter);
+    doorLock_setPin_commandParams.add(setPin_userType_commandParameter);
 
     CommandParameter setPin_pin_commandParameter = new CommandParameter("pin", byte[].class);
-    doorLock_setPin_parametersList.add(setPin_pin_commandParameter);
+    doorLock_setPin_commandParams.add(setPin_pin_commandParameter);
 
-    doorLock_setPin_commandInfo.parameters = doorLock_setPin_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_setPin_commandInfo);
-    List<CommandParameter> doorLock_setRfid_parametersList = new ArrayList<>();
-    CommandInfo doorLock_setRfid_commandInfo = new CommandInfo();
-    doorLock_setRfid_commandInfo.name = "setRfid";
-    doorLock_setRfid_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.SetRfidResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_setPin_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_setPin_commandParams);
+    doorLock_ClusterCommandInfo.put("setPin", doorLock_setPin_CommandInfo);
+    List<CommandParameter> doorLock_setRfid_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter setRfid_userId_commandParameter = new CommandParameter("userId", int.class);
-    doorLock_setRfid_parametersList.add(setRfid_userId_commandParameter);
+    doorLock_setRfid_commandParams.add(setRfid_userId_commandParameter);
 
     CommandParameter setRfid_userStatus_commandParameter =
         new CommandParameter("userStatus", int.class);
-    doorLock_setRfid_parametersList.add(setRfid_userStatus_commandParameter);
+    doorLock_setRfid_commandParams.add(setRfid_userStatus_commandParameter);
 
     CommandParameter setRfid_userType_commandParameter =
         new CommandParameter("userType", int.class);
-    doorLock_setRfid_parametersList.add(setRfid_userType_commandParameter);
+    doorLock_setRfid_commandParams.add(setRfid_userType_commandParameter);
 
     CommandParameter setRfid_id_commandParameter = new CommandParameter("id", byte[].class);
-    doorLock_setRfid_parametersList.add(setRfid_id_commandParameter);
+    doorLock_setRfid_commandParams.add(setRfid_id_commandParameter);
 
-    doorLock_setRfid_commandInfo.parameters = doorLock_setRfid_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_setRfid_commandInfo);
-    List<CommandParameter> doorLock_setUserType_parametersList = new ArrayList<>();
-    CommandInfo doorLock_setUserType_commandInfo = new CommandInfo();
-    doorLock_setUserType_commandInfo.name = "setUserType";
-    doorLock_setUserType_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.SetUserTypeResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_setRfid_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_setRfid_commandParams);
+    doorLock_ClusterCommandInfo.put("setRfid", doorLock_setRfid_CommandInfo);
+    List<CommandParameter> doorLock_setUserType_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter setUserType_userId_commandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_setUserType_parametersList.add(setUserType_userId_commandParameter);
+    doorLock_setUserType_commandParams.add(setUserType_userId_commandParameter);
 
     CommandParameter setUserType_userType_commandParameter =
         new CommandParameter("userType", int.class);
-    doorLock_setUserType_parametersList.add(setUserType_userType_commandParameter);
+    doorLock_setUserType_commandParams.add(setUserType_userType_commandParameter);
 
-    doorLock_setUserType_commandInfo.parameters = doorLock_setUserType_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_setUserType_commandInfo);
-    List<CommandParameter> doorLock_setWeekdaySchedule_parametersList = new ArrayList<>();
-    CommandInfo doorLock_setWeekdaySchedule_commandInfo = new CommandInfo();
-    doorLock_setWeekdaySchedule_commandInfo.name = "setWeekdaySchedule";
-    doorLock_setWeekdaySchedule_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.SetWeekdayScheduleResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_setUserType_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_setUserType_commandParams);
+    doorLock_ClusterCommandInfo.put("setUserType", doorLock_setUserType_CommandInfo);
+    List<CommandParameter> doorLock_setWeekdaySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter setWeekdaySchedule_scheduleId_commandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_setWeekdaySchedule_parametersList.add(setWeekdaySchedule_scheduleId_commandParameter);
+    doorLock_setWeekdaySchedule_commandParams.add(setWeekdaySchedule_scheduleId_commandParameter);
 
     CommandParameter setWeekdaySchedule_userId_commandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_setWeekdaySchedule_parametersList.add(setWeekdaySchedule_userId_commandParameter);
+    doorLock_setWeekdaySchedule_commandParams.add(setWeekdaySchedule_userId_commandParameter);
 
     CommandParameter setWeekdaySchedule_daysMask_commandParameter =
         new CommandParameter("daysMask", int.class);
-    doorLock_setWeekdaySchedule_parametersList.add(setWeekdaySchedule_daysMask_commandParameter);
+    doorLock_setWeekdaySchedule_commandParams.add(setWeekdaySchedule_daysMask_commandParameter);
 
     CommandParameter setWeekdaySchedule_startHour_commandParameter =
         new CommandParameter("startHour", int.class);
-    doorLock_setWeekdaySchedule_parametersList.add(setWeekdaySchedule_startHour_commandParameter);
+    doorLock_setWeekdaySchedule_commandParams.add(setWeekdaySchedule_startHour_commandParameter);
 
     CommandParameter setWeekdaySchedule_startMinute_commandParameter =
         new CommandParameter("startMinute", int.class);
-    doorLock_setWeekdaySchedule_parametersList.add(setWeekdaySchedule_startMinute_commandParameter);
+    doorLock_setWeekdaySchedule_commandParams.add(setWeekdaySchedule_startMinute_commandParameter);
 
     CommandParameter setWeekdaySchedule_endHour_commandParameter =
         new CommandParameter("endHour", int.class);
-    doorLock_setWeekdaySchedule_parametersList.add(setWeekdaySchedule_endHour_commandParameter);
+    doorLock_setWeekdaySchedule_commandParams.add(setWeekdaySchedule_endHour_commandParameter);
 
     CommandParameter setWeekdaySchedule_endMinute_commandParameter =
         new CommandParameter("endMinute", int.class);
-    doorLock_setWeekdaySchedule_parametersList.add(setWeekdaySchedule_endMinute_commandParameter);
+    doorLock_setWeekdaySchedule_commandParams.add(setWeekdaySchedule_endMinute_commandParameter);
 
-    doorLock_setWeekdaySchedule_commandInfo.parameters = doorLock_setWeekdaySchedule_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_setWeekdaySchedule_commandInfo);
-    List<CommandParameter> doorLock_setYeardaySchedule_parametersList = new ArrayList<>();
-    CommandInfo doorLock_setYeardaySchedule_commandInfo = new CommandInfo();
-    doorLock_setYeardaySchedule_commandInfo.name = "setYeardaySchedule";
-    doorLock_setYeardaySchedule_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.SetYeardayScheduleResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_setWeekdaySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_setWeekdaySchedule_commandParams);
+    doorLock_ClusterCommandInfo.put("setWeekdaySchedule", doorLock_setWeekdaySchedule_CommandInfo);
+    List<CommandParameter> doorLock_setYeardaySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter setYeardaySchedule_scheduleId_commandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_setYeardaySchedule_parametersList.add(setYeardaySchedule_scheduleId_commandParameter);
+    doorLock_setYeardaySchedule_commandParams.add(setYeardaySchedule_scheduleId_commandParameter);
 
     CommandParameter setYeardaySchedule_userId_commandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_setYeardaySchedule_parametersList.add(setYeardaySchedule_userId_commandParameter);
+    doorLock_setYeardaySchedule_commandParams.add(setYeardaySchedule_userId_commandParameter);
 
     CommandParameter setYeardaySchedule_localStartTime_commandParameter =
         new CommandParameter("localStartTime", long.class);
-    doorLock_setYeardaySchedule_parametersList.add(
+    doorLock_setYeardaySchedule_commandParams.add(
         setYeardaySchedule_localStartTime_commandParameter);
 
     CommandParameter setYeardaySchedule_localEndTime_commandParameter =
         new CommandParameter("localEndTime", long.class);
-    doorLock_setYeardaySchedule_parametersList.add(
-        setYeardaySchedule_localEndTime_commandParameter);
+    doorLock_setYeardaySchedule_commandParams.add(setYeardaySchedule_localEndTime_commandParameter);
 
-    doorLock_setYeardaySchedule_commandInfo.parameters = doorLock_setYeardaySchedule_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_setYeardaySchedule_commandInfo);
-    List<CommandParameter> doorLock_unlockDoor_parametersList = new ArrayList<>();
-    CommandInfo doorLock_unlockDoor_commandInfo = new CommandInfo();
-    doorLock_unlockDoor_commandInfo.name = "unlockDoor";
-    doorLock_unlockDoor_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.UnlockDoorResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_setYeardaySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_setYeardaySchedule_commandParams);
+    doorLock_ClusterCommandInfo.put("setYeardaySchedule", doorLock_setYeardaySchedule_CommandInfo);
+    List<CommandParameter> doorLock_unlockDoor_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter unlockDoor_pin_commandParameter = new CommandParameter("pin", byte[].class);
-    doorLock_unlockDoor_parametersList.add(unlockDoor_pin_commandParameter);
+    doorLock_unlockDoor_commandParams.add(unlockDoor_pin_commandParameter);
 
-    doorLock_unlockDoor_commandInfo.parameters = doorLock_unlockDoor_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_unlockDoor_commandInfo);
-    List<CommandParameter> doorLock_unlockWithTimeout_parametersList = new ArrayList<>();
-    CommandInfo doorLock_unlockWithTimeout_commandInfo = new CommandInfo();
-    doorLock_unlockWithTimeout_commandInfo.name = "unlockWithTimeout";
-    doorLock_unlockWithTimeout_commandInfo.callbackClass =
-        ChipClusters.DoorLockCluster.UnlockWithTimeoutResponseCallback.class;
+    // Populate commands
+    CommandInfo doorLock_unlockDoor_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_unlockDoor_commandParams);
+    doorLock_ClusterCommandInfo.put("unlockDoor", doorLock_unlockDoor_CommandInfo);
+    List<CommandParameter> doorLock_unlockWithTimeout_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter unlockWithTimeout_timeoutInSeconds_commandParameter =
         new CommandParameter("timeoutInSeconds", int.class);
-    doorLock_unlockWithTimeout_parametersList.add(
+    doorLock_unlockWithTimeout_commandParams.add(
         unlockWithTimeout_timeoutInSeconds_commandParameter);
 
     CommandParameter unlockWithTimeout_pin_commandParameter =
         new CommandParameter("pin", byte[].class);
-    doorLock_unlockWithTimeout_parametersList.add(unlockWithTimeout_pin_commandParameter);
+    doorLock_unlockWithTimeout_commandParams.add(unlockWithTimeout_pin_commandParameter);
 
-    doorLock_unlockWithTimeout_commandInfo.parameters = doorLock_unlockWithTimeout_parametersList;
-    doorLock_clusterInfo.commands.add(doorLock_unlockWithTimeout_commandInfo);
-    clusterInfoMapping.put("doorLock", doorLock_clusterInfo);
-    ClusterInfo electricalMeasurement_clusterInfo = new ClusterInfo("electricalMeasurement");
-    clusterInfoMapping.put("electricalMeasurement", electricalMeasurement_clusterInfo);
+    // Populate commands
+    CommandInfo doorLock_unlockWithTimeout_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            doorLock_unlockWithTimeout_commandParams);
+    doorLock_ClusterCommandInfo.put("unlockWithTimeout", doorLock_unlockWithTimeout_CommandInfo);
+    // Populate cluster
+    ClusterInfo doorLock_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.DoorLockCluster(ptr, endpointId),
+            doorLock_ClusterCommandInfo);
+    clusterMap.put("doorLock", doorLock_clusterInfo);
+    Map<String, CommandInfo> electricalMeasurement_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo electricalMeasurement_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ElectricalMeasurementCluster(ptr, endpointId),
+            electricalMeasurement_ClusterCommandInfo);
+    clusterMap.put("electricalMeasurement", electricalMeasurement_clusterInfo);
+    Map<String, CommandInfo> ethernetNetworkDiagnostics_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> ethernetNetworkDiagnostics_resetCounts_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo ethernetNetworkDiagnostics_resetCounts_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            ethernetNetworkDiagnostics_resetCounts_commandParams);
+    ethernetNetworkDiagnostics_ClusterCommandInfo.put(
+        "resetCounts", ethernetNetworkDiagnostics_resetCounts_CommandInfo);
+    // Populate cluster
     ClusterInfo ethernetNetworkDiagnostics_clusterInfo =
-        new ClusterInfo("ethernetNetworkDiagnostics");
-    List<CommandParameter> ethernetNetworkDiagnostics_resetCounts_parametersList =
-        new ArrayList<>();
-    CommandInfo ethernetNetworkDiagnostics_resetCounts_commandInfo = new CommandInfo();
-    ethernetNetworkDiagnostics_resetCounts_commandInfo.name = "resetCounts";
-    ethernetNetworkDiagnostics_resetCounts_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    ethernetNetworkDiagnostics_resetCounts_commandInfo.parameters =
-        ethernetNetworkDiagnostics_resetCounts_parametersList;
-    ethernetNetworkDiagnostics_clusterInfo.commands.add(
-        ethernetNetworkDiagnostics_resetCounts_commandInfo);
-    clusterInfoMapping.put("ethernetNetworkDiagnostics", ethernetNetworkDiagnostics_clusterInfo);
-    ClusterInfo fixedLabel_clusterInfo = new ClusterInfo("fixedLabel");
-    clusterInfoMapping.put("fixedLabel", fixedLabel_clusterInfo);
-    ClusterInfo flowMeasurement_clusterInfo = new ClusterInfo("flowMeasurement");
-    clusterInfoMapping.put("flowMeasurement", flowMeasurement_clusterInfo);
-    ClusterInfo generalCommissioning_clusterInfo = new ClusterInfo("generalCommissioning");
-    List<CommandParameter> generalCommissioning_armFailSafe_parametersList = new ArrayList<>();
-    CommandInfo generalCommissioning_armFailSafe_commandInfo = new CommandInfo();
-    generalCommissioning_armFailSafe_commandInfo.name = "armFailSafe";
-    generalCommissioning_armFailSafe_commandInfo.callbackClass =
-        ChipClusters.GeneralCommissioningCluster.ArmFailSafeResponseCallback.class;
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.EthernetNetworkDiagnosticsCluster(ptr, endpointId),
+            ethernetNetworkDiagnostics_ClusterCommandInfo);
+    clusterMap.put("ethernetNetworkDiagnostics", ethernetNetworkDiagnostics_clusterInfo);
+    Map<String, CommandInfo> fixedLabel_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo fixedLabel_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.FixedLabelCluster(ptr, endpointId),
+            fixedLabel_ClusterCommandInfo);
+    clusterMap.put("fixedLabel", fixedLabel_clusterInfo);
+    Map<String, CommandInfo> flowMeasurement_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo flowMeasurement_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.FlowMeasurementCluster(ptr, endpointId),
+            flowMeasurement_ClusterCommandInfo);
+    clusterMap.put("flowMeasurement", flowMeasurement_clusterInfo);
+    Map<String, CommandInfo> generalCommissioning_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> generalCommissioning_armFailSafe_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter armFailSafe_expiryLengthSeconds_commandParameter =
         new CommandParameter("expiryLengthSeconds", int.class);
-    generalCommissioning_armFailSafe_parametersList.add(
+    generalCommissioning_armFailSafe_commandParams.add(
         armFailSafe_expiryLengthSeconds_commandParameter);
 
     CommandParameter armFailSafe_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    generalCommissioning_armFailSafe_parametersList.add(armFailSafe_breadcrumb_commandParameter);
+    generalCommissioning_armFailSafe_commandParams.add(armFailSafe_breadcrumb_commandParameter);
 
     CommandParameter armFailSafe_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    generalCommissioning_armFailSafe_parametersList.add(armFailSafe_timeoutMs_commandParameter);
+    generalCommissioning_armFailSafe_commandParams.add(armFailSafe_timeoutMs_commandParameter);
 
-    generalCommissioning_armFailSafe_commandInfo.parameters =
-        generalCommissioning_armFailSafe_parametersList;
-    generalCommissioning_clusterInfo.commands.add(generalCommissioning_armFailSafe_commandInfo);
-    List<CommandParameter> generalCommissioning_commissioningComplete_parametersList =
+    // Populate commands
+    CommandInfo generalCommissioning_armFailSafe_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            generalCommissioning_armFailSafe_commandParams);
+    generalCommissioning_ClusterCommandInfo.put(
+        "armFailSafe", generalCommissioning_armFailSafe_CommandInfo);
+    List<CommandParameter> generalCommissioning_commissioningComplete_commandParams =
         new ArrayList<>();
-    CommandInfo generalCommissioning_commissioningComplete_commandInfo = new CommandInfo();
-    generalCommissioning_commissioningComplete_commandInfo.name = "commissioningComplete";
-    generalCommissioning_commissioningComplete_commandInfo.callbackClass =
-        ChipClusters.GeneralCommissioningCluster.CommissioningCompleteResponseCallback.class;
-    generalCommissioning_commissioningComplete_commandInfo.parameters =
-        generalCommissioning_commissioningComplete_parametersList;
-    generalCommissioning_clusterInfo.commands.add(
-        generalCommissioning_commissioningComplete_commandInfo);
-    List<CommandParameter> generalCommissioning_setRegulatoryConfig_parametersList =
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo generalCommissioning_commissioningComplete_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            generalCommissioning_commissioningComplete_commandParams);
+    generalCommissioning_ClusterCommandInfo.put(
+        "commissioningComplete", generalCommissioning_commissioningComplete_CommandInfo);
+    List<CommandParameter> generalCommissioning_setRegulatoryConfig_commandParams =
         new ArrayList<>();
-    CommandInfo generalCommissioning_setRegulatoryConfig_commandInfo = new CommandInfo();
-    generalCommissioning_setRegulatoryConfig_commandInfo.name = "setRegulatoryConfig";
-    generalCommissioning_setRegulatoryConfig_commandInfo.callbackClass =
-        ChipClusters.GeneralCommissioningCluster.SetRegulatoryConfigResponseCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter setRegulatoryConfig_location_commandParameter =
         new CommandParameter("location", int.class);
-    generalCommissioning_setRegulatoryConfig_parametersList.add(
+    generalCommissioning_setRegulatoryConfig_commandParams.add(
         setRegulatoryConfig_location_commandParameter);
 
     CommandParameter setRegulatoryConfig_countryCode_commandParameter =
         new CommandParameter("countryCode", String.class);
-    generalCommissioning_setRegulatoryConfig_parametersList.add(
+    generalCommissioning_setRegulatoryConfig_commandParams.add(
         setRegulatoryConfig_countryCode_commandParameter);
 
     CommandParameter setRegulatoryConfig_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    generalCommissioning_setRegulatoryConfig_parametersList.add(
+    generalCommissioning_setRegulatoryConfig_commandParams.add(
         setRegulatoryConfig_breadcrumb_commandParameter);
 
     CommandParameter setRegulatoryConfig_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    generalCommissioning_setRegulatoryConfig_parametersList.add(
+    generalCommissioning_setRegulatoryConfig_commandParams.add(
         setRegulatoryConfig_timeoutMs_commandParameter);
 
-    generalCommissioning_setRegulatoryConfig_commandInfo.parameters =
-        generalCommissioning_setRegulatoryConfig_parametersList;
-    generalCommissioning_clusterInfo.commands.add(
-        generalCommissioning_setRegulatoryConfig_commandInfo);
-    clusterInfoMapping.put("generalCommissioning", generalCommissioning_clusterInfo);
-    ClusterInfo generalDiagnostics_clusterInfo = new ClusterInfo("generalDiagnostics");
-    clusterInfoMapping.put("generalDiagnostics", generalDiagnostics_clusterInfo);
-    ClusterInfo groupKeyManagement_clusterInfo = new ClusterInfo("groupKeyManagement");
-    clusterInfoMapping.put("groupKeyManagement", groupKeyManagement_clusterInfo);
-    ClusterInfo groups_clusterInfo = new ClusterInfo("groups");
-    List<CommandParameter> groups_addGroup_parametersList = new ArrayList<>();
-    CommandInfo groups_addGroup_commandInfo = new CommandInfo();
-    groups_addGroup_commandInfo.name = "addGroup";
-    groups_addGroup_commandInfo.callbackClass =
-        ChipClusters.GroupsCluster.AddGroupResponseCallback.class;
+    // Populate commands
+    CommandInfo generalCommissioning_setRegulatoryConfig_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            generalCommissioning_setRegulatoryConfig_commandParams);
+    generalCommissioning_ClusterCommandInfo.put(
+        "setRegulatoryConfig", generalCommissioning_setRegulatoryConfig_CommandInfo);
+    // Populate cluster
+    ClusterInfo generalCommissioning_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.GeneralCommissioningCluster(ptr, endpointId),
+            generalCommissioning_ClusterCommandInfo);
+    clusterMap.put("generalCommissioning", generalCommissioning_clusterInfo);
+    Map<String, CommandInfo> generalDiagnostics_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo generalDiagnostics_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.GeneralDiagnosticsCluster(ptr, endpointId),
+            generalDiagnostics_ClusterCommandInfo);
+    clusterMap.put("generalDiagnostics", generalDiagnostics_clusterInfo);
+    Map<String, CommandInfo> groupKeyManagement_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo groupKeyManagement_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.GroupKeyManagementCluster(ptr, endpointId),
+            groupKeyManagement_ClusterCommandInfo);
+    clusterMap.put("groupKeyManagement", groupKeyManagement_clusterInfo);
+    Map<String, CommandInfo> groups_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> groups_addGroup_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter addGroup_groupId_commandParameter = new CommandParameter("groupId", int.class);
-    groups_addGroup_parametersList.add(addGroup_groupId_commandParameter);
+    groups_addGroup_commandParams.add(addGroup_groupId_commandParameter);
 
     CommandParameter addGroup_groupName_commandParameter =
         new CommandParameter("groupName", String.class);
-    groups_addGroup_parametersList.add(addGroup_groupName_commandParameter);
+    groups_addGroup_commandParams.add(addGroup_groupName_commandParameter);
 
-    groups_addGroup_commandInfo.parameters = groups_addGroup_parametersList;
-    groups_clusterInfo.commands.add(groups_addGroup_commandInfo);
-    List<CommandParameter> groups_addGroupIfIdentifying_parametersList = new ArrayList<>();
-    CommandInfo groups_addGroupIfIdentifying_commandInfo = new CommandInfo();
-    groups_addGroupIfIdentifying_commandInfo.name = "addGroupIfIdentifying";
-    groups_addGroupIfIdentifying_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo groups_addGroup_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groups_addGroup_commandParams);
+    groups_ClusterCommandInfo.put("addGroup", groups_addGroup_CommandInfo);
+    List<CommandParameter> groups_addGroupIfIdentifying_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter addGroupIfIdentifying_groupId_commandParameter =
         new CommandParameter("groupId", int.class);
-    groups_addGroupIfIdentifying_parametersList.add(addGroupIfIdentifying_groupId_commandParameter);
+    groups_addGroupIfIdentifying_commandParams.add(addGroupIfIdentifying_groupId_commandParameter);
 
     CommandParameter addGroupIfIdentifying_groupName_commandParameter =
         new CommandParameter("groupName", String.class);
-    groups_addGroupIfIdentifying_parametersList.add(
+    groups_addGroupIfIdentifying_commandParams.add(
         addGroupIfIdentifying_groupName_commandParameter);
 
-    groups_addGroupIfIdentifying_commandInfo.parameters =
-        groups_addGroupIfIdentifying_parametersList;
-    groups_clusterInfo.commands.add(groups_addGroupIfIdentifying_commandInfo);
-    List<CommandParameter> groups_getGroupMembership_parametersList = new ArrayList<>();
-    CommandInfo groups_getGroupMembership_commandInfo = new CommandInfo();
-    groups_getGroupMembership_commandInfo.name = "getGroupMembership";
-    groups_getGroupMembership_commandInfo.callbackClass =
-        ChipClusters.GroupsCluster.GetGroupMembershipResponseCallback.class;
+    // Populate commands
+    CommandInfo groups_addGroupIfIdentifying_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groups_addGroupIfIdentifying_commandParams);
+    groups_ClusterCommandInfo.put(
+        "addGroupIfIdentifying", groups_addGroupIfIdentifying_CommandInfo);
+    List<CommandParameter> groups_getGroupMembership_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getGroupMembership_groupCount_commandParameter =
         new CommandParameter("groupCount", int.class);
-    groups_getGroupMembership_parametersList.add(getGroupMembership_groupCount_commandParameter);
+    groups_getGroupMembership_commandParams.add(getGroupMembership_groupCount_commandParameter);
 
     CommandParameter getGroupMembership_groupList_commandParameter =
         new CommandParameter("groupList", int.class);
-    groups_getGroupMembership_parametersList.add(getGroupMembership_groupList_commandParameter);
+    groups_getGroupMembership_commandParams.add(getGroupMembership_groupList_commandParameter);
 
-    groups_getGroupMembership_commandInfo.parameters = groups_getGroupMembership_parametersList;
-    groups_clusterInfo.commands.add(groups_getGroupMembership_commandInfo);
-    List<CommandParameter> groups_removeAllGroups_parametersList = new ArrayList<>();
-    CommandInfo groups_removeAllGroups_commandInfo = new CommandInfo();
-    groups_removeAllGroups_commandInfo.name = "removeAllGroups";
-    groups_removeAllGroups_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
-    groups_removeAllGroups_commandInfo.parameters = groups_removeAllGroups_parametersList;
-    groups_clusterInfo.commands.add(groups_removeAllGroups_commandInfo);
-    List<CommandParameter> groups_removeGroup_parametersList = new ArrayList<>();
-    CommandInfo groups_removeGroup_commandInfo = new CommandInfo();
-    groups_removeGroup_commandInfo.name = "removeGroup";
-    groups_removeGroup_commandInfo.callbackClass =
-        ChipClusters.GroupsCluster.RemoveGroupResponseCallback.class;
+    // Populate commands
+    CommandInfo groups_getGroupMembership_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groups_getGroupMembership_commandParams);
+    groups_ClusterCommandInfo.put("getGroupMembership", groups_getGroupMembership_CommandInfo);
+    List<CommandParameter> groups_removeAllGroups_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo groups_removeAllGroups_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groups_removeAllGroups_commandParams);
+    groups_ClusterCommandInfo.put("removeAllGroups", groups_removeAllGroups_CommandInfo);
+    List<CommandParameter> groups_removeGroup_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter removeGroup_groupId_commandParameter =
         new CommandParameter("groupId", int.class);
-    groups_removeGroup_parametersList.add(removeGroup_groupId_commandParameter);
+    groups_removeGroup_commandParams.add(removeGroup_groupId_commandParameter);
 
-    groups_removeGroup_commandInfo.parameters = groups_removeGroup_parametersList;
-    groups_clusterInfo.commands.add(groups_removeGroup_commandInfo);
-    List<CommandParameter> groups_viewGroup_parametersList = new ArrayList<>();
-    CommandInfo groups_viewGroup_commandInfo = new CommandInfo();
-    groups_viewGroup_commandInfo.name = "viewGroup";
-    groups_viewGroup_commandInfo.callbackClass =
-        ChipClusters.GroupsCluster.ViewGroupResponseCallback.class;
+    // Populate commands
+    CommandInfo groups_removeGroup_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groups_removeGroup_commandParams);
+    groups_ClusterCommandInfo.put("removeGroup", groups_removeGroup_CommandInfo);
+    List<CommandParameter> groups_viewGroup_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter viewGroup_groupId_commandParameter =
         new CommandParameter("groupId", int.class);
-    groups_viewGroup_parametersList.add(viewGroup_groupId_commandParameter);
+    groups_viewGroup_commandParams.add(viewGroup_groupId_commandParameter);
 
-    groups_viewGroup_commandInfo.parameters = groups_viewGroup_parametersList;
-    groups_clusterInfo.commands.add(groups_viewGroup_commandInfo);
-    clusterInfoMapping.put("groups", groups_clusterInfo);
-    ClusterInfo identify_clusterInfo = new ClusterInfo("identify");
-    List<CommandParameter> identify_identify_parametersList = new ArrayList<>();
-    CommandInfo identify_identify_commandInfo = new CommandInfo();
-    identify_identify_commandInfo.name = "identify";
-    identify_identify_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo groups_viewGroup_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groups_viewGroup_commandParams);
+    groups_ClusterCommandInfo.put("viewGroup", groups_viewGroup_CommandInfo);
+    // Populate cluster
+    ClusterInfo groups_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.GroupsCluster(ptr, endpointId),
+            groups_ClusterCommandInfo);
+    clusterMap.put("groups", groups_clusterInfo);
+    Map<String, CommandInfo> identify_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> identify_identify_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter identify_identifyTime_commandParameter =
         new CommandParameter("identifyTime", int.class);
-    identify_identify_parametersList.add(identify_identifyTime_commandParameter);
+    identify_identify_commandParams.add(identify_identifyTime_commandParameter);
 
-    identify_identify_commandInfo.parameters = identify_identify_parametersList;
-    identify_clusterInfo.commands.add(identify_identify_commandInfo);
-    List<CommandParameter> identify_identifyQuery_parametersList = new ArrayList<>();
-    CommandInfo identify_identifyQuery_commandInfo = new CommandInfo();
-    identify_identifyQuery_commandInfo.name = "identifyQuery";
-    identify_identifyQuery_commandInfo.callbackClass =
-        ChipClusters.IdentifyCluster.IdentifyQueryResponseCallback.class;
-    identify_identifyQuery_commandInfo.parameters = identify_identifyQuery_parametersList;
-    identify_clusterInfo.commands.add(identify_identifyQuery_commandInfo);
-    List<CommandParameter> identify_triggerEffect_parametersList = new ArrayList<>();
-    CommandInfo identify_triggerEffect_commandInfo = new CommandInfo();
-    identify_triggerEffect_commandInfo.name = "triggerEffect";
-    identify_triggerEffect_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo identify_identify_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            identify_identify_commandParams);
+    identify_ClusterCommandInfo.put("identify", identify_identify_CommandInfo);
+    List<CommandParameter> identify_identifyQuery_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo identify_identifyQuery_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            identify_identifyQuery_commandParams);
+    identify_ClusterCommandInfo.put("identifyQuery", identify_identifyQuery_CommandInfo);
+    List<CommandParameter> identify_triggerEffect_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter triggerEffect_effectIdentifier_commandParameter =
         new CommandParameter("effectIdentifier", int.class);
-    identify_triggerEffect_parametersList.add(triggerEffect_effectIdentifier_commandParameter);
+    identify_triggerEffect_commandParams.add(triggerEffect_effectIdentifier_commandParameter);
 
     CommandParameter triggerEffect_effectVariant_commandParameter =
         new CommandParameter("effectVariant", int.class);
-    identify_triggerEffect_parametersList.add(triggerEffect_effectVariant_commandParameter);
+    identify_triggerEffect_commandParams.add(triggerEffect_effectVariant_commandParameter);
 
-    identify_triggerEffect_commandInfo.parameters = identify_triggerEffect_parametersList;
-    identify_clusterInfo.commands.add(identify_triggerEffect_commandInfo);
-    clusterInfoMapping.put("identify", identify_clusterInfo);
-    ClusterInfo keypadInput_clusterInfo = new ClusterInfo("keypadInput");
-    List<CommandParameter> keypadInput_sendKey_parametersList = new ArrayList<>();
-    CommandInfo keypadInput_sendKey_commandInfo = new CommandInfo();
-    keypadInput_sendKey_commandInfo.name = "sendKey";
-    keypadInput_sendKey_commandInfo.callbackClass =
-        ChipClusters.KeypadInputCluster.SendKeyResponseCallback.class;
+    // Populate commands
+    CommandInfo identify_triggerEffect_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            identify_triggerEffect_commandParams);
+    identify_ClusterCommandInfo.put("triggerEffect", identify_triggerEffect_CommandInfo);
+    // Populate cluster
+    ClusterInfo identify_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.IdentifyCluster(ptr, endpointId),
+            identify_ClusterCommandInfo);
+    clusterMap.put("identify", identify_clusterInfo);
+    Map<String, CommandInfo> keypadInput_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> keypadInput_sendKey_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter sendKey_keyCode_commandParameter = new CommandParameter("keyCode", int.class);
-    keypadInput_sendKey_parametersList.add(sendKey_keyCode_commandParameter);
+    keypadInput_sendKey_commandParams.add(sendKey_keyCode_commandParameter);
 
-    keypadInput_sendKey_commandInfo.parameters = keypadInput_sendKey_parametersList;
-    keypadInput_clusterInfo.commands.add(keypadInput_sendKey_commandInfo);
-    clusterInfoMapping.put("keypadInput", keypadInput_clusterInfo);
-    ClusterInfo levelControl_clusterInfo = new ClusterInfo("levelControl");
-    List<CommandParameter> levelControl_move_parametersList = new ArrayList<>();
-    CommandInfo levelControl_move_commandInfo = new CommandInfo();
-    levelControl_move_commandInfo.name = "move";
-    levelControl_move_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo keypadInput_sendKey_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            keypadInput_sendKey_commandParams);
+    keypadInput_ClusterCommandInfo.put("sendKey", keypadInput_sendKey_CommandInfo);
+    // Populate cluster
+    ClusterInfo keypadInput_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.KeypadInputCluster(ptr, endpointId),
+            keypadInput_ClusterCommandInfo);
+    clusterMap.put("keypadInput", keypadInput_clusterInfo);
+    Map<String, CommandInfo> levelControl_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> levelControl_move_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter move_moveMode_commandParameter = new CommandParameter("moveMode", int.class);
-    levelControl_move_parametersList.add(move_moveMode_commandParameter);
+    levelControl_move_commandParams.add(move_moveMode_commandParameter);
 
     CommandParameter move_rate_commandParameter = new CommandParameter("rate", int.class);
-    levelControl_move_parametersList.add(move_rate_commandParameter);
+    levelControl_move_commandParams.add(move_rate_commandParameter);
 
     CommandParameter move_optionMask_commandParameter =
         new CommandParameter("optionMask", int.class);
-    levelControl_move_parametersList.add(move_optionMask_commandParameter);
+    levelControl_move_commandParams.add(move_optionMask_commandParameter);
 
     CommandParameter move_optionOverride_commandParameter =
         new CommandParameter("optionOverride", int.class);
-    levelControl_move_parametersList.add(move_optionOverride_commandParameter);
+    levelControl_move_commandParams.add(move_optionOverride_commandParameter);
 
-    levelControl_move_commandInfo.parameters = levelControl_move_parametersList;
-    levelControl_clusterInfo.commands.add(levelControl_move_commandInfo);
-    List<CommandParameter> levelControl_moveToLevel_parametersList = new ArrayList<>();
-    CommandInfo levelControl_moveToLevel_commandInfo = new CommandInfo();
-    levelControl_moveToLevel_commandInfo.name = "moveToLevel";
-    levelControl_moveToLevel_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo levelControl_move_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            levelControl_move_commandParams);
+    levelControl_ClusterCommandInfo.put("move", levelControl_move_CommandInfo);
+    List<CommandParameter> levelControl_moveToLevel_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveToLevel_level_commandParameter = new CommandParameter("level", int.class);
-    levelControl_moveToLevel_parametersList.add(moveToLevel_level_commandParameter);
+    levelControl_moveToLevel_commandParams.add(moveToLevel_level_commandParameter);
 
     CommandParameter moveToLevel_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    levelControl_moveToLevel_parametersList.add(moveToLevel_transitionTime_commandParameter);
+    levelControl_moveToLevel_commandParams.add(moveToLevel_transitionTime_commandParameter);
 
     CommandParameter moveToLevel_optionMask_commandParameter =
         new CommandParameter("optionMask", int.class);
-    levelControl_moveToLevel_parametersList.add(moveToLevel_optionMask_commandParameter);
+    levelControl_moveToLevel_commandParams.add(moveToLevel_optionMask_commandParameter);
 
     CommandParameter moveToLevel_optionOverride_commandParameter =
         new CommandParameter("optionOverride", int.class);
-    levelControl_moveToLevel_parametersList.add(moveToLevel_optionOverride_commandParameter);
+    levelControl_moveToLevel_commandParams.add(moveToLevel_optionOverride_commandParameter);
 
-    levelControl_moveToLevel_commandInfo.parameters = levelControl_moveToLevel_parametersList;
-    levelControl_clusterInfo.commands.add(levelControl_moveToLevel_commandInfo);
-    List<CommandParameter> levelControl_moveToLevelWithOnOff_parametersList = new ArrayList<>();
-    CommandInfo levelControl_moveToLevelWithOnOff_commandInfo = new CommandInfo();
-    levelControl_moveToLevelWithOnOff_commandInfo.name = "moveToLevelWithOnOff";
-    levelControl_moveToLevelWithOnOff_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo levelControl_moveToLevel_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            levelControl_moveToLevel_commandParams);
+    levelControl_ClusterCommandInfo.put("moveToLevel", levelControl_moveToLevel_CommandInfo);
+    List<CommandParameter> levelControl_moveToLevelWithOnOff_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveToLevelWithOnOff_level_commandParameter =
         new CommandParameter("level", int.class);
-    levelControl_moveToLevelWithOnOff_parametersList.add(
+    levelControl_moveToLevelWithOnOff_commandParams.add(
         moveToLevelWithOnOff_level_commandParameter);
 
     CommandParameter moveToLevelWithOnOff_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    levelControl_moveToLevelWithOnOff_parametersList.add(
+    levelControl_moveToLevelWithOnOff_commandParams.add(
         moveToLevelWithOnOff_transitionTime_commandParameter);
 
-    levelControl_moveToLevelWithOnOff_commandInfo.parameters =
-        levelControl_moveToLevelWithOnOff_parametersList;
-    levelControl_clusterInfo.commands.add(levelControl_moveToLevelWithOnOff_commandInfo);
-    List<CommandParameter> levelControl_moveWithOnOff_parametersList = new ArrayList<>();
-    CommandInfo levelControl_moveWithOnOff_commandInfo = new CommandInfo();
-    levelControl_moveWithOnOff_commandInfo.name = "moveWithOnOff";
-    levelControl_moveWithOnOff_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo levelControl_moveToLevelWithOnOff_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            levelControl_moveToLevelWithOnOff_commandParams);
+    levelControl_ClusterCommandInfo.put(
+        "moveToLevelWithOnOff", levelControl_moveToLevelWithOnOff_CommandInfo);
+    List<CommandParameter> levelControl_moveWithOnOff_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter moveWithOnOff_moveMode_commandParameter =
         new CommandParameter("moveMode", int.class);
-    levelControl_moveWithOnOff_parametersList.add(moveWithOnOff_moveMode_commandParameter);
+    levelControl_moveWithOnOff_commandParams.add(moveWithOnOff_moveMode_commandParameter);
 
     CommandParameter moveWithOnOff_rate_commandParameter = new CommandParameter("rate", int.class);
-    levelControl_moveWithOnOff_parametersList.add(moveWithOnOff_rate_commandParameter);
+    levelControl_moveWithOnOff_commandParams.add(moveWithOnOff_rate_commandParameter);
 
-    levelControl_moveWithOnOff_commandInfo.parameters = levelControl_moveWithOnOff_parametersList;
-    levelControl_clusterInfo.commands.add(levelControl_moveWithOnOff_commandInfo);
-    List<CommandParameter> levelControl_step_parametersList = new ArrayList<>();
-    CommandInfo levelControl_step_commandInfo = new CommandInfo();
-    levelControl_step_commandInfo.name = "step";
-    levelControl_step_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo levelControl_moveWithOnOff_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            levelControl_moveWithOnOff_commandParams);
+    levelControl_ClusterCommandInfo.put("moveWithOnOff", levelControl_moveWithOnOff_CommandInfo);
+    List<CommandParameter> levelControl_step_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter step_stepMode_commandParameter = new CommandParameter("stepMode", int.class);
-    levelControl_step_parametersList.add(step_stepMode_commandParameter);
+    levelControl_step_commandParams.add(step_stepMode_commandParameter);
 
     CommandParameter step_stepSize_commandParameter = new CommandParameter("stepSize", int.class);
-    levelControl_step_parametersList.add(step_stepSize_commandParameter);
+    levelControl_step_commandParams.add(step_stepSize_commandParameter);
 
     CommandParameter step_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    levelControl_step_parametersList.add(step_transitionTime_commandParameter);
+    levelControl_step_commandParams.add(step_transitionTime_commandParameter);
 
     CommandParameter step_optionMask_commandParameter =
         new CommandParameter("optionMask", int.class);
-    levelControl_step_parametersList.add(step_optionMask_commandParameter);
+    levelControl_step_commandParams.add(step_optionMask_commandParameter);
 
     CommandParameter step_optionOverride_commandParameter =
         new CommandParameter("optionOverride", int.class);
-    levelControl_step_parametersList.add(step_optionOverride_commandParameter);
+    levelControl_step_commandParams.add(step_optionOverride_commandParameter);
 
-    levelControl_step_commandInfo.parameters = levelControl_step_parametersList;
-    levelControl_clusterInfo.commands.add(levelControl_step_commandInfo);
-    List<CommandParameter> levelControl_stepWithOnOff_parametersList = new ArrayList<>();
-    CommandInfo levelControl_stepWithOnOff_commandInfo = new CommandInfo();
-    levelControl_stepWithOnOff_commandInfo.name = "stepWithOnOff";
-    levelControl_stepWithOnOff_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo levelControl_step_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            levelControl_step_commandParams);
+    levelControl_ClusterCommandInfo.put("step", levelControl_step_CommandInfo);
+    List<CommandParameter> levelControl_stepWithOnOff_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter stepWithOnOff_stepMode_commandParameter =
         new CommandParameter("stepMode", int.class);
-    levelControl_stepWithOnOff_parametersList.add(stepWithOnOff_stepMode_commandParameter);
+    levelControl_stepWithOnOff_commandParams.add(stepWithOnOff_stepMode_commandParameter);
 
     CommandParameter stepWithOnOff_stepSize_commandParameter =
         new CommandParameter("stepSize", int.class);
-    levelControl_stepWithOnOff_parametersList.add(stepWithOnOff_stepSize_commandParameter);
+    levelControl_stepWithOnOff_commandParams.add(stepWithOnOff_stepSize_commandParameter);
 
     CommandParameter stepWithOnOff_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    levelControl_stepWithOnOff_parametersList.add(stepWithOnOff_transitionTime_commandParameter);
+    levelControl_stepWithOnOff_commandParams.add(stepWithOnOff_transitionTime_commandParameter);
 
-    levelControl_stepWithOnOff_commandInfo.parameters = levelControl_stepWithOnOff_parametersList;
-    levelControl_clusterInfo.commands.add(levelControl_stepWithOnOff_commandInfo);
-    List<CommandParameter> levelControl_stop_parametersList = new ArrayList<>();
-    CommandInfo levelControl_stop_commandInfo = new CommandInfo();
-    levelControl_stop_commandInfo.name = "stop";
-    levelControl_stop_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo levelControl_stepWithOnOff_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            levelControl_stepWithOnOff_commandParams);
+    levelControl_ClusterCommandInfo.put("stepWithOnOff", levelControl_stepWithOnOff_CommandInfo);
+    List<CommandParameter> levelControl_stop_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter stop_optionMask_commandParameter =
         new CommandParameter("optionMask", int.class);
-    levelControl_stop_parametersList.add(stop_optionMask_commandParameter);
+    levelControl_stop_commandParams.add(stop_optionMask_commandParameter);
 
     CommandParameter stop_optionOverride_commandParameter =
         new CommandParameter("optionOverride", int.class);
-    levelControl_stop_parametersList.add(stop_optionOverride_commandParameter);
+    levelControl_stop_commandParams.add(stop_optionOverride_commandParameter);
 
-    levelControl_stop_commandInfo.parameters = levelControl_stop_parametersList;
-    levelControl_clusterInfo.commands.add(levelControl_stop_commandInfo);
-    List<CommandParameter> levelControl_stopWithOnOff_parametersList = new ArrayList<>();
-    CommandInfo levelControl_stopWithOnOff_commandInfo = new CommandInfo();
-    levelControl_stopWithOnOff_commandInfo.name = "stopWithOnOff";
-    levelControl_stopWithOnOff_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    levelControl_stopWithOnOff_commandInfo.parameters = levelControl_stopWithOnOff_parametersList;
-    levelControl_clusterInfo.commands.add(levelControl_stopWithOnOff_commandInfo);
-    clusterInfoMapping.put("levelControl", levelControl_clusterInfo);
-    ClusterInfo lowPower_clusterInfo = new ClusterInfo("lowPower");
-    List<CommandParameter> lowPower_sleep_parametersList = new ArrayList<>();
-    CommandInfo lowPower_sleep_commandInfo = new CommandInfo();
-    lowPower_sleep_commandInfo.name = "sleep";
-    lowPower_sleep_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
-    lowPower_sleep_commandInfo.parameters = lowPower_sleep_parametersList;
-    lowPower_clusterInfo.commands.add(lowPower_sleep_commandInfo);
-    clusterInfoMapping.put("lowPower", lowPower_clusterInfo);
-    ClusterInfo mediaInput_clusterInfo = new ClusterInfo("mediaInput");
-    List<CommandParameter> mediaInput_hideInputStatus_parametersList = new ArrayList<>();
-    CommandInfo mediaInput_hideInputStatus_commandInfo = new CommandInfo();
-    mediaInput_hideInputStatus_commandInfo.name = "hideInputStatus";
-    mediaInput_hideInputStatus_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    mediaInput_hideInputStatus_commandInfo.parameters = mediaInput_hideInputStatus_parametersList;
-    mediaInput_clusterInfo.commands.add(mediaInput_hideInputStatus_commandInfo);
-    List<CommandParameter> mediaInput_renameInput_parametersList = new ArrayList<>();
-    CommandInfo mediaInput_renameInput_commandInfo = new CommandInfo();
-    mediaInput_renameInput_commandInfo.name = "renameInput";
-    mediaInput_renameInput_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo levelControl_stop_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            levelControl_stop_commandParams);
+    levelControl_ClusterCommandInfo.put("stop", levelControl_stop_CommandInfo);
+    List<CommandParameter> levelControl_stopWithOnOff_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo levelControl_stopWithOnOff_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            levelControl_stopWithOnOff_commandParams);
+    levelControl_ClusterCommandInfo.put("stopWithOnOff", levelControl_stopWithOnOff_CommandInfo);
+    // Populate cluster
+    ClusterInfo levelControl_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.LevelControlCluster(ptr, endpointId),
+            levelControl_ClusterCommandInfo);
+    clusterMap.put("levelControl", levelControl_clusterInfo);
+    Map<String, CommandInfo> lowPower_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> lowPower_sleep_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo lowPower_sleep_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            lowPower_sleep_commandParams);
+    lowPower_ClusterCommandInfo.put("sleep", lowPower_sleep_CommandInfo);
+    // Populate cluster
+    ClusterInfo lowPower_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.LowPowerCluster(ptr, endpointId),
+            lowPower_ClusterCommandInfo);
+    clusterMap.put("lowPower", lowPower_clusterInfo);
+    Map<String, CommandInfo> mediaInput_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> mediaInput_hideInputStatus_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaInput_hideInputStatus_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaInput_hideInputStatus_commandParams);
+    mediaInput_ClusterCommandInfo.put("hideInputStatus", mediaInput_hideInputStatus_CommandInfo);
+    List<CommandParameter> mediaInput_renameInput_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter renameInput_index_commandParameter = new CommandParameter("index", int.class);
-    mediaInput_renameInput_parametersList.add(renameInput_index_commandParameter);
+    mediaInput_renameInput_commandParams.add(renameInput_index_commandParameter);
 
     CommandParameter renameInput_name_commandParameter = new CommandParameter("name", String.class);
-    mediaInput_renameInput_parametersList.add(renameInput_name_commandParameter);
+    mediaInput_renameInput_commandParams.add(renameInput_name_commandParameter);
 
-    mediaInput_renameInput_commandInfo.parameters = mediaInput_renameInput_parametersList;
-    mediaInput_clusterInfo.commands.add(mediaInput_renameInput_commandInfo);
-    List<CommandParameter> mediaInput_selectInput_parametersList = new ArrayList<>();
-    CommandInfo mediaInput_selectInput_commandInfo = new CommandInfo();
-    mediaInput_selectInput_commandInfo.name = "selectInput";
-    mediaInput_selectInput_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo mediaInput_renameInput_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaInput_renameInput_commandParams);
+    mediaInput_ClusterCommandInfo.put("renameInput", mediaInput_renameInput_CommandInfo);
+    List<CommandParameter> mediaInput_selectInput_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter selectInput_index_commandParameter = new CommandParameter("index", int.class);
-    mediaInput_selectInput_parametersList.add(selectInput_index_commandParameter);
+    mediaInput_selectInput_commandParams.add(selectInput_index_commandParameter);
 
-    mediaInput_selectInput_commandInfo.parameters = mediaInput_selectInput_parametersList;
-    mediaInput_clusterInfo.commands.add(mediaInput_selectInput_commandInfo);
-    List<CommandParameter> mediaInput_showInputStatus_parametersList = new ArrayList<>();
-    CommandInfo mediaInput_showInputStatus_commandInfo = new CommandInfo();
-    mediaInput_showInputStatus_commandInfo.name = "showInputStatus";
-    mediaInput_showInputStatus_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    mediaInput_showInputStatus_commandInfo.parameters = mediaInput_showInputStatus_parametersList;
-    mediaInput_clusterInfo.commands.add(mediaInput_showInputStatus_commandInfo);
-    clusterInfoMapping.put("mediaInput", mediaInput_clusterInfo);
-    ClusterInfo mediaPlayback_clusterInfo = new ClusterInfo("mediaPlayback");
-    List<CommandParameter> mediaPlayback_mediaFastForward_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaFastForward_commandInfo = new CommandInfo();
-    mediaPlayback_mediaFastForward_commandInfo.name = "mediaFastForward";
-    mediaPlayback_mediaFastForward_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaFastForwardResponseCallback.class;
-    mediaPlayback_mediaFastForward_commandInfo.parameters =
-        mediaPlayback_mediaFastForward_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaFastForward_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaNext_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaNext_commandInfo = new CommandInfo();
-    mediaPlayback_mediaNext_commandInfo.name = "mediaNext";
-    mediaPlayback_mediaNext_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaNextResponseCallback.class;
-    mediaPlayback_mediaNext_commandInfo.parameters = mediaPlayback_mediaNext_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaNext_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaPause_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaPause_commandInfo = new CommandInfo();
-    mediaPlayback_mediaPause_commandInfo.name = "mediaPause";
-    mediaPlayback_mediaPause_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaPauseResponseCallback.class;
-    mediaPlayback_mediaPause_commandInfo.parameters = mediaPlayback_mediaPause_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaPause_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaPlay_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaPlay_commandInfo = new CommandInfo();
-    mediaPlayback_mediaPlay_commandInfo.name = "mediaPlay";
-    mediaPlayback_mediaPlay_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaPlayResponseCallback.class;
-    mediaPlayback_mediaPlay_commandInfo.parameters = mediaPlayback_mediaPlay_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaPlay_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaPrevious_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaPrevious_commandInfo = new CommandInfo();
-    mediaPlayback_mediaPrevious_commandInfo.name = "mediaPrevious";
-    mediaPlayback_mediaPrevious_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaPreviousResponseCallback.class;
-    mediaPlayback_mediaPrevious_commandInfo.parameters = mediaPlayback_mediaPrevious_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaPrevious_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaRewind_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaRewind_commandInfo = new CommandInfo();
-    mediaPlayback_mediaRewind_commandInfo.name = "mediaRewind";
-    mediaPlayback_mediaRewind_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaRewindResponseCallback.class;
-    mediaPlayback_mediaRewind_commandInfo.parameters = mediaPlayback_mediaRewind_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaRewind_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaSeek_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaSeek_commandInfo = new CommandInfo();
-    mediaPlayback_mediaSeek_commandInfo.name = "mediaSeek";
-    mediaPlayback_mediaSeek_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaSeekResponseCallback.class;
+    // Populate commands
+    CommandInfo mediaInput_selectInput_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaInput_selectInput_commandParams);
+    mediaInput_ClusterCommandInfo.put("selectInput", mediaInput_selectInput_CommandInfo);
+    List<CommandParameter> mediaInput_showInputStatus_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaInput_showInputStatus_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaInput_showInputStatus_commandParams);
+    mediaInput_ClusterCommandInfo.put("showInputStatus", mediaInput_showInputStatus_CommandInfo);
+    // Populate cluster
+    ClusterInfo mediaInput_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.MediaInputCluster(ptr, endpointId),
+            mediaInput_ClusterCommandInfo);
+    clusterMap.put("mediaInput", mediaInput_clusterInfo);
+    Map<String, CommandInfo> mediaPlayback_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> mediaPlayback_mediaFastForward_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaPlayback_mediaFastForward_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaFastForward_commandParams);
+    mediaPlayback_ClusterCommandInfo.put(
+        "mediaFastForward", mediaPlayback_mediaFastForward_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaNext_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaPlayback_mediaNext_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaNext_commandParams);
+    mediaPlayback_ClusterCommandInfo.put("mediaNext", mediaPlayback_mediaNext_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaPause_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaPlayback_mediaPause_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaPause_commandParams);
+    mediaPlayback_ClusterCommandInfo.put("mediaPause", mediaPlayback_mediaPause_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaPlay_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaPlayback_mediaPlay_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaPlay_commandParams);
+    mediaPlayback_ClusterCommandInfo.put("mediaPlay", mediaPlayback_mediaPlay_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaPrevious_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaPlayback_mediaPrevious_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaPrevious_commandParams);
+    mediaPlayback_ClusterCommandInfo.put("mediaPrevious", mediaPlayback_mediaPrevious_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaRewind_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaPlayback_mediaRewind_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaRewind_commandParams);
+    mediaPlayback_ClusterCommandInfo.put("mediaRewind", mediaPlayback_mediaRewind_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaSeek_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter mediaSeek_position_commandParameter =
         new CommandParameter("position", long.class);
-    mediaPlayback_mediaSeek_parametersList.add(mediaSeek_position_commandParameter);
+    mediaPlayback_mediaSeek_commandParams.add(mediaSeek_position_commandParameter);
 
-    mediaPlayback_mediaSeek_commandInfo.parameters = mediaPlayback_mediaSeek_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaSeek_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaSkipBackward_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaSkipBackward_commandInfo = new CommandInfo();
-    mediaPlayback_mediaSkipBackward_commandInfo.name = "mediaSkipBackward";
-    mediaPlayback_mediaSkipBackward_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaSkipBackwardResponseCallback.class;
+    // Populate commands
+    CommandInfo mediaPlayback_mediaSeek_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaSeek_commandParams);
+    mediaPlayback_ClusterCommandInfo.put("mediaSeek", mediaPlayback_mediaSeek_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaSkipBackward_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter mediaSkipBackward_deltaPositionMilliseconds_commandParameter =
         new CommandParameter("deltaPositionMilliseconds", long.class);
-    mediaPlayback_mediaSkipBackward_parametersList.add(
+    mediaPlayback_mediaSkipBackward_commandParams.add(
         mediaSkipBackward_deltaPositionMilliseconds_commandParameter);
 
-    mediaPlayback_mediaSkipBackward_commandInfo.parameters =
-        mediaPlayback_mediaSkipBackward_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaSkipBackward_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaSkipForward_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaSkipForward_commandInfo = new CommandInfo();
-    mediaPlayback_mediaSkipForward_commandInfo.name = "mediaSkipForward";
-    mediaPlayback_mediaSkipForward_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaSkipForwardResponseCallback.class;
+    // Populate commands
+    CommandInfo mediaPlayback_mediaSkipBackward_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaSkipBackward_commandParams);
+    mediaPlayback_ClusterCommandInfo.put(
+        "mediaSkipBackward", mediaPlayback_mediaSkipBackward_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaSkipForward_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter mediaSkipForward_deltaPositionMilliseconds_commandParameter =
         new CommandParameter("deltaPositionMilliseconds", long.class);
-    mediaPlayback_mediaSkipForward_parametersList.add(
+    mediaPlayback_mediaSkipForward_commandParams.add(
         mediaSkipForward_deltaPositionMilliseconds_commandParameter);
 
-    mediaPlayback_mediaSkipForward_commandInfo.parameters =
-        mediaPlayback_mediaSkipForward_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaSkipForward_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaStartOver_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaStartOver_commandInfo = new CommandInfo();
-    mediaPlayback_mediaStartOver_commandInfo.name = "mediaStartOver";
-    mediaPlayback_mediaStartOver_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaStartOverResponseCallback.class;
-    mediaPlayback_mediaStartOver_commandInfo.parameters =
-        mediaPlayback_mediaStartOver_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaStartOver_commandInfo);
-    List<CommandParameter> mediaPlayback_mediaStop_parametersList = new ArrayList<>();
-    CommandInfo mediaPlayback_mediaStop_commandInfo = new CommandInfo();
-    mediaPlayback_mediaStop_commandInfo.name = "mediaStop";
-    mediaPlayback_mediaStop_commandInfo.callbackClass =
-        ChipClusters.MediaPlaybackCluster.MediaStopResponseCallback.class;
-    mediaPlayback_mediaStop_commandInfo.parameters = mediaPlayback_mediaStop_parametersList;
-    mediaPlayback_clusterInfo.commands.add(mediaPlayback_mediaStop_commandInfo);
-    clusterInfoMapping.put("mediaPlayback", mediaPlayback_clusterInfo);
-    ClusterInfo networkCommissioning_clusterInfo = new ClusterInfo("networkCommissioning");
-    List<CommandParameter> networkCommissioning_addThreadNetwork_parametersList = new ArrayList<>();
-    CommandInfo networkCommissioning_addThreadNetwork_commandInfo = new CommandInfo();
-    networkCommissioning_addThreadNetwork_commandInfo.name = "addThreadNetwork";
-    networkCommissioning_addThreadNetwork_commandInfo.callbackClass =
-        ChipClusters.NetworkCommissioningCluster.AddThreadNetworkResponseCallback.class;
+    // Populate commands
+    CommandInfo mediaPlayback_mediaSkipForward_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaSkipForward_commandParams);
+    mediaPlayback_ClusterCommandInfo.put(
+        "mediaSkipForward", mediaPlayback_mediaSkipForward_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaStartOver_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaPlayback_mediaStartOver_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaStartOver_commandParams);
+    mediaPlayback_ClusterCommandInfo.put(
+        "mediaStartOver", mediaPlayback_mediaStartOver_CommandInfo);
+    List<CommandParameter> mediaPlayback_mediaStop_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo mediaPlayback_mediaStop_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            mediaPlayback_mediaStop_commandParams);
+    mediaPlayback_ClusterCommandInfo.put("mediaStop", mediaPlayback_mediaStop_CommandInfo);
+    // Populate cluster
+    ClusterInfo mediaPlayback_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.MediaPlaybackCluster(ptr, endpointId),
+            mediaPlayback_ClusterCommandInfo);
+    clusterMap.put("mediaPlayback", mediaPlayback_clusterInfo);
+    Map<String, CommandInfo> networkCommissioning_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> networkCommissioning_addThreadNetwork_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter addThreadNetwork_operationalDataset_commandParameter =
         new CommandParameter("operationalDataset", byte[].class);
-    networkCommissioning_addThreadNetwork_parametersList.add(
+    networkCommissioning_addThreadNetwork_commandParams.add(
         addThreadNetwork_operationalDataset_commandParameter);
 
     CommandParameter addThreadNetwork_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_addThreadNetwork_parametersList.add(
+    networkCommissioning_addThreadNetwork_commandParams.add(
         addThreadNetwork_breadcrumb_commandParameter);
 
     CommandParameter addThreadNetwork_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_addThreadNetwork_parametersList.add(
+    networkCommissioning_addThreadNetwork_commandParams.add(
         addThreadNetwork_timeoutMs_commandParameter);
 
-    networkCommissioning_addThreadNetwork_commandInfo.parameters =
-        networkCommissioning_addThreadNetwork_parametersList;
-    networkCommissioning_clusterInfo.commands.add(
-        networkCommissioning_addThreadNetwork_commandInfo);
-    List<CommandParameter> networkCommissioning_addWiFiNetwork_parametersList = new ArrayList<>();
-    CommandInfo networkCommissioning_addWiFiNetwork_commandInfo = new CommandInfo();
-    networkCommissioning_addWiFiNetwork_commandInfo.name = "addWiFiNetwork";
-    networkCommissioning_addWiFiNetwork_commandInfo.callbackClass =
-        ChipClusters.NetworkCommissioningCluster.AddWiFiNetworkResponseCallback.class;
+    // Populate commands
+    CommandInfo networkCommissioning_addThreadNetwork_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            networkCommissioning_addThreadNetwork_commandParams);
+    networkCommissioning_ClusterCommandInfo.put(
+        "addThreadNetwork", networkCommissioning_addThreadNetwork_CommandInfo);
+    List<CommandParameter> networkCommissioning_addWiFiNetwork_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter addWiFiNetwork_ssid_commandParameter =
         new CommandParameter("ssid", byte[].class);
-    networkCommissioning_addWiFiNetwork_parametersList.add(addWiFiNetwork_ssid_commandParameter);
+    networkCommissioning_addWiFiNetwork_commandParams.add(addWiFiNetwork_ssid_commandParameter);
 
     CommandParameter addWiFiNetwork_credentials_commandParameter =
         new CommandParameter("credentials", byte[].class);
-    networkCommissioning_addWiFiNetwork_parametersList.add(
+    networkCommissioning_addWiFiNetwork_commandParams.add(
         addWiFiNetwork_credentials_commandParameter);
 
     CommandParameter addWiFiNetwork_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_addWiFiNetwork_parametersList.add(
+    networkCommissioning_addWiFiNetwork_commandParams.add(
         addWiFiNetwork_breadcrumb_commandParameter);
 
     CommandParameter addWiFiNetwork_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_addWiFiNetwork_parametersList.add(
+    networkCommissioning_addWiFiNetwork_commandParams.add(
         addWiFiNetwork_timeoutMs_commandParameter);
 
-    networkCommissioning_addWiFiNetwork_commandInfo.parameters =
-        networkCommissioning_addWiFiNetwork_parametersList;
-    networkCommissioning_clusterInfo.commands.add(networkCommissioning_addWiFiNetwork_commandInfo);
-    List<CommandParameter> networkCommissioning_disableNetwork_parametersList = new ArrayList<>();
-    CommandInfo networkCommissioning_disableNetwork_commandInfo = new CommandInfo();
-    networkCommissioning_disableNetwork_commandInfo.name = "disableNetwork";
-    networkCommissioning_disableNetwork_commandInfo.callbackClass =
-        ChipClusters.NetworkCommissioningCluster.DisableNetworkResponseCallback.class;
+    // Populate commands
+    CommandInfo networkCommissioning_addWiFiNetwork_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            networkCommissioning_addWiFiNetwork_commandParams);
+    networkCommissioning_ClusterCommandInfo.put(
+        "addWiFiNetwork", networkCommissioning_addWiFiNetwork_CommandInfo);
+    List<CommandParameter> networkCommissioning_disableNetwork_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter disableNetwork_networkID_commandParameter =
         new CommandParameter("networkID", byte[].class);
-    networkCommissioning_disableNetwork_parametersList.add(
+    networkCommissioning_disableNetwork_commandParams.add(
         disableNetwork_networkID_commandParameter);
 
     CommandParameter disableNetwork_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_disableNetwork_parametersList.add(
+    networkCommissioning_disableNetwork_commandParams.add(
         disableNetwork_breadcrumb_commandParameter);
 
     CommandParameter disableNetwork_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_disableNetwork_parametersList.add(
+    networkCommissioning_disableNetwork_commandParams.add(
         disableNetwork_timeoutMs_commandParameter);
 
-    networkCommissioning_disableNetwork_commandInfo.parameters =
-        networkCommissioning_disableNetwork_parametersList;
-    networkCommissioning_clusterInfo.commands.add(networkCommissioning_disableNetwork_commandInfo);
-    List<CommandParameter> networkCommissioning_enableNetwork_parametersList = new ArrayList<>();
-    CommandInfo networkCommissioning_enableNetwork_commandInfo = new CommandInfo();
-    networkCommissioning_enableNetwork_commandInfo.name = "enableNetwork";
-    networkCommissioning_enableNetwork_commandInfo.callbackClass =
-        ChipClusters.NetworkCommissioningCluster.EnableNetworkResponseCallback.class;
+    // Populate commands
+    CommandInfo networkCommissioning_disableNetwork_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            networkCommissioning_disableNetwork_commandParams);
+    networkCommissioning_ClusterCommandInfo.put(
+        "disableNetwork", networkCommissioning_disableNetwork_CommandInfo);
+    List<CommandParameter> networkCommissioning_enableNetwork_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter enableNetwork_networkID_commandParameter =
         new CommandParameter("networkID", byte[].class);
-    networkCommissioning_enableNetwork_parametersList.add(enableNetwork_networkID_commandParameter);
+    networkCommissioning_enableNetwork_commandParams.add(enableNetwork_networkID_commandParameter);
 
     CommandParameter enableNetwork_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_enableNetwork_parametersList.add(
-        enableNetwork_breadcrumb_commandParameter);
+    networkCommissioning_enableNetwork_commandParams.add(enableNetwork_breadcrumb_commandParameter);
 
     CommandParameter enableNetwork_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_enableNetwork_parametersList.add(enableNetwork_timeoutMs_commandParameter);
+    networkCommissioning_enableNetwork_commandParams.add(enableNetwork_timeoutMs_commandParameter);
 
-    networkCommissioning_enableNetwork_commandInfo.parameters =
-        networkCommissioning_enableNetwork_parametersList;
-    networkCommissioning_clusterInfo.commands.add(networkCommissioning_enableNetwork_commandInfo);
-    List<CommandParameter> networkCommissioning_getLastNetworkCommissioningResult_parametersList =
+    // Populate commands
+    CommandInfo networkCommissioning_enableNetwork_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            networkCommissioning_enableNetwork_commandParams);
+    networkCommissioning_ClusterCommandInfo.put(
+        "enableNetwork", networkCommissioning_enableNetwork_CommandInfo);
+    List<CommandParameter> networkCommissioning_getLastNetworkCommissioningResult_commandParams =
         new ArrayList<>();
-    CommandInfo networkCommissioning_getLastNetworkCommissioningResult_commandInfo =
-        new CommandInfo();
-    networkCommissioning_getLastNetworkCommissioningResult_commandInfo.name =
-        "getLastNetworkCommissioningResult";
-    networkCommissioning_getLastNetworkCommissioningResult_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter getLastNetworkCommissioningResult_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_getLastNetworkCommissioningResult_parametersList.add(
+    networkCommissioning_getLastNetworkCommissioningResult_commandParams.add(
         getLastNetworkCommissioningResult_timeoutMs_commandParameter);
 
-    networkCommissioning_getLastNetworkCommissioningResult_commandInfo.parameters =
-        networkCommissioning_getLastNetworkCommissioningResult_parametersList;
-    networkCommissioning_clusterInfo.commands.add(
-        networkCommissioning_getLastNetworkCommissioningResult_commandInfo);
-    List<CommandParameter> networkCommissioning_removeNetwork_parametersList = new ArrayList<>();
-    CommandInfo networkCommissioning_removeNetwork_commandInfo = new CommandInfo();
-    networkCommissioning_removeNetwork_commandInfo.name = "removeNetwork";
-    networkCommissioning_removeNetwork_commandInfo.callbackClass =
-        ChipClusters.NetworkCommissioningCluster.RemoveNetworkResponseCallback.class;
+    // Populate commands
+    CommandInfo networkCommissioning_getLastNetworkCommissioningResult_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            networkCommissioning_getLastNetworkCommissioningResult_commandParams);
+    networkCommissioning_ClusterCommandInfo.put(
+        "getLastNetworkCommissioningResult",
+        networkCommissioning_getLastNetworkCommissioningResult_CommandInfo);
+    List<CommandParameter> networkCommissioning_removeNetwork_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter removeNetwork_networkID_commandParameter =
         new CommandParameter("networkID", byte[].class);
-    networkCommissioning_removeNetwork_parametersList.add(removeNetwork_networkID_commandParameter);
+    networkCommissioning_removeNetwork_commandParams.add(removeNetwork_networkID_commandParameter);
 
     CommandParameter removeNetwork_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_removeNetwork_parametersList.add(
-        removeNetwork_breadcrumb_commandParameter);
+    networkCommissioning_removeNetwork_commandParams.add(removeNetwork_breadcrumb_commandParameter);
 
     CommandParameter removeNetwork_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_removeNetwork_parametersList.add(removeNetwork_timeoutMs_commandParameter);
+    networkCommissioning_removeNetwork_commandParams.add(removeNetwork_timeoutMs_commandParameter);
 
-    networkCommissioning_removeNetwork_commandInfo.parameters =
-        networkCommissioning_removeNetwork_parametersList;
-    networkCommissioning_clusterInfo.commands.add(networkCommissioning_removeNetwork_commandInfo);
-    List<CommandParameter> networkCommissioning_scanNetworks_parametersList = new ArrayList<>();
-    CommandInfo networkCommissioning_scanNetworks_commandInfo = new CommandInfo();
-    networkCommissioning_scanNetworks_commandInfo.name = "scanNetworks";
-    networkCommissioning_scanNetworks_commandInfo.callbackClass =
-        ChipClusters.NetworkCommissioningCluster.ScanNetworksResponseCallback.class;
+    // Populate commands
+    CommandInfo networkCommissioning_removeNetwork_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            networkCommissioning_removeNetwork_commandParams);
+    networkCommissioning_ClusterCommandInfo.put(
+        "removeNetwork", networkCommissioning_removeNetwork_CommandInfo);
+    List<CommandParameter> networkCommissioning_scanNetworks_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter scanNetworks_ssid_commandParameter =
         new CommandParameter("ssid", byte[].class);
-    networkCommissioning_scanNetworks_parametersList.add(scanNetworks_ssid_commandParameter);
+    networkCommissioning_scanNetworks_commandParams.add(scanNetworks_ssid_commandParameter);
 
     CommandParameter scanNetworks_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_scanNetworks_parametersList.add(scanNetworks_breadcrumb_commandParameter);
+    networkCommissioning_scanNetworks_commandParams.add(scanNetworks_breadcrumb_commandParameter);
 
     CommandParameter scanNetworks_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_scanNetworks_parametersList.add(scanNetworks_timeoutMs_commandParameter);
+    networkCommissioning_scanNetworks_commandParams.add(scanNetworks_timeoutMs_commandParameter);
 
-    networkCommissioning_scanNetworks_commandInfo.parameters =
-        networkCommissioning_scanNetworks_parametersList;
-    networkCommissioning_clusterInfo.commands.add(networkCommissioning_scanNetworks_commandInfo);
-    List<CommandParameter> networkCommissioning_updateThreadNetwork_parametersList =
+    // Populate commands
+    CommandInfo networkCommissioning_scanNetworks_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            networkCommissioning_scanNetworks_commandParams);
+    networkCommissioning_ClusterCommandInfo.put(
+        "scanNetworks", networkCommissioning_scanNetworks_CommandInfo);
+    List<CommandParameter> networkCommissioning_updateThreadNetwork_commandParams =
         new ArrayList<>();
-    CommandInfo networkCommissioning_updateThreadNetwork_commandInfo = new CommandInfo();
-    networkCommissioning_updateThreadNetwork_commandInfo.name = "updateThreadNetwork";
-    networkCommissioning_updateThreadNetwork_commandInfo.callbackClass =
-        ChipClusters.NetworkCommissioningCluster.UpdateThreadNetworkResponseCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter updateThreadNetwork_operationalDataset_commandParameter =
         new CommandParameter("operationalDataset", byte[].class);
-    networkCommissioning_updateThreadNetwork_parametersList.add(
+    networkCommissioning_updateThreadNetwork_commandParams.add(
         updateThreadNetwork_operationalDataset_commandParameter);
 
     CommandParameter updateThreadNetwork_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_updateThreadNetwork_parametersList.add(
+    networkCommissioning_updateThreadNetwork_commandParams.add(
         updateThreadNetwork_breadcrumb_commandParameter);
 
     CommandParameter updateThreadNetwork_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_updateThreadNetwork_parametersList.add(
+    networkCommissioning_updateThreadNetwork_commandParams.add(
         updateThreadNetwork_timeoutMs_commandParameter);
 
-    networkCommissioning_updateThreadNetwork_commandInfo.parameters =
-        networkCommissioning_updateThreadNetwork_parametersList;
-    networkCommissioning_clusterInfo.commands.add(
-        networkCommissioning_updateThreadNetwork_commandInfo);
-    List<CommandParameter> networkCommissioning_updateWiFiNetwork_parametersList =
-        new ArrayList<>();
-    CommandInfo networkCommissioning_updateWiFiNetwork_commandInfo = new CommandInfo();
-    networkCommissioning_updateWiFiNetwork_commandInfo.name = "updateWiFiNetwork";
-    networkCommissioning_updateWiFiNetwork_commandInfo.callbackClass =
-        ChipClusters.NetworkCommissioningCluster.UpdateWiFiNetworkResponseCallback.class;
+    // Populate commands
+    CommandInfo networkCommissioning_updateThreadNetwork_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            networkCommissioning_updateThreadNetwork_commandParams);
+    networkCommissioning_ClusterCommandInfo.put(
+        "updateThreadNetwork", networkCommissioning_updateThreadNetwork_CommandInfo);
+    List<CommandParameter> networkCommissioning_updateWiFiNetwork_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter updateWiFiNetwork_ssid_commandParameter =
         new CommandParameter("ssid", byte[].class);
-    networkCommissioning_updateWiFiNetwork_parametersList.add(
+    networkCommissioning_updateWiFiNetwork_commandParams.add(
         updateWiFiNetwork_ssid_commandParameter);
 
     CommandParameter updateWiFiNetwork_credentials_commandParameter =
         new CommandParameter("credentials", byte[].class);
-    networkCommissioning_updateWiFiNetwork_parametersList.add(
+    networkCommissioning_updateWiFiNetwork_commandParams.add(
         updateWiFiNetwork_credentials_commandParameter);
 
     CommandParameter updateWiFiNetwork_breadcrumb_commandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_updateWiFiNetwork_parametersList.add(
+    networkCommissioning_updateWiFiNetwork_commandParams.add(
         updateWiFiNetwork_breadcrumb_commandParameter);
 
     CommandParameter updateWiFiNetwork_timeoutMs_commandParameter =
         new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_updateWiFiNetwork_parametersList.add(
+    networkCommissioning_updateWiFiNetwork_commandParams.add(
         updateWiFiNetwork_timeoutMs_commandParameter);
 
-    networkCommissioning_updateWiFiNetwork_commandInfo.parameters =
-        networkCommissioning_updateWiFiNetwork_parametersList;
-    networkCommissioning_clusterInfo.commands.add(
-        networkCommissioning_updateWiFiNetwork_commandInfo);
-    clusterInfoMapping.put("networkCommissioning", networkCommissioning_clusterInfo);
-    ClusterInfo otaSoftwareUpdateProvider_clusterInfo =
-        new ClusterInfo("otaSoftwareUpdateProvider");
-    List<CommandParameter> otaSoftwareUpdateProvider_applyUpdateRequest_parametersList =
+    // Populate commands
+    CommandInfo networkCommissioning_updateWiFiNetwork_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            networkCommissioning_updateWiFiNetwork_commandParams);
+    networkCommissioning_ClusterCommandInfo.put(
+        "updateWiFiNetwork", networkCommissioning_updateWiFiNetwork_CommandInfo);
+    // Populate cluster
+    ClusterInfo networkCommissioning_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.NetworkCommissioningCluster(ptr, endpointId),
+            networkCommissioning_ClusterCommandInfo);
+    clusterMap.put("networkCommissioning", networkCommissioning_clusterInfo);
+    Map<String, CommandInfo> otaSoftwareUpdateProvider_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> otaSoftwareUpdateProvider_applyUpdateRequest_commandParams =
         new ArrayList<>();
-    CommandInfo otaSoftwareUpdateProvider_applyUpdateRequest_commandInfo = new CommandInfo();
-    otaSoftwareUpdateProvider_applyUpdateRequest_commandInfo.name = "applyUpdateRequest";
-    otaSoftwareUpdateProvider_applyUpdateRequest_commandInfo.callbackClass =
-        ChipClusters.OtaSoftwareUpdateProviderCluster.ApplyUpdateRequestResponseCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter applyUpdateRequest_updateToken_commandParameter =
         new CommandParameter("updateToken", byte[].class);
-    otaSoftwareUpdateProvider_applyUpdateRequest_parametersList.add(
+    otaSoftwareUpdateProvider_applyUpdateRequest_commandParams.add(
         applyUpdateRequest_updateToken_commandParameter);
 
     CommandParameter applyUpdateRequest_newVersion_commandParameter =
         new CommandParameter("newVersion", long.class);
-    otaSoftwareUpdateProvider_applyUpdateRequest_parametersList.add(
+    otaSoftwareUpdateProvider_applyUpdateRequest_commandParams.add(
         applyUpdateRequest_newVersion_commandParameter);
 
-    otaSoftwareUpdateProvider_applyUpdateRequest_commandInfo.parameters =
-        otaSoftwareUpdateProvider_applyUpdateRequest_parametersList;
-    otaSoftwareUpdateProvider_clusterInfo.commands.add(
-        otaSoftwareUpdateProvider_applyUpdateRequest_commandInfo);
-    List<CommandParameter> otaSoftwareUpdateProvider_notifyUpdateApplied_parametersList =
+    // Populate commands
+    CommandInfo otaSoftwareUpdateProvider_applyUpdateRequest_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            otaSoftwareUpdateProvider_applyUpdateRequest_commandParams);
+    otaSoftwareUpdateProvider_ClusterCommandInfo.put(
+        "applyUpdateRequest", otaSoftwareUpdateProvider_applyUpdateRequest_CommandInfo);
+    List<CommandParameter> otaSoftwareUpdateProvider_notifyUpdateApplied_commandParams =
         new ArrayList<>();
-    CommandInfo otaSoftwareUpdateProvider_notifyUpdateApplied_commandInfo = new CommandInfo();
-    otaSoftwareUpdateProvider_notifyUpdateApplied_commandInfo.name = "notifyUpdateApplied";
-    otaSoftwareUpdateProvider_notifyUpdateApplied_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter notifyUpdateApplied_updateToken_commandParameter =
         new CommandParameter("updateToken", byte[].class);
-    otaSoftwareUpdateProvider_notifyUpdateApplied_parametersList.add(
+    otaSoftwareUpdateProvider_notifyUpdateApplied_commandParams.add(
         notifyUpdateApplied_updateToken_commandParameter);
 
     CommandParameter notifyUpdateApplied_softwareVersion_commandParameter =
         new CommandParameter("softwareVersion", long.class);
-    otaSoftwareUpdateProvider_notifyUpdateApplied_parametersList.add(
+    otaSoftwareUpdateProvider_notifyUpdateApplied_commandParams.add(
         notifyUpdateApplied_softwareVersion_commandParameter);
 
-    otaSoftwareUpdateProvider_notifyUpdateApplied_commandInfo.parameters =
-        otaSoftwareUpdateProvider_notifyUpdateApplied_parametersList;
-    otaSoftwareUpdateProvider_clusterInfo.commands.add(
-        otaSoftwareUpdateProvider_notifyUpdateApplied_commandInfo);
-    List<CommandParameter> otaSoftwareUpdateProvider_queryImage_parametersList = new ArrayList<>();
-    CommandInfo otaSoftwareUpdateProvider_queryImage_commandInfo = new CommandInfo();
-    otaSoftwareUpdateProvider_queryImage_commandInfo.name = "queryImage";
-    otaSoftwareUpdateProvider_queryImage_commandInfo.callbackClass =
-        ChipClusters.OtaSoftwareUpdateProviderCluster.QueryImageResponseCallback.class;
+    // Populate commands
+    CommandInfo otaSoftwareUpdateProvider_notifyUpdateApplied_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            otaSoftwareUpdateProvider_notifyUpdateApplied_commandParams);
+    otaSoftwareUpdateProvider_ClusterCommandInfo.put(
+        "notifyUpdateApplied", otaSoftwareUpdateProvider_notifyUpdateApplied_CommandInfo);
+    List<CommandParameter> otaSoftwareUpdateProvider_queryImage_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter queryImage_vendorId_commandParameter =
         new CommandParameter("vendorId", int.class);
-    otaSoftwareUpdateProvider_queryImage_parametersList.add(queryImage_vendorId_commandParameter);
+    otaSoftwareUpdateProvider_queryImage_commandParams.add(queryImage_vendorId_commandParameter);
 
     CommandParameter queryImage_productId_commandParameter =
         new CommandParameter("productId", int.class);
-    otaSoftwareUpdateProvider_queryImage_parametersList.add(queryImage_productId_commandParameter);
+    otaSoftwareUpdateProvider_queryImage_commandParams.add(queryImage_productId_commandParameter);
 
     CommandParameter queryImage_hardwareVersion_commandParameter =
         new CommandParameter("hardwareVersion", int.class);
-    otaSoftwareUpdateProvider_queryImage_parametersList.add(
+    otaSoftwareUpdateProvider_queryImage_commandParams.add(
         queryImage_hardwareVersion_commandParameter);
 
     CommandParameter queryImage_softwareVersion_commandParameter =
         new CommandParameter("softwareVersion", long.class);
-    otaSoftwareUpdateProvider_queryImage_parametersList.add(
+    otaSoftwareUpdateProvider_queryImage_commandParams.add(
         queryImage_softwareVersion_commandParameter);
 
     CommandParameter queryImage_protocolsSupported_commandParameter =
         new CommandParameter("protocolsSupported", int.class);
-    otaSoftwareUpdateProvider_queryImage_parametersList.add(
+    otaSoftwareUpdateProvider_queryImage_commandParams.add(
         queryImage_protocolsSupported_commandParameter);
 
     CommandParameter queryImage_location_commandParameter =
         new CommandParameter("location", String.class);
-    otaSoftwareUpdateProvider_queryImage_parametersList.add(queryImage_location_commandParameter);
+    otaSoftwareUpdateProvider_queryImage_commandParams.add(queryImage_location_commandParameter);
 
     CommandParameter queryImage_requestorCanConsent_commandParameter =
         new CommandParameter("requestorCanConsent", boolean.class);
-    otaSoftwareUpdateProvider_queryImage_parametersList.add(
+    otaSoftwareUpdateProvider_queryImage_commandParams.add(
         queryImage_requestorCanConsent_commandParameter);
 
     CommandParameter queryImage_metadataForProvider_commandParameter =
         new CommandParameter("metadataForProvider", byte[].class);
-    otaSoftwareUpdateProvider_queryImage_parametersList.add(
+    otaSoftwareUpdateProvider_queryImage_commandParams.add(
         queryImage_metadataForProvider_commandParameter);
 
-    otaSoftwareUpdateProvider_queryImage_commandInfo.parameters =
-        otaSoftwareUpdateProvider_queryImage_parametersList;
-    otaSoftwareUpdateProvider_clusterInfo.commands.add(
-        otaSoftwareUpdateProvider_queryImage_commandInfo);
-    clusterInfoMapping.put("otaSoftwareUpdateProvider", otaSoftwareUpdateProvider_clusterInfo);
-    ClusterInfo otaSoftwareUpdateRequestor_clusterInfo =
-        new ClusterInfo("otaSoftwareUpdateRequestor");
-    List<CommandParameter> otaSoftwareUpdateRequestor_announceOtaProvider_parametersList =
+    // Populate commands
+    CommandInfo otaSoftwareUpdateProvider_queryImage_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            otaSoftwareUpdateProvider_queryImage_commandParams);
+    otaSoftwareUpdateProvider_ClusterCommandInfo.put(
+        "queryImage", otaSoftwareUpdateProvider_queryImage_CommandInfo);
+    // Populate cluster
+    ClusterInfo otaSoftwareUpdateProvider_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OtaSoftwareUpdateProviderCluster(ptr, endpointId),
+            otaSoftwareUpdateProvider_ClusterCommandInfo);
+    clusterMap.put("otaSoftwareUpdateProvider", otaSoftwareUpdateProvider_clusterInfo);
+    Map<String, CommandInfo> otaSoftwareUpdateRequestor_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> otaSoftwareUpdateRequestor_announceOtaProvider_commandParams =
         new ArrayList<>();
-    CommandInfo otaSoftwareUpdateRequestor_announceOtaProvider_commandInfo = new CommandInfo();
-    otaSoftwareUpdateRequestor_announceOtaProvider_commandInfo.name = "announceOtaProvider";
-    otaSoftwareUpdateRequestor_announceOtaProvider_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter announceOtaProvider_providerLocation_commandParameter =
         new CommandParameter("providerLocation", byte[].class);
-    otaSoftwareUpdateRequestor_announceOtaProvider_parametersList.add(
+    otaSoftwareUpdateRequestor_announceOtaProvider_commandParams.add(
         announceOtaProvider_providerLocation_commandParameter);
 
     CommandParameter announceOtaProvider_vendorId_commandParameter =
         new CommandParameter("vendorId", int.class);
-    otaSoftwareUpdateRequestor_announceOtaProvider_parametersList.add(
+    otaSoftwareUpdateRequestor_announceOtaProvider_commandParams.add(
         announceOtaProvider_vendorId_commandParameter);
 
     CommandParameter announceOtaProvider_announcementReason_commandParameter =
         new CommandParameter("announcementReason", int.class);
-    otaSoftwareUpdateRequestor_announceOtaProvider_parametersList.add(
+    otaSoftwareUpdateRequestor_announceOtaProvider_commandParams.add(
         announceOtaProvider_announcementReason_commandParameter);
 
     CommandParameter announceOtaProvider_metadataForNode_commandParameter =
         new CommandParameter("metadataForNode", byte[].class);
-    otaSoftwareUpdateRequestor_announceOtaProvider_parametersList.add(
+    otaSoftwareUpdateRequestor_announceOtaProvider_commandParams.add(
         announceOtaProvider_metadataForNode_commandParameter);
 
-    otaSoftwareUpdateRequestor_announceOtaProvider_commandInfo.parameters =
-        otaSoftwareUpdateRequestor_announceOtaProvider_parametersList;
-    otaSoftwareUpdateRequestor_clusterInfo.commands.add(
-        otaSoftwareUpdateRequestor_announceOtaProvider_commandInfo);
-    clusterInfoMapping.put("otaSoftwareUpdateRequestor", otaSoftwareUpdateRequestor_clusterInfo);
-    ClusterInfo occupancySensing_clusterInfo = new ClusterInfo("occupancySensing");
-    clusterInfoMapping.put("occupancySensing", occupancySensing_clusterInfo);
-    ClusterInfo onOff_clusterInfo = new ClusterInfo("onOff");
-    List<CommandParameter> onOff_off_parametersList = new ArrayList<>();
-    CommandInfo onOff_off_commandInfo = new CommandInfo();
-    onOff_off_commandInfo.name = "off";
-    onOff_off_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
-    onOff_off_commandInfo.parameters = onOff_off_parametersList;
-    onOff_clusterInfo.commands.add(onOff_off_commandInfo);
-    List<CommandParameter> onOff_offWithEffect_parametersList = new ArrayList<>();
-    CommandInfo onOff_offWithEffect_commandInfo = new CommandInfo();
-    onOff_offWithEffect_commandInfo.name = "offWithEffect";
-    onOff_offWithEffect_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo otaSoftwareUpdateRequestor_announceOtaProvider_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            otaSoftwareUpdateRequestor_announceOtaProvider_commandParams);
+    otaSoftwareUpdateRequestor_ClusterCommandInfo.put(
+        "announceOtaProvider", otaSoftwareUpdateRequestor_announceOtaProvider_CommandInfo);
+    // Populate cluster
+    ClusterInfo otaSoftwareUpdateRequestor_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.OtaSoftwareUpdateRequestorCluster(ptr, endpointId),
+            otaSoftwareUpdateRequestor_ClusterCommandInfo);
+    clusterMap.put("otaSoftwareUpdateRequestor", otaSoftwareUpdateRequestor_clusterInfo);
+    Map<String, CommandInfo> occupancySensing_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo occupancySensing_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OccupancySensingCluster(ptr, endpointId),
+            occupancySensing_ClusterCommandInfo);
+    clusterMap.put("occupancySensing", occupancySensing_clusterInfo);
+    Map<String, CommandInfo> onOff_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> onOff_off_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo onOff_off_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            onOff_off_commandParams);
+    onOff_ClusterCommandInfo.put("off", onOff_off_CommandInfo);
+    List<CommandParameter> onOff_offWithEffect_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter offWithEffect_effectId_commandParameter =
         new CommandParameter("effectId", int.class);
-    onOff_offWithEffect_parametersList.add(offWithEffect_effectId_commandParameter);
+    onOff_offWithEffect_commandParams.add(offWithEffect_effectId_commandParameter);
 
     CommandParameter offWithEffect_effectVariant_commandParameter =
         new CommandParameter("effectVariant", int.class);
-    onOff_offWithEffect_parametersList.add(offWithEffect_effectVariant_commandParameter);
+    onOff_offWithEffect_commandParams.add(offWithEffect_effectVariant_commandParameter);
 
-    onOff_offWithEffect_commandInfo.parameters = onOff_offWithEffect_parametersList;
-    onOff_clusterInfo.commands.add(onOff_offWithEffect_commandInfo);
-    List<CommandParameter> onOff_on_parametersList = new ArrayList<>();
-    CommandInfo onOff_on_commandInfo = new CommandInfo();
-    onOff_on_commandInfo.name = "on";
-    onOff_on_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
-    onOff_on_commandInfo.parameters = onOff_on_parametersList;
-    onOff_clusterInfo.commands.add(onOff_on_commandInfo);
-    List<CommandParameter> onOff_onWithRecallGlobalScene_parametersList = new ArrayList<>();
-    CommandInfo onOff_onWithRecallGlobalScene_commandInfo = new CommandInfo();
-    onOff_onWithRecallGlobalScene_commandInfo.name = "onWithRecallGlobalScene";
-    onOff_onWithRecallGlobalScene_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    onOff_onWithRecallGlobalScene_commandInfo.parameters =
-        onOff_onWithRecallGlobalScene_parametersList;
-    onOff_clusterInfo.commands.add(onOff_onWithRecallGlobalScene_commandInfo);
-    List<CommandParameter> onOff_onWithTimedOff_parametersList = new ArrayList<>();
-    CommandInfo onOff_onWithTimedOff_commandInfo = new CommandInfo();
-    onOff_onWithTimedOff_commandInfo.name = "onWithTimedOff";
-    onOff_onWithTimedOff_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo onOff_offWithEffect_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            onOff_offWithEffect_commandParams);
+    onOff_ClusterCommandInfo.put("offWithEffect", onOff_offWithEffect_CommandInfo);
+    List<CommandParameter> onOff_on_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo onOff_on_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            onOff_on_commandParams);
+    onOff_ClusterCommandInfo.put("on", onOff_on_CommandInfo);
+    List<CommandParameter> onOff_onWithRecallGlobalScene_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo onOff_onWithRecallGlobalScene_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            onOff_onWithRecallGlobalScene_commandParams);
+    onOff_ClusterCommandInfo.put(
+        "onWithRecallGlobalScene", onOff_onWithRecallGlobalScene_CommandInfo);
+    List<CommandParameter> onOff_onWithTimedOff_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter onWithTimedOff_onOffControl_commandParameter =
         new CommandParameter("onOffControl", int.class);
-    onOff_onWithTimedOff_parametersList.add(onWithTimedOff_onOffControl_commandParameter);
+    onOff_onWithTimedOff_commandParams.add(onWithTimedOff_onOffControl_commandParameter);
 
     CommandParameter onWithTimedOff_onTime_commandParameter =
         new CommandParameter("onTime", int.class);
-    onOff_onWithTimedOff_parametersList.add(onWithTimedOff_onTime_commandParameter);
+    onOff_onWithTimedOff_commandParams.add(onWithTimedOff_onTime_commandParameter);
 
     CommandParameter onWithTimedOff_offWaitTime_commandParameter =
         new CommandParameter("offWaitTime", int.class);
-    onOff_onWithTimedOff_parametersList.add(onWithTimedOff_offWaitTime_commandParameter);
+    onOff_onWithTimedOff_commandParams.add(onWithTimedOff_offWaitTime_commandParameter);
 
-    onOff_onWithTimedOff_commandInfo.parameters = onOff_onWithTimedOff_parametersList;
-    onOff_clusterInfo.commands.add(onOff_onWithTimedOff_commandInfo);
-    List<CommandParameter> onOff_toggle_parametersList = new ArrayList<>();
-    CommandInfo onOff_toggle_commandInfo = new CommandInfo();
-    onOff_toggle_commandInfo.name = "toggle";
-    onOff_toggle_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
-    onOff_toggle_commandInfo.parameters = onOff_toggle_parametersList;
-    onOff_clusterInfo.commands.add(onOff_toggle_commandInfo);
-    clusterInfoMapping.put("onOff", onOff_clusterInfo);
-    ClusterInfo onOffSwitchConfiguration_clusterInfo = new ClusterInfo("onOffSwitchConfiguration");
-    clusterInfoMapping.put("onOffSwitchConfiguration", onOffSwitchConfiguration_clusterInfo);
-    ClusterInfo operationalCredentials_clusterInfo = new ClusterInfo("operationalCredentials");
-    List<CommandParameter> operationalCredentials_addNOC_parametersList = new ArrayList<>();
-    CommandInfo operationalCredentials_addNOC_commandInfo = new CommandInfo();
-    operationalCredentials_addNOC_commandInfo.name = "addNOC";
-    operationalCredentials_addNOC_commandInfo.callbackClass =
-        ChipClusters.OperationalCredentialsCluster.NOCResponseCallback.class;
+    // Populate commands
+    CommandInfo onOff_onWithTimedOff_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            onOff_onWithTimedOff_commandParams);
+    onOff_ClusterCommandInfo.put("onWithTimedOff", onOff_onWithTimedOff_CommandInfo);
+    List<CommandParameter> onOff_toggle_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo onOff_toggle_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            onOff_toggle_commandParams);
+    onOff_ClusterCommandInfo.put("toggle", onOff_toggle_CommandInfo);
+    // Populate cluster
+    ClusterInfo onOff_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OnOffCluster(ptr, endpointId),
+            onOff_ClusterCommandInfo);
+    clusterMap.put("onOff", onOff_clusterInfo);
+    Map<String, CommandInfo> onOffSwitchConfiguration_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo onOffSwitchConfiguration_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OnOffSwitchConfigurationCluster(ptr, endpointId),
+            onOffSwitchConfiguration_ClusterCommandInfo);
+    clusterMap.put("onOffSwitchConfiguration", onOffSwitchConfiguration_clusterInfo);
+    Map<String, CommandInfo> operationalCredentials_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> operationalCredentials_addNOC_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter addNOC_NOCValue_commandParameter =
         new CommandParameter("NOCValue", byte[].class);
-    operationalCredentials_addNOC_parametersList.add(addNOC_NOCValue_commandParameter);
+    operationalCredentials_addNOC_commandParams.add(addNOC_NOCValue_commandParameter);
 
     CommandParameter addNOC_ICACValue_commandParameter =
         new CommandParameter("ICACValue", byte[].class);
-    operationalCredentials_addNOC_parametersList.add(addNOC_ICACValue_commandParameter);
+    operationalCredentials_addNOC_commandParams.add(addNOC_ICACValue_commandParameter);
 
     CommandParameter addNOC_IPKValue_commandParameter =
         new CommandParameter("IPKValue", byte[].class);
-    operationalCredentials_addNOC_parametersList.add(addNOC_IPKValue_commandParameter);
+    operationalCredentials_addNOC_commandParams.add(addNOC_IPKValue_commandParameter);
 
     CommandParameter addNOC_caseAdminNode_commandParameter =
         new CommandParameter("caseAdminNode", long.class);
-    operationalCredentials_addNOC_parametersList.add(addNOC_caseAdminNode_commandParameter);
+    operationalCredentials_addNOC_commandParams.add(addNOC_caseAdminNode_commandParameter);
 
     CommandParameter addNOC_adminVendorId_commandParameter =
         new CommandParameter("adminVendorId", int.class);
-    operationalCredentials_addNOC_parametersList.add(addNOC_adminVendorId_commandParameter);
+    operationalCredentials_addNOC_commandParams.add(addNOC_adminVendorId_commandParameter);
 
-    operationalCredentials_addNOC_commandInfo.parameters =
-        operationalCredentials_addNOC_parametersList;
-    operationalCredentials_clusterInfo.commands.add(operationalCredentials_addNOC_commandInfo);
-    List<CommandParameter> operationalCredentials_addTrustedRootCertificate_parametersList =
+    // Populate commands
+    CommandInfo operationalCredentials_addNOC_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            operationalCredentials_addNOC_commandParams);
+    operationalCredentials_ClusterCommandInfo.put(
+        "addNOC", operationalCredentials_addNOC_CommandInfo);
+    List<CommandParameter> operationalCredentials_addTrustedRootCertificate_commandParams =
         new ArrayList<>();
-    CommandInfo operationalCredentials_addTrustedRootCertificate_commandInfo = new CommandInfo();
-    operationalCredentials_addTrustedRootCertificate_commandInfo.name = "addTrustedRootCertificate";
-    operationalCredentials_addTrustedRootCertificate_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter addTrustedRootCertificate_rootCertificate_commandParameter =
         new CommandParameter("rootCertificate", byte[].class);
-    operationalCredentials_addTrustedRootCertificate_parametersList.add(
+    operationalCredentials_addTrustedRootCertificate_commandParams.add(
         addTrustedRootCertificate_rootCertificate_commandParameter);
 
-    operationalCredentials_addTrustedRootCertificate_commandInfo.parameters =
-        operationalCredentials_addTrustedRootCertificate_parametersList;
-    operationalCredentials_clusterInfo.commands.add(
-        operationalCredentials_addTrustedRootCertificate_commandInfo);
-    List<CommandParameter> operationalCredentials_attestationRequest_parametersList =
+    // Populate commands
+    CommandInfo operationalCredentials_addTrustedRootCertificate_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            operationalCredentials_addTrustedRootCertificate_commandParams);
+    operationalCredentials_ClusterCommandInfo.put(
+        "addTrustedRootCertificate", operationalCredentials_addTrustedRootCertificate_CommandInfo);
+    List<CommandParameter> operationalCredentials_attestationRequest_commandParams =
         new ArrayList<>();
-    CommandInfo operationalCredentials_attestationRequest_commandInfo = new CommandInfo();
-    operationalCredentials_attestationRequest_commandInfo.name = "attestationRequest";
-    operationalCredentials_attestationRequest_commandInfo.callbackClass =
-        ChipClusters.OperationalCredentialsCluster.AttestationResponseCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter attestationRequest_attestationNonce_commandParameter =
         new CommandParameter("attestationNonce", byte[].class);
-    operationalCredentials_attestationRequest_parametersList.add(
+    operationalCredentials_attestationRequest_commandParams.add(
         attestationRequest_attestationNonce_commandParameter);
 
-    operationalCredentials_attestationRequest_commandInfo.parameters =
-        operationalCredentials_attestationRequest_parametersList;
-    operationalCredentials_clusterInfo.commands.add(
-        operationalCredentials_attestationRequest_commandInfo);
-    List<CommandParameter> operationalCredentials_certificateChainRequest_parametersList =
+    // Populate commands
+    CommandInfo operationalCredentials_attestationRequest_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            operationalCredentials_attestationRequest_commandParams);
+    operationalCredentials_ClusterCommandInfo.put(
+        "attestationRequest", operationalCredentials_attestationRequest_CommandInfo);
+    List<CommandParameter> operationalCredentials_certificateChainRequest_commandParams =
         new ArrayList<>();
-    CommandInfo operationalCredentials_certificateChainRequest_commandInfo = new CommandInfo();
-    operationalCredentials_certificateChainRequest_commandInfo.name = "certificateChainRequest";
-    operationalCredentials_certificateChainRequest_commandInfo.callbackClass =
-        ChipClusters.OperationalCredentialsCluster.CertificateChainResponseCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter certificateChainRequest_certificateType_commandParameter =
         new CommandParameter("certificateType", int.class);
-    operationalCredentials_certificateChainRequest_parametersList.add(
+    operationalCredentials_certificateChainRequest_commandParams.add(
         certificateChainRequest_certificateType_commandParameter);
 
-    operationalCredentials_certificateChainRequest_commandInfo.parameters =
-        operationalCredentials_certificateChainRequest_parametersList;
-    operationalCredentials_clusterInfo.commands.add(
-        operationalCredentials_certificateChainRequest_commandInfo);
-    List<CommandParameter> operationalCredentials_opCSRRequest_parametersList = new ArrayList<>();
-    CommandInfo operationalCredentials_opCSRRequest_commandInfo = new CommandInfo();
-    operationalCredentials_opCSRRequest_commandInfo.name = "opCSRRequest";
-    operationalCredentials_opCSRRequest_commandInfo.callbackClass =
-        ChipClusters.OperationalCredentialsCluster.OpCSRResponseCallback.class;
+    // Populate commands
+    CommandInfo operationalCredentials_certificateChainRequest_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            operationalCredentials_certificateChainRequest_commandParams);
+    operationalCredentials_ClusterCommandInfo.put(
+        "certificateChainRequest", operationalCredentials_certificateChainRequest_CommandInfo);
+    List<CommandParameter> operationalCredentials_opCSRRequest_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter opCSRRequest_CSRNonce_commandParameter =
         new CommandParameter("CSRNonce", byte[].class);
-    operationalCredentials_opCSRRequest_parametersList.add(opCSRRequest_CSRNonce_commandParameter);
+    operationalCredentials_opCSRRequest_commandParams.add(opCSRRequest_CSRNonce_commandParameter);
 
-    operationalCredentials_opCSRRequest_commandInfo.parameters =
-        operationalCredentials_opCSRRequest_parametersList;
-    operationalCredentials_clusterInfo.commands.add(
-        operationalCredentials_opCSRRequest_commandInfo);
-    List<CommandParameter> operationalCredentials_removeFabric_parametersList = new ArrayList<>();
-    CommandInfo operationalCredentials_removeFabric_commandInfo = new CommandInfo();
-    operationalCredentials_removeFabric_commandInfo.name = "removeFabric";
-    operationalCredentials_removeFabric_commandInfo.callbackClass =
-        ChipClusters.OperationalCredentialsCluster.NOCResponseCallback.class;
+    // Populate commands
+    CommandInfo operationalCredentials_opCSRRequest_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            operationalCredentials_opCSRRequest_commandParams);
+    operationalCredentials_ClusterCommandInfo.put(
+        "opCSRRequest", operationalCredentials_opCSRRequest_CommandInfo);
+    List<CommandParameter> operationalCredentials_removeFabric_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter removeFabric_fabricIndex_commandParameter =
         new CommandParameter("fabricIndex", int.class);
-    operationalCredentials_removeFabric_parametersList.add(
+    operationalCredentials_removeFabric_commandParams.add(
         removeFabric_fabricIndex_commandParameter);
 
-    operationalCredentials_removeFabric_commandInfo.parameters =
-        operationalCredentials_removeFabric_parametersList;
-    operationalCredentials_clusterInfo.commands.add(
-        operationalCredentials_removeFabric_commandInfo);
-    List<CommandParameter> operationalCredentials_removeTrustedRootCertificate_parametersList =
+    // Populate commands
+    CommandInfo operationalCredentials_removeFabric_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            operationalCredentials_removeFabric_commandParams);
+    operationalCredentials_ClusterCommandInfo.put(
+        "removeFabric", operationalCredentials_removeFabric_CommandInfo);
+    List<CommandParameter> operationalCredentials_removeTrustedRootCertificate_commandParams =
         new ArrayList<>();
-    CommandInfo operationalCredentials_removeTrustedRootCertificate_commandInfo = new CommandInfo();
-    operationalCredentials_removeTrustedRootCertificate_commandInfo.name =
-        "removeTrustedRootCertificate";
-    operationalCredentials_removeTrustedRootCertificate_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter removeTrustedRootCertificate_trustedRootIdentifier_commandParameter =
         new CommandParameter("trustedRootIdentifier", byte[].class);
-    operationalCredentials_removeTrustedRootCertificate_parametersList.add(
+    operationalCredentials_removeTrustedRootCertificate_commandParams.add(
         removeTrustedRootCertificate_trustedRootIdentifier_commandParameter);
 
-    operationalCredentials_removeTrustedRootCertificate_commandInfo.parameters =
-        operationalCredentials_removeTrustedRootCertificate_parametersList;
-    operationalCredentials_clusterInfo.commands.add(
-        operationalCredentials_removeTrustedRootCertificate_commandInfo);
-    List<CommandParameter> operationalCredentials_updateFabricLabel_parametersList =
+    // Populate commands
+    CommandInfo operationalCredentials_removeTrustedRootCertificate_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            operationalCredentials_removeTrustedRootCertificate_commandParams);
+    operationalCredentials_ClusterCommandInfo.put(
+        "removeTrustedRootCertificate",
+        operationalCredentials_removeTrustedRootCertificate_CommandInfo);
+    List<CommandParameter> operationalCredentials_updateFabricLabel_commandParams =
         new ArrayList<>();
-    CommandInfo operationalCredentials_updateFabricLabel_commandInfo = new CommandInfo();
-    operationalCredentials_updateFabricLabel_commandInfo.name = "updateFabricLabel";
-    operationalCredentials_updateFabricLabel_commandInfo.callbackClass =
-        ChipClusters.OperationalCredentialsCluster.NOCResponseCallback.class;
+    // TODO: fill out parameter types
+
     CommandParameter updateFabricLabel_label_commandParameter =
         new CommandParameter("label", String.class);
-    operationalCredentials_updateFabricLabel_parametersList.add(
+    operationalCredentials_updateFabricLabel_commandParams.add(
         updateFabricLabel_label_commandParameter);
 
-    operationalCredentials_updateFabricLabel_commandInfo.parameters =
-        operationalCredentials_updateFabricLabel_parametersList;
-    operationalCredentials_clusterInfo.commands.add(
-        operationalCredentials_updateFabricLabel_commandInfo);
-    List<CommandParameter> operationalCredentials_updateNOC_parametersList = new ArrayList<>();
-    CommandInfo operationalCredentials_updateNOC_commandInfo = new CommandInfo();
-    operationalCredentials_updateNOC_commandInfo.name = "updateNOC";
-    operationalCredentials_updateNOC_commandInfo.callbackClass =
-        ChipClusters.OperationalCredentialsCluster.NOCResponseCallback.class;
+    // Populate commands
+    CommandInfo operationalCredentials_updateFabricLabel_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            operationalCredentials_updateFabricLabel_commandParams);
+    operationalCredentials_ClusterCommandInfo.put(
+        "updateFabricLabel", operationalCredentials_updateFabricLabel_CommandInfo);
+    List<CommandParameter> operationalCredentials_updateNOC_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter updateNOC_NOCValue_commandParameter =
         new CommandParameter("NOCValue", byte[].class);
-    operationalCredentials_updateNOC_parametersList.add(updateNOC_NOCValue_commandParameter);
+    operationalCredentials_updateNOC_commandParams.add(updateNOC_NOCValue_commandParameter);
 
     CommandParameter updateNOC_ICACValue_commandParameter =
         new CommandParameter("ICACValue", byte[].class);
-    operationalCredentials_updateNOC_parametersList.add(updateNOC_ICACValue_commandParameter);
+    operationalCredentials_updateNOC_commandParams.add(updateNOC_ICACValue_commandParameter);
 
-    operationalCredentials_updateNOC_commandInfo.parameters =
-        operationalCredentials_updateNOC_parametersList;
-    operationalCredentials_clusterInfo.commands.add(operationalCredentials_updateNOC_commandInfo);
-    clusterInfoMapping.put("operationalCredentials", operationalCredentials_clusterInfo);
-    ClusterInfo powerSource_clusterInfo = new ClusterInfo("powerSource");
-    clusterInfoMapping.put("powerSource", powerSource_clusterInfo);
-    ClusterInfo pressureMeasurement_clusterInfo = new ClusterInfo("pressureMeasurement");
-    clusterInfoMapping.put("pressureMeasurement", pressureMeasurement_clusterInfo);
+    // Populate commands
+    CommandInfo operationalCredentials_updateNOC_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            operationalCredentials_updateNOC_commandParams);
+    operationalCredentials_ClusterCommandInfo.put(
+        "updateNOC", operationalCredentials_updateNOC_CommandInfo);
+    // Populate cluster
+    ClusterInfo operationalCredentials_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OperationalCredentialsCluster(ptr, endpointId),
+            operationalCredentials_ClusterCommandInfo);
+    clusterMap.put("operationalCredentials", operationalCredentials_clusterInfo);
+    Map<String, CommandInfo> powerSource_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo powerSource_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.PowerSourceCluster(ptr, endpointId),
+            powerSource_ClusterCommandInfo);
+    clusterMap.put("powerSource", powerSource_clusterInfo);
+    Map<String, CommandInfo> pressureMeasurement_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo pressureMeasurement_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.PressureMeasurementCluster(ptr, endpointId),
+            pressureMeasurement_ClusterCommandInfo);
+    clusterMap.put("pressureMeasurement", pressureMeasurement_clusterInfo);
+    Map<String, CommandInfo> pumpConfigurationAndControl_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
     ClusterInfo pumpConfigurationAndControl_clusterInfo =
-        new ClusterInfo("pumpConfigurationAndControl");
-    clusterInfoMapping.put("pumpConfigurationAndControl", pumpConfigurationAndControl_clusterInfo);
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.PumpConfigurationAndControlCluster(ptr, endpointId),
+            pumpConfigurationAndControl_ClusterCommandInfo);
+    clusterMap.put("pumpConfigurationAndControl", pumpConfigurationAndControl_clusterInfo);
+    Map<String, CommandInfo> relativeHumidityMeasurement_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
     ClusterInfo relativeHumidityMeasurement_clusterInfo =
-        new ClusterInfo("relativeHumidityMeasurement");
-    clusterInfoMapping.put("relativeHumidityMeasurement", relativeHumidityMeasurement_clusterInfo);
-    ClusterInfo scenes_clusterInfo = new ClusterInfo("scenes");
-    List<CommandParameter> scenes_addScene_parametersList = new ArrayList<>();
-    CommandInfo scenes_addScene_commandInfo = new CommandInfo();
-    scenes_addScene_commandInfo.name = "addScene";
-    scenes_addScene_commandInfo.callbackClass =
-        ChipClusters.ScenesCluster.AddSceneResponseCallback.class;
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.RelativeHumidityMeasurementCluster(ptr, endpointId),
+            relativeHumidityMeasurement_ClusterCommandInfo);
+    clusterMap.put("relativeHumidityMeasurement", relativeHumidityMeasurement_clusterInfo);
+    Map<String, CommandInfo> scenes_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> scenes_addScene_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter addScene_groupId_commandParameter = new CommandParameter("groupId", int.class);
-    scenes_addScene_parametersList.add(addScene_groupId_commandParameter);
+    scenes_addScene_commandParams.add(addScene_groupId_commandParameter);
 
     CommandParameter addScene_sceneId_commandParameter = new CommandParameter("sceneId", int.class);
-    scenes_addScene_parametersList.add(addScene_sceneId_commandParameter);
+    scenes_addScene_commandParams.add(addScene_sceneId_commandParameter);
 
     CommandParameter addScene_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    scenes_addScene_parametersList.add(addScene_transitionTime_commandParameter);
+    scenes_addScene_commandParams.add(addScene_transitionTime_commandParameter);
 
     CommandParameter addScene_sceneName_commandParameter =
         new CommandParameter("sceneName", String.class);
-    scenes_addScene_parametersList.add(addScene_sceneName_commandParameter);
+    scenes_addScene_commandParams.add(addScene_sceneName_commandParameter);
 
     CommandParameter addScene_clusterId_commandParameter =
         new CommandParameter("clusterId", long.class);
-    scenes_addScene_parametersList.add(addScene_clusterId_commandParameter);
+    scenes_addScene_commandParams.add(addScene_clusterId_commandParameter);
 
     CommandParameter addScene_length_commandParameter = new CommandParameter("length", int.class);
-    scenes_addScene_parametersList.add(addScene_length_commandParameter);
+    scenes_addScene_commandParams.add(addScene_length_commandParameter);
 
     CommandParameter addScene_value_commandParameter = new CommandParameter("value", int.class);
-    scenes_addScene_parametersList.add(addScene_value_commandParameter);
+    scenes_addScene_commandParams.add(addScene_value_commandParameter);
 
-    scenes_addScene_commandInfo.parameters = scenes_addScene_parametersList;
-    scenes_clusterInfo.commands.add(scenes_addScene_commandInfo);
-    List<CommandParameter> scenes_getSceneMembership_parametersList = new ArrayList<>();
-    CommandInfo scenes_getSceneMembership_commandInfo = new CommandInfo();
-    scenes_getSceneMembership_commandInfo.name = "getSceneMembership";
-    scenes_getSceneMembership_commandInfo.callbackClass =
-        ChipClusters.ScenesCluster.GetSceneMembershipResponseCallback.class;
+    // Populate commands
+    CommandInfo scenes_addScene_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            scenes_addScene_commandParams);
+    scenes_ClusterCommandInfo.put("addScene", scenes_addScene_CommandInfo);
+    List<CommandParameter> scenes_getSceneMembership_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getSceneMembership_groupId_commandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_getSceneMembership_parametersList.add(getSceneMembership_groupId_commandParameter);
+    scenes_getSceneMembership_commandParams.add(getSceneMembership_groupId_commandParameter);
 
-    scenes_getSceneMembership_commandInfo.parameters = scenes_getSceneMembership_parametersList;
-    scenes_clusterInfo.commands.add(scenes_getSceneMembership_commandInfo);
-    List<CommandParameter> scenes_recallScene_parametersList = new ArrayList<>();
-    CommandInfo scenes_recallScene_commandInfo = new CommandInfo();
-    scenes_recallScene_commandInfo.name = "recallScene";
-    scenes_recallScene_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo scenes_getSceneMembership_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            scenes_getSceneMembership_commandParams);
+    scenes_ClusterCommandInfo.put("getSceneMembership", scenes_getSceneMembership_CommandInfo);
+    List<CommandParameter> scenes_recallScene_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter recallScene_groupId_commandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_recallScene_parametersList.add(recallScene_groupId_commandParameter);
+    scenes_recallScene_commandParams.add(recallScene_groupId_commandParameter);
 
     CommandParameter recallScene_sceneId_commandParameter =
         new CommandParameter("sceneId", int.class);
-    scenes_recallScene_parametersList.add(recallScene_sceneId_commandParameter);
+    scenes_recallScene_commandParams.add(recallScene_sceneId_commandParameter);
 
     CommandParameter recallScene_transitionTime_commandParameter =
         new CommandParameter("transitionTime", int.class);
-    scenes_recallScene_parametersList.add(recallScene_transitionTime_commandParameter);
+    scenes_recallScene_commandParams.add(recallScene_transitionTime_commandParameter);
 
-    scenes_recallScene_commandInfo.parameters = scenes_recallScene_parametersList;
-    scenes_clusterInfo.commands.add(scenes_recallScene_commandInfo);
-    List<CommandParameter> scenes_removeAllScenes_parametersList = new ArrayList<>();
-    CommandInfo scenes_removeAllScenes_commandInfo = new CommandInfo();
-    scenes_removeAllScenes_commandInfo.name = "removeAllScenes";
-    scenes_removeAllScenes_commandInfo.callbackClass =
-        ChipClusters.ScenesCluster.RemoveAllScenesResponseCallback.class;
+    // Populate commands
+    CommandInfo scenes_recallScene_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            scenes_recallScene_commandParams);
+    scenes_ClusterCommandInfo.put("recallScene", scenes_recallScene_CommandInfo);
+    List<CommandParameter> scenes_removeAllScenes_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter removeAllScenes_groupId_commandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_removeAllScenes_parametersList.add(removeAllScenes_groupId_commandParameter);
+    scenes_removeAllScenes_commandParams.add(removeAllScenes_groupId_commandParameter);
 
-    scenes_removeAllScenes_commandInfo.parameters = scenes_removeAllScenes_parametersList;
-    scenes_clusterInfo.commands.add(scenes_removeAllScenes_commandInfo);
-    List<CommandParameter> scenes_removeScene_parametersList = new ArrayList<>();
-    CommandInfo scenes_removeScene_commandInfo = new CommandInfo();
-    scenes_removeScene_commandInfo.name = "removeScene";
-    scenes_removeScene_commandInfo.callbackClass =
-        ChipClusters.ScenesCluster.RemoveSceneResponseCallback.class;
+    // Populate commands
+    CommandInfo scenes_removeAllScenes_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            scenes_removeAllScenes_commandParams);
+    scenes_ClusterCommandInfo.put("removeAllScenes", scenes_removeAllScenes_CommandInfo);
+    List<CommandParameter> scenes_removeScene_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter removeScene_groupId_commandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_removeScene_parametersList.add(removeScene_groupId_commandParameter);
+    scenes_removeScene_commandParams.add(removeScene_groupId_commandParameter);
 
     CommandParameter removeScene_sceneId_commandParameter =
         new CommandParameter("sceneId", int.class);
-    scenes_removeScene_parametersList.add(removeScene_sceneId_commandParameter);
+    scenes_removeScene_commandParams.add(removeScene_sceneId_commandParameter);
 
-    scenes_removeScene_commandInfo.parameters = scenes_removeScene_parametersList;
-    scenes_clusterInfo.commands.add(scenes_removeScene_commandInfo);
-    List<CommandParameter> scenes_storeScene_parametersList = new ArrayList<>();
-    CommandInfo scenes_storeScene_commandInfo = new CommandInfo();
-    scenes_storeScene_commandInfo.name = "storeScene";
-    scenes_storeScene_commandInfo.callbackClass =
-        ChipClusters.ScenesCluster.StoreSceneResponseCallback.class;
+    // Populate commands
+    CommandInfo scenes_removeScene_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            scenes_removeScene_commandParams);
+    scenes_ClusterCommandInfo.put("removeScene", scenes_removeScene_CommandInfo);
+    List<CommandParameter> scenes_storeScene_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter storeScene_groupId_commandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_storeScene_parametersList.add(storeScene_groupId_commandParameter);
+    scenes_storeScene_commandParams.add(storeScene_groupId_commandParameter);
 
     CommandParameter storeScene_sceneId_commandParameter =
         new CommandParameter("sceneId", int.class);
-    scenes_storeScene_parametersList.add(storeScene_sceneId_commandParameter);
+    scenes_storeScene_commandParams.add(storeScene_sceneId_commandParameter);
 
-    scenes_storeScene_commandInfo.parameters = scenes_storeScene_parametersList;
-    scenes_clusterInfo.commands.add(scenes_storeScene_commandInfo);
-    List<CommandParameter> scenes_viewScene_parametersList = new ArrayList<>();
-    CommandInfo scenes_viewScene_commandInfo = new CommandInfo();
-    scenes_viewScene_commandInfo.name = "viewScene";
-    scenes_viewScene_commandInfo.callbackClass =
-        ChipClusters.ScenesCluster.ViewSceneResponseCallback.class;
+    // Populate commands
+    CommandInfo scenes_storeScene_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            scenes_storeScene_commandParams);
+    scenes_ClusterCommandInfo.put("storeScene", scenes_storeScene_CommandInfo);
+    List<CommandParameter> scenes_viewScene_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter viewScene_groupId_commandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_viewScene_parametersList.add(viewScene_groupId_commandParameter);
+    scenes_viewScene_commandParams.add(viewScene_groupId_commandParameter);
 
     CommandParameter viewScene_sceneId_commandParameter =
         new CommandParameter("sceneId", int.class);
-    scenes_viewScene_parametersList.add(viewScene_sceneId_commandParameter);
+    scenes_viewScene_commandParams.add(viewScene_sceneId_commandParameter);
 
-    scenes_viewScene_commandInfo.parameters = scenes_viewScene_parametersList;
-    scenes_clusterInfo.commands.add(scenes_viewScene_commandInfo);
-    clusterInfoMapping.put("scenes", scenes_clusterInfo);
-    ClusterInfo softwareDiagnostics_clusterInfo = new ClusterInfo("softwareDiagnostics");
-    List<CommandParameter> softwareDiagnostics_resetWatermarks_parametersList = new ArrayList<>();
-    CommandInfo softwareDiagnostics_resetWatermarks_commandInfo = new CommandInfo();
-    softwareDiagnostics_resetWatermarks_commandInfo.name = "resetWatermarks";
-    softwareDiagnostics_resetWatermarks_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    softwareDiagnostics_resetWatermarks_commandInfo.parameters =
-        softwareDiagnostics_resetWatermarks_parametersList;
-    softwareDiagnostics_clusterInfo.commands.add(softwareDiagnostics_resetWatermarks_commandInfo);
-    clusterInfoMapping.put("softwareDiagnostics", softwareDiagnostics_clusterInfo);
-    ClusterInfo switch_clusterInfo = new ClusterInfo("switch");
-    clusterInfoMapping.put("switch", switch_clusterInfo);
-    ClusterInfo tvChannel_clusterInfo = new ClusterInfo("tvChannel");
-    List<CommandParameter> tvChannel_changeChannel_parametersList = new ArrayList<>();
-    CommandInfo tvChannel_changeChannel_commandInfo = new CommandInfo();
-    tvChannel_changeChannel_commandInfo.name = "changeChannel";
-    tvChannel_changeChannel_commandInfo.callbackClass =
-        ChipClusters.TvChannelCluster.ChangeChannelResponseCallback.class;
+    // Populate commands
+    CommandInfo scenes_viewScene_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            scenes_viewScene_commandParams);
+    scenes_ClusterCommandInfo.put("viewScene", scenes_viewScene_CommandInfo);
+    // Populate cluster
+    ClusterInfo scenes_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ScenesCluster(ptr, endpointId),
+            scenes_ClusterCommandInfo);
+    clusterMap.put("scenes", scenes_clusterInfo);
+    Map<String, CommandInfo> softwareDiagnostics_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> softwareDiagnostics_resetWatermarks_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo softwareDiagnostics_resetWatermarks_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            softwareDiagnostics_resetWatermarks_commandParams);
+    softwareDiagnostics_ClusterCommandInfo.put(
+        "resetWatermarks", softwareDiagnostics_resetWatermarks_CommandInfo);
+    // Populate cluster
+    ClusterInfo softwareDiagnostics_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.SoftwareDiagnosticsCluster(ptr, endpointId),
+            softwareDiagnostics_ClusterCommandInfo);
+    clusterMap.put("softwareDiagnostics", softwareDiagnostics_clusterInfo);
+    Map<String, CommandInfo> switch_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo switch_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.SwitchCluster(ptr, endpointId),
+            switch_ClusterCommandInfo);
+    clusterMap.put("switch", switch_clusterInfo);
+    Map<String, CommandInfo> tvChannel_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> tvChannel_changeChannel_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter changeChannel_match_commandParameter =
         new CommandParameter("match", String.class);
-    tvChannel_changeChannel_parametersList.add(changeChannel_match_commandParameter);
+    tvChannel_changeChannel_commandParams.add(changeChannel_match_commandParameter);
 
-    tvChannel_changeChannel_commandInfo.parameters = tvChannel_changeChannel_parametersList;
-    tvChannel_clusterInfo.commands.add(tvChannel_changeChannel_commandInfo);
-    List<CommandParameter> tvChannel_changeChannelByNumber_parametersList = new ArrayList<>();
-    CommandInfo tvChannel_changeChannelByNumber_commandInfo = new CommandInfo();
-    tvChannel_changeChannelByNumber_commandInfo.name = "changeChannelByNumber";
-    tvChannel_changeChannelByNumber_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo tvChannel_changeChannel_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            tvChannel_changeChannel_commandParams);
+    tvChannel_ClusterCommandInfo.put("changeChannel", tvChannel_changeChannel_CommandInfo);
+    List<CommandParameter> tvChannel_changeChannelByNumber_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter changeChannelByNumber_majorNumber_commandParameter =
         new CommandParameter("majorNumber", int.class);
-    tvChannel_changeChannelByNumber_parametersList.add(
+    tvChannel_changeChannelByNumber_commandParams.add(
         changeChannelByNumber_majorNumber_commandParameter);
 
     CommandParameter changeChannelByNumber_minorNumber_commandParameter =
         new CommandParameter("minorNumber", int.class);
-    tvChannel_changeChannelByNumber_parametersList.add(
+    tvChannel_changeChannelByNumber_commandParams.add(
         changeChannelByNumber_minorNumber_commandParameter);
 
-    tvChannel_changeChannelByNumber_commandInfo.parameters =
-        tvChannel_changeChannelByNumber_parametersList;
-    tvChannel_clusterInfo.commands.add(tvChannel_changeChannelByNumber_commandInfo);
-    List<CommandParameter> tvChannel_skipChannel_parametersList = new ArrayList<>();
-    CommandInfo tvChannel_skipChannel_commandInfo = new CommandInfo();
-    tvChannel_skipChannel_commandInfo.name = "skipChannel";
-    tvChannel_skipChannel_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
-    CommandParameter skipChannel_count_commandParameter = new CommandParameter("count", int.class);
-    tvChannel_skipChannel_parametersList.add(skipChannel_count_commandParameter);
+    // Populate commands
+    CommandInfo tvChannel_changeChannelByNumber_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            tvChannel_changeChannelByNumber_commandParams);
+    tvChannel_ClusterCommandInfo.put(
+        "changeChannelByNumber", tvChannel_changeChannelByNumber_CommandInfo);
+    List<CommandParameter> tvChannel_skipChannel_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
 
-    tvChannel_skipChannel_commandInfo.parameters = tvChannel_skipChannel_parametersList;
-    tvChannel_clusterInfo.commands.add(tvChannel_skipChannel_commandInfo);
-    clusterInfoMapping.put("tvChannel", tvChannel_clusterInfo);
-    ClusterInfo targetNavigator_clusterInfo = new ClusterInfo("targetNavigator");
-    List<CommandParameter> targetNavigator_navigateTarget_parametersList = new ArrayList<>();
-    CommandInfo targetNavigator_navigateTarget_commandInfo = new CommandInfo();
-    targetNavigator_navigateTarget_commandInfo.name = "navigateTarget";
-    targetNavigator_navigateTarget_commandInfo.callbackClass =
-        ChipClusters.TargetNavigatorCluster.NavigateTargetResponseCallback.class;
+    CommandParameter skipChannel_count_commandParameter = new CommandParameter("count", int.class);
+    tvChannel_skipChannel_commandParams.add(skipChannel_count_commandParameter);
+
+    // Populate commands
+    CommandInfo tvChannel_skipChannel_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            tvChannel_skipChannel_commandParams);
+    tvChannel_ClusterCommandInfo.put("skipChannel", tvChannel_skipChannel_CommandInfo);
+    // Populate cluster
+    ClusterInfo tvChannel_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.TvChannelCluster(ptr, endpointId),
+            tvChannel_ClusterCommandInfo);
+    clusterMap.put("tvChannel", tvChannel_clusterInfo);
+    Map<String, CommandInfo> targetNavigator_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> targetNavigator_navigateTarget_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter navigateTarget_target_commandParameter =
         new CommandParameter("target", int.class);
-    targetNavigator_navigateTarget_parametersList.add(navigateTarget_target_commandParameter);
+    targetNavigator_navigateTarget_commandParams.add(navigateTarget_target_commandParameter);
 
     CommandParameter navigateTarget_data_commandParameter =
         new CommandParameter("data", String.class);
-    targetNavigator_navigateTarget_parametersList.add(navigateTarget_data_commandParameter);
+    targetNavigator_navigateTarget_commandParams.add(navigateTarget_data_commandParameter);
 
-    targetNavigator_navigateTarget_commandInfo.parameters =
-        targetNavigator_navigateTarget_parametersList;
-    targetNavigator_clusterInfo.commands.add(targetNavigator_navigateTarget_commandInfo);
-    clusterInfoMapping.put("targetNavigator", targetNavigator_clusterInfo);
-    ClusterInfo temperatureMeasurement_clusterInfo = new ClusterInfo("temperatureMeasurement");
-    clusterInfoMapping.put("temperatureMeasurement", temperatureMeasurement_clusterInfo);
-    ClusterInfo testCluster_clusterInfo = new ClusterInfo("testCluster");
-    List<CommandParameter> testCluster_test_parametersList = new ArrayList<>();
-    CommandInfo testCluster_test_commandInfo = new CommandInfo();
-    testCluster_test_commandInfo.name = "test";
-    testCluster_test_commandInfo.callbackClass = ChipClusters.DefaultClusterCallback.class;
-    testCluster_test_commandInfo.parameters = testCluster_test_parametersList;
-    testCluster_clusterInfo.commands.add(testCluster_test_commandInfo);
-    List<CommandParameter> testCluster_testAddArguments_parametersList = new ArrayList<>();
-    CommandInfo testCluster_testAddArguments_commandInfo = new CommandInfo();
-    testCluster_testAddArguments_commandInfo.name = "testAddArguments";
-    testCluster_testAddArguments_commandInfo.callbackClass =
-        ChipClusters.TestClusterCluster.TestAddArgumentsResponseCallback.class;
+    // Populate commands
+    CommandInfo targetNavigator_navigateTarget_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            targetNavigator_navigateTarget_commandParams);
+    targetNavigator_ClusterCommandInfo.put(
+        "navigateTarget", targetNavigator_navigateTarget_CommandInfo);
+    // Populate cluster
+    ClusterInfo targetNavigator_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.TargetNavigatorCluster(ptr, endpointId),
+            targetNavigator_ClusterCommandInfo);
+    clusterMap.put("targetNavigator", targetNavigator_clusterInfo);
+    Map<String, CommandInfo> temperatureMeasurement_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo temperatureMeasurement_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.TemperatureMeasurementCluster(ptr, endpointId),
+            temperatureMeasurement_ClusterCommandInfo);
+    clusterMap.put("temperatureMeasurement", temperatureMeasurement_clusterInfo);
+    Map<String, CommandInfo> testCluster_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> testCluster_test_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo testCluster_test_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testCluster_test_commandParams);
+    testCluster_ClusterCommandInfo.put("test", testCluster_test_CommandInfo);
+    List<CommandParameter> testCluster_testAddArguments_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter testAddArguments_arg1_commandParameter =
         new CommandParameter("arg1", int.class);
-    testCluster_testAddArguments_parametersList.add(testAddArguments_arg1_commandParameter);
+    testCluster_testAddArguments_commandParams.add(testAddArguments_arg1_commandParameter);
 
     CommandParameter testAddArguments_arg2_commandParameter =
         new CommandParameter("arg2", int.class);
-    testCluster_testAddArguments_parametersList.add(testAddArguments_arg2_commandParameter);
+    testCluster_testAddArguments_commandParams.add(testAddArguments_arg2_commandParameter);
 
-    testCluster_testAddArguments_commandInfo.parameters =
-        testCluster_testAddArguments_parametersList;
-    testCluster_clusterInfo.commands.add(testCluster_testAddArguments_commandInfo);
-    List<CommandParameter> testCluster_testNotHandled_parametersList = new ArrayList<>();
-    CommandInfo testCluster_testNotHandled_commandInfo = new CommandInfo();
-    testCluster_testNotHandled_commandInfo.name = "testNotHandled";
-    testCluster_testNotHandled_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    testCluster_testNotHandled_commandInfo.parameters = testCluster_testNotHandled_parametersList;
-    testCluster_clusterInfo.commands.add(testCluster_testNotHandled_commandInfo);
-    List<CommandParameter> testCluster_testSpecific_parametersList = new ArrayList<>();
-    CommandInfo testCluster_testSpecific_commandInfo = new CommandInfo();
-    testCluster_testSpecific_commandInfo.name = "testSpecific";
-    testCluster_testSpecific_commandInfo.callbackClass =
-        ChipClusters.TestClusterCluster.TestSpecificResponseCallback.class;
-    testCluster_testSpecific_commandInfo.parameters = testCluster_testSpecific_parametersList;
-    testCluster_clusterInfo.commands.add(testCluster_testSpecific_commandInfo);
-    List<CommandParameter> testCluster_testUnknownCommand_parametersList = new ArrayList<>();
-    CommandInfo testCluster_testUnknownCommand_commandInfo = new CommandInfo();
-    testCluster_testUnknownCommand_commandInfo.name = "testUnknownCommand";
-    testCluster_testUnknownCommand_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    testCluster_testUnknownCommand_commandInfo.parameters =
-        testCluster_testUnknownCommand_parametersList;
-    testCluster_clusterInfo.commands.add(testCluster_testUnknownCommand_commandInfo);
-    clusterInfoMapping.put("testCluster", testCluster_clusterInfo);
-    ClusterInfo thermostat_clusterInfo = new ClusterInfo("thermostat");
-    List<CommandParameter> thermostat_clearWeeklySchedule_parametersList = new ArrayList<>();
-    CommandInfo thermostat_clearWeeklySchedule_commandInfo = new CommandInfo();
-    thermostat_clearWeeklySchedule_commandInfo.name = "clearWeeklySchedule";
-    thermostat_clearWeeklySchedule_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    thermostat_clearWeeklySchedule_commandInfo.parameters =
-        thermostat_clearWeeklySchedule_parametersList;
-    thermostat_clusterInfo.commands.add(thermostat_clearWeeklySchedule_commandInfo);
-    List<CommandParameter> thermostat_getRelayStatusLog_parametersList = new ArrayList<>();
-    CommandInfo thermostat_getRelayStatusLog_commandInfo = new CommandInfo();
-    thermostat_getRelayStatusLog_commandInfo.name = "getRelayStatusLog";
-    thermostat_getRelayStatusLog_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    thermostat_getRelayStatusLog_commandInfo.parameters =
-        thermostat_getRelayStatusLog_parametersList;
-    thermostat_clusterInfo.commands.add(thermostat_getRelayStatusLog_commandInfo);
-    List<CommandParameter> thermostat_getWeeklySchedule_parametersList = new ArrayList<>();
-    CommandInfo thermostat_getWeeklySchedule_commandInfo = new CommandInfo();
-    thermostat_getWeeklySchedule_commandInfo.name = "getWeeklySchedule";
-    thermostat_getWeeklySchedule_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo testCluster_testAddArguments_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testCluster_testAddArguments_commandParams);
+    testCluster_ClusterCommandInfo.put(
+        "testAddArguments", testCluster_testAddArguments_CommandInfo);
+    List<CommandParameter> testCluster_testNotHandled_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo testCluster_testNotHandled_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testCluster_testNotHandled_commandParams);
+    testCluster_ClusterCommandInfo.put("testNotHandled", testCluster_testNotHandled_CommandInfo);
+    List<CommandParameter> testCluster_testSpecific_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo testCluster_testSpecific_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testCluster_testSpecific_commandParams);
+    testCluster_ClusterCommandInfo.put("testSpecific", testCluster_testSpecific_CommandInfo);
+    List<CommandParameter> testCluster_testUnknownCommand_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo testCluster_testUnknownCommand_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testCluster_testUnknownCommand_commandParams);
+    testCluster_ClusterCommandInfo.put(
+        "testUnknownCommand", testCluster_testUnknownCommand_CommandInfo);
+    // Populate cluster
+    ClusterInfo testCluster_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.TestClusterCluster(ptr, endpointId),
+            testCluster_ClusterCommandInfo);
+    clusterMap.put("testCluster", testCluster_clusterInfo);
+    Map<String, CommandInfo> thermostat_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> thermostat_clearWeeklySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo thermostat_clearWeeklySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            thermostat_clearWeeklySchedule_commandParams);
+    thermostat_ClusterCommandInfo.put(
+        "clearWeeklySchedule", thermostat_clearWeeklySchedule_CommandInfo);
+    List<CommandParameter> thermostat_getRelayStatusLog_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo thermostat_getRelayStatusLog_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            thermostat_getRelayStatusLog_commandParams);
+    thermostat_ClusterCommandInfo.put(
+        "getRelayStatusLog", thermostat_getRelayStatusLog_CommandInfo);
+    List<CommandParameter> thermostat_getWeeklySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter getWeeklySchedule_daysToReturn_commandParameter =
         new CommandParameter("daysToReturn", int.class);
-    thermostat_getWeeklySchedule_parametersList.add(
-        getWeeklySchedule_daysToReturn_commandParameter);
+    thermostat_getWeeklySchedule_commandParams.add(getWeeklySchedule_daysToReturn_commandParameter);
 
     CommandParameter getWeeklySchedule_modeToReturn_commandParameter =
         new CommandParameter("modeToReturn", int.class);
-    thermostat_getWeeklySchedule_parametersList.add(
-        getWeeklySchedule_modeToReturn_commandParameter);
+    thermostat_getWeeklySchedule_commandParams.add(getWeeklySchedule_modeToReturn_commandParameter);
 
-    thermostat_getWeeklySchedule_commandInfo.parameters =
-        thermostat_getWeeklySchedule_parametersList;
-    thermostat_clusterInfo.commands.add(thermostat_getWeeklySchedule_commandInfo);
-    List<CommandParameter> thermostat_setWeeklySchedule_parametersList = new ArrayList<>();
-    CommandInfo thermostat_setWeeklySchedule_commandInfo = new CommandInfo();
-    thermostat_setWeeklySchedule_commandInfo.name = "setWeeklySchedule";
-    thermostat_setWeeklySchedule_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo thermostat_getWeeklySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            thermostat_getWeeklySchedule_commandParams);
+    thermostat_ClusterCommandInfo.put(
+        "getWeeklySchedule", thermostat_getWeeklySchedule_CommandInfo);
+    List<CommandParameter> thermostat_setWeeklySchedule_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter setWeeklySchedule_numberOfTransitionsForSequence_commandParameter =
         new CommandParameter("numberOfTransitionsForSequence", int.class);
-    thermostat_setWeeklySchedule_parametersList.add(
+    thermostat_setWeeklySchedule_commandParams.add(
         setWeeklySchedule_numberOfTransitionsForSequence_commandParameter);
 
     CommandParameter setWeeklySchedule_dayOfWeekForSequence_commandParameter =
         new CommandParameter("dayOfWeekForSequence", int.class);
-    thermostat_setWeeklySchedule_parametersList.add(
+    thermostat_setWeeklySchedule_commandParams.add(
         setWeeklySchedule_dayOfWeekForSequence_commandParameter);
 
     CommandParameter setWeeklySchedule_modeForSequence_commandParameter =
         new CommandParameter("modeForSequence", int.class);
-    thermostat_setWeeklySchedule_parametersList.add(
+    thermostat_setWeeklySchedule_commandParams.add(
         setWeeklySchedule_modeForSequence_commandParameter);
 
     CommandParameter setWeeklySchedule_payload_commandParameter =
         new CommandParameter("payload", int.class);
-    thermostat_setWeeklySchedule_parametersList.add(setWeeklySchedule_payload_commandParameter);
+    thermostat_setWeeklySchedule_commandParams.add(setWeeklySchedule_payload_commandParameter);
 
-    thermostat_setWeeklySchedule_commandInfo.parameters =
-        thermostat_setWeeklySchedule_parametersList;
-    thermostat_clusterInfo.commands.add(thermostat_setWeeklySchedule_commandInfo);
-    List<CommandParameter> thermostat_setpointRaiseLower_parametersList = new ArrayList<>();
-    CommandInfo thermostat_setpointRaiseLower_commandInfo = new CommandInfo();
-    thermostat_setpointRaiseLower_commandInfo.name = "setpointRaiseLower";
-    thermostat_setpointRaiseLower_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo thermostat_setWeeklySchedule_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            thermostat_setWeeklySchedule_commandParams);
+    thermostat_ClusterCommandInfo.put(
+        "setWeeklySchedule", thermostat_setWeeklySchedule_CommandInfo);
+    List<CommandParameter> thermostat_setpointRaiseLower_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter setpointRaiseLower_mode_commandParameter =
         new CommandParameter("mode", int.class);
-    thermostat_setpointRaiseLower_parametersList.add(setpointRaiseLower_mode_commandParameter);
+    thermostat_setpointRaiseLower_commandParams.add(setpointRaiseLower_mode_commandParameter);
 
     CommandParameter setpointRaiseLower_amount_commandParameter =
         new CommandParameter("amount", int.class);
-    thermostat_setpointRaiseLower_parametersList.add(setpointRaiseLower_amount_commandParameter);
+    thermostat_setpointRaiseLower_commandParams.add(setpointRaiseLower_amount_commandParameter);
 
-    thermostat_setpointRaiseLower_commandInfo.parameters =
-        thermostat_setpointRaiseLower_parametersList;
-    thermostat_clusterInfo.commands.add(thermostat_setpointRaiseLower_commandInfo);
-    clusterInfoMapping.put("thermostat", thermostat_clusterInfo);
+    // Populate commands
+    CommandInfo thermostat_setpointRaiseLower_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            thermostat_setpointRaiseLower_commandParams);
+    thermostat_ClusterCommandInfo.put(
+        "setpointRaiseLower", thermostat_setpointRaiseLower_CommandInfo);
+    // Populate cluster
+    ClusterInfo thermostat_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ThermostatCluster(ptr, endpointId),
+            thermostat_ClusterCommandInfo);
+    clusterMap.put("thermostat", thermostat_clusterInfo);
+    Map<String, CommandInfo> thermostatUserInterfaceConfiguration_ClusterCommandInfo =
+        new HashMap<>();
+    // Populate cluster
     ClusterInfo thermostatUserInterfaceConfiguration_clusterInfo =
-        new ClusterInfo("thermostatUserInterfaceConfiguration");
-    clusterInfoMapping.put(
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.ThermostatUserInterfaceConfigurationCluster(ptr, endpointId),
+            thermostatUserInterfaceConfiguration_ClusterCommandInfo);
+    clusterMap.put(
         "thermostatUserInterfaceConfiguration", thermostatUserInterfaceConfiguration_clusterInfo);
-    ClusterInfo threadNetworkDiagnostics_clusterInfo = new ClusterInfo("threadNetworkDiagnostics");
-    List<CommandParameter> threadNetworkDiagnostics_resetCounts_parametersList = new ArrayList<>();
-    CommandInfo threadNetworkDiagnostics_resetCounts_commandInfo = new CommandInfo();
-    threadNetworkDiagnostics_resetCounts_commandInfo.name = "resetCounts";
-    threadNetworkDiagnostics_resetCounts_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    threadNetworkDiagnostics_resetCounts_commandInfo.parameters =
-        threadNetworkDiagnostics_resetCounts_parametersList;
-    threadNetworkDiagnostics_clusterInfo.commands.add(
-        threadNetworkDiagnostics_resetCounts_commandInfo);
-    clusterInfoMapping.put("threadNetworkDiagnostics", threadNetworkDiagnostics_clusterInfo);
-    ClusterInfo wakeOnLan_clusterInfo = new ClusterInfo("wakeOnLan");
-    clusterInfoMapping.put("wakeOnLan", wakeOnLan_clusterInfo);
-    ClusterInfo wiFiNetworkDiagnostics_clusterInfo = new ClusterInfo("wiFiNetworkDiagnostics");
-    List<CommandParameter> wiFiNetworkDiagnostics_resetCounts_parametersList = new ArrayList<>();
-    CommandInfo wiFiNetworkDiagnostics_resetCounts_commandInfo = new CommandInfo();
-    wiFiNetworkDiagnostics_resetCounts_commandInfo.name = "resetCounts";
-    wiFiNetworkDiagnostics_resetCounts_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    wiFiNetworkDiagnostics_resetCounts_commandInfo.parameters =
-        wiFiNetworkDiagnostics_resetCounts_parametersList;
-    wiFiNetworkDiagnostics_clusterInfo.commands.add(wiFiNetworkDiagnostics_resetCounts_commandInfo);
-    clusterInfoMapping.put("wiFiNetworkDiagnostics", wiFiNetworkDiagnostics_clusterInfo);
-    ClusterInfo windowCovering_clusterInfo = new ClusterInfo("windowCovering");
-    List<CommandParameter> windowCovering_downOrClose_parametersList = new ArrayList<>();
-    CommandInfo windowCovering_downOrClose_commandInfo = new CommandInfo();
-    windowCovering_downOrClose_commandInfo.name = "downOrClose";
-    windowCovering_downOrClose_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
-    windowCovering_downOrClose_commandInfo.parameters = windowCovering_downOrClose_parametersList;
-    windowCovering_clusterInfo.commands.add(windowCovering_downOrClose_commandInfo);
-    List<CommandParameter> windowCovering_goToLiftPercentage_parametersList = new ArrayList<>();
-    CommandInfo windowCovering_goToLiftPercentage_commandInfo = new CommandInfo();
-    windowCovering_goToLiftPercentage_commandInfo.name = "goToLiftPercentage";
-    windowCovering_goToLiftPercentage_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    Map<String, CommandInfo> threadNetworkDiagnostics_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> threadNetworkDiagnostics_resetCounts_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo threadNetworkDiagnostics_resetCounts_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            threadNetworkDiagnostics_resetCounts_commandParams);
+    threadNetworkDiagnostics_ClusterCommandInfo.put(
+        "resetCounts", threadNetworkDiagnostics_resetCounts_CommandInfo);
+    // Populate cluster
+    ClusterInfo threadNetworkDiagnostics_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ThreadNetworkDiagnosticsCluster(ptr, endpointId),
+            threadNetworkDiagnostics_ClusterCommandInfo);
+    clusterMap.put("threadNetworkDiagnostics", threadNetworkDiagnostics_clusterInfo);
+    Map<String, CommandInfo> wakeOnLan_ClusterCommandInfo = new HashMap<>();
+    // Populate cluster
+    ClusterInfo wakeOnLan_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.WakeOnLanCluster(ptr, endpointId),
+            wakeOnLan_ClusterCommandInfo);
+    clusterMap.put("wakeOnLan", wakeOnLan_clusterInfo);
+    Map<String, CommandInfo> wiFiNetworkDiagnostics_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> wiFiNetworkDiagnostics_resetCounts_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo wiFiNetworkDiagnostics_resetCounts_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            wiFiNetworkDiagnostics_resetCounts_commandParams);
+    wiFiNetworkDiagnostics_ClusterCommandInfo.put(
+        "resetCounts", wiFiNetworkDiagnostics_resetCounts_CommandInfo);
+    // Populate cluster
+    ClusterInfo wiFiNetworkDiagnostics_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.WiFiNetworkDiagnosticsCluster(ptr, endpointId),
+            wiFiNetworkDiagnostics_ClusterCommandInfo);
+    clusterMap.put("wiFiNetworkDiagnostics", wiFiNetworkDiagnostics_clusterInfo);
+    Map<String, CommandInfo> windowCovering_ClusterCommandInfo = new HashMap<>();
+    List<CommandParameter> windowCovering_downOrClose_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo windowCovering_downOrClose_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            windowCovering_downOrClose_commandParams);
+    windowCovering_ClusterCommandInfo.put("downOrClose", windowCovering_downOrClose_CommandInfo);
+    List<CommandParameter> windowCovering_goToLiftPercentage_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter goToLiftPercentage_liftPercentageValue_commandParameter =
         new CommandParameter("liftPercentageValue", int.class);
-    windowCovering_goToLiftPercentage_parametersList.add(
+    windowCovering_goToLiftPercentage_commandParams.add(
         goToLiftPercentage_liftPercentageValue_commandParameter);
 
     CommandParameter goToLiftPercentage_liftPercent100thsValue_commandParameter =
         new CommandParameter("liftPercent100thsValue", int.class);
-    windowCovering_goToLiftPercentage_parametersList.add(
+    windowCovering_goToLiftPercentage_commandParams.add(
         goToLiftPercentage_liftPercent100thsValue_commandParameter);
 
-    windowCovering_goToLiftPercentage_commandInfo.parameters =
-        windowCovering_goToLiftPercentage_parametersList;
-    windowCovering_clusterInfo.commands.add(windowCovering_goToLiftPercentage_commandInfo);
-    List<CommandParameter> windowCovering_goToLiftValue_parametersList = new ArrayList<>();
-    CommandInfo windowCovering_goToLiftValue_commandInfo = new CommandInfo();
-    windowCovering_goToLiftValue_commandInfo.name = "goToLiftValue";
-    windowCovering_goToLiftValue_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo windowCovering_goToLiftPercentage_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            windowCovering_goToLiftPercentage_commandParams);
+    windowCovering_ClusterCommandInfo.put(
+        "goToLiftPercentage", windowCovering_goToLiftPercentage_CommandInfo);
+    List<CommandParameter> windowCovering_goToLiftValue_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter goToLiftValue_liftValue_commandParameter =
         new CommandParameter("liftValue", int.class);
-    windowCovering_goToLiftValue_parametersList.add(goToLiftValue_liftValue_commandParameter);
+    windowCovering_goToLiftValue_commandParams.add(goToLiftValue_liftValue_commandParameter);
 
-    windowCovering_goToLiftValue_commandInfo.parameters =
-        windowCovering_goToLiftValue_parametersList;
-    windowCovering_clusterInfo.commands.add(windowCovering_goToLiftValue_commandInfo);
-    List<CommandParameter> windowCovering_goToTiltPercentage_parametersList = new ArrayList<>();
-    CommandInfo windowCovering_goToTiltPercentage_commandInfo = new CommandInfo();
-    windowCovering_goToTiltPercentage_commandInfo.name = "goToTiltPercentage";
-    windowCovering_goToTiltPercentage_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo windowCovering_goToLiftValue_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            windowCovering_goToLiftValue_commandParams);
+    windowCovering_ClusterCommandInfo.put(
+        "goToLiftValue", windowCovering_goToLiftValue_CommandInfo);
+    List<CommandParameter> windowCovering_goToTiltPercentage_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter goToTiltPercentage_tiltPercentageValue_commandParameter =
         new CommandParameter("tiltPercentageValue", int.class);
-    windowCovering_goToTiltPercentage_parametersList.add(
+    windowCovering_goToTiltPercentage_commandParams.add(
         goToTiltPercentage_tiltPercentageValue_commandParameter);
 
     CommandParameter goToTiltPercentage_tiltPercent100thsValue_commandParameter =
         new CommandParameter("tiltPercent100thsValue", int.class);
-    windowCovering_goToTiltPercentage_parametersList.add(
+    windowCovering_goToTiltPercentage_commandParams.add(
         goToTiltPercentage_tiltPercent100thsValue_commandParameter);
 
-    windowCovering_goToTiltPercentage_commandInfo.parameters =
-        windowCovering_goToTiltPercentage_parametersList;
-    windowCovering_clusterInfo.commands.add(windowCovering_goToTiltPercentage_commandInfo);
-    List<CommandParameter> windowCovering_goToTiltValue_parametersList = new ArrayList<>();
-    CommandInfo windowCovering_goToTiltValue_commandInfo = new CommandInfo();
-    windowCovering_goToTiltValue_commandInfo.name = "goToTiltValue";
-    windowCovering_goToTiltValue_commandInfo.callbackClass =
-        ChipClusters.DefaultClusterCallback.class;
+    // Populate commands
+    CommandInfo windowCovering_goToTiltPercentage_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            windowCovering_goToTiltPercentage_commandParams);
+    windowCovering_ClusterCommandInfo.put(
+        "goToTiltPercentage", windowCovering_goToTiltPercentage_CommandInfo);
+    List<CommandParameter> windowCovering_goToTiltValue_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
     CommandParameter goToTiltValue_tiltValue_commandParameter =
         new CommandParameter("tiltValue", int.class);
-    windowCovering_goToTiltValue_parametersList.add(goToTiltValue_tiltValue_commandParameter);
+    windowCovering_goToTiltValue_commandParams.add(goToTiltValue_tiltValue_commandParameter);
 
+<<<<<<< HEAD
     windowCovering_goToTiltValue_commandInfo.parameters =
         windowCovering_goToTiltValue_parametersList;
     windowCovering_clusterInfo.commands.add(windowCovering_goToTiltValue_commandInfo);
@@ -10135,5 +11186,48 @@ public class ClusterInfoMapping {
     clusterInfoMapping.put("windowCovering", windowCovering_clusterInfo);
     return clusterInfoMapping;
 >>>>>>> a4fd0282e (no error code generation)
+=======
+    // Populate commands
+    CommandInfo windowCovering_goToTiltValue_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            windowCovering_goToTiltValue_commandParams);
+    windowCovering_ClusterCommandInfo.put(
+        "goToTiltValue", windowCovering_goToTiltValue_CommandInfo);
+    List<CommandParameter> windowCovering_stopMotion_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo windowCovering_stopMotion_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            windowCovering_stopMotion_commandParams);
+    windowCovering_ClusterCommandInfo.put("stopMotion", windowCovering_stopMotion_CommandInfo);
+    List<CommandParameter> windowCovering_upOrOpen_commandParams = new ArrayList<>();
+    // TODO: fill out parameter types
+
+    // Populate commands
+    CommandInfo windowCovering_upOrOpen_CommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              // TODO: expose index in template helper
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            windowCovering_upOrOpen_commandParams);
+    windowCovering_ClusterCommandInfo.put("upOrOpen", windowCovering_upOrOpen_CommandInfo);
+    // Populate cluster
+    ClusterInfo windowCovering_clusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.WindowCoveringCluster(ptr, endpointId),
+            windowCovering_ClusterCommandInfo);
+    clusterMap.put("windowCovering", windowCovering_clusterInfo);
+    return clusterMap;
+>>>>>>> 2d2bbd2e1 (new design solution)
   }
 }
