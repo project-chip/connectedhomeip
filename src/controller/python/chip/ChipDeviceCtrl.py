@@ -97,9 +97,6 @@ class ChipDeviceController(object):
         self._Cluster = ChipClusters(self._ChipStack)
         self._Cluster.InitLib(self._dmLib)
 
-        self.device = c_void_p(None)
-        self.deviceAvailable = threading.Condition()
-
         def HandleKeyExchangeComplete(err):
             if err != 0:
                 print("Failed to establish secure session to device: {}".format(err))
@@ -309,15 +306,19 @@ class ChipDeviceController(object):
         return self._Cluster
 
     def GetConnectedDeviceSync(self, nodeid):
+        returnDevice = c_void_p(None)
+        deviceAvailableCV = threading.Condition()
+
         def DeviceAvailableCallback(device, err):
-            self.device = device
-            with self.deviceAvailable:
-                self.deviceAvailable.notify_all()
+            nonlocal returnDevice
+            nonlocal deviceAvailableCV
+            with deviceAvailableCV:
+                returnDevice = device
+                deviceAvailableCV.notify_all()
             if err != 0:
                 print("Failed in getting the connected device: {}".format(err))
                 raise self._ChipStack.ErrorToException(err)
 
-        self.device = c_void_p(None)
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
             self.devCtrl, nodeid, _DeviceAvailableFunct(DeviceAvailableCallback)))
         if res != 0:
@@ -325,59 +326,50 @@ class ChipDeviceController(object):
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
-        if self.device == c_void_p(None):
-            with self.deviceAvailable:
-                self.deviceAvailable.wait()
+        if returnDevice == c_void_p(None):
+            with deviceAvailableCV:
+                deviceAvailableCV.wait()
 
-        if self.device == c_void_p(None):
+        if returnDevice == c_void_p(None):
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
-        return res
+        return returnDevice
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
-        res = self.GetConnectedDeviceSync(nodeid)
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+        device = self.GetConnectedDeviceSync(nodeid)
 
         im.ClearCommandStatus(im.PLACEHOLDER_COMMAND_HANDLE)
         self._Cluster.SendCommand(
-            self.device, cluster, command, endpoint, groupid, args, True)
+            device, cluster, command, endpoint, groupid, args, True)
         if blocking:
             # We only send 1 command by this function, so index is always 0
             return im.WaitCommandIndexStatus(im.PLACEHOLDER_COMMAND_HANDLE, 1)
         return (0, None)
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
-        res = self.GetConnectedDeviceSync(nodeid)
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+        device = self.GetConnectedDeviceSync(nodeid)
 
         # We are not using IM for Attributes.
         res = self._Cluster.ReadAttribute(
-            self.device, cluster, attribute, endpoint, groupid, False)
+            device, cluster, attribute, endpoint, groupid, False)
         if blocking:
             return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
 
     def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
-        res = self.GetConnectedDeviceSync(nodeid)
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+        device = self.GetConnectedDeviceSync(nodeid)
 
         # We are not using IM for Attributes.
         res = self._Cluster.WriteAttribute(
-            self.device, cluster, attribute, endpoint, groupid, value, False)
+            device, cluster, attribute, endpoint, groupid, value, False)
         if blocking:
             return im.GetAttributeWriteResponse(im.DEFAULT_ATTRIBUTEWRITE_APPID)
 
     def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
-        res = self.GetConnectedDeviceSync(nodeid)
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
+        device = self.GetConnectedDeviceSync(nodeid)
 
-        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(
-            self.device)
+        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
         im.ClearCommandStatus(commandSenderHandle)
         res = self._Cluster.SubscribeAttribute(
-            self.device, cluster, attribute, endpoint, minInterval, maxInterval, commandSenderHandle != 0)
+            device, cluster, attribute, endpoint, minInterval, maxInterval, commandSenderHandle != 0)
         if blocking:
             # We only send 1 command by this function, so index is always 0
             return im.WaitCommandIndexStatus(commandSenderHandle, 1)

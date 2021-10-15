@@ -329,7 +329,7 @@ void CloseSessionCallback(Device * device, ChipError::StorageType err)
     }
     if (!ChipError::IsSuccess(err))
     {
-        ChipLogError(Controller, "Close session was callback called with an error:  %d", err);
+        ChipLogError(Controller, "Close session callback was called with an error:  %d", err);
     }
 }
 
