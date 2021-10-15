@@ -28,7 +28,6 @@
 // integrity algorithm to use for the message.The Session ID field is always present.
 // A Session ID of 0 SHALL indicate an unsecured session with no encryption or message integrity checking.
 
-
 namespace chip {
 
 class SessionIDAllocator
@@ -44,8 +43,7 @@ public:
     uint16_t Peek();
 
 private:
-
-    static constexpr uint16_t kMaxSessionID      = UINT16_MAX;
+    static constexpr uint16_t kMaxSessionID       = UINT16_MAX;
     static constexpr uint16_t kUnsecuredSessionId = 0;
 
     uint16_t mNextAvailable = 1;
