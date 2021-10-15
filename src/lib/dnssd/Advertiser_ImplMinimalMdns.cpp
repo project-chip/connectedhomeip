@@ -339,7 +339,7 @@ QueryResponderAllocator<AdvertiserMinMdns::kMaxOperationalRecords> * AdvertiserM
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
-    char nameBuffer[kOperationalServiceNamePrefix + 1] = "";
+    char nameBuffer[Operational::kInstanceNameMaxLength + 1] = "";
 
     /// need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
@@ -439,7 +439,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
 CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    if (maxLength < (kMaxInstanceNameSize + 1))
+    if (maxLength < (Commissionable::kInstanceNameMaxLength + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }

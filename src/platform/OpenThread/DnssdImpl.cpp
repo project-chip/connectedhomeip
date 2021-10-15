@@ -32,7 +32,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
 
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     MutableByteSpan mac(macBuffer);
-    char hostname[kDnssdHostNameMaxSize + 1] = "";
+    char hostname[kHostNameMaxLength + 1] = "";
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac));
     MakeHostName(hostname, sizeof(hostname), mac);
 

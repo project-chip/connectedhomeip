@@ -32,6 +32,7 @@ chip_test_suite("tests") {
     "TestDefer.cpp",
     "TestErrorStr.cpp",
     "TestFixedBufferAllocator.cpp",
+    "TestFold.cpp",
     "TestOwnerOf.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",

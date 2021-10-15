@@ -94,7 +94,7 @@ public:
 
 private:
     PeerAddress mPeerAddress;
-    char mInstanceName[chip::Dnssd::kMaxInstanceNameSize + 1];
+    char mInstanceName[Dnssd::Commissionable::kInstanceNameMaxLength + 1];
     UDCClientProcessingState mUDCClientProcessingState;
     uint64_t mExpirationTimeMs = 0;
 };

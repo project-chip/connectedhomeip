@@ -36,20 +36,6 @@ static constexpr uint16_t kMdnsPort = 5353;
 // Need 8 bytes to fit a thread mac.
 static constexpr size_t kMaxMacSize = 8;
 
-// Commissionable/commissioner node subtypes
-static constexpr size_t kSubTypeShortDiscriminatorMaxLength      = 4;  // _S<dd>
-static constexpr size_t kSubTypeLongDiscriminatorMaxLength       = 6;  // _L<dddd>
-static constexpr size_t kSubTypeVendorMaxLength                  = 7;  // _V<ddddd>
-static constexpr size_t kSubTypeDeviceTypeMaxLength              = 5;  // _T<ddd>
-static constexpr size_t kSubTypeCommissioningModeMaxLength       = 3;  // _C<d>
-static constexpr size_t kSubTypeAdditionalCommissioningMaxLength = 3;  // _A<d>
-static constexpr size_t kSubTypeCompressedFabricIdMaxLength      = 18; //_I<16-hex-digits>
-// These are the max vals for comissioning adverts
-static constexpr size_t kSubTypeMaxNumber   = 6;
-static constexpr size_t kSubTypeTotalLength = kSubTypeShortDiscriminatorMaxLength + kSubTypeLongDiscriminatorMaxLength +
-    kSubTypeVendorMaxLength + kSubTypeDeviceTypeMaxLength + kSubTypeCommissioningModeMaxLength +
-    kSubTypeAdditionalCommissioningMaxLength;
-
 enum class CommssionAdvertiseMode : uint8_t
 {
     kCommissionableNode,

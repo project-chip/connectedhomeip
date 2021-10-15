@@ -230,8 +230,8 @@ void TestGetRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 
     sprintf(ri, "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F3031");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
-    NL_TEST_ASSERT(inSuite, len == kMaxRotatingIdLen);
-    for (uint8_t i = 0; i < kMaxRotatingIdLen; ++i)
+    NL_TEST_ASSERT(inSuite, len == sizeof(id));
+    for (uint8_t i = 0; i < sizeof(id); ++i)
     {
         NL_TEST_ASSERT(inSuite, id[i] == i);
     }
