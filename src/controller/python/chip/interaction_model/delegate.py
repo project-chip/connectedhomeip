@@ -28,8 +28,7 @@ from dataclasses import dataclass
 # The type should match CommandStatus in interaction_model/Delegate.h
 # CommandStatus should not contain padding
 IMCommandStatus = Struct(
-    "ProtocolId" / Int32ul,
-    "ProtocolCode" / Int16ul,
+    "Status" / Int16ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "CommandId" / Int32ul,
@@ -39,8 +38,7 @@ IMCommandStatus = Struct(
 IMWriteStatus = Struct(
     "NodeId" / Int64ul,
     "AppIdentifier" / Int64ul,
-    "ProtocolId" / Int32ul,
-    "ProtocolCode" / Int16ul,
+    "Status" / Int16ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "AttributeId" / Int32ul,
@@ -197,7 +195,7 @@ def _OnWriteResponseStatus(IMAttributeWriteResult, IMAttributeWriteResultLen):
 
     with _writeStatusDictLock:
         _writeStatusDict[appId] = AttributeWriteResult(AttributePath(
-            status["NodeId"], status["EndpointId"], status["ClusterId"], status["AttributeId"]), status["ProtocolCode"])
+            status["NodeId"], status["EndpointId"], status["ClusterId"], status["AttributeId"]), status["Status"])
 
 
 def InitIMDelegate():

@@ -24,10 +24,10 @@
 from construct.core import EnumInteger
 
 from .delegate import OnSubscriptionReport, SetAttributeReportCallback, AttributePath
-__all__ = ["IMDelegate", "ProtocolCode"]
+__all__ = ["IMDelegate", "Status"]
 
 
-class ProtocolCode(EnumInteger):
+class Status(EnumInteger):
     Success = 0x0
     Failure = 0x01
     InvalidSubscription = 0x7d

@@ -86,8 +86,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     {
         if (aCommandPath.mCommandId == kTestCommandId)
         {
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
         }
         else
         {
@@ -125,11 +124,10 @@ public:
                       aPath.mClusterId, aPath.mCommandId, aPath.mEndpointId);
         onResponseCalledTimes++;
     }
-    void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aProtocolCode,
+    void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aStatus,
                  CHIP_ERROR aError) override
     {
-        ChipLogError(Controller, "OnError happens with %" PRIx16 " %" CHIP_ERROR_FORMAT, to_underlying(aProtocolCode),
-                     aError.Format());
+        ChipLogError(Controller, "OnError happens with %" PRIx16 " %" CHIP_ERROR_FORMAT, to_underlying(aStatus), aError.Format());
         onErrorCalledTimes++;
     }
     void OnDone(chip::app::CommandSender * apCommandSender) override { onFinalCalledTimes++; }
@@ -276,8 +274,7 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
                                                    3, // ClusterId
                                                    4  // CommandId
         );
-        apCommand->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-                                 Protocols::InteractionModel::Status::Success);
+        apCommand->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     }
     else
     {
