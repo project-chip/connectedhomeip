@@ -109,6 +109,8 @@ exit:
 CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    const access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSubjectDescriptor();
+
     while (CHIP_NO_ERROR == (err = aAttributeDataListReader.Next()))
     {
         chip::TLV::TLVReader dataReader;
@@ -151,7 +153,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
-        err = WriteSingleClusterData(clusterInfo, dataReader, this);
+        err = WriteSingleClusterData(subjectDescriptor, clusterInfo, dataReader, this);
         SuccessOrExit(err);
     }
 

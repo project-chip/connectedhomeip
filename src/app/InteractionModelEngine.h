@@ -240,19 +240,20 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
- *  @param[in]    aPath             The concrete path of the data being read.
- *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr if the caller does not care
- *                                  the exact value of the attribute.
- *  @param[out]   apDataExists      Tell whether the cluster data exist on server. Can be a nullptr if the caller does not care
- *                                  whether the data exists.
+ *  @param[in]    aSubjectDescriptor    The subject descriptor.
+ *  @param[in]    aPath                 The concrete path of the data being read.
+ *  @param[in]    apWriter              The TLVWriter for holding cluster data. Can be a nullptr if the caller does not care
+ *                                      the exact value of the attribute.
+ *  @param[out]   apDataExists          Tell whether the cluster data exist on server. Can be a nullptr if the caller does not care
+ *                                      whether the data exists.
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists);
+CHIP_ERROR ReadSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists);
 
 /**
  * TODO: Document.
  */
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
+CHIP_ERROR WriteSingleClusterData(const access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip

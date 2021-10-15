@@ -41,6 +41,7 @@ static_library("messaging") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/access",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
@@ -153,6 +154,25 @@ public:
     bool HasSecureSession() const { return mSecureSession.HasValue(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
+
+    const access::SubjectDescriptor GetSubjectDescriptor() const
+    {
+        access::SubjectDescriptor subjectDescriptor;
+
+        if (mSecureSession.HasValue())
+        {
+            // TODO: these are just placeholder values for now, need to get appropriate
+            // fields (auth mode, node id, etc.) from session handle (or whereever)
+            // and put in SubjectDescriptor appropriately, and ensure it's correct for
+            // all cases (e.g. peer node ID is good)
+            auto& session = mSecureSession.Value();
+            subjectDescriptor.authMode = access::AuthMode::Case;
+            subjectDescriptor.subject = session.GetPeerNodeId();
+            subjectDescriptor.fabricIndex = session.GetFabricIndex();
+        }
+
+        return subjectDescriptor;
+    }
 
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
