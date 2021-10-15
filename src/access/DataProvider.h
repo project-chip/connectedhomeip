@@ -83,14 +83,14 @@ public:
     /**
      * Returns the next entry. Must only be called if a next entry exists (see
      * HasNext).
-     * 
+     *
      * @retval the next entry.
      */
     virtual Entry& Next() = 0;
 
     /**
      * Whether a next entry exists.
-     * 
+     *
      * @retval true if a next entry exists (next can be called).
      * @retval false if no next entry exists (next must not be called).
      */
@@ -124,7 +124,7 @@ public:
 
     /**
      * Initialize the data provider.
-     * 
+     *
      * @retval various errors, probably fatal.
      * @retval #CHIP_NO_ERROR on success.
      */
@@ -137,7 +137,7 @@ public:
 
     /**
      * Get an iterator over all entries.
-     * 
+     *
      * @retval iterator, release when finished.
      * @retval nullptr if error, probably fatal, generally should not happen.
      */
@@ -145,7 +145,7 @@ public:
 
     /**
      * Get an iterator over all entries for a particular fabric.
-     * 
+     *
      * @retval iterator, release when finished.
      * @retval nullptr if error, probably fatal, generally should not happen.
      */
