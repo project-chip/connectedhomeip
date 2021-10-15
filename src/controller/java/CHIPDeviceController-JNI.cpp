@@ -405,14 +405,18 @@ JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong f
     }
 }
 
-JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint duration)
+JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    Device * chipDevice = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::SetupPayload setupPayload;
 
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+    Device * chipDevice = reinterpret_cast<Device *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return false;
+    }
 
     err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kOriginalSetupCode,
                                         setupPayload);
@@ -427,16 +431,20 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPIN)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint duration, jint iteration, jint discriminator, jlong setupPinCode)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jint iteration, jint discriminator, jlong setupPinCode)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    Device * chipDevice = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::SetupPayload setupPayload;
     setupPayload.discriminator = discriminator;
     setupPayload.setUpPINCode  = setupPinCode;
 
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+    Device * chipDevice = reinterpret_cast<Device *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return false;
+    }
 
     err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kTokenWithRandomPIN,
                                         setupPayload);
