@@ -10,9 +10,10 @@ a reference for creating your own application.
   <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 </p>
 
-The example is based on [Matter](https://github.com/project-chip/connectedhomeip)
-and Nordic Semiconductor's nRF Connect SDK, and supports remote access and
-control of a lighting over a low-power, 802.15.4 Thread network.
+The example is based on
+[Matter](https://github.com/project-chip/connectedhomeip) and Nordic
+Semiconductor's nRF Connect SDK, and supports remote access and control of a
+lighting over a low-power, 802.15.4 Thread network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
 into an existing Matter network and can be controlled by this network.
@@ -78,8 +79,9 @@ advertising times out, you can re-enable it manually using **Button 4**.
 
 ### Bluetooth LE rendezvous
 
-In Matter, the commissioning procedure is done over Bluetooth LE between a Matter
-device and the Matter controller, where the controller has the commissioner role.
+In Matter, the commissioning procedure is done over Bluetooth LE between a
+Matter device and the Matter controller, where the controller has the
+commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the Matter device. The data payload is encoded within a QR code, printed to
@@ -97,8 +99,8 @@ with other Thread devices in the network.
 ### Device Firmware Upgrade
 
 The example allows enabling the over-the-air Device Firmware Upgrade feature. In
-this process, the device hosting new firmware image sends the image to the Matter
-device using Bluetooth LE transport and
+this process, the device hosting new firmware image sends the image to the
+Matter device using Bluetooth LE transport and
 [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt).
 The
 [MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html)
@@ -228,7 +230,8 @@ communicate with it using the
 
 **NFC port with antenna attached** can be used to start the
 [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
-information from the Matter device in a data payload that can be shared using NFC.
+information from the Matter device in a data payload that can be shared using
+NFC.
 
 <hr>
 
@@ -309,18 +312,18 @@ To use the native shell for setup, complete the following steps:
     If you have the SDK already installed, continue to the next step and update
     the nRF Connect SDK after initializing environment variables.
 
-3.  Initialize environment variables referred to by the Matter and the nRF Connect
-    SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
-    Connect SDK installation directory, and _toolchain-dir_ with the path to GNU
-    Arm Embedded Toolchain.
+3.  Initialize environment variables referred to by the Matter and the nRF
+    Connect SDK build scripts. Replace _nrfconnect-dir_ with the path to your
+    nRF Connect SDK installation directory, and _toolchain-dir_ with the path to
+    GNU Arm Embedded Toolchain.
 
          $ source nrfconnect-dir/zephyr/zephyr-env.sh
          $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
 
 4.  Update the nRF Connect SDK to the most recent supported revision by running
-    the following command (replace _matter-dir_ with the path to Matter repository
-    directory):
+    the following command (replace _matter-dir_ with the path to Matter
+    repository directory):
 
          $ cd matter-dir
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update

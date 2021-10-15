@@ -2,22 +2,22 @@
 
 Want to contribute? Great! First, read this page (including the small print at
 the end). By submitting a pull request, you represent that you have the right to
-license your contribution to the Connectivity Standards Alliance and the community, and agree by
-submitting the patch that your contributions are licensed under the
-[Apache 2.0 license](./LICENSE). Before submitting the pull request, please make
-sure you have tested your changes and that they follow the project guidelines
-for contributing code.
+license your contribution to the Connectivity Standards Alliance and the
+community, and agree by submitting the patch that your contributions are
+licensed under the [Apache 2.0 license](./LICENSE). Before submitting the pull
+request, please make sure you have tested your changes and that they follow the
+project guidelines for contributing code.
 
 # Contributing as an Open Source Contributor
 
 As an open source contributor you can report bugs and request features in the
 [Issue Tracker](https://github.com/project-chip/connectedhomeip/issues), as well
-as contribute bug fixes and features that do not impact Matter
-specification as a pull request. For example: ports of Matter to add APIs
-to alternative programming languages (e.g. Java, JS), hardware ports, or an
-optimized implementation of existing functionality. For features that impact the
-specification, please join Matter work group within the Connectivity Standards Alliance.
-The requirements to become an open source contributor of the
+as contribute bug fixes and features that do not impact Matter specification as
+a pull request. For example: ports of Matter to add APIs to alternative
+programming languages (e.g. Java, JS), hardware ports, or an optimized
+implementation of existing functionality. For features that impact the
+specification, please join Matter work group within the Connectivity Standards
+Alliance. The requirements to become an open source contributor of the
 [Matter Repository](https://github.com/project-chip/connectedhomeip) are:
 
 -   Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
@@ -27,8 +27,8 @@ The requirements to become an open source contributor of the
 
 # Contributing as a Connectivity Standards Alliance Matter Working Group Member
 
-As a participant of the Connectivity Standards Alliance Matter Working Group, you can
-attend Working Group meetings, propose changes to the Matter
+As a participant of the Connectivity Standards Alliance Matter Working Group,
+you can attend Working Group meetings, propose changes to the Matter
 specification, and contribute code for approved updates to the specification.
 The requirements to become a member of the
 [Matter Repository](https://github.com/project-chip/connectedhomeip) are:
@@ -73,9 +73,8 @@ Matter follows the "Fork-and-Pull" model for accepting contributions.
 
 Setup your GitHub fork and continuous-integration services:
 
-1. Fork the
-   [Matter repository](https://github.com/project-chip/connectedhomeip) by
-   clicking "Fork" on the web UI.
+1. Fork the [Matter repository](https://github.com/project-chip/connectedhomeip)
+   by clicking "Fork" on the web UI.
 
 2. All contributions must pass all checks and reviews to be accepted.
 
@@ -165,8 +164,8 @@ on occasion.
 
 #### Documentation Best Practices
 
-Matter uses Doxygen to markup (or markdown) all C, C++, Objective C,
-Objective C++, Perl, Python, and Java code. Read our
+Matter uses Doxygen to markup (or markdown) all C, C++, Objective C, Objective
+C++, Perl, Python, and Java code. Read our
 [Doxygen Best Practices, Conventions, and Style](https://github.com/project-chip/connectedhomeip/blob/master/docs/style/DOXYGEN.adoc)
 
 #### Submit Pull Request

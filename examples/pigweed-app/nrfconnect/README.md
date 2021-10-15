@@ -8,17 +8,18 @@ functionalities in an application.
   <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 </p>
 
-The example is based on [Matter](https://github.com/project-chip/connectedhomeip),
-the [Pigweed](https://pigweed.googlesource.com/pigweed/pigweed) module, which is
-a collection of libraries that provide different functionalities for embedded
+The example is based on
+[Matter](https://github.com/project-chip/connectedhomeip), the
+[Pigweed](https://pigweed.googlesource.com/pigweed/pigweed) module, which is a
+collection of libraries that provide different functionalities for embedded
 systems, and Nordic Semiconductor's nRF Connect SDK.
 
 You can use this example as a training ground for making experiments, testing
 Pigweed module features and checking what actions are necessary to fully
 integrate Pigweed in a Matter project.
 
-Pigweed functionalities are being gradually integrated into Matter. Currently, the
-following features are available:
+Pigweed functionalities are being gradually integrated into Matter. Currently,
+the following features are available:
 
 -   **Echo RPC** - Creates a Remote Procedure Call server and allows sending
     commands through the serial port to the device, which makes echo and sends
@@ -186,18 +187,18 @@ To use the native shell for setup, complete the following steps:
     If you have the SDK already installed, continue to the next step and update
     the nRF Connect SDK after initializing environment variables.
 
-3.  Initialize environment variables referred to by the Matter and the nRF Connect
-    SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
-    Connect SDK installation directory, and _toolchain-dir_ with the path to GNU
-    Arm Embedded Toolchain.
+3.  Initialize environment variables referred to by the Matter and the nRF
+    Connect SDK build scripts. Replace _nrfconnect-dir_ with the path to your
+    nRF Connect SDK installation directory, and _toolchain-dir_ with the path to
+    GNU Arm Embedded Toolchain.
 
          $ source nrfconnect-dir/zephyr/zephyr-env.sh
          $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
 
 4.  Update the nRF Connect SDK to the most recent supported revision by running
-    the following command (replace _matter-dir_ with the path to Matter repository
-    directory):
+    the following command (replace _matter-dir_ with the path to Matter
+    repository directory):
 
          $ cd matter-dir
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update

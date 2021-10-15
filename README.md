@@ -19,21 +19,22 @@
 
 # What is Matter?
 
-Matter (formerly Project Connected Home over IP, or Project CHIP) is a new Working Group within the Connectivity Standards Alliance (CSA, formerly Zigbee
-Alliance). This Working Group plans to develop and promote the adoption of a new,
-royalty-free connectivity standard to increase compatibility among smart home
-products, with security as a fundamental design tenet.
+Matter (formerly Project Connected Home over IP, or Project CHIP) is a new
+Working Group within the Connectivity Standards Alliance (CSA, formerly Zigbee
+Alliance). This Working Group plans to develop and promote the adoption of a
+new, royalty-free connectivity standard to increase compatibility among smart
+home products, with security as a fundamental design tenet.
 
-The goal of the Matter project is to simplify development for
-manufacturers and increase compatibility for consumers. The project is built
-around a shared belief that smart home devices should be secure, reliable, and
-seamless to use. By building upon Internet Protocol (IP), the project aims to
-enable communication across smart home devices, mobile apps, and cloud services
-and to define a specific set of IP-based networking technologies for device
+The goal of the Matter project is to simplify development for manufacturers and
+increase compatibility for consumers. The project is built around a shared
+belief that smart home devices should be secure, reliable, and seamless to use.
+By building upon Internet Protocol (IP), the project aims to enable
+communication across smart home devices, mobile apps, and cloud services and to
+define a specific set of IP-based networking technologies for device
 certification.
 
-The CSA officially opened the Matter Working Group on January 17, 2020 and is in the process of
-drafting the specification.
+The CSA officially opened the Matter Working Group on January 17, 2020 and is in
+the process of drafting the specification.
 
 Visit [buildwithmatter.com](https://buildwithmatter.com) to learn more and read
 the latest news and updates about the project.
@@ -44,10 +45,11 @@ the latest news and updates about the project.
 
 Matter is developed with the following goals and principles in mind:
 
-**Unifying:** Matter will produce a new specification, building with and
-on top of market-tested, existing technologies.
+**Unifying:** Matter will produce a new specification, building with and on top
+of market-tested, existing technologies.
 
-**Interoperable:** The specification permits communication between any Matter-certified device, subject to users’ permission.
+**Interoperable:** The specification permits communication between any
+Matter-certified device, subject to users’ permission.
 
 **Secure:** The specification leverages modern security practices and protocols.
 
@@ -83,9 +85,9 @@ transparent to the general public, including to non-members wherever possible.
 
 The Project, as illustrated above, defines the application layer that will be
 deployed on devices and controllers as well as the supported IPv6-based networks
-to help achieve our interoperability architectural goal. Matter will
-initially support Wi-Fi and Thread for core, operational communications and
-Bluetooth Low Energy (BLE) to simplify device commissioning and setup.
+to help achieve our interoperability architectural goal. Matter will initially
+support Wi-Fi and Thread for core, operational communications and Bluetooth Low
+Energy (BLE) to simplify device commissioning and setup.
 
 The Application Layer can be further broken down seven main components:
 
@@ -123,18 +125,17 @@ The Application Layer can be further broken down seven main components:
 
 # Current Status of Matter
 
-Matter’s design and technical processes are intended to be open and
-transparent to the general public, including to Work Group non-members wherever
-possible. The availability of this GitHub repository and its source code under
-an Apache v2 license is an important and demonstrable step to achieving this
-commitment.
+Matter’s design and technical processes are intended to be open and transparent
+to the general public, including to Work Group non-members wherever possible.
+The availability of this GitHub repository and its source code under an Apache
+v2 license is an important and demonstrable step to achieving this commitment.
 
 Matter endeavors to bring together the best aspects of market-tested
 technologies and to redeploy them as a unified and cohesive whole-system
 solution. The overall goal of this approach is to bring the benefits of Matter
- to consumers and manufacturers as quickly as possible. As a result, what
-you observe in this repository is an implementation-first approach to the
-technical specification, vetting integrations in practice.
+to consumers and manufacturers as quickly as possible. As a result, what you
+observe in this repository is an implementation-first approach to the technical
+specification, vetting integrations in practice.
 
 The Matter repository is growing and evolving to implement the overall
 architecture. The repository currently contains the security foundations,
@@ -146,34 +147,33 @@ scalability.
 
 # How to Contribute
 
-We welcome your contributions to Matter. Read our
-contribution guidelines [here](./CONTRIBUTING.md).
+We welcome your contributions to Matter. Read our contribution guidelines
+[here](./CONTRIBUTING.md).
 
 # Building and Developing in Matter
 
-Instructions about how to build Matter can be found
-[here](./docs/README.md).
+Instructions about how to build Matter can be found [here](./docs/README.md).
 
 # Directory Structure
 
 The Matter repository is structured as follows:
 
-| File / Folder                          | Contents                                                                                 |
-| -------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `build/`                               | Build system support content and build output directories                                |
-| [BUILDING.md](docs/guides/BUILDING.md) | More detailed information on configuring and building Matter for different targets       |
-| `CODE_OF_CONDUCT.md`                   | Code of Conduct for Matter, and contributions to it                                      |
-| [CONTRIBUTING.md](./CONTRIBUTING.md)   | Guidelines for contributing to Matter                                                    |
-| `docs/`                                | Documentation, including [guides](./docs/guides)                                         |
-| `examples/`                            | Example firmware applications that demonstrate use of the Matter technology              |
-| `integrations/`                        | Third party integrations related to this project                                         |
-| `integrations/docker/`                 | Docker scripts and Dockerfiles                                                           |
-| `LICENSE`                              | Matter [License file](./LICENSE) (Apache 2.0)                                            |
-| `BUILD.gn`                             | Top level GN build file                                                                  |
-| `README.md`                            | This file                                                                                |
-| `src/`                                 | Implementation of Matter                                                                 |
-| `third_party/`                         | Third-party code used by Matter                                                          |
-| `scripts/`                             | Scripts needed to work with the Matter repository                                        |
+| File / Folder                          | Contents                                                                           |
+| -------------------------------------- | ---------------------------------------------------------------------------------- |
+| `build/`                               | Build system support content and build output directories                          |
+| [BUILDING.md](docs/guides/BUILDING.md) | More detailed information on configuring and building Matter for different targets |
+| `CODE_OF_CONDUCT.md`                   | Code of Conduct for Matter, and contributions to it                                |
+| [CONTRIBUTING.md](./CONTRIBUTING.md)   | Guidelines for contributing to Matter                                              |
+| `docs/`                                | Documentation, including [guides](./docs/guides)                                   |
+| `examples/`                            | Example firmware applications that demonstrate use of the Matter technology        |
+| `integrations/`                        | Third party integrations related to this project                                   |
+| `integrations/docker/`                 | Docker scripts and Dockerfiles                                                     |
+| `LICENSE`                              | Matter [License file](./LICENSE) (Apache 2.0)                                      |
+| `BUILD.gn`                             | Top level GN build file                                                            |
+| `README.md`                            | This file                                                                          |
+| `src/`                                 | Implementation of Matter                                                           |
+| `third_party/`                         | Third-party code used by Matter                                                    |
+| `scripts/`                             | Scripts needed to work with the Matter repository                                  |
 
 # License
 

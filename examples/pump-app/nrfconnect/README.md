@@ -170,7 +170,8 @@ communicate with it using the
 
 **NFC port with antenna attached** can be used to start the
 [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
-information from the Matter device in a data payload that can be shared using NFC.
+information from the Matter device in a data payload that can be shared using
+NFC.
 
 <hr>
 
@@ -251,18 +252,18 @@ To use the native shell for setup, complete the following steps:
     If you have the SDK already installed, continue to the next step and update
     the nRF Connect SDK after initializing environment variables.
 
-3.  Initialize environment variables referred to by the Matter and the nRF Connect
-    SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
-    Connect SDK installation directory, and _toolchain-dir_ with the path to GNU
-    Arm Embedded Toolchain.
+3.  Initialize environment variables referred to by the Matter and the nRF
+    Connect SDK build scripts. Replace _nrfconnect-dir_ with the path to your
+    nRF Connect SDK installation directory, and _toolchain-dir_ with the path to
+    GNU Arm Embedded Toolchain.
 
          $ source nrfconnect-dir/zephyr/zephyr-env.sh
          $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
 
 4.  Update the nRF Connect SDK to the most recent supported revision by running
-    the following command (replace _matter-dir_ with the path to Matter repository
-    directory):
+    the following command (replace _matter-dir_ with the path to Matter
+    repository directory):
 
          $ cd matter-dir
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update

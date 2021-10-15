@@ -42,8 +42,8 @@ implementation of the Thread stack.
 
 In the nRF Connect platform applications, the Bluetooth LE interface is used to
 perform pairing and Thread network provisioning operations between the Matter
-device and the Matter controller. Afterwards, the fully provisioned device is able
-to communicate with other devices inside the Thread network.
+device and the Matter controller. Afterwards, the fully provisioned device is
+able to communicate with other devices inside the Thread network.
 
 For the Bluetooth LE communication purposes, the nRF Connect platform
 application is using the Bluetooth LE stack, in which the Bluetooth LE Host part
@@ -66,8 +66,8 @@ Bluetooth LE and Thread concurrently on the same radio chip.
 
 Matter is located on the top application layer of the presented model, looking
 from the networking point of view. The Bluetooth LE and Thread stacks provided
-by the nRF Connect SDK and Zephyr must be integrated with the Matter stack using a
-special intermediate layer.
+by the nRF Connect SDK and Zephyr must be integrated with the Matter stack using
+a special intermediate layer.
 
 In practice, this layer contains platform-specific implementations of abstract
 manager interfaces (such as Bluetooth LE Manager or Thread Stack Manager)

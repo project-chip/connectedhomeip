@@ -6,11 +6,11 @@ repository.
 
 ### Issues
 
-Matter uses issues as simple problem descriptions or feature requests. In general,
-all work contributed to the repository in the form of pull requests (PR) should
-be under the auspices of some open issue. This may seem onerous and in some
-cases duplicative, so consider these guidelines when deciding whether to you can
-get away with not creating an issue:
+Matter uses issues as simple problem descriptions or feature requests. In
+general, all work contributed to the repository in the form of pull requests
+(PR) should be under the auspices of some open issue. This may seem onerous and
+in some cases duplicative, so consider these guidelines when deciding whether to
+you can get away with not creating an issue:
 
 -   Trivial fixes: issues can function as TODO lists, simple reminders that
     something should be addressed. Sometimes, though, the work required to fix

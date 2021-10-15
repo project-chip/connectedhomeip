@@ -89,7 +89,8 @@ example.
 
 Every invoked command must be preceded by the `matter` prefix.
 
-See the following subsections for the description of each Matter-specific command.
+See the following subsections for the description of each Matter-specific
+command.
 
 ### device
 

@@ -10,9 +10,10 @@ a reference for creating your own application.
   <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 </p>
 
-The example is based on [Matter](https://github.com/project-chip/connectedhomeip)
-and Nordic Semiconductor's nRF Connect SDK, and supports remote access and
-control of a simulated door lock over a low-power, 802.15.4 Thread network.
+The example is based on
+[Matter](https://github.com/project-chip/connectedhomeip) and Nordic
+Semiconductor's nRF Connect SDK, and supports remote access and control of a
+simulated door lock over a low-power, 802.15.4 Thread network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
 into an existing Matter network and can be controlled by this network.
@@ -75,8 +76,8 @@ LE advertising manually after powering up the device by pressing **Button 4**.
 ### Bluetooth LE rendezvous
 
 In this example, the commissioning procedure is done over Bluetooth LE between a
-Matter device and the Matter controller, where the controller has the commissioner
-role.
+Matter device and the Matter controller, where the controller has the
+commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the Matter device. The data payload is encoded within a QR code, printed to
@@ -94,8 +95,8 @@ with other Thread devices in the network.
 ### Device Firmware Upgrade
 
 The example allows enabling the over-the-air Device Firmware Upgrade feature. In
-this process, the device hosting new firmware image sends the image to the Matter
-device using Bluetooth LE transport and
+this process, the device hosting new firmware image sends the image to the
+Matter device using Bluetooth LE transport and
 [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt).
 The
 [MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html)
@@ -122,8 +123,8 @@ Simple Management Protocol (SMP) is a basic transfer encoding that is used for
 device management purposes, including application image management. SMP supports
 using different transports, such as Bluetooth LE, UDP, or serial USB/UART.
 
-In this example, the Matter device runs the SMP Server to download the application
-update image using the Bluetooth LE transport.
+In this example, the Matter device runs the SMP Server to download the
+application update image using the Bluetooth LE transport.
 
 See the
 [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
@@ -218,7 +219,8 @@ communicate with it using the
 
 **NFC port with antenna attached** can be used to start the
 [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
-information from the Matter device in a data payload that can be shared using NFC.
+information from the Matter device in a data payload that can be shared using
+NFC.
 
 <hr>
 
@@ -309,8 +311,8 @@ To use the native shell for setup, complete the following steps:
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
 
 4.  Update the nRF Connect SDK to the most recent supported revision by running
-    the following command (replace _matter-dir_ with the path to Matter repository
-    directory):
+    the following command (replace _matter-dir_ with the path to Matter
+    repository directory):
 
          $ cd matter-dir
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update
