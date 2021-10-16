@@ -29,6 +29,7 @@ shared_library("jni") {
     "AndroidClusterExceptions.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "CHIPCallbackWrapper.h",
     "CHIPDefaultCallbacks.cpp",
     "CHIPDefaultCallbacks.h",
     "CHIPDeviceController-JNI.cpp",

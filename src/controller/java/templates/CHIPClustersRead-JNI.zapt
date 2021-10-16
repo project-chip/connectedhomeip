@@ -19,27 +19,28 @@
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-{{#if isList}}
-    std::unique_ptr<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback, void (*)(CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>(callback), chip::Platform::Delete<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>);
-{{else}}
-    std::unique_ptr<CHIP{{chipCallback.name}}AttributeCallback, void (*)(CHIP{{chipCallback.name}}AttributeCallback *)> onSuccess(chip::Platform::New<CHIP{{chipCallback.name}}AttributeCallback>(callback{{#if (isString type)}},
-        {{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}), chip::Platform::Delete<CHIP{{chipCallback.name}}AttributeCallback>);
-{{/if}}
-    VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
-    std::unique_ptr<chip::CHIPDefaultFailureCallback, void (*)(chip::CHIPDefaultFailureCallback *)> onFailure(chip::Platform::New<chip::CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<chip::CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onFailure.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Controller::{{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<chip::Controller::{{asCamelCased ../name false}}Cluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->ReadAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel());
-    VerifyOrReturn(err == CHIP_NO_ERROR, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+    chip::CHIPActionBlock actionBlock = [cppCluster](chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure) {
+        return cppCluster->ReadAttribute{{asCamelCased name false}}(success->Cancel(), failure->Cancel());
+    };
 
-    onSuccess.release();
-    onFailure.release();
+    {{#if isList}}
+    std::unique_ptr<chip::CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback, void (*)(chip::CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback *)> readCallback(
+        chip::Platform::New<chip::CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>(callback, actionBlock),
+        chip::Platform::Delete<chip::CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>
+    );
+    {{else}}
+    std::unique_ptr<chip::CHIP{{chipCallback.name}}AttributeCallback, void (*)(chip::CHIP{{chipCallback.name}}AttributeCallback *)> readCallback(
+        chip::Platform::New<chip::CHIP{{chipCallback.name}}AttributeCallback>(callback, actionBlock{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}),
+        chip::Platform::Delete<chip::CHIP{{chipCallback.name}}AttributeCallback>
+    );
+    {{/if}}
+    VerifyOrReturn(readCallback.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    readCallback.release();
 }
 
 {{/chip_server_cluster_attributes}}
