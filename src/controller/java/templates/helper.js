@@ -88,6 +88,17 @@ function asJavaBasicType(type)
   }
 }
 
+function asJavaBoxedType(type)
+{
+  if (StringHelper.isOctetString(type)) {
+    return 'byte[]';
+  } else if (StringHelper.isCharString(type)) {
+    return 'String';
+  } else {
+    return convertBasicCTypeToJavaBoxedType(ChipTypesHelper.asBasicType(this.chipType));
+  }
+}
+
 function asJniBasicType(type)
 {
   if (StringHelper.isOctetString(type)) {
@@ -207,6 +218,7 @@ function omitCommaForFirstNonStatusCommand(id, index)
 // Module exports
 //
 exports.asJavaBasicType                        = asJavaBasicType;
+exports.asJavaBoxedType                        = asJavaBoxedType;
 exports.asJniBasicType                         = asJniBasicType;
 exports.asJniBasicTypeForZclType               = asJniBasicTypeForZclType;
 exports.asJniSignature                         = asJniSignature;
