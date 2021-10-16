@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
 config("server_config") {
-  defines = []
+  defines = ["OPERATIONAL_DEVICE_PROXY=1"]
 
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
