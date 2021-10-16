@@ -185,6 +185,50 @@ public class ClusterInfoMapping {
       callback.onFailure(e);
     }
   }
+  {{#chip_client_clusters}}
+    {{#chip_cluster_responses}}
+      public class Delegated{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+        @Override
+        public void onSuccess(
+              {{#chip_cluster_response_arguments}}
+              {{#if isArray}}
+                  // {{asSymbol label}}: {{asUnderlyingZclType type}}
+                  // Conversion from this type to Java is not properly implemented yet
+              {{else if (isOctetString type)}}
+                  {{omitCommaForFirstNonStatusCommand parent.id index}}byte[] {{asSymbol label}}
+              {{else if (isShortString type)}}
+                  {{omitCommaForFirstNonStatusCommand parent.id index}}String {{asSymbol label}}
+              {{else}}
+                  {{omitCommaForFirstNonStatusCommand parent.id index}}{{asJavaBasicTypeForZclType type false}} {{asSymbol label}}
+              {{/if}}
+              {{/chip_cluster_response_arguments}}
+        ) {
+            List<Object> responseValues = new ArrayList<>();
+            {{#chip_cluster_response_arguments}}
+              {{#if isArray}}
+                // {{asSymbol label}}: {{asUnderlyingZclType type}}
+                // Conversion from this type to Java is not properly implemented yet
+              {{else}}
+              responseValues.add({{asSymbol label}});
+              {{/if}}
+            {{/chip_cluster_response_arguments}}
+            callback.onSuccess(responseValues);
+        }
+
+        @Override
+        public void onError(Exception error) {
+          callback.onFailure(error);
+        }
+      }
+
+    {{/chip_cluster_responses}}
+ {{/chip_client_clusters}}
 
  public Map<String, ClusterInfo> getClusterMap() {
      Map<String, ClusterInfo> clusterMap = new HashMap<>();
@@ -219,16 +263,7 @@ public class ClusterInfoMapping {
                            .{{asLowerCamelCase name}}((ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback) callback
                            {{#chip_cluster_command_arguments}}
                            ,
-                              {{#chip_client_clusters}}
-                              {{#chip_cluster_commands}}
-                              {{#chip_cluster_command_arguments}}
-
-                              {{asJavaBoxedType type}}
-
-                              {{/chip_cluster_command_arguments}}
-                              {{/chip_cluster_commands}}
-                              {{/chip_client_clusters}}
-
+                              ({{asJavaBoxedType type}})
                             commandArguments.get("{{asLowerCamelCase label}}")
                        {{/chip_cluster_command_arguments}}
                        );
@@ -243,15 +278,7 @@ public class ClusterInfoMapping {
                           .{{asLowerCamelCase name}}((DefaultClusterCallback) callback
                           {{#chip_cluster_command_arguments}}
                           ,
-                             {{#chip_client_clusters}}
-                             {{#chip_cluster_commands}}
-                             {{#chip_cluster_command_arguments}}
-
-                             {{asJavaBoxedType type}}
-
-                             {{/chip_cluster_command_arguments}}
-                             {{/chip_cluster_commands}}
-                             {{/chip_client_clusters}}
+                             ({{asJavaBoxedType type}})
                            commandArguments.get("{{asLowerCamelCase label}}")
                 {{/chip_cluster_command_arguments}}
                 );
