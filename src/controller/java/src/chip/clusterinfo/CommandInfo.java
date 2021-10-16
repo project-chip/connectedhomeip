@@ -9,11 +9,11 @@ import chip.devicecontroller.ChipClusters.BaseChipCluster;
 public class CommandInfo {
   public ClusterCommandFunction commandFunction;
   private Supplier<DelegatedClusterCallback> commandCallbackSupplier;
-  private List<CommandParameter> commandParameters;
+  private Map<String, CommandParameter> commandParameters;
 
 
   public CommandInfo(ClusterCommandFunction commandFunction,
-      Supplier<DelegatedClusterCallback> commandCallbackSupplier, List<CommandParameter> commandParameters) {
+      Supplier<DelegatedClusterCallback> commandCallbackSupplier, Map<String, CommandParameter> commandParameters) {
     this.commandFunction = commandFunction;
     this.commandCallbackSupplier = commandCallbackSupplier;
     this.commandParameters = commandParameters;
@@ -27,12 +27,12 @@ public class CommandInfo {
     return commandCallbackSupplier;
   }
 
-  public List<CommandParameter> getCommandParameters() {
+  public Map<String, CommandParameter> getCommandParameters() {
     return commandParameters;
   }
 
   @FunctionalInterface
-  interface ClusterCommandFunction {
-    void invokeCommand(BaseChipCluster cluster, Object callback, List<Object> commandArguments);
+  public interface ClusterCommandFunction {
+    void invokeCommand(BaseChipCluster cluster, Object callback, Map<String, Object> commandArguments);
   }
 }
