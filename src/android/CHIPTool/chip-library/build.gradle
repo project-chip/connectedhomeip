@@ -27,15 +27,14 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    if (!matterBuildSrcDir.isEmpty()) {
-        sourceSets {
-            main {
-                java.srcDirs = [
-                        '../../../setup_payload/java/src',
-                        '../../../controller/java/zap-generated',
-                        '../../../controller/java/src',
-                ]
-            }
+    sourceSets {
+        main {
+            java.srcDirs = [
+                    '../../../setup_payload/java/src',
+                    '../../../controller/java/zap-generated',
+                    '../../../controller/java/src',
+                    '../../../platform/android/java'
+            ]
         }
     }
 }

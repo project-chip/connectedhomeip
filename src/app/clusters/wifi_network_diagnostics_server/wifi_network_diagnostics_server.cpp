@@ -22,7 +22,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
@@ -43,7 +42,7 @@ public:
     // Register for the WiFiNetworkDiagnostics cluster on all endpoints.
     WiFiDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
@@ -70,15 +69,15 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityMan
 
 WiFiDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != WiFiNetworkDiagnostics::Id)
+    if (aPath.mClusterId != WiFiNetworkDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case Attributes::SecurityType::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiSecurityType, aEncoder);
@@ -125,9 +124,10 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeV
 } // anonymous namespace
 
 bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
-                                                             const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                             Commands::ResetCounts::DecodableType & commandData)
+                                                             const app::ConcreteCommandPath & commandPath,
+                                                             const Commands::ResetCounts::DecodableType & commandData)
 {
+    EndpointId endpoint  = commandPath.mEndpointId;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetWiFiNetworkDiagnosticsCounts() == CHIP_NO_ERROR,

@@ -22,7 +22,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPEncoding.h>
@@ -47,20 +46,20 @@ public:
     // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
     ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
 ThreadDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != ThreadNetworkDiagnostics::Id)
+    if (aPath.mClusterId != ThreadNetworkDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aClusterInfo.mFieldId, aEncoder);
+    CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
 
     // If it isn't a run time assigned attribute, e.g. ClusterRevision, or if
     // not implemented, clear the error so we fall back to the standard read
@@ -80,10 +79,10 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, Attribut
 } // anonymous namespace
 
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
-                                                               const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                               Commands::ResetCounts::DecodableType & commandData)
+                                                               const app::ConcreteCommandPath & commandPath,
+                                                               const Commands::ResetCounts::DecodableType & commandData)
 {
-    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
+    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::OverrunCount::Set(commandPath.mEndpointId, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to reset OverrunCount attribute");

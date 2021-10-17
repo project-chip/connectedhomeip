@@ -21,7 +21,7 @@ on:
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
-  
+
 jobs:
     android:
         name: Build Android
@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-android:latest
+            image: connectedhomeip/chip-build-android:0.5.15
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 

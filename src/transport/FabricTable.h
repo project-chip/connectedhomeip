@@ -68,11 +68,10 @@ public:
         mFabric = kUndefinedFabricIndex;
     }
 
-    // Returns a pointer to a null terminated char array
-    const uint8_t * GetFabricLabel() const { return Uint8::from_const_char(mFabricLabel); };
+    // Returns a span into our internal storage.
+    CharSpan GetFabricLabel() const { return CharSpan(mFabricLabel, strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes)); }
 
-    // Expects a pointer to a null terminated char array
-    CHIP_ERROR SetFabricLabel(const uint8_t * fabricLabel);
+    CHIP_ERROR SetFabricLabel(const CharSpan & fabricLabel);
 
     ~FabricInfo()
     {

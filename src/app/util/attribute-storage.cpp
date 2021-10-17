@@ -46,6 +46,7 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 using namespace chip;
 
@@ -119,10 +120,6 @@ app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 
 // Returns endpoint index within a given cluster
 static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask, uint16_t manufacturerCode);
-
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-void emberAfPluginDescriptorServerInitCallback(void);
-#endif
 
 //------------------------------------------------------------------------------
 
@@ -334,58 +331,37 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
 }
 
 // This function is used to call the per-cluster attribute changed callback
-void emAfClusterAttributeChangedCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                         uint8_t clientServerMask, uint16_t manufacturerCode)
+void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask)
 {
-    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, clientServerMask, manufacturerCode);
+    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask,
+                                                             EMBER_AF_NULL_MANUFACTURER_CODE);
     if (cluster != NULL)
     {
-        if (manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)
+        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
+        if (f != NULL)
         {
-            EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
-            if (f != NULL)
-            {
-                // emberAfPushEndpointNetworkIndex(endpoint);
-                ((EmberAfClusterAttributeChangedCallback) f)(endpoint, attributeId);
-                // emberAfPopNetworkIndex();
-            }
-        }
-        else
-        {
-            EmberAfGenericClusterFunction f =
-                emberAfFindClusterFunction(cluster, CLUSTER_MASK_MANUFACTURER_SPECIFIC_ATTRIBUTE_CHANGED_FUNCTION);
-            if (f != NULL)
-            {
-                // emberAfPushEndpointNetworkIndex(endpoint);
-                ((EmberAfManufacturerSpecificClusterAttributeChangedCallback) f)(endpoint, attributeId, manufacturerCode);
-                // emberAfPopNetworkIndex();
-            }
+            ((EmberAfClusterAttributeChangedCallback) f)(attributePath);
         }
     }
 }
 
 // This function is used to call the per-cluster pre-attribute changed callback
-EmberAfStatus emAfClusterPreAttributeChangedCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                     uint8_t clientServerMask, uint16_t manufacturerCode,
+EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, clientServerMask, manufacturerCode);
+    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask,
+                                                             EMBER_AF_NULL_MANUFACTURER_CODE);
     if (cluster == NULL)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
     else
     {
-        EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-        if (manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)
+        EmberAfStatus status            = EMBER_ZCL_STATUS_SUCCESS;
+        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
+        if (f != NULL)
         {
-            EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
-            if (f != NULL)
-            {
-                // emberAfPushEndpointNetworkIndex(endpoint);
-                status = ((EmberAfClusterPreAttributeChangedCallback) f)(endpoint, attributeId, attributeType, size, value);
-                // emberAfPopNetworkIndex();
-            }
+            status = ((EmberAfClusterPreAttributeChangedCallback) f)(attributePath, attributeType, size, value);
         }
         return status;
     }
@@ -1013,7 +989,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
         // Rebuild descriptor attributes on all endpoints
-        emberAfPluginDescriptorServerInitCallback();
+        MatterDescriptorPluginServerInitCallback();
 #endif
     }
 

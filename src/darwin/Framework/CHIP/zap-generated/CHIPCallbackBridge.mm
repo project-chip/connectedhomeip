@@ -543,7 +543,7 @@ void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(vo
 };
 
 void CHIPDoorLockClusterGetLogRecordResponseCallbackBridge::OnSuccessFn(void * context, uint16_t logEntryId, uint32_t timestamp,
-    uint8_t eventType, uint8_t source, uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+    uint8_t eventType, uint8_t source, uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
 {
     DispatchSuccess(context, @ {
         @"logEntryId" : [NSNumber numberWithUnsignedShort:logEntryId],
@@ -552,29 +552,29 @@ void CHIPDoorLockClusterGetLogRecordResponseCallbackBridge::OnSuccessFn(void * c
         @"source" : [NSNumber numberWithUnsignedChar:source],
         @"eventIdOrAlarmCode" : [NSNumber numberWithUnsignedChar:eventIdOrAlarmCode],
         @"userId" : [NSNumber numberWithUnsignedShort:userId],
-        @"pin" : [NSString stringWithFormat:@"%s", pin],
+        @"pin" : [NSData dataWithBytes:pin.data() length:pin.size()],
     });
 };
 
 void CHIPDoorLockClusterGetPinResponseCallbackBridge::OnSuccessFn(
-    void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
+    void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
 {
     DispatchSuccess(context, @ {
         @"userId" : [NSNumber numberWithUnsignedShort:userId],
         @"userStatus" : [NSNumber numberWithUnsignedChar:userStatus],
         @"userType" : [NSNumber numberWithUnsignedChar:userType],
-        @"pin" : [NSString stringWithFormat:@"%s", pin],
+        @"pin" : [NSData dataWithBytes:pin.data() length:pin.size()],
     });
 };
 
 void CHIPDoorLockClusterGetRfidResponseCallbackBridge::OnSuccessFn(
-    void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+    void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid)
 {
     DispatchSuccess(context, @ {
         @"userId" : [NSNumber numberWithUnsignedShort:userId],
         @"userStatus" : [NSNumber numberWithUnsignedChar:userStatus],
         @"userType" : [NSNumber numberWithUnsignedChar:userType],
-        @"rfid" : [NSString stringWithFormat:@"%s", rfid],
+        @"rfid" : [NSData dataWithBytes:rfid.data() length:rfid.size()],
     });
 };
 

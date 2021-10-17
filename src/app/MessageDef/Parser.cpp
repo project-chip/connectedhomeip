@@ -41,7 +41,7 @@ void Parser::Init(const chip::TLV::TLVReader & aReader, chip::TLV::TLVType aOute
     mOuterContainerType = aOuterContainerType;
 }
 
-CHIP_ERROR Parser::GetReaderOnTag(const uint64_t aTagToFind, chip::TLV::TLVReader * const apReader) const
+CHIP_ERROR Parser::GetReaderOnTag(const Tag aTagToFind, chip::TLV::TLVReader * const apReader) const
 {
     return mReader.FindElementWithTag(aTagToFind, *apReader);
 }

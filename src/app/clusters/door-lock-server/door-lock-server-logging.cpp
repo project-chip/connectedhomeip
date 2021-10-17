@@ -121,9 +121,11 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
 }
 
 bool emberAfDoorLockClusterGetLogRecordCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                EndpointId endpoint, uint16_t entryId,
-                                                Commands::GetLogRecord::DecodableType & commandData)
+                                                const Commands::GetLogRecord::DecodableType & commandData)
 {
+    // Note: we make a copy of the entry id, because we will be modifying it.
+    uint16_t entryId = commandData.logIndex;
+
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -150,7 +152,7 @@ bool emberAfDoorLockClusterGetLogRecordCallback(app::CommandHandler * commandObj
             SuccessOrExit(err = writer->Put(TLV::ContextTag(3), entry.source));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(4), entry.eventId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(5), entry.userId));
-            SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(6), entry.pin + 1, entry.pin[0]));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(6), ByteSpan::fromZclString(entry.pin)));
             SuccessOrExit(err = commandObj->FinishCommand());
         }
     }

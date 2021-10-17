@@ -66,7 +66,7 @@ CHIP_ERROR ReadRequest::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        const uint64_t tag = reader.GetTag();
+        const Tag tag = reader.GetTag();
 
         if (chip::TLV::ContextTag(kCsTag_AttributePathList) == tag)
         {

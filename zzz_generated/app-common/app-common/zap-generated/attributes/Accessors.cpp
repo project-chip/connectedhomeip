@@ -1082,6 +1082,21 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t nameSupport)
 
 } // namespace NameSupport
 
+namespace LastConfiguredBy {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * lastConfiguredBy)
+{
+    return emberAfReadServerAttribute(endpoint, Scenes::Id, LastConfiguredBy::Id, (uint8_t *) lastConfiguredBy,
+                                      sizeof(*lastConfiguredBy));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId lastConfiguredBy)
+{
+    return emberAfWriteServerAttribute(endpoint, Scenes::Id, LastConfiguredBy::Id, (uint8_t *) &lastConfiguredBy,
+                                       ZCL_NODE_ID_ATTRIBUTE_TYPE);
+}
+
+} // namespace LastConfiguredBy
+
 } // namespace Attributes
 } // namespace Scenes
 
@@ -3534,13 +3549,13 @@ namespace Attributes {
 
 namespace PHYRate {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * pHYRate)
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * PHYRate)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) pHYRate, sizeof(*pHYRate));
+    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) PHYRate, sizeof(*PHYRate));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t pHYRate)
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t PHYRate)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) &pHYRate,
+    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) &PHYRate,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 

@@ -238,7 +238,7 @@ static void OnDoorLockClusterGetHolidayScheduleResponse(void * context, uint8_t 
 }
 
 static void OnDoorLockClusterGetLogRecordResponse(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType,
-                                                  uint8_t source, uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+                                                  uint8_t source, uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
 {
     ChipLogProgress(chipTool, "DoorLockClusterGetLogRecordResponse");
 
@@ -246,7 +246,8 @@ static void OnDoorLockClusterGetLogRecordResponse(void * context, uint16_t logEn
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterGetPinResponse(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
+static void OnDoorLockClusterGetPinResponse(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                            chip::ByteSpan pin)
 {
     ChipLogProgress(chipTool, "DoorLockClusterGetPinResponse");
 
@@ -254,7 +255,8 @@ static void OnDoorLockClusterGetPinResponse(void * context, uint16_t userId, uin
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterGetRfidResponse(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+static void OnDoorLockClusterGetRfidResponse(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                             chip::ByteSpan rfid)
 {
     ChipLogProgress(chipTool, "DoorLockClusterGetRfidResponse");
 
@@ -1245,8 +1247,7 @@ public:
 
         chip::Controller::AccountLoginCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.GetSetupPIN(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                   chip::ByteSpan(chip::Uint8::from_char(mTempAccountIdentifier), strlen(mTempAccountIdentifier)));
+        return cluster.GetSetupPIN(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTempAccountIdentifier);
     }
 
 private:
@@ -1255,7 +1256,7 @@ private:
                                                                                      this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mTempAccountIdentifier;
+    chip::ByteSpan mTempAccountIdentifier;
 };
 
 /*
@@ -1282,9 +1283,7 @@ public:
 
         chip::Controller::AccountLoginCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.Login(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                             chip::ByteSpan(chip::Uint8::from_char(mTempAccountIdentifier), strlen(mTempAccountIdentifier)),
-                             chip::ByteSpan(chip::Uint8::from_char(mSetupPIN), strlen(mSetupPIN)));
+        return cluster.Login(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTempAccountIdentifier, mSetupPIN);
     }
 
 private:
@@ -1292,8 +1291,8 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mTempAccountIdentifier;
-    char * mSetupPIN;
+    chip::ByteSpan mTempAccountIdentifier;
+    chip::ByteSpan mSetupPIN;
 };
 
 /*
@@ -1846,9 +1845,7 @@ public:
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.LaunchApp(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                 chip::ByteSpan(chip::Uint8::from_char(mData), strlen(mData)), mCatalogVendorId,
-                                 chip::ByteSpan(chip::Uint8::from_char(mApplicationId), strlen(mApplicationId)));
+        return cluster.LaunchApp(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mData, mCatalogVendorId, mApplicationId);
     }
 
 private:
@@ -1857,9 +1854,9 @@ private:
             OnApplicationLauncherClusterLaunchAppResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mData;
+    chip::ByteSpan mData;
     uint16_t mCatalogVendorId;
-    char * mApplicationId;
+    chip::ByteSpan mApplicationId;
 };
 
 /*
@@ -2036,8 +2033,7 @@ public:
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.RenameOutput(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mIndex,
-                                    chip::ByteSpan(chip::Uint8::from_char(mName), strlen(mName)));
+        return cluster.RenameOutput(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mIndex, mName);
     }
 
 private:
@@ -2046,7 +2042,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mIndex;
-    char * mName;
+    chip::ByteSpan mName;
 };
 
 /*
@@ -2717,8 +2713,7 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttributeUserLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                               chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)));
+        return cluster.WriteAttributeUserLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
     }
 
 private:
@@ -2726,7 +2721,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mValue;
+    chip::ByteSpan mValue;
 };
 
 /*
@@ -2785,8 +2780,7 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttributeLocation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                              chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)));
+        return cluster.WriteAttributeLocation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
     }
 
 private:
@@ -2794,7 +2788,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mValue;
+    chip::ByteSpan mValue;
 };
 
 /*
@@ -3850,8 +3844,7 @@ public:
 
         chip::Controller::BridgedDeviceBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttributeUserLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                               chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)));
+        return cluster.WriteAttributeUserLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
     }
 
 private:
@@ -3859,7 +3852,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mValue;
+    chip::ByteSpan mValue;
 };
 
 /*
@@ -7624,8 +7617,7 @@ public:
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.LaunchContent(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mAutoPlay,
-                                     chip::ByteSpan(chip::Uint8::from_char(mData), strlen(mData)));
+        return cluster.LaunchContent(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mAutoPlay, mData);
     }
 
 private:
@@ -7635,7 +7627,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     bool mAutoPlay;
-    char * mData;
+    chip::ByteSpan mData;
 };
 
 /*
@@ -7662,9 +7654,7 @@ public:
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.LaunchURL(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                 chip::ByteSpan(chip::Uint8::from_char(mContentURL), strlen(mContentURL)),
-                                 chip::ByteSpan(chip::Uint8::from_char(mDisplayString), strlen(mDisplayString)));
+        return cluster.LaunchURL(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mContentURL, mDisplayString);
     }
 
 private:
@@ -7673,8 +7663,8 @@ private:
                                                                                       this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mContentURL;
-    char * mDisplayString;
+    chip::ByteSpan mContentURL;
+    chip::ByteSpan mDisplayString;
 };
 
 /*
@@ -8550,8 +8540,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.LockDoor(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                chip::ByteSpan(chip::Uint8::from_char(mPin), strlen(mPin)));
+        return cluster.LockDoor(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mPin);
     }
 
 private:
@@ -8559,7 +8548,7 @@ private:
         new chip::Callback::Callback<DoorLockClusterLockDoorResponseCallback>(OnDoorLockClusterLockDoorResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mPin;
+    chip::ByteSpan mPin;
 };
 
 /*
@@ -8630,8 +8619,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.SetPin(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUserId, mUserStatus, mUserType,
-                              chip::ByteSpan(chip::Uint8::from_char(mPin), strlen(mPin)));
+        return cluster.SetPin(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUserId, mUserStatus, mUserType, mPin);
     }
 
 private:
@@ -8642,7 +8630,7 @@ private:
     uint16_t mUserId;
     uint8_t mUserStatus;
     uint8_t mUserType;
-    char * mPin;
+    chip::ByteSpan mPin;
 };
 
 /*
@@ -8671,8 +8659,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.SetRfid(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUserId, mUserStatus, mUserType,
-                               chip::ByteSpan(chip::Uint8::from_char(mId), strlen(mId)));
+        return cluster.SetRfid(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUserId, mUserStatus, mUserType, mId);
     }
 
 private:
@@ -8683,7 +8670,7 @@ private:
     uint16_t mUserId;
     uint8_t mUserStatus;
     uint8_t mUserType;
-    char * mId;
+    chip::ByteSpan mId;
 };
 
 /*
@@ -8835,8 +8822,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UnlockDoor(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                  chip::ByteSpan(chip::Uint8::from_char(mPin), strlen(mPin)));
+        return cluster.UnlockDoor(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mPin);
     }
 
 private:
@@ -8844,7 +8830,7 @@ private:
         new chip::Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>(OnDoorLockClusterUnlockDoorResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mPin;
+    chip::ByteSpan mPin;
 };
 
 /*
@@ -8871,8 +8857,7 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UnlockWithTimeout(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTimeoutInSeconds,
-                                         chip::ByteSpan(chip::Uint8::from_char(mPin), strlen(mPin)));
+        return cluster.UnlockWithTimeout(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTimeoutInSeconds, mPin);
     }
 
 private:
@@ -8882,7 +8867,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint16_t mTimeoutInSeconds;
-    char * mPin;
+    chip::ByteSpan mPin;
 };
 
 /*
@@ -10219,9 +10204,8 @@ public:
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.SetRegulatoryConfig(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLocation,
-                                           chip::ByteSpan(chip::Uint8::from_char(mCountryCode), strlen(mCountryCode)), mBreadcrumb,
-                                           mTimeoutMs);
+        return cluster.SetRegulatoryConfig(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLocation, mCountryCode,
+                                           mBreadcrumb, mTimeoutMs);
     }
 
 private:
@@ -10231,7 +10215,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mLocation;
-    char * mCountryCode;
+    chip::ByteSpan mCountryCode;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -10746,8 +10730,7 @@ public:
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddGroup(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mGroupId,
-                                chip::ByteSpan(chip::Uint8::from_char(mGroupName), strlen(mGroupName)));
+        return cluster.AddGroup(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mGroupId, mGroupName);
     }
 
 private:
@@ -10756,7 +10739,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint16_t mGroupId;
-    char * mGroupName;
+    chip::ByteSpan mGroupName;
 };
 
 /*
@@ -10783,8 +10766,7 @@ public:
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddGroupIfIdentifying(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mGroupId,
-                                             chip::ByteSpan(chip::Uint8::from_char(mGroupName), strlen(mGroupName)));
+        return cluster.AddGroupIfIdentifying(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mGroupId, mGroupName);
     }
 
 private:
@@ -10793,7 +10775,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint16_t mGroupId;
-    char * mGroupName;
+    chip::ByteSpan mGroupName;
 };
 
 /*
@@ -11898,8 +11880,7 @@ public:
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.RenameInput(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mIndex,
-                                   chip::ByteSpan(chip::Uint8::from_char(mName), strlen(mName)));
+        return cluster.RenameInput(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mIndex, mName);
     }
 
 private:
@@ -11908,7 +11889,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mIndex;
-    char * mName;
+    chip::ByteSpan mName;
 };
 
 /*
@@ -13311,9 +13292,7 @@ public:
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.QueryImage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mVendorId, mProductId, mHardwareVersion,
-                                  mSoftwareVersion, mProtocolsSupported,
-                                  chip::ByteSpan(chip::Uint8::from_char(mLocation), strlen(mLocation)), mRequestorCanConsent,
-                                  mMetadataForProvider);
+                                  mSoftwareVersion, mProtocolsSupported, mLocation, mRequestorCanConsent, mMetadataForProvider);
     }
 
 private:
@@ -13327,7 +13306,7 @@ private:
     uint16_t mHardwareVersion;
     uint32_t mSoftwareVersion;
     uint8_t mProtocolsSupported;
-    char * mLocation;
+    chip::ByteSpan mLocation;
     bool mRequestorCanConsent;
     chip::ByteSpan mMetadataForProvider;
 };
@@ -14786,8 +14765,7 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UpdateFabricLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                         chip::ByteSpan(chip::Uint8::from_char(mLabel), strlen(mLabel)));
+        return cluster.UpdateFabricLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLabel);
     }
 
 private:
@@ -14796,7 +14774,7 @@ private:
                                                                                        this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mLabel;
+    chip::ByteSpan mLabel;
 };
 
 /*
@@ -16173,8 +16151,7 @@ public:
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.AddScene(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mGroupId, mSceneId, mTransitionTime,
-                                chip::ByteSpan(chip::Uint8::from_char(mSceneName), strlen(mSceneName)), mClusterId, mLength,
-                                mValue);
+                                mSceneName, mClusterId, mLength, mValue);
     }
 
 private:
@@ -16185,7 +16162,7 @@ private:
     uint16_t mGroupId;
     uint8_t mSceneId;
     uint16_t mTransitionTime;
-    char * mSceneName;
+    chip::ByteSpan mSceneName;
     chip::ClusterId mClusterId;
     uint8_t mLength;
     uint8_t mValue;
@@ -16985,8 +16962,7 @@ public:
 
         chip::Controller::TvChannelCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ChangeChannel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                     chip::ByteSpan(chip::Uint8::from_char(mMatch), strlen(mMatch)));
+        return cluster.ChangeChannel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMatch);
     }
 
 private:
@@ -16994,7 +16970,7 @@ private:
         new chip::Callback::Callback<TvChannelClusterChangeChannelResponseCallback>(OnTvChannelClusterChangeChannelResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mMatch;
+    chip::ByteSpan mMatch;
 };
 
 /*
@@ -17239,8 +17215,7 @@ public:
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.NavigateTarget(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTarget,
-                                      chip::ByteSpan(chip::Uint8::from_char(mData), strlen(mData)));
+        return cluster.NavigateTarget(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTarget, mData);
     }
 
 private:
@@ -17250,7 +17225,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mTarget;
-    char * mData;
+    chip::ByteSpan mData;
 };
 
 /*
@@ -19008,8 +18983,7 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttributeCharString(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)));
+        return cluster.WriteAttributeCharString(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
     }
 
 private:
@@ -19017,7 +18991,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mValue;
+    chip::ByteSpan mValue;
 };
 
 /*
@@ -19076,8 +19050,7 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttributeLongCharString(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                    chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)));
+        return cluster.WriteAttributeLongCharString(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
     }
 
 private:
@@ -19085,7 +19058,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mValue;
+    chip::ByteSpan mValue;
 };
 
 /*

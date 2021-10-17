@@ -92,7 +92,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpoint)
 // The first two bytes of the identifier is set to the groupId
 // The local endpoint is set to the endpoint that is mapped to this group
 // --------------------------
-static EmberAfStatus addEntryToGroupTable(EndpointId endpoint, GroupId groupId, uint8_t * groupName)
+static EmberAfStatus addEntryToGroupTable(EndpointId endpoint, GroupId groupId, const CharSpan & groupName)
 {
     uint8_t i;
 
@@ -141,8 +141,7 @@ static EmberAfStatus removeEntryFromGroupTable(EndpointId endpoint, GroupId grou
         EmberStatus status   = emberDeleteBinding(bindingIndex);
         if (status == EMBER_SUCCESS)
         {
-            uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-            emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
+            emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, CharSpan());
             return EMBER_ZCL_STATUS_SUCCESS;
         }
         else
@@ -155,15 +154,15 @@ static EmberAfStatus removeEntryFromGroupTable(EndpointId endpoint, GroupId grou
 }
 
 bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          EndpointId endpoint, GroupId groupId, uint8_t * groupName,
-                                          Commands::AddGroup::DecodableType & commandData)
+                                          const Commands::AddGroup::DecodableType & commandData)
 {
+    auto & groupId   = commandData.groupId;
+    auto & groupName = commandData.groupName;
+
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    emberAfGroupsClusterPrint("RX: AddGroup 0x%2x, \"", groupId);
-    emberAfGroupsClusterPrintString(groupName);
-    emberAfGroupsClusterPrintln("\"");
+    emberAfGroupsClusterPrintln("RX: AddGroup 0x%2x, \"%.*s\"", groupId, static_cast<int>(groupName.size()), groupName.data());
 
     status = addEntryToGroupTable(emberAfCurrentEndpoint(), groupId, groupName);
 
@@ -193,8 +192,10 @@ exit:
 }
 
 bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           EndpointId endpoint, GroupId groupId, Commands::ViewGroup::DecodableType & commandData)
+                                           const Commands::ViewGroup::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+
     EmberAfStatus status                                          = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err                                                = CHIP_NO_ERROR;
     uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
@@ -236,9 +237,11 @@ exit:
 }
 
 bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                    EndpointId endpoint, uint8_t groupCount, uint8_t * groupList,
-                                                    Commands::GetGroupMembership::DecodableType & commandData)
+                                                    const Commands::GetGroupMembership::DecodableType & commandData)
 {
+    auto & groupCount = commandData.groupCount;
+    auto & groupList  = commandData.groupList;
+
     EmberStatus status = EMBER_ZCL_STATUS_FAILURE;
     uint8_t i, j;
     uint8_t count = 0;
@@ -246,18 +249,14 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
     uint8_t listLen = 0;
     CHIP_ERROR err  = CHIP_NO_ERROR;
 
-    emberAfGroupsClusterPrint("RX: GetGroupMembership 0x%x,", groupCount);
-    for (i = 0; i < groupCount; i++)
-    {
-        emberAfGroupsClusterPrint(" [0x%2x]", emberAfGetInt16u(groupList + (i << 1), 0, 2));
-    }
-    emberAfGroupsClusterPrintln("");
+    emberAfGroupsClusterPrint("RX: GetGroupMembership [");
 
     // For all networks, Get Group Membership commands may be sent either
     // unicast or broadcast (removing the ZLL-specific limitation to unicast).
 
     // When Group Count is zero, respond with a list of all active groups.
     // Otherwise, respond with a list of matches.
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/10335
     if (groupCount == 0)
     {
         for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
@@ -275,9 +274,11 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
     }
     else
     {
-        for (i = 0; i < groupCount; i++)
+        auto iter = groupList.begin();
+        while (iter.Next())
         {
-            GroupId groupId = emberAfGetInt16u(groupList + (i << 1), 0, 2);
+            GroupId groupId = iter.GetValue();
+            emberAfGroupsClusterPrint(" 0x%02" PRIx16, groupId);
             for (j = 0; j < EMBER_BINDING_TABLE_SIZE; j++)
             {
                 EmberBindingTableEntry entry;
@@ -294,6 +295,16 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
                 }
             }
         }
+        err = iter.GetStatus();
+    }
+
+    emberAfGroupsClusterPrintln("]");
+
+    if (err != CHIP_NO_ERROR)
+    {
+        status = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        err    = CHIP_NO_ERROR;
+        goto exit;
     }
 
     // Only send a response if the Group Count was zero or if one or more active
@@ -335,9 +346,10 @@ exit:
 }
 
 bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             EndpointId endpoint, GroupId groupId,
-                                             Commands::RemoveGroup::DecodableType & commandData)
+                                             const Commands::RemoveGroup::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -375,7 +387,7 @@ exit:
 }
 
 bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 EndpointId aEndpoint, Commands::RemoveAllGroups::DecodableType & commandData)
+                                                 const Commands::RemoveAllGroups::DecodableType & commandData)
 {
     EmberStatus sendStatus = EMBER_SUCCESS;
     uint8_t i;
@@ -399,9 +411,8 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
                 }
                 else
                 {
-                    uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-                    GroupId groupId                                               = binding.groupId;
-                    emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
+                    GroupId groupId = binding.groupId;
+                    emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, CharSpan());
                     success = true && success;
 
                     // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
@@ -424,16 +435,17 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
 }
 
 bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                       GroupId groupId, uint8_t * groupName,
-                                                       Commands::AddGroupIfIdentifying::DecodableType & commandData)
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const Commands::AddGroupIfIdentifying::DecodableType & commandData)
 {
+    auto & groupId   = commandData.groupId;
+    auto & groupName = commandData.groupName;
+
     EmberAfStatus status;
     EmberStatus sendStatus = EMBER_SUCCESS;
 
-    emberAfGroupsClusterPrint("RX: AddGroupIfIdentifying 0x%2x, \"", groupId);
-    emberAfGroupsClusterPrintString(groupName);
-    emberAfGroupsClusterPrintln("\"");
+    emberAfGroupsClusterPrintln("RX: AddGroupIfIdentifying 0x%2x, \"%.*s\"", groupId, static_cast<int>(groupName.size()),
+                                groupName.data());
 
     if (!emberAfIsDeviceIdentifying(emberAfCurrentEndpoint()))
     {
@@ -524,4 +536,4 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(EndpointId endpoint)
     return false;
 }
 
-void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, uint8_t * groupName) {}
+void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, const CharSpan & groupName) {}

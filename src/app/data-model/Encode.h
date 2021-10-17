@@ -30,23 +30,29 @@ namespace DataModel {
  * appropriately encodes them to TLV.
  */
 template <typename X, typename std::enable_if_t<std::is_integral<X>::value, int> = 0>
-CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, X x)
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
     return writer.Put(tag, x);
 }
 
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
-CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, X x)
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
     return writer.Put(tag, x);
 }
 
-inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, ByteSpan x)
+template <typename X>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, BitFlags<X> x)
 {
     return writer.Put(tag, x);
 }
 
-inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, Span<const char> x)
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, ByteSpan x)
+{
+    return writer.Put(tag, x);
+}
+
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, Span<const char> x)
 {
     return writer.PutString(tag, x);
 }
@@ -58,16 +64,16 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, Span<const char>
  * depends on the presence of an Encode method on the object. The signature of that method
  * is as follows:
  *
- * CHIP_ERROR <Object>::Encode(TLVWriter &writer, uint64_t tag) const;
+ * CHIP_ERROR <Object>::Encode(TLVWriter &writer, TLV::Tag tag) const;
  *
  *
  */
 template <
     typename X,
     typename std::enable_if_t<std::is_class<X>::value &&
-                                  std::is_same<decltype(&X::Encode), CHIP_ERROR (X::*)(TLV::TLVWriter &, uint64_t) const>::value,
+                                  std::is_same<decltype(&X::Encode), CHIP_ERROR (X::*)(TLV::TLVWriter &, TLV::Tag) const>::value,
                               X> * = nullptr>
-CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, const X & x)
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
 {
     return x.Encode(writer, tag);
 }

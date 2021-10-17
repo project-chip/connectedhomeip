@@ -51,8 +51,6 @@ static_library("P6") {
     "P6Utils.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "SoftwareUpdateManagerImpl.cpp",
-    "SoftwareUpdateManagerImpl.h",
     "SystemPlatformConfig.h",
     "WarmPlatformConfig.h",
     "app_platform_cfg.c",
@@ -64,7 +62,7 @@ static_library("P6") {
     "cycfg_gatt_db.c",
     "cycfg_gatt_db.h",
   ]
-  deps = [ "${chip_root}/src/lib/mdns:platform_header" ]
+  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
 
   public_deps = [
     "${chip_root}/src/crypto",

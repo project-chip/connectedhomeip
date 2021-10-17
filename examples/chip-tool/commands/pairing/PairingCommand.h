@@ -19,7 +19,7 @@
 #pragma once
 
 #include "../../config/PersistentStorage.h"
-#include "../common/Command.h"
+#include "../common/CHIPCommand.h"
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
@@ -49,15 +49,15 @@ enum class PairingNetworkType
     Ethernet,
 };
 
-class PairingCommand : public Command,
+class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceAddressUpdateDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
-                   chip::Mdns::DiscoveryFilterType filterType = chip::Mdns::DiscoveryFilterType::kNone) :
-        Command(commandName),
+                   chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
+        CHIPCommand(commandName),
         mPairingMode(mode), mNetworkType(networkType),
         mFilterType(filterType), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID },
         mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
@@ -119,34 +119,34 @@ public:
 
         switch (filterType)
         {
-        case chip::Mdns::DiscoveryFilterType::kNone:
+        case chip::Dnssd::DiscoveryFilterType::kNone:
             break;
-        case chip::Mdns::DiscoveryFilterType::kShort:
+        case chip::Dnssd::DiscoveryFilterType::kShort:
             AddArgument("discriminator", 0, 15, &mDiscoveryFilterCode);
             break;
-        case chip::Mdns::DiscoveryFilterType::kLong:
+        case chip::Dnssd::DiscoveryFilterType::kLong:
             AddArgument("discriminator", 0, 4096, &mDiscoveryFilterCode);
             break;
-        case chip::Mdns::DiscoveryFilterType::kVendor:
+        case chip::Dnssd::DiscoveryFilterType::kVendor:
             AddArgument("vendor-id", 0, UINT16_MAX, &mDiscoveryFilterCode);
             break;
-        case chip::Mdns::DiscoveryFilterType::kCompressedFabricId:
+        case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
             AddArgument("fabric-id", 0, UINT64_MAX, &mDiscoveryFilterCode);
             break;
-        case chip::Mdns::DiscoveryFilterType::kCommissioningMode:
-        case chip::Mdns::DiscoveryFilterType::kCommissioner:
+        case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
+        case chip::Dnssd::DiscoveryFilterType::kCommissioner:
             break;
-        case chip::Mdns::DiscoveryFilterType::kDeviceType:
+        case chip::Dnssd::DiscoveryFilterType::kDeviceType:
             AddArgument("device-type", 0, UINT16_MAX, &mDiscoveryFilterCode);
             break;
-        case chip::Mdns::DiscoveryFilterType::kInstanceName:
+        case chip::Dnssd::DiscoveryFilterType::kInstanceName:
             AddArgument("name", &mDiscoveryFilterInstanceName);
             break;
         }
     }
 
-    /////////// Command Interface /////////
-    CHIP_ERROR Run() override;
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR Run(NodeId remoteId) override;
     uint16_t GetWaitDurationInSeconds() const override { return 120; }
     void Shutdown() override;
 
@@ -157,7 +157,7 @@ public:
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData) override;
+    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     /////////// DeviceAddressUpdateDelegate Interface /////////
     void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
@@ -190,7 +190,7 @@ private:
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
-    const chip::Mdns::DiscoveryFilterType mFilterType;
+    const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
     NodeId mRemoteId;
     uint16_t mRemotePort;
@@ -215,7 +215,6 @@ private:
     ChipDevice * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);

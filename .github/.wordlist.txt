@@ -33,6 +33,7 @@ APIs
 apk
 AppConfig
 ApplicationBasic
+ApplicationIdentifier
 ApplicationLauncher
 approver
 appspot
@@ -46,6 +47,7 @@ armv
 ASYNC
 att
 attId
+attributeValue
 attrListName
 attrMask
 attSizeBytes
@@ -111,6 +113,7 @@ CAfile
 cancelled
 CBB
 cbd
+CMD
 CCMP
 CCS
 CCSTUDIO
@@ -137,6 +140,7 @@ ChipImResponder
 ChipLight
 ChipMessageLayer
 CHIPTool
+CHIPTest
 chmod
 chrpath
 cipd
@@ -249,6 +253,7 @@ DevKitM
 df
 dfu
 DHCP
+DHCPC
 DHCPv
 dhrishi
 dialout
@@ -264,6 +269,7 @@ DISTRO
 Distutils
 DK
 DL
+DMG
 DNS
 Dnsmasq
 dnsmasqd
@@ -430,6 +436,7 @@ Impl
 ImplClass
 implementers
 imx
+imxlinux
 indexhtml
 Inet
 InetLayer
@@ -437,8 +444,8 @@ Infineon
 ini
 init
 inlined
-instantiation
 installDebug
+instantiation
 integrations
 IntelliSense
 InteractionModelVersion
@@ -532,7 +539,10 @@ matterBuildSrcDir
 matterc
 matterd
 MatterLock
+matterSdkSourceBuild
+matterUTestLib
 MaxInterval
+MaxIntervalCeilingSeconds
 MaxRtrAdvInterval
 mbedTLS
 mcu
@@ -562,6 +572,7 @@ MicroSD
 middleware
 Minicom
 MinInterval
+MinIntervalFloorSeconds
 MinRtrAdvInterval
 mkdir
 mlan
@@ -670,6 +681,7 @@ PinCode
 pkgconfig
 PlatformManager
 PlatformManagerImpl
+plaintext
 plt
 png
 polymorphism
@@ -773,8 +785,8 @@ ScriptBinding
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -787,6 +799,7 @@ SerialNumber
 ServiceId
 SetDns
 SetUpPINCode
+SetpointRaiseLower
 SetupQRCode
 sexualized
 SIGINT
@@ -828,6 +841,8 @@ subdirectory
 submodule
 submodules
 subprocess
+SubscribeResponse
+SubscriptionId
 sudo
 svg
 SVR
@@ -895,9 +910,11 @@ ttyUSB
 TvChannel
 txt
 uart
+udhcpc
 UART
 UDP
 UDPEndPoint
+udpPort
 ug
 ui
 uint
@@ -959,12 +976,14 @@ wrover
 WS
 WSL
 WSTK
+xa
 xab
 xaver
 xbef
 xcd
 Xcode
 xd
+xdeadbeefcafe
 xds
 xdsdfu
 xef
@@ -991,6 +1010,7 @@ zaptool
 ZCL
 zclconfigure
 zclread
+zclsubscribe
 zclwrite
 ZephyrConfig
 zephyrproject

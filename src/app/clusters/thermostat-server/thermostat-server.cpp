@@ -30,7 +30,9 @@
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -66,14 +68,15 @@ void emberAfThermostatClusterServerInitCallback()
     // or should this just be the responsibility of the thermostat application?
 }
 
-EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value)
+Protocols::InteractionModel::Status
+MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EndpointId endpoint  = attributePath.mEndpointId;
     int16_t requested;
 
-    switch (attributeId)
+    switch (attributePath.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id: {
         int16_t AbsMinHeatSetpointLimit;
@@ -253,38 +256,35 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
         break;
     }
 
-    return status;
+    return app::ToInteractionModelStatus(status);
 }
 
 bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                         const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
-                                                         Commands::ClearWeeklySchedule::DecodableType & commandData)
+                                                         const app::ConcreteCommandPath & commandPath,
+                                                         const Commands::ClearWeeklySchedule::DecodableType & commandData)
 {
     // TODO
     return false;
 }
 bool emberAfThermostatClusterGetRelayStatusLogCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
-                                                       Commands::GetRelayStatusLog::DecodableType & commandData)
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const Commands::GetRelayStatusLog::DecodableType & commandData)
 {
     // TODO
     return false;
 }
 
 bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
-                                                       uint8_t daysToReturn, uint8_t modeToReturn,
-                                                       Commands::GetWeeklySchedule::DecodableType & commandData)
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const Commands::GetWeeklySchedule::DecodableType & commandData)
 {
     // TODO
     return false;
 }
 
 bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
-                                                       uint8_t numberOfTransitionsForSequence, uint8_t daysOfWeekForSequence,
-                                                       uint8_t modeForSequence, uint8_t * payload,
-                                                       Commands::SetWeeklySchedule::DecodableType & commandData)
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const Commands::SetWeeklySchedule::DecodableType & commandData)
 {
     // TODO
     return false;
@@ -434,10 +434,14 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
     return CoolingSetpoint;
 }
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
-                                                        uint8_t mode, int8_t amount,
-                                                        Commands::SetpointRaiseLower::DecodableType & commandData)
+                                                        const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::SetpointRaiseLower::DecodableType & commandData)
 {
+    auto & mode   = commandData.mode;
+    auto & amount = commandData.amount;
+
+    EndpointId aEndpointId = commandPath.mEndpointId;
+
     int16_t HeatingSetpoint = kDefaultHeatingSetpoint, CoolingSetpoint = kDefaultCoolingSetpoint; // Set to defaults to be safe
     EmberAfStatus status                     = EMBER_ZCL_STATUS_FAILURE;
     EmberAfStatus ReadStatus                 = EMBER_ZCL_STATUS_FAILURE;

@@ -270,14 +270,13 @@ CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
             err = ParseData(reader, 0);
             SuccessOrExit(err);
             break;
-        case kCsTag_StatusElement:
+        case kCsTag_StatusIB:
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_StatusElement)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_StatusElement);
-            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_StatusIB)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_StatusIB);
 
             {
-                StatusElement::Parser status;
+                StatusIB::Parser status;
                 err = status.Init(reader);
                 SuccessOrExit(err);
 
@@ -301,13 +300,12 @@ CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for at most field:
-        const uint16_t CheckDataField          = 1 << kCsTag_Data;
-        const uint16_t CheckStatusElementField = 1 << kCsTag_StatusElement;
+        const uint16_t CheckDataField     = 1 << kCsTag_Data;
+        const uint16_t CheckStatusIBField = 1 << kCsTag_StatusIB;
 
-        if ((TagPresenceMask & CheckDataField) == CheckDataField &&
-            (TagPresenceMask & CheckStatusElementField) == CheckStatusElementField)
+        if ((TagPresenceMask & CheckDataField) == CheckDataField && (TagPresenceMask & CheckStatusIBField) == CheckStatusIBField)
         {
-            // kCsTag_Data and kCsTag_StatusElement both exist
+            // kCsTag_Data and kCsTag_StatusIB both exist
             err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
         }
         else
@@ -355,17 +353,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR CommandDataElement::Parser::GetStatusElement(StatusElement::Parser * const apStatusElement) const
+CHIP_ERROR CommandDataElement::Parser::GetStatusIB(StatusIB::Parser * const apStatusIB) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
 
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusElement), reader);
+    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusIB), reader);
     SuccessOrExit(err);
 
-    VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = apStatusElement->Init(reader);
+    err = apStatusIB->Init(reader);
     SuccessOrExit(err);
 
 exit:
@@ -391,16 +387,16 @@ exit:
     return mCommandPathBuilder;
 }
 
-StatusElement::Builder & CommandDataElement::Builder::CreateStatusElementBuilder()
+StatusIB::Builder & CommandDataElement::Builder::CreateStatusIBBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mStatusElementBuilder.ResetError(mError));
+    VerifyOrExit(CHIP_NO_ERROR == mError, mStatusIBBuilder.ResetError(mError));
 
-    mError = mStatusElementBuilder.Init(mpWriter, kCsTag_StatusElement);
+    mError = mStatusIBBuilder.Init(mpWriter, kCsTag_StatusIB);
 
 exit:
-    // on error, mStatusElementBuilder would be un-/partial initialized and cannot be used to write anything
-    return mStatusElementBuilder;
+    // on error, mStatusIBBuilder would be un-/partial initialized and cannot be used to write anything
+    return mStatusIBBuilder;
 }
 
 CommandDataElement::Builder & CommandDataElement::Builder::EndOfCommandDataElement()

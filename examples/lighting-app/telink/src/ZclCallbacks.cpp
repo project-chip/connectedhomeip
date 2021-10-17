@@ -16,44 +16,31 @@
  *    limitations under the License.
  */
 
-#include <lib/support/logging/CHIPLogging.h>
+#include "AppTask.h"
+#include "LightingManager.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/ids/Commands.h>
-#include <app/util/af-types.h>
-#include <app/util/af.h>
-
-#include "AppTask.h"
-#include "LightingManager.h"
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
+    ClusterId clusterId     = attributePath.mClusterId;
+    AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    if (clusterId == OnOff::Id)
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
-        if (attributeId != OnOff::Attributes::OnOff::Id)
-        {
-            ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-            return;
-        }
-
         LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
                                      AppEvent::kEventType_Lighting, size, value);
     }
-    else if (clusterId == LevelControl::Id)
+    else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        if (attributeId != LevelControl::Attributes::CurrentLevel::Id)
-        {
-            ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-            return;
-        }
-
         ChipLogProgress(Zcl, "Value: %u, length %u", *value, size);
         if (size == 1)
         {
@@ -63,11 +50,6 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
         {
             ChipLogError(Zcl, "wrong length for level: %d", size);
         }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-        return;
     }
 }
 

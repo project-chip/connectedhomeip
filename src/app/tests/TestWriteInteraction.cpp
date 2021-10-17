@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -43,6 +44,9 @@ chip::TransportMgrBase gTransportManager;
 chip::Test::LoopbackTransport gLoopback;
 chip::Test::IOContext gIOContext;
 
+uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+size_t attributeDataTLVLen = 0;
+
 using TestContext = chip::Test::MessagingContext;
 TestContext sContext;
 
@@ -55,6 +59,7 @@ public:
     static void TestWriteClient(nlTestSuite * apSuite, void * apContext);
     static void TestWriteHandler(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient);
@@ -108,8 +113,7 @@ void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apCo
     attributePathParams.mListIndex  = 5;
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
-    err = aWriteHandler.AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                               Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::Success);
+    err = aWriteHandler.AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -172,24 +176,25 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AttributeStatusList::Builder attributeStatusListBuilder = writeResponseBuilder.CreateAttributeStatusListBuilder();
     NL_TEST_ASSERT(apSuite, attributeStatusListBuilder.GetError() == CHIP_NO_ERROR);
-    AttributeStatusElement::Builder attributeStatusElementBuilder = attributeStatusListBuilder.CreateAttributeStatusBuilder();
-    NL_TEST_ASSERT(apSuite, attributeStatusElementBuilder.GetError() == CHIP_NO_ERROR);
+    AttributeStatusIB::Builder attributeStatusIBBuilder = attributeStatusListBuilder.CreateAttributeStatusBuilder();
+    NL_TEST_ASSERT(apSuite, attributeStatusIBBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributeStatusElementBuilder.CreateAttributePathBuilder();
+    AttributePath::Builder attributePathBuilder = attributeStatusIBBuilder.CreateAttributePathBuilder();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    StatusElement::Builder statusElementBuilder = attributeStatusElementBuilder.CreateStatusElementBuilder();
-    NL_TEST_ASSERT(apSuite, statusElementBuilder.GetError() == CHIP_NO_ERROR);
-    statusElementBuilder.EncodeStatusElement(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3)
-        .EndOfStatusElement();
-    err = statusElementBuilder.GetError();
+    StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateStatusIBBuilder();
+    StatusIB statusIB;
+    statusIB.mStatus = chip::Protocols::InteractionModel::Status::InvalidSubscription;
+    NL_TEST_ASSERT(apSuite, statusIBBuilder.GetError() == CHIP_NO_ERROR);
+    statusIBBuilder.EncodeStatusIB(statusIB);
+    err = statusIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    attributeStatusElementBuilder.EndOfAttributeStatusElement();
-    NL_TEST_ASSERT(apSuite, attributeStatusElementBuilder.GetError() == CHIP_NO_ERROR);
+    attributeStatusIBBuilder.EndOfAttributeStatusIB();
+    NL_TEST_ASSERT(apSuite, attributeStatusIBBuilder.GetError() == CHIP_NO_ERROR);
 
     attributeStatusListBuilder.EndOfAttributeStatusList();
     NL_TEST_ASSERT(apSuite, attributeStatusListBuilder.GetError() == CHIP_NO_ERROR);
@@ -258,20 +263,21 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
-    return aWriteHandler->AddAttributeStatusCode(
-        AttributePathParams(aClusterInfo.mNodeId, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId,
-                            aClusterInfo.mListIndex, AttributePathParams::Flags::kFieldIdValid),
-        Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-        Protocols::InteractionModel::Status::Success);
+    TLV::TLVWriter writer;
+    writer.Init(attributeDataTLV);
+    writer.CopyElement(TLV::AnonymousTag, aReader);
+    attributeDataTLVLen = writer.GetLengthWritten();
+    return aWriteHandler->AddStatus(AttributePathParams(aClusterInfo.mNodeId, aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
+                                                        aClusterInfo.mFieldId, aClusterInfo.mListIndex,
+                                                        AttributePathParams::Flags::kFieldIdValid),
+                                    Protocols::InteractionModel::Status::Success);
 }
 
 class RoundtripDelegate : public chip::app::InteractionModelDelegate
 {
 public:
-    CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
-                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                   const uint16_t aProtocolCode, AttributePathParams & aAttributePathParams,
-                                   uint8_t aCommandIndex) override
+    CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient, const app::StatusIB & aStatusIB,
+                                   AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex) override
     {
         mGotResponse = true;
         return CHIP_NO_ERROR;
@@ -279,6 +285,76 @@ public:
 
     bool mGotResponse = false;
 };
+
+void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    RoundtripDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    app::WriteClientHandle writeClient;
+    err = engine->NewWriteClient(writeClient);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    AttributePathParams attributePathParams;
+    attributePathParams.mNodeId     = 1;
+    attributePathParams.mEndpointId = 2;
+    attributePathParams.mClusterId  = 3;
+    attributePathParams.mFieldId    = 4;
+    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+
+    const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
+    const char charSpanData[]    = "a simple test string";
+
+    app::Clusters::TestCluster::Structs::SimpleStruct::Type dataTx;
+    dataTx.a = 12;
+    dataTx.b = true;
+    dataTx.d = chip::ByteSpan(byteSpanData);
+    // Spec A.11.2 strings SHALL NOT include a terminating null character to mark the end of a string.
+    dataTx.e = chip::Span<const char>(charSpanData, strlen(charSpanData));
+
+    writeClient.EncodeAttributeWritePayload(attributePathParams, dataTx);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, !delegate.mGotResponse);
+
+    SessionHandle session = ctx.GetSessionBobToAlice();
+
+    err = writeClient.SendWriteRequest(ctx.GetAliceNodeId(), ctx.GetFabricIndex(), Optional<SessionHandle>::Value(session));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, delegate.mGotResponse);
+
+    {
+        app::Clusters::TestCluster::Structs::SimpleStruct::Type dataRx;
+        TLV::TLVReader reader;
+        reader.Init(attributeDataTLV, attributeDataTLVLen);
+        reader.Next();
+        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == DataModel::Decode(reader, dataRx));
+        NL_TEST_ASSERT(apSuite, dataRx.a == dataTx.a);
+        NL_TEST_ASSERT(apSuite, dataRx.b == dataTx.b);
+        NL_TEST_ASSERT(apSuite, dataRx.d.data_equal(dataTx.d));
+        // Equals to dataRx.e.size() == dataTx.e.size() && memncmp(dataRx.e.data(), dataTx.e.data(), dataTx.e.size()) == 0
+        NL_TEST_ASSERT(apSuite, dataRx.e.data_equal(dataTx.e));
+    }
+
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    engine->Shutdown();
+}
 
 void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext)
 {
@@ -333,6 +409,7 @@ const nlTest sTests[] =
         NL_TEST_DEF("CheckWriteClient", chip::app::TestWriteInteraction::TestWriteClient),
         NL_TEST_DEF("CheckWriteHandler", chip::app::TestWriteInteraction::TestWriteHandler),
         NL_TEST_DEF("CheckWriteRoundtrip", chip::app::TestWriteInteraction::TestWriteRoundtrip),
+        NL_TEST_DEF("TestWriteRoundtripWithClusterObjects", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjects),
         NL_TEST_SENTINEL()
 };
 // clang-format on

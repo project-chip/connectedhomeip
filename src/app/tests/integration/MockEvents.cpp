@@ -33,9 +33,9 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 
-static uint64_t kLivenessDeviceStatus = chip::TLV::ContextTag(1);
-static bool gMockEventStop            = false;
-static bool gEventIsStopped           = false;
+static chip::TLV::Tag kLivenessDeviceStatus = chip::TLV::ContextTag(1);
+static bool gMockEventStop                  = false;
+static bool gEventIsStopped                 = false;
 
 EventGenerator::EventGenerator(size_t aNumStates, size_t aInitialState) : mNumStates(aNumStates), mState(aInitialState) {}
 

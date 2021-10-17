@@ -36,6 +36,7 @@ typedef struct _SimpleStruct
     uint8_t c;
     chip::ByteSpan d;
     uint8_t * e;
+    uint8_t f;
 } SimpleStruct;
 
 // Struct for NestedStruct
@@ -113,26 +114,6 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * current;
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
-
-// Struct for ConfigureReportingRecord
-typedef struct _ConfigureReportingRecord
-{
-    uint8_t direction;
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint16_t minimumReportingInterval;
-    uint16_t maximumReportingInterval;
-    uint8_t * reportableChangeLocation;
-    uint16_t timeoutPeriod;
-} ConfigureReportingRecord;
-
-// Struct for ConfigureReportingStatusRecord
-typedef struct _ConfigureReportingStatusRecord
-{
-    chip::Protocols::InteractionModel::Status status;
-    uint8_t direction;
-    chip::AttributeId attributeId;
-} ConfigureReportingStatusRecord;
 
 // Struct for ContentLaunchBrandingInformation
 typedef struct _ContentLaunchBrandingInformation
@@ -328,26 +309,6 @@ typedef struct _ReadAttributeStatusRecord
     uint8_t * attributeLocation;
 } ReadAttributeStatusRecord;
 
-// Struct for ReadReportingConfigurationAttributeRecord
-typedef struct _ReadReportingConfigurationAttributeRecord
-{
-    uint8_t direction;
-    chip::AttributeId attributeId;
-} ReadReportingConfigurationAttributeRecord;
-
-// Struct for ReadReportingConfigurationRecord
-typedef struct _ReadReportingConfigurationRecord
-{
-    chip::Protocols::InteractionModel::Status status;
-    uint8_t direction;
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint16_t minimumReportingInterval;
-    uint16_t maximumReportingInterval;
-    uint8_t * reportableChangeLocation;
-    uint16_t timeoutPeriod;
-} ReadReportingConfigurationRecord;
-
 // Struct for ReadStructuredAttributeRecord
 typedef struct _ReadStructuredAttributeRecord
 {
@@ -355,14 +316,6 @@ typedef struct _ReadStructuredAttributeRecord
     uint8_t indicator;
     /* TYPE WARNING: array array defaults to */ uint8_t * indicies;
 } ReadStructuredAttributeRecord;
-
-// Struct for ReportAttributeRecord
-typedef struct _ReportAttributeRecord
-{
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint8_t * attributeLocation;
-} ReportAttributeRecord;
 
 // Struct for RouteTable
 typedef struct _RouteTable

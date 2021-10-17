@@ -22,7 +22,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
@@ -43,7 +42,7 @@ public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
     SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), AttributeValueEncoder & aEncoder);
@@ -51,15 +50,15 @@ private:
 
 SoftwareDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != SoftwareDiagnostics::Id)
+    if (aPath.mClusterId != SoftwareDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case CurrentHeapFree::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aEncoder);
@@ -96,9 +95,11 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMan
 } // anonymous namespace
 
 bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
-                                                              const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                              Commands::ResetWatermarks::DecodableType & commandData)
+                                                              const app::ConcreteCommandPath & commandPath,
+                                                              const Commands::ResetWatermarks::DecodableType & commandData)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+
     uint64_t currentHeapUsed;
 
     EmberAfStatus status = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Get(endpoint, &currentHeapUsed);
