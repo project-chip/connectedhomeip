@@ -163,16 +163,17 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
             if (hasDataResponse)
             {
                 ChipLogProgress(DataManagement,
-                        "Received Command Response Data, Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                        " Command=" ChipLogFormatMEI,
-                        endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+                                "Received Command Response Data, Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                                " Command=" ChipLogFormatMEI,
+                                endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
             }
             else
             {
                 ChipLogProgress(DataManagement,
-                        "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                        " Command=" ChipLogFormatMEI " Status=0x%" PRIx16,
-                        endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId), to_underlying(statusIB.mStatus));
+                                "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                                " Command=" ChipLogFormatMEI " Status=0x%" PRIx16,
+                                endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId),
+                                to_underlying(statusIB.mStatus));
             }
         }
         SuccessOrExit(err);
