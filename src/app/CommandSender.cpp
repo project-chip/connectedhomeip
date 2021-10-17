@@ -159,7 +159,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         SuccessOrExit(err);
         ChipLogProgress(DataManagement,
                         "Received Command Response Data, Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                        " Command=%" ChipLogFormatMEI,
+                        " Command=" ChipLogFormatMEI,
                         endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
         // TODO(#4503): Should call callbacks of cluster that sends the command.
         DispatchSingleClusterResponseCommand(ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader, this);
