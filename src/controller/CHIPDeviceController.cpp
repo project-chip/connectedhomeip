@@ -1843,8 +1843,7 @@ CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
     case CommissioningStage::kConfigRegulatory:
         return CommissioningStage::kDeviceAttestation;
     case CommissioningStage::kDeviceAttestation:
-        return CommissioningStage::kCheckCertificates;
-    case CommissioningStage::kCheckCertificates:
+        // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -1863,6 +1862,7 @@ CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
     case CommissioningStage::kNetworkSetup:
     case CommissioningStage::kNetworkEnable:
     case CommissioningStage::kScanNetworks:
+    case CommissioningStage::kCheckCertificates:
         return CommissioningStage::kError;
     // Neither of these have a next stage so return kError;
     case CommissioningStage::kCleanup:
