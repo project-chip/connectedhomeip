@@ -94,7 +94,7 @@ CHIP_ERROR CHIPCommand::Run()
 void CHIPCommand::RunQueuedCommand(intptr_t commandArg)
 {
     auto * command = reinterpret_cast<CHIPCommand *>(commandArg);
-    CHIP_ERROR err = command->Run(command->mStorage.GetRemoteNodeId());
+    CHIP_ERROR err = command->RunCommand();
     if (err != CHIP_NO_ERROR)
     {
         command->SetCommandExitStatus(err);
