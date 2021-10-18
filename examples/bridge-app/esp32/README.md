@@ -1,8 +1,8 @@
 # CHIP ESP32 Bridge App Example
 
 A prototype application that demonstrates dynamic endpoint with device
-commissioning and cluster control. It adds the non-chip device as endpoints
-on a bridge(Matter device). In this example four light devices supporting on-off
+commissioning and cluster control. It adds the non-chip device as endpoints on a
+bridge(Matter device). In this example four light devices supporting on-off
 cluster have been added as endpoints
 
 1. Light1 at endpoint 2
