@@ -18183,8 +18183,11 @@ private:
 | Commands:                                                           |        |
 | * Test                                                              |   0x00 |
 | * TestAddArguments                                                  |   0x04 |
+| * TestListInt8UArgumentRequest                                      |   0x0A |
+| * TestListStructArgumentRequest                                     |   0x09 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
+| * TestStructArgumentRequest                                         |   0x07 |
 | * TestUnknownCommand                                                |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -18283,6 +18286,85 @@ private:
 };
 
 /*
+ * Command TestListInt8UArgumentRequest
+ */
+class TestClusterTestListInt8UArgumentRequest : public ModelCommand
+{
+public:
+    TestClusterTestListInt8UArgumentRequest() : ModelCommand("test-list-int8uargument-request")
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mArg1);
+        ModelCommand::AddArguments();
+    }
+    ~TestClusterTestListInt8UArgumentRequest()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x0A) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.TestListInt8UArgumentRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mArg1);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mArg1;
+};
+
+/*
+ * Command TestListStructArgumentRequest
+ */
+class TestClusterTestListStructArgumentRequest : public ModelCommand
+{
+public:
+    TestClusterTestListStructArgumentRequest() : ModelCommand("test-list-struct-argument-request")
+    {
+        AddArgument("A", 0, UINT8_MAX, &mA);
+        AddArgument("B", 0, 1, &mB);
+        AddArgument("C", 0, UINT8_MAX, &mC);
+        AddArgument("D", &mD);
+        AddArgument("E", &mE);
+        AddArgument("F", 0, UINT8_MAX, &mF);
+        ModelCommand::AddArguments();
+    }
+    ~TestClusterTestListStructArgumentRequest()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x09) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.TestListStructArgumentRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mA, mB, mC, mD, mE,
+                                                     mF);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mA;
+    bool mB;
+    uint8_t mC;
+    chip::ByteSpan mD;
+    chip::ByteSpan mE;
+    uint8_t mF;
+};
+
+/*
  * Command TestNotHandled
  */
 class TestClusterTestNotHandled : public ModelCommand
@@ -18339,6 +18421,50 @@ private:
                                                                                      this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command TestStructArgumentRequest
+ */
+class TestClusterTestStructArgumentRequest : public ModelCommand
+{
+public:
+    TestClusterTestStructArgumentRequest() : ModelCommand("test-struct-argument-request")
+    {
+        AddArgument("A", 0, UINT8_MAX, &mA);
+        AddArgument("B", 0, 1, &mB);
+        AddArgument("C", 0, UINT8_MAX, &mC);
+        AddArgument("D", &mD);
+        AddArgument("E", &mE);
+        AddArgument("F", 0, UINT8_MAX, &mF);
+        ModelCommand::AddArguments();
+    }
+    ~TestClusterTestStructArgumentRequest()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x07) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.TestStructArgumentRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mA, mB, mC, mD, mE, mF);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mA;
+    bool mB;
+    uint8_t mC;
+    chip::ByteSpan mD;
+    chip::ByteSpan mE;
+    uint8_t mF;
 };
 
 /*
@@ -26436,59 +26562,62 @@ void registerClusterTestCluster(Commands & commands)
     const char * clusterName = "TestCluster";
 
     commands_list clusterCommands = {
-        make_unique<TestClusterTest>(),                      //
-        make_unique<TestClusterTestAddArguments>(),          //
-        make_unique<TestClusterTestNotHandled>(),            //
-        make_unique<TestClusterTestSpecific>(),              //
-        make_unique<TestClusterTestUnknownCommand>(),        //
-        make_unique<ReadTestClusterBoolean>(),               //
-        make_unique<WriteTestClusterBoolean>(),              //
-        make_unique<ReadTestClusterBitmap8>(),               //
-        make_unique<WriteTestClusterBitmap8>(),              //
-        make_unique<ReadTestClusterBitmap16>(),              //
-        make_unique<WriteTestClusterBitmap16>(),             //
-        make_unique<ReadTestClusterBitmap32>(),              //
-        make_unique<WriteTestClusterBitmap32>(),             //
-        make_unique<ReadTestClusterBitmap64>(),              //
-        make_unique<WriteTestClusterBitmap64>(),             //
-        make_unique<ReadTestClusterInt8u>(),                 //
-        make_unique<WriteTestClusterInt8u>(),                //
-        make_unique<ReadTestClusterInt16u>(),                //
-        make_unique<WriteTestClusterInt16u>(),               //
-        make_unique<ReadTestClusterInt32u>(),                //
-        make_unique<WriteTestClusterInt32u>(),               //
-        make_unique<ReadTestClusterInt64u>(),                //
-        make_unique<WriteTestClusterInt64u>(),               //
-        make_unique<ReadTestClusterInt8s>(),                 //
-        make_unique<WriteTestClusterInt8s>(),                //
-        make_unique<ReadTestClusterInt16s>(),                //
-        make_unique<WriteTestClusterInt16s>(),               //
-        make_unique<ReadTestClusterInt32s>(),                //
-        make_unique<WriteTestClusterInt32s>(),               //
-        make_unique<ReadTestClusterInt64s>(),                //
-        make_unique<WriteTestClusterInt64s>(),               //
-        make_unique<ReadTestClusterEnum8>(),                 //
-        make_unique<WriteTestClusterEnum8>(),                //
-        make_unique<ReadTestClusterEnum16>(),                //
-        make_unique<WriteTestClusterEnum16>(),               //
-        make_unique<ReadTestClusterOctetString>(),           //
-        make_unique<WriteTestClusterOctetString>(),          //
-        make_unique<ReadTestClusterListInt8u>(),             //
-        make_unique<ReadTestClusterListOctetString>(),       //
-        make_unique<ReadTestClusterListStructOctetString>(), //
-        make_unique<ReadTestClusterLongOctetString>(),       //
-        make_unique<WriteTestClusterLongOctetString>(),      //
-        make_unique<ReadTestClusterCharString>(),            //
-        make_unique<WriteTestClusterCharString>(),           //
-        make_unique<ReadTestClusterLongCharString>(),        //
-        make_unique<WriteTestClusterLongCharString>(),       //
-        make_unique<ReadTestClusterEpochUs>(),               //
-        make_unique<WriteTestClusterEpochUs>(),              //
-        make_unique<ReadTestClusterEpochS>(),                //
-        make_unique<WriteTestClusterEpochS>(),               //
-        make_unique<ReadTestClusterUnsupported>(),           //
-        make_unique<WriteTestClusterUnsupported>(),          //
-        make_unique<ReadTestClusterClusterRevision>(),       //
+        make_unique<TestClusterTest>(),                          //
+        make_unique<TestClusterTestAddArguments>(),              //
+        make_unique<TestClusterTestListInt8UArgumentRequest>(),  //
+        make_unique<TestClusterTestListStructArgumentRequest>(), //
+        make_unique<TestClusterTestNotHandled>(),                //
+        make_unique<TestClusterTestSpecific>(),                  //
+        make_unique<TestClusterTestStructArgumentRequest>(),     //
+        make_unique<TestClusterTestUnknownCommand>(),            //
+        make_unique<ReadTestClusterBoolean>(),                   //
+        make_unique<WriteTestClusterBoolean>(),                  //
+        make_unique<ReadTestClusterBitmap8>(),                   //
+        make_unique<WriteTestClusterBitmap8>(),                  //
+        make_unique<ReadTestClusterBitmap16>(),                  //
+        make_unique<WriteTestClusterBitmap16>(),                 //
+        make_unique<ReadTestClusterBitmap32>(),                  //
+        make_unique<WriteTestClusterBitmap32>(),                 //
+        make_unique<ReadTestClusterBitmap64>(),                  //
+        make_unique<WriteTestClusterBitmap64>(),                 //
+        make_unique<ReadTestClusterInt8u>(),                     //
+        make_unique<WriteTestClusterInt8u>(),                    //
+        make_unique<ReadTestClusterInt16u>(),                    //
+        make_unique<WriteTestClusterInt16u>(),                   //
+        make_unique<ReadTestClusterInt32u>(),                    //
+        make_unique<WriteTestClusterInt32u>(),                   //
+        make_unique<ReadTestClusterInt64u>(),                    //
+        make_unique<WriteTestClusterInt64u>(),                   //
+        make_unique<ReadTestClusterInt8s>(),                     //
+        make_unique<WriteTestClusterInt8s>(),                    //
+        make_unique<ReadTestClusterInt16s>(),                    //
+        make_unique<WriteTestClusterInt16s>(),                   //
+        make_unique<ReadTestClusterInt32s>(),                    //
+        make_unique<WriteTestClusterInt32s>(),                   //
+        make_unique<ReadTestClusterInt64s>(),                    //
+        make_unique<WriteTestClusterInt64s>(),                   //
+        make_unique<ReadTestClusterEnum8>(),                     //
+        make_unique<WriteTestClusterEnum8>(),                    //
+        make_unique<ReadTestClusterEnum16>(),                    //
+        make_unique<WriteTestClusterEnum16>(),                   //
+        make_unique<ReadTestClusterOctetString>(),               //
+        make_unique<WriteTestClusterOctetString>(),              //
+        make_unique<ReadTestClusterListInt8u>(),                 //
+        make_unique<ReadTestClusterListOctetString>(),           //
+        make_unique<ReadTestClusterListStructOctetString>(),     //
+        make_unique<ReadTestClusterLongOctetString>(),           //
+        make_unique<WriteTestClusterLongOctetString>(),          //
+        make_unique<ReadTestClusterCharString>(),                //
+        make_unique<WriteTestClusterCharString>(),               //
+        make_unique<ReadTestClusterLongCharString>(),            //
+        make_unique<WriteTestClusterLongCharString>(),           //
+        make_unique<ReadTestClusterEpochUs>(),                   //
+        make_unique<WriteTestClusterEpochUs>(),                  //
+        make_unique<ReadTestClusterEpochS>(),                    //
+        make_unique<WriteTestClusterEpochS>(),                   //
+        make_unique<ReadTestClusterUnsupported>(),               //
+        make_unique<WriteTestClusterUnsupported>(),              //
+        make_unique<ReadTestClusterClusterRevision>(),           //
     };
 
     commands.Register(clusterName, clusterCommands);
