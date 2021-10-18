@@ -64,7 +64,8 @@ public:
     virtual ~OperationalDeviceProxy() {}
     OperationalDeviceProxy() {}
     // OperationalDeviceProxy() :
-    //     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    //     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn,
+    //     this)
     // {}
 
     /**

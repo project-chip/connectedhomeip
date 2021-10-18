@@ -51,71 +51,71 @@ constexpr size_t kMaxBlePendingPackets = 1;
 
 void TestOperationalDeviceProxy_Connect(nlTestSuite * inSuite, void * inContext)
 {
-//     Platform::MemoryInit();
+    //     Platform::MemoryInit();
 
-//     // Setup params for operational device proxy
-//     DeviceTransportMgr transportMgr;
-//     SessionManager sessionManager;
-//     Messaging::ExchangeManager exchangeMgr;
-//     System::LayerImpl systemLayer;
-//     Inet::InetLayer inetLayer;
-// #if CONFIG_NETWORK_LAYER_BLE
-//     Ble::BleLayer blelayer;
-// #endif // CONFIG_NETWORK_LAYER_BLE
-//     // Heap-allocate the fairly large FabricTable so we don't end up with a huge
-//     // stack.
-//     FabricTable * fabricTable = Platform::New<FabricTable>();
-//     secure_channel::MessageCounterManager messageCounterManager;
-//     SessionIDAllocator idAllocator;
+    //     // Setup params for operational device proxy
+    //     DeviceTransportMgr transportMgr;
+    //     SessionManager sessionManager;
+    //     Messaging::ExchangeManager exchangeMgr;
+    //     System::LayerImpl systemLayer;
+    //     Inet::InetLayer inetLayer;
+    // #if CONFIG_NETWORK_LAYER_BLE
+    //     Ble::BleLayer blelayer;
+    // #endif // CONFIG_NETWORK_LAYER_BLE
+    //     // Heap-allocate the fairly large FabricTable so we don't end up with a huge
+    //     // stack.
+    //     FabricTable * fabricTable = Platform::New<FabricTable>();
+    //     secure_channel::MessageCounterManager messageCounterManager;
+    //     SessionIDAllocator idAllocator;
 
-//     systemLayer.Init();
-//     inetLayer.Init(systemLayer, nullptr);
-//     transportMgr.Init(
-//         Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPAddressType_IPv6).SetListenPort(CHIP_PORT)
-// #if INET_CONFIG_ENABLE_IPV4
-//             ,
-//         Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(CHIP_PORT)
-// #endif
-// #if CONFIG_NETWORK_LAYER_BLE
-//             ,
-//         Transport::BleListenParameters(&blelayer)
-// #endif
-//     );
-//     sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);
-//     exchangeMgr.Init(&sessionManager);
-//     messageCounterManager.Init(&exchangeMgr);
+    //     systemLayer.Init();
+    //     inetLayer.Init(systemLayer, nullptr);
+    //     transportMgr.Init(
+    //         Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPAddressType_IPv6).SetListenPort(CHIP_PORT)
+    // #if INET_CONFIG_ENABLE_IPV4
+    //             ,
+    //         Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(CHIP_PORT)
+    // #endif
+    // #if CONFIG_NETWORK_LAYER_BLE
+    //             ,
+    //         Transport::BleListenParameters(&blelayer)
+    // #endif
+    //     );
+    //     sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);
+    //     exchangeMgr.Init(&sessionManager);
+    //     messageCounterManager.Init(&exchangeMgr);
 
-//     // Setup instance of operational device proxy
-//     app::device::OperationalDeviceProxy operationalDevice;
-//     NodeId peerNodeId           = 1;
-//     FabricIndex peerFabricIndex = 1;
-//     Inet::IPAddress mockAddr;
+    //     // Setup instance of operational device proxy
+    //     app::device::OperationalDeviceProxy operationalDevice;
+    //     NodeId peerNodeId           = 1;
+    //     FabricIndex peerFabricIndex = 1;
+    //     Inet::IPAddress mockAddr;
 
-//     // Update the address of peer device
-//     Inet::IPAddress::FromString("::1", mockAddr);
-//     Transport::PeerAddress peerAddr = Transport::PeerAddress::UDP(mockAddr, CHIP_PORT);
-//     operationalDevice.UpdateAddress(peerAddr);
+    //     // Update the address of peer device
+    //     Inet::IPAddress::FromString("::1", mockAddr);
+    //     Transport::PeerAddress peerAddr = Transport::PeerAddress::UDP(mockAddr, CHIP_PORT);
+    //     operationalDevice.UpdateAddress(peerAddr);
 
-//     // Setup device params
-//     app::device::OperationalDeviceProxyInitParams initParams = {
-//         .sessionManager = &sessionManager,
-//         .exchangeMgr    = &exchangeMgr,
-//         .idAllocator    = &idAllocator,
-//         .fabricsTable   = fabricTable,
-//     };
+    //     // Setup device params
+    //     app::device::OperationalDeviceProxyInitParams initParams = {
+    //         .sessionManager = &sessionManager,
+    //         .exchangeMgr    = &exchangeMgr,
+    //         .idAllocator    = &idAllocator,
+    //         .fabricsTable   = fabricTable,
+    //     };
 
-//     operationalDevice.Init(peerNodeId, peerFabricIndex, initParams);
-//     NL_TEST_ASSERT(inSuite, operationalDevice.Connect(nullptr, nullptr) == CHIP_NO_ERROR);
+    //     operationalDevice.Init(peerNodeId, peerFabricIndex, initParams);
+    //     NL_TEST_ASSERT(inSuite, operationalDevice.Connect(nullptr, nullptr) == CHIP_NO_ERROR);
 
-//     operationalDevice.GetDevice().Reset();
-//     messageCounterManager.Shutdown();
-//     exchangeMgr.Shutdown();
-//     sessionManager.Shutdown();
-//     Platform::Delete(fabricTable);
-//     transportMgr.Close();
-//     inetLayer.Shutdown();
-//     systemLayer.Shutdown();
-//     Platform::MemoryShutdown();
+    //     operationalDevice.GetDevice().Reset();
+    //     messageCounterManager.Shutdown();
+    //     exchangeMgr.Shutdown();
+    //     sessionManager.Shutdown();
+    //     Platform::Delete(fabricTable);
+    //     transportMgr.Close();
+    //     inetLayer.Shutdown();
+    //     systemLayer.Shutdown();
+    //     Platform::MemoryShutdown();
 }
 
 // clang-format off

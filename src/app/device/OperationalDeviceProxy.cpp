@@ -48,42 +48,42 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnOperationalDevic
 
     return CHIP_NO_ERROR;
 
-/*
-    // Secure session already established
-    if (mDevice.IsSecureConnected())
-    {
-        onConnection->mCall(onConnection->mContext, this);
-        return CHIP_NO_ERROR;
-    }
+    /*
+        // Secure session already established
+        if (mDevice.IsSecureConnected())
+        {
+            onConnection->mCall(onConnection->mContext, this);
+            return CHIP_NO_ERROR;
+        }
 
-    VerifyOrReturnError(mInitParams.exchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(mInitParams.exchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
 
-    EnqueueConnectionCallbacks(onConnection, onFailure);
+        EnqueueConnectionCallbacks(onConnection, onFailure);
 
-    Controller::ControllerDeviceInitParams initParams = {
-        .sessionManager  = mInitParams.sessionManager,
-        .exchangeMgr     = mInitParams.exchangeMgr,
-        .storageDelegate = nullptr,
-        .idAllocator     = mInitParams.idAllocator,
-        .fabricsTable    = mInitParams.fabricsTable,
-    };
+        Controller::ControllerDeviceInitParams initParams = {
+            .sessionManager  = mInitParams.sessionManager,
+            .exchangeMgr     = mInitParams.exchangeMgr,
+            .storageDelegate = nullptr,
+            .idAllocator     = mInitParams.idAllocator,
+            .fabricsTable    = mInitParams.fabricsTable,
+        };
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mDevice.Init(initParams, mNodeId, mAddress, mFabricIndex);
-    mDevice.OperationalCertProvisioned();
-    mDevice.SetActive(true);
-    err = mDevice.EstablishConnectivity(&mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    SuccessOrExit(err);
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        mDevice.Init(initParams, mNodeId, mAddress, mFabricIndex);
+        mDevice.OperationalCertProvisioned();
+        mDevice.SetActive(true);
+        err = mDevice.EstablishConnectivity(&mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+        SuccessOrExit(err);
 
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        DequeueConnectionSuccessCallbacks(false);
-        DequeueConnectionFailureCallbacks(err, true);
-    }
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            DequeueConnectionSuccessCallbacks(false);
+            DequeueConnectionFailureCallbacks(err, true);
+        }
 
-    return err;
-*/
+        return err;
+    */
 }
 
 CHIP_ERROR OperationalDeviceProxy::UpdateAddress(const Transport::PeerAddress & address)
@@ -173,9 +173,8 @@ void OperationalDeviceProxy::OnSessionEstablished()
     // VerifyOrReturn(mState != State::Uninitialized,
     //                ChipLogError(Controller, "OnSessionEstablished was called while the device was not initialized"));
 
-    CHIP_ERROR err = mInitParams.sessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mAddress), mNodeId, &mCASESession,
-        CryptoContext::SessionRole::kInitiator, mFabricIndex);
+    CHIP_ERROR err = mInitParams.sessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mAddress), mNodeId,
+                                                            &mCASESession, CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
