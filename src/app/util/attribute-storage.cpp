@@ -586,16 +586,18 @@ bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am,
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write, int32_t index)
 {
-    uint8_t i;
     uint16_t attributeOffsetIndex = 0;
 
-    for (i = 0; i < emberAfEndpointCount(); i++)
+    for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
-        if (emAfEndpoints[i].endpoint == attRecord->endpoint)
+        // Is this a dynamic endpoint?
+        bool isDynamicEndpoint = (ep >= emberAfFixedEndpointCount());
+
+        if (emAfEndpoints[ep].endpoint == attRecord->endpoint)
         {
-            EmberAfEndpointType * endpointType = emAfEndpoints[i].endpointType;
+            EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
             uint8_t clusterIndex;
-            if (!emberAfEndpointIndexIsEnabled(i))
+            if (!emberAfEndpointIndexIsEnabled(ep))
             {
                 continue;
             }
@@ -649,15 +651,29 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     }
                                 }
 
-                                return (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE
-                                            ? (write) ? emberAfExternalAttributeWriteCallback(
-                                                            attRecord->endpoint, attRecord->clusterId, am,
-                                                            emAfGetManufacturerCodeForAttribute(cluster, am), buffer, index)
-                                                      : emberAfExternalAttributeReadCallback(
-                                                            attRecord->endpoint, attRecord->clusterId, am,
-                                                            emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
-                                                            emberAfAttributeSize(am), index)
-                                            : typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index));
+                                // Is the attribute externally stored?
+                                if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
+                                {
+                                    return (write ? emberAfExternalAttributeWriteCallback(
+                                                        attRecord->endpoint, attRecord->clusterId, am,
+                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer, index)
+                                                  : emberAfExternalAttributeReadCallback(
+                                                        attRecord->endpoint, attRecord->clusterId, am,
+                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
+                                                        emberAfAttributeSize(am), index));
+                                }
+                                else
+                                {
+                                    // Internal storage is only supported for fixed endpoints
+                                    if (!isDynamicEndpoint)
+                                    {
+                                        return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index);
+                                    }
+                                    else
+                                    {
+                                        return EMBER_ZCL_STATUS_FAILURE;
+                                    }
+                                }
                             }
                         }
                         else
@@ -679,9 +695,9 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
         else
         { // Not the endpoint we are looking for
             // Dynamic endpoints are external and don't factor into storage size
-            if (i < emberAfFixedEndpointCount())
+            if (!isDynamicEndpoint)
             {
-                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[i].endpointType->endpointSize);
+                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
             }
         }
     }
