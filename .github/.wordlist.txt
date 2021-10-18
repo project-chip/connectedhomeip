@@ -28,6 +28,10 @@ AE
 aef
 algs
 alloc
+Ameba
+ameba
+amebad
+amebaiot
 AnnounceOTAProvider
 APIs
 apk
@@ -44,6 +48,7 @@ args
 argv
 armeabi
 armv
+asdk
 ASYNC
 att
 attId
@@ -52,6 +57,7 @@ attrListName
 attrMask
 attSizeBytes
 attType
+ATW
 AudioOutput
 auth
 autoconnect
@@ -113,7 +119,6 @@ CAfile
 cancelled
 CBB
 cbd
-CMD
 CCMP
 CCS
 CCSTUDIO
@@ -139,8 +144,8 @@ ChipImInitiator
 ChipImResponder
 ChipLight
 ChipMessageLayer
-CHIPTool
 CHIPTest
+CHIPTool
 chmod
 chrpath
 cipd
@@ -160,6 +165,7 @@ clusterListName
 ClusterRevision
 ClusterTestGeneration
 cmake
+CMD
 CMSIS
 CMVH
 cn
@@ -269,6 +275,7 @@ DISTRO
 Distutils
 DK
 DL
+DM
 DMG
 DNS
 Dnsmasq
@@ -659,6 +666,7 @@ PacketBuffer
 PAI
 PairDevice
 PAKE
+pankore
 param
 params
 PartNumber
@@ -679,9 +687,9 @@ PID
 Pigweed
 PinCode
 pkgconfig
+plaintext
 PlatformManager
 PlatformManagerImpl
-plaintext
 plt
 png
 polymorphism
@@ -768,6 +776,7 @@ RPi
 rsn
 RSSI
 rsync
+RTL
 rtld
 RTOS
 RTT
@@ -785,9 +794,9 @@ ScriptBinding
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
 SDKs
+SDK's
 SDKTARGETSYSROOT
 sdl
 segger
@@ -798,8 +807,8 @@ SERIALDEVICE
 SerialNumber
 ServiceId
 SetDns
-SetUpPINCode
 SetpointRaiseLower
+SetUpPINCode
 SetupQRCode
 sexualized
 SIGINT
@@ -910,8 +919,8 @@ ttyUSB
 TvChannel
 txt
 uart
-udhcpc
 UART
+udhcpc
 UDP
 UDPEndPoint
 udpPort

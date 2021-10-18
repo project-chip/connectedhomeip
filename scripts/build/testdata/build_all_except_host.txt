@@ -1,6 +1,9 @@
 # Commands will be run in CHIP project root.
 cd "{root}"
 
+# Generating ameba-amebad-all-clusters
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters'
+
 # Generating JARs for Java build rules test
 python3 build/chip/java/tests/generate_jars_for_test.py
 
@@ -241,6 +244,9 @@ west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {
 
 # Generating tizen-arm-light
 gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
+
+# Building ameba-amebad-all-clusters
+ninja -C {out}/ameba-amebad-all-clusters
 
 # Building JNI android-arm-chip-tool
 ninja -C {out}/android-arm-chip-tool
