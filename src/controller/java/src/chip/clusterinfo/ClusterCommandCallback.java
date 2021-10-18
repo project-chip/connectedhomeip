@@ -1,4 +1,5 @@
 package chip.clusterinfo;
+
 import java.util.*;
 
 public interface ClusterCommandCallback {
