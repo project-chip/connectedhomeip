@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "DataProvider.h"
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
@@ -26,8 +27,6 @@
 
 namespace chip {
 namespace access {
-
-class DataProvider;
 
 class AccessControl
 {
