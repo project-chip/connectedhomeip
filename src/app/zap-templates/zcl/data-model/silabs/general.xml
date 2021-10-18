@@ -440,7 +440,12 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
     <attribute side="server" code="0x0000" define="CURRENT_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" reportable="true" default="0x00" optional="false">current level</attribute>
     <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">remaining time</attribute>
-    <!-- REMAINING_TIME -->
+    <attribute side="server" code="0x0002" define="MINIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">min level</attribute>
+    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0xFF" optional="true">max level</attribute>
+    <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">current frequency</attribute>
+    <attribute side="server" code="0x0005" define="MIN_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">min frequency</attribute>
+    <attribute side="server" code="0x0006" define="MAX_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">max frequency</attribute>
+    
     <attribute side="server" code="0x0010" define="ON_OFF_TRANSITION_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">on off transition time</attribute>
     <attribute side="server" code="0x0011" define="ON_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="true" default="0xFE" optional="true">on level</attribute>
     <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">on transition time</attribute>

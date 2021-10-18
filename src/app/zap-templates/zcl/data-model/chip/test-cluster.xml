@@ -30,6 +30,13 @@ limitations under the License.
     <item name="ValueC" value="0x03"/>
   </enum>
 
+  <bitmap name="SimpleBitmap" type="BITMAP8">
+    <cluster code="0x050F"/>
+    <field name="ValueA" mask="0x1"/>
+    <field name="ValueB" mask="0x2"/>
+    <field name="ValueC" mask="0x4"/>
+  </bitmap>
+
   <struct name="SimpleStruct">
     <cluster code="0x050F"/>
     <item name="a" type="INT8U" optional="false"/>
@@ -37,6 +44,7 @@ limitations under the License.
     <item name="c" type="SimpleEnum" optional="false"/>
     <item name="d" type="OCTET_STRING" optional="false"/>
     <item name="e" type="CHAR_STRING" optional="false"/>
+    <item name="f" type="SimpleBitmap" optional="false"/>
   </struct>
 
   <struct name="NestedStruct">
@@ -158,6 +166,76 @@ limitations under the License.
       <arg name="arg4" type="BOOLEAN" array="true"/>
       <arg name="arg5" type="SimpleEnum"/>
       <arg name="arg6" type="BOOLEAN"/>
+    </command>
+
+    <!--
+      This command expect a success response if:
+        * 'b' field of arg1 is true
+    -->
+    <command source="client" code="0x07" name="TestStructArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is struct
+      </description>
+      <arg name="arg1" type="SimpleStruct"/>
+    </command>
+
+    <!--
+      This command expect a success response if:
+        * 'b' field of arg1.c is true
+    -->
+    <command source="client" code="0x08" name="TestNestedStructArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is nested struct
+      </description>
+      <arg name="arg1" type="NestedStruct"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1 is an empty list
+        * the field 'b' of all the SimpleStruct contained in arg1 are true
+    -->
+    <command source="client" code="0x09" name="TestListStructArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of struct
+      </description>
+      <arg name="arg1" type="SimpleStruct" array="true"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1 is an empty list
+        * no element is 0
+    -->
+    <command source="client" code="0x0A" name="TestListInt8UArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of INT8U
+      </description>
+      <arg name="arg1" type="INT8U" array="true"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1.d is an empty list
+        * the field 'b' of all the SimpleStruct contained in arg1 are true
+    -->
+    <command source="client" code="0x0B" name="TestNestedStructListArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a Nested Struct List
+      </description>
+      <arg name="arg1" type="NestedStructList"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1 is an empty list
+        * the field 'b' of all the SimpleStruct contained in arg1 are true
+    -->
+    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of Nested Struct List
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
     </command>
 
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">

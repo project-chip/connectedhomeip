@@ -176,7 +176,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
             const otNetifAddress * otAddrs = otIp6GetUnicastAddresses(Impl()->OTInstance());
             for (const otNetifAddress * otAddr = otAddrs; otAddr != NULL; otAddr = otAddr->mNext)
             {
-                IPAddress addr = ToIPAddress(otAddr->mAddress);
+                Inet::IPAddress addr = ToIPAddress(otAddr->mAddress);
 
                 // Assign the following OpenThread addresses to LwIP's address table:
                 //   - link-local addresses.
@@ -247,7 +247,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                 uint8_t state = netif_ip6_addr_state(mNetIf, addrIdx);
                 if (state != IP6_ADDR_INVALID)
                 {
-                    IPAddress addr = IPAddress::FromIPv6(*netif_ip6_addr(mNetIf, addrIdx));
+                    Inet::IPAddress addr = Inet::IPAddress::FromIPv6(*netif_ip6_addr(mNetIf, addrIdx));
                     char addrStr[50];
                     addr.ToString(addrStr, sizeof(addrStr));
                     const char * typeStr;

@@ -27,10 +27,8 @@ public:
                       Protocols::InteractionModel::Status status) override;
     CHIP_ERROR ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
 
-    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                   const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
-                                   uint8_t aCommandIndex) override;
+    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient, const app::StatusIB & aStatusIB,
+                                   app::AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex) override;
 
     CHIP_ERROR WriteResponseProtocolError(const app::WriteClient * apWriteClient, uint8_t aAttributeIndex) override;
 

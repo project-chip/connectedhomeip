@@ -18,17 +18,17 @@
 
 #pragma once
 
-#include "../common/Command.h"
+#include "../common/CHIPCommand.h"
 
-class DiscoverCommissionablesCommand : public Command, public chip::Controller::DeviceDiscoveryDelegate
+class DiscoverCommissionablesCommand : public CHIPCommand, public chip::Controller::DeviceDiscoveryDelegate
 {
 public:
-    DiscoverCommissionablesCommand() : Command("commissionables") {}
+    DiscoverCommissionablesCommand() : CHIPCommand("commissionables") {}
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
-    /////////// Command Interface /////////
-    CHIP_ERROR Run() override;
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
     uint16_t GetWaitDurationInSeconds() const override { return 30; }
 };

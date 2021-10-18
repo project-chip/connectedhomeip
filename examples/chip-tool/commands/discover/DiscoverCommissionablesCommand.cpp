@@ -21,12 +21,11 @@
 
 using namespace ::chip;
 
-CHIP_ERROR DiscoverCommissionablesCommand::Run()
+CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
 {
-    GetExecContext()->commissioner->RegisterDeviceDiscoveryDelegate(this);
-
+    mController.RegisterDeviceDiscoveryDelegate(this);
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
-    return GetExecContext()->commissioner->DiscoverCommissionableNodes(filter);
+    return mController.DiscoverCommissionableNodes(filter);
 }
 
 void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)

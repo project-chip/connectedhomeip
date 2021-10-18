@@ -540,7 +540,7 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
             parent = df.attrs['parent']
             tdf.attrs['name'] = f'L,{commit},{parent}'
             tdf.attrs['title'] = (
-                f'Increases above {threshold:.1f}% from {commit} to {parent}')
+                f'Increases above {threshold:.1f}% from {parent} to {commit}')
             dfs[tdf.attrs['name']] = tdf
 
         if (pr and comment_enabled

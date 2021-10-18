@@ -18,8 +18,8 @@
 
 #include "DiscoverCommand.h"
 
-CHIP_ERROR DiscoverCommand::Run()
+CHIP_ERROR DiscoverCommand::RunCommand()
 {
-    GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
+    mController.RegisterDeviceAddressUpdateDelegate(this);
     return RunCommand(mNodeId, mFabricId);
 }

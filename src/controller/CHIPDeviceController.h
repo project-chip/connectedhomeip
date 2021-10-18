@@ -216,6 +216,8 @@ public:
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
+    CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
+
     /**
      *   This function returns true if the device corresponding to `deviceId` has previously been commissioned
      *   on the fabric.

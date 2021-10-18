@@ -21,7 +21,7 @@
 
 using namespace ::chip;
 
-CHIP_ERROR DiscoverCommissionersCommand::Run()
+CHIP_ERROR DiscoverCommissionersCommand::RunCommand()
 {
     return mCommissionableNodeController.DiscoverCommissioners();
 }

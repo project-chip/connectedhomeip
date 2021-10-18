@@ -18,20 +18,25 @@
 
 #pragma once
 
-#include "../common/Command.h"
+#include "../common/CHIPCommand.h"
+#include <app-common/zap-generated/cluster-objects.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <lib/support/UnitTestUtils.h>
 #include <zap-generated/tests/CHIPClustersTest.h>
 
-class TestCommand : public Command
+class TestCommand : public CHIPCommand
 {
 public:
     TestCommand(const char * commandName) :
-        Command(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
-    {}
+    {
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
+    }
 
-    /////////// Command Interface /////////
-    CHIP_ERROR Run() override;
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
     uint16_t GetWaitDurationInSeconds() const override { return 30; }
 
     virtual void NextTest() = 0;
@@ -41,6 +46,7 @@ public:
 
 protected:
     ChipDevice * mDevice;
+    chip::NodeId mNodeId;
 
     static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
@@ -103,4 +109,13 @@ protected:
 
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    void Wait()
+    {
+        if (mDelayInMs)
+        {
+            chip::test_utils::SleepMillis(mDelayInMs);
+        }
+    };
+    uint64_t mDelayInMs = 0;
 };
