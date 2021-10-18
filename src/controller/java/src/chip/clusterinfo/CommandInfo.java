@@ -3,6 +3,7 @@
 package chip.clusterinfo;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -57,21 +58,28 @@ package chip.clusterinfo;
 >>>>>>> 505e97db3 (change package)
 =======
 import java.util.function.Function;
+=======
+import chip.devicecontroller.ChipClusters.BaseChipCluster;
+>>>>>>> 46c963914 (Restyled by google-java-format)
 import java.util.*;
 <<<<<<< HEAD
 >>>>>>> a4fd0282e (no error code generation)
 
 =======
 import java.util.function.Supplier;
+<<<<<<< HEAD
 import chip.clusterinfo.DelegatedClusterCallback;
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
 >>>>>>> 2d2bbd2e1 (new design solution)
+=======
+>>>>>>> 46c963914 (Restyled by google-java-format)
 
 public class CommandInfo {
   public ClusterCommandFunction commandFunction;
   private Supplier<DelegatedClusterCallback> commandCallbackSupplier;
   private Map<String, CommandParameter> commandParameters;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   public String name;
   public Function<List<CommandParameter>, Class<?>> fn;
@@ -88,6 +96,12 @@ public class CommandInfo {
 
   public CommandInfo(ClusterCommandFunction commandFunction,
       Supplier<DelegatedClusterCallback> commandCallbackSupplier, Map<String, CommandParameter> commandParameters) {
+=======
+  public CommandInfo(
+      ClusterCommandFunction commandFunction,
+      Supplier<DelegatedClusterCallback> commandCallbackSupplier,
+      Map<String, CommandParameter> commandParameters) {
+>>>>>>> 46c963914 (Restyled by google-java-format)
     this.commandFunction = commandFunction;
     this.commandCallbackSupplier = commandCallbackSupplier;
     this.commandParameters = commandParameters;
@@ -107,7 +121,8 @@ public class CommandInfo {
 
   @FunctionalInterface
   public interface ClusterCommandFunction {
-    void invokeCommand(BaseChipCluster cluster, Object callback, Map<String, Object> commandArguments);
+    void invokeCommand(
+        BaseChipCluster cluster, Object callback, Map<String, Object> commandArguments);
   }
 }
 <<<<<<< HEAD
