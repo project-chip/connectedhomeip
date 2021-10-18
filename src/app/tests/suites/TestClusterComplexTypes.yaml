@@ -27,7 +27,14 @@ tests:
           values:
               - name: "arg1"
                 value:
-                    { a: 0, b: true, c: 2, d: "octet_string", e: "char_string", f: 1 }
+                    {
+                        a: 0,
+                        b: true,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                    }
 
     - label: "Send Test Command With Struct Argument and arg1.b is false"
       command: "testStructArgumentRequest"
