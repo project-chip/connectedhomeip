@@ -23,6 +23,7 @@ from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
+from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 
 
 class Target:
@@ -172,6 +173,8 @@ ALL.append(Target('infineon-p6-lock', InfineonBuilder,
                   board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK))
 ALL.append(Target('tizen-arm-light', TizenBuilder,
                   board=TizenBoard.ARM, app=TizenApp.LIGHT))
+ALL.append(Target('ameba-amebad-all-clusters', AmebaBuilder,
+                  board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)

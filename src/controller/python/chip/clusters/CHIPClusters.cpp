@@ -5200,6 +5200,26 @@ chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestAddArguments
     cluster.Associate(device, ZCLendpointId);
     return cluster.TestAddArguments(nullptr, nullptr, arg1, arg2).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest(chip::Controller::Device * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId, uint8_t arg1)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TestListInt8UArgumentRequest(nullptr, nullptr, arg1).AsInteger();
+}
+chip::ChipError::StorageType
+chip_ime_AppendCommand_TestCluster_TestListStructArgumentRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                 chip::GroupId, uint8_t a, bool b, uint8_t c, const uint8_t * d,
+                                                                 uint32_t d_Len, const uint8_t * e, uint32_t e_Len, uint8_t f)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TestListStructArgumentRequest(nullptr, nullptr, a, b, c, chip::ByteSpan(d, d_Len), chip::ByteSpan(e, e_Len), f)
+        .AsInteger();
+}
 chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestNotHandled(chip::Controller::Device * device,
                                                                                chip::EndpointId ZCLendpointId, chip::GroupId)
 {
@@ -5215,6 +5235,17 @@ chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestSpecific(chi
     chip::Controller::TestClusterCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.TestSpecific(nullptr, nullptr).AsInteger();
+}
+chip::ChipError::StorageType
+chip_ime_AppendCommand_TestCluster_TestStructArgumentRequest(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId, uint8_t a, bool b, uint8_t c, const uint8_t * d,
+                                                             uint32_t d_Len, const uint8_t * e, uint32_t e_Len, uint8_t f)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TestStructArgumentRequest(nullptr, nullptr, a, b, c, chip::ByteSpan(d, d_Len), chip::ByteSpan(e, e_Len), f)
+        .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestUnknownCommand(chip::Controller::Device * device,
                                                                                    chip::EndpointId ZCLendpointId, chip::GroupId)

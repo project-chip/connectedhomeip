@@ -26,6 +26,10 @@
         {
             "name": "test_cluster",
             "path": "partials/test_cluster.zapt"
+        },
+        {
+            "name": "commandValue",
+            "path": "partials/test_cluster_command_value.zapt"
         }
     ],
     "templates": [
