@@ -170,9 +170,9 @@ class ExampleCode {
     offWithEffectInfo.getCommandParameters()
     List<Object> commandArguments = new ArrayList<>();
     // "effectId"
-    commandArguments.add(123);
+    commandArguments.add("effectId", 123);
     // "effectVariant"
-    commandArguments.add(456);
+    commandArguments.add("effectVariant", 456);
     // How do you know what callback to create?
     offWithEffectInfo.getCommandFunction().invokeCommand(onOffCluster, null, commandArguments);
   }
