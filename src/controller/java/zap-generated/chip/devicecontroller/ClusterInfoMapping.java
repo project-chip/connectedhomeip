@@ -9298,21 +9298,26 @@ public class ClusterInfoMapping {
 
   public Map<String, ClusterInfo> getClusterMap() {
     Map<String, ClusterInfo> clusterMap = new HashMap<>();
-    Map<String, CommandInfo> accountLogin_ClusterCommandInfo = new HashMap<>();
-    Map<String, CommandParameter> accountLogin_getSetupPIN_commandParams =
-        new HashMap<String, CommandParameter>();
+    Map<String, CommandInfo> accountLoginClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> accountLogingetSetupPINCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
     // TODO: fill out parameter types
-    CommandParameter accountLogin_getSetupPIN_commandParameter =
+    CommandParameter accountLogingetSetupPINCommandParameter =
         new CommandParameter(
             "AccountLogin", ChipClusters.AccountLoginCluster.GetSetupPINResponseCallback.class);
-    CommandParameter accountLogin_getSetupPIN_tempAccountIdentifier_commandParameter =
+    CommandParameter accountLogingetSetupPINtempAccountIdentifierCommandParameter =
         new CommandParameter("tempAccountIdentifier", String.class);
+<<<<<<< HEAD
     accountLogin_getSetupPIN_commandParams.put(
         "tempAccountIdentifier", accountLogin_getSetupPIN_tempAccountIdentifier_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    accountLogingetSetupPINCommandParams.put(
+        "tempAccountIdentifier", accountLogingetSetupPINtempAccountIdentifierCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo accountLogin_getSetupPIN_CommandInfo =
+    CommandInfo accountLogingetSetupPINCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9324,6 +9329,7 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("tempAccountIdentifier"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             accountLogin_getSetupPIN_commandParams);
     accountLogin_ClusterCommandInfo.put("getSetupPIN", accountLogin_getSetupPIN_CommandInfo);
@@ -9341,21 +9347,32 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> accountLogin_login_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetSetupPINResponseCallback(),
+            accountLogingetSetupPINCommandParams);
+    accountLoginClusterCommandInfo.put("getSetupPIN", accountLogingetSetupPINCommandInfo);
+    Map<String, CommandParameter> accountLoginloginCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter accountLogin_login_commandParameter =
+    CommandParameter accountLoginloginCommandParameter =
         new CommandParameter("AccountLogin", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter accountLogin_login_tempAccountIdentifier_commandParameter =
+    CommandParameter accountLoginlogintempAccountIdentifierCommandParameter =
         new CommandParameter("tempAccountIdentifier", String.class);
-    accountLogin_login_commandParams.put(
-        "tempAccountIdentifier", accountLogin_login_tempAccountIdentifier_commandParameter);
+    accountLoginloginCommandParams.put(
+        "tempAccountIdentifier", accountLoginlogintempAccountIdentifierCommandParameter);
 
-    CommandParameter accountLogin_login_setupPIN_commandParameter =
+    CommandParameter accountLoginloginsetupPINCommandParameter =
         new CommandParameter("setupPIN", String.class);
+<<<<<<< HEAD
     accountLogin_login_commandParams.put("setupPIN", accountLogin_login_setupPIN_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    accountLoginloginCommandParams.put("setupPIN", accountLoginloginsetupPINCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo accountLogin_login_CommandInfo =
+    CommandInfo accountLoginloginCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9369,12 +9386,13 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            accountLogin_login_commandParams);
-    accountLogin_ClusterCommandInfo.put("login", accountLogin_login_CommandInfo);
+            accountLoginloginCommandParams);
+    accountLoginClusterCommandInfo.put("login", accountLoginloginCommandInfo);
     // Populate cluster
-    ClusterInfo accountLogin_clusterInfo =
+    ClusterInfo accountLoginClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.AccountLoginCluster(ptr, endpointId),
+<<<<<<< HEAD
             accountLogin_ClusterCommandInfo);
     clusterMap.put("accountLogin", accountLogin_clusterInfo);
     Map<String, CommandInfo> administratorCommissioning_ClusterCommandInfo = new HashMap<>();
@@ -9388,23 +9406,32 @@ public class ClusterInfoMapping {
     administratorCommissioning_openBasicCommissioningWindow_commandParams.add(
         openBasicCommissioningWindow_commissioningTimeout_commandParameter);
 =======
+=======
+            accountLoginClusterCommandInfo);
+    clusterMap.put("accountLogin", accountLoginClusterInfo);
+    Map<String, CommandInfo> administratorCommissioningClusterCommandInfo = new LinkedHashMap<>();
+>>>>>>> 41b0956c1 (on/off commands working)
     Map<String, CommandParameter>
-        administratorCommissioning_openBasicCommissioningWindow_commandParams =
-            new HashMap<String, CommandParameter>();
+        administratorCommissioningopenBasicCommissioningWindowCommandParams =
+            new LinkedHashMap<String, CommandParameter>();
     // TODO: fill out parameter types
-    CommandParameter administratorCommissioning_openBasicCommissioningWindow_commandParameter =
+    CommandParameter administratorCommissioningopenBasicCommissioningWindowCommandParameter =
         new CommandParameter(
             "AdministratorCommissioning", ChipClusters.DefaultClusterCallback.class);
     CommandParameter
-        administratorCommissioning_openBasicCommissioningWindow_commissioningTimeout_commandParameter =
+        administratorCommissioningopenBasicCommissioningWindowcommissioningTimeoutCommandParameter =
             new CommandParameter("commissioningTimeout", int.class);
-    administratorCommissioning_openBasicCommissioningWindow_commandParams.put(
+    administratorCommissioningopenBasicCommissioningWindowCommandParams.put(
         "commissioningTimeout",
+<<<<<<< HEAD
         administratorCommissioning_openBasicCommissioningWindow_commissioningTimeout_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        administratorCommissioningopenBasicCommissioningWindowcommissioningTimeoutCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo administratorCommissioning_openBasicCommissioningWindow_CommandInfo =
+    CommandInfo administratorCommissioningopenBasicCommissioningWindowCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9417,9 +9444,10 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            administratorCommissioning_openBasicCommissioningWindow_commandParams);
-    administratorCommissioning_ClusterCommandInfo.put(
+            administratorCommissioningopenBasicCommissioningWindowCommandParams);
+    administratorCommissioningClusterCommandInfo.put(
         "openBasicCommissioningWindow",
+<<<<<<< HEAD
         administratorCommissioning_openBasicCommissioningWindow_CommandInfo);
 <<<<<<< HEAD
     List<CommandParameter> administratorCommissioning_openCommissioningWindow_commandParams =
@@ -9458,43 +9486,46 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> administratorCommissioning_openCommissioningWindow_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+        administratorCommissioningopenBasicCommissioningWindowCommandInfo);
+    Map<String, CommandParameter> administratorCommissioningopenCommissioningWindowCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter administratorCommissioning_openCommissioningWindow_commandParameter =
+    CommandParameter administratorCommissioningopenCommissioningWindowCommandParameter =
         new CommandParameter(
             "AdministratorCommissioning", ChipClusters.DefaultClusterCallback.class);
     CommandParameter
-        administratorCommissioning_openCommissioningWindow_commissioningTimeout_commandParameter =
+        administratorCommissioningopenCommissioningWindowcommissioningTimeoutCommandParameter =
             new CommandParameter("commissioningTimeout", int.class);
-    administratorCommissioning_openCommissioningWindow_commandParams.put(
+    administratorCommissioningopenCommissioningWindowCommandParams.put(
         "commissioningTimeout",
-        administratorCommissioning_openCommissioningWindow_commissioningTimeout_commandParameter);
+        administratorCommissioningopenCommissioningWindowcommissioningTimeoutCommandParameter);
 
-    CommandParameter
-        administratorCommissioning_openCommissioningWindow_PAKEVerifier_commandParameter =
-            new CommandParameter("PAKEVerifier", byte[].class);
-    administratorCommissioning_openCommissioningWindow_commandParams.put(
+    CommandParameter administratorCommissioningopenCommissioningWindowPAKEVerifierCommandParameter =
+        new CommandParameter("PAKEVerifier", byte[].class);
+    administratorCommissioningopenCommissioningWindowCommandParams.put(
         "PAKEVerifier",
-        administratorCommissioning_openCommissioningWindow_PAKEVerifier_commandParameter);
+        administratorCommissioningopenCommissioningWindowPAKEVerifierCommandParameter);
 
     CommandParameter
-        administratorCommissioning_openCommissioningWindow_discriminator_commandParameter =
+        administratorCommissioningopenCommissioningWindowdiscriminatorCommandParameter =
             new CommandParameter("discriminator", int.class);
-    administratorCommissioning_openCommissioningWindow_commandParams.put(
+    administratorCommissioningopenCommissioningWindowCommandParams.put(
         "discriminator",
-        administratorCommissioning_openCommissioningWindow_discriminator_commandParameter);
+        administratorCommissioningopenCommissioningWindowdiscriminatorCommandParameter);
 
-    CommandParameter
-        administratorCommissioning_openCommissioningWindow_iterations_commandParameter =
-            new CommandParameter("iterations", long.class);
-    administratorCommissioning_openCommissioningWindow_commandParams.put(
-        "iterations",
-        administratorCommissioning_openCommissioningWindow_iterations_commandParameter);
+    CommandParameter administratorCommissioningopenCommissioningWindowiterationsCommandParameter =
+        new CommandParameter("iterations", long.class);
+    administratorCommissioningopenCommissioningWindowCommandParams.put(
+        "iterations", administratorCommissioningopenCommissioningWindowiterationsCommandParameter);
 
-    CommandParameter administratorCommissioning_openCommissioningWindow_salt_commandParameter =
+    CommandParameter administratorCommissioningopenCommissioningWindowsaltCommandParameter =
         new CommandParameter("salt", byte[].class);
-    administratorCommissioning_openCommissioningWindow_commandParams.put(
-        "salt", administratorCommissioning_openCommissioningWindow_salt_commandParameter);
+    administratorCommissioningopenCommissioningWindowCommandParams.put(
+        "salt", administratorCommissioningopenCommissioningWindowsaltCommandParameter);
 
+<<<<<<< HEAD
     CommandParameter
         administratorCommissioning_openCommissioningWindow_passcodeID_commandParameter =
             new CommandParameter("passcodeID", int.class);
@@ -9502,9 +9533,15 @@ public class ClusterInfoMapping {
         "passcodeID",
         administratorCommissioning_openCommissioningWindow_passcodeID_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    CommandParameter administratorCommissioningopenCommissioningWindowpasscodeIDCommandParameter =
+        new CommandParameter("passcodeID", int.class);
+    administratorCommissioningopenCommissioningWindowCommandParams.put(
+        "passcodeID", administratorCommissioningopenCommissioningWindowpasscodeIDCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo administratorCommissioning_openCommissioningWindow_CommandInfo =
+    CommandInfo administratorCommissioningopenCommissioningWindowCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9522,6 +9559,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             administratorCommissioning_openCommissioningWindow_commandParams);
     administratorCommissioning_ClusterCommandInfo.put(
         "openCommissioningWindow", administratorCommissioning_openCommissioningWindow_CommandInfo);
@@ -9533,13 +9571,20 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> administratorCommissioning_revokeCommissioning_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            administratorCommissioningopenCommissioningWindowCommandParams);
+    administratorCommissioningClusterCommandInfo.put(
+        "openCommissioningWindow", administratorCommissioningopenCommissioningWindowCommandInfo);
+    Map<String, CommandParameter> administratorCommissioningrevokeCommissioningCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter administratorCommissioning_revokeCommissioning_commandParameter =
+    CommandParameter administratorCommissioningrevokeCommissioningCommandParameter =
         new CommandParameter(
             "AdministratorCommissioning", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo administratorCommissioning_revokeCommissioning_CommandInfo =
+    CommandInfo administratorCommissioningrevokeCommissioningCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9550,14 +9595,15 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            administratorCommissioning_revokeCommissioning_commandParams);
-    administratorCommissioning_ClusterCommandInfo.put(
-        "revokeCommissioning", administratorCommissioning_revokeCommissioning_CommandInfo);
+            administratorCommissioningrevokeCommissioningCommandParams);
+    administratorCommissioningClusterCommandInfo.put(
+        "revokeCommissioning", administratorCommissioningrevokeCommissioningCommandInfo);
     // Populate cluster
-    ClusterInfo administratorCommissioning_clusterInfo =
+    ClusterInfo administratorCommissioningClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) ->
                 new ChipClusters.AdministratorCommissioningCluster(ptr, endpointId),
+<<<<<<< HEAD
             administratorCommissioning_ClusterCommandInfo);
     clusterMap.put("administratorCommissioning", administratorCommissioning_clusterInfo);
     Map<String, CommandInfo> applicationBasic_ClusterCommandInfo = new HashMap<>();
@@ -9571,17 +9617,29 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> applicationBasic_changeStatus_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            administratorCommissioningClusterCommandInfo);
+    clusterMap.put("administratorCommissioning", administratorCommissioningClusterInfo);
+    Map<String, CommandInfo> applicationBasicClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> applicationBasicchangeStatusCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter applicationBasic_changeStatus_commandParameter =
+    CommandParameter applicationBasicchangeStatusCommandParameter =
         new CommandParameter("ApplicationBasic", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter applicationBasic_changeStatus_status_commandParameter =
+    CommandParameter applicationBasicchangeStatusstatusCommandParameter =
         new CommandParameter("status", int.class);
+<<<<<<< HEAD
     applicationBasic_changeStatus_commandParams.put(
         "status", applicationBasic_changeStatus_status_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    applicationBasicchangeStatusCommandParams.put(
+        "status", applicationBasicchangeStatusstatusCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo applicationBasic_changeStatus_CommandInfo =
+    CommandInfo applicationBasicchangeStatusCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9593,13 +9651,13 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            applicationBasic_changeStatus_commandParams);
-    applicationBasic_ClusterCommandInfo.put(
-        "changeStatus", applicationBasic_changeStatus_CommandInfo);
+            applicationBasicchangeStatusCommandParams);
+    applicationBasicClusterCommandInfo.put("changeStatus", applicationBasicchangeStatusCommandInfo);
     // Populate cluster
-    ClusterInfo applicationBasic_clusterInfo =
+    ClusterInfo applicationBasicClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ApplicationBasicCluster(ptr, endpointId),
+<<<<<<< HEAD
             applicationBasic_ClusterCommandInfo);
     clusterMap.put("applicationBasic", applicationBasic_clusterInfo);
     Map<String, CommandInfo> applicationLauncher_ClusterCommandInfo = new HashMap<>();
@@ -9620,29 +9678,41 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> applicationLauncher_launchApp_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            applicationBasicClusterCommandInfo);
+    clusterMap.put("applicationBasic", applicationBasicClusterInfo);
+    Map<String, CommandInfo> applicationLauncherClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> applicationLauncherlaunchAppCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter applicationLauncher_launchApp_commandParameter =
+    CommandParameter applicationLauncherlaunchAppCommandParameter =
         new CommandParameter(
             "ApplicationLauncher",
             ChipClusters.ApplicationLauncherCluster.LaunchAppResponseCallback.class);
-    CommandParameter applicationLauncher_launchApp_data_commandParameter =
+    CommandParameter applicationLauncherlaunchAppdataCommandParameter =
         new CommandParameter("data", String.class);
-    applicationLauncher_launchApp_commandParams.put(
-        "data", applicationLauncher_launchApp_data_commandParameter);
+    applicationLauncherlaunchAppCommandParams.put(
+        "data", applicationLauncherlaunchAppdataCommandParameter);
 
-    CommandParameter applicationLauncher_launchApp_catalogVendorId_commandParameter =
+    CommandParameter applicationLauncherlaunchAppcatalogVendorIdCommandParameter =
         new CommandParameter("catalogVendorId", int.class);
-    applicationLauncher_launchApp_commandParams.put(
-        "catalogVendorId", applicationLauncher_launchApp_catalogVendorId_commandParameter);
+    applicationLauncherlaunchAppCommandParams.put(
+        "catalogVendorId", applicationLauncherlaunchAppcatalogVendorIdCommandParameter);
 
-    CommandParameter applicationLauncher_launchApp_applicationId_commandParameter =
+    CommandParameter applicationLauncherlaunchAppapplicationIdCommandParameter =
         new CommandParameter("applicationId", String.class);
+<<<<<<< HEAD
     applicationLauncher_launchApp_commandParams.put(
         "applicationId", applicationLauncher_launchApp_applicationId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    applicationLauncherlaunchAppCommandParams.put(
+        "applicationId", applicationLauncherlaunchAppapplicationIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo applicationLauncher_launchApp_CommandInfo =
+    CommandInfo applicationLauncherlaunchAppCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9656,14 +9726,14 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("applicationId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            applicationLauncher_launchApp_commandParams);
-    applicationLauncher_ClusterCommandInfo.put(
-        "launchApp", applicationLauncher_launchApp_CommandInfo);
+            () -> new DelegatedLaunchAppResponseCallback(),
+            applicationLauncherlaunchAppCommandParams);
+    applicationLauncherClusterCommandInfo.put("launchApp", applicationLauncherlaunchAppCommandInfo);
     // Populate cluster
-    ClusterInfo applicationLauncher_clusterInfo =
+    ClusterInfo applicationLauncherClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ApplicationLauncherCluster(ptr, endpointId),
+<<<<<<< HEAD
             applicationLauncher_ClusterCommandInfo);
     clusterMap.put("applicationLauncher", applicationLauncher_clusterInfo);
     Map<String, CommandInfo> audioOutput_ClusterCommandInfo = new HashMap<>();
@@ -9680,22 +9750,32 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> audioOutput_renameOutput_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            applicationLauncherClusterCommandInfo);
+    clusterMap.put("applicationLauncher", applicationLauncherClusterInfo);
+    Map<String, CommandInfo> audioOutputClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> audioOutputrenameOutputCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter audioOutput_renameOutput_commandParameter =
+    CommandParameter audioOutputrenameOutputCommandParameter =
         new CommandParameter("AudioOutput", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter audioOutput_renameOutput_index_commandParameter =
+    CommandParameter audioOutputrenameOutputindexCommandParameter =
         new CommandParameter("index", int.class);
-    audioOutput_renameOutput_commandParams.put(
-        "index", audioOutput_renameOutput_index_commandParameter);
+    audioOutputrenameOutputCommandParams.put("index", audioOutputrenameOutputindexCommandParameter);
 
-    CommandParameter audioOutput_renameOutput_name_commandParameter =
+    CommandParameter audioOutputrenameOutputnameCommandParameter =
         new CommandParameter("name", String.class);
+<<<<<<< HEAD
     audioOutput_renameOutput_commandParams.put(
         "name", audioOutput_renameOutput_name_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    audioOutputrenameOutputCommandParams.put("name", audioOutputrenameOutputnameCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo audioOutput_renameOutput_CommandInfo =
+    CommandInfo audioOutputrenameOutputCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9709,6 +9789,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             audioOutput_renameOutput_commandParams);
     audioOutput_ClusterCommandInfo.put("renameOutput", audioOutput_renameOutput_CommandInfo);
 <<<<<<< HEAD
@@ -9720,17 +9801,27 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> audioOutput_selectOutput_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            audioOutputrenameOutputCommandParams);
+    audioOutputClusterCommandInfo.put("renameOutput", audioOutputrenameOutputCommandInfo);
+    Map<String, CommandParameter> audioOutputselectOutputCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter audioOutput_selectOutput_commandParameter =
+    CommandParameter audioOutputselectOutputCommandParameter =
         new CommandParameter("AudioOutput", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter audioOutput_selectOutput_index_commandParameter =
+    CommandParameter audioOutputselectOutputindexCommandParameter =
         new CommandParameter("index", int.class);
+<<<<<<< HEAD
     audioOutput_selectOutput_commandParams.put(
         "index", audioOutput_selectOutput_index_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    audioOutputselectOutputCommandParams.put("index", audioOutputselectOutputindexCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo audioOutput_selectOutput_CommandInfo =
+    CommandInfo audioOutputselectOutputCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9742,12 +9833,13 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            audioOutput_selectOutput_commandParams);
-    audioOutput_ClusterCommandInfo.put("selectOutput", audioOutput_selectOutput_CommandInfo);
+            audioOutputselectOutputCommandParams);
+    audioOutputClusterCommandInfo.put("selectOutput", audioOutputselectOutputCommandInfo);
     // Populate cluster
-    ClusterInfo audioOutput_clusterInfo =
+    ClusterInfo audioOutputClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.AudioOutputCluster(ptr, endpointId),
+<<<<<<< HEAD
             audioOutput_ClusterCommandInfo);
     clusterMap.put("audioOutput", audioOutput_clusterInfo);
     Map<String, CommandInfo> barrierControl_ClusterCommandInfo = new HashMap<>();
@@ -9763,17 +9855,29 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> barrierControl_barrierControlGoToPercent_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            audioOutputClusterCommandInfo);
+    clusterMap.put("audioOutput", audioOutputClusterInfo);
+    Map<String, CommandInfo> barrierControlClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> barrierControlbarrierControlGoToPercentCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter barrierControl_barrierControlGoToPercent_commandParameter =
+    CommandParameter barrierControlbarrierControlGoToPercentCommandParameter =
         new CommandParameter("BarrierControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter barrierControl_barrierControlGoToPercent_percentOpen_commandParameter =
+    CommandParameter barrierControlbarrierControlGoToPercentpercentOpenCommandParameter =
         new CommandParameter("percentOpen", int.class);
+<<<<<<< HEAD
     barrierControl_barrierControlGoToPercent_commandParams.put(
         "percentOpen", barrierControl_barrierControlGoToPercent_percentOpen_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    barrierControlbarrierControlGoToPercentCommandParams.put(
+        "percentOpen", barrierControlbarrierControlGoToPercentpercentOpenCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo barrierControl_barrierControlGoToPercent_CommandInfo =
+    CommandInfo barrierControlbarrierControlGoToPercentCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9786,6 +9890,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             barrierControl_barrierControlGoToPercent_commandParams);
     barrierControl_ClusterCommandInfo.put(
         "barrierControlGoToPercent", barrierControl_barrierControlGoToPercent_CommandInfo);
@@ -9796,12 +9901,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> barrierControl_barrierControlStop_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            barrierControlbarrierControlGoToPercentCommandParams);
+    barrierControlClusterCommandInfo.put(
+        "barrierControlGoToPercent", barrierControlbarrierControlGoToPercentCommandInfo);
+    Map<String, CommandParameter> barrierControlbarrierControlStopCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter barrierControl_barrierControlStop_commandParameter =
+    CommandParameter barrierControlbarrierControlStopCommandParameter =
         new CommandParameter("BarrierControl", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo barrierControl_barrierControlStop_CommandInfo =
+    CommandInfo barrierControlbarrierControlStopCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9812,13 +9924,14 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            barrierControl_barrierControlStop_commandParams);
-    barrierControl_ClusterCommandInfo.put(
-        "barrierControlStop", barrierControl_barrierControlStop_CommandInfo);
+            barrierControlbarrierControlStopCommandParams);
+    barrierControlClusterCommandInfo.put(
+        "barrierControlStop", barrierControlbarrierControlStopCommandInfo);
     // Populate cluster
-    ClusterInfo barrierControl_clusterInfo =
+    ClusterInfo barrierControlClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.BarrierControlCluster(ptr, endpointId),
+<<<<<<< HEAD
             barrierControl_ClusterCommandInfo);
     clusterMap.put("barrierControl", barrierControl_clusterInfo);
     Map<String, CommandInfo> basic_ClusterCommandInfo = new HashMap<>();
@@ -9829,12 +9942,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> basic_mfgSpecificPing_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            barrierControlClusterCommandInfo);
+    clusterMap.put("barrierControl", barrierControlClusterInfo);
+    Map<String, CommandInfo> basicClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> basicmfgSpecificPingCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter basic_mfgSpecificPing_commandParameter =
+    CommandParameter basicmfgSpecificPingCommandParameter =
         new CommandParameter("Basic", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo basic_mfgSpecificPing_CommandInfo =
+    CommandInfo basicmfgSpecificPingCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9845,19 +9965,20 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            basic_mfgSpecificPing_commandParams);
-    basic_ClusterCommandInfo.put("mfgSpecificPing", basic_mfgSpecificPing_CommandInfo);
+            basicmfgSpecificPingCommandParams);
+    basicClusterCommandInfo.put("mfgSpecificPing", basicmfgSpecificPingCommandInfo);
     // Populate cluster
-    ClusterInfo basic_clusterInfo =
+    ClusterInfo basicClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.BasicCluster(ptr, endpointId),
-            basic_ClusterCommandInfo);
-    clusterMap.put("basic", basic_clusterInfo);
-    Map<String, CommandInfo> binaryInputBasic_ClusterCommandInfo = new HashMap<>();
+            basicClusterCommandInfo);
+    clusterMap.put("basic", basicClusterInfo);
+    Map<String, CommandInfo> binaryInputBasicClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo binaryInputBasic_clusterInfo =
+    ClusterInfo binaryInputBasicClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.BinaryInputBasicCluster(ptr, endpointId),
+<<<<<<< HEAD
             binaryInputBasic_ClusterCommandInfo);
     clusterMap.put("binaryInputBasic", binaryInputBasic_clusterInfo);
     Map<String, CommandInfo> binding_ClusterCommandInfo = new HashMap<>();
@@ -9881,28 +10002,38 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> binding_bind_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            binaryInputBasicClusterCommandInfo);
+    clusterMap.put("binaryInputBasic", binaryInputBasicClusterInfo);
+    Map<String, CommandInfo> bindingClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> bindingbindCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter binding_bind_commandParameter =
+    CommandParameter bindingbindCommandParameter =
         new CommandParameter("Binding", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter binding_bind_nodeId_commandParameter =
-        new CommandParameter("nodeId", long.class);
-    binding_bind_commandParams.put("nodeId", binding_bind_nodeId_commandParameter);
+    CommandParameter bindingbindnodeIdCommandParameter = new CommandParameter("nodeId", long.class);
+    bindingbindCommandParams.put("nodeId", bindingbindnodeIdCommandParameter);
 
-    CommandParameter binding_bind_groupId_commandParameter =
+    CommandParameter bindingbindgroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
-    binding_bind_commandParams.put("groupId", binding_bind_groupId_commandParameter);
+    bindingbindCommandParams.put("groupId", bindingbindgroupIdCommandParameter);
 
-    CommandParameter binding_bind_endpointId_commandParameter =
+    CommandParameter bindingbindendpointIdCommandParameter =
         new CommandParameter("endpointId", int.class);
-    binding_bind_commandParams.put("endpointId", binding_bind_endpointId_commandParameter);
+    bindingbindCommandParams.put("endpointId", bindingbindendpointIdCommandParameter);
 
-    CommandParameter binding_bind_clusterId_commandParameter =
+    CommandParameter bindingbindclusterIdCommandParameter =
         new CommandParameter("clusterId", long.class);
+<<<<<<< HEAD
     binding_bind_commandParams.put("clusterId", binding_bind_clusterId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    bindingbindCommandParams.put("clusterId", bindingbindclusterIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo binding_bind_CommandInfo =
+    CommandInfo bindingbindCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9918,6 +10049,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             binding_bind_commandParams);
     binding_ClusterCommandInfo.put("bind", binding_bind_CommandInfo);
 <<<<<<< HEAD
@@ -9940,28 +10072,38 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> binding_unbind_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            bindingbindCommandParams);
+    bindingClusterCommandInfo.put("bind", bindingbindCommandInfo);
+    Map<String, CommandParameter> bindingunbindCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter binding_unbind_commandParameter =
+    CommandParameter bindingunbindCommandParameter =
         new CommandParameter("Binding", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter binding_unbind_nodeId_commandParameter =
+    CommandParameter bindingunbindnodeIdCommandParameter =
         new CommandParameter("nodeId", long.class);
-    binding_unbind_commandParams.put("nodeId", binding_unbind_nodeId_commandParameter);
+    bindingunbindCommandParams.put("nodeId", bindingunbindnodeIdCommandParameter);
 
-    CommandParameter binding_unbind_groupId_commandParameter =
+    CommandParameter bindingunbindgroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
-    binding_unbind_commandParams.put("groupId", binding_unbind_groupId_commandParameter);
+    bindingunbindCommandParams.put("groupId", bindingunbindgroupIdCommandParameter);
 
-    CommandParameter binding_unbind_endpointId_commandParameter =
+    CommandParameter bindingunbindendpointIdCommandParameter =
         new CommandParameter("endpointId", int.class);
-    binding_unbind_commandParams.put("endpointId", binding_unbind_endpointId_commandParameter);
+    bindingunbindCommandParams.put("endpointId", bindingunbindendpointIdCommandParameter);
 
-    CommandParameter binding_unbind_clusterId_commandParameter =
+    CommandParameter bindingunbindclusterIdCommandParameter =
         new CommandParameter("clusterId", long.class);
+<<<<<<< HEAD
     binding_unbind_commandParams.put("clusterId", binding_unbind_clusterId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    bindingunbindCommandParams.put("clusterId", bindingunbindclusterIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo binding_unbind_CommandInfo =
+    CommandInfo bindingunbindCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -9977,19 +10119,20 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            binding_unbind_commandParams);
-    binding_ClusterCommandInfo.put("unbind", binding_unbind_CommandInfo);
+            bindingunbindCommandParams);
+    bindingClusterCommandInfo.put("unbind", bindingunbindCommandInfo);
     // Populate cluster
-    ClusterInfo binding_clusterInfo =
+    ClusterInfo bindingClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.BindingCluster(ptr, endpointId),
-            binding_ClusterCommandInfo);
-    clusterMap.put("binding", binding_clusterInfo);
-    Map<String, CommandInfo> bridgedDeviceBasic_ClusterCommandInfo = new HashMap<>();
+            bindingClusterCommandInfo);
+    clusterMap.put("binding", bindingClusterInfo);
+    Map<String, CommandInfo> bridgedDeviceBasicClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo bridgedDeviceBasic_clusterInfo =
+    ClusterInfo bridgedDeviceBasicClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.BridgedDeviceBasicCluster(ptr, endpointId),
+<<<<<<< HEAD
             bridgedDeviceBasic_ClusterCommandInfo);
     clusterMap.put("bridgedDeviceBasic", bridgedDeviceBasic_clusterInfo);
     Map<String, CommandInfo> colorControl_ClusterCommandInfo = new HashMap<>();
@@ -10026,47 +10169,58 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_colorLoopSet_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            bridgedDeviceBasicClusterCommandInfo);
+    clusterMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInfo);
+    Map<String, CommandInfo> colorControlClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> colorControlcolorLoopSetCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_colorLoopSet_commandParameter =
+    CommandParameter colorControlcolorLoopSetCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_colorLoopSet_updateFlags_commandParameter =
+    CommandParameter colorControlcolorLoopSetupdateFlagsCommandParameter =
         new CommandParameter("updateFlags", int.class);
-    colorControl_colorLoopSet_commandParams.put(
-        "updateFlags", colorControl_colorLoopSet_updateFlags_commandParameter);
+    colorControlcolorLoopSetCommandParams.put(
+        "updateFlags", colorControlcolorLoopSetupdateFlagsCommandParameter);
 
-    CommandParameter colorControl_colorLoopSet_action_commandParameter =
+    CommandParameter colorControlcolorLoopSetactionCommandParameter =
         new CommandParameter("action", int.class);
-    colorControl_colorLoopSet_commandParams.put(
-        "action", colorControl_colorLoopSet_action_commandParameter);
+    colorControlcolorLoopSetCommandParams.put(
+        "action", colorControlcolorLoopSetactionCommandParameter);
 
-    CommandParameter colorControl_colorLoopSet_direction_commandParameter =
+    CommandParameter colorControlcolorLoopSetdirectionCommandParameter =
         new CommandParameter("direction", int.class);
-    colorControl_colorLoopSet_commandParams.put(
-        "direction", colorControl_colorLoopSet_direction_commandParameter);
+    colorControlcolorLoopSetCommandParams.put(
+        "direction", colorControlcolorLoopSetdirectionCommandParameter);
 
-    CommandParameter colorControl_colorLoopSet_time_commandParameter =
+    CommandParameter colorControlcolorLoopSettimeCommandParameter =
         new CommandParameter("time", int.class);
-    colorControl_colorLoopSet_commandParams.put(
-        "time", colorControl_colorLoopSet_time_commandParameter);
+    colorControlcolorLoopSetCommandParams.put("time", colorControlcolorLoopSettimeCommandParameter);
 
-    CommandParameter colorControl_colorLoopSet_startHue_commandParameter =
+    CommandParameter colorControlcolorLoopSetstartHueCommandParameter =
         new CommandParameter("startHue", int.class);
-    colorControl_colorLoopSet_commandParams.put(
-        "startHue", colorControl_colorLoopSet_startHue_commandParameter);
+    colorControlcolorLoopSetCommandParams.put(
+        "startHue", colorControlcolorLoopSetstartHueCommandParameter);
 
-    CommandParameter colorControl_colorLoopSet_optionsMask_commandParameter =
+    CommandParameter colorControlcolorLoopSetoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_colorLoopSet_commandParams.put(
-        "optionsMask", colorControl_colorLoopSet_optionsMask_commandParameter);
+    colorControlcolorLoopSetCommandParams.put(
+        "optionsMask", colorControlcolorLoopSetoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_colorLoopSet_optionsOverride_commandParameter =
+    CommandParameter colorControlcolorLoopSetoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_colorLoopSet_commandParams.put(
         "optionsOverride", colorControl_colorLoopSet_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlcolorLoopSetCommandParams.put(
+        "optionsOverride", colorControlcolorLoopSetoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_colorLoopSet_CommandInfo =
+    CommandInfo colorControlcolorLoopSetCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10085,6 +10239,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_colorLoopSet_commandParams);
     colorControl_ClusterCommandInfo.put("colorLoopSet", colorControl_colorLoopSet_CommandInfo);
 <<<<<<< HEAD
@@ -10110,32 +10265,43 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_enhancedMoveHue_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlcolorLoopSetCommandParams);
+    colorControlClusterCommandInfo.put("colorLoopSet", colorControlcolorLoopSetCommandInfo);
+    Map<String, CommandParameter> colorControlenhancedMoveHueCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_enhancedMoveHue_commandParameter =
+    CommandParameter colorControlenhancedMoveHueCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_enhancedMoveHue_moveMode_commandParameter =
+    CommandParameter colorControlenhancedMoveHuemoveModeCommandParameter =
         new CommandParameter("moveMode", int.class);
-    colorControl_enhancedMoveHue_commandParams.put(
-        "moveMode", colorControl_enhancedMoveHue_moveMode_commandParameter);
+    colorControlenhancedMoveHueCommandParams.put(
+        "moveMode", colorControlenhancedMoveHuemoveModeCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveHue_rate_commandParameter =
+    CommandParameter colorControlenhancedMoveHuerateCommandParameter =
         new CommandParameter("rate", int.class);
-    colorControl_enhancedMoveHue_commandParams.put(
-        "rate", colorControl_enhancedMoveHue_rate_commandParameter);
+    colorControlenhancedMoveHueCommandParams.put(
+        "rate", colorControlenhancedMoveHuerateCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveHue_optionsMask_commandParameter =
+    CommandParameter colorControlenhancedMoveHueoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_enhancedMoveHue_commandParams.put(
-        "optionsMask", colorControl_enhancedMoveHue_optionsMask_commandParameter);
+    colorControlenhancedMoveHueCommandParams.put(
+        "optionsMask", colorControlenhancedMoveHueoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveHue_optionsOverride_commandParameter =
+    CommandParameter colorControlenhancedMoveHueoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_enhancedMoveHue_commandParams.put(
         "optionsOverride", colorControl_enhancedMoveHue_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlenhancedMoveHueCommandParams.put(
+        "optionsOverride", colorControlenhancedMoveHueoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_enhancedMoveHue_CommandInfo =
+    CommandInfo colorControlenhancedMoveHueCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10151,6 +10317,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_enhancedMoveHue_commandParams);
     colorControl_ClusterCommandInfo.put(
         "enhancedMoveHue", colorControl_enhancedMoveHue_CommandInfo);
@@ -10184,37 +10351,48 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_enhancedMoveToHue_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlenhancedMoveHueCommandParams);
+    colorControlClusterCommandInfo.put("enhancedMoveHue", colorControlenhancedMoveHueCommandInfo);
+    Map<String, CommandParameter> colorControlenhancedMoveToHueCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_enhancedMoveToHue_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_enhancedMoveToHue_enhancedHue_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueenhancedHueCommandParameter =
         new CommandParameter("enhancedHue", int.class);
-    colorControl_enhancedMoveToHue_commandParams.put(
-        "enhancedHue", colorControl_enhancedMoveToHue_enhancedHue_commandParameter);
+    colorControlenhancedMoveToHueCommandParams.put(
+        "enhancedHue", colorControlenhancedMoveToHueenhancedHueCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveToHue_direction_commandParameter =
+    CommandParameter colorControlenhancedMoveToHuedirectionCommandParameter =
         new CommandParameter("direction", int.class);
-    colorControl_enhancedMoveToHue_commandParams.put(
-        "direction", colorControl_enhancedMoveToHue_direction_commandParameter);
+    colorControlenhancedMoveToHueCommandParams.put(
+        "direction", colorControlenhancedMoveToHuedirectionCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveToHue_transitionTime_commandParameter =
+    CommandParameter colorControlenhancedMoveToHuetransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_enhancedMoveToHue_commandParams.put(
-        "transitionTime", colorControl_enhancedMoveToHue_transitionTime_commandParameter);
+    colorControlenhancedMoveToHueCommandParams.put(
+        "transitionTime", colorControlenhancedMoveToHuetransitionTimeCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveToHue_optionsMask_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_enhancedMoveToHue_commandParams.put(
-        "optionsMask", colorControl_enhancedMoveToHue_optionsMask_commandParameter);
+    colorControlenhancedMoveToHueCommandParams.put(
+        "optionsMask", colorControlenhancedMoveToHueoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveToHue_optionsOverride_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_enhancedMoveToHue_commandParams.put(
         "optionsOverride", colorControl_enhancedMoveToHue_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlenhancedMoveToHueCommandParams.put(
+        "optionsOverride", colorControlenhancedMoveToHueoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_enhancedMoveToHue_CommandInfo =
+    CommandInfo colorControlenhancedMoveToHueCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10231,6 +10409,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_enhancedMoveToHue_commandParams);
     colorControl_ClusterCommandInfo.put(
         "enhancedMoveToHue", colorControl_enhancedMoveToHue_CommandInfo);
@@ -10266,39 +10445,49 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_enhancedMoveToHueAndSaturation_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlenhancedMoveToHueCommandParams);
+    colorControlClusterCommandInfo.put(
+        "enhancedMoveToHue", colorControlenhancedMoveToHueCommandInfo);
+    Map<String, CommandParameter> colorControlenhancedMoveToHueAndSaturationCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_enhancedMoveToHueAndSaturation_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueAndSaturationCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_enhancedMoveToHueAndSaturation_enhancedHue_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueAndSaturationenhancedHueCommandParameter =
         new CommandParameter("enhancedHue", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_commandParams.put(
-        "enhancedHue", colorControl_enhancedMoveToHueAndSaturation_enhancedHue_commandParameter);
+    colorControlenhancedMoveToHueAndSaturationCommandParams.put(
+        "enhancedHue", colorControlenhancedMoveToHueAndSaturationenhancedHueCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveToHueAndSaturation_saturation_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueAndSaturationsaturationCommandParameter =
         new CommandParameter("saturation", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_commandParams.put(
-        "saturation", colorControl_enhancedMoveToHueAndSaturation_saturation_commandParameter);
+    colorControlenhancedMoveToHueAndSaturationCommandParams.put(
+        "saturation", colorControlenhancedMoveToHueAndSaturationsaturationCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveToHueAndSaturation_transitionTime_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueAndSaturationtransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_commandParams.put(
-        "transitionTime",
-        colorControl_enhancedMoveToHueAndSaturation_transitionTime_commandParameter);
+    colorControlenhancedMoveToHueAndSaturationCommandParams.put(
+        "transitionTime", colorControlenhancedMoveToHueAndSaturationtransitionTimeCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveToHueAndSaturation_optionsMask_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueAndSaturationoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_commandParams.put(
-        "optionsMask", colorControl_enhancedMoveToHueAndSaturation_optionsMask_commandParameter);
+    colorControlenhancedMoveToHueAndSaturationCommandParams.put(
+        "optionsMask", colorControlenhancedMoveToHueAndSaturationoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_enhancedMoveToHueAndSaturation_optionsOverride_commandParameter =
+    CommandParameter colorControlenhancedMoveToHueAndSaturationoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
-    colorControl_enhancedMoveToHueAndSaturation_commandParams.put(
+    colorControlenhancedMoveToHueAndSaturationCommandParams.put(
         "optionsOverride",
+<<<<<<< HEAD
         colorControl_enhancedMoveToHueAndSaturation_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        colorControlenhancedMoveToHueAndSaturationoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_enhancedMoveToHueAndSaturation_CommandInfo =
+    CommandInfo colorControlenhancedMoveToHueAndSaturationCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10315,6 +10504,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_enhancedMoveToHueAndSaturation_commandParams);
     colorControl_ClusterCommandInfo.put(
         "enhancedMoveToHueAndSaturation", colorControl_enhancedMoveToHueAndSaturation_CommandInfo);
@@ -10345,37 +10535,49 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_enhancedStepHue_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlenhancedMoveToHueAndSaturationCommandParams);
+    colorControlClusterCommandInfo.put(
+        "enhancedMoveToHueAndSaturation", colorControlenhancedMoveToHueAndSaturationCommandInfo);
+    Map<String, CommandParameter> colorControlenhancedStepHueCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_enhancedStepHue_commandParameter =
+    CommandParameter colorControlenhancedStepHueCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_enhancedStepHue_stepMode_commandParameter =
+    CommandParameter colorControlenhancedStepHuestepModeCommandParameter =
         new CommandParameter("stepMode", int.class);
-    colorControl_enhancedStepHue_commandParams.put(
-        "stepMode", colorControl_enhancedStepHue_stepMode_commandParameter);
+    colorControlenhancedStepHueCommandParams.put(
+        "stepMode", colorControlenhancedStepHuestepModeCommandParameter);
 
-    CommandParameter colorControl_enhancedStepHue_stepSize_commandParameter =
+    CommandParameter colorControlenhancedStepHuestepSizeCommandParameter =
         new CommandParameter("stepSize", int.class);
-    colorControl_enhancedStepHue_commandParams.put(
-        "stepSize", colorControl_enhancedStepHue_stepSize_commandParameter);
+    colorControlenhancedStepHueCommandParams.put(
+        "stepSize", colorControlenhancedStepHuestepSizeCommandParameter);
 
-    CommandParameter colorControl_enhancedStepHue_transitionTime_commandParameter =
+    CommandParameter colorControlenhancedStepHuetransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_enhancedStepHue_commandParams.put(
-        "transitionTime", colorControl_enhancedStepHue_transitionTime_commandParameter);
+    colorControlenhancedStepHueCommandParams.put(
+        "transitionTime", colorControlenhancedStepHuetransitionTimeCommandParameter);
 
-    CommandParameter colorControl_enhancedStepHue_optionsMask_commandParameter =
+    CommandParameter colorControlenhancedStepHueoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_enhancedStepHue_commandParams.put(
-        "optionsMask", colorControl_enhancedStepHue_optionsMask_commandParameter);
+    colorControlenhancedStepHueCommandParams.put(
+        "optionsMask", colorControlenhancedStepHueoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_enhancedStepHue_optionsOverride_commandParameter =
+    CommandParameter colorControlenhancedStepHueoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_enhancedStepHue_commandParams.put(
         "optionsOverride", colorControl_enhancedStepHue_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlenhancedStepHueCommandParams.put(
+        "optionsOverride", colorControlenhancedStepHueoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_enhancedStepHue_CommandInfo =
+    CommandInfo colorControlenhancedStepHueCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10392,6 +10594,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_enhancedStepHue_commandParams);
     colorControl_ClusterCommandInfo.put(
         "enhancedStepHue", colorControl_enhancedStepHue_CommandInfo);
@@ -10415,32 +10618,41 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_moveColor_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlenhancedStepHueCommandParams);
+    colorControlClusterCommandInfo.put("enhancedStepHue", colorControlenhancedStepHueCommandInfo);
+    Map<String, CommandParameter> colorControlmoveColorCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_moveColor_commandParameter =
+    CommandParameter colorControlmoveColorCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_moveColor_rateX_commandParameter =
+    CommandParameter colorControlmoveColorrateXCommandParameter =
         new CommandParameter("rateX", int.class);
-    colorControl_moveColor_commandParams.put(
-        "rateX", colorControl_moveColor_rateX_commandParameter);
+    colorControlmoveColorCommandParams.put("rateX", colorControlmoveColorrateXCommandParameter);
 
-    CommandParameter colorControl_moveColor_rateY_commandParameter =
+    CommandParameter colorControlmoveColorrateYCommandParameter =
         new CommandParameter("rateY", int.class);
-    colorControl_moveColor_commandParams.put(
-        "rateY", colorControl_moveColor_rateY_commandParameter);
+    colorControlmoveColorCommandParams.put("rateY", colorControlmoveColorrateYCommandParameter);
 
-    CommandParameter colorControl_moveColor_optionsMask_commandParameter =
+    CommandParameter colorControlmoveColoroptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveColor_commandParams.put(
-        "optionsMask", colorControl_moveColor_optionsMask_commandParameter);
+    colorControlmoveColorCommandParams.put(
+        "optionsMask", colorControlmoveColoroptionsMaskCommandParameter);
 
-    CommandParameter colorControl_moveColor_optionsOverride_commandParameter =
+    CommandParameter colorControlmoveColoroptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_moveColor_commandParams.put(
         "optionsOverride", colorControl_moveColor_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlmoveColorCommandParams.put(
+        "optionsOverride", colorControlmoveColoroptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_moveColor_CommandInfo =
+    CommandInfo colorControlmoveColorCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10456,6 +10668,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_moveColor_commandParams);
     colorControl_ClusterCommandInfo.put("moveColor", colorControl_moveColor_CommandInfo);
 <<<<<<< HEAD
@@ -10493,44 +10706,55 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_moveColorTemperature_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlmoveColorCommandParams);
+    colorControlClusterCommandInfo.put("moveColor", colorControlmoveColorCommandInfo);
+    Map<String, CommandParameter> colorControlmoveColorTemperatureCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_moveColorTemperature_commandParameter =
+    CommandParameter colorControlmoveColorTemperatureCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_moveColorTemperature_moveMode_commandParameter =
+    CommandParameter colorControlmoveColorTemperaturemoveModeCommandParameter =
         new CommandParameter("moveMode", int.class);
-    colorControl_moveColorTemperature_commandParams.put(
-        "moveMode", colorControl_moveColorTemperature_moveMode_commandParameter);
+    colorControlmoveColorTemperatureCommandParams.put(
+        "moveMode", colorControlmoveColorTemperaturemoveModeCommandParameter);
 
-    CommandParameter colorControl_moveColorTemperature_rate_commandParameter =
+    CommandParameter colorControlmoveColorTemperaturerateCommandParameter =
         new CommandParameter("rate", int.class);
-    colorControl_moveColorTemperature_commandParams.put(
-        "rate", colorControl_moveColorTemperature_rate_commandParameter);
+    colorControlmoveColorTemperatureCommandParams.put(
+        "rate", colorControlmoveColorTemperaturerateCommandParameter);
 
-    CommandParameter colorControl_moveColorTemperature_colorTemperatureMinimum_commandParameter =
+    CommandParameter colorControlmoveColorTemperaturecolorTemperatureMinimumCommandParameter =
         new CommandParameter("colorTemperatureMinimum", int.class);
-    colorControl_moveColorTemperature_commandParams.put(
+    colorControlmoveColorTemperatureCommandParams.put(
         "colorTemperatureMinimum",
-        colorControl_moveColorTemperature_colorTemperatureMinimum_commandParameter);
+        colorControlmoveColorTemperaturecolorTemperatureMinimumCommandParameter);
 
-    CommandParameter colorControl_moveColorTemperature_colorTemperatureMaximum_commandParameter =
+    CommandParameter colorControlmoveColorTemperaturecolorTemperatureMaximumCommandParameter =
         new CommandParameter("colorTemperatureMaximum", int.class);
-    colorControl_moveColorTemperature_commandParams.put(
+    colorControlmoveColorTemperatureCommandParams.put(
         "colorTemperatureMaximum",
-        colorControl_moveColorTemperature_colorTemperatureMaximum_commandParameter);
+        colorControlmoveColorTemperaturecolorTemperatureMaximumCommandParameter);
 
-    CommandParameter colorControl_moveColorTemperature_optionsMask_commandParameter =
+    CommandParameter colorControlmoveColorTemperatureoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveColorTemperature_commandParams.put(
-        "optionsMask", colorControl_moveColorTemperature_optionsMask_commandParameter);
+    colorControlmoveColorTemperatureCommandParams.put(
+        "optionsMask", colorControlmoveColorTemperatureoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_moveColorTemperature_optionsOverride_commandParameter =
+    CommandParameter colorControlmoveColorTemperatureoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_moveColorTemperature_commandParams.put(
         "optionsOverride", colorControl_moveColorTemperature_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlmoveColorTemperatureCommandParams.put(
+        "optionsOverride", colorControlmoveColorTemperatureoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_moveColorTemperature_CommandInfo =
+    CommandInfo colorControlmoveColorTemperatureCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10548,6 +10772,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_moveColorTemperature_commandParams);
     colorControl_ClusterCommandInfo.put(
         "moveColorTemperature", colorControl_moveColorTemperature_CommandInfo);
@@ -10572,31 +10797,42 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_moveHue_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlmoveColorTemperatureCommandParams);
+    colorControlClusterCommandInfo.put(
+        "moveColorTemperature", colorControlmoveColorTemperatureCommandInfo);
+    Map<String, CommandParameter> colorControlmoveHueCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_moveHue_commandParameter =
+    CommandParameter colorControlmoveHueCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_moveHue_moveMode_commandParameter =
+    CommandParameter colorControlmoveHuemoveModeCommandParameter =
         new CommandParameter("moveMode", int.class);
-    colorControl_moveHue_commandParams.put(
-        "moveMode", colorControl_moveHue_moveMode_commandParameter);
+    colorControlmoveHueCommandParams.put("moveMode", colorControlmoveHuemoveModeCommandParameter);
 
-    CommandParameter colorControl_moveHue_rate_commandParameter =
+    CommandParameter colorControlmoveHuerateCommandParameter =
         new CommandParameter("rate", int.class);
-    colorControl_moveHue_commandParams.put("rate", colorControl_moveHue_rate_commandParameter);
+    colorControlmoveHueCommandParams.put("rate", colorControlmoveHuerateCommandParameter);
 
-    CommandParameter colorControl_moveHue_optionsMask_commandParameter =
+    CommandParameter colorControlmoveHueoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveHue_commandParams.put(
-        "optionsMask", colorControl_moveHue_optionsMask_commandParameter);
+    colorControlmoveHueCommandParams.put(
+        "optionsMask", colorControlmoveHueoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_moveHue_optionsOverride_commandParameter =
+    CommandParameter colorControlmoveHueoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_moveHue_commandParams.put(
         "optionsOverride", colorControl_moveHue_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlmoveHueCommandParams.put(
+        "optionsOverride", colorControlmoveHueoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_moveHue_CommandInfo =
+    CommandInfo colorControlmoveHueCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10612,6 +10848,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_moveHue_commandParams);
     colorControl_ClusterCommandInfo.put("moveHue", colorControl_moveHue_CommandInfo);
 <<<<<<< HEAD
@@ -10635,32 +10872,43 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_moveSaturation_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlmoveHueCommandParams);
+    colorControlClusterCommandInfo.put("moveHue", colorControlmoveHueCommandInfo);
+    Map<String, CommandParameter> colorControlmoveSaturationCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_moveSaturation_commandParameter =
+    CommandParameter colorControlmoveSaturationCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_moveSaturation_moveMode_commandParameter =
+    CommandParameter colorControlmoveSaturationmoveModeCommandParameter =
         new CommandParameter("moveMode", int.class);
-    colorControl_moveSaturation_commandParams.put(
-        "moveMode", colorControl_moveSaturation_moveMode_commandParameter);
+    colorControlmoveSaturationCommandParams.put(
+        "moveMode", colorControlmoveSaturationmoveModeCommandParameter);
 
-    CommandParameter colorControl_moveSaturation_rate_commandParameter =
+    CommandParameter colorControlmoveSaturationrateCommandParameter =
         new CommandParameter("rate", int.class);
-    colorControl_moveSaturation_commandParams.put(
-        "rate", colorControl_moveSaturation_rate_commandParameter);
+    colorControlmoveSaturationCommandParams.put(
+        "rate", colorControlmoveSaturationrateCommandParameter);
 
-    CommandParameter colorControl_moveSaturation_optionsMask_commandParameter =
+    CommandParameter colorControlmoveSaturationoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveSaturation_commandParams.put(
-        "optionsMask", colorControl_moveSaturation_optionsMask_commandParameter);
+    colorControlmoveSaturationCommandParams.put(
+        "optionsMask", colorControlmoveSaturationoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_moveSaturation_optionsOverride_commandParameter =
+    CommandParameter colorControlmoveSaturationoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_moveSaturation_commandParams.put(
         "optionsOverride", colorControl_moveSaturation_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlmoveSaturationCommandParams.put(
+        "optionsOverride", colorControlmoveSaturationoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_moveSaturation_CommandInfo =
+    CommandInfo colorControlmoveSaturationCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10676,6 +10924,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_moveSaturation_commandParams);
     colorControl_ClusterCommandInfo.put("moveSaturation", colorControl_moveSaturation_CommandInfo);
 <<<<<<< HEAD
@@ -10704,37 +10953,48 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_moveToColor_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlmoveSaturationCommandParams);
+    colorControlClusterCommandInfo.put("moveSaturation", colorControlmoveSaturationCommandInfo);
+    Map<String, CommandParameter> colorControlmoveToColorCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_moveToColor_commandParameter =
+    CommandParameter colorControlmoveToColorCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_moveToColor_colorX_commandParameter =
+    CommandParameter colorControlmoveToColorcolorXCommandParameter =
         new CommandParameter("colorX", int.class);
-    colorControl_moveToColor_commandParams.put(
-        "colorX", colorControl_moveToColor_colorX_commandParameter);
+    colorControlmoveToColorCommandParams.put(
+        "colorX", colorControlmoveToColorcolorXCommandParameter);
 
-    CommandParameter colorControl_moveToColor_colorY_commandParameter =
+    CommandParameter colorControlmoveToColorcolorYCommandParameter =
         new CommandParameter("colorY", int.class);
-    colorControl_moveToColor_commandParams.put(
-        "colorY", colorControl_moveToColor_colorY_commandParameter);
+    colorControlmoveToColorCommandParams.put(
+        "colorY", colorControlmoveToColorcolorYCommandParameter);
 
-    CommandParameter colorControl_moveToColor_transitionTime_commandParameter =
+    CommandParameter colorControlmoveToColortransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToColor_commandParams.put(
-        "transitionTime", colorControl_moveToColor_transitionTime_commandParameter);
+    colorControlmoveToColorCommandParams.put(
+        "transitionTime", colorControlmoveToColortransitionTimeCommandParameter);
 
-    CommandParameter colorControl_moveToColor_optionsMask_commandParameter =
+    CommandParameter colorControlmoveToColoroptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToColor_commandParams.put(
-        "optionsMask", colorControl_moveToColor_optionsMask_commandParameter);
+    colorControlmoveToColorCommandParams.put(
+        "optionsMask", colorControlmoveToColoroptionsMaskCommandParameter);
 
-    CommandParameter colorControl_moveToColor_optionsOverride_commandParameter =
+    CommandParameter colorControlmoveToColoroptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_moveToColor_commandParams.put(
         "optionsOverride", colorControl_moveToColor_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlmoveToColorCommandParams.put(
+        "optionsOverride", colorControlmoveToColoroptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_moveToColor_CommandInfo =
+    CommandInfo colorControlmoveToColorCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10751,6 +11011,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_moveToColor_commandParams);
     colorControl_ClusterCommandInfo.put("moveToColor", colorControl_moveToColor_CommandInfo);
 <<<<<<< HEAD
@@ -10779,32 +11040,43 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_moveToColorTemperature_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlmoveToColorCommandParams);
+    colorControlClusterCommandInfo.put("moveToColor", colorControlmoveToColorCommandInfo);
+    Map<String, CommandParameter> colorControlmoveToColorTemperatureCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_moveToColorTemperature_commandParameter =
+    CommandParameter colorControlmoveToColorTemperatureCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_moveToColorTemperature_colorTemperature_commandParameter =
+    CommandParameter colorControlmoveToColorTemperaturecolorTemperatureCommandParameter =
         new CommandParameter("colorTemperature", int.class);
-    colorControl_moveToColorTemperature_commandParams.put(
-        "colorTemperature", colorControl_moveToColorTemperature_colorTemperature_commandParameter);
+    colorControlmoveToColorTemperatureCommandParams.put(
+        "colorTemperature", colorControlmoveToColorTemperaturecolorTemperatureCommandParameter);
 
-    CommandParameter colorControl_moveToColorTemperature_transitionTime_commandParameter =
+    CommandParameter colorControlmoveToColorTemperaturetransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToColorTemperature_commandParams.put(
-        "transitionTime", colorControl_moveToColorTemperature_transitionTime_commandParameter);
+    colorControlmoveToColorTemperatureCommandParams.put(
+        "transitionTime", colorControlmoveToColorTemperaturetransitionTimeCommandParameter);
 
-    CommandParameter colorControl_moveToColorTemperature_optionsMask_commandParameter =
+    CommandParameter colorControlmoveToColorTemperatureoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToColorTemperature_commandParams.put(
-        "optionsMask", colorControl_moveToColorTemperature_optionsMask_commandParameter);
+    colorControlmoveToColorTemperatureCommandParams.put(
+        "optionsMask", colorControlmoveToColorTemperatureoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_moveToColorTemperature_optionsOverride_commandParameter =
+    CommandParameter colorControlmoveToColorTemperatureoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_moveToColorTemperature_commandParams.put(
         "optionsOverride", colorControl_moveToColorTemperature_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlmoveToColorTemperatureCommandParams.put(
+        "optionsOverride", colorControlmoveToColorTemperatureoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_moveToColorTemperature_CommandInfo =
+    CommandInfo colorControlmoveToColorTemperatureCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10820,6 +11092,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_moveToColorTemperature_commandParams);
     colorControl_ClusterCommandInfo.put(
         "moveToColorTemperature", colorControl_moveToColorTemperature_CommandInfo);
@@ -10848,36 +11121,48 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_moveToHue_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlmoveToColorTemperatureCommandParams);
+    colorControlClusterCommandInfo.put(
+        "moveToColorTemperature", colorControlmoveToColorTemperatureCommandInfo);
+    Map<String, CommandParameter> colorControlmoveToHueCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_moveToHue_commandParameter =
+    CommandParameter colorControlmoveToHueCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_moveToHue_hue_commandParameter =
+    CommandParameter colorControlmoveToHuehueCommandParameter =
         new CommandParameter("hue", int.class);
-    colorControl_moveToHue_commandParams.put("hue", colorControl_moveToHue_hue_commandParameter);
+    colorControlmoveToHueCommandParams.put("hue", colorControlmoveToHuehueCommandParameter);
 
-    CommandParameter colorControl_moveToHue_direction_commandParameter =
+    CommandParameter colorControlmoveToHuedirectionCommandParameter =
         new CommandParameter("direction", int.class);
-    colorControl_moveToHue_commandParams.put(
-        "direction", colorControl_moveToHue_direction_commandParameter);
+    colorControlmoveToHueCommandParams.put(
+        "direction", colorControlmoveToHuedirectionCommandParameter);
 
-    CommandParameter colorControl_moveToHue_transitionTime_commandParameter =
+    CommandParameter colorControlmoveToHuetransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToHue_commandParams.put(
-        "transitionTime", colorControl_moveToHue_transitionTime_commandParameter);
+    colorControlmoveToHueCommandParams.put(
+        "transitionTime", colorControlmoveToHuetransitionTimeCommandParameter);
 
-    CommandParameter colorControl_moveToHue_optionsMask_commandParameter =
+    CommandParameter colorControlmoveToHueoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToHue_commandParams.put(
-        "optionsMask", colorControl_moveToHue_optionsMask_commandParameter);
+    colorControlmoveToHueCommandParams.put(
+        "optionsMask", colorControlmoveToHueoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_moveToHue_optionsOverride_commandParameter =
+    CommandParameter colorControlmoveToHueoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_moveToHue_commandParams.put(
         "optionsOverride", colorControl_moveToHue_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlmoveToHueCommandParams.put(
+        "optionsOverride", colorControlmoveToHueoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_moveToHue_CommandInfo =
+    CommandInfo colorControlmoveToHueCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10894,6 +11179,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_moveToHue_commandParams);
     colorControl_ClusterCommandInfo.put("moveToHue", colorControl_moveToHue_CommandInfo);
 <<<<<<< HEAD
@@ -10927,37 +11213,48 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_moveToHueAndSaturation_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlmoveToHueCommandParams);
+    colorControlClusterCommandInfo.put("moveToHue", colorControlmoveToHueCommandInfo);
+    Map<String, CommandParameter> colorControlmoveToHueAndSaturationCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_moveToHueAndSaturation_commandParameter =
+    CommandParameter colorControlmoveToHueAndSaturationCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_moveToHueAndSaturation_hue_commandParameter =
+    CommandParameter colorControlmoveToHueAndSaturationhueCommandParameter =
         new CommandParameter("hue", int.class);
-    colorControl_moveToHueAndSaturation_commandParams.put(
-        "hue", colorControl_moveToHueAndSaturation_hue_commandParameter);
+    colorControlmoveToHueAndSaturationCommandParams.put(
+        "hue", colorControlmoveToHueAndSaturationhueCommandParameter);
 
-    CommandParameter colorControl_moveToHueAndSaturation_saturation_commandParameter =
+    CommandParameter colorControlmoveToHueAndSaturationsaturationCommandParameter =
         new CommandParameter("saturation", int.class);
-    colorControl_moveToHueAndSaturation_commandParams.put(
-        "saturation", colorControl_moveToHueAndSaturation_saturation_commandParameter);
+    colorControlmoveToHueAndSaturationCommandParams.put(
+        "saturation", colorControlmoveToHueAndSaturationsaturationCommandParameter);
 
-    CommandParameter colorControl_moveToHueAndSaturation_transitionTime_commandParameter =
+    CommandParameter colorControlmoveToHueAndSaturationtransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToHueAndSaturation_commandParams.put(
-        "transitionTime", colorControl_moveToHueAndSaturation_transitionTime_commandParameter);
+    colorControlmoveToHueAndSaturationCommandParams.put(
+        "transitionTime", colorControlmoveToHueAndSaturationtransitionTimeCommandParameter);
 
-    CommandParameter colorControl_moveToHueAndSaturation_optionsMask_commandParameter =
+    CommandParameter colorControlmoveToHueAndSaturationoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToHueAndSaturation_commandParams.put(
-        "optionsMask", colorControl_moveToHueAndSaturation_optionsMask_commandParameter);
+    colorControlmoveToHueAndSaturationCommandParams.put(
+        "optionsMask", colorControlmoveToHueAndSaturationoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_moveToHueAndSaturation_optionsOverride_commandParameter =
+    CommandParameter colorControlmoveToHueAndSaturationoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_moveToHueAndSaturation_commandParams.put(
         "optionsOverride", colorControl_moveToHueAndSaturation_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlmoveToHueAndSaturationCommandParams.put(
+        "optionsOverride", colorControlmoveToHueAndSaturationoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_moveToHueAndSaturation_CommandInfo =
+    CommandInfo colorControlmoveToHueAndSaturationCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -10974,6 +11271,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_moveToHueAndSaturation_commandParams);
     colorControl_ClusterCommandInfo.put(
         "moveToHueAndSaturation", colorControl_moveToHueAndSaturation_CommandInfo);
@@ -11001,32 +11299,44 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_moveToSaturation_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlmoveToHueAndSaturationCommandParams);
+    colorControlClusterCommandInfo.put(
+        "moveToHueAndSaturation", colorControlmoveToHueAndSaturationCommandInfo);
+    Map<String, CommandParameter> colorControlmoveToSaturationCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_moveToSaturation_commandParameter =
+    CommandParameter colorControlmoveToSaturationCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_moveToSaturation_saturation_commandParameter =
+    CommandParameter colorControlmoveToSaturationsaturationCommandParameter =
         new CommandParameter("saturation", int.class);
-    colorControl_moveToSaturation_commandParams.put(
-        "saturation", colorControl_moveToSaturation_saturation_commandParameter);
+    colorControlmoveToSaturationCommandParams.put(
+        "saturation", colorControlmoveToSaturationsaturationCommandParameter);
 
-    CommandParameter colorControl_moveToSaturation_transitionTime_commandParameter =
+    CommandParameter colorControlmoveToSaturationtransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_moveToSaturation_commandParams.put(
-        "transitionTime", colorControl_moveToSaturation_transitionTime_commandParameter);
+    colorControlmoveToSaturationCommandParams.put(
+        "transitionTime", colorControlmoveToSaturationtransitionTimeCommandParameter);
 
-    CommandParameter colorControl_moveToSaturation_optionsMask_commandParameter =
+    CommandParameter colorControlmoveToSaturationoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_moveToSaturation_commandParams.put(
-        "optionsMask", colorControl_moveToSaturation_optionsMask_commandParameter);
+    colorControlmoveToSaturationCommandParams.put(
+        "optionsMask", colorControlmoveToSaturationoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_moveToSaturation_optionsOverride_commandParameter =
+    CommandParameter colorControlmoveToSaturationoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_moveToSaturation_commandParams.put(
         "optionsOverride", colorControl_moveToSaturation_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlmoveToSaturationCommandParams.put(
+        "optionsOverride", colorControlmoveToSaturationoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_moveToSaturation_CommandInfo =
+    CommandInfo colorControlmoveToSaturationCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11042,6 +11352,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_moveToSaturation_commandParams);
     colorControl_ClusterCommandInfo.put(
         "moveToSaturation", colorControl_moveToSaturation_CommandInfo);
@@ -11069,37 +11380,46 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_stepColor_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlmoveToSaturationCommandParams);
+    colorControlClusterCommandInfo.put("moveToSaturation", colorControlmoveToSaturationCommandInfo);
+    Map<String, CommandParameter> colorControlstepColorCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_stepColor_commandParameter =
+    CommandParameter colorControlstepColorCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_stepColor_stepX_commandParameter =
+    CommandParameter colorControlstepColorstepXCommandParameter =
         new CommandParameter("stepX", int.class);
-    colorControl_stepColor_commandParams.put(
-        "stepX", colorControl_stepColor_stepX_commandParameter);
+    colorControlstepColorCommandParams.put("stepX", colorControlstepColorstepXCommandParameter);
 
-    CommandParameter colorControl_stepColor_stepY_commandParameter =
+    CommandParameter colorControlstepColorstepYCommandParameter =
         new CommandParameter("stepY", int.class);
-    colorControl_stepColor_commandParams.put(
-        "stepY", colorControl_stepColor_stepY_commandParameter);
+    colorControlstepColorCommandParams.put("stepY", colorControlstepColorstepYCommandParameter);
 
-    CommandParameter colorControl_stepColor_transitionTime_commandParameter =
+    CommandParameter colorControlstepColortransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_stepColor_commandParams.put(
-        "transitionTime", colorControl_stepColor_transitionTime_commandParameter);
+    colorControlstepColorCommandParams.put(
+        "transitionTime", colorControlstepColortransitionTimeCommandParameter);
 
-    CommandParameter colorControl_stepColor_optionsMask_commandParameter =
+    CommandParameter colorControlstepColoroptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stepColor_commandParams.put(
-        "optionsMask", colorControl_stepColor_optionsMask_commandParameter);
+    colorControlstepColorCommandParams.put(
+        "optionsMask", colorControlstepColoroptionsMaskCommandParameter);
 
-    CommandParameter colorControl_stepColor_optionsOverride_commandParameter =
+    CommandParameter colorControlstepColoroptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_stepColor_commandParams.put(
         "optionsOverride", colorControl_stepColor_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlstepColorCommandParams.put(
+        "optionsOverride", colorControlstepColoroptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_stepColor_CommandInfo =
+    CommandInfo colorControlstepColorCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11116,6 +11436,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_stepColor_commandParams);
     colorControl_ClusterCommandInfo.put("stepColor", colorControl_stepColor_CommandInfo);
 <<<<<<< HEAD
@@ -11159,49 +11480,60 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_stepColorTemperature_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlstepColorCommandParams);
+    colorControlClusterCommandInfo.put("stepColor", colorControlstepColorCommandInfo);
+    Map<String, CommandParameter> colorControlstepColorTemperatureCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_stepColorTemperature_commandParameter =
+    CommandParameter colorControlstepColorTemperatureCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_stepColorTemperature_stepMode_commandParameter =
+    CommandParameter colorControlstepColorTemperaturestepModeCommandParameter =
         new CommandParameter("stepMode", int.class);
-    colorControl_stepColorTemperature_commandParams.put(
-        "stepMode", colorControl_stepColorTemperature_stepMode_commandParameter);
+    colorControlstepColorTemperatureCommandParams.put(
+        "stepMode", colorControlstepColorTemperaturestepModeCommandParameter);
 
-    CommandParameter colorControl_stepColorTemperature_stepSize_commandParameter =
+    CommandParameter colorControlstepColorTemperaturestepSizeCommandParameter =
         new CommandParameter("stepSize", int.class);
-    colorControl_stepColorTemperature_commandParams.put(
-        "stepSize", colorControl_stepColorTemperature_stepSize_commandParameter);
+    colorControlstepColorTemperatureCommandParams.put(
+        "stepSize", colorControlstepColorTemperaturestepSizeCommandParameter);
 
-    CommandParameter colorControl_stepColorTemperature_transitionTime_commandParameter =
+    CommandParameter colorControlstepColorTemperaturetransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_stepColorTemperature_commandParams.put(
-        "transitionTime", colorControl_stepColorTemperature_transitionTime_commandParameter);
+    colorControlstepColorTemperatureCommandParams.put(
+        "transitionTime", colorControlstepColorTemperaturetransitionTimeCommandParameter);
 
-    CommandParameter colorControl_stepColorTemperature_colorTemperatureMinimum_commandParameter =
+    CommandParameter colorControlstepColorTemperaturecolorTemperatureMinimumCommandParameter =
         new CommandParameter("colorTemperatureMinimum", int.class);
-    colorControl_stepColorTemperature_commandParams.put(
+    colorControlstepColorTemperatureCommandParams.put(
         "colorTemperatureMinimum",
-        colorControl_stepColorTemperature_colorTemperatureMinimum_commandParameter);
+        colorControlstepColorTemperaturecolorTemperatureMinimumCommandParameter);
 
-    CommandParameter colorControl_stepColorTemperature_colorTemperatureMaximum_commandParameter =
+    CommandParameter colorControlstepColorTemperaturecolorTemperatureMaximumCommandParameter =
         new CommandParameter("colorTemperatureMaximum", int.class);
-    colorControl_stepColorTemperature_commandParams.put(
+    colorControlstepColorTemperatureCommandParams.put(
         "colorTemperatureMaximum",
-        colorControl_stepColorTemperature_colorTemperatureMaximum_commandParameter);
+        colorControlstepColorTemperaturecolorTemperatureMaximumCommandParameter);
 
-    CommandParameter colorControl_stepColorTemperature_optionsMask_commandParameter =
+    CommandParameter colorControlstepColorTemperatureoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stepColorTemperature_commandParams.put(
-        "optionsMask", colorControl_stepColorTemperature_optionsMask_commandParameter);
+    colorControlstepColorTemperatureCommandParams.put(
+        "optionsMask", colorControlstepColorTemperatureoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_stepColorTemperature_optionsOverride_commandParameter =
+    CommandParameter colorControlstepColorTemperatureoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_stepColorTemperature_commandParams.put(
         "optionsOverride", colorControl_stepColorTemperature_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlstepColorTemperatureCommandParams.put(
+        "optionsOverride", colorControlstepColorTemperatureoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_stepColorTemperature_CommandInfo =
+    CommandInfo colorControlstepColorTemperatureCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11220,6 +11552,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_stepColorTemperature_commandParams);
     colorControl_ClusterCommandInfo.put(
         "stepColorTemperature", colorControl_stepColorTemperature_CommandInfo);
@@ -11249,37 +11582,47 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_stepHue_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlstepColorTemperatureCommandParams);
+    colorControlClusterCommandInfo.put(
+        "stepColorTemperature", colorControlstepColorTemperatureCommandInfo);
+    Map<String, CommandParameter> colorControlstepHueCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_stepHue_commandParameter =
+    CommandParameter colorControlstepHueCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_stepHue_stepMode_commandParameter =
+    CommandParameter colorControlstepHuestepModeCommandParameter =
         new CommandParameter("stepMode", int.class);
-    colorControl_stepHue_commandParams.put(
-        "stepMode", colorControl_stepHue_stepMode_commandParameter);
+    colorControlstepHueCommandParams.put("stepMode", colorControlstepHuestepModeCommandParameter);
 
-    CommandParameter colorControl_stepHue_stepSize_commandParameter =
+    CommandParameter colorControlstepHuestepSizeCommandParameter =
         new CommandParameter("stepSize", int.class);
-    colorControl_stepHue_commandParams.put(
-        "stepSize", colorControl_stepHue_stepSize_commandParameter);
+    colorControlstepHueCommandParams.put("stepSize", colorControlstepHuestepSizeCommandParameter);
 
-    CommandParameter colorControl_stepHue_transitionTime_commandParameter =
+    CommandParameter colorControlstepHuetransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_stepHue_commandParams.put(
-        "transitionTime", colorControl_stepHue_transitionTime_commandParameter);
+    colorControlstepHueCommandParams.put(
+        "transitionTime", colorControlstepHuetransitionTimeCommandParameter);
 
-    CommandParameter colorControl_stepHue_optionsMask_commandParameter =
+    CommandParameter colorControlstepHueoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stepHue_commandParams.put(
-        "optionsMask", colorControl_stepHue_optionsMask_commandParameter);
+    colorControlstepHueCommandParams.put(
+        "optionsMask", colorControlstepHueoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_stepHue_optionsOverride_commandParameter =
+    CommandParameter colorControlstepHueoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_stepHue_commandParams.put(
         "optionsOverride", colorControl_stepHue_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlstepHueCommandParams.put(
+        "optionsOverride", colorControlstepHueoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_stepHue_CommandInfo =
+    CommandInfo colorControlstepHueCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11296,6 +11639,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_stepHue_commandParams);
     colorControl_ClusterCommandInfo.put("stepHue", colorControl_stepHue_CommandInfo);
 <<<<<<< HEAD
@@ -11324,37 +11668,48 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_stepSaturation_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlstepHueCommandParams);
+    colorControlClusterCommandInfo.put("stepHue", colorControlstepHueCommandInfo);
+    Map<String, CommandParameter> colorControlstepSaturationCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_stepSaturation_commandParameter =
+    CommandParameter colorControlstepSaturationCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_stepSaturation_stepMode_commandParameter =
+    CommandParameter colorControlstepSaturationstepModeCommandParameter =
         new CommandParameter("stepMode", int.class);
-    colorControl_stepSaturation_commandParams.put(
-        "stepMode", colorControl_stepSaturation_stepMode_commandParameter);
+    colorControlstepSaturationCommandParams.put(
+        "stepMode", colorControlstepSaturationstepModeCommandParameter);
 
-    CommandParameter colorControl_stepSaturation_stepSize_commandParameter =
+    CommandParameter colorControlstepSaturationstepSizeCommandParameter =
         new CommandParameter("stepSize", int.class);
-    colorControl_stepSaturation_commandParams.put(
-        "stepSize", colorControl_stepSaturation_stepSize_commandParameter);
+    colorControlstepSaturationCommandParams.put(
+        "stepSize", colorControlstepSaturationstepSizeCommandParameter);
 
-    CommandParameter colorControl_stepSaturation_transitionTime_commandParameter =
+    CommandParameter colorControlstepSaturationtransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    colorControl_stepSaturation_commandParams.put(
-        "transitionTime", colorControl_stepSaturation_transitionTime_commandParameter);
+    colorControlstepSaturationCommandParams.put(
+        "transitionTime", colorControlstepSaturationtransitionTimeCommandParameter);
 
-    CommandParameter colorControl_stepSaturation_optionsMask_commandParameter =
+    CommandParameter colorControlstepSaturationoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stepSaturation_commandParams.put(
-        "optionsMask", colorControl_stepSaturation_optionsMask_commandParameter);
+    colorControlstepSaturationCommandParams.put(
+        "optionsMask", colorControlstepSaturationoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_stepSaturation_optionsOverride_commandParameter =
+    CommandParameter colorControlstepSaturationoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_stepSaturation_commandParams.put(
         "optionsOverride", colorControl_stepSaturation_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlstepSaturationCommandParams.put(
+        "optionsOverride", colorControlstepSaturationoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_stepSaturation_CommandInfo =
+    CommandInfo colorControlstepSaturationCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11371,6 +11726,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             colorControl_stepSaturation_commandParams);
     colorControl_ClusterCommandInfo.put("stepSaturation", colorControl_stepSaturation_CommandInfo);
 <<<<<<< HEAD
@@ -11387,22 +11743,33 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> colorControl_stopMoveStep_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlstepSaturationCommandParams);
+    colorControlClusterCommandInfo.put("stepSaturation", colorControlstepSaturationCommandInfo);
+    Map<String, CommandParameter> colorControlstopMoveStepCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter colorControl_stopMoveStep_commandParameter =
+    CommandParameter colorControlstopMoveStepCommandParameter =
         new CommandParameter("ColorControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter colorControl_stopMoveStep_optionsMask_commandParameter =
+    CommandParameter colorControlstopMoveStepoptionsMaskCommandParameter =
         new CommandParameter("optionsMask", int.class);
-    colorControl_stopMoveStep_commandParams.put(
-        "optionsMask", colorControl_stopMoveStep_optionsMask_commandParameter);
+    colorControlstopMoveStepCommandParams.put(
+        "optionsMask", colorControlstopMoveStepoptionsMaskCommandParameter);
 
-    CommandParameter colorControl_stopMoveStep_optionsOverride_commandParameter =
+    CommandParameter colorControlstopMoveStepoptionsOverrideCommandParameter =
         new CommandParameter("optionsOverride", int.class);
+<<<<<<< HEAD
     colorControl_stopMoveStep_commandParams.put(
         "optionsOverride", colorControl_stopMoveStep_optionsOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    colorControlstopMoveStepCommandParams.put(
+        "optionsOverride", colorControlstopMoveStepoptionsOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo colorControl_stopMoveStep_CommandInfo =
+    CommandInfo colorControlstopMoveStepCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11416,12 +11783,13 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            colorControl_stopMoveStep_commandParams);
-    colorControl_ClusterCommandInfo.put("stopMoveStep", colorControl_stopMoveStep_CommandInfo);
+            colorControlstopMoveStepCommandParams);
+    colorControlClusterCommandInfo.put("stopMoveStep", colorControlstopMoveStepCommandInfo);
     // Populate cluster
-    ClusterInfo colorControl_clusterInfo =
+    ClusterInfo colorControlClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ColorControlCluster(ptr, endpointId),
+<<<<<<< HEAD
             colorControl_ClusterCommandInfo);
     clusterMap.put("colorControl", colorControl_clusterInfo);
     Map<String, CommandInfo> contentLauncher_ClusterCommandInfo = new HashMap<>();
@@ -11439,24 +11807,36 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> contentLauncher_launchContent_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            colorControlClusterCommandInfo);
+    clusterMap.put("colorControl", colorControlClusterInfo);
+    Map<String, CommandInfo> contentLauncherClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> contentLauncherlaunchContentCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter contentLauncher_launchContent_commandParameter =
+    CommandParameter contentLauncherlaunchContentCommandParameter =
         new CommandParameter(
             "ContentLauncher",
             ChipClusters.ContentLauncherCluster.LaunchContentResponseCallback.class);
-    CommandParameter contentLauncher_launchContent_autoPlay_commandParameter =
+    CommandParameter contentLauncherlaunchContentautoPlayCommandParameter =
         new CommandParameter("autoPlay", boolean.class);
-    contentLauncher_launchContent_commandParams.put(
-        "autoPlay", contentLauncher_launchContent_autoPlay_commandParameter);
+    contentLauncherlaunchContentCommandParams.put(
+        "autoPlay", contentLauncherlaunchContentautoPlayCommandParameter);
 
-    CommandParameter contentLauncher_launchContent_data_commandParameter =
+    CommandParameter contentLauncherlaunchContentdataCommandParameter =
         new CommandParameter("data", String.class);
+<<<<<<< HEAD
     contentLauncher_launchContent_commandParams.put(
         "data", contentLauncher_launchContent_data_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    contentLauncherlaunchContentCommandParams.put(
+        "data", contentLauncherlaunchContentdataCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo contentLauncher_launchContent_CommandInfo =
+    CommandInfo contentLauncherlaunchContentCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11469,6 +11849,7 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("data"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             contentLauncher_launchContent_commandParams);
     contentLauncher_ClusterCommandInfo.put(
@@ -11487,23 +11868,35 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> contentLauncher_launchURL_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedLaunchContentResponseCallback(),
+            contentLauncherlaunchContentCommandParams);
+    contentLauncherClusterCommandInfo.put("launchContent", contentLauncherlaunchContentCommandInfo);
+    Map<String, CommandParameter> contentLauncherlaunchURLCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter contentLauncher_launchURL_commandParameter =
+    CommandParameter contentLauncherlaunchURLCommandParameter =
         new CommandParameter(
             "ContentLauncher", ChipClusters.ContentLauncherCluster.LaunchURLResponseCallback.class);
-    CommandParameter contentLauncher_launchURL_contentURL_commandParameter =
+    CommandParameter contentLauncherlaunchURLcontentURLCommandParameter =
         new CommandParameter("contentURL", String.class);
-    contentLauncher_launchURL_commandParams.put(
-        "contentURL", contentLauncher_launchURL_contentURL_commandParameter);
+    contentLauncherlaunchURLCommandParams.put(
+        "contentURL", contentLauncherlaunchURLcontentURLCommandParameter);
 
-    CommandParameter contentLauncher_launchURL_displayString_commandParameter =
+    CommandParameter contentLauncherlaunchURLdisplayStringCommandParameter =
         new CommandParameter("displayString", String.class);
+<<<<<<< HEAD
     contentLauncher_launchURL_commandParams.put(
         "displayString", contentLauncher_launchURL_displayString_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    contentLauncherlaunchURLCommandParams.put(
+        "displayString", contentLauncherlaunchURLdisplayStringCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo contentLauncher_launchURL_CommandInfo =
+    CommandInfo contentLauncherlaunchURLCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11516,20 +11909,21 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("displayString"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            contentLauncher_launchURL_commandParams);
-    contentLauncher_ClusterCommandInfo.put("launchURL", contentLauncher_launchURL_CommandInfo);
+            () -> new DelegatedLaunchURLResponseCallback(),
+            contentLauncherlaunchURLCommandParams);
+    contentLauncherClusterCommandInfo.put("launchURL", contentLauncherlaunchURLCommandInfo);
     // Populate cluster
-    ClusterInfo contentLauncher_clusterInfo =
+    ClusterInfo contentLauncherClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ContentLauncherCluster(ptr, endpointId),
-            contentLauncher_ClusterCommandInfo);
-    clusterMap.put("contentLauncher", contentLauncher_clusterInfo);
-    Map<String, CommandInfo> descriptor_ClusterCommandInfo = new HashMap<>();
+            contentLauncherClusterCommandInfo);
+    clusterMap.put("contentLauncher", contentLauncherClusterInfo);
+    Map<String, CommandInfo> descriptorClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo descriptor_clusterInfo =
+    ClusterInfo descriptorClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.DescriptorCluster(ptr, endpointId),
+<<<<<<< HEAD
             descriptor_ClusterCommandInfo);
     clusterMap.put("descriptor", descriptor_clusterInfo);
     Map<String, CommandInfo> diagnosticLogs_ClusterCommandInfo = new HashMap<>();
@@ -11554,28 +11948,39 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> diagnosticLogs_retrieveLogsRequest_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            descriptorClusterCommandInfo);
+    clusterMap.put("descriptor", descriptorClusterInfo);
+    Map<String, CommandInfo> diagnosticLogsClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> diagnosticLogsretrieveLogsRequestCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter diagnosticLogs_retrieveLogsRequest_commandParameter =
+    CommandParameter diagnosticLogsretrieveLogsRequestCommandParameter =
         new CommandParameter("DiagnosticLogs", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter diagnosticLogs_retrieveLogsRequest_intent_commandParameter =
+    CommandParameter diagnosticLogsretrieveLogsRequestintentCommandParameter =
         new CommandParameter("intent", int.class);
-    diagnosticLogs_retrieveLogsRequest_commandParams.put(
-        "intent", diagnosticLogs_retrieveLogsRequest_intent_commandParameter);
+    diagnosticLogsretrieveLogsRequestCommandParams.put(
+        "intent", diagnosticLogsretrieveLogsRequestintentCommandParameter);
 
-    CommandParameter diagnosticLogs_retrieveLogsRequest_requestedProtocol_commandParameter =
+    CommandParameter diagnosticLogsretrieveLogsRequestrequestedProtocolCommandParameter =
         new CommandParameter("requestedProtocol", int.class);
-    diagnosticLogs_retrieveLogsRequest_commandParams.put(
-        "requestedProtocol", diagnosticLogs_retrieveLogsRequest_requestedProtocol_commandParameter);
+    diagnosticLogsretrieveLogsRequestCommandParams.put(
+        "requestedProtocol", diagnosticLogsretrieveLogsRequestrequestedProtocolCommandParameter);
 
-    CommandParameter diagnosticLogs_retrieveLogsRequest_transferFileDesignator_commandParameter =
+    CommandParameter diagnosticLogsretrieveLogsRequesttransferFileDesignatorCommandParameter =
         new CommandParameter("transferFileDesignator", byte[].class);
-    diagnosticLogs_retrieveLogsRequest_commandParams.put(
+    diagnosticLogsretrieveLogsRequestCommandParams.put(
         "transferFileDesignator",
+<<<<<<< HEAD
         diagnosticLogs_retrieveLogsRequest_transferFileDesignator_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        diagnosticLogsretrieveLogsRequesttransferFileDesignatorCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo diagnosticLogs_retrieveLogsRequest_CommandInfo =
+    CommandInfo diagnosticLogsretrieveLogsRequestCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11590,13 +11995,14 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            diagnosticLogs_retrieveLogsRequest_commandParams);
-    diagnosticLogs_ClusterCommandInfo.put(
-        "retrieveLogsRequest", diagnosticLogs_retrieveLogsRequest_CommandInfo);
+            diagnosticLogsretrieveLogsRequestCommandParams);
+    diagnosticLogsClusterCommandInfo.put(
+        "retrieveLogsRequest", diagnosticLogsretrieveLogsRequestCommandInfo);
     // Populate cluster
-    ClusterInfo diagnosticLogs_clusterInfo =
+    ClusterInfo diagnosticLogsClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.DiagnosticLogsCluster(ptr, endpointId),
+<<<<<<< HEAD
             diagnosticLogs_ClusterCommandInfo);
     clusterMap.put("diagnosticLogs", diagnosticLogs_clusterInfo);
     Map<String, CommandInfo> doorLock_ClusterCommandInfo = new HashMap<>();
@@ -11607,13 +12013,20 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_clearAllPins_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            diagnosticLogsClusterCommandInfo);
+    clusterMap.put("diagnosticLogs", diagnosticLogsClusterInfo);
+    Map<String, CommandInfo> doorLockClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> doorLockclearAllPinsCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_clearAllPins_commandParameter =
+    CommandParameter doorLockclearAllPinsCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.ClearAllPinsResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo doorLock_clearAllPins_CommandInfo =
+    CommandInfo doorLockclearAllPinsCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11624,6 +12037,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.DoorLockCluster.ClearAllPinsResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_clearAllPins_commandParams);
     doorLock_ClusterCommandInfo.put("clearAllPins", doorLock_clearAllPins_CommandInfo);
@@ -11634,13 +12048,20 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_clearAllRfids_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedClearAllPinsResponseCallback(),
+            doorLockclearAllPinsCommandParams);
+    doorLockClusterCommandInfo.put("clearAllPins", doorLockclearAllPinsCommandInfo);
+    Map<String, CommandParameter> doorLockclearAllRfidsCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_clearAllRfids_commandParameter =
+    CommandParameter doorLockclearAllRfidsCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.ClearAllRfidsResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo doorLock_clearAllRfids_CommandInfo =
+    CommandInfo doorLockclearAllRfidsCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11651,6 +12072,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.DoorLockCluster.ClearAllRfidsResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_clearAllRfids_commandParams);
     doorLock_ClusterCommandInfo.put("clearAllRfids", doorLock_clearAllRfids_CommandInfo);
@@ -11665,18 +12087,30 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_clearHolidaySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedClearAllRfidsResponseCallback(),
+            doorLockclearAllRfidsCommandParams);
+    doorLockClusterCommandInfo.put("clearAllRfids", doorLockclearAllRfidsCommandInfo);
+    Map<String, CommandParameter> doorLockclearHolidayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_clearHolidaySchedule_commandParameter =
+    CommandParameter doorLockclearHolidayScheduleCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.ClearHolidayScheduleResponseCallback.class);
-    CommandParameter doorLock_clearHolidaySchedule_scheduleId_commandParameter =
+    CommandParameter doorLockclearHolidaySchedulescheduleIdCommandParameter =
         new CommandParameter("scheduleId", int.class);
+<<<<<<< HEAD
     doorLock_clearHolidaySchedule_commandParams.put(
         "scheduleId", doorLock_clearHolidaySchedule_scheduleId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockclearHolidayScheduleCommandParams.put(
+        "scheduleId", doorLockclearHolidaySchedulescheduleIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_clearHolidaySchedule_CommandInfo =
+    CommandInfo doorLockclearHolidayScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11688,6 +12122,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("scheduleId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_clearHolidaySchedule_commandParams);
     doorLock_ClusterCommandInfo.put(
@@ -11701,17 +12136,28 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_clearPin_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedClearHolidayScheduleResponseCallback(),
+            doorLockclearHolidayScheduleCommandParams);
+    doorLockClusterCommandInfo.put("clearHolidaySchedule", doorLockclearHolidayScheduleCommandInfo);
+    Map<String, CommandParameter> doorLockclearPinCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_clearPin_commandParameter =
+    CommandParameter doorLockclearPinCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.ClearPinResponseCallback.class);
-    CommandParameter doorLock_clearPin_userId_commandParameter =
+    CommandParameter doorLockclearPinuserIdCommandParameter =
         new CommandParameter("userId", int.class);
+<<<<<<< HEAD
     doorLock_clearPin_commandParams.put("userId", doorLock_clearPin_userId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockclearPinCommandParams.put("userId", doorLockclearPinuserIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_clearPin_CommandInfo =
+    CommandInfo doorLockclearPinCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11723,6 +12169,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_clearPin_commandParams);
     doorLock_ClusterCommandInfo.put("clearPin", doorLock_clearPin_CommandInfo);
@@ -11735,17 +12182,28 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_clearRfid_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedClearPinResponseCallback(),
+            doorLockclearPinCommandParams);
+    doorLockClusterCommandInfo.put("clearPin", doorLockclearPinCommandInfo);
+    Map<String, CommandParameter> doorLockclearRfidCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_clearRfid_commandParameter =
+    CommandParameter doorLockclearRfidCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.ClearRfidResponseCallback.class);
-    CommandParameter doorLock_clearRfid_userId_commandParameter =
+    CommandParameter doorLockclearRfiduserIdCommandParameter =
         new CommandParameter("userId", int.class);
+<<<<<<< HEAD
     doorLock_clearRfid_commandParams.put("userId", doorLock_clearRfid_userId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockclearRfidCommandParams.put("userId", doorLockclearRfiduserIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_clearRfid_CommandInfo =
+    CommandInfo doorLockclearRfidCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11757,6 +12215,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_clearRfid_commandParams);
     doorLock_ClusterCommandInfo.put("clearRfid", doorLock_clearRfid_CommandInfo);
@@ -11775,23 +12234,35 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_clearWeekdaySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedClearRfidResponseCallback(),
+            doorLockclearRfidCommandParams);
+    doorLockClusterCommandInfo.put("clearRfid", doorLockclearRfidCommandInfo);
+    Map<String, CommandParameter> doorLockclearWeekdayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_clearWeekdaySchedule_commandParameter =
+    CommandParameter doorLockclearWeekdayScheduleCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.ClearWeekdayScheduleResponseCallback.class);
-    CommandParameter doorLock_clearWeekdaySchedule_scheduleId_commandParameter =
+    CommandParameter doorLockclearWeekdaySchedulescheduleIdCommandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_clearWeekdaySchedule_commandParams.put(
-        "scheduleId", doorLock_clearWeekdaySchedule_scheduleId_commandParameter);
+    doorLockclearWeekdayScheduleCommandParams.put(
+        "scheduleId", doorLockclearWeekdaySchedulescheduleIdCommandParameter);
 
-    CommandParameter doorLock_clearWeekdaySchedule_userId_commandParameter =
+    CommandParameter doorLockclearWeekdayScheduleuserIdCommandParameter =
         new CommandParameter("userId", int.class);
+<<<<<<< HEAD
     doorLock_clearWeekdaySchedule_commandParams.put(
         "userId", doorLock_clearWeekdaySchedule_userId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockclearWeekdayScheduleCommandParams.put(
+        "userId", doorLockclearWeekdayScheduleuserIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_clearWeekdaySchedule_CommandInfo =
+    CommandInfo doorLockclearWeekdayScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11804,6 +12275,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_clearWeekdaySchedule_commandParams);
     doorLock_ClusterCommandInfo.put(
@@ -11823,23 +12295,35 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_clearYeardaySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedClearWeekdayScheduleResponseCallback(),
+            doorLockclearWeekdayScheduleCommandParams);
+    doorLockClusterCommandInfo.put("clearWeekdaySchedule", doorLockclearWeekdayScheduleCommandInfo);
+    Map<String, CommandParameter> doorLockclearYeardayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_clearYeardaySchedule_commandParameter =
+    CommandParameter doorLockclearYeardayScheduleCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.ClearYeardayScheduleResponseCallback.class);
-    CommandParameter doorLock_clearYeardaySchedule_scheduleId_commandParameter =
+    CommandParameter doorLockclearYeardaySchedulescheduleIdCommandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_clearYeardaySchedule_commandParams.put(
-        "scheduleId", doorLock_clearYeardaySchedule_scheduleId_commandParameter);
+    doorLockclearYeardayScheduleCommandParams.put(
+        "scheduleId", doorLockclearYeardaySchedulescheduleIdCommandParameter);
 
-    CommandParameter doorLock_clearYeardaySchedule_userId_commandParameter =
+    CommandParameter doorLockclearYeardayScheduleuserIdCommandParameter =
         new CommandParameter("userId", int.class);
+<<<<<<< HEAD
     doorLock_clearYeardaySchedule_commandParams.put(
         "userId", doorLock_clearYeardaySchedule_userId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockclearYeardayScheduleCommandParams.put(
+        "userId", doorLockclearYeardayScheduleuserIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_clearYeardaySchedule_CommandInfo =
+    CommandInfo doorLockclearYeardayScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11852,6 +12336,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_clearYeardaySchedule_commandParams);
     doorLock_ClusterCommandInfo.put(
@@ -11866,18 +12351,30 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_getHolidaySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedClearYeardayScheduleResponseCallback(),
+            doorLockclearYeardayScheduleCommandParams);
+    doorLockClusterCommandInfo.put("clearYeardaySchedule", doorLockclearYeardayScheduleCommandInfo);
+    Map<String, CommandParameter> doorLockgetHolidayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_getHolidaySchedule_commandParameter =
+    CommandParameter doorLockgetHolidayScheduleCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.GetHolidayScheduleResponseCallback.class);
-    CommandParameter doorLock_getHolidaySchedule_scheduleId_commandParameter =
+    CommandParameter doorLockgetHolidaySchedulescheduleIdCommandParameter =
         new CommandParameter("scheduleId", int.class);
+<<<<<<< HEAD
     doorLock_getHolidaySchedule_commandParams.put(
         "scheduleId", doorLock_getHolidaySchedule_scheduleId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockgetHolidayScheduleCommandParams.put(
+        "scheduleId", doorLockgetHolidaySchedulescheduleIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_getHolidaySchedule_CommandInfo =
+    CommandInfo doorLockgetHolidayScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11889,6 +12386,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("scheduleId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_getHolidaySchedule_commandParams);
     doorLock_ClusterCommandInfo.put("getHolidaySchedule", doorLock_getHolidaySchedule_CommandInfo);
@@ -11902,18 +12400,29 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_getLogRecord_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetHolidayScheduleResponseCallback(),
+            doorLockgetHolidayScheduleCommandParams);
+    doorLockClusterCommandInfo.put("getHolidaySchedule", doorLockgetHolidayScheduleCommandInfo);
+    Map<String, CommandParameter> doorLockgetLogRecordCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_getLogRecord_commandParameter =
+    CommandParameter doorLockgetLogRecordCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.GetLogRecordResponseCallback.class);
-    CommandParameter doorLock_getLogRecord_logIndex_commandParameter =
+    CommandParameter doorLockgetLogRecordlogIndexCommandParameter =
         new CommandParameter("logIndex", int.class);
+<<<<<<< HEAD
     doorLock_getLogRecord_commandParams.put(
         "logIndex", doorLock_getLogRecord_logIndex_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockgetLogRecordCommandParams.put("logIndex", doorLockgetLogRecordlogIndexCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_getLogRecord_CommandInfo =
+    CommandInfo doorLockgetLogRecordCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11925,6 +12434,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("logIndex"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_getLogRecord_commandParams);
     doorLock_ClusterCommandInfo.put("getLogRecord", doorLock_getLogRecord_CommandInfo);
@@ -11937,16 +12447,27 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_getPin_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetLogRecordResponseCallback(),
+            doorLockgetLogRecordCommandParams);
+    doorLockClusterCommandInfo.put("getLogRecord", doorLockgetLogRecordCommandInfo);
+    Map<String, CommandParameter> doorLockgetPinCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_getPin_commandParameter =
+    CommandParameter doorLockgetPinCommandParameter =
         new CommandParameter("DoorLock", ChipClusters.DoorLockCluster.GetPinResponseCallback.class);
-    CommandParameter doorLock_getPin_userId_commandParameter =
+    CommandParameter doorLockgetPinuserIdCommandParameter =
         new CommandParameter("userId", int.class);
+<<<<<<< HEAD
     doorLock_getPin_commandParams.put("userId", doorLock_getPin_userId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockgetPinCommandParams.put("userId", doorLockgetPinuserIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_getPin_CommandInfo =
+    CommandInfo doorLockgetPinCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11958,6 +12479,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_getPin_commandParams);
     doorLock_ClusterCommandInfo.put("getPin", doorLock_getPin_CommandInfo);
@@ -11970,17 +12492,28 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_getRfid_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetPinResponseCallback(),
+            doorLockgetPinCommandParams);
+    doorLockClusterCommandInfo.put("getPin", doorLockgetPinCommandInfo);
+    Map<String, CommandParameter> doorLockgetRfidCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_getRfid_commandParameter =
+    CommandParameter doorLockgetRfidCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.GetRfidResponseCallback.class);
-    CommandParameter doorLock_getRfid_userId_commandParameter =
+    CommandParameter doorLockgetRfiduserIdCommandParameter =
         new CommandParameter("userId", int.class);
+<<<<<<< HEAD
     doorLock_getRfid_commandParams.put("userId", doorLock_getRfid_userId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockgetRfidCommandParams.put("userId", doorLockgetRfiduserIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_getRfid_CommandInfo =
+    CommandInfo doorLockgetRfidCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -11992,6 +12525,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_getRfid_commandParams);
     doorLock_ClusterCommandInfo.put("getRfid", doorLock_getRfid_CommandInfo);
@@ -12005,17 +12539,28 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_getUserType_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetRfidResponseCallback(),
+            doorLockgetRfidCommandParams);
+    doorLockClusterCommandInfo.put("getRfid", doorLockgetRfidCommandInfo);
+    Map<String, CommandParameter> doorLockgetUserTypeCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_getUserType_commandParameter =
+    CommandParameter doorLockgetUserTypeCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.GetUserTypeResponseCallback.class);
-    CommandParameter doorLock_getUserType_userId_commandParameter =
+    CommandParameter doorLockgetUserTypeuserIdCommandParameter =
         new CommandParameter("userId", int.class);
+<<<<<<< HEAD
     doorLock_getUserType_commandParams.put("userId", doorLock_getUserType_userId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockgetUserTypeCommandParams.put("userId", doorLockgetUserTypeuserIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_getUserType_CommandInfo =
+    CommandInfo doorLockgetUserTypeCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12027,6 +12572,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_getUserType_commandParams);
     doorLock_ClusterCommandInfo.put("getUserType", doorLock_getUserType_CommandInfo);
@@ -12044,23 +12590,35 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_getWeekdaySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetUserTypeResponseCallback(),
+            doorLockgetUserTypeCommandParams);
+    doorLockClusterCommandInfo.put("getUserType", doorLockgetUserTypeCommandInfo);
+    Map<String, CommandParameter> doorLockgetWeekdayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_getWeekdaySchedule_commandParameter =
+    CommandParameter doorLockgetWeekdayScheduleCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.GetWeekdayScheduleResponseCallback.class);
-    CommandParameter doorLock_getWeekdaySchedule_scheduleId_commandParameter =
+    CommandParameter doorLockgetWeekdaySchedulescheduleIdCommandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_getWeekdaySchedule_commandParams.put(
-        "scheduleId", doorLock_getWeekdaySchedule_scheduleId_commandParameter);
+    doorLockgetWeekdayScheduleCommandParams.put(
+        "scheduleId", doorLockgetWeekdaySchedulescheduleIdCommandParameter);
 
-    CommandParameter doorLock_getWeekdaySchedule_userId_commandParameter =
+    CommandParameter doorLockgetWeekdayScheduleuserIdCommandParameter =
         new CommandParameter("userId", int.class);
+<<<<<<< HEAD
     doorLock_getWeekdaySchedule_commandParams.put(
         "userId", doorLock_getWeekdaySchedule_userId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockgetWeekdayScheduleCommandParams.put(
+        "userId", doorLockgetWeekdayScheduleuserIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_getWeekdaySchedule_CommandInfo =
+    CommandInfo doorLockgetWeekdayScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12073,6 +12631,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_getWeekdaySchedule_commandParams);
     doorLock_ClusterCommandInfo.put("getWeekdaySchedule", doorLock_getWeekdaySchedule_CommandInfo);
@@ -12090,23 +12649,35 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_getYeardaySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetWeekdayScheduleResponseCallback(),
+            doorLockgetWeekdayScheduleCommandParams);
+    doorLockClusterCommandInfo.put("getWeekdaySchedule", doorLockgetWeekdayScheduleCommandInfo);
+    Map<String, CommandParameter> doorLockgetYeardayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_getYeardaySchedule_commandParameter =
+    CommandParameter doorLockgetYeardayScheduleCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.GetYeardayScheduleResponseCallback.class);
-    CommandParameter doorLock_getYeardaySchedule_scheduleId_commandParameter =
+    CommandParameter doorLockgetYeardaySchedulescheduleIdCommandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_getYeardaySchedule_commandParams.put(
-        "scheduleId", doorLock_getYeardaySchedule_scheduleId_commandParameter);
+    doorLockgetYeardayScheduleCommandParams.put(
+        "scheduleId", doorLockgetYeardaySchedulescheduleIdCommandParameter);
 
-    CommandParameter doorLock_getYeardaySchedule_userId_commandParameter =
+    CommandParameter doorLockgetYeardayScheduleuserIdCommandParameter =
         new CommandParameter("userId", int.class);
+<<<<<<< HEAD
     doorLock_getYeardaySchedule_commandParams.put(
         "userId", doorLock_getYeardaySchedule_userId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockgetYeardayScheduleCommandParams.put(
+        "userId", doorLockgetYeardayScheduleuserIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_getYeardaySchedule_CommandInfo =
+    CommandInfo doorLockgetYeardayScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12119,6 +12690,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_getYeardaySchedule_commandParams);
     doorLock_ClusterCommandInfo.put("getYeardaySchedule", doorLock_getYeardaySchedule_CommandInfo);
@@ -12131,17 +12703,28 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_lockDoor_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetYeardayScheduleResponseCallback(),
+            doorLockgetYeardayScheduleCommandParams);
+    doorLockClusterCommandInfo.put("getYeardaySchedule", doorLockgetYeardayScheduleCommandInfo);
+    Map<String, CommandParameter> doorLocklockDoorCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_lockDoor_commandParameter =
+    CommandParameter doorLocklockDoorCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.LockDoorResponseCallback.class);
-    CommandParameter doorLock_lockDoor_pin_commandParameter =
+    CommandParameter doorLocklockDoorpinCommandParameter =
         new CommandParameter("pin", byte[].class);
+<<<<<<< HEAD
     doorLock_lockDoor_commandParams.put("pin", doorLock_lockDoor_pin_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLocklockDoorCommandParams.put("pin", doorLocklockDoorpinCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_lockDoor_CommandInfo =
+    CommandInfo doorLocklockDoorCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12153,6 +12736,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("pin"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_lockDoor_commandParams);
     doorLock_ClusterCommandInfo.put("lockDoor", doorLock_lockDoor_CommandInfo);
@@ -12180,34 +12764,45 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_setHolidaySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedLockDoorResponseCallback(),
+            doorLocklockDoorCommandParams);
+    doorLockClusterCommandInfo.put("lockDoor", doorLocklockDoorCommandInfo);
+    Map<String, CommandParameter> doorLocksetHolidayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_setHolidaySchedule_commandParameter =
+    CommandParameter doorLocksetHolidayScheduleCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.SetHolidayScheduleResponseCallback.class);
-    CommandParameter doorLock_setHolidaySchedule_scheduleId_commandParameter =
+    CommandParameter doorLocksetHolidaySchedulescheduleIdCommandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_setHolidaySchedule_commandParams.put(
-        "scheduleId", doorLock_setHolidaySchedule_scheduleId_commandParameter);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "scheduleId", doorLocksetHolidaySchedulescheduleIdCommandParameter);
 
-    CommandParameter doorLock_setHolidaySchedule_localStartTime_commandParameter =
+    CommandParameter doorLocksetHolidaySchedulelocalStartTimeCommandParameter =
         new CommandParameter("localStartTime", long.class);
-    doorLock_setHolidaySchedule_commandParams.put(
-        "localStartTime", doorLock_setHolidaySchedule_localStartTime_commandParameter);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "localStartTime", doorLocksetHolidaySchedulelocalStartTimeCommandParameter);
 
-    CommandParameter doorLock_setHolidaySchedule_localEndTime_commandParameter =
+    CommandParameter doorLocksetHolidaySchedulelocalEndTimeCommandParameter =
         new CommandParameter("localEndTime", long.class);
-    doorLock_setHolidaySchedule_commandParams.put(
-        "localEndTime", doorLock_setHolidaySchedule_localEndTime_commandParameter);
+    doorLocksetHolidayScheduleCommandParams.put(
+        "localEndTime", doorLocksetHolidaySchedulelocalEndTimeCommandParameter);
 
-    CommandParameter doorLock_setHolidaySchedule_operatingModeDuringHoliday_commandParameter =
+    CommandParameter doorLocksetHolidayScheduleoperatingModeDuringHolidayCommandParameter =
         new CommandParameter("operatingModeDuringHoliday", int.class);
-    doorLock_setHolidaySchedule_commandParams.put(
+    doorLocksetHolidayScheduleCommandParams.put(
         "operatingModeDuringHoliday",
+<<<<<<< HEAD
         doorLock_setHolidaySchedule_operatingModeDuringHoliday_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        doorLocksetHolidayScheduleoperatingModeDuringHolidayCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_setHolidaySchedule_CommandInfo =
+    CommandInfo doorLocksetHolidayScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12222,6 +12817,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("operatingModeDuringHoliday"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_setHolidaySchedule_commandParams);
     doorLock_ClusterCommandInfo.put("setHolidaySchedule", doorLock_setHolidaySchedule_CommandInfo);
@@ -12244,28 +12840,40 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_setPin_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedSetHolidayScheduleResponseCallback(),
+            doorLocksetHolidayScheduleCommandParams);
+    doorLockClusterCommandInfo.put("setHolidaySchedule", doorLocksetHolidayScheduleCommandInfo);
+    Map<String, CommandParameter> doorLocksetPinCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_setPin_commandParameter =
+    CommandParameter doorLocksetPinCommandParameter =
         new CommandParameter("DoorLock", ChipClusters.DoorLockCluster.SetPinResponseCallback.class);
-    CommandParameter doorLock_setPin_userId_commandParameter =
+    CommandParameter doorLocksetPinuserIdCommandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_setPin_commandParams.put("userId", doorLock_setPin_userId_commandParameter);
+    doorLocksetPinCommandParams.put("userId", doorLocksetPinuserIdCommandParameter);
 
-    CommandParameter doorLock_setPin_userStatus_commandParameter =
+    CommandParameter doorLocksetPinuserStatusCommandParameter =
         new CommandParameter("userStatus", int.class);
-    doorLock_setPin_commandParams.put("userStatus", doorLock_setPin_userStatus_commandParameter);
+    doorLocksetPinCommandParams.put("userStatus", doorLocksetPinuserStatusCommandParameter);
 
-    CommandParameter doorLock_setPin_userType_commandParameter =
+    CommandParameter doorLocksetPinuserTypeCommandParameter =
         new CommandParameter("userType", int.class);
-    doorLock_setPin_commandParams.put("userType", doorLock_setPin_userType_commandParameter);
+    doorLocksetPinCommandParams.put("userType", doorLocksetPinuserTypeCommandParameter);
 
+<<<<<<< HEAD
     CommandParameter doorLock_setPin_pin_commandParameter =
         new CommandParameter("pin", byte[].class);
     doorLock_setPin_commandParams.put("pin", doorLock_setPin_pin_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    CommandParameter doorLocksetPinpinCommandParameter = new CommandParameter("pin", byte[].class);
+    doorLocksetPinCommandParams.put("pin", doorLocksetPinpinCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_setPin_CommandInfo =
+    CommandInfo doorLocksetPinCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12280,6 +12888,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("pin"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_setPin_commandParams);
     doorLock_ClusterCommandInfo.put("setPin", doorLock_setPin_CommandInfo);
@@ -12303,29 +12912,41 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_setRfid_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedSetPinResponseCallback(),
+            doorLocksetPinCommandParams);
+    doorLockClusterCommandInfo.put("setPin", doorLocksetPinCommandInfo);
+    Map<String, CommandParameter> doorLocksetRfidCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_setRfid_commandParameter =
+    CommandParameter doorLocksetRfidCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.SetRfidResponseCallback.class);
-    CommandParameter doorLock_setRfid_userId_commandParameter =
+    CommandParameter doorLocksetRfiduserIdCommandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_setRfid_commandParams.put("userId", doorLock_setRfid_userId_commandParameter);
+    doorLocksetRfidCommandParams.put("userId", doorLocksetRfiduserIdCommandParameter);
 
-    CommandParameter doorLock_setRfid_userStatus_commandParameter =
+    CommandParameter doorLocksetRfiduserStatusCommandParameter =
         new CommandParameter("userStatus", int.class);
-    doorLock_setRfid_commandParams.put("userStatus", doorLock_setRfid_userStatus_commandParameter);
+    doorLocksetRfidCommandParams.put("userStatus", doorLocksetRfiduserStatusCommandParameter);
 
-    CommandParameter doorLock_setRfid_userType_commandParameter =
+    CommandParameter doorLocksetRfiduserTypeCommandParameter =
         new CommandParameter("userType", int.class);
-    doorLock_setRfid_commandParams.put("userType", doorLock_setRfid_userType_commandParameter);
+    doorLocksetRfidCommandParams.put("userType", doorLocksetRfiduserTypeCommandParameter);
 
+<<<<<<< HEAD
     CommandParameter doorLock_setRfid_id_commandParameter =
         new CommandParameter("id", byte[].class);
     doorLock_setRfid_commandParams.put("id", doorLock_setRfid_id_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    CommandParameter doorLocksetRfididCommandParameter = new CommandParameter("id", byte[].class);
+    doorLocksetRfidCommandParams.put("id", doorLocksetRfididCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_setRfid_CommandInfo =
+    CommandInfo doorLocksetRfidCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12340,6 +12961,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("id"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_setRfid_commandParams);
     doorLock_ClusterCommandInfo.put("setRfid", doorLock_setRfid_CommandInfo);
@@ -12357,22 +12979,33 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_setUserType_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedSetRfidResponseCallback(),
+            doorLocksetRfidCommandParams);
+    doorLockClusterCommandInfo.put("setRfid", doorLocksetRfidCommandInfo);
+    Map<String, CommandParameter> doorLocksetUserTypeCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_setUserType_commandParameter =
+    CommandParameter doorLocksetUserTypeCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.SetUserTypeResponseCallback.class);
-    CommandParameter doorLock_setUserType_userId_commandParameter =
+    CommandParameter doorLocksetUserTypeuserIdCommandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_setUserType_commandParams.put("userId", doorLock_setUserType_userId_commandParameter);
+    doorLocksetUserTypeCommandParams.put("userId", doorLocksetUserTypeuserIdCommandParameter);
 
-    CommandParameter doorLock_setUserType_userType_commandParameter =
+    CommandParameter doorLocksetUserTypeuserTypeCommandParameter =
         new CommandParameter("userType", int.class);
+<<<<<<< HEAD
     doorLock_setUserType_commandParams.put(
         "userType", doorLock_setUserType_userType_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLocksetUserTypeCommandParams.put("userType", doorLocksetUserTypeuserTypeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_setUserType_CommandInfo =
+    CommandInfo doorLocksetUserTypeCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12385,6 +13018,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("userType"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_setUserType_commandParams);
     doorLock_ClusterCommandInfo.put("setUserType", doorLock_setUserType_CommandInfo);
@@ -12422,48 +13056,60 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_setWeekdaySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedSetUserTypeResponseCallback(),
+            doorLocksetUserTypeCommandParams);
+    doorLockClusterCommandInfo.put("setUserType", doorLocksetUserTypeCommandInfo);
+    Map<String, CommandParameter> doorLocksetWeekdayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_setWeekdaySchedule_commandParameter =
+    CommandParameter doorLocksetWeekdayScheduleCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.SetWeekdayScheduleResponseCallback.class);
-    CommandParameter doorLock_setWeekdaySchedule_scheduleId_commandParameter =
+    CommandParameter doorLocksetWeekdaySchedulescheduleIdCommandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_setWeekdaySchedule_commandParams.put(
-        "scheduleId", doorLock_setWeekdaySchedule_scheduleId_commandParameter);
+    doorLocksetWeekdayScheduleCommandParams.put(
+        "scheduleId", doorLocksetWeekdaySchedulescheduleIdCommandParameter);
 
-    CommandParameter doorLock_setWeekdaySchedule_userId_commandParameter =
+    CommandParameter doorLocksetWeekdayScheduleuserIdCommandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_setWeekdaySchedule_commandParams.put(
-        "userId", doorLock_setWeekdaySchedule_userId_commandParameter);
+    doorLocksetWeekdayScheduleCommandParams.put(
+        "userId", doorLocksetWeekdayScheduleuserIdCommandParameter);
 
-    CommandParameter doorLock_setWeekdaySchedule_daysMask_commandParameter =
+    CommandParameter doorLocksetWeekdayScheduledaysMaskCommandParameter =
         new CommandParameter("daysMask", int.class);
-    doorLock_setWeekdaySchedule_commandParams.put(
-        "daysMask", doorLock_setWeekdaySchedule_daysMask_commandParameter);
+    doorLocksetWeekdayScheduleCommandParams.put(
+        "daysMask", doorLocksetWeekdayScheduledaysMaskCommandParameter);
 
-    CommandParameter doorLock_setWeekdaySchedule_startHour_commandParameter =
+    CommandParameter doorLocksetWeekdaySchedulestartHourCommandParameter =
         new CommandParameter("startHour", int.class);
-    doorLock_setWeekdaySchedule_commandParams.put(
-        "startHour", doorLock_setWeekdaySchedule_startHour_commandParameter);
+    doorLocksetWeekdayScheduleCommandParams.put(
+        "startHour", doorLocksetWeekdaySchedulestartHourCommandParameter);
 
-    CommandParameter doorLock_setWeekdaySchedule_startMinute_commandParameter =
+    CommandParameter doorLocksetWeekdaySchedulestartMinuteCommandParameter =
         new CommandParameter("startMinute", int.class);
-    doorLock_setWeekdaySchedule_commandParams.put(
-        "startMinute", doorLock_setWeekdaySchedule_startMinute_commandParameter);
+    doorLocksetWeekdayScheduleCommandParams.put(
+        "startMinute", doorLocksetWeekdaySchedulestartMinuteCommandParameter);
 
-    CommandParameter doorLock_setWeekdaySchedule_endHour_commandParameter =
+    CommandParameter doorLocksetWeekdayScheduleendHourCommandParameter =
         new CommandParameter("endHour", int.class);
-    doorLock_setWeekdaySchedule_commandParams.put(
-        "endHour", doorLock_setWeekdaySchedule_endHour_commandParameter);
+    doorLocksetWeekdayScheduleCommandParams.put(
+        "endHour", doorLocksetWeekdayScheduleendHourCommandParameter);
 
-    CommandParameter doorLock_setWeekdaySchedule_endMinute_commandParameter =
+    CommandParameter doorLocksetWeekdayScheduleendMinuteCommandParameter =
         new CommandParameter("endMinute", int.class);
+<<<<<<< HEAD
     doorLock_setWeekdaySchedule_commandParams.put(
         "endMinute", doorLock_setWeekdaySchedule_endMinute_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLocksetWeekdayScheduleCommandParams.put(
+        "endMinute", doorLocksetWeekdayScheduleendMinuteCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_setWeekdaySchedule_CommandInfo =
+    CommandInfo doorLocksetWeekdayScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12481,6 +13127,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("endMinute"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_setWeekdaySchedule_commandParams);
     doorLock_ClusterCommandInfo.put("setWeekdaySchedule", doorLock_setWeekdaySchedule_CommandInfo);
@@ -12507,33 +13154,45 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_setYeardaySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedSetWeekdayScheduleResponseCallback(),
+            doorLocksetWeekdayScheduleCommandParams);
+    doorLockClusterCommandInfo.put("setWeekdaySchedule", doorLocksetWeekdayScheduleCommandInfo);
+    Map<String, CommandParameter> doorLocksetYeardayScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_setYeardaySchedule_commandParameter =
+    CommandParameter doorLocksetYeardayScheduleCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.SetYeardayScheduleResponseCallback.class);
-    CommandParameter doorLock_setYeardaySchedule_scheduleId_commandParameter =
+    CommandParameter doorLocksetYeardaySchedulescheduleIdCommandParameter =
         new CommandParameter("scheduleId", int.class);
-    doorLock_setYeardaySchedule_commandParams.put(
-        "scheduleId", doorLock_setYeardaySchedule_scheduleId_commandParameter);
+    doorLocksetYeardayScheduleCommandParams.put(
+        "scheduleId", doorLocksetYeardaySchedulescheduleIdCommandParameter);
 
-    CommandParameter doorLock_setYeardaySchedule_userId_commandParameter =
+    CommandParameter doorLocksetYeardayScheduleuserIdCommandParameter =
         new CommandParameter("userId", int.class);
-    doorLock_setYeardaySchedule_commandParams.put(
-        "userId", doorLock_setYeardaySchedule_userId_commandParameter);
+    doorLocksetYeardayScheduleCommandParams.put(
+        "userId", doorLocksetYeardayScheduleuserIdCommandParameter);
 
-    CommandParameter doorLock_setYeardaySchedule_localStartTime_commandParameter =
+    CommandParameter doorLocksetYeardaySchedulelocalStartTimeCommandParameter =
         new CommandParameter("localStartTime", long.class);
-    doorLock_setYeardaySchedule_commandParams.put(
-        "localStartTime", doorLock_setYeardaySchedule_localStartTime_commandParameter);
+    doorLocksetYeardayScheduleCommandParams.put(
+        "localStartTime", doorLocksetYeardaySchedulelocalStartTimeCommandParameter);
 
-    CommandParameter doorLock_setYeardaySchedule_localEndTime_commandParameter =
+    CommandParameter doorLocksetYeardaySchedulelocalEndTimeCommandParameter =
         new CommandParameter("localEndTime", long.class);
+<<<<<<< HEAD
     doorLock_setYeardaySchedule_commandParams.put(
         "localEndTime", doorLock_setYeardaySchedule_localEndTime_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLocksetYeardayScheduleCommandParams.put(
+        "localEndTime", doorLocksetYeardaySchedulelocalEndTimeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_setYeardaySchedule_CommandInfo =
+    CommandInfo doorLocksetYeardayScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12548,6 +13207,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("localEndTime"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_setYeardaySchedule_commandParams);
     doorLock_ClusterCommandInfo.put("setYeardaySchedule", doorLock_setYeardaySchedule_CommandInfo);
@@ -12560,17 +13220,28 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_unlockDoor_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedSetYeardayScheduleResponseCallback(),
+            doorLocksetYeardayScheduleCommandParams);
+    doorLockClusterCommandInfo.put("setYeardaySchedule", doorLocksetYeardayScheduleCommandInfo);
+    Map<String, CommandParameter> doorLockunlockDoorCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_unlockDoor_commandParameter =
+    CommandParameter doorLockunlockDoorCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.UnlockDoorResponseCallback.class);
-    CommandParameter doorLock_unlockDoor_pin_commandParameter =
+    CommandParameter doorLockunlockDoorpinCommandParameter =
         new CommandParameter("pin", byte[].class);
+<<<<<<< HEAD
     doorLock_unlockDoor_commandParams.put("pin", doorLock_unlockDoor_pin_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockunlockDoorCommandParams.put("pin", doorLockunlockDoorpinCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_unlockDoor_CommandInfo =
+    CommandInfo doorLockunlockDoorCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12582,6 +13253,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("pin"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             doorLock_unlockDoor_commandParams);
     doorLock_ClusterCommandInfo.put("unlockDoor", doorLock_unlockDoor_CommandInfo);
@@ -12600,23 +13272,34 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> doorLock_unlockWithTimeout_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedUnlockDoorResponseCallback(),
+            doorLockunlockDoorCommandParams);
+    doorLockClusterCommandInfo.put("unlockDoor", doorLockunlockDoorCommandInfo);
+    Map<String, CommandParameter> doorLockunlockWithTimeoutCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter doorLock_unlockWithTimeout_commandParameter =
+    CommandParameter doorLockunlockWithTimeoutCommandParameter =
         new CommandParameter(
             "DoorLock", ChipClusters.DoorLockCluster.UnlockWithTimeoutResponseCallback.class);
-    CommandParameter doorLock_unlockWithTimeout_timeoutInSeconds_commandParameter =
+    CommandParameter doorLockunlockWithTimeouttimeoutInSecondsCommandParameter =
         new CommandParameter("timeoutInSeconds", int.class);
-    doorLock_unlockWithTimeout_commandParams.put(
-        "timeoutInSeconds", doorLock_unlockWithTimeout_timeoutInSeconds_commandParameter);
+    doorLockunlockWithTimeoutCommandParams.put(
+        "timeoutInSeconds", doorLockunlockWithTimeouttimeoutInSecondsCommandParameter);
 
-    CommandParameter doorLock_unlockWithTimeout_pin_commandParameter =
+    CommandParameter doorLockunlockWithTimeoutpinCommandParameter =
         new CommandParameter("pin", byte[].class);
+<<<<<<< HEAD
     doorLock_unlockWithTimeout_commandParams.put(
         "pin", doorLock_unlockWithTimeout_pin_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    doorLockunlockWithTimeoutCommandParams.put("pin", doorLockunlockWithTimeoutpinCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo doorLock_unlockWithTimeout_CommandInfo =
+    CommandInfo doorLockunlockWithTimeoutCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12629,20 +13312,21 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("pin"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            doorLock_unlockWithTimeout_commandParams);
-    doorLock_ClusterCommandInfo.put("unlockWithTimeout", doorLock_unlockWithTimeout_CommandInfo);
+            () -> new DelegatedUnlockWithTimeoutResponseCallback(),
+            doorLockunlockWithTimeoutCommandParams);
+    doorLockClusterCommandInfo.put("unlockWithTimeout", doorLockunlockWithTimeoutCommandInfo);
     // Populate cluster
-    ClusterInfo doorLock_clusterInfo =
+    ClusterInfo doorLockClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.DoorLockCluster(ptr, endpointId),
-            doorLock_ClusterCommandInfo);
-    clusterMap.put("doorLock", doorLock_clusterInfo);
-    Map<String, CommandInfo> electricalMeasurement_ClusterCommandInfo = new HashMap<>();
+            doorLockClusterCommandInfo);
+    clusterMap.put("doorLock", doorLockClusterInfo);
+    Map<String, CommandInfo> electricalMeasurementClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo electricalMeasurement_clusterInfo =
+    ClusterInfo electricalMeasurementClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ElectricalMeasurementCluster(ptr, endpointId),
+<<<<<<< HEAD
             electricalMeasurement_ClusterCommandInfo);
     clusterMap.put("electricalMeasurement", electricalMeasurement_clusterInfo);
     Map<String, CommandInfo> ethernetNetworkDiagnostics_ClusterCommandInfo = new HashMap<>();
@@ -12653,13 +13337,20 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> ethernetNetworkDiagnostics_resetCounts_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            electricalMeasurementClusterCommandInfo);
+    clusterMap.put("electricalMeasurement", electricalMeasurementClusterInfo);
+    Map<String, CommandInfo> ethernetNetworkDiagnosticsClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> ethernetNetworkDiagnosticsresetCountsCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter ethernetNetworkDiagnostics_resetCounts_commandParameter =
+    CommandParameter ethernetNetworkDiagnosticsresetCountsCommandParameter =
         new CommandParameter(
             "EthernetNetworkDiagnostics", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo ethernetNetworkDiagnostics_resetCounts_CommandInfo =
+    CommandInfo ethernetNetworkDiagnosticsresetCountsCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12670,28 +13361,29 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            ethernetNetworkDiagnostics_resetCounts_commandParams);
-    ethernetNetworkDiagnostics_ClusterCommandInfo.put(
-        "resetCounts", ethernetNetworkDiagnostics_resetCounts_CommandInfo);
+            ethernetNetworkDiagnosticsresetCountsCommandParams);
+    ethernetNetworkDiagnosticsClusterCommandInfo.put(
+        "resetCounts", ethernetNetworkDiagnosticsresetCountsCommandInfo);
     // Populate cluster
-    ClusterInfo ethernetNetworkDiagnostics_clusterInfo =
+    ClusterInfo ethernetNetworkDiagnosticsClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) ->
                 new ChipClusters.EthernetNetworkDiagnosticsCluster(ptr, endpointId),
-            ethernetNetworkDiagnostics_ClusterCommandInfo);
-    clusterMap.put("ethernetNetworkDiagnostics", ethernetNetworkDiagnostics_clusterInfo);
-    Map<String, CommandInfo> fixedLabel_ClusterCommandInfo = new HashMap<>();
+            ethernetNetworkDiagnosticsClusterCommandInfo);
+    clusterMap.put("ethernetNetworkDiagnostics", ethernetNetworkDiagnosticsClusterInfo);
+    Map<String, CommandInfo> fixedLabelClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo fixedLabel_clusterInfo =
+    ClusterInfo fixedLabelClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.FixedLabelCluster(ptr, endpointId),
-            fixedLabel_ClusterCommandInfo);
-    clusterMap.put("fixedLabel", fixedLabel_clusterInfo);
-    Map<String, CommandInfo> flowMeasurement_ClusterCommandInfo = new HashMap<>();
+            fixedLabelClusterCommandInfo);
+    clusterMap.put("fixedLabel", fixedLabelClusterInfo);
+    Map<String, CommandInfo> flowMeasurementClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo flowMeasurement_clusterInfo =
+    ClusterInfo flowMeasurementClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.FlowMeasurementCluster(ptr, endpointId),
+<<<<<<< HEAD
             flowMeasurement_ClusterCommandInfo);
     clusterMap.put("flowMeasurement", flowMeasurement_clusterInfo);
     Map<String, CommandInfo> generalCommissioning_ClusterCommandInfo = new HashMap<>();
@@ -12714,30 +13406,41 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> generalCommissioning_armFailSafe_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            flowMeasurementClusterCommandInfo);
+    clusterMap.put("flowMeasurement", flowMeasurementClusterInfo);
+    Map<String, CommandInfo> generalCommissioningClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> generalCommissioningarmFailSafeCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter generalCommissioning_armFailSafe_commandParameter =
+    CommandParameter generalCommissioningarmFailSafeCommandParameter =
         new CommandParameter(
             "GeneralCommissioning",
             ChipClusters.GeneralCommissioningCluster.ArmFailSafeResponseCallback.class);
-    CommandParameter generalCommissioning_armFailSafe_expiryLengthSeconds_commandParameter =
+    CommandParameter generalCommissioningarmFailSafeexpiryLengthSecondsCommandParameter =
         new CommandParameter("expiryLengthSeconds", int.class);
-    generalCommissioning_armFailSafe_commandParams.put(
-        "expiryLengthSeconds",
-        generalCommissioning_armFailSafe_expiryLengthSeconds_commandParameter);
+    generalCommissioningarmFailSafeCommandParams.put(
+        "expiryLengthSeconds", generalCommissioningarmFailSafeexpiryLengthSecondsCommandParameter);
 
-    CommandParameter generalCommissioning_armFailSafe_breadcrumb_commandParameter =
+    CommandParameter generalCommissioningarmFailSafebreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    generalCommissioning_armFailSafe_commandParams.put(
-        "breadcrumb", generalCommissioning_armFailSafe_breadcrumb_commandParameter);
+    generalCommissioningarmFailSafeCommandParams.put(
+        "breadcrumb", generalCommissioningarmFailSafebreadcrumbCommandParameter);
 
-    CommandParameter generalCommissioning_armFailSafe_timeoutMs_commandParameter =
+    CommandParameter generalCommissioningarmFailSafetimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     generalCommissioning_armFailSafe_commandParams.put(
         "timeoutMs", generalCommissioning_armFailSafe_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    generalCommissioningarmFailSafeCommandParams.put(
+        "timeoutMs", generalCommissioningarmFailSafetimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo generalCommissioning_armFailSafe_CommandInfo =
+    CommandInfo generalCommissioningarmFailSafeCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12752,6 +13455,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             generalCommissioning_armFailSafe_commandParams);
     generalCommissioning_ClusterCommandInfo.put(
@@ -12764,14 +13468,22 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> generalCommissioning_commissioningComplete_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedArmFailSafeResponseCallback(),
+            generalCommissioningarmFailSafeCommandParams);
+    generalCommissioningClusterCommandInfo.put(
+        "armFailSafe", generalCommissioningarmFailSafeCommandInfo);
+    Map<String, CommandParameter> generalCommissioningcommissioningCompleteCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter generalCommissioning_commissioningComplete_commandParameter =
+    CommandParameter generalCommissioningcommissioningCompleteCommandParameter =
         new CommandParameter(
             "GeneralCommissioning",
             ChipClusters.GeneralCommissioningCluster.CommissioningCompleteResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo generalCommissioning_commissioningComplete_CommandInfo =
+    CommandInfo generalCommissioningcommissioningCompleteCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12784,6 +13496,7 @@ public class ClusterInfoMapping {
                           callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             generalCommissioning_commissioningComplete_commandParams);
     generalCommissioning_ClusterCommandInfo.put(
@@ -12815,34 +13528,47 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> generalCommissioning_setRegulatoryConfig_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedCommissioningCompleteResponseCallback(),
+            generalCommissioningcommissioningCompleteCommandParams);
+    generalCommissioningClusterCommandInfo.put(
+        "commissioningComplete", generalCommissioningcommissioningCompleteCommandInfo);
+    Map<String, CommandParameter> generalCommissioningsetRegulatoryConfigCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter generalCommissioning_setRegulatoryConfig_commandParameter =
+    CommandParameter generalCommissioningsetRegulatoryConfigCommandParameter =
         new CommandParameter(
             "GeneralCommissioning",
             ChipClusters.GeneralCommissioningCluster.SetRegulatoryConfigResponseCallback.class);
-    CommandParameter generalCommissioning_setRegulatoryConfig_location_commandParameter =
+    CommandParameter generalCommissioningsetRegulatoryConfiglocationCommandParameter =
         new CommandParameter("location", int.class);
-    generalCommissioning_setRegulatoryConfig_commandParams.put(
-        "location", generalCommissioning_setRegulatoryConfig_location_commandParameter);
+    generalCommissioningsetRegulatoryConfigCommandParams.put(
+        "location", generalCommissioningsetRegulatoryConfiglocationCommandParameter);
 
-    CommandParameter generalCommissioning_setRegulatoryConfig_countryCode_commandParameter =
+    CommandParameter generalCommissioningsetRegulatoryConfigcountryCodeCommandParameter =
         new CommandParameter("countryCode", String.class);
-    generalCommissioning_setRegulatoryConfig_commandParams.put(
-        "countryCode", generalCommissioning_setRegulatoryConfig_countryCode_commandParameter);
+    generalCommissioningsetRegulatoryConfigCommandParams.put(
+        "countryCode", generalCommissioningsetRegulatoryConfigcountryCodeCommandParameter);
 
-    CommandParameter generalCommissioning_setRegulatoryConfig_breadcrumb_commandParameter =
+    CommandParameter generalCommissioningsetRegulatoryConfigbreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    generalCommissioning_setRegulatoryConfig_commandParams.put(
-        "breadcrumb", generalCommissioning_setRegulatoryConfig_breadcrumb_commandParameter);
+    generalCommissioningsetRegulatoryConfigCommandParams.put(
+        "breadcrumb", generalCommissioningsetRegulatoryConfigbreadcrumbCommandParameter);
 
-    CommandParameter generalCommissioning_setRegulatoryConfig_timeoutMs_commandParameter =
+    CommandParameter generalCommissioningsetRegulatoryConfigtimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     generalCommissioning_setRegulatoryConfig_commandParams.put(
         "timeoutMs", generalCommissioning_setRegulatoryConfig_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    generalCommissioningsetRegulatoryConfigCommandParams.put(
+        "timeoutMs", generalCommissioningsetRegulatoryConfigtimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo generalCommissioning_setRegulatoryConfig_CommandInfo =
+    CommandInfo generalCommissioningsetRegulatoryConfigCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12858,28 +13584,29 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            generalCommissioning_setRegulatoryConfig_commandParams);
-    generalCommissioning_ClusterCommandInfo.put(
-        "setRegulatoryConfig", generalCommissioning_setRegulatoryConfig_CommandInfo);
+            () -> new DelegatedSetRegulatoryConfigResponseCallback(),
+            generalCommissioningsetRegulatoryConfigCommandParams);
+    generalCommissioningClusterCommandInfo.put(
+        "setRegulatoryConfig", generalCommissioningsetRegulatoryConfigCommandInfo);
     // Populate cluster
-    ClusterInfo generalCommissioning_clusterInfo =
+    ClusterInfo generalCommissioningClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.GeneralCommissioningCluster(ptr, endpointId),
-            generalCommissioning_ClusterCommandInfo);
-    clusterMap.put("generalCommissioning", generalCommissioning_clusterInfo);
-    Map<String, CommandInfo> generalDiagnostics_ClusterCommandInfo = new HashMap<>();
+            generalCommissioningClusterCommandInfo);
+    clusterMap.put("generalCommissioning", generalCommissioningClusterInfo);
+    Map<String, CommandInfo> generalDiagnosticsClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo generalDiagnostics_clusterInfo =
+    ClusterInfo generalDiagnosticsClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.GeneralDiagnosticsCluster(ptr, endpointId),
-            generalDiagnostics_ClusterCommandInfo);
-    clusterMap.put("generalDiagnostics", generalDiagnostics_clusterInfo);
-    Map<String, CommandInfo> groupKeyManagement_ClusterCommandInfo = new HashMap<>();
+            generalDiagnosticsClusterCommandInfo);
+    clusterMap.put("generalDiagnostics", generalDiagnosticsClusterInfo);
+    Map<String, CommandInfo> groupKeyManagementClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo groupKeyManagement_clusterInfo =
+    ClusterInfo groupKeyManagementClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.GroupKeyManagementCluster(ptr, endpointId),
+<<<<<<< HEAD
             groupKeyManagement_ClusterCommandInfo);
     clusterMap.put("groupKeyManagement", groupKeyManagement_clusterInfo);
     Map<String, CommandInfo> groups_ClusterCommandInfo = new HashMap<>();
@@ -12896,20 +13623,31 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> groups_addGroup_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            groupKeyManagementClusterCommandInfo);
+    clusterMap.put("groupKeyManagement", groupKeyManagementClusterInfo);
+    Map<String, CommandInfo> groupsClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> groupsaddGroupCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter groups_addGroup_commandParameter =
+    CommandParameter groupsaddGroupCommandParameter =
         new CommandParameter("Groups", ChipClusters.GroupsCluster.AddGroupResponseCallback.class);
-    CommandParameter groups_addGroup_groupId_commandParameter =
+    CommandParameter groupsaddGroupgroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
-    groups_addGroup_commandParams.put("groupId", groups_addGroup_groupId_commandParameter);
+    groupsaddGroupCommandParams.put("groupId", groupsaddGroupgroupIdCommandParameter);
 
-    CommandParameter groups_addGroup_groupName_commandParameter =
+    CommandParameter groupsaddGroupgroupNameCommandParameter =
         new CommandParameter("groupName", String.class);
+<<<<<<< HEAD
     groups_addGroup_commandParams.put("groupName", groups_addGroup_groupName_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    groupsaddGroupCommandParams.put("groupName", groupsaddGroupgroupNameCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo groups_addGroup_CommandInfo =
+    CommandInfo groupsaddGroupCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12922,6 +13660,7 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("groupName"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             groups_addGroup_commandParams);
     groups_ClusterCommandInfo.put("addGroup", groups_addGroup_CommandInfo);
@@ -12940,22 +13679,34 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> groups_addGroupIfIdentifying_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedAddGroupResponseCallback(),
+            groupsaddGroupCommandParams);
+    groupsClusterCommandInfo.put("addGroup", groupsaddGroupCommandInfo);
+    Map<String, CommandParameter> groupsaddGroupIfIdentifyingCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter groups_addGroupIfIdentifying_commandParameter =
+    CommandParameter groupsaddGroupIfIdentifyingCommandParameter =
         new CommandParameter("Groups", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter groups_addGroupIfIdentifying_groupId_commandParameter =
+    CommandParameter groupsaddGroupIfIdentifyinggroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
-    groups_addGroupIfIdentifying_commandParams.put(
-        "groupId", groups_addGroupIfIdentifying_groupId_commandParameter);
+    groupsaddGroupIfIdentifyingCommandParams.put(
+        "groupId", groupsaddGroupIfIdentifyinggroupIdCommandParameter);
 
-    CommandParameter groups_addGroupIfIdentifying_groupName_commandParameter =
+    CommandParameter groupsaddGroupIfIdentifyinggroupNameCommandParameter =
         new CommandParameter("groupName", String.class);
+<<<<<<< HEAD
     groups_addGroupIfIdentifying_commandParams.put(
         "groupName", groups_addGroupIfIdentifying_groupName_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    groupsaddGroupIfIdentifyingCommandParams.put(
+        "groupName", groupsaddGroupIfIdentifyinggroupNameCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo groups_addGroupIfIdentifying_CommandInfo =
+    CommandInfo groupsaddGroupIfIdentifyingCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -12969,6 +13720,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             groups_addGroupIfIdentifying_commandParams);
     groups_ClusterCommandInfo.put(
         "addGroupIfIdentifying", groups_addGroupIfIdentifying_CommandInfo);
@@ -12986,23 +13738,34 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> groups_getGroupMembership_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            groupsaddGroupIfIdentifyingCommandParams);
+    groupsClusterCommandInfo.put("addGroupIfIdentifying", groupsaddGroupIfIdentifyingCommandInfo);
+    Map<String, CommandParameter> groupsgetGroupMembershipCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter groups_getGroupMembership_commandParameter =
+    CommandParameter groupsgetGroupMembershipCommandParameter =
         new CommandParameter(
             "Groups", ChipClusters.GroupsCluster.GetGroupMembershipResponseCallback.class);
-    CommandParameter groups_getGroupMembership_groupCount_commandParameter =
+    CommandParameter groupsgetGroupMembershipgroupCountCommandParameter =
         new CommandParameter("groupCount", int.class);
-    groups_getGroupMembership_commandParams.put(
-        "groupCount", groups_getGroupMembership_groupCount_commandParameter);
+    groupsgetGroupMembershipCommandParams.put(
+        "groupCount", groupsgetGroupMembershipgroupCountCommandParameter);
 
-    CommandParameter groups_getGroupMembership_groupList_commandParameter =
+    CommandParameter groupsgetGroupMembershipgroupListCommandParameter =
         new CommandParameter("groupList", int.class);
+<<<<<<< HEAD
     groups_getGroupMembership_commandParams.put(
         "groupList", groups_getGroupMembership_groupList_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    groupsgetGroupMembershipCommandParams.put(
+        "groupList", groupsgetGroupMembershipgroupListCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo groups_getGroupMembership_CommandInfo =
+    CommandInfo groupsgetGroupMembershipCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13015,6 +13778,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("groupList"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             groups_getGroupMembership_commandParams);
     groups_ClusterCommandInfo.put("getGroupMembership", groups_getGroupMembership_CommandInfo);
@@ -13025,12 +13789,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> groups_removeAllGroups_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetGroupMembershipResponseCallback(),
+            groupsgetGroupMembershipCommandParams);
+    groupsClusterCommandInfo.put("getGroupMembership", groupsgetGroupMembershipCommandInfo);
+    Map<String, CommandParameter> groupsremoveAllGroupsCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter groups_removeAllGroups_commandParameter =
+    CommandParameter groupsremoveAllGroupsCommandParameter =
         new CommandParameter("Groups", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo groups_removeAllGroups_CommandInfo =
+    CommandInfo groupsremoveAllGroupsCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13041,6 +13812,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             groups_removeAllGroups_commandParams);
     groups_ClusterCommandInfo.put("removeAllGroups", groups_removeAllGroups_CommandInfo);
 <<<<<<< HEAD
@@ -13053,17 +13825,27 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> groups_removeGroup_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            groupsremoveAllGroupsCommandParams);
+    groupsClusterCommandInfo.put("removeAllGroups", groupsremoveAllGroupsCommandInfo);
+    Map<String, CommandParameter> groupsremoveGroupCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter groups_removeGroup_commandParameter =
+    CommandParameter groupsremoveGroupCommandParameter =
         new CommandParameter(
             "Groups", ChipClusters.GroupsCluster.RemoveGroupResponseCallback.class);
-    CommandParameter groups_removeGroup_groupId_commandParameter =
+    CommandParameter groupsremoveGroupgroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
+<<<<<<< HEAD
     groups_removeGroup_commandParams.put("groupId", groups_removeGroup_groupId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    groupsremoveGroupCommandParams.put("groupId", groupsremoveGroupgroupIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo groups_removeGroup_CommandInfo =
+    CommandInfo groupsremoveGroupCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13075,6 +13857,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("groupId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             groups_removeGroup_commandParams);
     groups_ClusterCommandInfo.put("removeGroup", groups_removeGroup_CommandInfo);
@@ -13088,16 +13871,27 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> groups_viewGroup_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedRemoveGroupResponseCallback(),
+            groupsremoveGroupCommandParams);
+    groupsClusterCommandInfo.put("removeGroup", groupsremoveGroupCommandInfo);
+    Map<String, CommandParameter> groupsviewGroupCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter groups_viewGroup_commandParameter =
+    CommandParameter groupsviewGroupCommandParameter =
         new CommandParameter("Groups", ChipClusters.GroupsCluster.ViewGroupResponseCallback.class);
-    CommandParameter groups_viewGroup_groupId_commandParameter =
+    CommandParameter groupsviewGroupgroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
+<<<<<<< HEAD
     groups_viewGroup_commandParams.put("groupId", groups_viewGroup_groupId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    groupsviewGroupCommandParams.put("groupId", groupsviewGroupgroupIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo groups_viewGroup_CommandInfo =
+    CommandInfo groupsviewGroupCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13109,13 +13903,14 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("groupId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            groups_viewGroup_commandParams);
-    groups_ClusterCommandInfo.put("viewGroup", groups_viewGroup_CommandInfo);
+            () -> new DelegatedViewGroupResponseCallback(),
+            groupsviewGroupCommandParams);
+    groupsClusterCommandInfo.put("viewGroup", groupsviewGroupCommandInfo);
     // Populate cluster
-    ClusterInfo groups_clusterInfo =
+    ClusterInfo groupsClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.GroupsCluster(ptr, endpointId),
+<<<<<<< HEAD
             groups_ClusterCommandInfo);
     clusterMap.put("groups", groups_clusterInfo);
     Map<String, CommandInfo> identify_ClusterCommandInfo = new HashMap<>();
@@ -13129,17 +13924,28 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> identify_identify_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            groupsClusterCommandInfo);
+    clusterMap.put("groups", groupsClusterInfo);
+    Map<String, CommandInfo> identifyClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> identifyidentifyCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter identify_identify_commandParameter =
+    CommandParameter identifyidentifyCommandParameter =
         new CommandParameter("Identify", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter identify_identify_identifyTime_commandParameter =
+    CommandParameter identifyidentifyidentifyTimeCommandParameter =
         new CommandParameter("identifyTime", int.class);
+<<<<<<< HEAD
     identify_identify_commandParams.put(
         "identifyTime", identify_identify_identifyTime_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    identifyidentifyCommandParams.put("identifyTime", identifyidentifyidentifyTimeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo identify_identify_CommandInfo =
+    CommandInfo identifyidentifyCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13152,6 +13958,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             identify_identify_commandParams);
     identify_ClusterCommandInfo.put("identify", identify_identify_CommandInfo);
 <<<<<<< HEAD
@@ -13161,13 +13968,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> identify_identifyQuery_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            identifyidentifyCommandParams);
+    identifyClusterCommandInfo.put("identify", identifyidentifyCommandInfo);
+    Map<String, CommandParameter> identifyidentifyQueryCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter identify_identifyQuery_commandParameter =
+    CommandParameter identifyidentifyQueryCommandParameter =
         new CommandParameter(
             "Identify", ChipClusters.IdentifyCluster.IdentifyQueryResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo identify_identifyQuery_CommandInfo =
+    CommandInfo identifyidentifyQueryCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13178,6 +13991,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.IdentifyCluster.IdentifyQueryResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             identify_identifyQuery_commandParams);
     identify_ClusterCommandInfo.put("identifyQuery", identify_identifyQuery_CommandInfo);
@@ -13195,22 +14009,34 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> identify_triggerEffect_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedIdentifyQueryResponseCallback(),
+            identifyidentifyQueryCommandParams);
+    identifyClusterCommandInfo.put("identifyQuery", identifyidentifyQueryCommandInfo);
+    Map<String, CommandParameter> identifytriggerEffectCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter identify_triggerEffect_commandParameter =
+    CommandParameter identifytriggerEffectCommandParameter =
         new CommandParameter("Identify", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter identify_triggerEffect_effectIdentifier_commandParameter =
+    CommandParameter identifytriggerEffecteffectIdentifierCommandParameter =
         new CommandParameter("effectIdentifier", int.class);
-    identify_triggerEffect_commandParams.put(
-        "effectIdentifier", identify_triggerEffect_effectIdentifier_commandParameter);
+    identifytriggerEffectCommandParams.put(
+        "effectIdentifier", identifytriggerEffecteffectIdentifierCommandParameter);
 
-    CommandParameter identify_triggerEffect_effectVariant_commandParameter =
+    CommandParameter identifytriggerEffecteffectVariantCommandParameter =
         new CommandParameter("effectVariant", int.class);
+<<<<<<< HEAD
     identify_triggerEffect_commandParams.put(
         "effectVariant", identify_triggerEffect_effectVariant_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    identifytriggerEffectCommandParams.put(
+        "effectVariant", identifytriggerEffecteffectVariantCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo identify_triggerEffect_CommandInfo =
+    CommandInfo identifytriggerEffectCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13224,12 +14050,13 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            identify_triggerEffect_commandParams);
-    identify_ClusterCommandInfo.put("triggerEffect", identify_triggerEffect_CommandInfo);
+            identifytriggerEffectCommandParams);
+    identifyClusterCommandInfo.put("triggerEffect", identifytriggerEffectCommandInfo);
     // Populate cluster
-    ClusterInfo identify_clusterInfo =
+    ClusterInfo identifyClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.IdentifyCluster(ptr, endpointId),
+<<<<<<< HEAD
             identify_ClusterCommandInfo);
     clusterMap.put("identify", identify_clusterInfo);
     Map<String, CommandInfo> keypadInput_ClusterCommandInfo = new HashMap<>();
@@ -13242,17 +14069,28 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> keypadInput_sendKey_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            identifyClusterCommandInfo);
+    clusterMap.put("identify", identifyClusterInfo);
+    Map<String, CommandInfo> keypadInputClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> keypadInputsendKeyCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter keypadInput_sendKey_commandParameter =
+    CommandParameter keypadInputsendKeyCommandParameter =
         new CommandParameter(
             "KeypadInput", ChipClusters.KeypadInputCluster.SendKeyResponseCallback.class);
-    CommandParameter keypadInput_sendKey_keyCode_commandParameter =
+    CommandParameter keypadInputsendKeykeyCodeCommandParameter =
         new CommandParameter("keyCode", int.class);
+<<<<<<< HEAD
     keypadInput_sendKey_commandParams.put("keyCode", keypadInput_sendKey_keyCode_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    keypadInputsendKeyCommandParams.put("keyCode", keypadInputsendKeykeyCodeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo keypadInput_sendKey_CommandInfo =
+    CommandInfo keypadInputsendKeyCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13264,13 +14102,14 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("keyCode"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            keypadInput_sendKey_commandParams);
-    keypadInput_ClusterCommandInfo.put("sendKey", keypadInput_sendKey_CommandInfo);
+            () -> new DelegatedSendKeyResponseCallback(),
+            keypadInputsendKeyCommandParams);
+    keypadInputClusterCommandInfo.put("sendKey", keypadInputsendKeyCommandInfo);
     // Populate cluster
-    ClusterInfo keypadInput_clusterInfo =
+    ClusterInfo keypadInputClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.KeypadInputCluster(ptr, endpointId),
+<<<<<<< HEAD
             keypadInput_ClusterCommandInfo);
     clusterMap.put("keypadInput", keypadInput_clusterInfo);
     Map<String, CommandInfo> levelControl_ClusterCommandInfo = new HashMap<>();
@@ -13294,30 +14133,40 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> levelControl_move_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            keypadInputClusterCommandInfo);
+    clusterMap.put("keypadInput", keypadInputClusterInfo);
+    Map<String, CommandInfo> levelControlClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> levelControlmoveCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter levelControl_move_commandParameter =
+    CommandParameter levelControlmoveCommandParameter =
         new CommandParameter("LevelControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter levelControl_move_moveMode_commandParameter =
+    CommandParameter levelControlmovemoveModeCommandParameter =
         new CommandParameter("moveMode", int.class);
-    levelControl_move_commandParams.put("moveMode", levelControl_move_moveMode_commandParameter);
+    levelControlmoveCommandParams.put("moveMode", levelControlmovemoveModeCommandParameter);
 
-    CommandParameter levelControl_move_rate_commandParameter =
-        new CommandParameter("rate", int.class);
-    levelControl_move_commandParams.put("rate", levelControl_move_rate_commandParameter);
+    CommandParameter levelControlmoverateCommandParameter = new CommandParameter("rate", int.class);
+    levelControlmoveCommandParams.put("rate", levelControlmoverateCommandParameter);
 
-    CommandParameter levelControl_move_optionMask_commandParameter =
+    CommandParameter levelControlmoveoptionMaskCommandParameter =
         new CommandParameter("optionMask", int.class);
-    levelControl_move_commandParams.put(
-        "optionMask", levelControl_move_optionMask_commandParameter);
+    levelControlmoveCommandParams.put("optionMask", levelControlmoveoptionMaskCommandParameter);
 
-    CommandParameter levelControl_move_optionOverride_commandParameter =
+    CommandParameter levelControlmoveoptionOverrideCommandParameter =
         new CommandParameter("optionOverride", int.class);
+<<<<<<< HEAD
     levelControl_move_commandParams.put(
         "optionOverride", levelControl_move_optionOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    levelControlmoveCommandParams.put(
+        "optionOverride", levelControlmoveoptionOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo levelControl_move_CommandInfo =
+    CommandInfo levelControlmoveCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13333,6 +14182,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             levelControl_move_commandParams);
     levelControl_ClusterCommandInfo.put("move", levelControl_move_CommandInfo);
 <<<<<<< HEAD
@@ -13356,32 +14206,42 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> levelControl_moveToLevel_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            levelControlmoveCommandParams);
+    levelControlClusterCommandInfo.put("move", levelControlmoveCommandInfo);
+    Map<String, CommandParameter> levelControlmoveToLevelCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter levelControl_moveToLevel_commandParameter =
+    CommandParameter levelControlmoveToLevelCommandParameter =
         new CommandParameter("LevelControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter levelControl_moveToLevel_level_commandParameter =
+    CommandParameter levelControlmoveToLevellevelCommandParameter =
         new CommandParameter("level", int.class);
-    levelControl_moveToLevel_commandParams.put(
-        "level", levelControl_moveToLevel_level_commandParameter);
+    levelControlmoveToLevelCommandParams.put("level", levelControlmoveToLevellevelCommandParameter);
 
-    CommandParameter levelControl_moveToLevel_transitionTime_commandParameter =
+    CommandParameter levelControlmoveToLeveltransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    levelControl_moveToLevel_commandParams.put(
-        "transitionTime", levelControl_moveToLevel_transitionTime_commandParameter);
+    levelControlmoveToLevelCommandParams.put(
+        "transitionTime", levelControlmoveToLeveltransitionTimeCommandParameter);
 
-    CommandParameter levelControl_moveToLevel_optionMask_commandParameter =
+    CommandParameter levelControlmoveToLeveloptionMaskCommandParameter =
         new CommandParameter("optionMask", int.class);
-    levelControl_moveToLevel_commandParams.put(
-        "optionMask", levelControl_moveToLevel_optionMask_commandParameter);
+    levelControlmoveToLevelCommandParams.put(
+        "optionMask", levelControlmoveToLeveloptionMaskCommandParameter);
 
-    CommandParameter levelControl_moveToLevel_optionOverride_commandParameter =
+    CommandParameter levelControlmoveToLeveloptionOverrideCommandParameter =
         new CommandParameter("optionOverride", int.class);
+<<<<<<< HEAD
     levelControl_moveToLevel_commandParams.put(
         "optionOverride", levelControl_moveToLevel_optionOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    levelControlmoveToLevelCommandParams.put(
+        "optionOverride", levelControlmoveToLeveloptionOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo levelControl_moveToLevel_CommandInfo =
+    CommandInfo levelControlmoveToLevelCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13397,6 +14257,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             levelControl_moveToLevel_commandParams);
     levelControl_ClusterCommandInfo.put("moveToLevel", levelControl_moveToLevel_CommandInfo);
 <<<<<<< HEAD
@@ -13415,22 +14276,33 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> levelControl_moveToLevelWithOnOff_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            levelControlmoveToLevelCommandParams);
+    levelControlClusterCommandInfo.put("moveToLevel", levelControlmoveToLevelCommandInfo);
+    Map<String, CommandParameter> levelControlmoveToLevelWithOnOffCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter levelControl_moveToLevelWithOnOff_commandParameter =
+    CommandParameter levelControlmoveToLevelWithOnOffCommandParameter =
         new CommandParameter("LevelControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter levelControl_moveToLevelWithOnOff_level_commandParameter =
+    CommandParameter levelControlmoveToLevelWithOnOfflevelCommandParameter =
         new CommandParameter("level", int.class);
-    levelControl_moveToLevelWithOnOff_commandParams.put(
-        "level", levelControl_moveToLevelWithOnOff_level_commandParameter);
+    levelControlmoveToLevelWithOnOffCommandParams.put(
+        "level", levelControlmoveToLevelWithOnOfflevelCommandParameter);
 
-    CommandParameter levelControl_moveToLevelWithOnOff_transitionTime_commandParameter =
+    CommandParameter levelControlmoveToLevelWithOnOfftransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
+<<<<<<< HEAD
     levelControl_moveToLevelWithOnOff_commandParams.put(
         "transitionTime", levelControl_moveToLevelWithOnOff_transitionTime_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    levelControlmoveToLevelWithOnOffCommandParams.put(
+        "transitionTime", levelControlmoveToLevelWithOnOfftransitionTimeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo levelControl_moveToLevelWithOnOff_CommandInfo =
+    CommandInfo levelControlmoveToLevelWithOnOffCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13444,6 +14316,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             levelControl_moveToLevelWithOnOff_commandParams);
     levelControl_ClusterCommandInfo.put(
         "moveToLevelWithOnOff", levelControl_moveToLevelWithOnOff_CommandInfo);
@@ -13460,22 +14333,34 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> levelControl_moveWithOnOff_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            levelControlmoveToLevelWithOnOffCommandParams);
+    levelControlClusterCommandInfo.put(
+        "moveToLevelWithOnOff", levelControlmoveToLevelWithOnOffCommandInfo);
+    Map<String, CommandParameter> levelControlmoveWithOnOffCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter levelControl_moveWithOnOff_commandParameter =
+    CommandParameter levelControlmoveWithOnOffCommandParameter =
         new CommandParameter("LevelControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter levelControl_moveWithOnOff_moveMode_commandParameter =
+    CommandParameter levelControlmoveWithOnOffmoveModeCommandParameter =
         new CommandParameter("moveMode", int.class);
-    levelControl_moveWithOnOff_commandParams.put(
-        "moveMode", levelControl_moveWithOnOff_moveMode_commandParameter);
+    levelControlmoveWithOnOffCommandParams.put(
+        "moveMode", levelControlmoveWithOnOffmoveModeCommandParameter);
 
-    CommandParameter levelControl_moveWithOnOff_rate_commandParameter =
+    CommandParameter levelControlmoveWithOnOffrateCommandParameter =
         new CommandParameter("rate", int.class);
+<<<<<<< HEAD
     levelControl_moveWithOnOff_commandParams.put(
         "rate", levelControl_moveWithOnOff_rate_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    levelControlmoveWithOnOffCommandParams.put(
+        "rate", levelControlmoveWithOnOffrateCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo levelControl_moveWithOnOff_CommandInfo =
+    CommandInfo levelControlmoveWithOnOffCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13489,6 +14374,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             levelControl_moveWithOnOff_commandParams);
     levelControl_ClusterCommandInfo.put("moveWithOnOff", levelControl_moveWithOnOff_CommandInfo);
 <<<<<<< HEAD
@@ -13515,35 +14401,45 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> levelControl_step_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            levelControlmoveWithOnOffCommandParams);
+    levelControlClusterCommandInfo.put("moveWithOnOff", levelControlmoveWithOnOffCommandInfo);
+    Map<String, CommandParameter> levelControlstepCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter levelControl_step_commandParameter =
+    CommandParameter levelControlstepCommandParameter =
         new CommandParameter("LevelControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter levelControl_step_stepMode_commandParameter =
+    CommandParameter levelControlstepstepModeCommandParameter =
         new CommandParameter("stepMode", int.class);
-    levelControl_step_commandParams.put("stepMode", levelControl_step_stepMode_commandParameter);
+    levelControlstepCommandParams.put("stepMode", levelControlstepstepModeCommandParameter);
 
-    CommandParameter levelControl_step_stepSize_commandParameter =
+    CommandParameter levelControlstepstepSizeCommandParameter =
         new CommandParameter("stepSize", int.class);
-    levelControl_step_commandParams.put("stepSize", levelControl_step_stepSize_commandParameter);
+    levelControlstepCommandParams.put("stepSize", levelControlstepstepSizeCommandParameter);
 
-    CommandParameter levelControl_step_transitionTime_commandParameter =
+    CommandParameter levelControlsteptransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    levelControl_step_commandParams.put(
-        "transitionTime", levelControl_step_transitionTime_commandParameter);
+    levelControlstepCommandParams.put(
+        "transitionTime", levelControlsteptransitionTimeCommandParameter);
 
-    CommandParameter levelControl_step_optionMask_commandParameter =
+    CommandParameter levelControlstepoptionMaskCommandParameter =
         new CommandParameter("optionMask", int.class);
-    levelControl_step_commandParams.put(
-        "optionMask", levelControl_step_optionMask_commandParameter);
+    levelControlstepCommandParams.put("optionMask", levelControlstepoptionMaskCommandParameter);
 
-    CommandParameter levelControl_step_optionOverride_commandParameter =
+    CommandParameter levelControlstepoptionOverrideCommandParameter =
         new CommandParameter("optionOverride", int.class);
+<<<<<<< HEAD
     levelControl_step_commandParams.put(
         "optionOverride", levelControl_step_optionOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    levelControlstepCommandParams.put(
+        "optionOverride", levelControlstepoptionOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo levelControl_step_CommandInfo =
+    CommandInfo levelControlstepCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13560,6 +14456,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             levelControl_step_commandParams);
     levelControl_ClusterCommandInfo.put("step", levelControl_step_CommandInfo);
 <<<<<<< HEAD
@@ -13580,27 +14477,38 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> levelControl_stepWithOnOff_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            levelControlstepCommandParams);
+    levelControlClusterCommandInfo.put("step", levelControlstepCommandInfo);
+    Map<String, CommandParameter> levelControlstepWithOnOffCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter levelControl_stepWithOnOff_commandParameter =
+    CommandParameter levelControlstepWithOnOffCommandParameter =
         new CommandParameter("LevelControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter levelControl_stepWithOnOff_stepMode_commandParameter =
+    CommandParameter levelControlstepWithOnOffstepModeCommandParameter =
         new CommandParameter("stepMode", int.class);
-    levelControl_stepWithOnOff_commandParams.put(
-        "stepMode", levelControl_stepWithOnOff_stepMode_commandParameter);
+    levelControlstepWithOnOffCommandParams.put(
+        "stepMode", levelControlstepWithOnOffstepModeCommandParameter);
 
-    CommandParameter levelControl_stepWithOnOff_stepSize_commandParameter =
+    CommandParameter levelControlstepWithOnOffstepSizeCommandParameter =
         new CommandParameter("stepSize", int.class);
-    levelControl_stepWithOnOff_commandParams.put(
-        "stepSize", levelControl_stepWithOnOff_stepSize_commandParameter);
+    levelControlstepWithOnOffCommandParams.put(
+        "stepSize", levelControlstepWithOnOffstepSizeCommandParameter);
 
-    CommandParameter levelControl_stepWithOnOff_transitionTime_commandParameter =
+    CommandParameter levelControlstepWithOnOfftransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
+<<<<<<< HEAD
     levelControl_stepWithOnOff_commandParams.put(
         "transitionTime", levelControl_stepWithOnOff_transitionTime_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    levelControlstepWithOnOffCommandParams.put(
+        "transitionTime", levelControlstepWithOnOfftransitionTimeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo levelControl_stepWithOnOff_CommandInfo =
+    CommandInfo levelControlstepWithOnOffCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13615,6 +14523,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             levelControl_stepWithOnOff_commandParams);
     levelControl_ClusterCommandInfo.put("stepWithOnOff", levelControl_stepWithOnOff_CommandInfo);
 <<<<<<< HEAD
@@ -13631,22 +14540,32 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> levelControl_stop_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            levelControlstepWithOnOffCommandParams);
+    levelControlClusterCommandInfo.put("stepWithOnOff", levelControlstepWithOnOffCommandInfo);
+    Map<String, CommandParameter> levelControlstopCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter levelControl_stop_commandParameter =
+    CommandParameter levelControlstopCommandParameter =
         new CommandParameter("LevelControl", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter levelControl_stop_optionMask_commandParameter =
+    CommandParameter levelControlstopoptionMaskCommandParameter =
         new CommandParameter("optionMask", int.class);
-    levelControl_stop_commandParams.put(
-        "optionMask", levelControl_stop_optionMask_commandParameter);
+    levelControlstopCommandParams.put("optionMask", levelControlstopoptionMaskCommandParameter);
 
-    CommandParameter levelControl_stop_optionOverride_commandParameter =
+    CommandParameter levelControlstopoptionOverrideCommandParameter =
         new CommandParameter("optionOverride", int.class);
+<<<<<<< HEAD
     levelControl_stop_commandParams.put(
         "optionOverride", levelControl_stop_optionOverride_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    levelControlstopCommandParams.put(
+        "optionOverride", levelControlstopoptionOverrideCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo levelControl_stop_CommandInfo =
+    CommandInfo levelControlstopCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13660,6 +14579,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             levelControl_stop_commandParams);
     levelControl_ClusterCommandInfo.put("stop", levelControl_stop_CommandInfo);
 <<<<<<< HEAD
@@ -13669,12 +14589,18 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> levelControl_stopWithOnOff_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            levelControlstopCommandParams);
+    levelControlClusterCommandInfo.put("stop", levelControlstopCommandInfo);
+    Map<String, CommandParameter> levelControlstopWithOnOffCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter levelControl_stopWithOnOff_commandParameter =
+    CommandParameter levelControlstopWithOnOffCommandParameter =
         new CommandParameter("LevelControl", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo levelControl_stopWithOnOff_CommandInfo =
+    CommandInfo levelControlstopWithOnOffCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13685,12 +14611,13 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            levelControl_stopWithOnOff_commandParams);
-    levelControl_ClusterCommandInfo.put("stopWithOnOff", levelControl_stopWithOnOff_CommandInfo);
+            levelControlstopWithOnOffCommandParams);
+    levelControlClusterCommandInfo.put("stopWithOnOff", levelControlstopWithOnOffCommandInfo);
     // Populate cluster
-    ClusterInfo levelControl_clusterInfo =
+    ClusterInfo levelControlClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.LevelControlCluster(ptr, endpointId),
+<<<<<<< HEAD
             levelControl_ClusterCommandInfo);
     clusterMap.put("levelControl", levelControl_clusterInfo);
     Map<String, CommandInfo> lowPower_ClusterCommandInfo = new HashMap<>();
@@ -13701,12 +14628,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> lowPower_sleep_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            levelControlClusterCommandInfo);
+    clusterMap.put("levelControl", levelControlClusterInfo);
+    Map<String, CommandInfo> lowPowerClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> lowPowersleepCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter lowPower_sleep_commandParameter =
+    CommandParameter lowPowersleepCommandParameter =
         new CommandParameter("LowPower", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo lowPower_sleep_CommandInfo =
+    CommandInfo lowPowersleepCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13716,12 +14650,13 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            lowPower_sleep_commandParams);
-    lowPower_ClusterCommandInfo.put("sleep", lowPower_sleep_CommandInfo);
+            lowPowersleepCommandParams);
+    lowPowerClusterCommandInfo.put("sleep", lowPowersleepCommandInfo);
     // Populate cluster
-    ClusterInfo lowPower_clusterInfo =
+    ClusterInfo lowPowerClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.LowPowerCluster(ptr, endpointId),
+<<<<<<< HEAD
             lowPower_ClusterCommandInfo);
     clusterMap.put("lowPower", lowPower_clusterInfo);
     Map<String, CommandInfo> mediaInput_ClusterCommandInfo = new HashMap<>();
@@ -13732,12 +14667,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaInput_hideInputStatus_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            lowPowerClusterCommandInfo);
+    clusterMap.put("lowPower", lowPowerClusterInfo);
+    Map<String, CommandInfo> mediaInputClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> mediaInputhideInputStatusCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaInput_hideInputStatus_commandParameter =
+    CommandParameter mediaInputhideInputStatusCommandParameter =
         new CommandParameter("MediaInput", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaInput_hideInputStatus_CommandInfo =
+    CommandInfo mediaInputhideInputStatusCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13748,6 +14690,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             mediaInput_hideInputStatus_commandParams);
     mediaInput_ClusterCommandInfo.put("hideInputStatus", mediaInput_hideInputStatus_CommandInfo);
 <<<<<<< HEAD
@@ -13762,21 +14705,30 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaInput_renameInput_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            mediaInputhideInputStatusCommandParams);
+    mediaInputClusterCommandInfo.put("hideInputStatus", mediaInputhideInputStatusCommandInfo);
+    Map<String, CommandParameter> mediaInputrenameInputCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaInput_renameInput_commandParameter =
+    CommandParameter mediaInputrenameInputCommandParameter =
         new CommandParameter("MediaInput", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter mediaInput_renameInput_index_commandParameter =
+    CommandParameter mediaInputrenameInputindexCommandParameter =
         new CommandParameter("index", int.class);
-    mediaInput_renameInput_commandParams.put(
-        "index", mediaInput_renameInput_index_commandParameter);
+    mediaInputrenameInputCommandParams.put("index", mediaInputrenameInputindexCommandParameter);
 
-    CommandParameter mediaInput_renameInput_name_commandParameter =
+    CommandParameter mediaInputrenameInputnameCommandParameter =
         new CommandParameter("name", String.class);
+<<<<<<< HEAD
     mediaInput_renameInput_commandParams.put("name", mediaInput_renameInput_name_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    mediaInputrenameInputCommandParams.put("name", mediaInputrenameInputnameCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo mediaInput_renameInput_CommandInfo =
+    CommandInfo mediaInputrenameInputCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13790,6 +14742,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             mediaInput_renameInput_commandParams);
     mediaInput_ClusterCommandInfo.put("renameInput", mediaInput_renameInput_CommandInfo);
 <<<<<<< HEAD
@@ -13801,17 +14754,27 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaInput_selectInput_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            mediaInputrenameInputCommandParams);
+    mediaInputClusterCommandInfo.put("renameInput", mediaInputrenameInputCommandInfo);
+    Map<String, CommandParameter> mediaInputselectInputCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaInput_selectInput_commandParameter =
+    CommandParameter mediaInputselectInputCommandParameter =
         new CommandParameter("MediaInput", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter mediaInput_selectInput_index_commandParameter =
+    CommandParameter mediaInputselectInputindexCommandParameter =
         new CommandParameter("index", int.class);
+<<<<<<< HEAD
     mediaInput_selectInput_commandParams.put(
         "index", mediaInput_selectInput_index_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    mediaInputselectInputCommandParams.put("index", mediaInputselectInputindexCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo mediaInput_selectInput_CommandInfo =
+    CommandInfo mediaInputselectInputCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13823,6 +14786,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             mediaInput_selectInput_commandParams);
     mediaInput_ClusterCommandInfo.put("selectInput", mediaInput_selectInput_CommandInfo);
 <<<<<<< HEAD
@@ -13832,12 +14796,18 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaInput_showInputStatus_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            mediaInputselectInputCommandParams);
+    mediaInputClusterCommandInfo.put("selectInput", mediaInputselectInputCommandInfo);
+    Map<String, CommandParameter> mediaInputshowInputStatusCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaInput_showInputStatus_commandParameter =
+    CommandParameter mediaInputshowInputStatusCommandParameter =
         new CommandParameter("MediaInput", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaInput_showInputStatus_CommandInfo =
+    CommandInfo mediaInputshowInputStatusCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13848,12 +14818,13 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            mediaInput_showInputStatus_commandParams);
-    mediaInput_ClusterCommandInfo.put("showInputStatus", mediaInput_showInputStatus_CommandInfo);
+            mediaInputshowInputStatusCommandParams);
+    mediaInputClusterCommandInfo.put("showInputStatus", mediaInputshowInputStatusCommandInfo);
     // Populate cluster
-    ClusterInfo mediaInput_clusterInfo =
+    ClusterInfo mediaInputClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.MediaInputCluster(ptr, endpointId),
+<<<<<<< HEAD
             mediaInput_ClusterCommandInfo);
     clusterMap.put("mediaInput", mediaInput_clusterInfo);
     Map<String, CommandInfo> mediaPlayback_ClusterCommandInfo = new HashMap<>();
@@ -13864,14 +14835,21 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaFastForward_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            mediaInputClusterCommandInfo);
+    clusterMap.put("mediaInput", mediaInputClusterInfo);
+    Map<String, CommandInfo> mediaPlaybackClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> mediaPlaybackmediaFastForwardCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaFastForward_commandParameter =
+    CommandParameter mediaPlaybackmediaFastForwardCommandParameter =
         new CommandParameter(
             "MediaPlayback",
             ChipClusters.MediaPlaybackCluster.MediaFastForwardResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaPlayback_mediaFastForward_CommandInfo =
+    CommandInfo mediaPlaybackmediaFastForwardCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13883,6 +14861,7 @@ public class ClusterInfoMapping {
                           callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaFastForward_commandParams);
     mediaPlayback_ClusterCommandInfo.put(
@@ -13894,13 +14873,21 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaNext_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaFastForwardResponseCallback(),
+            mediaPlaybackmediaFastForwardCommandParams);
+    mediaPlaybackClusterCommandInfo.put(
+        "mediaFastForward", mediaPlaybackmediaFastForwardCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaNextCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaNext_commandParameter =
+    CommandParameter mediaPlaybackmediaNextCommandParameter =
         new CommandParameter(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaNextResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaPlayback_mediaNext_CommandInfo =
+    CommandInfo mediaPlaybackmediaNextCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13911,6 +14898,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.MediaNextResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaNext_commandParams);
     mediaPlayback_ClusterCommandInfo.put("mediaNext", mediaPlayback_mediaNext_CommandInfo);
@@ -13921,13 +14909,20 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaPause_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaNextResponseCallback(),
+            mediaPlaybackmediaNextCommandParams);
+    mediaPlaybackClusterCommandInfo.put("mediaNext", mediaPlaybackmediaNextCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaPauseCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaPause_commandParameter =
+    CommandParameter mediaPlaybackmediaPauseCommandParameter =
         new CommandParameter(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaPauseResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaPlayback_mediaPause_CommandInfo =
+    CommandInfo mediaPlaybackmediaPauseCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13938,6 +14933,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.MediaPauseResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaPause_commandParams);
     mediaPlayback_ClusterCommandInfo.put("mediaPause", mediaPlayback_mediaPause_CommandInfo);
@@ -13948,13 +14944,20 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaPlay_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaPauseResponseCallback(),
+            mediaPlaybackmediaPauseCommandParams);
+    mediaPlaybackClusterCommandInfo.put("mediaPause", mediaPlaybackmediaPauseCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaPlayCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaPlay_commandParameter =
+    CommandParameter mediaPlaybackmediaPlayCommandParameter =
         new CommandParameter(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaPlayResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaPlayback_mediaPlay_CommandInfo =
+    CommandInfo mediaPlaybackmediaPlayCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13965,6 +14968,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.MediaPlayResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaPlay_commandParams);
     mediaPlayback_ClusterCommandInfo.put("mediaPlay", mediaPlayback_mediaPlay_CommandInfo);
@@ -13975,13 +14979,20 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaPrevious_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaPlayResponseCallback(),
+            mediaPlaybackmediaPlayCommandParams);
+    mediaPlaybackClusterCommandInfo.put("mediaPlay", mediaPlaybackmediaPlayCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaPreviousCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaPrevious_commandParameter =
+    CommandParameter mediaPlaybackmediaPreviousCommandParameter =
         new CommandParameter(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaPreviousResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaPlayback_mediaPrevious_CommandInfo =
+    CommandInfo mediaPlaybackmediaPreviousCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -13992,6 +15003,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.MediaPreviousResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaPrevious_commandParams);
     mediaPlayback_ClusterCommandInfo.put("mediaPrevious", mediaPlayback_mediaPrevious_CommandInfo);
@@ -14002,13 +15014,20 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaRewind_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaPreviousResponseCallback(),
+            mediaPlaybackmediaPreviousCommandParams);
+    mediaPlaybackClusterCommandInfo.put("mediaPrevious", mediaPlaybackmediaPreviousCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaRewindCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaRewind_commandParameter =
+    CommandParameter mediaPlaybackmediaRewindCommandParameter =
         new CommandParameter(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaRewindResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaPlayback_mediaRewind_CommandInfo =
+    CommandInfo mediaPlaybackmediaRewindCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14019,6 +15038,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.MediaRewindResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaRewind_commandParams);
     mediaPlayback_ClusterCommandInfo.put("mediaRewind", mediaPlayback_mediaRewind_CommandInfo);
@@ -14032,18 +15052,30 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaSeek_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaRewindResponseCallback(),
+            mediaPlaybackmediaRewindCommandParams);
+    mediaPlaybackClusterCommandInfo.put("mediaRewind", mediaPlaybackmediaRewindCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaSeekCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaSeek_commandParameter =
+    CommandParameter mediaPlaybackmediaSeekCommandParameter =
         new CommandParameter(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaSeekResponseCallback.class);
-    CommandParameter mediaPlayback_mediaSeek_position_commandParameter =
+    CommandParameter mediaPlaybackmediaSeekpositionCommandParameter =
         new CommandParameter("position", long.class);
+<<<<<<< HEAD
     mediaPlayback_mediaSeek_commandParams.put(
         "position", mediaPlayback_mediaSeek_position_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    mediaPlaybackmediaSeekCommandParams.put(
+        "position", mediaPlaybackmediaSeekpositionCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo mediaPlayback_mediaSeek_CommandInfo =
+    CommandInfo mediaPlaybackmediaSeekCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14055,6 +15087,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("position"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaSeek_commandParams);
     mediaPlayback_ClusterCommandInfo.put("mediaSeek", mediaPlayback_mediaSeek_CommandInfo);
@@ -14069,20 +15102,31 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaSkipBackward_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaSeekResponseCallback(),
+            mediaPlaybackmediaSeekCommandParams);
+    mediaPlaybackClusterCommandInfo.put("mediaSeek", mediaPlaybackmediaSeekCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaSkipBackwardCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaSkipBackward_commandParameter =
+    CommandParameter mediaPlaybackmediaSkipBackwardCommandParameter =
         new CommandParameter(
             "MediaPlayback",
             ChipClusters.MediaPlaybackCluster.MediaSkipBackwardResponseCallback.class);
-    CommandParameter mediaPlayback_mediaSkipBackward_deltaPositionMilliseconds_commandParameter =
+    CommandParameter mediaPlaybackmediaSkipBackwarddeltaPositionMillisecondsCommandParameter =
         new CommandParameter("deltaPositionMilliseconds", long.class);
-    mediaPlayback_mediaSkipBackward_commandParams.put(
+    mediaPlaybackmediaSkipBackwardCommandParams.put(
         "deltaPositionMilliseconds",
+<<<<<<< HEAD
         mediaPlayback_mediaSkipBackward_deltaPositionMilliseconds_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        mediaPlaybackmediaSkipBackwarddeltaPositionMillisecondsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo mediaPlayback_mediaSkipBackward_CommandInfo =
+    CommandInfo mediaPlaybackmediaSkipBackwardCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14095,6 +15139,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("deltaPositionMilliseconds"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaSkipBackward_commandParams);
     mediaPlayback_ClusterCommandInfo.put(
@@ -14110,20 +15155,32 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaSkipForward_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaSkipBackwardResponseCallback(),
+            mediaPlaybackmediaSkipBackwardCommandParams);
+    mediaPlaybackClusterCommandInfo.put(
+        "mediaSkipBackward", mediaPlaybackmediaSkipBackwardCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaSkipForwardCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaSkipForward_commandParameter =
+    CommandParameter mediaPlaybackmediaSkipForwardCommandParameter =
         new CommandParameter(
             "MediaPlayback",
             ChipClusters.MediaPlaybackCluster.MediaSkipForwardResponseCallback.class);
-    CommandParameter mediaPlayback_mediaSkipForward_deltaPositionMilliseconds_commandParameter =
+    CommandParameter mediaPlaybackmediaSkipForwarddeltaPositionMillisecondsCommandParameter =
         new CommandParameter("deltaPositionMilliseconds", long.class);
-    mediaPlayback_mediaSkipForward_commandParams.put(
+    mediaPlaybackmediaSkipForwardCommandParams.put(
         "deltaPositionMilliseconds",
+<<<<<<< HEAD
         mediaPlayback_mediaSkipForward_deltaPositionMilliseconds_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        mediaPlaybackmediaSkipForwarddeltaPositionMillisecondsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo mediaPlayback_mediaSkipForward_CommandInfo =
+    CommandInfo mediaPlaybackmediaSkipForwardCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14135,6 +15192,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("deltaPositionMilliseconds"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaSkipForward_commandParams);
     mediaPlayback_ClusterCommandInfo.put(
@@ -14146,14 +15204,22 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaStartOver_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaSkipForwardResponseCallback(),
+            mediaPlaybackmediaSkipForwardCommandParams);
+    mediaPlaybackClusterCommandInfo.put(
+        "mediaSkipForward", mediaPlaybackmediaSkipForwardCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaStartOverCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaStartOver_commandParameter =
+    CommandParameter mediaPlaybackmediaStartOverCommandParameter =
         new CommandParameter(
             "MediaPlayback",
             ChipClusters.MediaPlaybackCluster.MediaStartOverResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaPlayback_mediaStartOver_CommandInfo =
+    CommandInfo mediaPlaybackmediaStartOverCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14164,6 +15230,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.MediaStartOverResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             mediaPlayback_mediaStartOver_commandParams);
     mediaPlayback_ClusterCommandInfo.put(
@@ -14175,13 +15242,20 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> mediaPlayback_mediaStop_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedMediaStartOverResponseCallback(),
+            mediaPlaybackmediaStartOverCommandParams);
+    mediaPlaybackClusterCommandInfo.put("mediaStartOver", mediaPlaybackmediaStartOverCommandInfo);
+    Map<String, CommandParameter> mediaPlaybackmediaStopCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter mediaPlayback_mediaStop_commandParameter =
+    CommandParameter mediaPlaybackmediaStopCommandParameter =
         new CommandParameter(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaStopResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo mediaPlayback_mediaStop_CommandInfo =
+    CommandInfo mediaPlaybackmediaStopCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14192,13 +15266,14 @@ public class ClusterInfoMapping {
                       (ChipClusters.MediaPlaybackCluster.MediaStopResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            mediaPlayback_mediaStop_commandParams);
-    mediaPlayback_ClusterCommandInfo.put("mediaStop", mediaPlayback_mediaStop_CommandInfo);
+            () -> new DelegatedMediaStopResponseCallback(),
+            mediaPlaybackmediaStopCommandParams);
+    mediaPlaybackClusterCommandInfo.put("mediaStop", mediaPlaybackmediaStopCommandInfo);
     // Populate cluster
-    ClusterInfo mediaPlayback_clusterInfo =
+    ClusterInfo mediaPlaybackClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.MediaPlaybackCluster(ptr, endpointId),
+<<<<<<< HEAD
             mediaPlayback_ClusterCommandInfo);
     clusterMap.put("mediaPlayback", mediaPlayback_clusterInfo);
     Map<String, CommandInfo> networkCommissioning_ClusterCommandInfo = new HashMap<>();
@@ -14223,30 +15298,42 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> networkCommissioning_addThreadNetwork_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            mediaPlaybackClusterCommandInfo);
+    clusterMap.put("mediaPlayback", mediaPlaybackClusterInfo);
+    Map<String, CommandInfo> networkCommissioningClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> networkCommissioningaddThreadNetworkCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter networkCommissioning_addThreadNetwork_commandParameter =
+    CommandParameter networkCommissioningaddThreadNetworkCommandParameter =
         new CommandParameter(
             "NetworkCommissioning",
             ChipClusters.NetworkCommissioningCluster.AddThreadNetworkResponseCallback.class);
-    CommandParameter networkCommissioning_addThreadNetwork_operationalDataset_commandParameter =
+    CommandParameter networkCommissioningaddThreadNetworkoperationalDatasetCommandParameter =
         new CommandParameter("operationalDataset", byte[].class);
-    networkCommissioning_addThreadNetwork_commandParams.put(
+    networkCommissioningaddThreadNetworkCommandParams.put(
         "operationalDataset",
-        networkCommissioning_addThreadNetwork_operationalDataset_commandParameter);
+        networkCommissioningaddThreadNetworkoperationalDatasetCommandParameter);
 
-    CommandParameter networkCommissioning_addThreadNetwork_breadcrumb_commandParameter =
+    CommandParameter networkCommissioningaddThreadNetworkbreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_addThreadNetwork_commandParams.put(
-        "breadcrumb", networkCommissioning_addThreadNetwork_breadcrumb_commandParameter);
+    networkCommissioningaddThreadNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningaddThreadNetworkbreadcrumbCommandParameter);
 
-    CommandParameter networkCommissioning_addThreadNetwork_timeoutMs_commandParameter =
+    CommandParameter networkCommissioningaddThreadNetworktimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     networkCommissioning_addThreadNetwork_commandParams.put(
         "timeoutMs", networkCommissioning_addThreadNetwork_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    networkCommissioningaddThreadNetworkCommandParams.put(
+        "timeoutMs", networkCommissioningaddThreadNetworktimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo networkCommissioning_addThreadNetwork_CommandInfo =
+    CommandInfo networkCommissioningaddThreadNetworkCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14261,6 +15348,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             networkCommissioning_addThreadNetwork_commandParams);
     networkCommissioning_ClusterCommandInfo.put(
@@ -14290,34 +15378,47 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> networkCommissioning_addWiFiNetwork_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedAddThreadNetworkResponseCallback(),
+            networkCommissioningaddThreadNetworkCommandParams);
+    networkCommissioningClusterCommandInfo.put(
+        "addThreadNetwork", networkCommissioningaddThreadNetworkCommandInfo);
+    Map<String, CommandParameter> networkCommissioningaddWiFiNetworkCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter networkCommissioning_addWiFiNetwork_commandParameter =
+    CommandParameter networkCommissioningaddWiFiNetworkCommandParameter =
         new CommandParameter(
             "NetworkCommissioning",
             ChipClusters.NetworkCommissioningCluster.AddWiFiNetworkResponseCallback.class);
-    CommandParameter networkCommissioning_addWiFiNetwork_ssid_commandParameter =
+    CommandParameter networkCommissioningaddWiFiNetworkssidCommandParameter =
         new CommandParameter("ssid", byte[].class);
-    networkCommissioning_addWiFiNetwork_commandParams.put(
-        "ssid", networkCommissioning_addWiFiNetwork_ssid_commandParameter);
+    networkCommissioningaddWiFiNetworkCommandParams.put(
+        "ssid", networkCommissioningaddWiFiNetworkssidCommandParameter);
 
-    CommandParameter networkCommissioning_addWiFiNetwork_credentials_commandParameter =
+    CommandParameter networkCommissioningaddWiFiNetworkcredentialsCommandParameter =
         new CommandParameter("credentials", byte[].class);
-    networkCommissioning_addWiFiNetwork_commandParams.put(
-        "credentials", networkCommissioning_addWiFiNetwork_credentials_commandParameter);
+    networkCommissioningaddWiFiNetworkCommandParams.put(
+        "credentials", networkCommissioningaddWiFiNetworkcredentialsCommandParameter);
 
-    CommandParameter networkCommissioning_addWiFiNetwork_breadcrumb_commandParameter =
+    CommandParameter networkCommissioningaddWiFiNetworkbreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_addWiFiNetwork_commandParams.put(
-        "breadcrumb", networkCommissioning_addWiFiNetwork_breadcrumb_commandParameter);
+    networkCommissioningaddWiFiNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningaddWiFiNetworkbreadcrumbCommandParameter);
 
-    CommandParameter networkCommissioning_addWiFiNetwork_timeoutMs_commandParameter =
+    CommandParameter networkCommissioningaddWiFiNetworktimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     networkCommissioning_addWiFiNetwork_commandParams.put(
         "timeoutMs", networkCommissioning_addWiFiNetwork_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    networkCommissioningaddWiFiNetworkCommandParams.put(
+        "timeoutMs", networkCommissioningaddWiFiNetworktimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo networkCommissioning_addWiFiNetwork_CommandInfo =
+    CommandInfo networkCommissioningaddWiFiNetworkCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14333,6 +15434,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             networkCommissioning_addWiFiNetwork_commandParams);
     networkCommissioning_ClusterCommandInfo.put(
@@ -14358,29 +15460,42 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> networkCommissioning_disableNetwork_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedAddWiFiNetworkResponseCallback(),
+            networkCommissioningaddWiFiNetworkCommandParams);
+    networkCommissioningClusterCommandInfo.put(
+        "addWiFiNetwork", networkCommissioningaddWiFiNetworkCommandInfo);
+    Map<String, CommandParameter> networkCommissioningdisableNetworkCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter networkCommissioning_disableNetwork_commandParameter =
+    CommandParameter networkCommissioningdisableNetworkCommandParameter =
         new CommandParameter(
             "NetworkCommissioning",
             ChipClusters.NetworkCommissioningCluster.DisableNetworkResponseCallback.class);
-    CommandParameter networkCommissioning_disableNetwork_networkID_commandParameter =
+    CommandParameter networkCommissioningdisableNetworknetworkIDCommandParameter =
         new CommandParameter("networkID", byte[].class);
-    networkCommissioning_disableNetwork_commandParams.put(
-        "networkID", networkCommissioning_disableNetwork_networkID_commandParameter);
+    networkCommissioningdisableNetworkCommandParams.put(
+        "networkID", networkCommissioningdisableNetworknetworkIDCommandParameter);
 
-    CommandParameter networkCommissioning_disableNetwork_breadcrumb_commandParameter =
+    CommandParameter networkCommissioningdisableNetworkbreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_disableNetwork_commandParams.put(
-        "breadcrumb", networkCommissioning_disableNetwork_breadcrumb_commandParameter);
+    networkCommissioningdisableNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningdisableNetworkbreadcrumbCommandParameter);
 
-    CommandParameter networkCommissioning_disableNetwork_timeoutMs_commandParameter =
+    CommandParameter networkCommissioningdisableNetworktimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     networkCommissioning_disableNetwork_commandParams.put(
         "timeoutMs", networkCommissioning_disableNetwork_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    networkCommissioningdisableNetworkCommandParams.put(
+        "timeoutMs", networkCommissioningdisableNetworktimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo networkCommissioning_disableNetwork_CommandInfo =
+    CommandInfo networkCommissioningdisableNetworkCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14395,6 +15510,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             networkCommissioning_disableNetwork_commandParams);
     networkCommissioning_ClusterCommandInfo.put(
@@ -14417,29 +15533,42 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> networkCommissioning_enableNetwork_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedDisableNetworkResponseCallback(),
+            networkCommissioningdisableNetworkCommandParams);
+    networkCommissioningClusterCommandInfo.put(
+        "disableNetwork", networkCommissioningdisableNetworkCommandInfo);
+    Map<String, CommandParameter> networkCommissioningenableNetworkCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter networkCommissioning_enableNetwork_commandParameter =
+    CommandParameter networkCommissioningenableNetworkCommandParameter =
         new CommandParameter(
             "NetworkCommissioning",
             ChipClusters.NetworkCommissioningCluster.EnableNetworkResponseCallback.class);
-    CommandParameter networkCommissioning_enableNetwork_networkID_commandParameter =
+    CommandParameter networkCommissioningenableNetworknetworkIDCommandParameter =
         new CommandParameter("networkID", byte[].class);
-    networkCommissioning_enableNetwork_commandParams.put(
-        "networkID", networkCommissioning_enableNetwork_networkID_commandParameter);
+    networkCommissioningenableNetworkCommandParams.put(
+        "networkID", networkCommissioningenableNetworknetworkIDCommandParameter);
 
-    CommandParameter networkCommissioning_enableNetwork_breadcrumb_commandParameter =
+    CommandParameter networkCommissioningenableNetworkbreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_enableNetwork_commandParams.put(
-        "breadcrumb", networkCommissioning_enableNetwork_breadcrumb_commandParameter);
+    networkCommissioningenableNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningenableNetworkbreadcrumbCommandParameter);
 
-    CommandParameter networkCommissioning_enableNetwork_timeoutMs_commandParameter =
+    CommandParameter networkCommissioningenableNetworktimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     networkCommissioning_enableNetwork_commandParams.put(
         "timeoutMs", networkCommissioning_enableNetwork_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    networkCommissioningenableNetworkCommandParams.put(
+        "timeoutMs", networkCommissioningenableNetworktimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo networkCommissioning_enableNetwork_CommandInfo =
+    CommandInfo networkCommissioningenableNetworkCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14454,6 +15583,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             networkCommissioning_enableNetwork_commandParams);
     networkCommissioning_ClusterCommandInfo.put(
@@ -14468,22 +15598,32 @@ public class ClusterInfoMapping {
     networkCommissioning_getLastNetworkCommissioningResult_commandParams.add(
         getLastNetworkCommissioningResult_timeoutMs_commandParameter);
 =======
+=======
+            () -> new DelegatedEnableNetworkResponseCallback(),
+            networkCommissioningenableNetworkCommandParams);
+    networkCommissioningClusterCommandInfo.put(
+        "enableNetwork", networkCommissioningenableNetworkCommandInfo);
+>>>>>>> 41b0956c1 (on/off commands working)
     Map<String, CommandParameter>
-        networkCommissioning_getLastNetworkCommissioningResult_commandParams =
-            new HashMap<String, CommandParameter>();
+        networkCommissioninggetLastNetworkCommissioningResultCommandParams =
+            new LinkedHashMap<String, CommandParameter>();
     // TODO: fill out parameter types
-    CommandParameter networkCommissioning_getLastNetworkCommissioningResult_commandParameter =
+    CommandParameter networkCommissioninggetLastNetworkCommissioningResultCommandParameter =
         new CommandParameter("NetworkCommissioning", ChipClusters.DefaultClusterCallback.class);
     CommandParameter
-        networkCommissioning_getLastNetworkCommissioningResult_timeoutMs_commandParameter =
+        networkCommissioninggetLastNetworkCommissioningResulttimeoutMsCommandParameter =
             new CommandParameter("timeoutMs", long.class);
-    networkCommissioning_getLastNetworkCommissioningResult_commandParams.put(
+    networkCommissioninggetLastNetworkCommissioningResultCommandParams.put(
         "timeoutMs",
+<<<<<<< HEAD
         networkCommissioning_getLastNetworkCommissioningResult_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        networkCommissioninggetLastNetworkCommissioningResulttimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo networkCommissioning_getLastNetworkCommissioningResult_CommandInfo =
+    CommandInfo networkCommissioninggetLastNetworkCommissioningResultCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14495,9 +15635,10 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            networkCommissioning_getLastNetworkCommissioningResult_commandParams);
-    networkCommissioning_ClusterCommandInfo.put(
+            networkCommissioninggetLastNetworkCommissioningResultCommandParams);
+    networkCommissioningClusterCommandInfo.put(
         "getLastNetworkCommissioningResult",
+<<<<<<< HEAD
         networkCommissioning_getLastNetworkCommissioningResult_CommandInfo);
 <<<<<<< HEAD
     List<CommandParameter> networkCommissioning_removeNetwork_commandParams = new ArrayList<>();
@@ -14517,29 +15658,39 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> networkCommissioning_removeNetwork_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+        networkCommissioninggetLastNetworkCommissioningResultCommandInfo);
+    Map<String, CommandParameter> networkCommissioningremoveNetworkCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter networkCommissioning_removeNetwork_commandParameter =
+    CommandParameter networkCommissioningremoveNetworkCommandParameter =
         new CommandParameter(
             "NetworkCommissioning",
             ChipClusters.NetworkCommissioningCluster.RemoveNetworkResponseCallback.class);
-    CommandParameter networkCommissioning_removeNetwork_networkID_commandParameter =
+    CommandParameter networkCommissioningremoveNetworknetworkIDCommandParameter =
         new CommandParameter("networkID", byte[].class);
-    networkCommissioning_removeNetwork_commandParams.put(
-        "networkID", networkCommissioning_removeNetwork_networkID_commandParameter);
+    networkCommissioningremoveNetworkCommandParams.put(
+        "networkID", networkCommissioningremoveNetworknetworkIDCommandParameter);
 
-    CommandParameter networkCommissioning_removeNetwork_breadcrumb_commandParameter =
+    CommandParameter networkCommissioningremoveNetworkbreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_removeNetwork_commandParams.put(
-        "breadcrumb", networkCommissioning_removeNetwork_breadcrumb_commandParameter);
+    networkCommissioningremoveNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningremoveNetworkbreadcrumbCommandParameter);
 
-    CommandParameter networkCommissioning_removeNetwork_timeoutMs_commandParameter =
+    CommandParameter networkCommissioningremoveNetworktimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     networkCommissioning_removeNetwork_commandParams.put(
         "timeoutMs", networkCommissioning_removeNetwork_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    networkCommissioningremoveNetworkCommandParams.put(
+        "timeoutMs", networkCommissioningremoveNetworktimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo networkCommissioning_removeNetwork_CommandInfo =
+    CommandInfo networkCommissioningremoveNetworkCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14554,6 +15705,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             networkCommissioning_removeNetwork_commandParams);
     networkCommissioning_ClusterCommandInfo.put(
@@ -14576,29 +15728,42 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> networkCommissioning_scanNetworks_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedRemoveNetworkResponseCallback(),
+            networkCommissioningremoveNetworkCommandParams);
+    networkCommissioningClusterCommandInfo.put(
+        "removeNetwork", networkCommissioningremoveNetworkCommandInfo);
+    Map<String, CommandParameter> networkCommissioningscanNetworksCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter networkCommissioning_scanNetworks_commandParameter =
+    CommandParameter networkCommissioningscanNetworksCommandParameter =
         new CommandParameter(
             "NetworkCommissioning",
             ChipClusters.NetworkCommissioningCluster.ScanNetworksResponseCallback.class);
-    CommandParameter networkCommissioning_scanNetworks_ssid_commandParameter =
+    CommandParameter networkCommissioningscanNetworksssidCommandParameter =
         new CommandParameter("ssid", byte[].class);
-    networkCommissioning_scanNetworks_commandParams.put(
-        "ssid", networkCommissioning_scanNetworks_ssid_commandParameter);
+    networkCommissioningscanNetworksCommandParams.put(
+        "ssid", networkCommissioningscanNetworksssidCommandParameter);
 
-    CommandParameter networkCommissioning_scanNetworks_breadcrumb_commandParameter =
+    CommandParameter networkCommissioningscanNetworksbreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_scanNetworks_commandParams.put(
-        "breadcrumb", networkCommissioning_scanNetworks_breadcrumb_commandParameter);
+    networkCommissioningscanNetworksCommandParams.put(
+        "breadcrumb", networkCommissioningscanNetworksbreadcrumbCommandParameter);
 
-    CommandParameter networkCommissioning_scanNetworks_timeoutMs_commandParameter =
+    CommandParameter networkCommissioningscanNetworkstimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     networkCommissioning_scanNetworks_commandParams.put(
         "timeoutMs", networkCommissioning_scanNetworks_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    networkCommissioningscanNetworksCommandParams.put(
+        "timeoutMs", networkCommissioningscanNetworkstimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo networkCommissioning_scanNetworks_CommandInfo =
+    CommandInfo networkCommissioningscanNetworksCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14613,6 +15778,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             networkCommissioning_scanNetworks_commandParams);
     networkCommissioning_ClusterCommandInfo.put(
@@ -14639,30 +15805,43 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> networkCommissioning_updateThreadNetwork_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedScanNetworksResponseCallback(),
+            networkCommissioningscanNetworksCommandParams);
+    networkCommissioningClusterCommandInfo.put(
+        "scanNetworks", networkCommissioningscanNetworksCommandInfo);
+    Map<String, CommandParameter> networkCommissioningupdateThreadNetworkCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter networkCommissioning_updateThreadNetwork_commandParameter =
+    CommandParameter networkCommissioningupdateThreadNetworkCommandParameter =
         new CommandParameter(
             "NetworkCommissioning",
             ChipClusters.NetworkCommissioningCluster.UpdateThreadNetworkResponseCallback.class);
-    CommandParameter networkCommissioning_updateThreadNetwork_operationalDataset_commandParameter =
+    CommandParameter networkCommissioningupdateThreadNetworkoperationalDatasetCommandParameter =
         new CommandParameter("operationalDataset", byte[].class);
-    networkCommissioning_updateThreadNetwork_commandParams.put(
+    networkCommissioningupdateThreadNetworkCommandParams.put(
         "operationalDataset",
-        networkCommissioning_updateThreadNetwork_operationalDataset_commandParameter);
+        networkCommissioningupdateThreadNetworkoperationalDatasetCommandParameter);
 
-    CommandParameter networkCommissioning_updateThreadNetwork_breadcrumb_commandParameter =
+    CommandParameter networkCommissioningupdateThreadNetworkbreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_updateThreadNetwork_commandParams.put(
-        "breadcrumb", networkCommissioning_updateThreadNetwork_breadcrumb_commandParameter);
+    networkCommissioningupdateThreadNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningupdateThreadNetworkbreadcrumbCommandParameter);
 
-    CommandParameter networkCommissioning_updateThreadNetwork_timeoutMs_commandParameter =
+    CommandParameter networkCommissioningupdateThreadNetworktimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     networkCommissioning_updateThreadNetwork_commandParams.put(
         "timeoutMs", networkCommissioning_updateThreadNetwork_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    networkCommissioningupdateThreadNetworkCommandParams.put(
+        "timeoutMs", networkCommissioningupdateThreadNetworktimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo networkCommissioning_updateThreadNetwork_CommandInfo =
+    CommandInfo networkCommissioningupdateThreadNetworkCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14677,6 +15856,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             networkCommissioning_updateThreadNetwork_commandParams);
     networkCommissioning_ClusterCommandInfo.put(
@@ -14707,34 +15887,47 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> networkCommissioning_updateWiFiNetwork_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedUpdateThreadNetworkResponseCallback(),
+            networkCommissioningupdateThreadNetworkCommandParams);
+    networkCommissioningClusterCommandInfo.put(
+        "updateThreadNetwork", networkCommissioningupdateThreadNetworkCommandInfo);
+    Map<String, CommandParameter> networkCommissioningupdateWiFiNetworkCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter networkCommissioning_updateWiFiNetwork_commandParameter =
+    CommandParameter networkCommissioningupdateWiFiNetworkCommandParameter =
         new CommandParameter(
             "NetworkCommissioning",
             ChipClusters.NetworkCommissioningCluster.UpdateWiFiNetworkResponseCallback.class);
-    CommandParameter networkCommissioning_updateWiFiNetwork_ssid_commandParameter =
+    CommandParameter networkCommissioningupdateWiFiNetworkssidCommandParameter =
         new CommandParameter("ssid", byte[].class);
-    networkCommissioning_updateWiFiNetwork_commandParams.put(
-        "ssid", networkCommissioning_updateWiFiNetwork_ssid_commandParameter);
+    networkCommissioningupdateWiFiNetworkCommandParams.put(
+        "ssid", networkCommissioningupdateWiFiNetworkssidCommandParameter);
 
-    CommandParameter networkCommissioning_updateWiFiNetwork_credentials_commandParameter =
+    CommandParameter networkCommissioningupdateWiFiNetworkcredentialsCommandParameter =
         new CommandParameter("credentials", byte[].class);
-    networkCommissioning_updateWiFiNetwork_commandParams.put(
-        "credentials", networkCommissioning_updateWiFiNetwork_credentials_commandParameter);
+    networkCommissioningupdateWiFiNetworkCommandParams.put(
+        "credentials", networkCommissioningupdateWiFiNetworkcredentialsCommandParameter);
 
-    CommandParameter networkCommissioning_updateWiFiNetwork_breadcrumb_commandParameter =
+    CommandParameter networkCommissioningupdateWiFiNetworkbreadcrumbCommandParameter =
         new CommandParameter("breadcrumb", long.class);
-    networkCommissioning_updateWiFiNetwork_commandParams.put(
-        "breadcrumb", networkCommissioning_updateWiFiNetwork_breadcrumb_commandParameter);
+    networkCommissioningupdateWiFiNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningupdateWiFiNetworkbreadcrumbCommandParameter);
 
-    CommandParameter networkCommissioning_updateWiFiNetwork_timeoutMs_commandParameter =
+    CommandParameter networkCommissioningupdateWiFiNetworktimeoutMsCommandParameter =
         new CommandParameter("timeoutMs", long.class);
+<<<<<<< HEAD
     networkCommissioning_updateWiFiNetwork_commandParams.put(
         "timeoutMs", networkCommissioning_updateWiFiNetwork_timeoutMs_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    networkCommissioningupdateWiFiNetworkCommandParams.put(
+        "timeoutMs", networkCommissioningupdateWiFiNetworktimeoutMsCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo networkCommissioning_updateWiFiNetwork_CommandInfo =
+    CommandInfo networkCommissioningupdateWiFiNetworkCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14750,14 +15943,15 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("timeoutMs"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            networkCommissioning_updateWiFiNetwork_commandParams);
-    networkCommissioning_ClusterCommandInfo.put(
-        "updateWiFiNetwork", networkCommissioning_updateWiFiNetwork_CommandInfo);
+            () -> new DelegatedUpdateWiFiNetworkResponseCallback(),
+            networkCommissioningupdateWiFiNetworkCommandParams);
+    networkCommissioningClusterCommandInfo.put(
+        "updateWiFiNetwork", networkCommissioningupdateWiFiNetworkCommandInfo);
     // Populate cluster
-    ClusterInfo networkCommissioning_clusterInfo =
+    ClusterInfo networkCommissioningClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.NetworkCommissioningCluster(ptr, endpointId),
+<<<<<<< HEAD
             networkCommissioning_ClusterCommandInfo);
     clusterMap.put("networkCommissioning", networkCommissioning_clusterInfo);
     Map<String, CommandInfo> otaSoftwareUpdateProvider_ClusterCommandInfo = new HashMap<>();
@@ -14778,24 +15972,36 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> otaSoftwareUpdateProvider_applyUpdateRequest_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            networkCommissioningClusterCommandInfo);
+    clusterMap.put("networkCommissioning", networkCommissioningClusterInfo);
+    Map<String, CommandInfo> otaSoftwareUpdateProviderClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> otaSoftwareUpdateProviderapplyUpdateRequestCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter otaSoftwareUpdateProvider_applyUpdateRequest_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderapplyUpdateRequestCommandParameter =
         new CommandParameter(
             "OtaSoftwareUpdateProvider",
             ChipClusters.OtaSoftwareUpdateProviderCluster.ApplyUpdateRequestResponseCallback.class);
-    CommandParameter otaSoftwareUpdateProvider_applyUpdateRequest_updateToken_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderapplyUpdateRequestupdateTokenCommandParameter =
         new CommandParameter("updateToken", byte[].class);
-    otaSoftwareUpdateProvider_applyUpdateRequest_commandParams.put(
-        "updateToken", otaSoftwareUpdateProvider_applyUpdateRequest_updateToken_commandParameter);
+    otaSoftwareUpdateProviderapplyUpdateRequestCommandParams.put(
+        "updateToken", otaSoftwareUpdateProviderapplyUpdateRequestupdateTokenCommandParameter);
 
-    CommandParameter otaSoftwareUpdateProvider_applyUpdateRequest_newVersion_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderapplyUpdateRequestnewVersionCommandParameter =
         new CommandParameter("newVersion", long.class);
+<<<<<<< HEAD
     otaSoftwareUpdateProvider_applyUpdateRequest_commandParams.put(
         "newVersion", otaSoftwareUpdateProvider_applyUpdateRequest_newVersion_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    otaSoftwareUpdateProviderapplyUpdateRequestCommandParams.put(
+        "newVersion", otaSoftwareUpdateProviderapplyUpdateRequestnewVersionCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo otaSoftwareUpdateProvider_applyUpdateRequest_CommandInfo =
+    CommandInfo otaSoftwareUpdateProviderapplyUpdateRequestCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14810,6 +16016,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("newVersion"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             otaSoftwareUpdateProvider_applyUpdateRequest_commandParams);
     otaSoftwareUpdateProvider_ClusterCommandInfo.put(
@@ -14831,25 +16038,36 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> otaSoftwareUpdateProvider_notifyUpdateApplied_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedApplyUpdateRequestResponseCallback(),
+            otaSoftwareUpdateProviderapplyUpdateRequestCommandParams);
+    otaSoftwareUpdateProviderClusterCommandInfo.put(
+        "applyUpdateRequest", otaSoftwareUpdateProviderapplyUpdateRequestCommandInfo);
+    Map<String, CommandParameter> otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter otaSoftwareUpdateProvider_notifyUpdateApplied_commandParameter =
+    CommandParameter otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParameter =
         new CommandParameter(
             "OtaSoftwareUpdateProvider", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter otaSoftwareUpdateProvider_notifyUpdateApplied_updateToken_commandParameter =
+    CommandParameter otaSoftwareUpdateProvidernotifyUpdateAppliedupdateTokenCommandParameter =
         new CommandParameter("updateToken", byte[].class);
-    otaSoftwareUpdateProvider_notifyUpdateApplied_commandParams.put(
-        "updateToken", otaSoftwareUpdateProvider_notifyUpdateApplied_updateToken_commandParameter);
+    otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParams.put(
+        "updateToken", otaSoftwareUpdateProvidernotifyUpdateAppliedupdateTokenCommandParameter);
 
-    CommandParameter
-        otaSoftwareUpdateProvider_notifyUpdateApplied_softwareVersion_commandParameter =
-            new CommandParameter("softwareVersion", long.class);
-    otaSoftwareUpdateProvider_notifyUpdateApplied_commandParams.put(
+    CommandParameter otaSoftwareUpdateProvidernotifyUpdateAppliedsoftwareVersionCommandParameter =
+        new CommandParameter("softwareVersion", long.class);
+    otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParams.put(
         "softwareVersion",
+<<<<<<< HEAD
         otaSoftwareUpdateProvider_notifyUpdateApplied_softwareVersion_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        otaSoftwareUpdateProvidernotifyUpdateAppliedsoftwareVersionCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo otaSoftwareUpdateProvider_notifyUpdateApplied_CommandInfo =
+    CommandInfo otaSoftwareUpdateProvidernotifyUpdateAppliedCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14863,6 +16081,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             otaSoftwareUpdateProvider_notifyUpdateApplied_commandParams);
     otaSoftwareUpdateProvider_ClusterCommandInfo.put(
         "notifyUpdateApplied", otaSoftwareUpdateProvider_notifyUpdateApplied_CommandInfo);
@@ -14909,57 +16128,68 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> otaSoftwareUpdateProvider_queryImage_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParams);
+    otaSoftwareUpdateProviderClusterCommandInfo.put(
+        "notifyUpdateApplied", otaSoftwareUpdateProvidernotifyUpdateAppliedCommandInfo);
+    Map<String, CommandParameter> otaSoftwareUpdateProviderqueryImageCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter otaSoftwareUpdateProvider_queryImage_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderqueryImageCommandParameter =
         new CommandParameter(
             "OtaSoftwareUpdateProvider",
             ChipClusters.OtaSoftwareUpdateProviderCluster.QueryImageResponseCallback.class);
-    CommandParameter otaSoftwareUpdateProvider_queryImage_vendorId_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderqueryImagevendorIdCommandParameter =
         new CommandParameter("vendorId", int.class);
-    otaSoftwareUpdateProvider_queryImage_commandParams.put(
-        "vendorId", otaSoftwareUpdateProvider_queryImage_vendorId_commandParameter);
+    otaSoftwareUpdateProviderqueryImageCommandParams.put(
+        "vendorId", otaSoftwareUpdateProviderqueryImagevendorIdCommandParameter);
 
-    CommandParameter otaSoftwareUpdateProvider_queryImage_productId_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderqueryImageproductIdCommandParameter =
         new CommandParameter("productId", int.class);
-    otaSoftwareUpdateProvider_queryImage_commandParams.put(
-        "productId", otaSoftwareUpdateProvider_queryImage_productId_commandParameter);
+    otaSoftwareUpdateProviderqueryImageCommandParams.put(
+        "productId", otaSoftwareUpdateProviderqueryImageproductIdCommandParameter);
 
-    CommandParameter otaSoftwareUpdateProvider_queryImage_hardwareVersion_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderqueryImagehardwareVersionCommandParameter =
         new CommandParameter("hardwareVersion", int.class);
-    otaSoftwareUpdateProvider_queryImage_commandParams.put(
-        "hardwareVersion", otaSoftwareUpdateProvider_queryImage_hardwareVersion_commandParameter);
+    otaSoftwareUpdateProviderqueryImageCommandParams.put(
+        "hardwareVersion", otaSoftwareUpdateProviderqueryImagehardwareVersionCommandParameter);
 
-    CommandParameter otaSoftwareUpdateProvider_queryImage_softwareVersion_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderqueryImagesoftwareVersionCommandParameter =
         new CommandParameter("softwareVersion", long.class);
-    otaSoftwareUpdateProvider_queryImage_commandParams.put(
-        "softwareVersion", otaSoftwareUpdateProvider_queryImage_softwareVersion_commandParameter);
+    otaSoftwareUpdateProviderqueryImageCommandParams.put(
+        "softwareVersion", otaSoftwareUpdateProviderqueryImagesoftwareVersionCommandParameter);
 
-    CommandParameter otaSoftwareUpdateProvider_queryImage_protocolsSupported_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderqueryImageprotocolsSupportedCommandParameter =
         new CommandParameter("protocolsSupported", int.class);
-    otaSoftwareUpdateProvider_queryImage_commandParams.put(
+    otaSoftwareUpdateProviderqueryImageCommandParams.put(
         "protocolsSupported",
-        otaSoftwareUpdateProvider_queryImage_protocolsSupported_commandParameter);
+        otaSoftwareUpdateProviderqueryImageprotocolsSupportedCommandParameter);
 
-    CommandParameter otaSoftwareUpdateProvider_queryImage_location_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderqueryImagelocationCommandParameter =
         new CommandParameter("location", String.class);
-    otaSoftwareUpdateProvider_queryImage_commandParams.put(
-        "location", otaSoftwareUpdateProvider_queryImage_location_commandParameter);
+    otaSoftwareUpdateProviderqueryImageCommandParams.put(
+        "location", otaSoftwareUpdateProviderqueryImagelocationCommandParameter);
 
-    CommandParameter otaSoftwareUpdateProvider_queryImage_requestorCanConsent_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderqueryImagerequestorCanConsentCommandParameter =
         new CommandParameter("requestorCanConsent", boolean.class);
-    otaSoftwareUpdateProvider_queryImage_commandParams.put(
+    otaSoftwareUpdateProviderqueryImageCommandParams.put(
         "requestorCanConsent",
-        otaSoftwareUpdateProvider_queryImage_requestorCanConsent_commandParameter);
+        otaSoftwareUpdateProviderqueryImagerequestorCanConsentCommandParameter);
 
-    CommandParameter otaSoftwareUpdateProvider_queryImage_metadataForProvider_commandParameter =
+    CommandParameter otaSoftwareUpdateProviderqueryImagemetadataForProviderCommandParameter =
         new CommandParameter("metadataForProvider", byte[].class);
-    otaSoftwareUpdateProvider_queryImage_commandParams.put(
+    otaSoftwareUpdateProviderqueryImageCommandParams.put(
         "metadataForProvider",
+<<<<<<< HEAD
         otaSoftwareUpdateProvider_queryImage_metadataForProvider_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        otaSoftwareUpdateProviderqueryImagemetadataForProviderCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo otaSoftwareUpdateProvider_queryImage_CommandInfo =
+    CommandInfo otaSoftwareUpdateProviderqueryImageCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -14979,14 +16209,15 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("metadataForProvider"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            otaSoftwareUpdateProvider_queryImage_commandParams);
-    otaSoftwareUpdateProvider_ClusterCommandInfo.put(
-        "queryImage", otaSoftwareUpdateProvider_queryImage_CommandInfo);
+            () -> new DelegatedQueryImageResponseCallback(),
+            otaSoftwareUpdateProviderqueryImageCommandParams);
+    otaSoftwareUpdateProviderClusterCommandInfo.put(
+        "queryImage", otaSoftwareUpdateProviderqueryImageCommandInfo);
     // Populate cluster
-    ClusterInfo otaSoftwareUpdateProvider_clusterInfo =
+    ClusterInfo otaSoftwareUpdateProviderClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.OtaSoftwareUpdateProviderCluster(ptr, endpointId),
+<<<<<<< HEAD
             otaSoftwareUpdateProvider_ClusterCommandInfo);
     clusterMap.put("otaSoftwareUpdateProvider", otaSoftwareUpdateProvider_clusterInfo);
     Map<String, CommandInfo> otaSoftwareUpdateRequestor_ClusterCommandInfo = new HashMap<>();
@@ -15017,39 +16248,48 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> otaSoftwareUpdateRequestor_announceOtaProvider_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            otaSoftwareUpdateProviderClusterCommandInfo);
+    clusterMap.put("otaSoftwareUpdateProvider", otaSoftwareUpdateProviderClusterInfo);
+    Map<String, CommandInfo> otaSoftwareUpdateRequestorClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> otaSoftwareUpdateRequestorannounceOtaProviderCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter otaSoftwareUpdateRequestor_announceOtaProvider_commandParameter =
+    CommandParameter otaSoftwareUpdateRequestorannounceOtaProviderCommandParameter =
         new CommandParameter(
             "OtaSoftwareUpdateRequestor", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter
-        otaSoftwareUpdateRequestor_announceOtaProvider_providerLocation_commandParameter =
-            new CommandParameter("providerLocation", byte[].class);
-    otaSoftwareUpdateRequestor_announceOtaProvider_commandParams.put(
+    CommandParameter otaSoftwareUpdateRequestorannounceOtaProviderproviderLocationCommandParameter =
+        new CommandParameter("providerLocation", byte[].class);
+    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
         "providerLocation",
-        otaSoftwareUpdateRequestor_announceOtaProvider_providerLocation_commandParameter);
+        otaSoftwareUpdateRequestorannounceOtaProviderproviderLocationCommandParameter);
 
-    CommandParameter otaSoftwareUpdateRequestor_announceOtaProvider_vendorId_commandParameter =
+    CommandParameter otaSoftwareUpdateRequestorannounceOtaProvidervendorIdCommandParameter =
         new CommandParameter("vendorId", int.class);
-    otaSoftwareUpdateRequestor_announceOtaProvider_commandParams.put(
-        "vendorId", otaSoftwareUpdateRequestor_announceOtaProvider_vendorId_commandParameter);
+    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
+        "vendorId", otaSoftwareUpdateRequestorannounceOtaProvidervendorIdCommandParameter);
 
     CommandParameter
-        otaSoftwareUpdateRequestor_announceOtaProvider_announcementReason_commandParameter =
+        otaSoftwareUpdateRequestorannounceOtaProviderannouncementReasonCommandParameter =
             new CommandParameter("announcementReason", int.class);
-    otaSoftwareUpdateRequestor_announceOtaProvider_commandParams.put(
+    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
         "announcementReason",
-        otaSoftwareUpdateRequestor_announceOtaProvider_announcementReason_commandParameter);
+        otaSoftwareUpdateRequestorannounceOtaProviderannouncementReasonCommandParameter);
 
-    CommandParameter
-        otaSoftwareUpdateRequestor_announceOtaProvider_metadataForNode_commandParameter =
-            new CommandParameter("metadataForNode", byte[].class);
-    otaSoftwareUpdateRequestor_announceOtaProvider_commandParams.put(
+    CommandParameter otaSoftwareUpdateRequestorannounceOtaProvidermetadataForNodeCommandParameter =
+        new CommandParameter("metadataForNode", byte[].class);
+    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
         "metadataForNode",
+<<<<<<< HEAD
         otaSoftwareUpdateRequestor_announceOtaProvider_metadataForNode_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        otaSoftwareUpdateRequestorannounceOtaProvidermetadataForNodeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo otaSoftwareUpdateRequestor_announceOtaProvider_CommandInfo =
+    CommandInfo otaSoftwareUpdateRequestorannounceOtaProviderCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15065,21 +16305,22 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            otaSoftwareUpdateRequestor_announceOtaProvider_commandParams);
-    otaSoftwareUpdateRequestor_ClusterCommandInfo.put(
-        "announceOtaProvider", otaSoftwareUpdateRequestor_announceOtaProvider_CommandInfo);
+            otaSoftwareUpdateRequestorannounceOtaProviderCommandParams);
+    otaSoftwareUpdateRequestorClusterCommandInfo.put(
+        "announceOtaProvider", otaSoftwareUpdateRequestorannounceOtaProviderCommandInfo);
     // Populate cluster
-    ClusterInfo otaSoftwareUpdateRequestor_clusterInfo =
+    ClusterInfo otaSoftwareUpdateRequestorClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) ->
                 new ChipClusters.OtaSoftwareUpdateRequestorCluster(ptr, endpointId),
-            otaSoftwareUpdateRequestor_ClusterCommandInfo);
-    clusterMap.put("otaSoftwareUpdateRequestor", otaSoftwareUpdateRequestor_clusterInfo);
-    Map<String, CommandInfo> occupancySensing_ClusterCommandInfo = new HashMap<>();
+            otaSoftwareUpdateRequestorClusterCommandInfo);
+    clusterMap.put("otaSoftwareUpdateRequestor", otaSoftwareUpdateRequestorClusterInfo);
+    Map<String, CommandInfo> occupancySensingClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo occupancySensing_clusterInfo =
+    ClusterInfo occupancySensingClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.OccupancySensingCluster(ptr, endpointId),
+<<<<<<< HEAD
             occupancySensing_ClusterCommandInfo);
     clusterMap.put("occupancySensing", occupancySensing_clusterInfo);
     Map<String, CommandInfo> onOff_ClusterCommandInfo = new HashMap<>();
@@ -15089,12 +16330,19 @@ public class ClusterInfoMapping {
 
 =======
     Map<String, CommandParameter> onOff_off_commandParams = new HashMap<String, CommandParameter>();
+=======
+            occupancySensingClusterCommandInfo);
+    clusterMap.put("occupancySensing", occupancySensingClusterInfo);
+    Map<String, CommandInfo> onOffClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> onOffoffCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter onOff_off_commandParameter =
+    CommandParameter onOffoffCommandParameter =
         new CommandParameter("OnOff", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo onOff_off_CommandInfo =
+    CommandInfo onOffoffCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15104,6 +16352,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             onOff_off_commandParams);
     onOff_ClusterCommandInfo.put("off", onOff_off_CommandInfo);
 <<<<<<< HEAD
@@ -15120,22 +16369,32 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> onOff_offWithEffect_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            onOffoffCommandParams);
+    onOffClusterCommandInfo.put("off", onOffoffCommandInfo);
+    Map<String, CommandParameter> onOffoffWithEffectCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter onOff_offWithEffect_commandParameter =
+    CommandParameter onOffoffWithEffectCommandParameter =
         new CommandParameter("OnOff", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter onOff_offWithEffect_effectId_commandParameter =
+    CommandParameter onOffoffWithEffecteffectIdCommandParameter =
         new CommandParameter("effectId", int.class);
-    onOff_offWithEffect_commandParams.put(
-        "effectId", onOff_offWithEffect_effectId_commandParameter);
+    onOffoffWithEffectCommandParams.put("effectId", onOffoffWithEffecteffectIdCommandParameter);
 
-    CommandParameter onOff_offWithEffect_effectVariant_commandParameter =
+    CommandParameter onOffoffWithEffecteffectVariantCommandParameter =
         new CommandParameter("effectVariant", int.class);
+<<<<<<< HEAD
     onOff_offWithEffect_commandParams.put(
         "effectVariant", onOff_offWithEffect_effectVariant_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    onOffoffWithEffectCommandParams.put(
+        "effectVariant", onOffoffWithEffecteffectVariantCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo onOff_offWithEffect_CommandInfo =
+    CommandInfo onOffoffWithEffectCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15149,6 +16408,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             onOff_offWithEffect_commandParams);
     onOff_ClusterCommandInfo.put("offWithEffect", onOff_offWithEffect_CommandInfo);
 <<<<<<< HEAD
@@ -15157,12 +16417,18 @@ public class ClusterInfoMapping {
 
 =======
     Map<String, CommandParameter> onOff_on_commandParams = new HashMap<String, CommandParameter>();
+=======
+            onOffoffWithEffectCommandParams);
+    onOffClusterCommandInfo.put("offWithEffect", onOffoffWithEffectCommandInfo);
+    Map<String, CommandParameter> onOffonCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter onOff_on_commandParameter =
+    CommandParameter onOffonCommandParameter =
         new CommandParameter("OnOff", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo onOff_on_CommandInfo =
+    CommandInfo onOffonCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15172,6 +16438,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             onOff_on_commandParams);
     onOff_ClusterCommandInfo.put("on", onOff_on_CommandInfo);
 <<<<<<< HEAD
@@ -15181,12 +16448,18 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> onOff_onWithRecallGlobalScene_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            onOffonCommandParams);
+    onOffClusterCommandInfo.put("on", onOffonCommandInfo);
+    Map<String, CommandParameter> onOffonWithRecallGlobalSceneCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter onOff_onWithRecallGlobalScene_commandParameter =
+    CommandParameter onOffonWithRecallGlobalSceneCommandParameter =
         new CommandParameter("OnOff", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo onOff_onWithRecallGlobalScene_CommandInfo =
+    CommandInfo onOffonWithRecallGlobalSceneCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15197,6 +16470,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             onOff_onWithRecallGlobalScene_commandParams);
     onOff_ClusterCommandInfo.put(
         "onWithRecallGlobalScene", onOff_onWithRecallGlobalScene_CommandInfo);
@@ -15218,26 +16492,37 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> onOff_onWithTimedOff_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            onOffonWithRecallGlobalSceneCommandParams);
+    onOffClusterCommandInfo.put("onWithRecallGlobalScene", onOffonWithRecallGlobalSceneCommandInfo);
+    Map<String, CommandParameter> onOffonWithTimedOffCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter onOff_onWithTimedOff_commandParameter =
+    CommandParameter onOffonWithTimedOffCommandParameter =
         new CommandParameter("OnOff", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter onOff_onWithTimedOff_onOffControl_commandParameter =
+    CommandParameter onOffonWithTimedOffonOffControlCommandParameter =
         new CommandParameter("onOffControl", int.class);
-    onOff_onWithTimedOff_commandParams.put(
-        "onOffControl", onOff_onWithTimedOff_onOffControl_commandParameter);
+    onOffonWithTimedOffCommandParams.put(
+        "onOffControl", onOffonWithTimedOffonOffControlCommandParameter);
 
-    CommandParameter onOff_onWithTimedOff_onTime_commandParameter =
+    CommandParameter onOffonWithTimedOffonTimeCommandParameter =
         new CommandParameter("onTime", int.class);
-    onOff_onWithTimedOff_commandParams.put("onTime", onOff_onWithTimedOff_onTime_commandParameter);
+    onOffonWithTimedOffCommandParams.put("onTime", onOffonWithTimedOffonTimeCommandParameter);
 
-    CommandParameter onOff_onWithTimedOff_offWaitTime_commandParameter =
+    CommandParameter onOffonWithTimedOffoffWaitTimeCommandParameter =
         new CommandParameter("offWaitTime", int.class);
+<<<<<<< HEAD
     onOff_onWithTimedOff_commandParams.put(
         "offWaitTime", onOff_onWithTimedOff_offWaitTime_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    onOffonWithTimedOffCommandParams.put(
+        "offWaitTime", onOffonWithTimedOffoffWaitTimeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo onOff_onWithTimedOff_CommandInfo =
+    CommandInfo onOffonWithTimedOffCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15252,6 +16537,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             onOff_onWithTimedOff_commandParams);
     onOff_ClusterCommandInfo.put("onWithTimedOff", onOff_onWithTimedOff_CommandInfo);
 <<<<<<< HEAD
@@ -15261,12 +16547,18 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> onOff_toggle_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            onOffonWithTimedOffCommandParams);
+    onOffClusterCommandInfo.put("onWithTimedOff", onOffonWithTimedOffCommandInfo);
+    Map<String, CommandParameter> onOfftoggleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter onOff_toggle_commandParameter =
+    CommandParameter onOfftoggleCommandParameter =
         new CommandParameter("OnOff", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo onOff_toggle_CommandInfo =
+    CommandInfo onOfftoggleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15276,19 +16568,20 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            onOff_toggle_commandParams);
-    onOff_ClusterCommandInfo.put("toggle", onOff_toggle_CommandInfo);
+            onOfftoggleCommandParams);
+    onOffClusterCommandInfo.put("toggle", onOfftoggleCommandInfo);
     // Populate cluster
-    ClusterInfo onOff_clusterInfo =
+    ClusterInfo onOffClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.OnOffCluster(ptr, endpointId),
-            onOff_ClusterCommandInfo);
-    clusterMap.put("onOff", onOff_clusterInfo);
-    Map<String, CommandInfo> onOffSwitchConfiguration_ClusterCommandInfo = new HashMap<>();
+            onOffClusterCommandInfo);
+    clusterMap.put("onOff", onOffClusterInfo);
+    Map<String, CommandInfo> onOffSwitchConfigurationClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo onOffSwitchConfiguration_clusterInfo =
+    ClusterInfo onOffSwitchConfigurationClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.OnOffSwitchConfigurationCluster(ptr, endpointId),
+<<<<<<< HEAD
             onOffSwitchConfiguration_ClusterCommandInfo);
     clusterMap.put("onOffSwitchConfiguration", onOffSwitchConfiguration_clusterInfo);
     Map<String, CommandInfo> operationalCredentials_ClusterCommandInfo = new HashMap<>();
@@ -15318,39 +16611,51 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> operationalCredentials_addNOC_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            onOffSwitchConfigurationClusterCommandInfo);
+    clusterMap.put("onOffSwitchConfiguration", onOffSwitchConfigurationClusterInfo);
+    Map<String, CommandInfo> operationalCredentialsClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> operationalCredentialsaddNOCCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter operationalCredentials_addNOC_commandParameter =
+    CommandParameter operationalCredentialsaddNOCCommandParameter =
         new CommandParameter(
             "OperationalCredentials",
             ChipClusters.OperationalCredentialsCluster.NOCResponseCallback.class);
-    CommandParameter operationalCredentials_addNOC_NOCValue_commandParameter =
+    CommandParameter operationalCredentialsaddNOCNOCValueCommandParameter =
         new CommandParameter("NOCValue", byte[].class);
-    operationalCredentials_addNOC_commandParams.put(
-        "NOCValue", operationalCredentials_addNOC_NOCValue_commandParameter);
+    operationalCredentialsaddNOCCommandParams.put(
+        "NOCValue", operationalCredentialsaddNOCNOCValueCommandParameter);
 
-    CommandParameter operationalCredentials_addNOC_ICACValue_commandParameter =
+    CommandParameter operationalCredentialsaddNOCICACValueCommandParameter =
         new CommandParameter("ICACValue", byte[].class);
-    operationalCredentials_addNOC_commandParams.put(
-        "ICACValue", operationalCredentials_addNOC_ICACValue_commandParameter);
+    operationalCredentialsaddNOCCommandParams.put(
+        "ICACValue", operationalCredentialsaddNOCICACValueCommandParameter);
 
-    CommandParameter operationalCredentials_addNOC_IPKValue_commandParameter =
+    CommandParameter operationalCredentialsaddNOCIPKValueCommandParameter =
         new CommandParameter("IPKValue", byte[].class);
-    operationalCredentials_addNOC_commandParams.put(
-        "IPKValue", operationalCredentials_addNOC_IPKValue_commandParameter);
+    operationalCredentialsaddNOCCommandParams.put(
+        "IPKValue", operationalCredentialsaddNOCIPKValueCommandParameter);
 
-    CommandParameter operationalCredentials_addNOC_caseAdminNode_commandParameter =
+    CommandParameter operationalCredentialsaddNOCcaseAdminNodeCommandParameter =
         new CommandParameter("caseAdminNode", long.class);
-    operationalCredentials_addNOC_commandParams.put(
-        "caseAdminNode", operationalCredentials_addNOC_caseAdminNode_commandParameter);
+    operationalCredentialsaddNOCCommandParams.put(
+        "caseAdminNode", operationalCredentialsaddNOCcaseAdminNodeCommandParameter);
 
-    CommandParameter operationalCredentials_addNOC_adminVendorId_commandParameter =
+    CommandParameter operationalCredentialsaddNOCadminVendorIdCommandParameter =
         new CommandParameter("adminVendorId", int.class);
+<<<<<<< HEAD
     operationalCredentials_addNOC_commandParams.put(
         "adminVendorId", operationalCredentials_addNOC_adminVendorId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    operationalCredentialsaddNOCCommandParams.put(
+        "adminVendorId", operationalCredentialsaddNOCadminVendorIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo operationalCredentials_addNOC_CommandInfo =
+    CommandInfo operationalCredentialsaddNOCCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15366,6 +16671,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("adminVendorId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             operationalCredentials_addNOC_commandParams);
     operationalCredentials_ClusterCommandInfo.put(
@@ -15382,19 +16688,30 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> operationalCredentials_addTrustedRootCertificate_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedNOCResponseCallback(),
+            operationalCredentialsaddNOCCommandParams);
+    operationalCredentialsClusterCommandInfo.put("addNOC", operationalCredentialsaddNOCCommandInfo);
+    Map<String, CommandParameter> operationalCredentialsaddTrustedRootCertificateCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter operationalCredentials_addTrustedRootCertificate_commandParameter =
+    CommandParameter operationalCredentialsaddTrustedRootCertificateCommandParameter =
         new CommandParameter("OperationalCredentials", ChipClusters.DefaultClusterCallback.class);
     CommandParameter
-        operationalCredentials_addTrustedRootCertificate_rootCertificate_commandParameter =
+        operationalCredentialsaddTrustedRootCertificaterootCertificateCommandParameter =
             new CommandParameter("rootCertificate", byte[].class);
-    operationalCredentials_addTrustedRootCertificate_commandParams.put(
+    operationalCredentialsaddTrustedRootCertificateCommandParams.put(
         "rootCertificate",
+<<<<<<< HEAD
         operationalCredentials_addTrustedRootCertificate_rootCertificate_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        operationalCredentialsaddTrustedRootCertificaterootCertificateCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo operationalCredentials_addTrustedRootCertificate_CommandInfo =
+    CommandInfo operationalCredentialsaddTrustedRootCertificateCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15407,6 +16724,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             operationalCredentials_addTrustedRootCertificate_commandParams);
     operationalCredentials_ClusterCommandInfo.put(
         "addTrustedRootCertificate", operationalCredentials_addTrustedRootCertificate_CommandInfo);
@@ -15422,20 +16740,31 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> operationalCredentials_attestationRequest_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            operationalCredentialsaddTrustedRootCertificateCommandParams);
+    operationalCredentialsClusterCommandInfo.put(
+        "addTrustedRootCertificate", operationalCredentialsaddTrustedRootCertificateCommandInfo);
+    Map<String, CommandParameter> operationalCredentialsattestationRequestCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter operationalCredentials_attestationRequest_commandParameter =
+    CommandParameter operationalCredentialsattestationRequestCommandParameter =
         new CommandParameter(
             "OperationalCredentials",
             ChipClusters.OperationalCredentialsCluster.AttestationResponseCallback.class);
-    CommandParameter operationalCredentials_attestationRequest_attestationNonce_commandParameter =
+    CommandParameter operationalCredentialsattestationRequestattestationNonceCommandParameter =
         new CommandParameter("attestationNonce", byte[].class);
-    operationalCredentials_attestationRequest_commandParams.put(
+    operationalCredentialsattestationRequestCommandParams.put(
         "attestationNonce",
+<<<<<<< HEAD
         operationalCredentials_attestationRequest_attestationNonce_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        operationalCredentialsattestationRequestattestationNonceCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo operationalCredentials_attestationRequest_CommandInfo =
+    CommandInfo operationalCredentialsattestationRequestCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15448,6 +16777,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("attestationNonce"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             operationalCredentials_attestationRequest_commandParams);
     operationalCredentials_ClusterCommandInfo.put(
@@ -15464,21 +16794,32 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> operationalCredentials_certificateChainRequest_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedAttestationResponseCallback(),
+            operationalCredentialsattestationRequestCommandParams);
+    operationalCredentialsClusterCommandInfo.put(
+        "attestationRequest", operationalCredentialsattestationRequestCommandInfo);
+    Map<String, CommandParameter> operationalCredentialscertificateChainRequestCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter operationalCredentials_certificateChainRequest_commandParameter =
+    CommandParameter operationalCredentialscertificateChainRequestCommandParameter =
         new CommandParameter(
             "OperationalCredentials",
             ChipClusters.OperationalCredentialsCluster.CertificateChainResponseCallback.class);
-    CommandParameter
-        operationalCredentials_certificateChainRequest_certificateType_commandParameter =
-            new CommandParameter("certificateType", int.class);
-    operationalCredentials_certificateChainRequest_commandParams.put(
+    CommandParameter operationalCredentialscertificateChainRequestcertificateTypeCommandParameter =
+        new CommandParameter("certificateType", int.class);
+    operationalCredentialscertificateChainRequestCommandParams.put(
         "certificateType",
+<<<<<<< HEAD
         operationalCredentials_certificateChainRequest_certificateType_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        operationalCredentialscertificateChainRequestcertificateTypeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo operationalCredentials_certificateChainRequest_CommandInfo =
+    CommandInfo operationalCredentialscertificateChainRequestCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15491,6 +16832,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("certificateType"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             operationalCredentials_certificateChainRequest_commandParams);
     operationalCredentials_ClusterCommandInfo.put(
@@ -15505,19 +16847,32 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> operationalCredentials_opCSRRequest_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedCertificateChainResponseCallback(),
+            operationalCredentialscertificateChainRequestCommandParams);
+    operationalCredentialsClusterCommandInfo.put(
+        "certificateChainRequest", operationalCredentialscertificateChainRequestCommandInfo);
+    Map<String, CommandParameter> operationalCredentialsopCSRRequestCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter operationalCredentials_opCSRRequest_commandParameter =
+    CommandParameter operationalCredentialsopCSRRequestCommandParameter =
         new CommandParameter(
             "OperationalCredentials",
             ChipClusters.OperationalCredentialsCluster.OpCSRResponseCallback.class);
-    CommandParameter operationalCredentials_opCSRRequest_CSRNonce_commandParameter =
+    CommandParameter operationalCredentialsopCSRRequestCSRNonceCommandParameter =
         new CommandParameter("CSRNonce", byte[].class);
+<<<<<<< HEAD
     operationalCredentials_opCSRRequest_commandParams.put(
         "CSRNonce", operationalCredentials_opCSRRequest_CSRNonce_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    operationalCredentialsopCSRRequestCommandParams.put(
+        "CSRNonce", operationalCredentialsopCSRRequestCSRNonceCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo operationalCredentials_opCSRRequest_CommandInfo =
+    CommandInfo operationalCredentialsopCSRRequestCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15529,6 +16884,7 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("CSRNonce"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             operationalCredentials_opCSRRequest_commandParams);
     operationalCredentials_ClusterCommandInfo.put(
@@ -15544,19 +16900,32 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> operationalCredentials_removeFabric_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedOpCSRResponseCallback(),
+            operationalCredentialsopCSRRequestCommandParams);
+    operationalCredentialsClusterCommandInfo.put(
+        "opCSRRequest", operationalCredentialsopCSRRequestCommandInfo);
+    Map<String, CommandParameter> operationalCredentialsremoveFabricCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter operationalCredentials_removeFabric_commandParameter =
+    CommandParameter operationalCredentialsremoveFabricCommandParameter =
         new CommandParameter(
             "OperationalCredentials",
             ChipClusters.OperationalCredentialsCluster.NOCResponseCallback.class);
-    CommandParameter operationalCredentials_removeFabric_fabricIndex_commandParameter =
+    CommandParameter operationalCredentialsremoveFabricfabricIndexCommandParameter =
         new CommandParameter("fabricIndex", int.class);
+<<<<<<< HEAD
     operationalCredentials_removeFabric_commandParams.put(
         "fabricIndex", operationalCredentials_removeFabric_fabricIndex_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    operationalCredentialsremoveFabricCommandParams.put(
+        "fabricIndex", operationalCredentialsremoveFabricfabricIndexCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo operationalCredentials_removeFabric_CommandInfo =
+    CommandInfo operationalCredentialsremoveFabricCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15568,6 +16937,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("fabricIndex"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             operationalCredentials_removeFabric_commandParams);
     operationalCredentials_ClusterCommandInfo.put(
@@ -15585,19 +16955,31 @@ public class ClusterInfoMapping {
     Map<String, CommandParameter>
         operationalCredentials_removeTrustedRootCertificate_commandParams =
             new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedNOCResponseCallback(),
+            operationalCredentialsremoveFabricCommandParams);
+    operationalCredentialsClusterCommandInfo.put(
+        "removeFabric", operationalCredentialsremoveFabricCommandInfo);
+    Map<String, CommandParameter> operationalCredentialsremoveTrustedRootCertificateCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter operationalCredentials_removeTrustedRootCertificate_commandParameter =
+    CommandParameter operationalCredentialsremoveTrustedRootCertificateCommandParameter =
         new CommandParameter("OperationalCredentials", ChipClusters.DefaultClusterCallback.class);
     CommandParameter
-        operationalCredentials_removeTrustedRootCertificate_trustedRootIdentifier_commandParameter =
+        operationalCredentialsremoveTrustedRootCertificatetrustedRootIdentifierCommandParameter =
             new CommandParameter("trustedRootIdentifier", byte[].class);
-    operationalCredentials_removeTrustedRootCertificate_commandParams.put(
+    operationalCredentialsremoveTrustedRootCertificateCommandParams.put(
         "trustedRootIdentifier",
+<<<<<<< HEAD
         operationalCredentials_removeTrustedRootCertificate_trustedRootIdentifier_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        operationalCredentialsremoveTrustedRootCertificatetrustedRootIdentifierCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo operationalCredentials_removeTrustedRootCertificate_CommandInfo =
+    CommandInfo operationalCredentialsremoveTrustedRootCertificateCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15610,9 +16992,10 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            operationalCredentials_removeTrustedRootCertificate_commandParams);
-    operationalCredentials_ClusterCommandInfo.put(
+            operationalCredentialsremoveTrustedRootCertificateCommandParams);
+    operationalCredentialsClusterCommandInfo.put(
         "removeTrustedRootCertificate",
+<<<<<<< HEAD
         operationalCredentials_removeTrustedRootCertificate_CommandInfo);
 <<<<<<< HEAD
     List<CommandParameter> operationalCredentials_updateFabricLabel_commandParams =
@@ -15626,19 +17009,29 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> operationalCredentials_updateFabricLabel_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+        operationalCredentialsremoveTrustedRootCertificateCommandInfo);
+    Map<String, CommandParameter> operationalCredentialsupdateFabricLabelCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter operationalCredentials_updateFabricLabel_commandParameter =
+    CommandParameter operationalCredentialsupdateFabricLabelCommandParameter =
         new CommandParameter(
             "OperationalCredentials",
             ChipClusters.OperationalCredentialsCluster.NOCResponseCallback.class);
-    CommandParameter operationalCredentials_updateFabricLabel_label_commandParameter =
+    CommandParameter operationalCredentialsupdateFabricLabellabelCommandParameter =
         new CommandParameter("label", String.class);
+<<<<<<< HEAD
     operationalCredentials_updateFabricLabel_commandParams.put(
         "label", operationalCredentials_updateFabricLabel_label_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    operationalCredentialsupdateFabricLabelCommandParams.put(
+        "label", operationalCredentialsupdateFabricLabellabelCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo operationalCredentials_updateFabricLabel_CommandInfo =
+    CommandInfo operationalCredentialsupdateFabricLabelCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15650,6 +17043,7 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("label"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             operationalCredentials_updateFabricLabel_commandParams);
     operationalCredentials_ClusterCommandInfo.put(
@@ -15668,24 +17062,37 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> operationalCredentials_updateNOC_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedNOCResponseCallback(),
+            operationalCredentialsupdateFabricLabelCommandParams);
+    operationalCredentialsClusterCommandInfo.put(
+        "updateFabricLabel", operationalCredentialsupdateFabricLabelCommandInfo);
+    Map<String, CommandParameter> operationalCredentialsupdateNOCCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter operationalCredentials_updateNOC_commandParameter =
+    CommandParameter operationalCredentialsupdateNOCCommandParameter =
         new CommandParameter(
             "OperationalCredentials",
             ChipClusters.OperationalCredentialsCluster.NOCResponseCallback.class);
-    CommandParameter operationalCredentials_updateNOC_NOCValue_commandParameter =
+    CommandParameter operationalCredentialsupdateNOCNOCValueCommandParameter =
         new CommandParameter("NOCValue", byte[].class);
-    operationalCredentials_updateNOC_commandParams.put(
-        "NOCValue", operationalCredentials_updateNOC_NOCValue_commandParameter);
+    operationalCredentialsupdateNOCCommandParams.put(
+        "NOCValue", operationalCredentialsupdateNOCNOCValueCommandParameter);
 
-    CommandParameter operationalCredentials_updateNOC_ICACValue_commandParameter =
+    CommandParameter operationalCredentialsupdateNOCICACValueCommandParameter =
         new CommandParameter("ICACValue", byte[].class);
+<<<<<<< HEAD
     operationalCredentials_updateNOC_commandParams.put(
         "ICACValue", operationalCredentials_updateNOC_ICACValue_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    operationalCredentialsupdateNOCCommandParams.put(
+        "ICACValue", operationalCredentialsupdateNOCICACValueCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo operationalCredentials_updateNOC_CommandInfo =
+    CommandInfo operationalCredentialsupdateNOCCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15698,44 +17105,45 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("ICACValue"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            operationalCredentials_updateNOC_commandParams);
-    operationalCredentials_ClusterCommandInfo.put(
-        "updateNOC", operationalCredentials_updateNOC_CommandInfo);
+            () -> new DelegatedNOCResponseCallback(),
+            operationalCredentialsupdateNOCCommandParams);
+    operationalCredentialsClusterCommandInfo.put(
+        "updateNOC", operationalCredentialsupdateNOCCommandInfo);
     // Populate cluster
-    ClusterInfo operationalCredentials_clusterInfo =
+    ClusterInfo operationalCredentialsClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.OperationalCredentialsCluster(ptr, endpointId),
-            operationalCredentials_ClusterCommandInfo);
-    clusterMap.put("operationalCredentials", operationalCredentials_clusterInfo);
-    Map<String, CommandInfo> powerSource_ClusterCommandInfo = new HashMap<>();
+            operationalCredentialsClusterCommandInfo);
+    clusterMap.put("operationalCredentials", operationalCredentialsClusterInfo);
+    Map<String, CommandInfo> powerSourceClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo powerSource_clusterInfo =
+    ClusterInfo powerSourceClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.PowerSourceCluster(ptr, endpointId),
-            powerSource_ClusterCommandInfo);
-    clusterMap.put("powerSource", powerSource_clusterInfo);
-    Map<String, CommandInfo> pressureMeasurement_ClusterCommandInfo = new HashMap<>();
+            powerSourceClusterCommandInfo);
+    clusterMap.put("powerSource", powerSourceClusterInfo);
+    Map<String, CommandInfo> pressureMeasurementClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo pressureMeasurement_clusterInfo =
+    ClusterInfo pressureMeasurementClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.PressureMeasurementCluster(ptr, endpointId),
-            pressureMeasurement_ClusterCommandInfo);
-    clusterMap.put("pressureMeasurement", pressureMeasurement_clusterInfo);
-    Map<String, CommandInfo> pumpConfigurationAndControl_ClusterCommandInfo = new HashMap<>();
+            pressureMeasurementClusterCommandInfo);
+    clusterMap.put("pressureMeasurement", pressureMeasurementClusterInfo);
+    Map<String, CommandInfo> pumpConfigurationAndControlClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo pumpConfigurationAndControl_clusterInfo =
+    ClusterInfo pumpConfigurationAndControlClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) ->
                 new ChipClusters.PumpConfigurationAndControlCluster(ptr, endpointId),
-            pumpConfigurationAndControl_ClusterCommandInfo);
-    clusterMap.put("pumpConfigurationAndControl", pumpConfigurationAndControl_clusterInfo);
-    Map<String, CommandInfo> relativeHumidityMeasurement_ClusterCommandInfo = new HashMap<>();
+            pumpConfigurationAndControlClusterCommandInfo);
+    clusterMap.put("pumpConfigurationAndControl", pumpConfigurationAndControlClusterInfo);
+    Map<String, CommandInfo> relativeHumidityMeasurementClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo relativeHumidityMeasurement_clusterInfo =
+    ClusterInfo relativeHumidityMeasurementClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) ->
                 new ChipClusters.RelativeHumidityMeasurementCluster(ptr, endpointId),
+<<<<<<< HEAD
             relativeHumidityMeasurement_ClusterCommandInfo);
     clusterMap.put("relativeHumidityMeasurement", relativeHumidityMeasurement_clusterInfo);
     Map<String, CommandInfo> scenes_ClusterCommandInfo = new HashMap<>();
@@ -15769,41 +17177,52 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> scenes_addScene_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            relativeHumidityMeasurementClusterCommandInfo);
+    clusterMap.put("relativeHumidityMeasurement", relativeHumidityMeasurementClusterInfo);
+    Map<String, CommandInfo> scenesClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> scenesaddSceneCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter scenes_addScene_commandParameter =
+    CommandParameter scenesaddSceneCommandParameter =
         new CommandParameter("Scenes", ChipClusters.ScenesCluster.AddSceneResponseCallback.class);
-    CommandParameter scenes_addScene_groupId_commandParameter =
+    CommandParameter scenesaddScenegroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_addScene_commandParams.put("groupId", scenes_addScene_groupId_commandParameter);
+    scenesaddSceneCommandParams.put("groupId", scenesaddScenegroupIdCommandParameter);
 
-    CommandParameter scenes_addScene_sceneId_commandParameter =
+    CommandParameter scenesaddScenesceneIdCommandParameter =
         new CommandParameter("sceneId", int.class);
-    scenes_addScene_commandParams.put("sceneId", scenes_addScene_sceneId_commandParameter);
+    scenesaddSceneCommandParams.put("sceneId", scenesaddScenesceneIdCommandParameter);
 
-    CommandParameter scenes_addScene_transitionTime_commandParameter =
+    CommandParameter scenesaddScenetransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
-    scenes_addScene_commandParams.put(
-        "transitionTime", scenes_addScene_transitionTime_commandParameter);
+    scenesaddSceneCommandParams.put("transitionTime", scenesaddScenetransitionTimeCommandParameter);
 
-    CommandParameter scenes_addScene_sceneName_commandParameter =
+    CommandParameter scenesaddScenesceneNameCommandParameter =
         new CommandParameter("sceneName", String.class);
-    scenes_addScene_commandParams.put("sceneName", scenes_addScene_sceneName_commandParameter);
+    scenesaddSceneCommandParams.put("sceneName", scenesaddScenesceneNameCommandParameter);
 
-    CommandParameter scenes_addScene_clusterId_commandParameter =
+    CommandParameter scenesaddSceneclusterIdCommandParameter =
         new CommandParameter("clusterId", long.class);
-    scenes_addScene_commandParams.put("clusterId", scenes_addScene_clusterId_commandParameter);
+    scenesaddSceneCommandParams.put("clusterId", scenesaddSceneclusterIdCommandParameter);
 
-    CommandParameter scenes_addScene_length_commandParameter =
+    CommandParameter scenesaddScenelengthCommandParameter =
         new CommandParameter("length", int.class);
-    scenes_addScene_commandParams.put("length", scenes_addScene_length_commandParameter);
+    scenesaddSceneCommandParams.put("length", scenesaddScenelengthCommandParameter);
 
+<<<<<<< HEAD
     CommandParameter scenes_addScene_value_commandParameter =
         new CommandParameter("value", int.class);
     scenes_addScene_commandParams.put("value", scenes_addScene_value_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    CommandParameter scenesaddScenevalueCommandParameter = new CommandParameter("value", int.class);
+    scenesaddSceneCommandParams.put("value", scenesaddScenevalueCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo scenes_addScene_CommandInfo =
+    CommandInfo scenesaddSceneCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15821,6 +17240,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("value"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             scenes_addScene_commandParams);
     scenes_ClusterCommandInfo.put("addScene", scenes_addScene_CommandInfo);
@@ -15834,18 +17254,30 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> scenes_getSceneMembership_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedAddSceneResponseCallback(),
+            scenesaddSceneCommandParams);
+    scenesClusterCommandInfo.put("addScene", scenesaddSceneCommandInfo);
+    Map<String, CommandParameter> scenesgetSceneMembershipCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter scenes_getSceneMembership_commandParameter =
+    CommandParameter scenesgetSceneMembershipCommandParameter =
         new CommandParameter(
             "Scenes", ChipClusters.ScenesCluster.GetSceneMembershipResponseCallback.class);
-    CommandParameter scenes_getSceneMembership_groupId_commandParameter =
+    CommandParameter scenesgetSceneMembershipgroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
+<<<<<<< HEAD
     scenes_getSceneMembership_commandParams.put(
         "groupId", scenes_getSceneMembership_groupId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    scenesgetSceneMembershipCommandParams.put(
+        "groupId", scenesgetSceneMembershipgroupIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo scenes_getSceneMembership_CommandInfo =
+    CommandInfo scenesgetSceneMembershipCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15857,6 +17289,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("groupId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             scenes_getSceneMembership_commandParams);
     scenes_ClusterCommandInfo.put("getSceneMembership", scenes_getSceneMembership_CommandInfo);
@@ -15878,25 +17311,37 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> scenes_recallScene_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedGetSceneMembershipResponseCallback(),
+            scenesgetSceneMembershipCommandParams);
+    scenesClusterCommandInfo.put("getSceneMembership", scenesgetSceneMembershipCommandInfo);
+    Map<String, CommandParameter> scenesrecallSceneCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter scenes_recallScene_commandParameter =
+    CommandParameter scenesrecallSceneCommandParameter =
         new CommandParameter("Scenes", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter scenes_recallScene_groupId_commandParameter =
+    CommandParameter scenesrecallScenegroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_recallScene_commandParams.put("groupId", scenes_recallScene_groupId_commandParameter);
+    scenesrecallSceneCommandParams.put("groupId", scenesrecallScenegroupIdCommandParameter);
 
-    CommandParameter scenes_recallScene_sceneId_commandParameter =
+    CommandParameter scenesrecallScenesceneIdCommandParameter =
         new CommandParameter("sceneId", int.class);
-    scenes_recallScene_commandParams.put("sceneId", scenes_recallScene_sceneId_commandParameter);
+    scenesrecallSceneCommandParams.put("sceneId", scenesrecallScenesceneIdCommandParameter);
 
-    CommandParameter scenes_recallScene_transitionTime_commandParameter =
+    CommandParameter scenesrecallScenetransitionTimeCommandParameter =
         new CommandParameter("transitionTime", int.class);
+<<<<<<< HEAD
     scenes_recallScene_commandParams.put(
         "transitionTime", scenes_recallScene_transitionTime_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    scenesrecallSceneCommandParams.put(
+        "transitionTime", scenesrecallScenetransitionTimeCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo scenes_recallScene_CommandInfo =
+    CommandInfo scenesrecallSceneCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15911,6 +17356,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             scenes_recallScene_commandParams);
     scenes_ClusterCommandInfo.put("recallScene", scenes_recallScene_CommandInfo);
 <<<<<<< HEAD
@@ -15923,18 +17369,28 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> scenes_removeAllScenes_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            scenesrecallSceneCommandParams);
+    scenesClusterCommandInfo.put("recallScene", scenesrecallSceneCommandInfo);
+    Map<String, CommandParameter> scenesremoveAllScenesCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter scenes_removeAllScenes_commandParameter =
+    CommandParameter scenesremoveAllScenesCommandParameter =
         new CommandParameter(
             "Scenes", ChipClusters.ScenesCluster.RemoveAllScenesResponseCallback.class);
-    CommandParameter scenes_removeAllScenes_groupId_commandParameter =
+    CommandParameter scenesremoveAllScenesgroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
+<<<<<<< HEAD
     scenes_removeAllScenes_commandParams.put(
         "groupId", scenes_removeAllScenes_groupId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    scenesremoveAllScenesCommandParams.put("groupId", scenesremoveAllScenesgroupIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo scenes_removeAllScenes_CommandInfo =
+    CommandInfo scenesremoveAllScenesCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15946,6 +17402,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("groupId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             scenes_removeAllScenes_commandParams);
     scenes_ClusterCommandInfo.put("removeAllScenes", scenes_removeAllScenes_CommandInfo);
@@ -15963,21 +17420,32 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> scenes_removeScene_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedRemoveAllScenesResponseCallback(),
+            scenesremoveAllScenesCommandParams);
+    scenesClusterCommandInfo.put("removeAllScenes", scenesremoveAllScenesCommandInfo);
+    Map<String, CommandParameter> scenesremoveSceneCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter scenes_removeScene_commandParameter =
+    CommandParameter scenesremoveSceneCommandParameter =
         new CommandParameter(
             "Scenes", ChipClusters.ScenesCluster.RemoveSceneResponseCallback.class);
-    CommandParameter scenes_removeScene_groupId_commandParameter =
+    CommandParameter scenesremoveScenegroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_removeScene_commandParams.put("groupId", scenes_removeScene_groupId_commandParameter);
+    scenesremoveSceneCommandParams.put("groupId", scenesremoveScenegroupIdCommandParameter);
 
-    CommandParameter scenes_removeScene_sceneId_commandParameter =
+    CommandParameter scenesremoveScenesceneIdCommandParameter =
         new CommandParameter("sceneId", int.class);
+<<<<<<< HEAD
     scenes_removeScene_commandParams.put("sceneId", scenes_removeScene_sceneId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    scenesremoveSceneCommandParams.put("sceneId", scenesremoveScenesceneIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo scenes_removeScene_CommandInfo =
+    CommandInfo scenesremoveSceneCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -15990,6 +17458,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("sceneId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             scenes_removeScene_commandParams);
     scenes_ClusterCommandInfo.put("removeScene", scenes_removeScene_CommandInfo);
@@ -16007,20 +17476,31 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> scenes_storeScene_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedRemoveSceneResponseCallback(),
+            scenesremoveSceneCommandParams);
+    scenesClusterCommandInfo.put("removeScene", scenesremoveSceneCommandInfo);
+    Map<String, CommandParameter> scenesstoreSceneCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter scenes_storeScene_commandParameter =
+    CommandParameter scenesstoreSceneCommandParameter =
         new CommandParameter("Scenes", ChipClusters.ScenesCluster.StoreSceneResponseCallback.class);
-    CommandParameter scenes_storeScene_groupId_commandParameter =
+    CommandParameter scenesstoreScenegroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_storeScene_commandParams.put("groupId", scenes_storeScene_groupId_commandParameter);
+    scenesstoreSceneCommandParams.put("groupId", scenesstoreScenegroupIdCommandParameter);
 
-    CommandParameter scenes_storeScene_sceneId_commandParameter =
+    CommandParameter scenesstoreScenesceneIdCommandParameter =
         new CommandParameter("sceneId", int.class);
+<<<<<<< HEAD
     scenes_storeScene_commandParams.put("sceneId", scenes_storeScene_sceneId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    scenesstoreSceneCommandParams.put("sceneId", scenesstoreScenesceneIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo scenes_storeScene_CommandInfo =
+    CommandInfo scenesstoreSceneCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16033,6 +17513,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("sceneId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             scenes_storeScene_commandParams);
     scenes_ClusterCommandInfo.put("storeScene", scenes_storeScene_CommandInfo);
@@ -16050,20 +17531,31 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> scenes_viewScene_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedStoreSceneResponseCallback(),
+            scenesstoreSceneCommandParams);
+    scenesClusterCommandInfo.put("storeScene", scenesstoreSceneCommandInfo);
+    Map<String, CommandParameter> scenesviewSceneCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter scenes_viewScene_commandParameter =
+    CommandParameter scenesviewSceneCommandParameter =
         new CommandParameter("Scenes", ChipClusters.ScenesCluster.ViewSceneResponseCallback.class);
-    CommandParameter scenes_viewScene_groupId_commandParameter =
+    CommandParameter scenesviewScenegroupIdCommandParameter =
         new CommandParameter("groupId", int.class);
-    scenes_viewScene_commandParams.put("groupId", scenes_viewScene_groupId_commandParameter);
+    scenesviewSceneCommandParams.put("groupId", scenesviewScenegroupIdCommandParameter);
 
-    CommandParameter scenes_viewScene_sceneId_commandParameter =
+    CommandParameter scenesviewScenesceneIdCommandParameter =
         new CommandParameter("sceneId", int.class);
+<<<<<<< HEAD
     scenes_viewScene_commandParams.put("sceneId", scenes_viewScene_sceneId_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    scenesviewSceneCommandParams.put("sceneId", scenesviewScenesceneIdCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo scenes_viewScene_CommandInfo =
+    CommandInfo scenesviewSceneCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16076,13 +17568,14 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("sceneId"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            scenes_viewScene_commandParams);
-    scenes_ClusterCommandInfo.put("viewScene", scenes_viewScene_CommandInfo);
+            () -> new DelegatedViewSceneResponseCallback(),
+            scenesviewSceneCommandParams);
+    scenesClusterCommandInfo.put("viewScene", scenesviewSceneCommandInfo);
     // Populate cluster
-    ClusterInfo scenes_clusterInfo =
+    ClusterInfo scenesClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ScenesCluster(ptr, endpointId),
+<<<<<<< HEAD
             scenes_ClusterCommandInfo);
     clusterMap.put("scenes", scenes_clusterInfo);
     Map<String, CommandInfo> softwareDiagnostics_ClusterCommandInfo = new HashMap<>();
@@ -16093,12 +17586,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> softwareDiagnostics_resetWatermarks_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            scenesClusterCommandInfo);
+    clusterMap.put("scenes", scenesClusterInfo);
+    Map<String, CommandInfo> softwareDiagnosticsClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> softwareDiagnosticsresetWatermarksCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter softwareDiagnostics_resetWatermarks_commandParameter =
+    CommandParameter softwareDiagnosticsresetWatermarksCommandParameter =
         new CommandParameter("SoftwareDiagnostics", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo softwareDiagnostics_resetWatermarks_CommandInfo =
+    CommandInfo softwareDiagnosticsresetWatermarksCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16109,20 +17609,21 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            softwareDiagnostics_resetWatermarks_commandParams);
-    softwareDiagnostics_ClusterCommandInfo.put(
-        "resetWatermarks", softwareDiagnostics_resetWatermarks_CommandInfo);
+            softwareDiagnosticsresetWatermarksCommandParams);
+    softwareDiagnosticsClusterCommandInfo.put(
+        "resetWatermarks", softwareDiagnosticsresetWatermarksCommandInfo);
     // Populate cluster
-    ClusterInfo softwareDiagnostics_clusterInfo =
+    ClusterInfo softwareDiagnosticsClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.SoftwareDiagnosticsCluster(ptr, endpointId),
-            softwareDiagnostics_ClusterCommandInfo);
-    clusterMap.put("softwareDiagnostics", softwareDiagnostics_clusterInfo);
-    Map<String, CommandInfo> switch_ClusterCommandInfo = new HashMap<>();
+            softwareDiagnosticsClusterCommandInfo);
+    clusterMap.put("softwareDiagnostics", softwareDiagnosticsClusterInfo);
+    Map<String, CommandInfo> switchClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo switch_clusterInfo =
+    ClusterInfo switchClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.SwitchCluster(ptr, endpointId),
+<<<<<<< HEAD
             switch_ClusterCommandInfo);
     clusterMap.put("switch", switch_clusterInfo);
     Map<String, CommandInfo> tvChannel_ClusterCommandInfo = new HashMap<>();
@@ -16136,18 +17637,29 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> tvChannel_changeChannel_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            switchClusterCommandInfo);
+    clusterMap.put("switch", switchClusterInfo);
+    Map<String, CommandInfo> tvChannelClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> tvChannelchangeChannelCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter tvChannel_changeChannel_commandParameter =
+    CommandParameter tvChannelchangeChannelCommandParameter =
         new CommandParameter(
             "TvChannel", ChipClusters.TvChannelCluster.ChangeChannelResponseCallback.class);
-    CommandParameter tvChannel_changeChannel_match_commandParameter =
+    CommandParameter tvChannelchangeChannelmatchCommandParameter =
         new CommandParameter("match", String.class);
+<<<<<<< HEAD
     tvChannel_changeChannel_commandParams.put(
         "match", tvChannel_changeChannel_match_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    tvChannelchangeChannelCommandParams.put("match", tvChannelchangeChannelmatchCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo tvChannel_changeChannel_CommandInfo =
+    CommandInfo tvChannelchangeChannelCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16159,6 +17671,7 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("match"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             tvChannel_changeChannel_commandParams);
     tvChannel_ClusterCommandInfo.put("changeChannel", tvChannel_changeChannel_CommandInfo);
@@ -16178,22 +17691,34 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> tvChannel_changeChannelByNumber_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedChangeChannelResponseCallback(),
+            tvChannelchangeChannelCommandParams);
+    tvChannelClusterCommandInfo.put("changeChannel", tvChannelchangeChannelCommandInfo);
+    Map<String, CommandParameter> tvChannelchangeChannelByNumberCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter tvChannel_changeChannelByNumber_commandParameter =
+    CommandParameter tvChannelchangeChannelByNumberCommandParameter =
         new CommandParameter("TvChannel", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter tvChannel_changeChannelByNumber_majorNumber_commandParameter =
+    CommandParameter tvChannelchangeChannelByNumbermajorNumberCommandParameter =
         new CommandParameter("majorNumber", int.class);
-    tvChannel_changeChannelByNumber_commandParams.put(
-        "majorNumber", tvChannel_changeChannelByNumber_majorNumber_commandParameter);
+    tvChannelchangeChannelByNumberCommandParams.put(
+        "majorNumber", tvChannelchangeChannelByNumbermajorNumberCommandParameter);
 
-    CommandParameter tvChannel_changeChannelByNumber_minorNumber_commandParameter =
+    CommandParameter tvChannelchangeChannelByNumberminorNumberCommandParameter =
         new CommandParameter("minorNumber", int.class);
+<<<<<<< HEAD
     tvChannel_changeChannelByNumber_commandParams.put(
         "minorNumber", tvChannel_changeChannelByNumber_minorNumber_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    tvChannelchangeChannelByNumberCommandParams.put(
+        "minorNumber", tvChannelchangeChannelByNumberminorNumberCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo tvChannel_changeChannelByNumber_CommandInfo =
+    CommandInfo tvChannelchangeChannelByNumberCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16207,6 +17732,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             tvChannel_changeChannelByNumber_commandParams);
     tvChannel_ClusterCommandInfo.put(
         "changeChannelByNumber", tvChannel_changeChannelByNumber_CommandInfo);
@@ -16219,16 +17745,27 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> tvChannel_skipChannel_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            tvChannelchangeChannelByNumberCommandParams);
+    tvChannelClusterCommandInfo.put(
+        "changeChannelByNumber", tvChannelchangeChannelByNumberCommandInfo);
+    Map<String, CommandParameter> tvChannelskipChannelCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter tvChannel_skipChannel_commandParameter =
+    CommandParameter tvChannelskipChannelCommandParameter =
         new CommandParameter("TvChannel", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter tvChannel_skipChannel_count_commandParameter =
+    CommandParameter tvChannelskipChannelcountCommandParameter =
         new CommandParameter("count", int.class);
+<<<<<<< HEAD
     tvChannel_skipChannel_commandParams.put("count", tvChannel_skipChannel_count_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    tvChannelskipChannelCommandParams.put("count", tvChannelskipChannelcountCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo tvChannel_skipChannel_CommandInfo =
+    CommandInfo tvChannelskipChannelCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16240,12 +17777,13 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            tvChannel_skipChannel_commandParams);
-    tvChannel_ClusterCommandInfo.put("skipChannel", tvChannel_skipChannel_CommandInfo);
+            tvChannelskipChannelCommandParams);
+    tvChannelClusterCommandInfo.put("skipChannel", tvChannelskipChannelCommandInfo);
     // Populate cluster
-    ClusterInfo tvChannel_clusterInfo =
+    ClusterInfo tvChannelClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.TvChannelCluster(ptr, endpointId),
+<<<<<<< HEAD
             tvChannel_ClusterCommandInfo);
     clusterMap.put("tvChannel", tvChannel_clusterInfo);
     Map<String, CommandInfo> targetNavigator_ClusterCommandInfo = new HashMap<>();
@@ -16263,24 +17801,36 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> targetNavigator_navigateTarget_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            tvChannelClusterCommandInfo);
+    clusterMap.put("tvChannel", tvChannelClusterInfo);
+    Map<String, CommandInfo> targetNavigatorClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> targetNavigatornavigateTargetCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter targetNavigator_navigateTarget_commandParameter =
+    CommandParameter targetNavigatornavigateTargetCommandParameter =
         new CommandParameter(
             "TargetNavigator",
             ChipClusters.TargetNavigatorCluster.NavigateTargetResponseCallback.class);
-    CommandParameter targetNavigator_navigateTarget_target_commandParameter =
+    CommandParameter targetNavigatornavigateTargettargetCommandParameter =
         new CommandParameter("target", int.class);
-    targetNavigator_navigateTarget_commandParams.put(
-        "target", targetNavigator_navigateTarget_target_commandParameter);
+    targetNavigatornavigateTargetCommandParams.put(
+        "target", targetNavigatornavigateTargettargetCommandParameter);
 
-    CommandParameter targetNavigator_navigateTarget_data_commandParameter =
+    CommandParameter targetNavigatornavigateTargetdataCommandParameter =
         new CommandParameter("data", String.class);
+<<<<<<< HEAD
     targetNavigator_navigateTarget_commandParams.put(
         "data", targetNavigator_navigateTarget_data_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    targetNavigatornavigateTargetCommandParams.put(
+        "data", targetNavigatornavigateTargetdataCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo targetNavigator_navigateTarget_CommandInfo =
+    CommandInfo targetNavigatornavigateTargetCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16293,21 +17843,22 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("data"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
-            () -> new DelegatedDefaultClusterCallback(),
-            targetNavigator_navigateTarget_commandParams);
-    targetNavigator_ClusterCommandInfo.put(
-        "navigateTarget", targetNavigator_navigateTarget_CommandInfo);
+            () -> new DelegatedNavigateTargetResponseCallback(),
+            targetNavigatornavigateTargetCommandParams);
+    targetNavigatorClusterCommandInfo.put(
+        "navigateTarget", targetNavigatornavigateTargetCommandInfo);
     // Populate cluster
-    ClusterInfo targetNavigator_clusterInfo =
+    ClusterInfo targetNavigatorClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.TargetNavigatorCluster(ptr, endpointId),
-            targetNavigator_ClusterCommandInfo);
-    clusterMap.put("targetNavigator", targetNavigator_clusterInfo);
-    Map<String, CommandInfo> temperatureMeasurement_ClusterCommandInfo = new HashMap<>();
+            targetNavigatorClusterCommandInfo);
+    clusterMap.put("targetNavigator", targetNavigatorClusterInfo);
+    Map<String, CommandInfo> temperatureMeasurementClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo temperatureMeasurement_clusterInfo =
+    ClusterInfo temperatureMeasurementClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.TemperatureMeasurementCluster(ptr, endpointId),
+<<<<<<< HEAD
             temperatureMeasurement_ClusterCommandInfo);
     clusterMap.put("temperatureMeasurement", temperatureMeasurement_clusterInfo);
     Map<String, CommandInfo> testCluster_ClusterCommandInfo = new HashMap<>();
@@ -16318,12 +17869,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> testCluster_test_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            temperatureMeasurementClusterCommandInfo);
+    clusterMap.put("temperatureMeasurement", temperatureMeasurementClusterInfo);
+    Map<String, CommandInfo> testClusterClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> testClustertestCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter testCluster_test_commandParameter =
+    CommandParameter testClustertestCommandParameter =
         new CommandParameter("TestCluster", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo testCluster_test_CommandInfo =
+    CommandInfo testClustertestCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16333,6 +17891,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             testCluster_test_commandParams);
     testCluster_ClusterCommandInfo.put("test", testCluster_test_CommandInfo);
 <<<<<<< HEAD
@@ -16349,23 +17908,34 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> testCluster_testAddArguments_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            testClustertestCommandParams);
+    testClusterClusterCommandInfo.put("test", testClustertestCommandInfo);
+    Map<String, CommandParameter> testClustertestAddArgumentsCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter testCluster_testAddArguments_commandParameter =
+    CommandParameter testClustertestAddArgumentsCommandParameter =
         new CommandParameter(
             "TestCluster", ChipClusters.TestClusterCluster.TestAddArgumentsResponseCallback.class);
-    CommandParameter testCluster_testAddArguments_arg1_commandParameter =
+    CommandParameter testClustertestAddArgumentsarg1CommandParameter =
         new CommandParameter("arg1", int.class);
-    testCluster_testAddArguments_commandParams.put(
-        "arg1", testCluster_testAddArguments_arg1_commandParameter);
+    testClustertestAddArgumentsCommandParams.put(
+        "arg1", testClustertestAddArgumentsarg1CommandParameter);
 
-    CommandParameter testCluster_testAddArguments_arg2_commandParameter =
+    CommandParameter testClustertestAddArgumentsarg2CommandParameter =
         new CommandParameter("arg2", int.class);
+<<<<<<< HEAD
     testCluster_testAddArguments_commandParams.put(
         "arg2", testCluster_testAddArguments_arg2_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    testClustertestAddArgumentsCommandParams.put(
+        "arg2", testClustertestAddArgumentsarg2CommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo testCluster_testAddArguments_CommandInfo =
+    CommandInfo testClustertestAddArgumentsCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16378,6 +17948,7 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("arg2"));
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             testCluster_testAddArguments_commandParams);
     testCluster_ClusterCommandInfo.put(
@@ -16389,12 +17960,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> testCluster_testNotHandled_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedTestAddArgumentsResponseCallback(),
+            testClustertestAddArgumentsCommandParams);
+    testClusterClusterCommandInfo.put("testAddArguments", testClustertestAddArgumentsCommandInfo);
+    Map<String, CommandParameter> testClustertestNotHandledCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter testCluster_testNotHandled_commandParameter =
+    CommandParameter testClustertestNotHandledCommandParameter =
         new CommandParameter("TestCluster", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo testCluster_testNotHandled_CommandInfo =
+    CommandInfo testClustertestNotHandledCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16405,6 +17983,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             testCluster_testNotHandled_commandParams);
     testCluster_ClusterCommandInfo.put("testNotHandled", testCluster_testNotHandled_CommandInfo);
 <<<<<<< HEAD
@@ -16414,13 +17993,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> testCluster_testSpecific_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            testClustertestNotHandledCommandParams);
+    testClusterClusterCommandInfo.put("testNotHandled", testClustertestNotHandledCommandInfo);
+    Map<String, CommandParameter> testClustertestSpecificCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter testCluster_testSpecific_commandParameter =
+    CommandParameter testClustertestSpecificCommandParameter =
         new CommandParameter(
             "TestCluster", ChipClusters.TestClusterCluster.TestSpecificResponseCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo testCluster_testSpecific_CommandInfo =
+    CommandInfo testClustertestSpecificCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16431,6 +18016,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.TestClusterCluster.TestSpecificResponseCallback) callback);
 >>>>>>> 677ef48a5 (callback generation done)
             },
+<<<<<<< HEAD
             () -> new DelegatedDefaultClusterCallback(),
             testCluster_testSpecific_commandParams);
     testCluster_ClusterCommandInfo.put("testSpecific", testCluster_testSpecific_CommandInfo);
@@ -16441,12 +18027,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> testCluster_testUnknownCommand_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            () -> new DelegatedTestSpecificResponseCallback(),
+            testClustertestSpecificCommandParams);
+    testClusterClusterCommandInfo.put("testSpecific", testClustertestSpecificCommandInfo);
+    Map<String, CommandParameter> testClustertestUnknownCommandCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter testCluster_testUnknownCommand_commandParameter =
+    CommandParameter testClustertestUnknownCommandCommandParameter =
         new CommandParameter("TestCluster", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo testCluster_testUnknownCommand_CommandInfo =
+    CommandInfo testClustertestUnknownCommandCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16457,13 +18050,14 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            testCluster_testUnknownCommand_commandParams);
-    testCluster_ClusterCommandInfo.put(
-        "testUnknownCommand", testCluster_testUnknownCommand_CommandInfo);
+            testClustertestUnknownCommandCommandParams);
+    testClusterClusterCommandInfo.put(
+        "testUnknownCommand", testClustertestUnknownCommandCommandInfo);
     // Populate cluster
-    ClusterInfo testCluster_clusterInfo =
+    ClusterInfo testClusterClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.TestClusterCluster(ptr, endpointId),
+<<<<<<< HEAD
             testCluster_ClusterCommandInfo);
     clusterMap.put("testCluster", testCluster_clusterInfo);
     Map<String, CommandInfo> thermostat_ClusterCommandInfo = new HashMap<>();
@@ -16474,12 +18068,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> thermostat_clearWeeklySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            testClusterClusterCommandInfo);
+    clusterMap.put("testCluster", testClusterClusterInfo);
+    Map<String, CommandInfo> thermostatClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> thermostatclearWeeklyScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter thermostat_clearWeeklySchedule_commandParameter =
+    CommandParameter thermostatclearWeeklyScheduleCommandParameter =
         new CommandParameter("Thermostat", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo thermostat_clearWeeklySchedule_CommandInfo =
+    CommandInfo thermostatclearWeeklyScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16490,6 +18091,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             thermostat_clearWeeklySchedule_commandParams);
     thermostat_ClusterCommandInfo.put(
         "clearWeeklySchedule", thermostat_clearWeeklySchedule_CommandInfo);
@@ -16500,12 +18102,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> thermostat_getRelayStatusLog_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            thermostatclearWeeklyScheduleCommandParams);
+    thermostatClusterCommandInfo.put(
+        "clearWeeklySchedule", thermostatclearWeeklyScheduleCommandInfo);
+    Map<String, CommandParameter> thermostatgetRelayStatusLogCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter thermostat_getRelayStatusLog_commandParameter =
+    CommandParameter thermostatgetRelayStatusLogCommandParameter =
         new CommandParameter("Thermostat", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo thermostat_getRelayStatusLog_CommandInfo =
+    CommandInfo thermostatgetRelayStatusLogCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16516,6 +18125,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             thermostat_getRelayStatusLog_commandParams);
     thermostat_ClusterCommandInfo.put(
         "getRelayStatusLog", thermostat_getRelayStatusLog_CommandInfo);
@@ -16533,22 +18143,33 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> thermostat_getWeeklySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            thermostatgetRelayStatusLogCommandParams);
+    thermostatClusterCommandInfo.put("getRelayStatusLog", thermostatgetRelayStatusLogCommandInfo);
+    Map<String, CommandParameter> thermostatgetWeeklyScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter thermostat_getWeeklySchedule_commandParameter =
+    CommandParameter thermostatgetWeeklyScheduleCommandParameter =
         new CommandParameter("Thermostat", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter thermostat_getWeeklySchedule_daysToReturn_commandParameter =
+    CommandParameter thermostatgetWeeklyScheduledaysToReturnCommandParameter =
         new CommandParameter("daysToReturn", int.class);
-    thermostat_getWeeklySchedule_commandParams.put(
-        "daysToReturn", thermostat_getWeeklySchedule_daysToReturn_commandParameter);
+    thermostatgetWeeklyScheduleCommandParams.put(
+        "daysToReturn", thermostatgetWeeklyScheduledaysToReturnCommandParameter);
 
-    CommandParameter thermostat_getWeeklySchedule_modeToReturn_commandParameter =
+    CommandParameter thermostatgetWeeklySchedulemodeToReturnCommandParameter =
         new CommandParameter("modeToReturn", int.class);
+<<<<<<< HEAD
     thermostat_getWeeklySchedule_commandParams.put(
         "modeToReturn", thermostat_getWeeklySchedule_modeToReturn_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    thermostatgetWeeklyScheduleCommandParams.put(
+        "modeToReturn", thermostatgetWeeklySchedulemodeToReturnCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo thermostat_getWeeklySchedule_CommandInfo =
+    CommandInfo thermostatgetWeeklyScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16562,6 +18183,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             thermostat_getWeeklySchedule_commandParams);
     thermostat_ClusterCommandInfo.put(
         "getWeeklySchedule", thermostat_getWeeklySchedule_CommandInfo);
@@ -16590,33 +18212,44 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> thermostat_setWeeklySchedule_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            thermostatgetWeeklyScheduleCommandParams);
+    thermostatClusterCommandInfo.put("getWeeklySchedule", thermostatgetWeeklyScheduleCommandInfo);
+    Map<String, CommandParameter> thermostatsetWeeklyScheduleCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter thermostat_setWeeklySchedule_commandParameter =
+    CommandParameter thermostatsetWeeklyScheduleCommandParameter =
         new CommandParameter("Thermostat", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter thermostat_setWeeklySchedule_numberOfTransitionsForSequence_commandParameter =
+    CommandParameter thermostatsetWeeklySchedulenumberOfTransitionsForSequenceCommandParameter =
         new CommandParameter("numberOfTransitionsForSequence", int.class);
-    thermostat_setWeeklySchedule_commandParams.put(
+    thermostatsetWeeklyScheduleCommandParams.put(
         "numberOfTransitionsForSequence",
-        thermostat_setWeeklySchedule_numberOfTransitionsForSequence_commandParameter);
+        thermostatsetWeeklySchedulenumberOfTransitionsForSequenceCommandParameter);
 
-    CommandParameter thermostat_setWeeklySchedule_dayOfWeekForSequence_commandParameter =
+    CommandParameter thermostatsetWeeklyScheduledayOfWeekForSequenceCommandParameter =
         new CommandParameter("dayOfWeekForSequence", int.class);
-    thermostat_setWeeklySchedule_commandParams.put(
-        "dayOfWeekForSequence", thermostat_setWeeklySchedule_dayOfWeekForSequence_commandParameter);
+    thermostatsetWeeklyScheduleCommandParams.put(
+        "dayOfWeekForSequence", thermostatsetWeeklyScheduledayOfWeekForSequenceCommandParameter);
 
-    CommandParameter thermostat_setWeeklySchedule_modeForSequence_commandParameter =
+    CommandParameter thermostatsetWeeklySchedulemodeForSequenceCommandParameter =
         new CommandParameter("modeForSequence", int.class);
-    thermostat_setWeeklySchedule_commandParams.put(
-        "modeForSequence", thermostat_setWeeklySchedule_modeForSequence_commandParameter);
+    thermostatsetWeeklyScheduleCommandParams.put(
+        "modeForSequence", thermostatsetWeeklySchedulemodeForSequenceCommandParameter);
 
-    CommandParameter thermostat_setWeeklySchedule_payload_commandParameter =
+    CommandParameter thermostatsetWeeklySchedulepayloadCommandParameter =
         new CommandParameter("payload", int.class);
+<<<<<<< HEAD
     thermostat_setWeeklySchedule_commandParams.put(
         "payload", thermostat_setWeeklySchedule_payload_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    thermostatsetWeeklyScheduleCommandParams.put(
+        "payload", thermostatsetWeeklySchedulepayloadCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo thermostat_setWeeklySchedule_CommandInfo =
+    CommandInfo thermostatsetWeeklyScheduleCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16632,6 +18265,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             thermostat_setWeeklySchedule_commandParams);
     thermostat_ClusterCommandInfo.put(
         "setWeeklySchedule", thermostat_setWeeklySchedule_CommandInfo);
@@ -16649,22 +18283,33 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> thermostat_setpointRaiseLower_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            thermostatsetWeeklyScheduleCommandParams);
+    thermostatClusterCommandInfo.put("setWeeklySchedule", thermostatsetWeeklyScheduleCommandInfo);
+    Map<String, CommandParameter> thermostatsetpointRaiseLowerCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter thermostat_setpointRaiseLower_commandParameter =
+    CommandParameter thermostatsetpointRaiseLowerCommandParameter =
         new CommandParameter("Thermostat", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter thermostat_setpointRaiseLower_mode_commandParameter =
+    CommandParameter thermostatsetpointRaiseLowermodeCommandParameter =
         new CommandParameter("mode", int.class);
-    thermostat_setpointRaiseLower_commandParams.put(
-        "mode", thermostat_setpointRaiseLower_mode_commandParameter);
+    thermostatsetpointRaiseLowerCommandParams.put(
+        "mode", thermostatsetpointRaiseLowermodeCommandParameter);
 
-    CommandParameter thermostat_setpointRaiseLower_amount_commandParameter =
+    CommandParameter thermostatsetpointRaiseLoweramountCommandParameter =
         new CommandParameter("amount", int.class);
+<<<<<<< HEAD
     thermostat_setpointRaiseLower_commandParams.put(
         "amount", thermostat_setpointRaiseLower_amount_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    thermostatsetpointRaiseLowerCommandParams.put(
+        "amount", thermostatsetpointRaiseLoweramountCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo thermostat_setpointRaiseLower_CommandInfo =
+    CommandInfo thermostatsetpointRaiseLowerCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16678,24 +18323,24 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            thermostat_setpointRaiseLower_commandParams);
-    thermostat_ClusterCommandInfo.put(
-        "setpointRaiseLower", thermostat_setpointRaiseLower_CommandInfo);
+            thermostatsetpointRaiseLowerCommandParams);
+    thermostatClusterCommandInfo.put("setpointRaiseLower", thermostatsetpointRaiseLowerCommandInfo);
     // Populate cluster
-    ClusterInfo thermostat_clusterInfo =
+    ClusterInfo thermostatClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ThermostatCluster(ptr, endpointId),
-            thermostat_ClusterCommandInfo);
-    clusterMap.put("thermostat", thermostat_clusterInfo);
-    Map<String, CommandInfo> thermostatUserInterfaceConfiguration_ClusterCommandInfo =
-        new HashMap<>();
+            thermostatClusterCommandInfo);
+    clusterMap.put("thermostat", thermostatClusterInfo);
+    Map<String, CommandInfo> thermostatUserInterfaceConfigurationClusterCommandInfo =
+        new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo thermostatUserInterfaceConfiguration_clusterInfo =
+    ClusterInfo thermostatUserInterfaceConfigurationClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) ->
                 new ChipClusters.ThermostatUserInterfaceConfigurationCluster(ptr, endpointId),
-            thermostatUserInterfaceConfiguration_ClusterCommandInfo);
+            thermostatUserInterfaceConfigurationClusterCommandInfo);
     clusterMap.put(
+<<<<<<< HEAD
         "thermostatUserInterfaceConfiguration", thermostatUserInterfaceConfiguration_clusterInfo);
     Map<String, CommandInfo> threadNetworkDiagnostics_ClusterCommandInfo = new HashMap<>();
 <<<<<<< HEAD
@@ -16705,12 +18350,18 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> threadNetworkDiagnostics_resetCounts_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+        "thermostatUserInterfaceConfiguration", thermostatUserInterfaceConfigurationClusterInfo);
+    Map<String, CommandInfo> threadNetworkDiagnosticsClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> threadNetworkDiagnosticsresetCountsCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter threadNetworkDiagnostics_resetCounts_commandParameter =
+    CommandParameter threadNetworkDiagnosticsresetCountsCommandParameter =
         new CommandParameter("ThreadNetworkDiagnostics", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo threadNetworkDiagnostics_resetCounts_CommandInfo =
+    CommandInfo threadNetworkDiagnosticsresetCountsCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16721,20 +18372,21 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            threadNetworkDiagnostics_resetCounts_commandParams);
-    threadNetworkDiagnostics_ClusterCommandInfo.put(
-        "resetCounts", threadNetworkDiagnostics_resetCounts_CommandInfo);
+            threadNetworkDiagnosticsresetCountsCommandParams);
+    threadNetworkDiagnosticsClusterCommandInfo.put(
+        "resetCounts", threadNetworkDiagnosticsresetCountsCommandInfo);
     // Populate cluster
-    ClusterInfo threadNetworkDiagnostics_clusterInfo =
+    ClusterInfo threadNetworkDiagnosticsClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ThreadNetworkDiagnosticsCluster(ptr, endpointId),
-            threadNetworkDiagnostics_ClusterCommandInfo);
-    clusterMap.put("threadNetworkDiagnostics", threadNetworkDiagnostics_clusterInfo);
-    Map<String, CommandInfo> wakeOnLan_ClusterCommandInfo = new HashMap<>();
+            threadNetworkDiagnosticsClusterCommandInfo);
+    clusterMap.put("threadNetworkDiagnostics", threadNetworkDiagnosticsClusterInfo);
+    Map<String, CommandInfo> wakeOnLanClusterCommandInfo = new LinkedHashMap<>();
     // Populate cluster
-    ClusterInfo wakeOnLan_clusterInfo =
+    ClusterInfo wakeOnLanClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.WakeOnLanCluster(ptr, endpointId),
+<<<<<<< HEAD
             wakeOnLan_ClusterCommandInfo);
     clusterMap.put("wakeOnLan", wakeOnLan_clusterInfo);
     Map<String, CommandInfo> wiFiNetworkDiagnostics_ClusterCommandInfo = new HashMap<>();
@@ -16745,12 +18397,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> wiFiNetworkDiagnostics_resetCounts_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            wakeOnLanClusterCommandInfo);
+    clusterMap.put("wakeOnLan", wakeOnLanClusterInfo);
+    Map<String, CommandInfo> wiFiNetworkDiagnosticsClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> wiFiNetworkDiagnosticsresetCountsCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter wiFiNetworkDiagnostics_resetCounts_commandParameter =
+    CommandParameter wiFiNetworkDiagnosticsresetCountsCommandParameter =
         new CommandParameter("WiFiNetworkDiagnostics", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo wiFiNetworkDiagnostics_resetCounts_CommandInfo =
+    CommandInfo wiFiNetworkDiagnosticsresetCountsCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16761,13 +18420,14 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            wiFiNetworkDiagnostics_resetCounts_commandParams);
-    wiFiNetworkDiagnostics_ClusterCommandInfo.put(
-        "resetCounts", wiFiNetworkDiagnostics_resetCounts_CommandInfo);
+            wiFiNetworkDiagnosticsresetCountsCommandParams);
+    wiFiNetworkDiagnosticsClusterCommandInfo.put(
+        "resetCounts", wiFiNetworkDiagnosticsresetCountsCommandInfo);
     // Populate cluster
-    ClusterInfo wiFiNetworkDiagnostics_clusterInfo =
+    ClusterInfo wiFiNetworkDiagnosticsClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.WiFiNetworkDiagnosticsCluster(ptr, endpointId),
+<<<<<<< HEAD
             wiFiNetworkDiagnostics_ClusterCommandInfo);
     clusterMap.put("wiFiNetworkDiagnostics", wiFiNetworkDiagnostics_clusterInfo);
     Map<String, CommandInfo> windowCovering_ClusterCommandInfo = new HashMap<>();
@@ -16778,12 +18438,19 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> windowCovering_downOrClose_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            wiFiNetworkDiagnosticsClusterCommandInfo);
+    clusterMap.put("wiFiNetworkDiagnostics", wiFiNetworkDiagnosticsClusterInfo);
+    Map<String, CommandInfo> windowCoveringClusterCommandInfo = new LinkedHashMap<>();
+    Map<String, CommandParameter> windowCoveringdownOrCloseCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter windowCovering_downOrClose_commandParameter =
+    CommandParameter windowCoveringdownOrCloseCommandParameter =
         new CommandParameter("WindowCovering", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo windowCovering_downOrClose_CommandInfo =
+    CommandInfo windowCoveringdownOrCloseCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16794,6 +18461,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             windowCovering_downOrClose_commandParams);
     windowCovering_ClusterCommandInfo.put("downOrClose", windowCovering_downOrClose_CommandInfo);
 <<<<<<< HEAD
@@ -16812,24 +18480,33 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> windowCovering_goToLiftPercentage_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            windowCoveringdownOrCloseCommandParams);
+    windowCoveringClusterCommandInfo.put("downOrClose", windowCoveringdownOrCloseCommandInfo);
+    Map<String, CommandParameter> windowCoveringgoToLiftPercentageCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter windowCovering_goToLiftPercentage_commandParameter =
+    CommandParameter windowCoveringgoToLiftPercentageCommandParameter =
         new CommandParameter("WindowCovering", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter windowCovering_goToLiftPercentage_liftPercentageValue_commandParameter =
+    CommandParameter windowCoveringgoToLiftPercentageliftPercentageValueCommandParameter =
         new CommandParameter("liftPercentageValue", int.class);
-    windowCovering_goToLiftPercentage_commandParams.put(
-        "liftPercentageValue",
-        windowCovering_goToLiftPercentage_liftPercentageValue_commandParameter);
+    windowCoveringgoToLiftPercentageCommandParams.put(
+        "liftPercentageValue", windowCoveringgoToLiftPercentageliftPercentageValueCommandParameter);
 
-    CommandParameter windowCovering_goToLiftPercentage_liftPercent100thsValue_commandParameter =
+    CommandParameter windowCoveringgoToLiftPercentageliftPercent100thsValueCommandParameter =
         new CommandParameter("liftPercent100thsValue", int.class);
-    windowCovering_goToLiftPercentage_commandParams.put(
+    windowCoveringgoToLiftPercentageCommandParams.put(
         "liftPercent100thsValue",
+<<<<<<< HEAD
         windowCovering_goToLiftPercentage_liftPercent100thsValue_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        windowCoveringgoToLiftPercentageliftPercent100thsValueCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo windowCovering_goToLiftPercentage_CommandInfo =
+    CommandInfo windowCoveringgoToLiftPercentageCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16843,6 +18520,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             windowCovering_goToLiftPercentage_commandParams);
     windowCovering_ClusterCommandInfo.put(
         "goToLiftPercentage", windowCovering_goToLiftPercentage_CommandInfo);
@@ -16856,17 +18534,29 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> windowCovering_goToLiftValue_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            windowCoveringgoToLiftPercentageCommandParams);
+    windowCoveringClusterCommandInfo.put(
+        "goToLiftPercentage", windowCoveringgoToLiftPercentageCommandInfo);
+    Map<String, CommandParameter> windowCoveringgoToLiftValueCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter windowCovering_goToLiftValue_commandParameter =
+    CommandParameter windowCoveringgoToLiftValueCommandParameter =
         new CommandParameter("WindowCovering", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter windowCovering_goToLiftValue_liftValue_commandParameter =
+    CommandParameter windowCoveringgoToLiftValueliftValueCommandParameter =
         new CommandParameter("liftValue", int.class);
+<<<<<<< HEAD
     windowCovering_goToLiftValue_commandParams.put(
         "liftValue", windowCovering_goToLiftValue_liftValue_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+    windowCoveringgoToLiftValueCommandParams.put(
+        "liftValue", windowCoveringgoToLiftValueliftValueCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo windowCovering_goToLiftValue_CommandInfo =
+    CommandInfo windowCoveringgoToLiftValueCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16879,6 +18569,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             windowCovering_goToLiftValue_commandParams);
     windowCovering_ClusterCommandInfo.put(
         "goToLiftValue", windowCovering_goToLiftValue_CommandInfo);
@@ -16898,24 +18589,33 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> windowCovering_goToTiltPercentage_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            windowCoveringgoToLiftValueCommandParams);
+    windowCoveringClusterCommandInfo.put("goToLiftValue", windowCoveringgoToLiftValueCommandInfo);
+    Map<String, CommandParameter> windowCoveringgoToTiltPercentageCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter windowCovering_goToTiltPercentage_commandParameter =
+    CommandParameter windowCoveringgoToTiltPercentageCommandParameter =
         new CommandParameter("WindowCovering", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter windowCovering_goToTiltPercentage_tiltPercentageValue_commandParameter =
+    CommandParameter windowCoveringgoToTiltPercentagetiltPercentageValueCommandParameter =
         new CommandParameter("tiltPercentageValue", int.class);
-    windowCovering_goToTiltPercentage_commandParams.put(
-        "tiltPercentageValue",
-        windowCovering_goToTiltPercentage_tiltPercentageValue_commandParameter);
+    windowCoveringgoToTiltPercentageCommandParams.put(
+        "tiltPercentageValue", windowCoveringgoToTiltPercentagetiltPercentageValueCommandParameter);
 
-    CommandParameter windowCovering_goToTiltPercentage_tiltPercent100thsValue_commandParameter =
+    CommandParameter windowCoveringgoToTiltPercentagetiltPercent100thsValueCommandParameter =
         new CommandParameter("tiltPercent100thsValue", int.class);
-    windowCovering_goToTiltPercentage_commandParams.put(
+    windowCoveringgoToTiltPercentageCommandParams.put(
         "tiltPercent100thsValue",
+<<<<<<< HEAD
         windowCovering_goToTiltPercentage_tiltPercent100thsValue_commandParameter);
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+        windowCoveringgoToTiltPercentagetiltPercent100thsValueCommandParameter);
+>>>>>>> 41b0956c1 (on/off commands working)
 
     // Populate commands
-    CommandInfo windowCovering_goToTiltPercentage_CommandInfo =
+    CommandInfo windowCoveringgoToTiltPercentageCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16929,6 +18629,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             windowCovering_goToTiltPercentage_commandParams);
     windowCovering_ClusterCommandInfo.put(
         "goToTiltPercentage", windowCovering_goToTiltPercentage_CommandInfo);
@@ -16963,17 +18664,24 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> windowCovering_goToTiltValue_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            windowCoveringgoToTiltPercentageCommandParams);
+    windowCoveringClusterCommandInfo.put(
+        "goToTiltPercentage", windowCoveringgoToTiltPercentageCommandInfo);
+    Map<String, CommandParameter> windowCoveringgoToTiltValueCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter windowCovering_goToTiltValue_commandParameter =
+    CommandParameter windowCoveringgoToTiltValueCommandParameter =
         new CommandParameter("WindowCovering", ChipClusters.DefaultClusterCallback.class);
-    CommandParameter windowCovering_goToTiltValue_tiltValue_commandParameter =
+    CommandParameter windowCoveringgoToTiltValuetiltValueCommandParameter =
         new CommandParameter("tiltValue", int.class);
-    windowCovering_goToTiltValue_commandParams.put(
-        "tiltValue", windowCovering_goToTiltValue_tiltValue_commandParameter);
+    windowCoveringgoToTiltValueCommandParams.put(
+        "tiltValue", windowCoveringgoToTiltValuetiltValueCommandParameter);
 
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo windowCovering_goToTiltValue_CommandInfo =
+    CommandInfo windowCoveringgoToTiltValueCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -16986,6 +18694,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             windowCovering_goToTiltValue_commandParams);
     windowCovering_ClusterCommandInfo.put(
         "goToTiltValue", windowCovering_goToTiltValue_CommandInfo);
@@ -16996,12 +18705,18 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> windowCovering_stopMotion_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            windowCoveringgoToTiltValueCommandParams);
+    windowCoveringClusterCommandInfo.put("goToTiltValue", windowCoveringgoToTiltValueCommandInfo);
+    Map<String, CommandParameter> windowCoveringstopMotionCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter windowCovering_stopMotion_commandParameter =
+    CommandParameter windowCoveringstopMotionCommandParameter =
         new CommandParameter("WindowCovering", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo windowCovering_stopMotion_CommandInfo =
+    CommandInfo windowCoveringstopMotionCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -17012,6 +18727,7 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
+<<<<<<< HEAD
             windowCovering_stopMotion_commandParams);
     windowCovering_ClusterCommandInfo.put("stopMotion", windowCovering_stopMotion_CommandInfo);
 <<<<<<< HEAD
@@ -17021,12 +18737,18 @@ public class ClusterInfoMapping {
 =======
     Map<String, CommandParameter> windowCovering_upOrOpen_commandParams =
         new HashMap<String, CommandParameter>();
+=======
+            windowCoveringstopMotionCommandParams);
+    windowCoveringClusterCommandInfo.put("stopMotion", windowCoveringstopMotionCommandInfo);
+    Map<String, CommandParameter> windowCoveringupOrOpenCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+>>>>>>> 41b0956c1 (on/off commands working)
     // TODO: fill out parameter types
-    CommandParameter windowCovering_upOrOpen_commandParameter =
+    CommandParameter windowCoveringupOrOpenCommandParameter =
         new CommandParameter("WindowCovering", ChipClusters.DefaultClusterCallback.class);
 >>>>>>> 677ef48a5 (callback generation done)
     // Populate commands
-    CommandInfo windowCovering_upOrOpen_CommandInfo =
+    CommandInfo windowCoveringupOrOpenCommandInfo =
         new CommandInfo(
             (cluster, callback, commandArguments) -> {
 <<<<<<< HEAD
@@ -17037,14 +18759,14 @@ public class ClusterInfoMapping {
 >>>>>>> 677ef48a5 (callback generation done)
             },
             () -> new DelegatedDefaultClusterCallback(),
-            windowCovering_upOrOpen_commandParams);
-    windowCovering_ClusterCommandInfo.put("upOrOpen", windowCovering_upOrOpen_CommandInfo);
+            windowCoveringupOrOpenCommandParams);
+    windowCoveringClusterCommandInfo.put("upOrOpen", windowCoveringupOrOpenCommandInfo);
     // Populate cluster
-    ClusterInfo windowCovering_clusterInfo =
+    ClusterInfo windowCoveringClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.WindowCoveringCluster(ptr, endpointId),
-            windowCovering_ClusterCommandInfo);
-    clusterMap.put("windowCovering", windowCovering_clusterInfo);
+            windowCoveringClusterCommandInfo);
+    clusterMap.put("windowCovering", windowCoveringClusterInfo);
     return clusterMap;
 <<<<<<< HEAD
 >>>>>>> 2d2bbd2e1 (new design solution)
