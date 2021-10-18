@@ -38,7 +38,7 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
 
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
+    if (packetHeader.IsEncrypted())
     {
         ChipLogError(AppServer, "UDC encryption flag set - ignoring");
         return;
