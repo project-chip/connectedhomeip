@@ -105,17 +105,11 @@ public class ChipDeviceController {
   }
 
   /**
-   * Returns a pointer to a device with the specified nodeId. The device is not guaranteed to be
-   * connected.
+   * Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error.
    *
-   * <p>TODO(#8443): This method and getConnectedDevicePointer() could benefit from ChipDevice
-   * abstraction to hide the pointer passing.
+   * <p>TODO(#8443): This method could benefit from a ChipDevice abstraction to hide the pointer
+   * passing.
    */
-  public long getDevicePointer(long nodeId) {
-    return getDevicePointer(deviceControllerPtr, nodeId);
-  }
-
-  /** Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error. */
   public void getConnectedDevicePointer(long nodeId, GetConnectedDeviceCallback callback) {
     GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);
     getConnectedDevicePointer(deviceControllerPtr, nodeId, jniCallback.getCallbackHandle());
@@ -239,8 +233,6 @@ public class ChipDeviceController {
       @Nullable byte[] csrNonce);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
-
-  private native long getDevicePointer(long deviceControllerPtr, long deviceId);
 
   private native void getConnectedDevicePointer(
       long deviceControllerPtr, long deviceId, long callbackHandle);
