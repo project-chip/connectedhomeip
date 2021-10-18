@@ -20,6 +20,7 @@
 
 #include "../common/CHIPCommand.h"
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <lib/support/UnitTestUtils.h>
 #include <zap-generated/tests/CHIPClustersTest.h>
 
 class TestCommand : public CHIPCommand
@@ -28,7 +29,9 @@ public:
     TestCommand(const char * commandName) :
         CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
-    {}
+    {
+        AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
+    }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR Run(NodeId remoteId) override;
@@ -103,4 +106,13 @@ protected:
 
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    void Wait()
+    {
+        if (mDelayInMs)
+        {
+            chip::test_utils::SleepMillis(mDelayInMs);
+        }
+    };
+    uint64_t mDelayInMs = 0;
 };
