@@ -18,7 +18,7 @@
 
 #include "DiscoverCommand.h"
 
-CHIP_ERROR DiscoverCommand::Run(NodeId remoteId)
+CHIP_ERROR DiscoverCommand::RunCommand()
 {
     mController.RegisterDeviceAddressUpdateDelegate(this);
     return RunCommand(mNodeId, mFabricId);

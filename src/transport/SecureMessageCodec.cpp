@@ -52,7 +52,8 @@ CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
         .SetMessageCounter(messageCounter) //
         .SetSessionId(state->GetPeerSessionId());
 
-    packetHeader.GetFlags().Set(Header::FlagValues::kEncryptedMessage);
+    // TODO set Session Type (Unicast or Group)
+    // packetHeader.SetSessionType(Header::SessionType::kUnicastSession);
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
 
@@ -90,7 +91,7 @@ CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
     msg->SetDataLength(len);
 #endif
 
-    uint16_t footerLen = MessageAuthenticationCode::TagLenForSessionType(packetHeader.GetSessionType());
+    uint16_t footerLen = packetHeader.MICTagLength();
     VerifyOrReturnError(footerLen <= len, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     uint16_t taglen = 0;

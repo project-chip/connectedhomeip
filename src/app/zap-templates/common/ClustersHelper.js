@@ -431,15 +431,16 @@ function enhancedCommands(commands, types)
     return commands.find(command => command.responseName == responseName);
   });
 
-  // At this stage, 'command.arguments' may contains 'struct'. But controllers does not know (yet) how
+  // At this stage, 'command.arguments' may contains 'struct'. But some controllers does not know (yet) how
   // to handle them. So those needs to be inlined.
   commands.forEach(command => {
     if (command.isResponse) {
       return;
     }
 
-    command.arguments = inlineStructItems(command.arguments);
+    command.expandedArguments = inlineStructItems(command.arguments);
   });
+
   return commands;
 }
 
