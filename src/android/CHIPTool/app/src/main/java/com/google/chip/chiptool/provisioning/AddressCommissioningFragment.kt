@@ -18,11 +18,14 @@ import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.android.synthetic.main.address_commissioning_fragment.addressEditText
 import kotlinx.android.synthetic.main.address_commissioning_fragment.commissionBtn
 import kotlinx.android.synthetic.main.address_commissioning_fragment.discoverBtn
+import kotlinx.android.synthetic.main.address_commissioning_fragment.discoverListSpinner
 import kotlinx.android.synthetic.main.address_commissioning_fragment.discriminatorEditText
 import kotlinx.android.synthetic.main.address_commissioning_fragment.pincodeEditText
 
 import chip.platform.NsdManagerServiceDiscover;
 import chip.platform.NsdManagerServiceResolver;
+import chip.platform.ServiceResolver;
+import chip.platform.ChipMdnsCallback;
 
 class AddressCommissioningFragment : Fragment() {
   override fun onCreateView(
@@ -72,7 +75,7 @@ class AddressCommissioningFragment : Fragment() {
       commissionBtn.isEnabled = false
       ipAddressList.clear()
       mUpdateSpinnerHandler.sendEmptyMessage(0)
-      serviceDiscover.startDiscover(SERVICE_TYPE, 0, 0, mdnsCallback)
+      serviceDiscover.startDiscover(SERVICE_TYPE, 0, 0, discoverCallback)
     }
   }
 
@@ -96,21 +99,21 @@ class AddressCommissioningFragment : Fragment() {
   companion object {
     private const val TAG = "AddressCommissioningFragment"
     private const val SERVICE_TYPE = "_matterc._udp"
-    private lateinit var serviceDiscover : ServiceDiscover
+    private lateinit var serviceDiscover : NsdManagerServiceDiscover
     private lateinit var serviceResolver : ServiceResolver
     private val ipAddressList = ArrayList<String>()
     private lateinit var mUpdateSpinnerHandler: Handler
 
     private val mdnsCallback = object: ChipMdnsCallback {
       override fun handleServiceResolve(
-        instanceName: String?,
-        serviceType: String?,
-        address: String?,
-        port: Int,
-        attributes: MutableMap<String, ByteArray>?,
-        callbackHandle: Long,
-        contextHandle: Long,
-        errorCode: Int
+              instanceName: String?,
+              serviceType: String?,
+              address: String?,
+              port: Int,
+              attributes: MutableMap<String, ByteArray>?,
+              callbackHandle: Long,
+              contextHandle: Long,
+              errorCode: Int
       ) {
         if (errorCode != 0) {
           return
@@ -125,7 +128,8 @@ class AddressCommissioningFragment : Fragment() {
           }
         }
       }
-
+    }
+    private val discoverCallback = object: NsdManagerServiceDiscover.Callback {
       override fun handleServiceDiscover(
         instanceName: String?,
         serviceType: String?,
@@ -136,7 +140,7 @@ class AddressCommissioningFragment : Fragment() {
        if (errorCode != 0) {
          return
        }
-        serviceResolver.resolve(instanceName, serviceType, 0, 0, this)
+        serviceResolver.resolve(instanceName, serviceType, 0, 0, mdnsCallback)
       }
     }
     fun newInstance(): AddressCommissioningFragment = AddressCommissioningFragment()
