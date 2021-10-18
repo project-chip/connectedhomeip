@@ -33,47 +33,6 @@ const kGlobalAttributes = [
   0xfffd, // FeatureMap
 ];
 
-// TODO Expose the readTypeLength as an additional member field of {{asUnderlyingZclType}} instead
-//      of having to call this method separately.
-function asReadTypeLength(type)
-{
-  const db = this.global.db;
-
-  if (StringHelper.isShortString(type)) {
-    return '1u';
-  }
-
-  if (StringHelper.isLongString(type)) {
-    return '2u';
-  }
-
-  function fn(pkgId)
-  {
-    const defaultResolver = zclQuery.selectAtomicType(db, pkgId, type);
-
-    const enumResolver = zclHelper.isEnum(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectEnumByName(db, type, pkgId).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
-    });
-
-    const bitmapResolver = zclHelper.isBitmap(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectBitmapByName(db, pkgId, type).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
-    });
-
-    const typeResolver = Promise.all([ defaultResolver, enumResolver, bitmapResolver ]);
-    return typeResolver.then(types => (types.find(type => type)).size);
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
-    console.log(err);
-    throw err;
-  });
-  return templateUtil.templatePromise(this.global, promise)
-}
-
 // TODO Expose the readType as an additional member field of {{asUnderlyingZclType}} instead
 //      of having to call this method separately.
 function asReadType(type)
@@ -391,10 +350,6 @@ function asMEI(prefix, suffix)
  */
 async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
-  if (StringHelper.isCharString(type)) {
-    return 'chip::Span<const char>';
-  }
-
   if (type == 'single') {
     return 'float';
   }
@@ -438,7 +393,6 @@ function zapTypeToDecodableClusterObjectType(type, options)
 //
 exports.asPrintFormat                       = asPrintFormat;
 exports.asReadType                          = asReadType;
-exports.asReadTypeLength                    = asReadTypeLength;
 exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
 exports.asTypeLiteralSuffix                 = asTypeLiteralSuffix;
