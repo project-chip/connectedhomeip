@@ -19,8 +19,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-#pragma GCC diagnostic ignored "-Wstack-usage="
-
 namespace chip {
 namespace app {
 namespace Clusters {
