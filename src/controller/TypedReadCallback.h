@@ -82,9 +82,10 @@ private:
         }
     }
 
-    CHIP_ERROR ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         mOnError(nullptr, Protocols::InteractionModel::Status::Failure, aError);
+        mOnDone(apReadClient, this);
         return CHIP_NO_ERROR;
     }
 

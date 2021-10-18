@@ -1709,7 +1709,7 @@ void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClien
     IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError)
+CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError)
 {
     app::ClusterInfo path;
     path.mNodeId = apReadClient->GetPeerNodeId();

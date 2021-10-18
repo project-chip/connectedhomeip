@@ -123,7 +123,6 @@ void InteractionModelEngine::Shutdown()
 CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
                                                  uint64_t aAppIdentifier, InteractionModelDelegate * apDelegateOverride)
 {
-    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
     if (apDelegateOverride == nullptr)
     {
@@ -136,6 +135,8 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
     {
         if (readClient.IsFree())
         {
+            CHIP_ERROR err;
+
             *apReadClient = &readClient;
             err           = readClient.Init(mpExchangeMgr, apDelegateOverride, aInteractionType, aAppIdentifier);
             if (CHIP_NO_ERROR != err)
@@ -146,10 +147,10 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
         }
     }
 
-    return err;
+    return CHIP_ERROR_NO_MEMORY;
 }
 
-uint32_t InteractionModelEngine::GetNumActiveReadClients()
+uint32_t InteractionModelEngine::GetNumActiveReadClients() const
 {
     uint32_t numActive = 0;
 
@@ -164,7 +165,7 @@ uint32_t InteractionModelEngine::GetNumActiveReadClients()
     return numActive;
 }
 
-uint32_t InteractionModelEngine::GetNumActiveReadHandlers()
+uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
 {
     uint32_t numActive = 0;
 

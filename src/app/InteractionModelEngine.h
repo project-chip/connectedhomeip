@@ -140,12 +140,12 @@ public:
      *
      *  @param[inout] 	apReadClient	    A double pointer to a ReadClient that is updated to point to a valid ReadClient
      *                                      on successful completion of this function. On failure, it will be updated to point to
-     * nullptr.
+     *                                      nullptr.
      *  @param[in]      aInteractionType    Type of interaction (read or subscription) that the requested ReadClient should execute.
      *  @param[in]      aAppIdentifier      A unique token that can be attached to the returned ReadClient object that will be
-     * passed through some of the methods in the registered InteractionModelDelegate.
+     *                                      passed through some of the methods in the registered InteractionModelDelegate.
      *  @param[in]      apDelegateOverride  If not-null, permits overriding the default delegate registered with the
-     * InteractionModelEngine that will be used by the ReadClient.
+     *                                      InteractionModelEngine that will be used by the ReadClient.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
@@ -153,8 +153,8 @@ public:
     CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
                              uint64_t aAppIdentifier, InteractionModelDelegate * apDelegateOverride = nullptr);
 
-    uint32_t GetNumActiveReadHandlers();
-    uint32_t GetNumActiveReadClients();
+    uint32_t GetNumActiveReadHandlers() const;
+    uint32_t GetNumActiveReadClients() const;
 
     /**
      *  Get read client index in mReadClients
