@@ -61,20 +61,20 @@ android_library("java") {
     "src/chip/clusterinfo/ClusterCommandCallback.java",
     "src/chip/clusterinfo/ClusterInfo.java",
     "src/chip/clusterinfo/CommandInfo.java",
+<<<<<<< HEAD
     "src/chip/clusterinfo/CommandParameterInfo.java",
     "src/chip/clusterinfo/DelegatedClusterCallback.java",
+=======
+    "src/chip/clusterinfo/CommandParameter.java",
+    "src/chip/clusterinfo/DelegatedClusterCallback.java",
+    "src/chip/clusterinfo/ParameterType.java",
+>>>>>>> 9199ce0a6 (Restyled by gn)
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/PaseVerifierParams.java",
-    "src/chip/clusterinfo/ClusterInfo.java",
-    "src/chip/clusterinfo/CommandInfo.java",
-    "src/chip/clusterinfo/CommandParameter.java",
-    "src/chip/clusterinfo/ParameterType.java",
-    "src/chip/clusterinfo/ClusterCommandCallback.java",
-    "src/chip/clusterinfo/DelegatedClusterCallback.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
 <<<<<<< HEAD
 <<<<<<< HEAD
