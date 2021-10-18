@@ -107,8 +107,8 @@ public class ChipDeviceController {
   /**
    * Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error.
    *
-   * <p>TODO(#8443): This method and getConnectedDevicePointer() could benefit from ChipDevice
-   * abstraction to hide the pointer passing.
+   * <p>TODO(#8443): This method could benefit from a ChipDevice abstraction to hide the pointer
+   * passing.
    */
   public void getConnectedDevicePointer(long nodeId, GetConnectedDeviceCallback callback) {
     GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);

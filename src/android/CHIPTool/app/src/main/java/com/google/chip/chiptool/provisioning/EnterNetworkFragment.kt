@@ -36,7 +36,10 @@ import kotlinx.android.synthetic.main.enter_thread_network_fragment.xpanIdEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.pwdEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.ssidEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.view.saveNetworkBtn
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * Fragment to collect Wi-Fi network information from user and send it to device being provisioned.
@@ -65,15 +68,15 @@ class EnterNetworkFragment : Fragment() {
     }
 
     return inflater.inflate(layoutRes, container, false).apply {
-      saveNetworkBtn.setOnClickListener { scope.launch { onSaveNetworkClicked() } }
+      saveNetworkBtn.setOnClickListener { onSaveNetworkClicked() }
     }
   }
 
-  private suspend fun onSaveNetworkClicked() {
+  private fun onSaveNetworkClicked() {
     if (networkType == ProvisionNetworkType.WIFI) {
-      saveWifiNetwork()
+      scope.launch { saveWifiNetwork() }
     } else {
-      saveThreadNetwork()
+      scope.launch { saveThreadNetwork() }
     }
   }
 
