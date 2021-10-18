@@ -18,7 +18,7 @@
 
 from chip.clusters import TestObjects
 import logging
-from chip.interaction_model import exceptions as IMExceptions
+import chip.interaction_model
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -56,7 +56,7 @@ class ClusterObjectTests:
         try:
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=233, payload=req)
             raise ValueError(f"Failure expected")
-        except IMExceptions.InteractionModelError as ex:
+        except chip.interaction_model.InteractionModelError as ex:
             logger.info(f"Recevied {ex} from server.")
             return
 

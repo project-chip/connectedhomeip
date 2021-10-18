@@ -123,7 +123,6 @@ pw_python_action("python") {
         "chip/exceptions/__init__.py",
         "chip/interaction_model/__init__.py",
         "chip/interaction_model/delegate.py",
-        "chip/interaction_model/exceptions.py",
         "chip/internal/__init__.py",
         "chip/internal/commissioner.py",
         "chip/internal/thread.py",

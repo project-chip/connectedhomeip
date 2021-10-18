@@ -23,9 +23,8 @@ from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32,  c_uint16,
 
 
 from .ClusterObjects import ClusterCommand
-import chip
-from chip import exceptions as ChipExceptions
-from chip.interaction_model import exceptions as IMExceptions
+import chip.exceptions
+import chip.interaction_model
 
 
 @dataclass
@@ -47,7 +46,7 @@ class AsyncCommandTransaction:
                 self._future.set_result(self._expect_type.FromTLV(response))
             except Exception as ex:
                 self._handleError(
-                    IMExceptions.InteractionModelState.Failure, 0, ex)
+                    chip.interaction_model.Status.Failure, 0, ex)
         else:
             self._future.set_result(None)
 
@@ -61,14 +60,14 @@ class AsyncCommandTransaction:
         elif chipError != 0 and chipError != 0xCA:
             # 0xCA is CHIP_IM_STATUS_CODE_RECEIVED
             self._future.set_exception(
-                ChipExceptions.ChipStackError(chipError))
+                chip.exceptions.ChipStackError(chipError))
         else:
             try:
                 self._future.set_exception(
-                    IMExceptions.InteractionModelError(IMExceptions.InteractionModelState(imError)))
+                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError)))
             except:
-                self._future.set_exception(IMExceptions.InteractionModelError(
-                    IMExceptions.InteractionModelState.Failure))
+                self._future.set_exception(chip.interaction_model.InteractionModelError(
+                    chip.interaction_model.Status.Failure))
         pass
 
     def handleError(self, imError: int, chipError: int):

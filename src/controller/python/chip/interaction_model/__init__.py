@@ -21,13 +21,15 @@
 #
 
 """Provides Python APIs for CHIP."""
-from construct.core import EnumInteger
-
+import enum
 from .delegate import OnSubscriptionReport, SetAttributeReportCallback, AttributePath
-__all__ = ["IMDelegate", "Status"]
+
+from chip.exceptions import ChipStackException
+
+__all__ = ["IMDelegate", "Status", "InteractionModelError"]
 
 
-class Status(EnumInteger):
+class Status(enum.IntEnum):
     Success = 0x0
     Failure = 0x01
     InvalidSubscription = 0x7d
@@ -69,3 +71,15 @@ class Status(EnumInteger):
     Deprecatedc4 = 0xc4
     NoUpstreamSubscription = 0xc5
     InvalidArgument = 0xc6
+
+
+class InteractionModelError(ChipStackException):
+    def __init__(self, state: Status):
+        self._state = state
+
+    def __str__(self):
+        return f"InteractionModelError: {self._state.name} (0x{self._state.value:x})"
+
+    @property
+    def state(self) -> Status:
+        return self._state
