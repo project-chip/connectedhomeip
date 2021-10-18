@@ -56,6 +56,7 @@ QueryResponderSettings QueryResponderBase::AddResponder(RecordResponder * respon
     {
         return QueryResponderSettings();
     }
+    ChipLogDetail(Discovery, "Responding with %s", responder->GetQName());
 
     for (size_t i = 0; i < mResponderInfoSize; i++)
     {
