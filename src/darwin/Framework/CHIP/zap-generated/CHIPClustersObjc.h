@@ -1436,8 +1436,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)test:(ResponseHandler)responseHandler;
 - (void)testAddArguments:(uint8_t)arg1 arg2:(uint8_t)arg2 responseHandler:(ResponseHandler)responseHandler;
+- (void)testListInt8UArgumentRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler;
+- (void)testListStructArgumentRequest:(uint8_t)a
+                                    b:(bool)b
+                                    c:(uint8_t)c
+                                    d:(NSData *)d
+                                    e:(NSString *)e
+                                    f:(uint8_t)f
+                      responseHandler:(ResponseHandler)responseHandler;
 - (void)testNotHandled:(ResponseHandler)responseHandler;
 - (void)testSpecific:(ResponseHandler)responseHandler;
+- (void)testStructArgumentRequest:(uint8_t)a
+                                b:(bool)b
+                                c:(uint8_t)c
+                                d:(NSData *)d
+                                e:(NSString *)e
+                                f:(uint8_t)f
+                  responseHandler:(ResponseHandler)responseHandler;
 - (void)testUnknownCommand:(ResponseHandler)responseHandler;
 
 - (void)readAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler;

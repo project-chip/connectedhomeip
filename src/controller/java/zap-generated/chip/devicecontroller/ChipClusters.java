@@ -5421,12 +5421,26 @@ public class ChipClusters {
       testAddArguments(chipClusterPtr, callback, arg1, arg2);
     }
 
+    public void testListInt8UArgumentRequest(DefaultClusterCallback callback, int arg1) {
+      testListInt8UArgumentRequest(chipClusterPtr, callback, arg1);
+    }
+
+    public void testListStructArgumentRequest(
+        DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
+      testListStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
+    }
+
     public void testNotHandled(DefaultClusterCallback callback) {
       testNotHandled(chipClusterPtr, callback);
     }
 
     public void testSpecific(TestSpecificResponseCallback callback) {
       testSpecific(chipClusterPtr, callback);
+    }
+
+    public void testStructArgumentRequest(
+        DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
+      testStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
     }
 
     public void testUnknownCommand(DefaultClusterCallback callback) {
@@ -5438,9 +5452,32 @@ public class ChipClusters {
     private native void testAddArguments(
         long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
 
+    private native void testListInt8UArgumentRequest(
+        long chipClusterPtr, DefaultClusterCallback callback, int arg1);
+
+    private native void testListStructArgumentRequest(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int a,
+        boolean b,
+        int c,
+        byte[] d,
+        String e,
+        int f);
+
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
 
     private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback callback);
+
+    private native void testStructArgumentRequest(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int a,
+        boolean b,
+        int c,
+        byte[] d,
+        String e,
+        int f);
 
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback callback);
 
