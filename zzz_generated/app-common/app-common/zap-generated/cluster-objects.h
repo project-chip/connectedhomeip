@@ -2734,7 +2734,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
@@ -2745,7 +2744,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
@@ -2756,7 +2754,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFrequency::Id; }
@@ -2767,7 +2764,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinFrequency::Id; }
@@ -2778,7 +2774,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxFrequency::Id; }
