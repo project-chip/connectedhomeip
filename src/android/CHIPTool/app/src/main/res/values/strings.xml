@@ -37,6 +37,8 @@
     <string name="enter_discriminator_label_text">Discriminator</string>
     <string name="enter_pincode_label_text">Pincode</string>
     <string name="commission_btn_text">Commission</string>
+    <string name="dns_discover_btn_off_text">Start Discover</string>
+    <string name="dns_discover_btn_on_text">discovering...</string>
 
     <string name="send_command_on_btn_text">On</string>
     <string name="send_command_off_btn_text">Off</string>
