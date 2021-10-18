@@ -1,19 +1,18 @@
 package chip.clusterinfo;
 
-import java.util.function.Function;
+import chip.devicecontroller.ChipClusters.BaseChipCluster;
 import java.util.*;
 import java.util.function.Supplier;
-import chip.clusterinfo.DelegatedClusterCallback;
-import chip.devicecontroller.ChipClusters.BaseChipCluster;
 
 public class CommandInfo {
   public ClusterCommandFunction commandFunction;
   private Supplier<DelegatedClusterCallback> commandCallbackSupplier;
   private Map<String, CommandParameter> commandParameters;
 
-
-  public CommandInfo(ClusterCommandFunction commandFunction,
-      Supplier<DelegatedClusterCallback> commandCallbackSupplier, Map<String, CommandParameter> commandParameters) {
+  public CommandInfo(
+      ClusterCommandFunction commandFunction,
+      Supplier<DelegatedClusterCallback> commandCallbackSupplier,
+      Map<String, CommandParameter> commandParameters) {
     this.commandFunction = commandFunction;
     this.commandCallbackSupplier = commandCallbackSupplier;
     this.commandParameters = commandParameters;
@@ -33,6 +32,7 @@ public class CommandInfo {
 
   @FunctionalInterface
   public interface ClusterCommandFunction {
-    void invokeCommand(BaseChipCluster cluster, Object callback, Map<String, Object> commandArguments);
+    void invokeCommand(
+        BaseChipCluster cluster, Object callback, Map<String, Object> commandArguments);
   }
 }
