@@ -82,8 +82,8 @@
       android:layout_margin="16dp"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/address_commissioning_fragment_flow"
->
+      app:layout_constraintTop_toBottomOf="@id/address_commissioning_fragment_flow">
+
     <ToggleButton
         android:id="@+id/discoverBtn"
         android:layout_width="wrap_content"
