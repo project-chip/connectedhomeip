@@ -24,7 +24,7 @@ PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
 # Generating linux-arm64-rpc-console
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --root={root}/examples/common/pigweed/rpc_console '"'"'--args=target_cpu="arm64"'"'"' {out}/linux-arm64-rpc-console'
+ gn gen --check --fail-on-unused-args --root={root}/examples/common/pigweed/rpc_console '"'"'--args=target_cpu="arm64" is_clang=true'"'"' {out}/linux-arm64-rpc-console'
 
 # Generating linux-arm64-thermostat
 bash -c '
