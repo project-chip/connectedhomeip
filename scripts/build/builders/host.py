@@ -106,13 +106,13 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.extend(
                 [
                     'target_cpu="arm64"',
+                    'is_clang=true'
                 ]
             )
 
             if 'rpc-console' not in self.app_name:
                 self.extra_gn_options.extend(
                     [
-                        'is_clang=true',
                         'chip_crypto="mbedtls"',
                         'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
                     ]
