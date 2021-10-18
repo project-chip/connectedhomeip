@@ -2729,6 +2729,61 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
 };
 } // namespace RemainingTime
+namespace MinLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+    ;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
+};
+} // namespace MinLevel
+namespace MaxLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+    ;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
+};
+} // namespace MaxLevel
+namespace CurrentFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+    ;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFrequency::Id; }
+};
+} // namespace CurrentFrequency
+namespace MinFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+    ;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinFrequency::Id; }
+};
+} // namespace MinFrequency
+namespace MaxFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+    ;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxFrequency::Id; }
+};
+} // namespace MaxFrequency
 namespace Options {
 struct TypeInfo
 {
