@@ -396,7 +396,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     }
 
     if (await typeChecker('isBitmap')) {
-      return ns + 'BitFlags<' + type + '>';
+      return 'chip::BitFlags<' + ns + type + '>';
     }
 
     if (await typeChecker('isStruct')) {
