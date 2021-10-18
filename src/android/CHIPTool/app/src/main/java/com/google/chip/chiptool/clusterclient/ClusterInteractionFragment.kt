@@ -1,11 +1,11 @@
 package com.google.chip.chiptool.clusterclient
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import chip.clusterinfo.ClusterCommandCallback
 import chip.clusterinfo.ClusterInfo
@@ -30,6 +30,8 @@ import
 >>>>>>> 505e97db3 (change package)
 =======
 import chip.devicecontroller.ClusterInfoMapping
+import java.lang.Exception
+import java.util.Objects
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getClusterMappingBtn
 import kotlinx.coroutines.launch
 >>>>>>> a4fd0282e (no error code generation)
@@ -41,9 +43,13 @@ class ClusterInteractionFragment : Fragment() {
   private val scope = CoroutineScope(Dispatchers.Main + Job())
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 <<<<<<< HEAD
+<<<<<<< HEAD
   private lateinit var clusterMap: Map<String, ClusterInfo>
 =======
 >>>>>>> a4fd0282e (no error code generation)
+=======
+  private lateinit var clusterMap: Map<String, ClusterInfo>
+>>>>>>> 41b0956c1 (on/off commands working)
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -54,6 +60,7 @@ class ClusterInteractionFragment : Fragment() {
       deviceController.setCompletionListener(ChipControllerCallback())
       addressUpdateFragment =
         childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+<<<<<<< HEAD
 <<<<<<< HEAD
       clusterMap = ClusterInfoMapping().clusterMap;
       getClusterMappingBtn.setOnClickListener { scope.launch { getClusterMapping() } }
@@ -104,6 +111,55 @@ class ClusterInteractionFragment : Fragment() {
     for ((key, value) in test.entries) {
       println("${key}=$value")
 >>>>>>> a4fd0282e (no error code generation)
+=======
+      val clusterMapping = ClusterInfoMapping()
+      clusterMap = clusterMapping.clusterMap;
+      getClusterMappingBtn.setOnClickListener { scope.launch {getClusterMapping()} }
+    }
+  }
+
+  private suspend fun getClusterMapping() {
+    // In real code: get the device ptr using ChipClient.getConnectedDevicePointer
+    showMessage("initialized")
+    // In real code: "OnOff" would be selected by the user.
+    val selectedClusterInfo = clusterMap["onOff"]
+    val devicePtr =
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+    val endpointId = 1
+    val selectedCluster = selectedClusterInfo!!.createClusterFunction.create(devicePtr, endpointId)
+    // Imagine user wants to execute the command "OffWithEffect", pass the string here
+    val selectedCommandInfo: CommandInfo? = selectedClusterInfo!!.commands["on"]
+
+    var selectedCommandCallback =  selectedCommandInfo?.commandCallbackSupplier?.get()
+    selectedCommandCallback?.setCallbackDelegate(object : ClusterCommandCallback {
+      override fun onSuccess(responseValues: List<Any?>?) {
+        showMessage("command success")
+        // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
+        for (responseValue in responseValues!!) {
+           Log.d("test", responseValue.toString());
+        }
+
+      }
+
+      override fun onFailure(exception: Exception?) {
+        showMessage("command failed")
+        Log.e(ClusterInteractionFragment.TAG, exception.toString())
+
+      }
+    })
+
+    var commandArguments: HashMap<String, Any> = HashMap<String, Any>()
+    for ((key, value) in selectedCommandInfo!!.commandParameters.entries) {
+      commandArguments.put(key, 123)
+    }
+    selectedCommandInfo.getCommandFunction().invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
+
+  }
+
+  private fun showMessage(msg: String) {
+    requireActivity().runOnUiThread {
+      Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+>>>>>>> 41b0956c1 (on/off commands working)
     }
   }
 

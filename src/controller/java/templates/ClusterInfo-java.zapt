@@ -233,31 +233,31 @@ public class ClusterInfoMapping {
  public Map<String, ClusterInfo> getClusterMap() {
      Map<String, ClusterInfo> clusterMap = new HashMap<>();
      {{#chip_client_clusters}}
-     Map<String, CommandInfo> {{asLowerCamelCase name}}_ClusterCommandInfo = new HashMap<>();
+     Map<String, CommandInfo> {{asLowerCamelCase name}}ClusterCommandInfo = new LinkedHashMap<>();
      {{#chip_cluster_commands}}
-           Map<String, CommandParameter> {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_commandParams = new HashMap<String, CommandParameter>();
+           Map<String, CommandParameter> {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameter>();
            // TODO: fill out parameter types
            {{#if (zcl_command_arguments_count this.id)}}
                {{#if hasSpecificResponse}}
-                 CommandParameter {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_commandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback.class);
+                 CommandParameter {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback.class);
                {{else}}
-                 CommandParameter {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_commandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.DefaultClusterCallback.class);
+                 CommandParameter {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.DefaultClusterCallback.class);
                {{/if}}
                {{#chip_cluster_command_arguments}}
-                 CommandParameter {{asLowerCamelCase ../../name}}_{{asLowerCamelCase ../name}}_{{asLowerCamelCase label}}_commandParameter = new CommandParameter("{{asLowerCamelCase label}}", {{asJavaBasicType type}}.class);
-                 {{asLowerCamelCase ../../name}}_{{asLowerCamelCase ../name}}_commandParams.put("{{asLowerCamelCase label}}",{{asLowerCamelCase ../../name}}_{{asLowerCamelCase ../name}}_{{asLowerCamelCase label}}_commandParameter);
+                 CommandParameter {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameter = new CommandParameter("{{asLowerCamelCase label}}", {{asJavaBasicType type}}.class);
+                 {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}CommandParams.put("{{asLowerCamelCase label}}",{{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameter);
                  {{#not_last}} {{/not_last}}
                {{/chip_cluster_command_arguments}}
            {{else}}
                {{#if hasSpecificResponse}}
-                 CommandParameter {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_commandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback.class);
+                 CommandParameter {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback.class);
                {{else}}
-                 CommandParameter {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_commandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.DefaultClusterCallback.class);
+                 CommandParameter {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.DefaultClusterCallback.class);
                {{/if}}
            {{/if}}
            // Populate commands
            {{#if hasSpecificResponse}}
-           CommandInfo {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_CommandInfo = new CommandInfo(
+           CommandInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandInfo = new CommandInfo(
                    (cluster, callback, commandArguments) -> {
                        ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
                            .{{asLowerCamelCase name}}((ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback) callback
@@ -268,11 +268,11 @@ public class ClusterInfoMapping {
                        {{/chip_cluster_command_arguments}}
                        );
                    },
-                   () -> new DelegatedDefaultClusterCallback(),
-                   {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_commandParams
+                   () -> new Delegated{{asUpperCamelCase responseName}}Callback(),
+                   {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams
            );
            {{else}}
-           CommandInfo {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_CommandInfo = new CommandInfo(
+           CommandInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandInfo = new CommandInfo(
                    (cluster, callback, commandArguments) -> {
                        ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
                           .{{asLowerCamelCase name}}((DefaultClusterCallback) callback
@@ -284,15 +284,15 @@ public class ClusterInfoMapping {
                 );
                    },
                    () -> new DelegatedDefaultClusterCallback(),
-                   {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_commandParams
+                   {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams
            );
            {{/if}}
-           {{asLowerCamelCase ../name}}_ClusterCommandInfo.put("{{asLowerCamelCase name}}", {{asLowerCamelCase ../name}}_{{asLowerCamelCase name}}_CommandInfo);
+           {{asLowerCamelCase ../name}}ClusterCommandInfo.put("{{asLowerCamelCase name}}", {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandInfo);
      {{/chip_cluster_commands}}
      // Populate cluster
-     ClusterInfo {{asLowerCamelCase name}}_clusterInfo = new ClusterInfo(
-          (ptr, endpointId) -> new ChipClusters.{{asUpperCamelCase name}}Cluster(ptr, endpointId), {{asLowerCamelCase name}}_ClusterCommandInfo);
-     clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}_clusterInfo);
+     ClusterInfo {{asLowerCamelCase name}}ClusterInfo = new ClusterInfo(
+          (ptr, endpointId) -> new ChipClusters.{{asUpperCamelCase name}}Cluster(ptr, endpointId), {{asLowerCamelCase name}}ClusterCommandInfo);
+     clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInfo);
      {{/chip_client_clusters}}
 <<<<<<< HEAD
 <<<<<<< HEAD
