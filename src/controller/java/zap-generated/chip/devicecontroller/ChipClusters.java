@@ -3766,6 +3766,7 @@ public class ChipClusters {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public void readRemainingTimeAttribute(
       IntegerAttributeCallback callback
     ) {
@@ -3774,6 +3775,8 @@ public class ChipClusters {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+>>>>>>> f00108887 (merge conflict)
     public void readRemainingTimeAttribute(IntegerAttributeCallback callback) {
 >>>>>>> e993d01f0 (callback generation done)
       readRemainingTimeAttribute(chipClusterPtr, callback);
@@ -3879,6 +3882,7 @@ public class ChipClusters {
       writeStartUpCurrentLevelAttribute(chipClusterPtr, callback, value);
     }
 
+<<<<<<< HEAD
     public void readClusterRevisionAttribute(
       IntegerAttributeCallback callback
     ) {
@@ -3897,12 +3901,16 @@ public class ChipClusters {
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
 >>>>>>> 6e6e45a1a (callback generation done)
 >>>>>>> e993d01f0 (callback generation done)
+=======
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+>>>>>>> f00108887 (merge conflict)
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
     private native void readCurrentLevelAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -3913,14 +3921,14 @@ public class ChipClusters {
 >>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
 =======
 >>>>>>> 6e6e45a1a (callback generation done)
+=======
+>>>>>>> f00108887 (merge conflict)
     private native void subscribeCurrentLevelAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
 
     private native void reportCurrentLevelAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void readRemainingTimeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -3983,6 +3991,7 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> d51f00a65 (need to wait for cast-helper)
@@ -4073,6 +4082,8 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 >>>>>>> 6e6e45a1a (callback generation done)
 >>>>>>> e993d01f0 (callback generation done)
+=======
+>>>>>>> f00108887 (merge conflict)
   }
 
   public static class LowPowerCluster extends BaseChipCluster {
@@ -6480,11 +6491,14 @@ public class ChipClusters {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     public void testEnumsRequest(TestEnumsResponseCallback callback, int arg1, int arg2) {
       testEnumsRequest(chipClusterPtr, callback, arg1, arg2);
     }
 =======
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+>>>>>>> c49afcc9f (merge conflict)
 
 =======
 <<<<<<< HEAD
@@ -6498,7 +6512,12 @@ public class ChipClusters {
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> e993d01f0 (callback generation done)
+<<<<<<< HEAD
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+=======
+>>>>>>> f00108887 (merge conflict)
+>>>>>>> c49afcc9f (merge conflict)
     public void testListInt8UArgumentRequest(DefaultClusterCallback callback, int arg1) {
       testListInt8UArgumentRequest(chipClusterPtr, callback, arg1);
     }
@@ -6513,6 +6532,7 @@ public class ChipClusters {
       testListStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
     }
 
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 =======
@@ -6520,6 +6540,8 @@ public class ChipClusters {
 =======
 >>>>>>> 6e6e45a1a (callback generation done)
 >>>>>>> e993d01f0 (callback generation done)
+=======
+>>>>>>> f00108887 (merge conflict)
     public void testNotHandled(DefaultClusterCallback callback) {
       testNotHandled(chipClusterPtr, callback);
     }
@@ -6540,6 +6562,7 @@ public class ChipClusters {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     public void testStructArgumentRequest(DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
 =======
@@ -6547,12 +6570,15 @@ public class ChipClusters {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+>>>>>>> f00108887 (merge conflict)
     public void testStructArgumentRequest(
         DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
 >>>>>>> e993d01f0 (callback generation done)
       testStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
     }
 
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 =======
@@ -6560,11 +6586,14 @@ public class ChipClusters {
 =======
 >>>>>>> 6e6e45a1a (callback generation done)
 >>>>>>> e993d01f0 (callback generation done)
+=======
+>>>>>>> f00108887 (merge conflict)
     public void testUnknownCommand(DefaultClusterCallback callback) {
       testUnknownCommand(chipClusterPtr, callback);
     }
 
     private native void test(long chipClusterPtr, DefaultClusterCallback callback);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -6603,6 +6632,8 @@ public class ChipClusters {
 >>>>>>> e83b94d19 (need to wait for cast-helper)
 =======
 >>>>>>> 677ef48a5 (callback generation done)
+=======
+>>>>>>> c49afcc9f (merge conflict)
     private native void testAddArguments(long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
     private native void testListInt8UArgumentRequest(long chipClusterPtr, DefaultClusterCallback callback, int arg1);
     private native void testListInt8UReverseRequest(long chipClusterPtr, TestListInt8UReverseResponseCallback callback, int arg1);
@@ -6616,12 +6647,12 @@ public class ChipClusters {
 >>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
 =======
 >>>>>>> 6e6e45a1a (callback generation done)
+=======
+>>>>>>> f00108887 (merge conflict)
 
     private native void testAddArguments(
         long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void testListInt8UArgumentRequest(
         long chipClusterPtr, DefaultClusterCallback callback, int arg1);
 
@@ -6638,6 +6669,7 @@ public class ChipClusters {
         String e,
         int f);
 
+<<<<<<< HEAD
 =======
     private native void testAddArguments(long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
 >>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
@@ -6669,6 +6701,11 @@ public class ChipClusters {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+    private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
+
+    private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback callback);
+>>>>>>> f00108887 (merge conflict)
 
     private native void testStructArgumentRequest(
         long chipClusterPtr,
@@ -6680,6 +6717,7 @@ public class ChipClusters {
         String e,
         int f);
 
+<<<<<<< HEAD
 =======
 >>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
 =======
@@ -6691,6 +6729,8 @@ public class ChipClusters {
 
 >>>>>>> 6e6e45a1a (callback generation done)
 >>>>>>> e993d01f0 (callback generation done)
+=======
+>>>>>>> f00108887 (merge conflict)
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback callback);
 
     public interface TestAddArgumentsResponseCallback {
