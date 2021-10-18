@@ -9816,6 +9816,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -10171,6 +10173,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
