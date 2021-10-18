@@ -20547,6 +20547,174 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestStructArrayArgumentRequest
+namespace TestStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::SimpleStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::SimpleStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestStructArgumentRequest
+namespace TestNestedStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNestedStructArgumentRequest
+namespace TestListStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::SimpleStruct::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListStructArgumentRequest
+namespace TestListInt8UArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<uint8_t> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<uint8_t> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListInt8UArgumentRequest
+namespace TestNestedStructListArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStructList::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStructList::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNestedStructListArgumentRequest
+namespace TestListNestedStructListArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::NestedStructList::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListNestedStructListArgumentRequest
 } // namespace Commands
 
 namespace Attributes {

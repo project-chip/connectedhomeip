@@ -34,6 +34,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -266,6 +267,123 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(CommandHandler * apComman
     {
         ChipLogError(Zcl, "Test Cluster: failed to send TestAddArguments response: %" CHIP_ERROR_FORMAT, err.Format());
     }
+    return true;
+}
+
+bool emberAfTestClusterClusterTestStructArgumentRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::TestStructArgumentRequest::DecodableType & commandData)
+{
+    emberAfSendImmediateDefaultResponse(commandData.arg1.b ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::TestNestedStructArgumentRequest::DecodableType & commandData)
+{
+    emberAfSendImmediateDefaultResponse(commandData.arg1.c.b ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
+    app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
+    Commands::TestListStructArgumentRequest::DecodableType const & commandData)
+{
+    bool shouldReturnTrue = true;
+
+    auto structIterator = commandData.arg1.begin();
+    while (structIterator.Next())
+    {
+        auto & structValue = structIterator.GetValue();
+        shouldReturnTrue   = shouldReturnTrue && structValue.b;
+    }
+
+    if (CHIP_NO_ERROR != structIterator.GetStatus())
+    {
+        shouldReturnTrue = false;
+    }
+
+    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
+    app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
+    Commands::TestListInt8UArgumentRequest::DecodableType const & commandData)
+{
+    bool shouldReturnTrue = true;
+
+    auto uint8Iterator = commandData.arg1.begin();
+    while (uint8Iterator.Next())
+    {
+        auto & value     = uint8Iterator.GetValue();
+        shouldReturnTrue = shouldReturnTrue && (value != 0);
+    }
+
+    if (CHIP_NO_ERROR != uint8Iterator.GetStatus())
+    {
+        shouldReturnTrue = false;
+    }
+
+    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
+    app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
+    Commands::TestNestedStructListArgumentRequest::DecodableType const & commandData)
+{
+    bool shouldReturnTrue = commandData.arg1.c.b;
+
+    auto structIterator = commandData.arg1.d.begin();
+    while (structIterator.Next())
+    {
+        auto & structValue = structIterator.GetValue();
+        shouldReturnTrue   = shouldReturnTrue && structValue.b;
+    }
+
+    if (CHIP_NO_ERROR != structIterator.GetStatus())
+    {
+        shouldReturnTrue = false;
+    }
+
+    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
+    app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
+    Commands::TestListNestedStructListArgumentRequest::DecodableType const & commandData)
+{
+    bool shouldReturnTrue = true;
+
+    auto structIterator = commandData.arg1.begin();
+    while (structIterator.Next())
+    {
+        auto & structValue = structIterator.GetValue();
+        shouldReturnTrue   = shouldReturnTrue && structValue.c.b;
+
+        auto subStructIterator = structValue.d.begin();
+        while (subStructIterator.Next())
+        {
+            auto & subStructValue = subStructIterator.GetValue();
+            shouldReturnTrue      = shouldReturnTrue && subStructValue.b;
+        }
+
+        if (CHIP_NO_ERROR != subStructIterator.GetStatus())
+        {
+            shouldReturnTrue = false;
+            break;
+        }
+    }
+
+    if (CHIP_NO_ERROR != structIterator.GetStatus())
+    {
+        shouldReturnTrue = false;
+    }
+
+    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
     return true;
 }
 
