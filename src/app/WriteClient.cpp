@@ -258,7 +258,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricInde
     ClearExistingExchangeContext();
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(apSecureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(apSecureSession.ValueOr(SessionHandle(aNodeId, 1, 1, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(timeout);
 

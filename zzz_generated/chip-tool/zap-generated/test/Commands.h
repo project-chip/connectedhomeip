@@ -43,6 +43,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -155,6 +157,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -291,6 +295,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -472,6 +478,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -548,6 +556,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -655,6 +665,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -735,6 +747,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -905,6 +919,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -1324,6 +1340,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -1461,6 +1479,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -1532,6 +1552,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -1750,6 +1772,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -5648,6 +5672,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -5821,6 +5847,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -5872,6 +5900,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -6055,6 +6085,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -6326,6 +6358,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -6562,6 +6596,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -6988,6 +7024,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -7434,6 +7472,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -8110,6 +8150,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -8155,6 +8197,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -8298,6 +8342,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -8696,6 +8742,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -8824,6 +8872,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -8954,6 +9004,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -9082,6 +9134,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -9226,6 +9280,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -9304,6 +9360,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -9448,6 +9506,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -9558,6 +9618,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -9673,6 +9735,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -9730,6 +9794,779 @@ private:
     void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
+class Test_TC_LVL_2_1 : public TestCommand
+{
+public:
+    Test_TC_LVL_2_1() : TestCommand("Test_TC_LVL_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_LVL_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_LVL_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : reads current Level attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : sends a Move to level command\n");
+            err = TestSendsAMoveToLevelCommand_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 10ms\n");
+            err = TestWait10ms_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : reads current Level attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : sends a Move to level command\n");
+            err = TestSendsAMoveToLevelCommand_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 100ms\n");
+            err = TestWait100ms_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : reads current Level attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : reads On Off Transition Time attribute from DUT\n");
+            err = TestReadsOnOffTransitionTimeAttributeFromDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : sends a Move to level command\n");
+            err = TestSendsAMoveToLevelCommand_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 1ms\n");
+            err = TestWait1ms_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : reads current Level attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Reset level to 0\n");
+            err = TestResetLevelTo0_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
+            err = TestWait10ms_12();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 13;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t onOffTransitionTime)> mOnSuccessCallback_7{ OnSuccessCallback_7,
+                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
+    chip::Callback::Callback<void (*)(void * context)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_0(currentLevel);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_1(); }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_3(currentLevel);
+    }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_4(); }
+
+    static void OnFailureCallback_6(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_6(currentLevel);
+    }
+
+    static void OnFailureCallback_7(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context, uint16_t onOffTransitionTime)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_7(onOffTransitionTime);
+    }
+
+    static void OnFailureCallback_8(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_8(); }
+
+    static void OnFailureCallback_10(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_10(currentLevel);
+    }
+
+    static void OnFailureCallback_11(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_11(status);
+    }
+
+    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_11(); }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_0()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveToLevelCommand_1()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t levelArgument           = 64;
+        uint16_t transitionTimeArgument = 0U;
+        uint8_t optionMaskArgument      = 1;
+        uint8_t optionOverrideArgument  = 1;
+
+        return cluster.MoveToLevel(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), levelArgument,
+                                   transitionTimeArgument, optionMaskArgument, optionOverrideArgument);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR TestWait10ms_2() { return WaitForMs(10); }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_3()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 64));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveToLevelCommand_4()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t levelArgument           = 128;
+        uint16_t transitionTimeArgument = 1U;
+        uint8_t optionMaskArgument      = 1;
+        uint8_t optionOverrideArgument  = 1;
+
+        return cluster.MoveToLevel(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(), levelArgument,
+                                   transitionTimeArgument, optionMaskArgument, optionOverrideArgument);
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_5() { return WaitForMs(100); }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_6()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 128));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsOnOffTransitionTimeAttributeFromDut_7()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOnOffTransitionTime(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(uint16_t onOffTransitionTime)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("onOffTransitionTime", onOffTransitionTime, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveToLevelCommand_8()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t levelArgument           = 254;
+        uint16_t transitionTimeArgument = 65535U;
+        uint8_t optionMaskArgument      = 1;
+        uint8_t optionOverrideArgument  = 1;
+
+        return cluster.MoveToLevel(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel(), levelArgument,
+                                   transitionTimeArgument, optionMaskArgument, optionOverrideArgument);
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8() { NextTest(); }
+
+    CHIP_ERROR TestWait1ms_9() { return WaitForMs(1); }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 254));
+        NextTest();
+    }
+
+    CHIP_ERROR TestResetLevelTo0_11()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t levelArgument           = 0;
+        uint16_t transitionTimeArgument = 0U;
+        uint8_t optionMaskArgument      = 1;
+        uint8_t optionOverrideArgument  = 1;
+
+        return cluster.MoveToLevel(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel(), levelArgument,
+                                   transitionTimeArgument, optionMaskArgument, optionOverrideArgument);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestWait10ms_12() { return WaitForMs(10); }
+};
+
+class Test_TC_LVL_3_1 : public TestCommand
+{
+public:
+    Test_TC_LVL_3_1() : TestCommand("Test_TC_LVL_3_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_LVL_3_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_LVL_3_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : reads current level attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : reads max level attribute from DUT\n");
+            err = TestReadsMaxLevelAttributeFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : sends a Move up command\n");
+            err = TestSendsAMoveUpCommand_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 2500ms\n");
+            err = TestWait2500ms_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads current level attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : reads min level attribute from DUT\n");
+            err = TestReadsMinLevelAttributeFromDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : sends a Move down command\n");
+            err = TestSendsAMoveDownCommand_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 2500ms\n");
+            err = TestWait2500ms_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : reads current level attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Write default move rate attribute from DUT\n");
+            err = TestWriteDefaultMoveRateAttributeFromDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : reads default move rate attribute from DUT\n");
+            err = TestReadsDefaultMoveRateAttributeFromDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : sends a Move up command at default move rate\n");
+            err = TestSendsAMoveUpCommandAtDefaultMoveRate_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
+            err = TestWait10ms_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : reads current level attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_13();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 14;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t maxLevel)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t minLevel)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t defaultMoveRate)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t defaultMoveRate)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
+    chip::Callback::Callback<void (*)(void * context)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_13{ OnSuccessCallback_13, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_0(currentLevel);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t maxLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_1(maxLevel);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_2(); }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_4(currentLevel);
+    }
+
+    static void OnFailureCallback_5(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, uint8_t minLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_5(minLevel);
+    }
+
+    static void OnFailureCallback_6(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_6(); }
+
+    static void OnFailureCallback_8(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_8(currentLevel);
+    }
+
+    static void OnFailureCallback_9(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context, uint8_t defaultMoveRate)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_9(defaultMoveRate);
+    }
+
+    static void OnFailureCallback_10(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint8_t defaultMoveRate)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_10(defaultMoveRate);
+    }
+
+    static void OnFailureCallback_11(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_11(status);
+    }
+
+    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_11(); }
+
+    static void OnFailureCallback_13(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_13(currentLevel);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_0()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsMaxLevelAttributeFromDut_1()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMaxLevel(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t maxLevel)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("maxLevel", maxLevel, 255));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveUpCommand_2()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t moveModeArgument       = 0;
+        uint8_t rateArgument           = 200;
+        uint8_t optionMaskArgument     = 1;
+        uint8_t optionOverrideArgument = 1;
+
+        return cluster.Move(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), moveModeArgument, rateArgument,
+                            optionMaskArgument, optionOverrideArgument);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2() { NextTest(); }
+
+    CHIP_ERROR TestWait2500ms_3() { return WaitForMs(2500); }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 255));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsMinLevelAttributeFromDut_5()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMinLevel(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint8_t minLevel)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("minLevel", minLevel, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveDownCommand_6()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t moveModeArgument       = 1;
+        uint8_t rateArgument           = 250;
+        uint8_t optionMaskArgument     = 1;
+        uint8_t optionOverrideArgument = 1;
+
+        return cluster.Move(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel(), moveModeArgument, rateArgument,
+                            optionMaskArgument, optionOverrideArgument);
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestWait2500ms_7() { return WaitForMs(2500); }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_8()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteDefaultMoveRateAttributeFromDut_9()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t defaultMoveRateArgument = 20;
+
+        return cluster.WriteAttributeDefaultMoveRate(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel(),
+                                                     defaultMoveRateArgument);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(uint8_t defaultMoveRate) { NextTest(); }
+
+    CHIP_ERROR TestReadsDefaultMoveRateAttributeFromDut_10()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeDefaultMoveRate(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(uint8_t defaultMoveRate)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("defaultMoveRate", defaultMoveRate, 20));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveUpCommandAtDefaultMoveRate_11()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t moveModeArgument       = 1;
+        uint8_t rateArgument           = 255;
+        uint8_t optionMaskArgument     = 1;
+        uint8_t optionOverrideArgument = 1;
+
+        return cluster.Move(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel(), moveModeArgument, rateArgument,
+                            optionMaskArgument, optionOverrideArgument);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestWait10ms_12() { return WaitForMs(10); }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_13()
+    {
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
+    }
+
+    void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckConstraintNotValue<uint8_t>("currentLevel", currentLevel, 255));
+        NextTest();
+    }
+};
+
 class Test_TC_CC_1_1 : public TestCommand
 {
 public:
@@ -9751,6 +10588,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -9831,6 +10670,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -9909,6 +10750,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -9989,6 +10832,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -10067,6 +10912,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -10147,6 +10994,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -10225,6 +11074,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -10369,6 +11220,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -10447,6 +11300,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -10987,6 +11842,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -11294,6 +12151,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -11583,6 +12442,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -11868,6 +12729,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -12093,6 +12956,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -12284,6 +13149,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -12507,6 +13374,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -12733,6 +13602,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -12927,6 +13798,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -13119,6 +13992,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -13341,6 +14216,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -13534,6 +14411,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -13726,6 +14605,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -13990,6 +14871,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -14221,6 +15104,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -14446,6 +15331,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -14732,6 +15619,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -14957,6 +15846,8 @@ public:
             return;
         }
 
+        Wait();
+
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
@@ -15150,6 +16041,8 @@ public:
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
+
+        Wait();
 
         // Ensure we increment mTestIndex before we start running the relevant
         // command.  That way if we lose the timeslice after we send the message
@@ -15728,6 +16621,8 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_OCC_1_1>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<Test_TC_LVL_1_1>(),
+        make_unique<Test_TC_LVL_2_1>(),
+        make_unique<Test_TC_LVL_3_1>(),
         make_unique<Test_TC_CC_1_1>(),
         make_unique<Test_TC_RH_1_1>(),
         make_unique<Test_TC_MC_1_1>(),

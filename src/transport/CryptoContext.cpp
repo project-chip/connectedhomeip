@@ -163,9 +163,8 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
                                   MessageAuthenticationCode & mac) const
 {
 
-    constexpr Header::SessionType sessionType = Header::SessionType::kAESCCMTagLen16;
+    const size_t taglen = header.MICTagLength();
 
-    const size_t taglen = MessageAuthenticationCode::TagLenForSessionType(sessionType);
     VerifyOrDie(taglen <= kMaxTagLen);
 
     VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
@@ -194,7 +193,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
     ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, IV,
                                          sizeof(IV), output, tag, taglen));
 
-    mac.SetTag(&header, sessionType, tag, taglen);
+    mac.SetTag(&header, tag, taglen);
 
     return CHIP_NO_ERROR;
 }
@@ -202,7 +201,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
 CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                                   const MessageAuthenticationCode & mac) const
 {
-    const size_t taglen = MessageAuthenticationCode::TagLenForSessionType(header.GetSessionType());
+    const size_t taglen = header.MICTagLength();
     const uint8_t * tag = mac.GetTag();
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
