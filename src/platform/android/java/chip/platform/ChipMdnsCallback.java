@@ -17,6 +17,8 @@
  */
 package chip.platform;
 
+import java.util.Map;
+
 /** Interface for communicating with the CHIP mDNS stack. */
 public interface ChipMdnsCallback {
   void handleServiceResolve(
@@ -24,6 +26,8 @@ public interface ChipMdnsCallback {
       String serviceType,
       String address,
       int port,
+      Map<String, byte[]> attributes,
       long callbackHandle,
-      long contextHandle);
+      long contextHandle,
+      int errorCode);
 }
