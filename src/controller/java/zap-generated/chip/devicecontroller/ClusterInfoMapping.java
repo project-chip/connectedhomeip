@@ -17963,6 +17963,81 @@ public class ClusterInfoMapping {
             () -> new DelegatedTestAddArgumentsResponseCallback(),
             testClustertestAddArgumentsCommandParams);
     testClusterClusterCommandInfo.put("testAddArguments", testClustertestAddArgumentsCommandInfo);
+    Map<String, CommandParameter> testClustertestListInt8UArgumentRequestCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+    // TODO: fill out parameter types
+    CommandParameter testClustertestListInt8UArgumentRequestCommandParameter =
+        new CommandParameter("TestCluster", ChipClusters.DefaultClusterCallback.class);
+    CommandParameter testClustertestListInt8UArgumentRequestarg1CommandParameter =
+        new CommandParameter("arg1", int.class);
+    testClustertestListInt8UArgumentRequestCommandParams.put(
+        "arg1", testClustertestListInt8UArgumentRequestarg1CommandParameter);
+
+    // Populate commands
+    CommandInfo testClustertestListInt8UArgumentRequestCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .testListInt8UArgumentRequest(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("arg1"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testClustertestListInt8UArgumentRequestCommandParams);
+    testClusterClusterCommandInfo.put(
+        "testListInt8UArgumentRequest", testClustertestListInt8UArgumentRequestCommandInfo);
+    Map<String, CommandParameter> testClustertestListStructArgumentRequestCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+    // TODO: fill out parameter types
+    CommandParameter testClustertestListStructArgumentRequestCommandParameter =
+        new CommandParameter("TestCluster", ChipClusters.DefaultClusterCallback.class);
+    CommandParameter testClustertestListStructArgumentRequestaCommandParameter =
+        new CommandParameter("a", int.class);
+    testClustertestListStructArgumentRequestCommandParams.put(
+        "a", testClustertestListStructArgumentRequestaCommandParameter);
+
+    CommandParameter testClustertestListStructArgumentRequestbCommandParameter =
+        new CommandParameter("b", boolean.class);
+    testClustertestListStructArgumentRequestCommandParams.put(
+        "b", testClustertestListStructArgumentRequestbCommandParameter);
+
+    CommandParameter testClustertestListStructArgumentRequestcCommandParameter =
+        new CommandParameter("c", int.class);
+    testClustertestListStructArgumentRequestCommandParams.put(
+        "c", testClustertestListStructArgumentRequestcCommandParameter);
+
+    CommandParameter testClustertestListStructArgumentRequestdCommandParameter =
+        new CommandParameter("d", byte[].class);
+    testClustertestListStructArgumentRequestCommandParams.put(
+        "d", testClustertestListStructArgumentRequestdCommandParameter);
+
+    CommandParameter testClustertestListStructArgumentRequesteCommandParameter =
+        new CommandParameter("e", String.class);
+    testClustertestListStructArgumentRequestCommandParams.put(
+        "e", testClustertestListStructArgumentRequesteCommandParameter);
+
+    CommandParameter testClustertestListStructArgumentRequestfCommandParameter =
+        new CommandParameter("f", int.class);
+    testClustertestListStructArgumentRequestCommandParams.put(
+        "f", testClustertestListStructArgumentRequestfCommandParameter);
+
+    // Populate commands
+    CommandInfo testClustertestListStructArgumentRequestCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .testListStructArgumentRequest(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("a"),
+                      (Boolean) commandArguments.get("b"),
+                      (Integer) commandArguments.get("c"),
+                      (byte[]) commandArguments.get("d"),
+                      (String) commandArguments.get("e"),
+                      (Integer) commandArguments.get("f"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testClustertestListStructArgumentRequestCommandParams);
+    testClusterClusterCommandInfo.put(
+        "testListStructArgumentRequest", testClustertestListStructArgumentRequestCommandInfo);
     Map<String, CommandParameter> testClustertestNotHandledCommandParams =
         new LinkedHashMap<String, CommandParameter>();
 >>>>>>> 41b0956c1 (on/off commands working)
@@ -18030,6 +18105,59 @@ public class ClusterInfoMapping {
             () -> new DelegatedTestSpecificResponseCallback(),
             testClustertestSpecificCommandParams);
     testClusterClusterCommandInfo.put("testSpecific", testClustertestSpecificCommandInfo);
+    Map<String, CommandParameter> testClustertestStructArgumentRequestCommandParams =
+        new LinkedHashMap<String, CommandParameter>();
+    // TODO: fill out parameter types
+    CommandParameter testClustertestStructArgumentRequestCommandParameter =
+        new CommandParameter("TestCluster", ChipClusters.DefaultClusterCallback.class);
+    CommandParameter testClustertestStructArgumentRequestaCommandParameter =
+        new CommandParameter("a", int.class);
+    testClustertestStructArgumentRequestCommandParams.put(
+        "a", testClustertestStructArgumentRequestaCommandParameter);
+
+    CommandParameter testClustertestStructArgumentRequestbCommandParameter =
+        new CommandParameter("b", boolean.class);
+    testClustertestStructArgumentRequestCommandParams.put(
+        "b", testClustertestStructArgumentRequestbCommandParameter);
+
+    CommandParameter testClustertestStructArgumentRequestcCommandParameter =
+        new CommandParameter("c", int.class);
+    testClustertestStructArgumentRequestCommandParams.put(
+        "c", testClustertestStructArgumentRequestcCommandParameter);
+
+    CommandParameter testClustertestStructArgumentRequestdCommandParameter =
+        new CommandParameter("d", byte[].class);
+    testClustertestStructArgumentRequestCommandParams.put(
+        "d", testClustertestStructArgumentRequestdCommandParameter);
+
+    CommandParameter testClustertestStructArgumentRequesteCommandParameter =
+        new CommandParameter("e", String.class);
+    testClustertestStructArgumentRequestCommandParams.put(
+        "e", testClustertestStructArgumentRequesteCommandParameter);
+
+    CommandParameter testClustertestStructArgumentRequestfCommandParameter =
+        new CommandParameter("f", int.class);
+    testClustertestStructArgumentRequestCommandParams.put(
+        "f", testClustertestStructArgumentRequestfCommandParameter);
+
+    // Populate commands
+    CommandInfo testClustertestStructArgumentRequestCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .testStructArgumentRequest(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("a"),
+                      (Boolean) commandArguments.get("b"),
+                      (Integer) commandArguments.get("c"),
+                      (byte[]) commandArguments.get("d"),
+                      (String) commandArguments.get("e"),
+                      (Integer) commandArguments.get("f"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testClustertestStructArgumentRequestCommandParams);
+    testClusterClusterCommandInfo.put(
+        "testStructArgumentRequest", testClustertestStructArgumentRequestCommandInfo);
     Map<String, CommandParameter> testClustertestUnknownCommandCommandParams =
         new LinkedHashMap<String, CommandParameter>();
 >>>>>>> 41b0956c1 (on/off commands working)

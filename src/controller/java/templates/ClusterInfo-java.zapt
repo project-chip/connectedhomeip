@@ -243,11 +243,11 @@ public class ClusterInfoMapping {
                {{else}}
                  CommandParameter {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.DefaultClusterCallback.class);
                {{/if}}
-               {{#chip_cluster_command_arguments}}
+               {{#chip_cluster_command_arguments_with_structs_expanded}}
                  CommandParameter {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameter = new CommandParameter("{{asLowerCamelCase label}}", {{asJavaBasicType type}}.class);
                  {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}CommandParams.put("{{asLowerCamelCase label}}",{{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameter);
                  {{#not_last}} {{/not_last}}
-               {{/chip_cluster_command_arguments}}
+               {{/chip_cluster_command_arguments_with_structs_expanded}}
            {{else}}
                {{#if hasSpecificResponse}}
                  CommandParameter {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameter = new CommandParameter("{{asUpperCamelCase ../name}}", ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback.class);
@@ -261,11 +261,11 @@ public class ClusterInfoMapping {
                    (cluster, callback, commandArguments) -> {
                        ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
                            .{{asLowerCamelCase name}}((ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback) callback
-                           {{#chip_cluster_command_arguments}}
+                           {{#chip_cluster_command_arguments_with_structs_expanded}}
                            ,
                               ({{asJavaBoxedType type}})
                             commandArguments.get("{{asLowerCamelCase label}}")
-                       {{/chip_cluster_command_arguments}}
+                       {{/chip_cluster_command_arguments_with_structs_expanded}}
                        );
                    },
                    () -> new Delegated{{asUpperCamelCase responseName}}Callback(),
@@ -276,11 +276,11 @@ public class ClusterInfoMapping {
                    (cluster, callback, commandArguments) -> {
                        ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
                           .{{asLowerCamelCase name}}((DefaultClusterCallback) callback
-                          {{#chip_cluster_command_arguments}}
+                          {{#chip_cluster_command_arguments_with_structs_expanded}}
                           ,
                              ({{asJavaBoxedType type}})
                            commandArguments.get("{{asLowerCamelCase label}}")
-                {{/chip_cluster_command_arguments}}
+                {{/chip_cluster_command_arguments_with_structs_expanded}}
                 );
                    },
                    () -> new DelegatedDefaultClusterCallback(),
