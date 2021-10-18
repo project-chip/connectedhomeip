@@ -18,7 +18,12 @@
 
 #pragma once
 
-#include <controller/CHIPDevice.h>
+// #include <controller/CHIPDevice.h>
+#include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/CASESession.h>
+#include <protocols/secure_channel/SessionIDAllocator.h>
+#include <transport/FabricTable.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 namespace app {
@@ -53,13 +58,14 @@ typedef void (*OnOperationalDeviceConnectionFailure)(void * context, Operational
  * must supply the node ID, fabric index, as well as other device specific parameters to the peer node
  * it wants to communicate with.
  */
-class DLL_EXPORT OperationalDeviceProxy
+class DLL_EXPORT OperationalDeviceProxy : public SessionEstablishmentDelegate
 {
 public:
     virtual ~OperationalDeviceProxy() {}
-    OperationalDeviceProxy() :
-        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
-    {}
+    OperationalDeviceProxy() {}
+    // OperationalDeviceProxy() :
+    //     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    // {}
 
     /**
      * @brief
@@ -123,7 +129,13 @@ public:
      */
     void OnConnectionExpired(SessionHandle session);
 
-    chip::Controller::Device & GetDevice() { return mDevice; }
+    /**
+     * ----- SessionEstablishmentDelegate implementation -----
+     */
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablished() override;
+
+    // chip::Controller::Device & GetDevice() { return mDevice; }
 
 private:
     /* Node ID assigned to the device */
@@ -138,6 +150,8 @@ private:
     /* Address used to communicate with the device */
     Transport::PeerAddress mAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
+    CASESession mCASESession;
+
     /* Tracker of callbacks for the device */
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
@@ -145,7 +159,7 @@ private:
     // TODO: https://github.com/project-chip/connectedhomeip/issues/10423 will provide a refactor of the `Device`
     // class. When that happens, this class will no longer act as a wrapper to the `Device` class. This class
     // should not need to hold a Device class object.
-    Controller::Device mDevice;
+    // Controller::Device mDevice;
 
     /**
      * ----- Member functions -----
@@ -164,11 +178,11 @@ private:
     // callbacks from the `Device` class to the users of the `OperationalDeviceProxy` class. Once the
     // `OperationalDeviceProxy` class is no longer a wrapper to the `Device` class, the former will no longer
     // need to register for the following callbacks to the `Device` class.
-    static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
-    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+    // static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
+    // static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
-    chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
-    chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    // chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
+    // chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };
 
 } // namespace device
