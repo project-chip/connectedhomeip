@@ -49,6 +49,35 @@ template <class>
 class GenericPlatformManagerImpl_POSIX;
 } // namespace Internal
 
+constexpr size_t kMaxIfNameSize = 32;
+
+// 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
+constexpr size_t kMaxHardwareAddrSize = 8;
+
+/**
+ * InterfaceType Types.
+ */
+enum class InterfaceType : uint8_t
+{
+    kInterfaceType_Unspecified = 0x00,
+    kInterfaceType_WiFi        = 0x01,
+    kInterfaceType_Ethernet    = 0x02,
+    kInterfaceType_Cellular    = 0x03,
+    kInterfaceType_Thread      = 0x04,
+};
+
+struct NetworkInterface
+{
+    char Name[kMaxIfNameSize];
+    bool FabricConnected;
+    bool OffPremiseServicesReachableIPv4;
+    bool OffPremiseServicesReachableIPv6;
+    bool Is64MacAddress;
+    char HardwareAddress[kMaxHardwareAddrSize];
+    InterfaceType Type;
+    struct NetworkInterface * Next; /* Pointer to the next structure.  */
+};
+
 class ConnectivityManagerImpl;
 
 /**
@@ -166,6 +195,10 @@ public:
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
+
+    // General diagnostics methods
+    CHIP_ERROR GetNetworkInterfaces(struct NetworkInterface ** netifp);
+    void ReleaseNetworkInterfaces(struct NetworkInterface ** netifp);
 
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
@@ -388,6 +421,16 @@ inline void ConnectivityManager::SetWiFiAPIdleTimeoutMS(uint32_t val)
 inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
 {
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
+}
+
+inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(struct NetworkInterface ** netifp)
+{
+    return static_cast<ImplClass *>(this)->_GetNetworkInterfaces(netifp);
+}
+
+inline void ConnectivityManager::ReleaseNetworkInterfaces(struct NetworkInterface ** netifp)
+{
+    return static_cast<ImplClass *>(this)->_ReleaseNetworkInterfaces(netifp);
 }
 
 inline CHIP_ERROR ConnectivityManager::GetEthPHYRate(uint8_t & pHYRate)
