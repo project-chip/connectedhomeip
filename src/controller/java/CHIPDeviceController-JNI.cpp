@@ -59,7 +59,6 @@ using namespace chip::Controller;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
-static void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device ** device);
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
@@ -275,19 +274,6 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
     }
 }
 
-JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
-{
-    chip::DeviceLayer::StackLock lock;
-    Device * chipDevice = nullptr;
-
-    ChipLogProgress(Controller, "getDevicePointer() called with device ID");
-
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
-
-    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
-    return reinterpret_cast<jlong>(chipDevice);
-}
-
 JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
 {
     chip::DeviceLayer::StackLock lock;
@@ -337,20 +323,6 @@ JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
 
     Device * chipDevice = reinterpret_cast<Device *>(handle);
     return chipDevice->IsActive();
-}
-
-void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device ** chipDevice)
-{
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(wrapperHandle);
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-
-    err = wrapper->Controller()->GetDevice(deviceId, chipDevice);
-
-    if (err != CHIP_NO_ERROR || !chipDevice)
-    {
-        ChipLogError(Controller, "Failed to get paired device.");
-        ThrowError(env, err);
-    }
 }
 
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
