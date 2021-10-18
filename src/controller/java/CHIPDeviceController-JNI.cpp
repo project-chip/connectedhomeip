@@ -326,20 +326,9 @@ JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlo
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    Device * chipDevice                      = nullptr;
 
     ChipLogProgress(Controller, "disconnectDevice() called with deviceId");
-
-    err = wrapper->Controller()->GetDevice(deviceId, &chipDevice);
-
-    if (err != CHIP_NO_ERROR || !chipDevice)
-    {
-        ChipLogError(Controller, "Failed to get paired device.");
-        ThrowError(env, err);
-    }
-
-    wrapper->Controller()->ReleaseDevice(chipDevice);
+    wrapper->Controller()->ReleaseDeviceById(deviceId);
 }
 
 JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
@@ -367,16 +356,19 @@ void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device *
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
-    Device * chipDevice = nullptr;
-
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::Inet::IPAddress addr;
     uint16_t port;
     char addrStr[50];
 
-    if (!chipDevice->GetAddress(addr, port))
-        return nullptr;
+    CHIP_ERROR err = wrapper->Controller()->GetPeerAddressAndPort(PeerId().SetCompressedFabricId().SetNodeId(), addr, port);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to get device address.");
+        ThrowError(env, err);
+    }
 
     addr.ToString(addrStr);
     return env->NewStringUTF(addrStr);
