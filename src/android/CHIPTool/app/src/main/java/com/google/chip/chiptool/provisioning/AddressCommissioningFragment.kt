@@ -42,7 +42,7 @@ class AddressCommissioningFragment : Fragment() {
     serviceDiscover = NsdManagerServiceDiscover(requireContext())
     serviceResolver = NsdManagerServiceResolver(requireContext())
 
-    mUpdateSpinnerHandler = Handler(Looper.getMainLooper()) {
+    updateSpinnerHandler = Handler(Looper.getMainLooper()) {
       updateSpinner()
       true
     }
@@ -74,7 +74,7 @@ class AddressCommissioningFragment : Fragment() {
       }
       commissionBtn.isEnabled = false
       ipAddressList.clear()
-      mUpdateSpinnerHandler.sendEmptyMessage(0)
+      updateSpinnerHandler.sendEmptyMessage(0)
       serviceDiscover.startDiscover(SERVICE_TYPE, 0, 0, discoverCallback)
     }
   }
@@ -102,7 +102,7 @@ class AddressCommissioningFragment : Fragment() {
     private lateinit var serviceDiscover : NsdManagerServiceDiscover
     private lateinit var serviceResolver : ServiceResolver
     private val ipAddressList = ArrayList<String>()
-    private lateinit var mUpdateSpinnerHandler: Handler
+    private lateinit var updateSpinnerHandler: Handler
 
     private val mdnsCallback = object: ChipMdnsCallback {
       override fun handleServiceResolve(
@@ -124,11 +124,12 @@ class AddressCommissioningFragment : Fragment() {
           val discriminator = String(attributes["D"] ?: return)
           if (value == "1") {
             ipAddressList.add("${address}, $discriminator")
-            mUpdateSpinnerHandler.sendEmptyMessage(0)
+            updateSpinnerHandler.sendEmptyMessage(0)
           }
         }
       }
     }
+
     private val discoverCallback = object: NsdManagerServiceDiscover.Callback {
       override fun handleServiceDiscover(
         instanceName: String?,
