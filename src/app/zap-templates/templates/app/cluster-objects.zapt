@@ -140,7 +140,7 @@ namespace {{asUpperCamelCase label}} {
         using DecodableType = DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType entryType}}>;
     {{else}}
         using Type = {{zapTypeToEncodableClusterObjectType type}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType type}};;
+        using DecodableType = {{zapTypeToDecodableClusterObjectType type}};
     {{/if}}
 
         static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }

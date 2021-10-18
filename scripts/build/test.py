@@ -82,7 +82,13 @@ class TestBuilder(unittest.TestCase):
         diffs = [line for line in difflib.unified_diff(expected, actual)]
 
         if diffs:
-            msg = "DIFFERENCE between expected and generated output in %s" % expected_file
+            reference = os.path.basename(expected_file) + '.actual'
+            with open(reference, 'wt') as fo:
+                for l in build_actual_output(ROOT, OUT, args):
+                    fo.write(l.replace(ROOT, '{root}').replace(OUT, '{out}'))
+
+            msg = "DIFFERENCE between expected and generated output in %s\n" % expected_file
+            msg += "Expected file can be found in %s" % reference
             for l in diffs:
                 msg += ("\n   " + l.replace(ROOT,
                         '{root}').replace(OUT, '{out}').strip())
