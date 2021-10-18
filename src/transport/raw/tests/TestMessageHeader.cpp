@@ -41,6 +41,9 @@ void TestPacketHeaderInitialState(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !header.IsSecureSessionControlMsg());
     NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 0);
     NL_TEST_ASSERT(inSuite, header.GetSessionId() == 0);
+    NL_TEST_ASSERT(inSuite, header.GetSessionType() == Header::SessionType::kUnicastSession);
+    NL_TEST_ASSERT(inSuite, header.IsSessionTypeValid());
+    NL_TEST_ASSERT(inSuite, !header.IsEncrypted());
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
     NL_TEST_ASSERT(inSuite, !header.GetDestinationGroupId().HasValue());
     NL_TEST_ASSERT(inSuite, !header.GetSourceNodeId().HasValue());
@@ -127,6 +130,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88ull));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
+    NL_TEST_ASSERT(inSuite, header.IsEncrypted());
     NL_TEST_ASSERT(inSuite, header.GetSessionId() == 2);
 
     header.SetMessageCounter(234).SetSourceNodeId(77).SetDestinationNodeId(88);
@@ -144,6 +148,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_ERROR_INTERNAL);
 
     header.ClearDestinationNodeId();
+    header.SetSessionType(Header::SessionType::kGroupSession);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
@@ -254,6 +259,7 @@ void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
     // Now test encoding/decoding with a source node id and destination group id present.
     header.ClearDestinationNodeId();
     header.SetDestinationGroupId(25);
+    header.SetSessionType(Header::SessionType::kGroupSession);
     for (uint16_t shortLen = minLen; shortLen < minLen + 10; shortLen++)
     {
         NL_TEST_ASSERT(inSuite, header.Encode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);

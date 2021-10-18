@@ -54,7 +54,7 @@ protected:
     // 1) If error is returned, Run() must not call SetCommandExitStatus.
     // 2) If success is returned Run() must either have called
     //    SetCommandExitStatus() or scheduled async work that will do that.
-    virtual CHIP_ERROR Run(NodeId remoteId) = 0;
+    virtual CHIP_ERROR RunCommand() = 0;
 
     // Get the wait duration, in seconds, before the command times out.
     virtual uint16_t GetWaitDurationInSeconds() const = 0;

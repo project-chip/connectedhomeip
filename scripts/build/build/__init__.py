@@ -43,6 +43,8 @@ class Context:
         if BuildSteps.GENERATED in self.completed_steps:
             return
 
+        self.runner.StartCommandExecution()
+
         for builder in self.builders:
             logging.info('Generating %s', builder.output_dir)
             builder.generate()

@@ -57,22 +57,7 @@ public:
      */
     template <typename RequestDataT, typename ResponseDataT>
     CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
-                             CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb)
-    {
-        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-        auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
-            successCb(context, responseData);
-        };
-
-        auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
-            failureCb(context, app::ToEmberAfStatus(aIMStatus));
-        };
-
-        return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                                   requestData, onSuccessCb, onFailureCb);
-    }
+                             CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb);
 
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}

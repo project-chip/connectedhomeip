@@ -41,8 +41,8 @@ void TemporaryAuditRandomNumberGenerator()
     uint8_t buf1[16] = { 0 };
     uint8_t buf2[16] = { 0 };
 
-    VerifyOrDie(chip::Crypto::DRBG_get_bytes(&buf1[0], sizeof(buf1)) == CHIP_NO_ERROR);
-    VerifyOrDie(chip::Crypto::DRBG_get_bytes(&buf2[0], sizeof(buf2)) == CHIP_NO_ERROR);
+    VerifyOrDie(Crypto::DRBG_get_bytes(&buf1[0], sizeof(buf1)) == CHIP_NO_ERROR);
+    VerifyOrDie(Crypto::DRBG_get_bytes(&buf2[0], sizeof(buf2)) == CHIP_NO_ERROR);
 
     char hex_buf[sizeof(buf1) * 2 + 1];
 
@@ -61,8 +61,8 @@ void TemporaryAuditRandomNumberGenerator()
     VerifyOrDieWithMsg(memcmp(&buf1[0], &buf2[0], sizeof(buf1)) != 0, DeviceLayer,
                        "AUDIT: FAILED: buf1, buf2 are equal: DRBG_get_bytes() does not function!");
 
-    uint32_t r1 = chip::Crypto::GetRandU32();
-    uint32_t r2 = chip::Crypto::GetRandU32();
+    uint32_t r1 = Crypto::GetRandU32();
+    uint32_t r2 = Crypto::GetRandU32();
 
     ChipLogProgress(DeviceLayer, "AUDIT: * r1: 0x%08" PRIX32 " r2: 0x%08" PRIX32, r1, r2);
     VerifyOrDieWithMsg(r1 != r2, DeviceLayer, "AUDIT: FAILED: r1, r2 are equal: random number generator does not function!");
@@ -77,7 +77,7 @@ namespace Internal {
 CHIP_ERROR InitEntropy()
 {
     unsigned int seed;
-    ReturnErrorOnFailure(chip::Crypto::DRBG_get_bytes((uint8_t *) &seed, sizeof(seed)));
+    ReturnErrorOnFailure(Crypto::DRBG_get_bytes((uint8_t *) &seed, sizeof(seed)));
     srand(seed);
 
     // TODO: remove once https://github.com/project-chip/connectedhomeip/issues/10454 is done.

@@ -43,7 +43,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltage::Id; }
@@ -54,7 +53,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsFrequency::Id; }
@@ -65,7 +63,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsAlarmMask::Id; }
@@ -76,7 +73,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageMinThreshold::Id; }
@@ -87,7 +83,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageMaxThreshold::Id; }
@@ -98,7 +93,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageDwellTrip::Id; }
@@ -109,7 +103,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltage::Id; }
@@ -120,7 +113,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageRemaining::Id; }
@@ -131,7 +123,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryManufacturer::Id; }
@@ -142,7 +133,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatterySize::Id; }
@@ -153,7 +143,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAhrRating::Id; }
@@ -164,7 +153,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryQuantity::Id; }
@@ -175,7 +163,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryRatedVoltage::Id; }
@@ -186,7 +173,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmMask::Id; }
@@ -197,7 +183,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageMinThreshold::Id; }
@@ -208,7 +193,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold1::Id; }
@@ -219,7 +203,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold2::Id; }
@@ -230,7 +213,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold3::Id; }
@@ -241,7 +223,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageMinThreshold::Id; }
@@ -252,7 +233,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold1::Id; }
@@ -263,7 +243,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold2::Id; }
@@ -274,7 +253,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold3::Id; }
@@ -285,7 +263,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmState::Id; }
@@ -296,7 +273,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Voltage::Id; }
@@ -307,7 +283,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageRemaining::Id; }
@@ -318,7 +293,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Manufacturer::Id; }
@@ -329,7 +303,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Size::Id; }
@@ -340,7 +313,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AhrRating::Id; }
@@ -351,7 +323,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Quantity::Id; }
@@ -362,7 +333,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2RatedVoltage::Id; }
@@ -373,7 +343,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmMask::Id; }
@@ -384,7 +353,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageMinThreshold::Id; }
@@ -395,7 +363,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold1::Id; }
@@ -406,7 +373,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold2::Id; }
@@ -417,7 +383,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold3::Id; }
@@ -428,7 +393,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageMinThreshold::Id; }
@@ -439,7 +403,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold1::Id; }
@@ -450,7 +413,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold2::Id; }
@@ -461,7 +423,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold3::Id; }
@@ -472,7 +433,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmState::Id; }
@@ -483,7 +443,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Voltage::Id; }
@@ -494,7 +453,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageRemaining::Id; }
@@ -505,7 +463,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Manufacturer::Id; }
@@ -516,7 +473,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Size::Id; }
@@ -527,7 +483,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AhrRating::Id; }
@@ -538,7 +493,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Quantity::Id; }
@@ -549,7 +503,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3RatedVoltage::Id; }
@@ -560,7 +513,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmMask::Id; }
@@ -571,7 +523,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageMinThreshold::Id; }
@@ -582,7 +533,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold1::Id; }
@@ -593,7 +543,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold2::Id; }
@@ -604,7 +553,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold3::Id; }
@@ -615,7 +563,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageMinThreshold::Id; }
@@ -626,7 +573,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold1::Id; }
@@ -637,7 +583,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold2::Id; }
@@ -648,7 +593,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold3::Id; }
@@ -659,7 +603,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmState::Id; }
@@ -675,7 +618,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTemperature::Id; }
@@ -686,7 +628,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinTempExperienced::Id; }
@@ -697,7 +638,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxTempExperienced::Id; }
@@ -708,7 +648,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverTempTotalDwell::Id; }
@@ -719,7 +658,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DeviceTempAlarmMask::Id; }
@@ -730,7 +668,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LowTempThreshold::Id; }
@@ -741,7 +678,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HighTempThreshold::Id; }
@@ -752,7 +688,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LowTempDwellTripPoint::Id; }
@@ -763,7 +698,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HighTempDwellTripPoint::Id; }
@@ -936,7 +870,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyTime::Id; }
@@ -947,7 +880,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyType::Id; }
@@ -1269,7 +1201,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
@@ -1915,7 +1846,7 @@ public:
     static constexpr CommandId GetCommandId() { return CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
 
-    BitFlags<ScenesCopyMode> mode;
+    chip::BitFlags<ScenesCopyMode> mode;
     uint16_t groupIdFrom;
     uint8_t sceneIdFrom;
     uint16_t groupIdTo;
@@ -1930,7 +1861,7 @@ public:
     static constexpr CommandId GetCommandId() { return CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
 
-    BitFlags<ScenesCopyMode> mode;
+    chip::BitFlags<ScenesCopyMode> mode;
     uint16_t groupIdFrom;
     uint8_t sceneIdFrom;
     uint16_t groupIdTo;
@@ -1980,7 +1911,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SceneCount::Id; }
@@ -1991,7 +1921,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentScene::Id; }
@@ -2002,7 +1931,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentGroup::Id; }
@@ -2013,7 +1941,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SceneValid::Id; }
@@ -2024,7 +1951,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
@@ -2035,7 +1961,6 @@ struct TypeInfo
 {
     using Type          = chip::NodeId;
     using DecodableType = chip::NodeId;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastConfiguredBy::Id; }
@@ -2350,7 +2275,7 @@ public:
     static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    BitFlags<OnOffControl> onOffControl;
+    chip::BitFlags<OnOffControl> onOffControl;
     uint16_t onTime;
     uint16_t offWaitTime;
 
@@ -2363,7 +2288,7 @@ public:
     static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    BitFlags<OnOffControl> onOffControl;
+    chip::BitFlags<OnOffControl> onOffControl;
     uint16_t onTime;
     uint16_t offWaitTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -2377,7 +2302,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnOff::Id; }
@@ -2388,7 +2312,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00000x1002::Id; }
@@ -2399,7 +2322,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00000x1049::Id; }
@@ -2410,7 +2332,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00010x1002::Id; }
@@ -2421,7 +2342,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00010x1040::Id; }
@@ -2432,7 +2352,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GlobalSceneControl::Id; }
@@ -2443,7 +2362,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTime::Id; }
@@ -2454,7 +2372,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffWaitTime::Id; }
@@ -2465,7 +2382,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpOnOff::Id; }
@@ -2481,7 +2397,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SwitchType::Id; }
@@ -2492,7 +2407,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SwitchActions::Id; }
@@ -2800,7 +2714,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentLevel::Id; }
@@ -2811,18 +2724,66 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
 };
 } // namespace RemainingTime
+namespace MinLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
+};
+} // namespace MinLevel
+namespace MaxLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
+};
+} // namespace MaxLevel
+namespace CurrentFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFrequency::Id; }
+};
+} // namespace CurrentFrequency
+namespace MinFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinFrequency::Id; }
+};
+} // namespace MinFrequency
+namespace MaxFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxFrequency::Id; }
+};
+} // namespace MaxFrequency
 namespace Options {
 struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Options::Id; }
@@ -2833,7 +2794,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnOffTransitionTime::Id; }
@@ -2844,7 +2804,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnLevel::Id; }
@@ -2855,7 +2814,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTransitionTime::Id; }
@@ -2866,7 +2824,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffTransitionTime::Id; }
@@ -2877,7 +2834,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultMoveRate::Id; }
@@ -2888,7 +2844,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpCurrentLevel::Id; }
@@ -3078,7 +3033,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Alarms::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmCount::Id; }
@@ -3094,7 +3048,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Time::Id; }
@@ -3105,7 +3058,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeStatus::Id; }
@@ -3116,7 +3068,6 @@ struct TypeInfo
 {
     using Type          = int32_t;
     using DecodableType = int32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeZone::Id; }
@@ -3127,7 +3078,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DstStart::Id; }
@@ -3138,7 +3088,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DstEnd::Id; }
@@ -3149,7 +3098,6 @@ struct TypeInfo
 {
     using Type          = int32_t;
     using DecodableType = int32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DstShift::Id; }
@@ -3160,7 +3108,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StandardTime::Id; }
@@ -3171,7 +3118,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTime::Id; }
@@ -3182,7 +3128,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastSetTime::Id; }
@@ -3193,7 +3138,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ValidUntilTime::Id; }
@@ -3209,7 +3153,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveText::Id; }
@@ -3220,7 +3163,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
@@ -3231,7 +3173,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InactiveText::Id; }
@@ -3242,7 +3183,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OutOfService::Id; }
@@ -3253,7 +3193,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Polarity::Id; }
@@ -3264,7 +3203,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PresentValue::Id; }
@@ -3275,7 +3213,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reliability::Id; }
@@ -3286,7 +3223,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StatusFlags::Id; }
@@ -3297,7 +3233,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationType::Id; }
@@ -4061,7 +3996,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalProfileNum::Id; }
@@ -4072,7 +4006,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MultipleScheduling::Id; }
@@ -4083,7 +4016,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnergyFormatting::Id; }
@@ -4094,7 +4026,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnergyRemote::Id; }
@@ -4105,7 +4036,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleMode::Id; }
@@ -4228,7 +4158,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -4241,7 +4171,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4286,7 +4216,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -4299,7 +4229,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4422,7 +4352,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
@@ -4433,7 +4362,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FinishTime::Id; }
@@ -4444,7 +4372,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
@@ -4666,7 +4593,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CheckInInterval::Id; }
@@ -4677,7 +4603,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongPollInterval::Id; }
@@ -4688,7 +4613,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ShortPollInterval::Id; }
@@ -4699,7 +4623,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FastPollTimeout::Id; }
@@ -4710,7 +4633,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CheckInIntervalMin::Id; }
@@ -4721,7 +4643,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongPollIntervalMin::Id; }
@@ -4732,7 +4653,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FastPollTimeoutMax::Id; }
@@ -4847,7 +4767,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InteractionModelVersion::Id; }
@@ -4858,7 +4777,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
@@ -4869,7 +4787,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -4880,7 +4797,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
@@ -4891,7 +4807,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductID::Id; }
@@ -4902,7 +4817,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
@@ -4913,7 +4827,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Location::Id; }
@@ -4924,7 +4837,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersion::Id; }
@@ -4935,7 +4847,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
@@ -4946,7 +4857,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersion::Id; }
@@ -4957,7 +4867,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
@@ -4968,7 +4877,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
@@ -4979,7 +4887,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -4990,7 +4897,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
@@ -5001,7 +4907,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
@@ -5012,7 +4917,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
@@ -5023,7 +4927,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalConfigDisabled::Id; }
@@ -5034,7 +4937,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
@@ -5340,7 +5242,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProvider::Id; }
@@ -5351,7 +5252,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UpdatePossible::Id; }
@@ -5367,7 +5267,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -5378,7 +5277,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Order::Id; }
@@ -5389,7 +5287,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
@@ -5400,7 +5297,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputVoltage::Id; }
@@ -5411,7 +5307,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputFrequency::Id; }
@@ -5422,7 +5317,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredCurrentType::Id; }
@@ -5433,7 +5327,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedCurrent::Id; }
@@ -5444,7 +5337,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredNominalVoltage::Id; }
@@ -5455,7 +5347,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredMaximumCurrent::Id; }
@@ -5466,7 +5357,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredPresent::Id; }
@@ -5487,7 +5377,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltage::Id; }
@@ -5498,7 +5387,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentRemaining::Id; }
@@ -5509,7 +5397,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeRemaining::Id; }
@@ -5520,7 +5407,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeLevel::Id; }
@@ -5531,7 +5417,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementNeeded::Id; }
@@ -5542,7 +5427,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplaceability::Id; }
@@ -5553,7 +5437,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPresent::Id; }
@@ -5574,7 +5457,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementDescription::Id; }
@@ -5585,7 +5467,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCommonDesignation::Id; }
@@ -5596,7 +5477,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryANSIDesignation::Id; }
@@ -5607,7 +5487,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryIECDesignation::Id; }
@@ -5618,7 +5497,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryApprovedChemistry::Id; }
@@ -5629,7 +5507,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCapacity::Id; }
@@ -5640,7 +5517,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryQuantity::Id; }
@@ -5651,7 +5527,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeState::Id; }
@@ -5662,7 +5537,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeToFullCharge::Id; }
@@ -5673,7 +5547,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryFunctionalWhileCharging::Id; }
@@ -5684,7 +5557,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargingCurrent::Id; }
@@ -5948,7 +5820,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Breadcrumb::Id; }
@@ -6879,7 +6750,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RebootCount::Id; }
@@ -6890,7 +6760,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UpTime::Id; }
@@ -6901,7 +6770,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalOperationalHours::Id; }
@@ -6912,7 +6780,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BootReasons::Id; }
@@ -7024,7 +6891,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapFree::Id; }
@@ -7035,7 +6901,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapUsed::Id; }
@@ -7046,7 +6911,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapHighWatermark::Id; }
@@ -7263,7 +7127,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Channel::Id; }
@@ -7274,7 +7137,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RoutingRole::Id; }
@@ -7285,7 +7147,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkName::Id; }
@@ -7296,7 +7157,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PanId::Id; }
@@ -7307,7 +7167,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ExtendedPanId::Id; }
@@ -7318,7 +7177,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeshLocalPrefix::Id; }
@@ -7329,7 +7187,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
@@ -7360,7 +7217,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartitionId::Id; }
@@ -7371,7 +7227,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Weighting::Id; }
@@ -7382,7 +7237,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DataVersion::Id; }
@@ -7393,7 +7247,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StableDataVersion::Id; }
@@ -7404,7 +7257,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LeaderRouterId::Id; }
@@ -7415,7 +7267,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DetachedRoleCount::Id; }
@@ -7426,7 +7277,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChildRoleCount::Id; }
@@ -7437,7 +7287,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RouterRoleCount::Id; }
@@ -7448,7 +7297,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LeaderRoleCount::Id; }
@@ -7459,7 +7307,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttachAttemptCount::Id; }
@@ -7470,7 +7317,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartitionIdChangeCount::Id; }
@@ -7481,7 +7327,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BetterPartitionAttachAttemptCount::Id; }
@@ -7492,7 +7337,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ParentChangeCount::Id; }
@@ -7503,7 +7347,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxTotalCount::Id; }
@@ -7514,7 +7357,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxUnicastCount::Id; }
@@ -7525,7 +7367,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxBroadcastCount::Id; }
@@ -7536,7 +7377,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxAckRequestedCount::Id; }
@@ -7547,7 +7387,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxAckedCount::Id; }
@@ -7558,7 +7397,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxNoAckRequestedCount::Id; }
@@ -7569,7 +7407,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxDataCount::Id; }
@@ -7580,7 +7417,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxDataPollCount::Id; }
@@ -7591,7 +7427,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxBeaconCount::Id; }
@@ -7602,7 +7437,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxBeaconRequestCount::Id; }
@@ -7613,7 +7447,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxOtherCount::Id; }
@@ -7624,7 +7457,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxRetryCount::Id; }
@@ -7635,7 +7467,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxDirectMaxRetryExpiryCount::Id; }
@@ -7646,7 +7477,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxIndirectMaxRetryExpiryCount::Id; }
@@ -7657,7 +7487,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrCcaCount::Id; }
@@ -7668,7 +7497,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrAbortCount::Id; }
@@ -7679,7 +7507,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrBusyChannelCount::Id; }
@@ -7690,7 +7517,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxTotalCount::Id; }
@@ -7701,7 +7527,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxUnicastCount::Id; }
@@ -7712,7 +7537,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxBroadcastCount::Id; }
@@ -7723,7 +7547,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDataCount::Id; }
@@ -7734,7 +7557,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDataPollCount::Id; }
@@ -7745,7 +7567,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxBeaconCount::Id; }
@@ -7756,7 +7577,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxBeaconRequestCount::Id; }
@@ -7767,7 +7587,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxOtherCount::Id; }
@@ -7778,7 +7597,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxAddressFilteredCount::Id; }
@@ -7789,7 +7607,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDestAddrFilteredCount::Id; }
@@ -7800,7 +7617,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDuplicatedCount::Id; }
@@ -7811,7 +7627,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrNoFrameCount::Id; }
@@ -7822,7 +7637,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrUnknownNeighborCount::Id; }
@@ -7833,7 +7647,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrInvalidSrcAddrCount::Id; }
@@ -7844,7 +7657,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrSecCount::Id; }
@@ -7855,7 +7667,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrFcsCount::Id; }
@@ -7866,7 +7677,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrOtherCount::Id; }
@@ -7877,7 +7687,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveTimestamp::Id; }
@@ -7888,7 +7697,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PendingTimestamp::Id; }
@@ -7899,7 +7707,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Delay::Id; }
@@ -7920,7 +7727,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelMask::Id; }
@@ -8015,7 +7821,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bssid::Id; }
@@ -8026,7 +7831,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SecurityType::Id; }
@@ -8037,7 +7841,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiFiVersion::Id; }
@@ -8048,7 +7851,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelNumber::Id; }
@@ -8059,7 +7861,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Rssi::Id; }
@@ -8070,7 +7871,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BeaconLostCount::Id; }
@@ -8081,7 +7881,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BeaconRxCount::Id; }
@@ -8092,7 +7891,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastRxCount::Id; }
@@ -8103,7 +7901,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastTxCount::Id; }
@@ -8114,7 +7911,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastRxCount::Id; }
@@ -8125,7 +7921,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastTxCount::Id; }
@@ -8136,7 +7931,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMaxRate::Id; }
@@ -8147,7 +7941,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
@@ -8210,7 +8003,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PHYRate::Id; }
@@ -8221,7 +8013,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FullDuplex::Id; }
@@ -8232,7 +8023,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketRxCount::Id; }
@@ -8243,7 +8033,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketTxCount::Id; }
@@ -8254,7 +8043,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrCount::Id; }
@@ -8265,7 +8053,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CollisionCount::Id; }
@@ -8276,7 +8063,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
@@ -8287,7 +8073,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CarrierDetect::Id; }
@@ -8298,7 +8083,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeSinceReset::Id; }
@@ -8413,7 +8197,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
@@ -8424,7 +8207,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -8435,7 +8217,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
@@ -8446,7 +8227,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
@@ -8457,7 +8237,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersion::Id; }
@@ -8468,7 +8247,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
@@ -8479,7 +8257,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersion::Id; }
@@ -8490,7 +8267,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
@@ -8501,7 +8277,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
@@ -8512,7 +8287,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -8523,7 +8297,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
@@ -8534,7 +8307,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
@@ -8545,7 +8317,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
@@ -8556,7 +8327,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
@@ -8572,7 +8342,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPositions::Id; }
@@ -8583,7 +8352,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPosition::Id; }
@@ -8594,7 +8362,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MultiPressMax::Id; }
@@ -9199,7 +8966,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedFabrics::Id; }
@@ -9210,7 +8976,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CommissionedFabrics::Id; }
@@ -9274,7 +9039,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimit::Id; }
@@ -9285,7 +9049,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MotorStepSize::Id; }
@@ -9296,7 +9059,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -9307,7 +9069,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClosedLimit::Id; }
@@ -9318,7 +9079,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
@@ -10105,7 +9865,7 @@ public:
 
     uint8_t scheduleId;
     uint16_t userId;
-    BitFlags<DoorLockDayOfWeek> daysMask;
+    chip::BitFlags<DoorLockDayOfWeek> daysMask;
     uint8_t startHour;
     uint8_t startMinute;
     uint8_t endHour;
@@ -10122,7 +9882,7 @@ public:
 
     uint8_t scheduleId;
     uint16_t userId;
-    BitFlags<DoorLockDayOfWeek> daysMask;
+    chip::BitFlags<DoorLockDayOfWeek> daysMask;
     uint8_t startHour;
     uint8_t startMinute;
     uint8_t endHour;
@@ -11137,7 +10897,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockState::Id; }
@@ -11148,7 +10907,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockType::Id; }
@@ -11159,7 +10917,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActuatorEnabled::Id; }
@@ -11170,7 +10927,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorState::Id; }
@@ -11181,7 +10937,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorOpenEvents::Id; }
@@ -11192,7 +10947,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorClosedEvents::Id; }
@@ -11203,7 +10957,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OpenPeriod::Id; }
@@ -11214,7 +10967,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumLockRecordsSupported::Id; }
@@ -11225,7 +10977,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumTotalUsersSupported::Id; }
@@ -11236,7 +10987,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumPinUsersSupported::Id; }
@@ -11247,7 +10997,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumRfidUsersSupported::Id; }
@@ -11258,7 +11007,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumWeekdaySchedulesSupportedPerUser::Id; }
@@ -11269,7 +11017,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumYeardaySchedulesSupportedPerUser::Id; }
@@ -11280,7 +11027,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumHolidaySchedulesSupportedPerUser::Id; }
@@ -11291,7 +11037,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxPinLength::Id; }
@@ -11302,7 +11047,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinPinLength::Id; }
@@ -11313,7 +11057,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxRfidCodeLength::Id; }
@@ -11324,7 +11067,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinRfidCodeLength::Id; }
@@ -11335,7 +11077,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableLogging::Id; }
@@ -11346,7 +11087,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Language::Id; }
@@ -11357,7 +11097,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LedSettings::Id; }
@@ -11368,7 +11107,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AutoRelockTime::Id; }
@@ -11379,7 +11117,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoundVolume::Id; }
@@ -11390,7 +11127,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperatingMode::Id; }
@@ -11401,7 +11137,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedOperatingModes::Id; }
@@ -11412,7 +11147,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultConfigurationRegister::Id; }
@@ -11423,7 +11157,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableLocalProgramming::Id; }
@@ -11434,7 +11167,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableOneTouchLocking::Id; }
@@ -11445,7 +11177,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableInsideStatusLed::Id; }
@@ -11456,7 +11187,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnablePrivacyModeButton::Id; }
@@ -11467,7 +11197,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WrongCodeEntryLimit::Id; }
@@ -11478,7 +11207,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UserCodeTemporaryDisableTime::Id; }
@@ -11489,7 +11217,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SendPinOverTheAir::Id; }
@@ -11500,7 +11227,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RequirePinForRfOperation::Id; }
@@ -11511,7 +11237,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZigbeeSecurityLevel::Id; }
@@ -11522,7 +11247,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
@@ -11533,7 +11257,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadOperationEventMask::Id; }
@@ -11544,7 +11267,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfOperationEventMask::Id; }
@@ -11555,7 +11277,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManualOperationEventMask::Id; }
@@ -11566,7 +11287,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfidOperationEventMask::Id; }
@@ -11577,7 +11297,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadProgrammingEventMask::Id; }
@@ -11588,7 +11307,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfProgrammingEventMask::Id; }
@@ -11599,7 +11317,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfidProgrammingEventMask::Id; }
@@ -11910,7 +11627,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Type::Id; }
@@ -11921,7 +11637,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitLift::Id; }
@@ -11932,7 +11647,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitTilt::Id; }
@@ -11943,7 +11657,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLift::Id; }
@@ -11954,7 +11667,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTilt::Id; }
@@ -11965,7 +11677,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfActuationsLift::Id; }
@@ -11976,7 +11687,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfActuationsTilt::Id; }
@@ -11987,7 +11697,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ConfigStatus::Id; }
@@ -11998,7 +11707,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercentage::Id; }
@@ -12009,7 +11717,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercentage::Id; }
@@ -12020,7 +11727,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalStatus::Id; }
@@ -12031,7 +11737,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionLiftPercent100ths::Id; }
@@ -12042,7 +11747,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionTiltPercent100ths::Id; }
@@ -12053,7 +11757,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EndProductType::Id; }
@@ -12064,7 +11767,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercent100ths::Id; }
@@ -12075,7 +11777,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercent100ths::Id; }
@@ -12086,7 +11787,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitLift::Id; }
@@ -12097,7 +11797,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitLift::Id; }
@@ -12108,7 +11807,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitTilt::Id; }
@@ -12119,7 +11817,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitTilt::Id; }
@@ -12130,7 +11827,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VelocityLift::Id; }
@@ -12141,7 +11837,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AccelerationTimeLift::Id; }
@@ -12152,7 +11847,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DecelerationTimeLift::Id; }
@@ -12163,7 +11857,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
@@ -12174,7 +11867,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsLift::Id; }
@@ -12185,7 +11877,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsTilt::Id; }
@@ -12196,7 +11887,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SafetyStatus::Id; }
@@ -12267,7 +11957,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierMovingState::Id; }
@@ -12278,7 +11967,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierSafetyStatus::Id; }
@@ -12289,7 +11977,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCapabilities::Id; }
@@ -12300,7 +11987,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierOpenEvents::Id; }
@@ -12311,7 +11997,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCloseEvents::Id; }
@@ -12322,7 +12007,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCommandOpenEvents::Id; }
@@ -12333,7 +12017,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCommandCloseEvents::Id; }
@@ -12344,7 +12027,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierOpenPeriod::Id; }
@@ -12355,7 +12037,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierClosePeriod::Id; }
@@ -12366,7 +12047,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierPosition::Id; }
@@ -12426,7 +12106,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxPressure::Id; }
@@ -12437,7 +12116,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxSpeed::Id; }
@@ -12448,7 +12126,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxFlow::Id; }
@@ -12459,7 +12136,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstPressure::Id; }
@@ -12470,7 +12146,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstPressure::Id; }
@@ -12481,7 +12156,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinCompPressure::Id; }
@@ -12492,7 +12166,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxCompPressure::Id; }
@@ -12503,7 +12176,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstSpeed::Id; }
@@ -12514,7 +12186,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstSpeed::Id; }
@@ -12525,7 +12196,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstFlow::Id; }
@@ -12536,7 +12206,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstFlow::Id; }
@@ -12547,7 +12216,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstTemp::Id; }
@@ -12558,7 +12226,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstTemp::Id; }
@@ -12569,7 +12236,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PumpStatus::Id; }
@@ -12580,7 +12246,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveOperationMode::Id; }
@@ -12591,7 +12256,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveControlMode::Id; }
@@ -12602,7 +12266,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Capacity::Id; }
@@ -12613,7 +12276,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Speed::Id; }
@@ -12624,7 +12286,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeRunningHours::Id; }
@@ -12635,7 +12296,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Power::Id; }
@@ -12646,7 +12306,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeEnergyConsumed::Id; }
@@ -12657,7 +12316,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationMode::Id; }
@@ -12668,7 +12326,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ControlMode::Id; }
@@ -12679,7 +12336,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
@@ -12771,8 +12427,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    BitFlags<DayOfWeek> dayOfWeekForSequence;
-    BitFlags<ModeForSequence> modeForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
     DataModel::List<uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -12785,8 +12441,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    BitFlags<DayOfWeek> dayOfWeekForSequence;
-    BitFlags<ModeForSequence> modeForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
     DataModel::DecodableList<uint8_t> payload;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12808,8 +12464,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    BitFlags<DayOfWeek> dayOfWeekForSequence;
-    BitFlags<ModeForSequence> modeForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
     DataModel::List<uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -12822,8 +12478,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    BitFlags<DayOfWeek> dayOfWeekForSequence;
-    BitFlags<ModeForSequence> modeForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
     DataModel::DecodableList<uint8_t> payload;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12885,8 +12541,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
-    BitFlags<DayOfWeek> daysToReturn;
-    BitFlags<ModeForSequence> modeToReturn;
+    chip::BitFlags<DayOfWeek> daysToReturn;
+    chip::BitFlags<ModeForSequence> modeToReturn;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12897,8 +12553,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
-    BitFlags<DayOfWeek> daysToReturn;
-    BitFlags<ModeForSequence> modeToReturn;
+    chip::BitFlags<DayOfWeek> daysToReturn;
+    chip::BitFlags<ModeForSequence> modeToReturn;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeeklySchedule
@@ -12958,7 +12614,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTemperature::Id; }
@@ -12969,7 +12624,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OutdoorTemperature::Id; }
@@ -12980,7 +12634,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
@@ -12991,7 +12644,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMinHeatSetpointLimit::Id; }
@@ -13002,7 +12654,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMaxHeatSetpointLimit::Id; }
@@ -13013,7 +12664,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMinCoolSetpointLimit::Id; }
@@ -13024,7 +12674,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMaxCoolSetpointLimit::Id; }
@@ -13035,7 +12684,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PiCoolingDemand::Id; }
@@ -13046,7 +12694,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PiHeatingDemand::Id; }
@@ -13057,7 +12704,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HvacSystemTypeConfiguration::Id; }
@@ -13068,7 +12714,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTemperatureCalibration::Id; }
@@ -13079,7 +12724,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedCoolingSetpoint::Id; }
@@ -13090,7 +12734,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedHeatingSetpoint::Id; }
@@ -13101,7 +12744,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedCoolingSetpoint::Id; }
@@ -13112,7 +12754,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedHeatingSetpoint::Id; }
@@ -13123,7 +12764,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinHeatSetpointLimit::Id; }
@@ -13134,7 +12774,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxHeatSetpointLimit::Id; }
@@ -13145,7 +12784,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinCoolSetpointLimit::Id; }
@@ -13156,7 +12794,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxCoolSetpointLimit::Id; }
@@ -13167,7 +12804,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinSetpointDeadBand::Id; }
@@ -13178,7 +12814,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemoteSensing::Id; }
@@ -13189,7 +12824,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ControlSequenceOfOperation::Id; }
@@ -13200,7 +12834,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SystemMode::Id; }
@@ -13211,7 +12844,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
@@ -13222,7 +12854,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatRunningMode::Id; }
@@ -13233,7 +12864,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartOfWeek::Id; }
@@ -13244,7 +12874,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfWeeklyTransitions::Id; }
@@ -13255,7 +12884,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfDailyTransitions::Id; }
@@ -13266,7 +12894,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHold::Id; }
@@ -13277,7 +12904,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHoldDuration::Id; }
@@ -13288,7 +12914,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatProgrammingOperationMode::Id; }
@@ -13299,7 +12924,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HvacRelayState::Id; }
@@ -13310,7 +12934,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeSource::Id; }
@@ -13321,7 +12944,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeAmount::Id; }
@@ -13332,7 +12954,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeSourceTimestamp::Id; }
@@ -13343,7 +12964,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcType::Id; }
@@ -13354,7 +12974,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacity::Id; }
@@ -13365,7 +12984,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcRefrigerantType::Id; }
@@ -13376,7 +12994,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressor::Id; }
@@ -13387,7 +13004,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcErrorCode::Id; }
@@ -13398,7 +13014,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcLouverPosition::Id; }
@@ -13409,7 +13024,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCoilTemperature::Id; }
@@ -13420,7 +13034,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacityFormat::Id; }
@@ -13436,7 +13049,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanMode::Id; }
@@ -13447,7 +13059,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanModeSequence::Id; }
@@ -13463,7 +13074,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidity::Id; }
@@ -13474,7 +13084,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationCooling::Id; }
@@ -13485,7 +13094,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RhDehumidificationSetpoint::Id; }
@@ -13496,7 +13104,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityMode::Id; }
@@ -13507,7 +13114,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationLockout::Id; }
@@ -13518,7 +13124,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationHysteresis::Id; }
@@ -13529,7 +13134,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationMaxCool::Id; }
@@ -13540,7 +13144,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityDisplay::Id; }
@@ -13556,7 +13159,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureDisplayMode::Id; }
@@ -13567,7 +13169,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadLockout::Id; }
@@ -13578,7 +13179,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleProgrammingVisibility::Id; }
@@ -14311,7 +13911,7 @@ public:
     static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
 
-    BitFlags<ColorLoopUpdateFlags> updateFlags;
+    chip::BitFlags<ColorLoopUpdateFlags> updateFlags;
     ColorLoopAction action;
     ColorLoopDirection direction;
     uint16_t time;
@@ -14328,7 +13928,7 @@ public:
     static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
 
-    BitFlags<ColorLoopUpdateFlags> updateFlags;
+    chip::BitFlags<ColorLoopUpdateFlags> updateFlags;
     ColorLoopAction action;
     ColorLoopDirection direction;
     uint16_t time;
@@ -14466,7 +14066,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHue::Id; }
@@ -14477,7 +14076,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentSaturation::Id; }
@@ -14488,7 +14086,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
@@ -14499,7 +14096,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentX::Id; }
@@ -14510,7 +14106,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentY::Id; }
@@ -14521,7 +14116,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DriftCompensation::Id; }
@@ -14532,7 +14126,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompensationText::Id; }
@@ -14543,7 +14136,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorTemperature::Id; }
@@ -14554,7 +14146,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorMode::Id; }
@@ -14565,7 +14156,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorControlOptions::Id; }
@@ -14576,7 +14166,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPrimaries::Id; }
@@ -14587,7 +14176,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1X::Id; }
@@ -14598,7 +14186,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1Y::Id; }
@@ -14609,7 +14196,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1Intensity::Id; }
@@ -14620,7 +14206,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2X::Id; }
@@ -14631,7 +14216,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2Y::Id; }
@@ -14642,7 +14226,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2Intensity::Id; }
@@ -14653,7 +14236,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3X::Id; }
@@ -14664,7 +14246,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3Y::Id; }
@@ -14675,7 +14256,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3Intensity::Id; }
@@ -14686,7 +14266,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4X::Id; }
@@ -14697,7 +14276,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4Y::Id; }
@@ -14708,7 +14286,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4Intensity::Id; }
@@ -14719,7 +14296,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5X::Id; }
@@ -14730,7 +14306,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5Y::Id; }
@@ -14741,7 +14316,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5Intensity::Id; }
@@ -14752,7 +14326,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6X::Id; }
@@ -14763,7 +14336,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6Y::Id; }
@@ -14774,7 +14346,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6Intensity::Id; }
@@ -14785,7 +14356,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WhitePointX::Id; }
@@ -14796,7 +14366,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WhitePointY::Id; }
@@ -14807,7 +14376,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRX::Id; }
@@ -14818,7 +14386,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRY::Id; }
@@ -14829,7 +14396,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRIntensity::Id; }
@@ -14840,7 +14406,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGX::Id; }
@@ -14851,7 +14416,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGY::Id; }
@@ -14862,7 +14426,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGIntensity::Id; }
@@ -14873,7 +14436,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBX::Id; }
@@ -14884,7 +14446,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBY::Id; }
@@ -14895,7 +14456,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBIntensity::Id; }
@@ -14906,7 +14466,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedCurrentHue::Id; }
@@ -14917,7 +14476,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedColorMode::Id; }
@@ -14928,7 +14486,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopActive::Id; }
@@ -14939,7 +14496,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopDirection::Id; }
@@ -14950,7 +14506,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopTime::Id; }
@@ -14961,7 +14516,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopStartEnhancedHue::Id; }
@@ -14972,7 +14526,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopStoredEnhancedHue::Id; }
@@ -14983,7 +14536,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorCapabilities::Id; }
@@ -14994,7 +14546,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMin::Id; }
@@ -15005,7 +14556,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMax::Id; }
@@ -15016,7 +14566,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CoupleColorTempToLevelMinMireds::Id; }
@@ -15027,7 +14576,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpColorTemperatureMireds::Id; }
@@ -15043,7 +14591,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalMinLevel::Id; }
@@ -15054,7 +14601,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalMaxLevel::Id; }
@@ -15065,7 +14611,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BallastStatus::Id; }
@@ -15076,7 +14621,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
@@ -15087,7 +14631,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
@@ -15098,7 +14641,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnLevel::Id; }
@@ -15109,7 +14651,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnFadeTime::Id; }
@@ -15120,7 +14661,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBallastFactor::Id; }
@@ -15131,7 +14671,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BallastFactorAdjustment::Id; }
@@ -15142,7 +14681,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampQuality::Id; }
@@ -15153,7 +14691,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampType::Id; }
@@ -15164,7 +14701,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampManufacturer::Id; }
@@ -15175,7 +14711,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampRatedHours::Id; }
@@ -15186,7 +14721,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHours::Id; }
@@ -15197,7 +14731,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampAlarmMode::Id; }
@@ -15208,7 +14741,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHoursTripPoint::Id; }
@@ -15224,7 +14756,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15235,7 +14766,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15246,7 +14776,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15257,7 +14786,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15268,7 +14796,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
@@ -15284,7 +14811,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IlluminanceLevelSensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelStatus::Id; }
@@ -15295,7 +14821,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IlluminanceLevelSensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
@@ -15306,7 +14831,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IlluminanceLevelSensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IlluminanceLevelTarget::Id; }
@@ -15322,7 +14846,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15333,7 +14856,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15344,7 +14866,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15355,7 +14876,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15371,7 +14891,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15382,7 +14901,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15393,7 +14911,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15404,7 +14921,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15415,7 +14931,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScaledValue::Id; }
@@ -15426,7 +14941,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinScaledValue::Id; }
@@ -15437,7 +14951,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxScaledValue::Id; }
@@ -15448,7 +14961,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScaledTolerance::Id; }
@@ -15459,7 +14971,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Scale::Id; }
@@ -15475,7 +14986,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15486,7 +14996,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15497,7 +15006,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15508,7 +15016,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15524,7 +15031,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15535,7 +15041,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15546,7 +15051,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15557,7 +15061,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15573,7 +15076,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
@@ -15584,7 +15086,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorType::Id; }
@@ -15595,7 +15096,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorTypeBitmap::Id; }
@@ -15606,7 +15106,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PirOccupiedToUnoccupiedDelay::Id; }
@@ -15617,7 +15116,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedDelay::Id; }
@@ -15628,7 +15126,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedThreshold::Id; }
@@ -15639,7 +15136,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id; }
@@ -15650,7 +15146,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id; }
@@ -15661,7 +15156,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id; }
@@ -15672,7 +15166,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id; }
@@ -15683,7 +15176,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id; }
@@ -15694,7 +15186,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id; }
@@ -15710,7 +15201,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15721,7 +15211,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15732,7 +15221,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15743,7 +15231,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15759,7 +15246,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15770,7 +15256,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15781,7 +15266,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15792,7 +15276,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15808,7 +15291,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15819,7 +15301,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15830,7 +15311,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15841,7 +15321,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15857,7 +15336,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15868,7 +15346,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15879,7 +15356,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15890,7 +15366,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15906,7 +15381,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15917,7 +15391,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15928,7 +15401,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15939,7 +15411,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -15955,7 +15426,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -15966,7 +15436,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -15977,7 +15446,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -15988,7 +15456,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16004,7 +15471,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16015,7 +15481,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16026,7 +15491,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16037,7 +15501,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16053,7 +15516,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16064,7 +15526,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16075,7 +15536,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16086,7 +15546,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16102,7 +15561,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16113,7 +15571,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16124,7 +15581,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16135,7 +15591,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16151,7 +15606,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16162,7 +15616,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16173,7 +15626,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16184,7 +15636,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16200,7 +15651,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16211,7 +15661,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16222,7 +15671,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16233,7 +15681,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16249,7 +15696,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16260,7 +15706,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16271,7 +15716,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16282,7 +15726,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16298,7 +15741,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16309,7 +15751,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16320,7 +15761,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16331,7 +15771,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16347,7 +15786,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16358,7 +15796,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16369,7 +15806,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16380,7 +15816,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16396,7 +15831,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16407,7 +15841,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16418,7 +15851,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16429,7 +15861,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16445,7 +15876,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16456,7 +15886,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16467,7 +15896,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16478,7 +15906,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16494,7 +15921,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16505,7 +15931,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16516,7 +15941,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16527,7 +15951,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16543,7 +15966,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16554,7 +15976,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16565,7 +15986,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16576,7 +15996,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16592,7 +16011,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16603,7 +16021,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16614,7 +16031,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16625,7 +16041,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16641,7 +16056,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16652,7 +16066,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16663,7 +16076,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16674,7 +16086,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16690,7 +16101,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16701,7 +16111,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16712,7 +16121,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16723,7 +16131,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16739,7 +16146,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16750,7 +16156,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16761,7 +16166,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16772,7 +16176,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16788,7 +16191,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16799,7 +16201,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16810,7 +16211,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16821,7 +16221,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16837,7 +16236,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16848,7 +16246,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16859,7 +16256,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16870,7 +16266,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16886,7 +16281,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16897,7 +16291,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16908,7 +16301,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16919,7 +16311,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16935,7 +16326,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16946,7 +16336,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16957,7 +16346,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16968,7 +16356,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16984,7 +16371,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16995,7 +16381,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17006,7 +16391,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17017,7 +16401,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17033,7 +16416,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17044,7 +16426,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17055,7 +16436,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17066,7 +16446,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17082,7 +16461,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17093,7 +16471,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17104,7 +16481,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17115,7 +16491,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17131,7 +16506,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17142,7 +16516,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17153,7 +16526,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17164,7 +16536,6 @@ struct TypeInfo
 {
     using Type          = float;
     using DecodableType = float;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17277,7 +16648,7 @@ public:
     static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
 
-    BitFlags<IasZoneStatus> zoneStatus;
+    chip::BitFlags<IasZoneStatus> zoneStatus;
     uint8_t extendedStatus;
     uint8_t zoneId;
     uint16_t delay;
@@ -17291,7 +16662,7 @@ public:
     static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
 
-    BitFlags<IasZoneStatus> zoneStatus;
+    chip::BitFlags<IasZoneStatus> zoneStatus;
     uint8_t extendedStatus;
     uint8_t zoneId;
     uint16_t delay;
@@ -17440,7 +16811,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneState::Id; }
@@ -17451,7 +16821,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneType::Id; }
@@ -17462,7 +16831,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneStatus::Id; }
@@ -17473,7 +16841,6 @@ struct TypeInfo
 {
     using Type          = chip::NodeId;
     using DecodableType = chip::NodeId;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IasCieAddress::Id; }
@@ -17484,7 +16851,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneId::Id; }
@@ -17495,7 +16861,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfZoneSensitivityLevelsSupported::Id; }
@@ -17506,7 +16871,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentZoneSensitivityLevel::Id; }
@@ -17666,7 +17030,7 @@ struct Type
 {
 public:
     uint8_t zoneId;
-    BitFlags<IasZoneStatus> zoneStatus;
+    chip::BitFlags<IasZoneStatus> zoneStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -18338,7 +17702,7 @@ public:
     static constexpr CommandId GetCommandId() { return StartWarning::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    BitFlags<WarningInfo> warningInfo;
+    chip::BitFlags<WarningInfo> warningInfo;
     uint16_t warningDuration;
     uint8_t strobeDutyCycle;
     uint8_t strobeLevel;
@@ -18352,7 +17716,7 @@ public:
     static constexpr CommandId GetCommandId() { return StartWarning::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    BitFlags<WarningInfo> warningInfo;
+    chip::BitFlags<WarningInfo> warningInfo;
     uint16_t warningDuration;
     uint8_t strobeDutyCycle;
     uint8_t strobeLevel;
@@ -18372,7 +17736,7 @@ public:
     static constexpr CommandId GetCommandId() { return Squawk::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    BitFlags<SquawkInfo> squawkInfo;
+    chip::BitFlags<SquawkInfo> squawkInfo;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -18383,7 +17747,7 @@ public:
     static constexpr CommandId GetCommandId() { return Squawk::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    BitFlags<SquawkInfo> squawkInfo;
+    chip::BitFlags<SquawkInfo> squawkInfo;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Squawk
@@ -18395,7 +17759,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxDuration::Id; }
@@ -18411,7 +17774,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WakeOnLanMacAddress::Id; }
@@ -18634,7 +17996,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TvChannelLineup::Id; }
@@ -18645,7 +18006,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTvChannel::Id; }
@@ -18772,7 +18132,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentNavigatorTarget::Id; }
@@ -19428,7 +18787,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackState::Id; }
@@ -19439,7 +18797,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
@@ -19450,7 +18807,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Duration::Id; }
@@ -19461,7 +18817,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PositionUpdatedAt::Id; }
@@ -19472,7 +18827,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Position::Id; }
@@ -19483,7 +18837,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackSpeed::Id; }
@@ -19494,7 +18847,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeEnd::Id; }
@@ -19505,7 +18857,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeStart::Id; }
@@ -19690,7 +19041,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMediaInput::Id; }
@@ -20353,7 +19703,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentAudioOutput::Id; }
@@ -20483,7 +19832,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
@@ -20494,7 +19842,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
@@ -20555,7 +19902,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
@@ -20566,7 +19912,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
@@ -20577,7 +19922,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationName::Id; }
@@ -20588,7 +19932,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductId::Id; }
@@ -20599,7 +19942,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
@@ -20610,7 +19952,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
@@ -20621,7 +19962,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationStatus::Id; }
@@ -20766,7 +20106,7 @@ public:
     SimpleEnum c;
     chip::ByteSpan d;
     chip::Span<const char> e;
-    BitFlags<SimpleBitmap> f;
+    chip::BitFlags<SimpleBitmap> f;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21207,6 +20547,174 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestStructArrayArgumentRequest
+namespace TestStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::SimpleStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::SimpleStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestStructArgumentRequest
+namespace TestNestedStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNestedStructArgumentRequest
+namespace TestListStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::SimpleStruct::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListStructArgumentRequest
+namespace TestListInt8UArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<uint8_t> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<uint8_t> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListInt8UArgumentRequest
+namespace TestNestedStructListArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStructList::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStructList::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNestedStructListArgumentRequest
+namespace TestListNestedStructListArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::NestedStructList::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListNestedStructListArgumentRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -21215,7 +20723,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Boolean::Id; }
@@ -21226,7 +20733,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap8::Id; }
@@ -21237,7 +20743,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap16::Id; }
@@ -21248,7 +20753,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap32::Id; }
@@ -21259,7 +20763,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap64::Id; }
@@ -21270,7 +20773,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int8u::Id; }
@@ -21281,7 +20783,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int16u::Id; }
@@ -21292,7 +20793,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int32u::Id; }
@@ -21303,7 +20803,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int64u::Id; }
@@ -21314,7 +20813,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int8s::Id; }
@@ -21325,7 +20823,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int16s::Id; }
@@ -21336,7 +20833,6 @@ struct TypeInfo
 {
     using Type          = int32_t;
     using DecodableType = int32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int32s::Id; }
@@ -21347,7 +20843,6 @@ struct TypeInfo
 {
     using Type          = int64_t;
     using DecodableType = int64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int64s::Id; }
@@ -21358,7 +20853,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Enum8::Id; }
@@ -21369,7 +20863,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Enum16::Id; }
@@ -21380,7 +20873,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OctetString::Id; }
@@ -21421,7 +20913,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongOctetString::Id; }
@@ -21432,7 +20923,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CharString::Id; }
@@ -21443,7 +20933,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongCharString::Id; }
@@ -21454,7 +20943,6 @@ struct TypeInfo
 {
     using Type          = uint64_t;
     using DecodableType = uint64_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EpochUs::Id; }
@@ -21465,7 +20953,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EpochS::Id; }
@@ -21476,7 +20963,6 @@ struct TypeInfo
 {
     using Type          = bool;
     using DecodableType = bool;
-    ;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Unsupported::Id; }
@@ -21671,11 +21157,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21687,11 +21173,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisplayMessage
@@ -21734,7 +21220,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21746,7 +21232,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CancelMessage
@@ -21806,11 +21292,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21822,11 +21308,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisplayProtectedMessage
@@ -21897,7 +21383,6 @@ struct TypeInfo
 {
     using Type          = uint8_t *;
     using DecodableType = uint8_t *;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BasicIdentification::Id; }
@@ -21908,7 +21393,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
@@ -21919,7 +21403,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyId::Id; }
@@ -21930,7 +21413,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BrandName::Id; }
@@ -21941,7 +21423,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BrandId::Id; }
@@ -21952,7 +21433,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Model::Id; }
@@ -21963,7 +21443,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -21974,7 +21453,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductRevision::Id; }
@@ -21985,7 +21463,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareRevision::Id; }
@@ -21996,7 +21473,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductTypeName::Id; }
@@ -22007,7 +21483,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductTypeId::Id; }
@@ -22018,7 +21493,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CecedSpecificationVersion::Id; }
@@ -22034,7 +21508,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
@@ -22045,7 +21518,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeterTypeId::Id; }
@@ -22056,7 +21528,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DataQualityId::Id; }
@@ -22067,7 +21538,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CustomerName::Id; }
@@ -22078,7 +21548,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Model::Id; }
@@ -22089,7 +21558,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -22100,7 +21568,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductRevision::Id; }
@@ -22111,7 +21578,6 @@ struct TypeInfo
 {
     using Type          = chip::ByteSpan;
     using DecodableType = chip::ByteSpan;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareRevision::Id; }
@@ -22122,7 +21588,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UtilityName::Id; }
@@ -22133,7 +21598,6 @@ struct TypeInfo
 {
     using Type          = chip::Span<const char>;
     using DecodableType = chip::Span<const char>;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Pod::Id; }
@@ -22144,7 +21608,6 @@ struct TypeInfo
 {
     using Type          = int32_t;
     using DecodableType = int32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AvailablePower::Id; }
@@ -22155,7 +21618,6 @@ struct TypeInfo
 {
     using Type          = int32_t;
     using DecodableType = int32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerThreshold::Id; }
@@ -22234,8 +21696,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    BitFlags<AlertCount> alertsCount;
-    DataModel::List<BitFlags<AlertStructure>> alertStructures;
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22246,8 +21708,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    BitFlags<AlertCount> alertsCount;
-    DataModel::DecodableList<BitFlags<AlertStructure>> alertStructures;
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::DecodableList<chip::BitFlags<AlertStructure>> alertStructures;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetAlertsResponse
@@ -22265,8 +21727,8 @@ public:
     static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    BitFlags<AlertCount> alertsCount;
-    DataModel::List<BitFlags<AlertStructure>> alertStructures;
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22277,8 +21739,8 @@ public:
     static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    BitFlags<AlertCount> alertsCount;
-    DataModel::DecodableList<BitFlags<AlertStructure>> alertStructures;
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::DecodableList<chip::BitFlags<AlertStructure>> alertStructures;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AlertsNotification
@@ -22515,7 +21977,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LogMaxSize::Id; }
@@ -22526,7 +21987,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LogQueueMaxSize::Id; }
@@ -22683,7 +22143,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }
@@ -22694,7 +22153,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltage::Id; }
@@ -22705,7 +22163,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMin::Id; }
@@ -22716,7 +22173,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMax::Id; }
@@ -22727,7 +22183,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrent::Id; }
@@ -22738,7 +22193,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMin::Id; }
@@ -22749,7 +22203,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMax::Id; }
@@ -22760,7 +22213,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPower::Id; }
@@ -22771,7 +22223,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMin::Id; }
@@ -22782,7 +22233,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMax::Id; }
@@ -22793,7 +22243,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMultiplier::Id; }
@@ -22804,7 +22253,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageDivisor::Id; }
@@ -22815,7 +22263,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMultiplier::Id; }
@@ -22826,7 +22273,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentDivisor::Id; }
@@ -22837,7 +22283,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMultiplier::Id; }
@@ -22848,7 +22293,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerDivisor::Id; }
@@ -22859,7 +22303,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequency::Id; }
@@ -22870,7 +22313,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMin::Id; }
@@ -22881,7 +22323,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMax::Id; }
@@ -22892,7 +22333,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NeutralCurrent::Id; }
@@ -22903,7 +22343,6 @@ struct TypeInfo
 {
     using Type          = int32_t;
     using DecodableType = int32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalActivePower::Id; }
@@ -22914,7 +22353,6 @@ struct TypeInfo
 {
     using Type          = int32_t;
     using DecodableType = int32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalReactivePower::Id; }
@@ -22925,7 +22363,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalApparentPower::Id; }
@@ -22936,7 +22373,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured1stHarmonicCurrent::Id; }
@@ -22947,7 +22383,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured3rdHarmonicCurrent::Id; }
@@ -22958,7 +22393,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured5thHarmonicCurrent::Id; }
@@ -22969,7 +22403,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured7thHarmonicCurrent::Id; }
@@ -22980,7 +22413,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured9thHarmonicCurrent::Id; }
@@ -22991,7 +22423,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured11thHarmonicCurrent::Id; }
@@ -23002,7 +22433,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase1stHarmonicCurrent::Id; }
@@ -23013,7 +22443,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase3rdHarmonicCurrent::Id; }
@@ -23024,7 +22453,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase5thHarmonicCurrent::Id; }
@@ -23035,7 +22463,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase7thHarmonicCurrent::Id; }
@@ -23046,7 +22473,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase9thHarmonicCurrent::Id; }
@@ -23057,7 +22483,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase11thHarmonicCurrent::Id; }
@@ -23068,7 +22493,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMultiplier::Id; }
@@ -23079,7 +22503,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyDivisor::Id; }
@@ -23090,7 +22513,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerMultiplier::Id; }
@@ -23101,7 +22523,6 @@ struct TypeInfo
 {
     using Type          = uint32_t;
     using DecodableType = uint32_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerDivisor::Id; }
@@ -23112,7 +22533,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HarmonicCurrentMultiplier::Id; }
@@ -23123,7 +22543,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhaseHarmonicCurrentMultiplier::Id; }
@@ -23134,7 +22553,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousVoltage::Id; }
@@ -23145,7 +22563,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousLineCurrent::Id; }
@@ -23156,7 +22573,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousActiveCurrent::Id; }
@@ -23167,7 +22583,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousReactiveCurrent::Id; }
@@ -23178,7 +22593,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousPower::Id; }
@@ -23189,7 +22603,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltage::Id; }
@@ -23200,7 +22613,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMin::Id; }
@@ -23211,7 +22623,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMax::Id; }
@@ -23222,7 +22633,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrent::Id; }
@@ -23233,7 +22643,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMin::Id; }
@@ -23244,7 +22653,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMax::Id; }
@@ -23255,7 +22663,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePower::Id; }
@@ -23266,7 +22673,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMin::Id; }
@@ -23277,7 +22683,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMax::Id; }
@@ -23288,7 +22693,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePower::Id; }
@@ -23299,7 +22703,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPower::Id; }
@@ -23310,7 +22713,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactor::Id; }
@@ -23321,7 +22723,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriod::Id; }
@@ -23332,7 +22733,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounter::Id; }
@@ -23343,7 +22743,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriod::Id; }
@@ -23354,7 +22753,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriod::Id; }
@@ -23365,7 +22763,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriod::Id; }
@@ -23376,7 +22773,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriod::Id; }
@@ -23387,7 +22783,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageMultiplier::Id; }
@@ -23398,7 +22793,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageDivisor::Id; }
@@ -23409,7 +22803,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentMultiplier::Id; }
@@ -23420,7 +22813,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentDivisor::Id; }
@@ -23431,7 +22823,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerMultiplier::Id; }
@@ -23442,7 +22833,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerDivisor::Id; }
@@ -23453,7 +22843,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverloadAlarmsMask::Id; }
@@ -23464,7 +22853,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VoltageOverload::Id; }
@@ -23475,7 +22863,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentOverload::Id; }
@@ -23486,7 +22873,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcOverloadAlarmsMask::Id; }
@@ -23497,7 +22883,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageOverload::Id; }
@@ -23508,7 +22893,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentOverload::Id; }
@@ -23519,7 +22903,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcActivePowerOverload::Id; }
@@ -23530,7 +22913,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcReactivePowerOverload::Id; }
@@ -23541,7 +22923,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltage::Id; }
@@ -23552,7 +22933,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltage::Id; }
@@ -23563,7 +22943,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltage::Id; }
@@ -23574,7 +22953,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltage::Id; }
@@ -23585,7 +22963,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSag::Id; }
@@ -23596,7 +22973,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwell::Id; }
@@ -23607,7 +22983,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseB::Id; }
@@ -23618,7 +22993,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseB::Id; }
@@ -23629,7 +23003,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseB::Id; }
@@ -23640,7 +23013,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseB::Id; }
@@ -23651,7 +23023,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseB::Id; }
@@ -23662,7 +23033,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseB::Id; }
@@ -23673,7 +23043,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseB::Id; }
@@ -23684,7 +23053,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseB::Id; }
@@ -23695,7 +23063,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseB::Id; }
@@ -23706,7 +23073,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseB::Id; }
@@ -23717,7 +23083,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseB::Id; }
@@ -23728,7 +23093,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseB::Id; }
@@ -23739,7 +23103,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseB::Id; }
@@ -23750,7 +23113,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseB::Id; }
@@ -23761,7 +23123,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseB::Id; }
@@ -23772,7 +23133,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::Id; }
@@ -23783,7 +23143,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseB::Id; }
@@ -23794,7 +23153,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseB::Id; }
@@ -23805,7 +23163,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseB::Id; }
@@ -23816,7 +23173,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseB::Id; }
@@ -23827,7 +23183,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseB::Id; }
@@ -23838,7 +23193,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseB::Id; }
@@ -23849,7 +23203,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseC::Id; }
@@ -23860,7 +23213,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseC::Id; }
@@ -23871,7 +23223,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseC::Id; }
@@ -23882,7 +23233,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseC::Id; }
@@ -23893,7 +23243,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseC::Id; }
@@ -23904,7 +23253,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseC::Id; }
@@ -23915,7 +23263,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseC::Id; }
@@ -23926,7 +23273,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseC::Id; }
@@ -23937,7 +23283,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseC::Id; }
@@ -23948,7 +23293,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseC::Id; }
@@ -23959,7 +23303,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseC::Id; }
@@ -23970,7 +23313,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseC::Id; }
@@ -23981,7 +23323,6 @@ struct TypeInfo
 {
     using Type          = int16_t;
     using DecodableType = int16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseC::Id; }
@@ -23992,7 +23333,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseC::Id; }
@@ -24003,7 +23343,6 @@ struct TypeInfo
 {
     using Type          = int8_t;
     using DecodableType = int8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseC::Id; }
@@ -24014,7 +23353,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::Id; }
@@ -24025,7 +23363,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseC::Id; }
@@ -24036,7 +23373,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseC::Id; }
@@ -24047,7 +23383,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseC::Id; }
@@ -24058,7 +23393,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseC::Id; }
@@ -24069,7 +23403,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseC::Id; }
@@ -24080,7 +23413,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseC::Id; }
@@ -24295,7 +23627,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute::Id; }
@@ -24306,7 +23637,6 @@ struct TypeInfo
 {
     using Type          = uint8_t;
     using DecodableType = uint8_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute2::Id; }
@@ -24353,7 +23683,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster2::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute3::Id; }
@@ -24364,7 +23693,6 @@ struct TypeInfo
 {
     using Type          = uint16_t;
     using DecodableType = uint16_t;
-    ;
 
     static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster2::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute4::Id; }

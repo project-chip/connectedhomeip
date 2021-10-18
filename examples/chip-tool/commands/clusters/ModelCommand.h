@@ -38,15 +38,20 @@ public:
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {}
 
-    void AddArguments() { AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId); }
+    void AddArguments()
+    {
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
+    }
 
     /////////// CHIPCommand Interface /////////
-    CHIP_ERROR Run(NodeId remoteId) override;
+    CHIP_ERROR RunCommand() override;
     uint16_t GetWaitDurationInSeconds() const override { return 10; }
 
     virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
 
 private:
+    chip::NodeId mNodeId;
     uint8_t mEndPointId;
 
     static void OnDeviceConnectedFn(void * context, ChipDevice * device);
