@@ -101,7 +101,6 @@ menu "Demo"
         help
             To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
 
-
 endmenu
 
 menu "PW RPC Debug channel"

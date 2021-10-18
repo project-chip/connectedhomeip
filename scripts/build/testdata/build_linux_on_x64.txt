@@ -1,3 +1,6 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
 # Generating linux-arm64-all-clusters
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \

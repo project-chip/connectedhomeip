@@ -70,6 +70,10 @@ else()
 chip_gn_arg_append("chip_config_network_layer_ble"           "false")
 endif()
 
+if(CONFIG_DISABLE_IPV4)
+    chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]")
