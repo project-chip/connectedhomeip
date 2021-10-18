@@ -34,6 +34,7 @@ public class ClusterInfo {
     BaseChipCluster create(Long devicePtr, int endpointId);
   }
 }
+<<<<<<< HEAD
 =======
 package chip.devicecontroller;
 =======
@@ -74,3 +75,5 @@ public class ClusterInfo {
   }
 }
 >>>>>>> 2d2bbd2e1 (new design solution)
+=======
+>>>>>>> df6a682b0 (Restyled by whitespace)
