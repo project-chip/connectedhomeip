@@ -29,11 +29,11 @@ public class ChipMdnsCallbackImpl implements ChipMdnsCallback {
       long callbackHandle,
       long contextHandle,
       int errorCode) {
-        chipMdnsCallback.handleServiceResolve(
+        handleServiceResolve(
             instanceName,
             serviceType,
-            serviceInfo.getHost().getHostAddress(),
-            serviceInfo.getPort(),
+            address,
+            port,
             callbackHandle,
             contextHandle);
   }
