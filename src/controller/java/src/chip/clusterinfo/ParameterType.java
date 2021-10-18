@@ -1,5 +1,9 @@
 package chip.clusterinfo;
 
 enum ParameterType {
-  CALLBACK, INT, LONG, BOOLEAN, STRUCT
+  CALLBACK,
+  INT,
+  LONG,
+  BOOLEAN,
+  STRUCT
 }
