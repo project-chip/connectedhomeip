@@ -455,7 +455,7 @@ public:
     CHIP_ERROR Get(float & v);
 
     /**
-     * Get the value of the current element as a chip::ByteSpan
+     * Get the value of the current element as a ByteSpan
      *
      * @param[out]  v                       Receives the value associated with current TLV element.
      *
@@ -464,7 +464,19 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(chip::ByteSpan & v);
+    CHIP_ERROR Get(ByteSpan & v);
+
+    /**
+     * Get the value of the current element as a CharSpan
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV character string, or
+     *                                      the reader is not positioned on an element.
+     *
+     */
+    CHIP_ERROR Get(CharSpan & v);
 
     /**
      * Get the value of the current element as an enum value, if it's an integer
@@ -2415,7 +2427,8 @@ public:
     CHIP_ERROR Get(uint64_t & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(float & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(double & v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(chip::ByteSpan & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(ByteSpan & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(CharSpan & v) { return mUpdaterReader.Get(v); }
 
     CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize) { return mUpdaterReader.GetBytes(buf, bufSize); }
     CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t & dataLen) { return mUpdaterReader.DupBytes(buf, dataLen); }
