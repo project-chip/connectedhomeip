@@ -240,49 +240,102 @@ double ConnectivityUtils::ConvertFrequenceToFloat(const iw_freq * in)
     return result;
 }
 
-ConnectionType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
+bool ConnectivityUtils::CheckReachableIPv4(struct ifaddrs * ifap, const char * ifname)
 {
-    ConnectionType ret = ConnectionType::kConnectionUnknown;
-    int skfd           = -1;
+    for (struct ifaddrs * ifa = ifap; ifa; ifa = ifa->ifa_next)
+    {
+        if (strcmp(ifname, ifa->ifa_name) != 0)
+            continue;
 
-    if ((skfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)
+            return true;
+    }
+
+    return false;
+}
+
+bool ConnectivityUtils::CheckReachableIPv6(struct ifaddrs * ifap, const char * ifname)
+{
+    for (struct ifaddrs * ifa = ifap; ifa; ifa = ifa->ifa_next)
+    {
+        if (strcmp(ifname, ifa->ifa_name) != 0)
+            continue;
+
+        if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET6)
+            return true;
+    }
+
+    return false;
+}
+
+InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
+{
+    InterfaceType ret = InterfaceType::kInterfaceType_Unspecified;
+    int sock          = -1;
+
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to open socket");
-        return ConnectionType::kConnectionUnknown;
+        return InterfaceType::kInterfaceType_Unspecified;
     }
 
     // Test wireless extensions for CONNECTION_WIFI
     struct iwreq pwrq = {};
     strncpy(pwrq.ifr_name, ifname, IFNAMSIZ - 1);
 
-    if (ioctl(skfd, SIOCGIWNAME, &pwrq) != -1)
+    if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
     {
-        ret = ConnectionType::kConnectionWiFi;
+        ret = InterfaceType::kInterfaceType_WiFi;
     }
-    else
+    else if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
     {
-        // Test ethtool for CONNECTION_ETHERNET
-        if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
-        {
-            struct ethtool_cmd ecmd = {};
-            ecmd.cmd                = ETHTOOL_GSET;
-            struct ifreq ifr        = {};
-            ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
-            strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+        struct ethtool_cmd ecmd = {};
+        ecmd.cmd                = ETHTOOL_GSET;
+        struct ifreq ifr        = {};
+        ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
+        strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
 
-            if (ioctl(skfd, SIOCETHTOOL, &ifr) != -1)
-                ret = ConnectionType::kConnectionEthernet;
+        if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
+            ret = InterfaceType::kInterfaceType_Ethernet;
+    }
+
+    close(sock);
+
+    return ret;
+}
+
+CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, char * outMacAddr)
+{
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    int skfd;
+
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "yujuan: Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
+
+    if (ifname[0] != '\0')
+    {
+        struct ifreq req;
+
+        strcpy(req.ifr_name, ifname);
+        if (ioctl(skfd, SIOCGIFHWADDR, &req) != -1)
+        {
+            // Copy 48-bit IEEE MAC Address
+            memcpy(outMacAddr, req.ifr_ifru.ifru_hwaddr.sa_data, 6);
+            err = CHIP_NO_ERROR;
         }
     }
 
     close(skfd);
 
-    return ret;
+    return err;
 }
 
 CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize)
 {
-    CHIP_ERROR ret          = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)
@@ -297,11 +350,11 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionWiFi)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::kInterfaceType_WiFi)
             {
                 strncpy(ifname, ifa->ifa_name, bufSize);
                 ifname[bufSize - 1] = '\0';
-                ret                 = CHIP_NO_ERROR;
+                err                 = CHIP_NO_ERROR;
                 break;
             }
         }
@@ -309,7 +362,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
         freeifaddrs(ifaddr);
     }
 
-    return ret;
+    return err;
 }
 
 CHIP_ERROR ConnectivityUtils::GetWiFiParameter(int skfd,            /* Socket to the kernel */
@@ -492,7 +545,7 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::kInterfaceType_Ethernet)
             {
                 strncpy(ifname, ifa->ifa_name, bufSize);
                 ifname[bufSize - 1] = '\0';

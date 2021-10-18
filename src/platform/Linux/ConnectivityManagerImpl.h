@@ -154,6 +154,8 @@ private:
     static std::mutex mWpaSupplicantMutex;
 #endif
 
+    void _ReleaseNetworkInterfaces(struct NetworkInterface ** netifp);
+    CHIP_ERROR _GetNetworkInterfaces(struct NetworkInterface ** netifp);
     CHIP_ERROR _GetEthPHYRate(uint8_t & pHYRate);
     CHIP_ERROR _GetEthFullDuplex(bool & fullDuplex);
     CHIP_ERROR _GetEthTimeSinceReset(uint64_t & timeSinceReset);

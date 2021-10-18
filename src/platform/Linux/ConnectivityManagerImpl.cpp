@@ -54,6 +54,7 @@
 
 using namespace ::chip;
 using namespace ::chip::TLV;
+using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
@@ -93,7 +94,7 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::kInterfaceType_Ethernet)
             {
                 ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
                 break;
@@ -158,7 +159,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionWiFi)
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::kInterfaceType_WiFi)
             {
                 ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
                 break;
@@ -1035,6 +1036,75 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(struct NetworkInterface ** netifp)
+{
+    if (*netifp != nullptr)
+    {
+        struct NetworkInterface * p = *netifp;
+
+        while (p)
+        {
+            struct NetworkInterface * del = p;
+            p                             = p->Next;
+            delete del;
+        }
+
+        *netifp = nullptr;
+    }
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(struct NetworkInterface ** netifp)
+{
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        struct NetworkInterface dummy;
+
+        dummy.Next = nullptr;
+
+        /* Walk through linked list, maintaining head pointer so we
+          can free list later */
+        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_PACKET)
+            {
+                struct NetworkInterface * ifp = new NetworkInterface();
+
+                strncpy(ifp->Name, ifa->ifa_name, kMaxIfNameSize);
+                ifp->Name[kMaxIfNameSize - 1] = '\0';
+
+                ifp->FabricConnected                 = ifa->ifa_flags & IFF_RUNNING;
+                ifp->OffPremiseServicesReachableIPv4 = ConnectivityUtils::CheckReachableIPv4(ifaddr, ifa->ifa_name);
+                ifp->OffPremiseServicesReachableIPv6 = ConnectivityUtils::CheckReachableIPv6(ifaddr, ifa->ifa_name);
+                ifp->Type                            = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
+
+                memset(ifp->HardwareAddress, 0, kMaxHardwareAddrSize);
+                ifp->Is64MacAddress = false;
+                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->HardwareAddress) != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Failed to get network hardware address");
+                }
+
+                ifp->Next  = dummy.Next;
+                dummy.Next = ifp;
+            }
+        }
+
+        *netifp = dummy.Next;
+        err     = CHIP_NO_ERROR;
+
+        freeifaddrs(ifaddr);
+    }
+
+    return err;
+}
+
 CHIP_ERROR ConnectivityManagerImpl::_GetEthPHYRate(uint8_t & pHYRate)
 {
     if (mEthIfName[0] == '\0')
@@ -1142,7 +1212,7 @@ CHIP_ERROR ConnectivityManagerImpl::ResetEthernetStatsCount()
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::kInterfaceType_Ethernet)
             {
                 ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
                 break;
@@ -1313,7 +1383,7 @@ CHIP_ERROR ConnectivityManagerImpl::ResetWiFiStatsCount()
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionWiFi)
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::kInterfaceType_WiFi)
             {
                 ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
                 break;
