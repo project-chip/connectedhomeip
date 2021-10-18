@@ -122,8 +122,8 @@ struct TypeInfo
 namespace BatteryManufacturer {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryManufacturer::Id; }
@@ -292,8 +292,8 @@ struct TypeInfo
 namespace Battery2Manufacturer {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Manufacturer::Id; }
@@ -462,8 +462,8 @@ struct TypeInfo
 namespace Battery3Manufacturer {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Manufacturer::Id; }
@@ -906,7 +906,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
     uint16_t groupId;
-    chip::Span<const char> groupName;
+    chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -918,7 +918,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
     uint16_t groupId;
-    chip::Span<const char> groupName;
+    chip::CharSpan groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddGroup
@@ -998,7 +998,7 @@ public:
 
     uint8_t status;
     uint16_t groupId;
-    chip::Span<const char> groupName;
+    chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -1011,7 +1011,7 @@ public:
 
     uint8_t status;
     uint16_t groupId;
-    chip::Span<const char> groupName;
+    chip::CharSpan groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ViewGroupResponse
@@ -1178,7 +1178,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
     uint16_t groupId;
-    chip::Span<const char> groupName;
+    chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -1190,7 +1190,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
     uint16_t groupId;
-    chip::Span<const char> groupName;
+    chip::CharSpan groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddGroupIfIdentifying
@@ -1263,7 +1263,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    chip::Span<const char> sceneName;
+    chip::CharSpan sceneName;
     DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1278,7 +1278,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    chip::Span<const char> sceneName;
+    chip::CharSpan sceneName;
     DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1370,7 +1370,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    chip::Span<const char> sceneName;
+    chip::CharSpan sceneName;
     DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1386,7 +1386,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    chip::Span<const char> sceneName;
+    chip::CharSpan sceneName;
     DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1702,7 +1702,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    chip::Span<const char> sceneName;
+    chip::CharSpan sceneName;
     DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1717,7 +1717,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    chip::Span<const char> sceneName;
+    chip::CharSpan sceneName;
     DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1809,7 +1809,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    chip::Span<const char> sceneName;
+    chip::CharSpan sceneName;
     DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1825,7 +1825,7 @@ public:
     uint16_t groupId;
     uint8_t sceneId;
     uint16_t transitionTime;
-    chip::Span<const char> sceneName;
+    chip::CharSpan sceneName;
     DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3152,8 +3152,8 @@ namespace Attributes {
 namespace ActiveText {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveText::Id; }
@@ -3162,8 +3162,8 @@ struct TypeInfo
 namespace Description {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
@@ -3172,8 +3172,8 @@ struct TypeInfo
 namespace InactiveText {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InactiveText::Id; }
@@ -4776,8 +4776,8 @@ struct TypeInfo
 namespace VendorName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
@@ -4796,8 +4796,8 @@ struct TypeInfo
 namespace ProductName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
@@ -4816,8 +4816,8 @@ struct TypeInfo
 namespace UserLabel {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
@@ -4826,8 +4826,8 @@ struct TypeInfo
 namespace Location {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Location::Id; }
@@ -4846,8 +4846,8 @@ struct TypeInfo
 namespace HardwareVersionString {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
@@ -4866,8 +4866,8 @@ struct TypeInfo
 namespace SoftwareVersionString {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
@@ -4876,8 +4876,8 @@ struct TypeInfo
 namespace ManufacturingDate {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
@@ -4886,8 +4886,8 @@ struct TypeInfo
 namespace PartNumber {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -4896,8 +4896,8 @@ struct TypeInfo
 namespace ProductURL {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
@@ -4906,8 +4906,8 @@ struct TypeInfo
 namespace ProductLabel {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
@@ -4916,8 +4916,8 @@ struct TypeInfo
 namespace SerialNumber {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
@@ -5013,7 +5013,7 @@ public:
     uint16_t hardwareVersion;
     uint32_t softwareVersion;
     OTADownloadProtocol protocolsSupported;
-    chip::Span<const char> location;
+    chip::CharSpan location;
     bool requestorCanConsent;
     chip::ByteSpan metadataForProvider;
 
@@ -5031,7 +5031,7 @@ public:
     uint16_t hardwareVersion;
     uint32_t softwareVersion;
     OTADownloadProtocol protocolsSupported;
-    chip::Span<const char> location;
+    chip::CharSpan location;
     bool requestorCanConsent;
     chip::ByteSpan metadataForProvider;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -5121,9 +5121,9 @@ public:
 
     OTAQueryStatus status;
     uint32_t delayedActionTime;
-    chip::Span<const char> imageURI;
+    chip::CharSpan imageURI;
     uint32_t softwareVersion;
-    chip::Span<const char> softwareVersionString;
+    chip::CharSpan softwareVersionString;
     chip::ByteSpan updateToken;
     bool userConsentNeeded;
     chip::ByteSpan metadataForRequestor;
@@ -5139,9 +5139,9 @@ public:
 
     OTAQueryStatus status;
     uint32_t delayedActionTime;
-    chip::Span<const char> imageURI;
+    chip::CharSpan imageURI;
     uint32_t softwareVersion;
-    chip::Span<const char> softwareVersionString;
+    chip::CharSpan softwareVersionString;
     chip::ByteSpan updateToken;
     bool userConsentNeeded;
     chip::ByteSpan metadataForRequestor;
@@ -5286,8 +5286,8 @@ struct TypeInfo
 namespace Description {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
@@ -5456,8 +5456,8 @@ struct TypeInfo
 namespace BatteryReplacementDescription {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementDescription::Id; }
@@ -5476,8 +5476,8 @@ struct TypeInfo
 namespace BatteryANSIDesignation {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryANSIDesignation::Id; }
@@ -5486,8 +5486,8 @@ struct TypeInfo
 namespace BatteryIECDesignation {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryIECDesignation::Id; }
@@ -5674,7 +5674,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5686,7 +5686,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ArmFailSafeResponse
@@ -5707,7 +5707,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     RegulatoryLocationType location;
-    chip::Span<const char> countryCode;
+    chip::CharSpan countryCode;
     uint64_t breadcrumb;
     uint32_t timeoutMs;
 
@@ -5721,7 +5721,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     RegulatoryLocationType location;
-    chip::Span<const char> countryCode;
+    chip::CharSpan countryCode;
     uint64_t breadcrumb;
     uint32_t timeoutMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -5742,7 +5742,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5754,7 +5754,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetRegulatoryConfigResponse
@@ -5797,7 +5797,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5809,7 +5809,7 @@ public:
     static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CommissioningCompleteResponse
@@ -5989,7 +5989,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     DataModel::List<Structs::WiFiInterfaceScanResult::Type> wifiScanResults;
     DataModel::List<Structs::ThreadInterfaceScanResult::Type> threadScanResults;
 
@@ -6003,7 +6003,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType> wifiScanResults;
     DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6061,7 +6061,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6073,7 +6073,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddWiFiNetworkResponse
@@ -6129,7 +6129,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6141,7 +6141,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateWiFiNetworkResponse
@@ -6194,7 +6194,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6206,7 +6206,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddThreadNetworkResponse
@@ -6259,7 +6259,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6271,7 +6271,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateThreadNetworkResponse
@@ -6324,7 +6324,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6336,7 +6336,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveNetworkResponse
@@ -6389,7 +6389,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6401,7 +6401,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnableNetworkResponse
@@ -6454,7 +6454,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6466,7 +6466,7 @@ public:
     static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
 
     uint8_t errorCode;
-    chip::Span<const char> debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisableNetworkResponse
@@ -8196,8 +8196,8 @@ namespace Attributes {
 namespace VendorName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
@@ -8216,8 +8216,8 @@ struct TypeInfo
 namespace ProductName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
@@ -8226,8 +8226,8 @@ struct TypeInfo
 namespace UserLabel {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
@@ -8246,8 +8246,8 @@ struct TypeInfo
 namespace HardwareVersionString {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
@@ -8266,8 +8266,8 @@ struct TypeInfo
 namespace SoftwareVersionString {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
@@ -8276,8 +8276,8 @@ struct TypeInfo
 namespace ManufacturingDate {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
@@ -8286,8 +8286,8 @@ struct TypeInfo
 namespace PartNumber {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -8296,8 +8296,8 @@ struct TypeInfo
 namespace ProductURL {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
@@ -8306,8 +8306,8 @@ struct TypeInfo
 namespace ProductLabel {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
@@ -8316,8 +8316,8 @@ struct TypeInfo
 namespace SerialNumber {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
@@ -8850,7 +8850,7 @@ public:
     static constexpr CommandId GetCommandId() { return UpdateFabricLabel::Id; }
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
 
-    chip::Span<const char> label;
+    chip::CharSpan label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8861,7 +8861,7 @@ public:
     static constexpr CommandId GetCommandId() { return UpdateFabricLabel::Id; }
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
 
-    chip::Span<const char> label;
+    chip::CharSpan label;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateFabricLabel
@@ -9313,7 +9313,7 @@ public:
     static constexpr CommandId GetCommandId() { return Toggle::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    chip::Span<const char> pin;
+    chip::CharSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9324,7 +9324,7 @@ public:
     static constexpr CommandId GetCommandId() { return Toggle::Id; }
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
 
-    chip::Span<const char> pin;
+    chip::CharSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Toggle
@@ -10821,7 +10821,7 @@ public:
     uint16_t userId;
     chip::ByteSpan pin;
     uint32_t timeStamp;
-    chip::Span<const char> data;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -10837,7 +10837,7 @@ public:
     uint16_t userId;
     chip::ByteSpan pin;
     uint32_t timeStamp;
-    chip::Span<const char> data;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OperationEventNotification
@@ -10868,7 +10868,7 @@ public:
     DoorLockUserType userType;
     DoorLockUserStatus userStatus;
     uint32_t timeStamp;
-    chip::Span<const char> data;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -10886,7 +10886,7 @@ public:
     DoorLockUserType userType;
     DoorLockUserStatus userStatus;
     uint32_t timeStamp;
-    chip::Span<const char> data;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProgrammingEventNotification
@@ -11086,8 +11086,8 @@ struct TypeInfo
 namespace Language {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Language::Id; }
@@ -14603,8 +14603,8 @@ struct TypeInfo
 namespace CompensationText {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompensationText::Id; }
@@ -15168,8 +15168,8 @@ struct TypeInfo
 namespace LampType {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampType::Id; }
@@ -15178,8 +15178,8 @@ struct TypeInfo
 namespace LampManufacturer {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampManufacturer::Id; }
@@ -17537,7 +17537,7 @@ public:
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
     IasAceArmMode armMode;
-    chip::Span<const char> armDisarmCode;
+    chip::CharSpan armDisarmCode;
     uint8_t zoneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -17550,7 +17550,7 @@ public:
     static constexpr ClusterId GetClusterId() { return IasAce::Id; }
 
     IasAceArmMode armMode;
-    chip::Span<const char> armDisarmCode;
+    chip::CharSpan armDisarmCode;
     uint8_t zoneId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -17600,7 +17600,7 @@ public:
 
     uint8_t numberOfZones;
     DataModel::List<uint8_t> zoneIds;
-    chip::Span<const char> armDisarmCode;
+    chip::CharSpan armDisarmCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -17613,7 +17613,7 @@ public:
 
     uint8_t numberOfZones;
     DataModel::DecodableList<uint8_t> zoneIds;
-    chip::Span<const char> armDisarmCode;
+    chip::CharSpan armDisarmCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Bypass
@@ -17733,7 +17733,7 @@ public:
     uint8_t zoneId;
     IasZoneType zoneType;
     chip::NodeId ieeeAddress;
-    chip::Span<const char> zoneLabel;
+    chip::CharSpan zoneLabel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -17747,7 +17747,7 @@ public:
     uint8_t zoneId;
     IasZoneType zoneType;
     chip::NodeId ieeeAddress;
-    chip::Span<const char> zoneLabel;
+    chip::CharSpan zoneLabel;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetZoneInformationResponse
@@ -17794,7 +17794,7 @@ public:
     uint8_t zoneId;
     uint16_t zoneStatus;
     IasAceAudibleNotification audibleNotification;
-    chip::Span<const char> zoneLabel;
+    chip::CharSpan zoneLabel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -17808,7 +17808,7 @@ public:
     uint8_t zoneId;
     uint16_t zoneStatus;
     IasAceAudibleNotification audibleNotification;
-    chip::Span<const char> zoneLabel;
+    chip::CharSpan zoneLabel;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ZoneStatusChanged
@@ -18251,8 +18251,8 @@ namespace Attributes {
 namespace WakeOnLanMacAddress {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WakeOnLanMacAddress::Id; }
@@ -18324,9 +18324,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::Span<const char> operatorName;
-    chip::Span<const char> lineupName;
-    chip::Span<const char> postalCode;
+    chip::CharSpan operatorName;
+    chip::CharSpan lineupName;
+    chip::CharSpan postalCode;
     TvChannelLineupInfoType lineupInfoType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -18352,7 +18352,7 @@ public:
     static constexpr CommandId GetCommandId() { return ChangeChannel::Id; }
     static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
 
-    chip::Span<const char> match;
+    chip::CharSpan match;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -18363,7 +18363,7 @@ public:
     static constexpr CommandId GetCommandId() { return ChangeChannel::Id; }
     static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
 
-    chip::Span<const char> match;
+    chip::CharSpan match;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannel
@@ -18546,7 +18546,7 @@ public:
     static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
 
     uint8_t target;
-    chip::Span<const char> data;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -18558,7 +18558,7 @@ public:
     static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
 
     uint8_t target;
-    chip::Span<const char> data;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTarget
@@ -18577,7 +18577,7 @@ public:
     static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
 
     NavigateTargetStatus status;
-    chip::Span<const char> data;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -18589,7 +18589,7 @@ public:
     static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
 
     NavigateTargetStatus status;
-    chip::Span<const char> data;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTargetResponse
@@ -19486,7 +19486,7 @@ public:
     static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
 
     uint8_t index;
-    chip::Span<const char> name;
+    chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19498,7 +19498,7 @@ public:
     static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
 
     uint8_t index;
-    chip::Span<const char> name;
+    chip::CharSpan name;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RenameInput
@@ -19799,8 +19799,8 @@ enum class Fields
 struct Type
 {
 public:
-    chip::Span<const char> name;
-    chip::Span<const char> value;
+    chip::CharSpan name;
+    chip::CharSpan value;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -19821,7 +19821,7 @@ struct Type
 {
 public:
     ContentLaunchParameterEnum type;
-    chip::Span<const char> value;
+    chip::CharSpan value;
     DataModel::List<Structs::ContentLaunchAdditionalInfo::Type> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -19831,7 +19831,7 @@ struct DecodableType
 {
 public:
     ContentLaunchParameterEnum type;
-    chip::Span<const char> value;
+    chip::CharSpan value;
     DataModel::DecodableList<Structs::ContentLaunchAdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19851,7 +19851,7 @@ enum class Fields
 struct Type
 {
 public:
-    chip::Span<const char> providerName;
+    chip::CharSpan providerName;
     uint8_t background;
     uint8_t logo;
     uint8_t progressBar;
@@ -19876,8 +19876,8 @@ enum class Fields
 struct Type
 {
 public:
-    chip::Span<const char> width;
-    chip::Span<const char> height;
+    chip::CharSpan width;
+    chip::CharSpan height;
     ContentLaunchMetricType metric;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -19898,8 +19898,8 @@ enum class Fields
 struct Type
 {
 public:
-    chip::Span<const char> imageUrl;
-    chip::Span<const char> color;
+    chip::CharSpan imageUrl;
+    chip::CharSpan color;
     uint8_t size;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -19927,7 +19927,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
     bool autoPlay;
-    chip::Span<const char> data;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19939,7 +19939,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
     bool autoPlay;
-    chip::Span<const char> data;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchContent
@@ -19957,7 +19957,7 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchContentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    chip::Span<const char> data;
+    chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -19969,7 +19969,7 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchContentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    chip::Span<const char> data;
+    chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19988,8 +19988,8 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchURL::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    chip::Span<const char> contentURL;
-    chip::Span<const char> displayString;
+    chip::CharSpan contentURL;
+    chip::CharSpan displayString;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20000,8 +20000,8 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchURL::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    chip::Span<const char> contentURL;
-    chip::Span<const char> displayString;
+    chip::CharSpan contentURL;
+    chip::CharSpan displayString;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURL
@@ -20019,7 +20019,7 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchURLResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    chip::Span<const char> data;
+    chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20031,7 +20031,7 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchURLResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
 
-    chip::Span<const char> data;
+    chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20148,7 +20148,7 @@ public:
     static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
 
     uint8_t index;
-    chip::Span<const char> name;
+    chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20160,7 +20160,7 @@ public:
     static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
 
     uint8_t index;
-    chip::Span<const char> name;
+    chip::CharSpan name;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RenameOutput
@@ -20216,7 +20216,7 @@ struct Type
 {
 public:
     uint16_t catalogVendorId;
-    chip::Span<const char> applicationId;
+    chip::CharSpan applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20243,9 +20243,9 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
 
-    chip::Span<const char> data;
+    chip::CharSpan data;
     uint16_t catalogVendorId;
-    chip::Span<const char> applicationId;
+    chip::CharSpan applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20256,9 +20256,9 @@ public:
     static constexpr CommandId GetCommandId() { return LaunchApp::Id; }
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
 
-    chip::Span<const char> data;
+    chip::CharSpan data;
     uint16_t catalogVendorId;
-    chip::Span<const char> applicationId;
+    chip::CharSpan applicationId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchApp
@@ -20277,7 +20277,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
-    chip::Span<const char> data;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20289,7 +20289,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
-    chip::Span<const char> data;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppResponse
@@ -20379,8 +20379,8 @@ namespace Attributes {
 namespace VendorName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
@@ -20399,8 +20399,8 @@ struct TypeInfo
 namespace ApplicationName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationName::Id; }
@@ -20419,8 +20419,8 @@ struct TypeInfo
 namespace ApplicationId {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
@@ -20464,7 +20464,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetSetupPIN::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    chip::Span<const char> tempAccountIdentifier;
+    chip::CharSpan tempAccountIdentifier;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20475,7 +20475,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetSetupPIN::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    chip::Span<const char> tempAccountIdentifier;
+    chip::CharSpan tempAccountIdentifier;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetSetupPIN
@@ -20492,7 +20492,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetSetupPINResponse::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    chip::Span<const char> setupPIN;
+    chip::CharSpan setupPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20503,7 +20503,7 @@ public:
     static constexpr CommandId GetCommandId() { return GetSetupPINResponse::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    chip::Span<const char> setupPIN;
+    chip::CharSpan setupPIN;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetSetupPINResponse
@@ -20521,8 +20521,8 @@ public:
     static constexpr CommandId GetCommandId() { return Login::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    chip::Span<const char> tempAccountIdentifier;
-    chip::Span<const char> setupPIN;
+    chip::CharSpan tempAccountIdentifier;
+    chip::CharSpan setupPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20533,8 +20533,8 @@ public:
     static constexpr CommandId GetCommandId() { return Login::Id; }
     static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
 
-    chip::Span<const char> tempAccountIdentifier;
-    chip::Span<const char> setupPIN;
+    chip::CharSpan tempAccountIdentifier;
+    chip::CharSpan setupPIN;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Login
@@ -20584,7 +20584,7 @@ public:
     bool b;
     SimpleEnum c;
     chip::ByteSpan d;
-    chip::Span<const char> e;
+    chip::CharSpan e;
     chip::BitFlags<SimpleBitmap> f;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21456,8 +21456,8 @@ struct TypeInfo
 namespace CharString {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CharString::Id; }
@@ -21466,8 +21466,8 @@ struct TypeInfo
 namespace LongCharString {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongCharString::Id; }
@@ -21745,7 +21745,7 @@ public:
     chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
-    chip::Span<const char> message;
+    chip::CharSpan message;
     chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21761,7 +21761,7 @@ public:
     chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
-    chip::Span<const char> message;
+    chip::CharSpan message;
     chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -21880,7 +21880,7 @@ public:
     chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
-    chip::Span<const char> message;
+    chip::CharSpan message;
     chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -21896,7 +21896,7 @@ public:
     chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
-    chip::Span<const char> message;
+    chip::CharSpan message;
     chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -21976,8 +21976,8 @@ struct TypeInfo
 namespace CompanyName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
@@ -21996,8 +21996,8 @@ struct TypeInfo
 namespace BrandName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BrandName::Id; }
@@ -22091,8 +22091,8 @@ namespace Attributes {
 namespace CompanyName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
@@ -22121,8 +22121,8 @@ struct TypeInfo
 namespace CustomerName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CustomerName::Id; }
@@ -22171,8 +22171,8 @@ struct TypeInfo
 namespace UtilityName {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UtilityName::Id; }
@@ -22181,8 +22181,8 @@ struct TypeInfo
 namespace Pod {
 struct TypeInfo
 {
-    using Type          = chip::Span<const char>;
-    using DecodableType = chip::Span<const char>;
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Pod::Id; }
