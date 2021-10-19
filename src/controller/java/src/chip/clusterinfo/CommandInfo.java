@@ -7,12 +7,12 @@ import java.util.function.Supplier;
 public class CommandInfo {
   public ClusterCommandFunction commandFunction;
   private Supplier<DelegatedClusterCallback> commandCallbackSupplier;
-  private Map<String, CommandParameter> commandParameters;
+  private Map<String, CommandParameterInfo> commandParameters;
 
   public CommandInfo(
       ClusterCommandFunction commandFunction,
       Supplier<DelegatedClusterCallback> commandCallbackSupplier,
-      Map<String, CommandParameter> commandParameters) {
+      Map<String, CommandParameterInfo> commandParameters) {
     this.commandFunction = commandFunction;
     this.commandCallbackSupplier = commandCallbackSupplier;
     this.commandParameters = commandParameters;
@@ -26,7 +26,7 @@ public class CommandInfo {
     return commandCallbackSupplier;
   }
 
-  public Map<String, CommandParameter> getCommandParameters() {
+  public Map<String, CommandParameterInfo> getCommandParameters() {
     return commandParameters;
   }
 
