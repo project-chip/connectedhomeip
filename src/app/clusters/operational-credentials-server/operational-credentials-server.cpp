@@ -68,7 +68,7 @@ public:
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::OperationalCredentials::Id)
     {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
@@ -103,14 +103,14 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
 OperationalCredentialsAttrAccess gAttrAccess;
 
-CHIP_ERROR OperationalCredentialsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aClusterInfo.mClusterId == Clusters::OperationalCredentials::Id);
+    VerifyOrDie(aPath.mClusterId == Clusters::OperationalCredentials::Id);
 
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case Attributes::FabricsList::Id: {
-        return ReadFabricsList(aClusterInfo.mEndpointId, aEncoder);
+        return ReadFabricsList(aPath.mEndpointId, aEncoder);
     }
     default:
         break;
@@ -241,7 +241,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
 
     if (err == CHIP_NO_ERROR && Attributes::SupportedFabrics::Set(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write %" PRIu8 " in supported fabrics count attribute",
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write %d in supported fabrics count attribute",
                        CHIP_CONFIG_MAX_DEVICE_ADMINS);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
@@ -292,8 +292,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     void OnFabricPersistedToStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
-                       ", NodeId %0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       "OpCreds: Fabric %" PRIX8 " was persisted to storage. FabricId " ChipLogFormatX64
+                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
@@ -715,7 +715,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
     }
 
     err = gFabricBeingCommissioned.GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %d", err);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %" CHIP_ERROR_FORMAT, err.Format());
     SuccessOrExit(err);
     VerifyOrExit(csrLength < UINT8_MAX, err = CHIP_ERROR_INTERNAL);
 

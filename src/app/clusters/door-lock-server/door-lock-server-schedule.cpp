@@ -150,7 +150,7 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(app::CommandHandler * comm
         EmberAfDoorLockScheduleEntry * entry = &weekdayScheduleTable[scheduleId];
         entry->inUse                         = true;
         entry->userId                        = userId;
-        entry->daysMask                      = daysMask;
+        entry->daysMask                      = daysMask.Raw();
         entry->startHour                     = startHour;
         entry->startMinute                   = startMinute;
         entry->stopHour                      = stopHour;

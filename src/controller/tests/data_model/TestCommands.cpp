@@ -79,8 +79,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to decode the request");
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
             return;
         }
 
@@ -106,13 +105,11 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         }
         else if (responseDirective == kSendSuccessStatusCode)
         {
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
         }
         else if (responseDirective == kSendError)
         {
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
         }
     }
 }
@@ -123,7 +120,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

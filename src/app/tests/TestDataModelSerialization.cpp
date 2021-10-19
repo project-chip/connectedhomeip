@@ -166,13 +166,15 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
         t.a = 20;
         t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+        t.c = TestCluster::SimpleEnum::kValueA;
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.d = buf;
 
         t.e = Span<char>{ strbuf, strlen(strbuf) };
+
+        t.f.Set(TestCluster::SimpleBitmap::kValueC);
 
         err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -197,7 +199,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
         NL_TEST_ASSERT(apSuite, t.a == 20);
         NL_TEST_ASSERT(apSuite, t.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
+        NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::kValueA);
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_A);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -210,6 +212,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
         }
 
         NL_TEST_ASSERT(apSuite, StringMatches(t.e, "chip"));
+        NL_TEST_ASSERT(apSuite, t.f.HasOnly(TestCluster::SimpleBitmap::kValueC));
     }
 }
 
@@ -234,7 +237,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         t.c.a = 11;
         t.c.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        t.c.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B;
+        t.c.c = TestCluster::SimpleEnum::kValueB;
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_B;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -267,7 +270,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         NL_TEST_ASSERT(apSuite, t.c.a == 11);
         NL_TEST_ASSERT(apSuite, t.c.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        NL_TEST_ASSERT(apSuite, t.c.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
+        NL_TEST_ASSERT(apSuite, t.c.c == TestCluster::SimpleEnum::kValueB);
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_B);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -309,7 +312,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         t.c.a = 11;
         t.c.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        t.c.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B;
+        t.c.c = TestCluster::SimpleEnum::kValueB;
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_B;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -361,7 +364,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         NL_TEST_ASSERT(apSuite, t.c.a == 11);
         NL_TEST_ASSERT(apSuite, t.c.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        NL_TEST_ASSERT(apSuite, t.c.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
+        NL_TEST_ASSERT(apSuite, t.c.c == TestCluster::SimpleEnum::kValueB);
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_B);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -533,7 +536,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
         t.a = 20;
         t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+        t.c = TestCluster::SimpleEnum::kValueA;
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -577,7 +580,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
 
         NL_TEST_ASSERT(apSuite, t.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
+        NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::kValueA);
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_A);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -612,7 +615,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
         t.a = 20;
         t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+        t.c = TestCluster::SimpleEnum::kValueA;
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -654,7 +657,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
         NL_TEST_ASSERT(apSuite, t.a == 20);
         NL_TEST_ASSERT(apSuite, t.b == true);
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
+        NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::kValueA);
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         NL_TEST_ASSERT(apSuite, t.c == EMBER_ZCL_SIMPLE_ENUM_VALUE_A);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -693,7 +696,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             t.a = 20;
             t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-            t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+            t.c = TestCluster::SimpleEnum::kValueA;
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
             t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -749,7 +752,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             t.a = 20;
             t.b = true;
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-            t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+            t.c = TestCluster::SimpleEnum::kValueA;
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
             t.c = EMBER_ZCL_SIMPLE_ENUM_VALUE_A;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM

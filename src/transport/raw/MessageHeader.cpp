@@ -80,15 +80,15 @@ constexpr size_t kVendorIdSizeBytes = 2;
 /// size of a serialized ack message counter inside a header
 constexpr size_t kAckMessageCounterSizeBytes = 4;
 
-/// Mask to extract just the version part from a 16bit header prefix.
-constexpr uint16_t kVersionMask = 0x00F0;
-/// Shift to convert to/from a masked version 16bit value to a 4bit version.
+/// Mask to extract just the version part from a 8bits header prefix.
+constexpr uint8_t kVersionMask = 0xF0;
+
+constexpr uint8_t kMsgFlagsMask = 0x07;
+/// Shift to convert to/from a masked version 8bit value to a 4bit version.
 constexpr int kVersionShift = 4;
 
-/// Mask to extract just the encryption type part from a 16bit header prefix.
-constexpr uint16_t kSessionTypeMask = 0x3000;
-/// Shift to convert to/from a masked encryption type 16bit value to a 2bit encryption type.
-constexpr int kSessionTypeShift = 12;
+// Mask to extract sessionType
+constexpr uint8_t kSessionTypeMask = 0x03;
 
 } // namespace
 
@@ -134,18 +134,6 @@ uint16_t PayloadHeader::EncodeSizeBytes() const
     return static_cast<uint16_t>(size);
 }
 
-uint16_t MessageAuthenticationCode::TagLenForSessionType(Header::SessionType sessionType)
-{
-    switch (sessionType)
-    {
-    case Header::SessionType::kAESCCMTagLen16:
-        return 16;
-
-    default:
-        return 0;
-    }
-}
-
 CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -154,14 +142,20 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     // TODO: De-uint16-ify everything related to this library
     uint16_t octets_read;
 
-    uint16_t header;
-    err = reader.Read16(&header).StatusCode();
+    uint8_t msgFlags;
+    err = reader.Read8(&msgFlags).StatusCode();
     SuccessOrExit(err);
-    version = ((header & kVersionMask) >> kVersionShift);
+    version = ((msgFlags & kVersionMask) >> kVersionShift);
     VerifyOrExit(version == kMsgHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
-    mFlags.SetRaw(header);
-    mSessionType = static_cast<Header::SessionType>((header & kSessionTypeMask) >> kSessionTypeShift);
+    mMsgFlags.SetRaw(msgFlags);
+
+    uint8_t securityFlags;
+    err = reader.Read8(&securityFlags).StatusCode();
+    SuccessOrExit(err);
+    mSecFlags.SetRaw(securityFlags);
+
+    mSessionType = static_cast<Header::SessionType>(securityFlags & kSessionTypeMask);
 
     err = reader.Read16(&mSessionId).StatusCode();
     SuccessOrExit(err);
@@ -169,7 +163,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     err = reader.Read32(&mMessageCounter).StatusCode();
     SuccessOrExit(err);
 
-    if (mFlags.Has(Header::FlagValues::kSourceNodeIdPresent))
+    if (mMsgFlags.Has(Header::MsgFlagValues::kSourceNodeIdPresent))
     {
         uint64_t sourceNodeId;
         err = reader.Read64(&sourceNodeId).StatusCode();
@@ -180,22 +174,40 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     {
         mSourceNodeId.ClearValue();
     }
-    if (mFlags.HasAll(Header::FlagValues::kDestinationNodeIdPresent, Header::FlagValues::kDestinationGroupIdPresent))
+
+    if (!IsSessionTypeValid())
     {
         // Reserved.
         err = CHIP_ERROR_INTERNAL;
         SuccessOrExit(err);
     }
-    else if (mFlags.Has(Header::FlagValues::kDestinationNodeIdPresent))
+
+    if (mMsgFlags.HasAll(Header::MsgFlagValues::kDestinationNodeIdPresent, Header::MsgFlagValues::kDestinationGroupIdPresent))
     {
+        // Reserved.
+        err = CHIP_ERROR_INTERNAL;
+        SuccessOrExit(err);
+    }
+    else if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationNodeIdPresent))
+    {
+        if (mSessionType != Header::SessionType::kUnicastSession)
+        {
+            err = CHIP_ERROR_INTERNAL;
+            SuccessOrExit(err);
+        }
         uint64_t destinationNodeId;
         err = reader.Read64(&destinationNodeId).StatusCode();
         SuccessOrExit(err);
         mDestinationNodeId.SetValue(destinationNodeId);
         mDestinationGroupId.ClearValue();
     }
-    else if (mFlags.Has(Header::FlagValues::kDestinationGroupIdPresent))
+    else if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationGroupIdPresent))
     {
+        if (mSessionType != Header::SessionType::kGroupSession)
+        {
+            err = CHIP_ERROR_INTERNAL;
+            SuccessOrExit(err);
+        }
         uint16_t destinationGroupId;
         err = reader.Read16(&destinationGroupId).StatusCode();
         SuccessOrExit(err);
@@ -289,17 +301,22 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
 {
     VerifyOrReturnError(size >= EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!(mDestinationNodeId.HasValue() && mDestinationGroupId.HasValue()), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(encode_size != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsSessionTypeValid(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(!(IsGroupSession() && !mDestinationGroupId.HasValue()), CHIP_ERROR_INTERNAL);
 
-    Header::Flags encodeFlags = mFlags;
-    encodeFlags.Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
-        .Set(Header::FlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue())
-        .Set(Header::FlagValues::kDestinationGroupIdPresent, mDestinationGroupId.HasValue());
+    Header::MsgFlags messageFlags = mMsgFlags;
+    messageFlags.Set(Header::MsgFlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
+        .Set(Header::MsgFlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue())
+        .Set(Header::MsgFlagValues::kDestinationGroupIdPresent, mDestinationGroupId.HasValue());
 
-    uint16_t header = (kMsgHeaderVersion << kVersionShift) | encodeFlags.Raw();
-    header |= (static_cast<uint16_t>(static_cast<uint16_t>(mSessionType) << kSessionTypeShift) & kSessionTypeMask);
+    uint8_t msgFlags = (kMsgHeaderVersion << kVersionShift) | (messageFlags.Raw() & kMsgFlagsMask);
+    uint8_t secFlags = mSecFlags.Raw();
+    secFlags |= static_cast<uint8_t>(mSessionType);
 
     uint8_t * p = data;
-    LittleEndian::Write16(p, header);
+    Write8(p, msgFlags);
+    Write8(p, secFlags);
     LittleEndian::Write16(p, mSessionId);
     LittleEndian::Write32(p, mMessageCounter);
     if (mSourceNodeId.HasValue())
@@ -379,7 +396,7 @@ CHIP_ERROR PayloadHeader::EncodeBeforeData(const System::PacketBufferHandle & bu
 CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, uint16_t size,
                                              uint16_t * decode_len)
 {
-    const uint16_t taglen = TagLenForSessionType(packetHeader.GetSessionType());
+    const uint16_t taglen = packetHeader.MICTagLength();
 
     VerifyOrReturnError(taglen != 0, CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER);
     VerifyOrReturnError(size >= taglen, CHIP_ERROR_INVALID_ARGUMENT);
@@ -395,7 +412,7 @@ CHIP_ERROR MessageAuthenticationCode::Encode(const PacketHeader & packetHeader, 
                                              uint16_t * encode_size) const
 {
     uint8_t * p           = data;
-    const uint16_t taglen = TagLenForSessionType(packetHeader.GetSessionType());
+    const uint16_t taglen = packetHeader.MICTagLength();
 
     VerifyOrReturnError(taglen != 0, CHIP_ERROR_WRONG_ENCRYPTION_TYPE);
     VerifyOrReturnError(size >= taglen, CHIP_ERROR_INVALID_ARGUMENT);

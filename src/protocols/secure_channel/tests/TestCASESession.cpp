@@ -405,6 +405,10 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     PacketHeader header;
     MessageAuthenticationCode mac;
 
+    header.SetSessionId(1);
+    NL_TEST_ASSERT(inSuite, header.IsEncrypted() == true);
+    NL_TEST_ASSERT(inSuite, header.MICTagLength() == 16);
+
     // Let's try encrypting using original session, and decrypting using deserialized
     {
         CryptoContext session1;

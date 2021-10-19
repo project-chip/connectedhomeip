@@ -186,13 +186,13 @@ class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ModelCom
 public:
     {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ModelCommand("{{asDelimitedCommand name}}")
     {
-        {{#chip_cluster_command_arguments}}
+        {{#chip_cluster_command_arguments_with_structs_expanded}}
         {{#if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &m{{asUpperCamelCase label}});
         {{else}}
         AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase label}});
         {{/if}}
-        {{/chip_cluster_command_arguments}}
+        {{/chip_cluster_command_arguments_with_structs_expanded}}
         ModelCommand::AddArguments();
     }
     ~{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}()
@@ -207,7 +207,7 @@ public:
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_cluster_command_arguments}}, m{{asUpperCamelCase label}}{{/chip_cluster_command_arguments}});
+        return cluster.{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_cluster_command_arguments_with_structs_expanded}}, m{{asUpperCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
     }
 
 private:
@@ -217,9 +217,9 @@ private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     {{/if}}
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    {{#chip_cluster_command_arguments}}
+    {{#chip_cluster_command_arguments_with_structs_expanded}}
     {{#if (isCharString type)}}chip::ByteSpan{{else}}{{chipType}}{{/if}} m{{asUpperCamelCase label}};
-    {{/chip_cluster_command_arguments}}
+    {{/chip_cluster_command_arguments_with_structs_expanded}}
 };
 
 {{/chip_cluster_commands}}

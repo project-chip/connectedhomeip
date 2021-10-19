@@ -211,6 +211,7 @@
             "id": "exampleTarget",
             "description": "What target to build",
             "options": [
+                "ameba-amebad-all-clusters",
                 "android-arm-chip-tool",
                 "android-arm64-chip-test",
                 "android-arm64-chip-tool",

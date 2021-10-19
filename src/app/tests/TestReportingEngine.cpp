@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
 #include <lib/core/CHIPCore.h>
@@ -54,32 +55,8 @@ constexpr ClusterId kTestClusterId        = 6;
 constexpr EndpointId kTestEndpointId      = 1;
 constexpr chip::AttributeId kTestFieldId1 = 1;
 constexpr chip::AttributeId kTestFieldId2 = 2;
-constexpr uint8_t kTestFieldValue1        = 1;
-constexpr uint8_t kTestFieldValue2        = 2;
 
 namespace app {
-CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter * apWriter, bool * apDataExists)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(aAttributePathParams.mClusterId == kTestClusterId && aAttributePathParams.mEndpointId == kTestEndpointId,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(apWriter != nullptr, /* no op */);
-
-    if (aAttributePathParams.mFieldId == kTestFieldId1)
-    {
-        err = apWriter->Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
-        SuccessOrExit(err);
-    }
-    if (aAttributePathParams.mFieldId == kTestFieldId2)
-    {
-        err = apWriter->Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
-        SuccessOrExit(err);
-    }
-
-exit:
-    return err;
-}
-
 namespace reporting {
 class TestReportingEngine
 {
