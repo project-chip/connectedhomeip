@@ -52,6 +52,8 @@ static_library("Tizen") {
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
+    "WiFiManager.cpp",
+    "WiFiManager.h",
   ]
 
   deps = [ "${chip_root}/src/setup_payload" ]
