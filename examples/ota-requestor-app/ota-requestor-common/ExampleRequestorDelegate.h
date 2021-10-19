@@ -38,8 +38,9 @@ public:
     void Init(chip::Controller::ControllerDeviceInitParams connectParams, uint32_t startDelayMs);
 
     // Inherited from OTARequestorDelegate
-    EmberAfStatus HandleAnnounceOTAProvider(chip::app::CommandHandler * commandObj, chip::NodeId providerLocation,
-                                            uint16_t vendorId, uint8_t announcementReason, chip::ByteSpan metadataForNode) override;
+    EmberAfStatus HandleAnnounceOTAProvider(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 
 private:
     static void StartDelayTimerHandler(chip::System::Layer * systemLayer, void * appState);

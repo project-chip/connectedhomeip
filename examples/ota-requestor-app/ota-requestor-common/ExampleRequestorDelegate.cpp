@@ -61,10 +61,13 @@ void ExampleRequestorDelegate::ConnectToProvider()
     // mProviderDevice.EstablishConnectivity();
 }
 
-EmberAfStatus ExampleRequestorDelegate::HandleAnnounceOTAProvider(chip::app::CommandHandler * commandObj,
-                                                                  chip::NodeId providerLocation, uint16_t vendorId,
-                                                                  uint8_t announcementReason, chip::ByteSpan metadataForNode)
+EmberAfStatus ExampleRequestorDelegate::HandleAnnounceOTAProvider(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
 {
+    auto & providerLocation   = commandData.providerLocation;
+    auto & announcementReason = commandData.announcementReason;
+
     if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Cannot access ExchangeContext for FabricIndex");

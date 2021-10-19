@@ -44,18 +44,14 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    auto & providerLocation   = commandData.providerLocation;
-    auto & vendorId           = commandData.vendorId;
-    auto & announcementReason = commandData.announcementReason;
-    auto & metadataForNode    = commandData.metadataForNode;
-
     if (gDelegate == nullptr)
     {
         ChipLogDetail(Zcl, "No OTARequestorDelegate set");
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         return true;
     }
 
-    status = gDelegate->HandleAnnounceOTAProvider(commandObj, providerLocation, vendorId, announcementReason, metadataForNode);
+    status = gDelegate->HandleAnnounceOTAProvider(commandObj, commandPath, commandData);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

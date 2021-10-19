@@ -18,8 +18,10 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/Span.h>
@@ -34,10 +36,10 @@ namespace clusters {
 class OTARequestorDelegate
 {
 public:
-    virtual EmberAfStatus HandleAnnounceOTAProvider(chip::app::CommandHandler * commandObj, chip::NodeId providerLocation,
-                                                    uint16_t vendorId, uint8_t announcementReason,
-                                                    chip::ByteSpan metadataForNode) = 0;
-    virtual ~OTARequestorDelegate()                                                 = default;
+    virtual EmberAfStatus HandleAnnounceOTAProvider(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
+    virtual ~OTARequestorDelegate() = default;
 };
 
 } // namespace clusters
