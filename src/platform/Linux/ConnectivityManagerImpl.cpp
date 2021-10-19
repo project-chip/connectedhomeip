@@ -1067,7 +1067,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** ne
         {
             if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_PACKET)
             {
-                struct NetworkInterface * ifp = new NetworkInterface();
+                NetworkInterface * ifp = new NetworkInterface();
 
                 strncpy(ifp->Name, ifa->ifa_name, kMaxIfNameSize);
                 ifp->Name[kMaxIfNameSize - 1] = '\0';
