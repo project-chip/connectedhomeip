@@ -29,8 +29,8 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE" type="ENUM8" min="0x00" max="0x02" writable="false" default="0x00" optional="true">playback state</attribute>
     <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME" type="INT64U" min="0x00"  writable="false" default="0xFF" optional="true">start time</attribute>
     <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION" type="INT64U" min="0x00"  writable="false" optional="true">duration</attribute>
-    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION_UPDATED_AT" type="INT64U" min="0x00"  writable="false" optional="true">updated at</attribute>
-    <attribute side="server" code="0x0004" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="INT64U" min="0x00"  writable="false" optional="true">posistion</attribute>
+    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION_UPDATED_AT" type="INT64U" min="0x00"  writable="false" optional="true">position updated at</attribute>
+    <attribute side="server" code="0x0004" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="INT64U" min="0x00"  writable="false" optional="true">position</attribute>
     <!-- TODO: Convert to single once it is supported -->
     <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SPEED" type="INT64U" min="0x00"  writable="false" optional="true">playback speed</attribute>
     <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END" type="INT64U" min="0x00"  writable="false" optional="true">seek range end</attribute>
@@ -142,11 +142,13 @@ limitations under the License.
   </cluster>
 
   <struct name="MediaPlaybackPosition">
+    <cluster code="0x0506"/>
     <item name="updatedAt" type="INT64U"/>
     <item name="position" type="INT64U"/>    
   </struct>
 
   <enum name="MediaPlaybackState" type="ENUM8">
+    <cluster code="0x0506"/>
     <item name="Playing" value="0x00"/>
     <item name="Paused" value="0x01"/>
     <item name="NotPlaying" value="0x02"/>
@@ -154,6 +156,7 @@ limitations under the License.
   </enum>
 
   <enum name="MediaPlaybackStatus" type="ENUM8">
+    <cluster code="0x0506"/>
     <item name="Success" value="0x00"/>
     <item name="InvalidStateForCommand" value="0x01"/>
     <item name="NotAllowed" value="0x02"/>

@@ -37,7 +37,13 @@ endif()
 
 option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)
 if(BUILD_WITH_DFU)
-    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-dfu_support.conf)
+    if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
+        list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-multi_image_dfu_support.conf)
+        set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_multi_image_dfu.conf CACHE INTERNAL "")
+    else()
+        list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-single_image_dfu_support.conf)
+        set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_single_image_dfu.conf CACHE INTERNAL "")
+    endif()
     set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static.yml)
 endif()
 
@@ -47,6 +53,8 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 project(chip-nrfconnect-lighting-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
+include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 target_compile_options(app PRIVATE -Werror)
 
@@ -68,50 +76,12 @@ target_sources(app PRIVATE
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
-               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
-               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
-               ${CHIP_ROOT}/src/app/util/af-event.cpp
-               ${CHIP_ROOT}/src/app/util/af-main-common.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-list-byte-span.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-table.cpp
-               ${CHIP_ROOT}/src/app/util/binding-table.cpp
-               ${CHIP_ROOT}/src/app/util/chip-message-send.cpp
-               ${CHIP_ROOT}/src/app/util/client-api.cpp
-               ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
-               ${CHIP_ROOT}/src/app/util/ember-print.cpp
-               ${CHIP_ROOT}/src/app/util/error-mapping.cpp
-               ${CHIP_ROOT}/src/app/util/message.cpp
-               ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
-               ${CHIP_ROOT}/src/app/util/process-global-message.cpp
-               ${CHIP_ROOT}/src/app/util/util.cpp
-               ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
-               ${CHIP_ROOT}/src/app/server/Mdns.cpp
-               ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
-               ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
-               ${CHIP_ROOT}/src/app/server/Server.cpp
-               ${CHIP_ROOT}/src/app/server/StorablePeerConnection.cpp
-               ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
-               ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/ethernet_network_diagnostics_server/ethernet_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/thread_network_diagnostics_server/thread_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/wifi_network_diagnostics_server/wifi_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/software_diagnostics_server/software_diagnostics_server.cpp	       
-               ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp               
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
-               ${CHIP_ROOT}/src/app/clusters/color-control-server/color-control-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               )
+               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
+
+chip_configure_data_model(app
+    INCLUDE_SERVER
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
+)
 
 if(BUILD_WITH_DFU)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
@@ -162,9 +132,11 @@ pw_proto_library(device_service
 
 pw_proto_library(lighting_service
   SOURCES
-    ${CHIP_ROOT}/examples/lighting-app/lighting-common/lighting_service/lighting_service.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/lighting_service.proto
   STRIP_PREFIX
-    ${CHIP_ROOT}/examples/lighting-app/lighting-common/
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    lighting_service
   DEPS
     pw_protobuf.common_protos
 )
@@ -181,6 +153,7 @@ target_include_directories(app PRIVATE
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
   ../../common
+  ../../common/pigweed
   ../../common/pigweed/nrfconnect)
 
 target_link_libraries(app PRIVATE
@@ -196,5 +169,3 @@ target_link_libraries(app PRIVATE
 target_link_libraries(pw_build INTERFACE zephyr_interface)
 
 endif(CONFIG_CHIP_PW_RPC)
-
-include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

@@ -1,12 +1,12 @@
-# NOTE: /workspace/ is the persistent directory across steps for
+# NOTE: /workspace/ is the persistent directory across steps
 steps:
-    - name: "connectedhomeip/chip-build-vscode:latest"
+    - name: "connectedhomeip/chip-build-vscode:0.5.17"
       id: "CompileAll"
       entrypoint: "./scripts/run_in_build_env.sh"
       args:
           [
-              "./scripts/build/build_examples.py --platform all
-              --enable-flashbundle build --create-archives /workspace/artifacts/",
+              "./scripts/build/build_examples.py --enable-flashbundle build
+              --create-archives /workspace/artifacts/",
           ]
       timeout: 7200s
 

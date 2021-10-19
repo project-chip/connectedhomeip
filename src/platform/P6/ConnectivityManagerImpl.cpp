@@ -43,10 +43,6 @@
 #error "WiFi Station support must be enabled when building for PSoC6"
 #endif
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-#error "WiFi AP support must be enabled when building for PSoC6"
-#endif
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
@@ -69,7 +65,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
     if (val != kWiFiStationMode_ApplicationControlled)
     {
         mWiFiStationMode = val;
-        SystemLayer.ScheduleWork(DriveStationState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
     if (mWiFiStationMode != val)
     {
@@ -101,8 +97,8 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
         memset(&stationConfig, 0, sizeof(stationConfig));
         Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &stationConfig);
 
-        SystemLayer.ScheduleWork(DriveStationState, NULL);
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -117,7 +113,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
         ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
     }
     mWiFiAPMode = val;
-    SystemLayer.ScheduleWork(DriveAPState, NULL);
+    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 exit:
     return err;
 }
@@ -126,8 +122,8 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
 {
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
-        mLastAPDemandTime = System::Clock::GetMonotonicMilliseconds();
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -136,7 +132,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         mLastAPDemandTime = 0;
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -146,7 +142,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
     {
         if (mWiFiAPState == kWiFiAPState_Activating || mWiFiAPState == kWiFiAPState_Active)
         {
-            mLastAPDemandTime = System::Clock::GetMonotonicMilliseconds();
+            mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
         }
     }
 }
@@ -154,7 +150,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
 {
     mWiFiAPIdleTimeoutMS = val;
-    SystemLayer.ScheduleWork(DriveAPState, NULL);
+    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
@@ -225,7 +221,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     SuccessOrExit(err);
 
     // Queue work items to bootstrap the station state machines once the Chip event loop is running.
-    err = SystemLayer.ScheduleWork(DriveStationState, NULL);
+    err = DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     SuccessOrExit(err);
 
 exit:
@@ -278,12 +274,12 @@ void ConnectivityManagerImpl::wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_d
 }
 void ConnectivityManagerImpl::_OnWiFiScanDone()
 {
-    SystemLayer.ScheduleWork(DriveStationState, NULL);
+    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
-    SystemLayer.ScheduleWork(DriveStationState, NULL);
+    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)
@@ -408,7 +404,7 @@ void ConnectivityManagerImpl::DriveAPState()
         // has been demand for the AP within the idle timeout period.
         else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
         {
-            now = System::Clock::GetMonotonicMilliseconds();
+            now = System::SystemClock().GetMonotonicMilliseconds();
 
             if (mLastAPDemandTime != 0 && now < (mLastAPDemandTime + mWiFiAPIdleTimeoutMS))
             {
@@ -417,7 +413,7 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
+                err       = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
                 SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " ms", apTimeout);
             }
@@ -530,7 +526,7 @@ void ConnectivityManagerImpl::DriveStationState()
     // Otherwise the station interface is NOT connected to an AP, so...
     else
     {
-        uint32_t now = static_cast<uint32_t>(System::Clock::GetMonotonicMilliseconds());
+        uint32_t now = static_cast<uint32_t>(System::SystemClock().GetMonotonicMilliseconds());
 
         // Advance the station state to NotConnected if it was previously Connected or Disconnecting,
         // or if a previous initiated connect attempt failed.
@@ -574,7 +570,7 @@ void ConnectivityManagerImpl::DriveStationState()
                 uint32_t timeToNextConnect = (uint32_t)((mLastStationConnectFailTime + mWiFiStationReconnectIntervalMS) - now);
                 ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRId32 " ms ", timeToNextConnect);
 
-                err = SystemLayer.StartTimer(timeToNextConnect, DriveStationState, NULL);
+                err = DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, NULL);
                 SuccessOrExit(err);
             }
         }
@@ -611,7 +607,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 ChipDeviceEvent event;
                 event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
                 event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
-                PlatformMgr().PostEvent(&event);
+                PlatformMgr().PostEventOrDie(&event);
             }
             // Search among the IPv6 addresses assigned to the interface for a Global Unicast
             // address (2000::/3) that is in the valid state.  If such an address is found...
@@ -624,7 +620,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                     ChipDeviceEvent event;
                     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
                     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
-                    PlatformMgr().PostEvent(&event);
+                    PlatformMgr().PostEventOrDie(&event);
                 }
             }
         }
@@ -642,7 +638,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
         event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
         addr.ToString(event.InternetConnectivityChange.address);
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)
         {

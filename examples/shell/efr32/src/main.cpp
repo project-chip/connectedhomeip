@@ -82,7 +82,7 @@ void appError(int err)
         ;
 }
 
-unsigned int sleep(unsigned int seconds)
+extern "C" unsigned int sleep(unsigned int seconds)
 {
     const TickType_t xDelay = 1000 * seconds / portTICK_PERIOD_MS;
     vTaskDelay(xDelay);

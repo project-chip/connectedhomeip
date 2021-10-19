@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,7 +52,6 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/Protocols.h>
-#include <protocols/service_provisioning/ServiceProvisioning.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
@@ -63,60 +62,6 @@ using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
-CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
-                               System::PacketBufferHandle && buffer)
-{
-    System::PacketBufferHandle resend;
-    bool loadedSecureSession = false;
-
-    VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
-
-    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession.Value(), nullptr);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    if (!loadedSecureSession)
-    {
-        // Secure connection already existed
-        // Hold on to the buffer, in case session resumption and resend is needed
-        // Cloning data, instead of increasing the ref count, as the original
-        // buffer might get modified by lower layers before the send fails. So,
-        // that buffer cannot be used for resends.
-        resend = buffer.CloneData();
-    }
-
-    // TODO(#5675): This code is temporary, and must be updated to use the IM API. Currently, we use a temporary Protocol
-    // TempZCL to carry over legacy ZCL messages.  We need to set flag kFromInitiator to allow receiver to deliver message to
-    // corresponding unsolicited message handler.
-    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator);
-    exchange->SetDelegate(this);
-
-    CHIP_ERROR err = exchange->SendMessage(protocolId, msgType, std::move(buffer), sendFlags);
-
-    buffer = nullptr;
-    ChipLogDetail(Controller, "SendMessage returned %s", ErrorStr(err));
-
-    // The send could fail due to network timeouts (e.g. broken pipe)
-    // Try session resumption if needed
-    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
-    {
-        mState = ConnectionState::NotConnected;
-
-        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
-
-        err = exchange->SendMessage(protocolId, msgType, std::move(resend), sendFlags);
-        ChipLogDetail(Controller, "Re-SendMessage returned %s", ErrorStr(err));
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        exchange->Close();
-    }
-
-    return err;
-}
-
 CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
 {
     didLoad = false;
@@ -124,26 +69,26 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
     // If there is no secure connection to the device, try establishing it
     if (mState != ConnectionState::SecureConnected)
     {
-        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+        ReturnErrorOnFailure(LoadSecureSessionParameters());
         didLoad = true;
     }
     else
     {
         if (mSecureSession.HasValue())
         {
-            Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession.Value());
+            Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
             // Check if the connection state has the correct transport information
-            if (connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
+            if (secureSession->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
             {
                 mState = ConnectionState::NotConnected;
-                ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+                ReturnErrorOnFailure(LoadSecureSessionParameters());
                 didLoad = true;
             }
         }
         else
         {
             mState = ConnectionState::NotConnected;
-            ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+            ReturnErrorOnFailure(LoadSecureSessionParameters());
             didLoad = true;
         }
     }
@@ -180,9 +125,9 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     // trigger the CASE based secure session.
     if (mSecureSession.HasValue())
     {
-        Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession.Value());
-        const uint32_t localMessageCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter().Value();
-        const uint32_t peerMessageCounter  = connectionState->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
+        Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+        const uint32_t localMessageCounter       = secureSession->GetSessionMessageCounter().GetLocalMessageCounter().Value();
+        const uint32_t peerMessageCounter        = secureSession->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
 
         serializable.mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(localMessageCounter);
         serializable.mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(peerMessageCounter);
@@ -316,14 +261,14 @@ void Device::OnNewConnection(SessionHandle session)
     // Reset the message counters here because this is the first time we get a handle to the secure session.
     // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
     // we need to restore the session counters along with the session information.
-    Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession.Value());
-    VerifyOrReturn(connectionState != nullptr);
-    MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
+    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+    VerifyOrReturn(secureSession != nullptr);
+    MessageCounter & localCounter = secureSession->GetSessionMessageCounter().GetLocalMessageCounter();
     if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
     }
-    Transport::PeerMessageCounter & peerCounter = connectionState->GetSessionMessageCounter().GetPeerMessageCounter();
+    Transport::PeerMessageCounter & peerCounter = secureSession->GetSessionMessageCounter().GetPeerMessageCounter();
     peerCounter.SetCounter(mPeerMessageCounter);
 }
 
@@ -335,8 +280,8 @@ void Device::OnConnectionExpired(SessionHandle session)
     mSecureSession.ClearValue();
 }
 
-CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
-                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
+                                     System::PacketBufferHandle && msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -399,7 +344,7 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
     }
 
     setupPayload.version               = 0;
-    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
+    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
     return CHIP_NO_ERROR;
 }
@@ -433,14 +378,14 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
     if (!mSecureSession.HasValue())
     {
         // Nothing needs to be done here.  It's not an error to not have a
-        // connectionState.  For one thing, we could have gotten an different
+        // secureSession.  For one thing, we could have gotten an different
         // UpdateAddress already and that caused connections to be torn down and
         // whatnot.
         return CHIP_NO_ERROR;
     }
 
-    Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession.Value());
-    connectionState->SetPeerAddress(addr);
+    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+    secureSession->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
 }
@@ -475,9 +420,12 @@ void Device::Reset()
         mExchangeMgr->CloseAllContextsForDelegate(this);
     }
     mExchangeMgr = nullptr;
+
+    ReleaseDAC();
+    ReleasePAI();
 }
 
-CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
+CHIP_ERROR Device::LoadSecureSessionParameters()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PASESession pairingSession;
@@ -492,22 +440,6 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         ExitNow(err = CHIP_NO_ERROR);
     }
 
-    if (resetNeeded == ResetTransport::kYes)
-    {
-        err = mTransportMgr->ResetTransport(
-            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(mListenPort)
-#if INET_CONFIG_ENABLE_IPV4
-                ,
-            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(mListenPort)
-#endif
-#if CONFIG_NETWORK_LAYER_BLE
-                ,
-            Transport::BleListenParameters(mBleLayer)
-#endif
-        );
-        SuccessOrExit(err);
-    }
-
     if (IsOperationalCertProvisioned())
     {
         err = WarmupCASESession();
@@ -519,7 +451,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         SuccessOrExit(err);
 
         err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
-                                          SecureSession::SessionRole::kInitiator, mFabricIndex);
+                                          CryptoContext::SessionRole::kInitiator, mFabricIndex);
         SuccessOrExit(err);
     }
 
@@ -552,6 +484,7 @@ void Device::OperationalCertProvisioned()
 
     Persist();
     CloseSession();
+    mState = ConnectionState::NotConnected;
 }
 
 CHIP_ERROR Device::WarmupCASESession()
@@ -559,12 +492,17 @@ CHIP_ERROR Device::WarmupCASESession()
     VerifyOrReturnError(mDeviceOperationalCertProvisioned, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == ConnectionState::NotConnected, CHIP_NO_ERROR);
 
-    Messaging::ExchangeContext * exchange =
-        mExchangeMgr->NewContext(SessionHandle::TemporaryUnauthenticatedSession(), &mCASESession);
+    // Create a UnauthenticatedSession for CASE pairing.
+    // Don't use mSecureSession here, because mSecureSession is the secure session.
+    Optional<SessionHandle> session = mSessionManager->CreateUnauthenticatedSession(mDeviceAddress);
+    if (!session.HasValue())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(session.Value(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
-    mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);
+    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager));
 
     uint16_t keyID = 0;
     ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
@@ -572,7 +510,7 @@ CHIP_ERROR Device::WarmupCASESession()
     mLocalMessageCounter = 0;
     mPeerMessageCounter  = 0;
 
-    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, fabric, mDeviceId, keyID, exchange, this));
@@ -585,7 +523,7 @@ CHIP_ERROR Device::WarmupCASESession()
 void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 {
     mState = ConnectionState::NotConnected;
-    mIDAllocator->Free(mCASESession.GetLocalKeyId());
+    mIDAllocator->Free(mCASESession.GetLocalSessionId());
 
     Cancelable ready;
     mConnectionFailure.DequeueAll(ready);
@@ -601,11 +539,8 @@ void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void Device::OnSessionEstablished()
 {
-    // TODO: the session should know which peer we are trying to connect to when started
-    mCASESession.SetPeerNodeId(mDeviceId);
-
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
-                                                 SecureSession::SessionRole::kInitiator, mFabricIndex);
+                                                 CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
@@ -622,6 +557,78 @@ void Device::OnSessionEstablished()
         cb->Cancel();
         cb->mCall(cb->mContext, this);
     }
+}
+
+void Device::ReleaseDAC()
+{
+    if (mDAC != nullptr)
+    {
+        Platform::MemoryFree(mDAC);
+    }
+    mDACLen = 0;
+    mDAC    = nullptr;
+}
+
+CHIP_ERROR Device::SetDAC(const ByteSpan & dac)
+{
+    if (dac.size() == 0)
+    {
+        ReleaseDAC();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(dac.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mDACLen != 0)
+    {
+        ReleaseDAC();
+    }
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(dac.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    if (mDAC == nullptr)
+    {
+        mDAC = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(dac.size()));
+    }
+    VerifyOrReturnError(mDAC != nullptr, CHIP_ERROR_NO_MEMORY);
+    mDACLen = static_cast<uint16_t>(dac.size());
+    memcpy(mDAC, dac.data(), mDACLen);
+
+    return CHIP_NO_ERROR;
+}
+
+void Device::ReleasePAI()
+{
+    if (mPAI != nullptr)
+    {
+        chip::Platform::MemoryFree(mPAI);
+    }
+    mPAILen = 0;
+    mPAI    = nullptr;
+}
+
+CHIP_ERROR Device::SetPAI(const chip::ByteSpan & pai)
+{
+    if (pai.size() == 0)
+    {
+        ReleasePAI();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(pai.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mPAILen != 0)
+    {
+        ReleasePAI();
+    }
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(pai.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    if (mPAI == nullptr)
+    {
+        mPAI = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(pai.size()));
+    }
+    VerifyOrReturnError(mPAI != nullptr, CHIP_ERROR_NO_MEMORY);
+    mPAILen = static_cast<uint16_t>(pai.size());
+    memcpy(mPAI, pai.data(), mPAILen);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
@@ -690,9 +697,9 @@ void Device::CancelIMResponseHandler(app::CommandSender * commandObj)
 }
 
 void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute,
-                              Callback::Cancelable * onReportCallback)
+                              Callback::Cancelable * onReportCallback, app::TLVDataFilter tlvDataFilter)
 {
-    mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
+    mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback, tlvDataFilter);
 }
 
 CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
@@ -708,7 +715,7 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     {
         AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback, aTlvDataFilter);
     }
-    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // The application context is used to identify different requests from client application the type of it is intptr_t, here we
     // use the seqNum.
     chip::app::ReadPrepareParams readPrepareParams(mSecureSession.Value());
     readPrepareParams.mpAttributePathParamsList    = &aPath;
@@ -720,6 +727,47 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
         CancelResponseHandler(seqNum);
     }
     return err;
+}
+
+CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
+                                                 uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback)
+{
+    bool loadedSecureSession = false;
+    uint8_t seqNum           = GetNextSequenceNumber();
+    aPath.mNodeId            = GetDeviceId();
+
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    app::AttributePathParams * path = mpIMDelegate->AllocateAttributePathParam(1, seqNum);
+
+    VerifyOrReturnError(path != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    *path = aPath;
+
+    // The application context is used to identify different requests from client application the type of it is intptr_t, here we
+    // use the seqNum.
+    VerifyOrReturnError(GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    app::ReadPrepareParams params(GetSecureSession().Value());
+    params.mpAttributePathParamsList    = path;
+    params.mAttributePathParamsListSize = 1;
+    params.mMinIntervalFloorSeconds     = mMinIntervalFloorSeconds;
+    params.mMaxIntervalCeilingSeconds   = mMaxIntervalCeilingSeconds;
+    params.mKeepSubscriptions           = false;
+
+    CHIP_ERROR err =
+        chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(params, seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpIMDelegate->FreeAttributePathParam(seqNum);
+        return err;
+    }
+
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
@@ -752,12 +800,22 @@ Device::~Device()
         // point.
         mExchangeMgr->CloseAllContextsForDelegate(this);
     }
+
+    ReleaseDAC();
+    ReleasePAI();
 }
 
-CHIP_ERROR Device::ReduceNOCChainBufferSize(size_t new_size)
+CHIP_ERROR Device::SetNOCCertBufferSize(size_t new_size)
 {
-    ReturnErrorCodeIf(new_size > sizeof(mNOCChainBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    mNOCChainBufferSize = new_size;
+    ReturnErrorCodeIf(new_size > sizeof(mNOCCertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    mNOCCertBufferSize = new_size;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::SetICACertBufferSize(size_t new_size)
+{
+    ReturnErrorCodeIf(new_size > sizeof(mICACertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    mICACertBufferSize = new_size;
     return CHIP_NO_ERROR;
 }
 

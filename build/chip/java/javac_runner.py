@@ -19,6 +19,7 @@
 """Wrapper script to run javac command as an action with gn."""
 
 import argparse
+import json
 import os
 import subprocess
 import sys
@@ -78,6 +79,19 @@ def FindCommand(command):
     return None
 
 
+def ReadBuildConfig(build_config):
+    with open(build_config, 'r') as file:
+        return json.load(file)
+
+
+def ComputeClasspath(build_config_json):
+    unique_jars = build_config_json['deps_info']['deps_jars']
+    if sys.platform == 'win32':
+        return ";".join(unique_jars)
+    else:
+        return ":".join(unique_jars)
+
+
 def main():
     java_path = FindCommand('javac')
     if not java_path:
@@ -96,12 +110,24 @@ def main():
         required=True,
         help='Output file containing a list of classes')
     parser.add_argument(
+        '--build-config',
+        dest='build_config',
+        required=True,
+        help='Build config')
+    parser.add_argument(
         'rest', metavar='JAVAC_ARGS', nargs='*', help='Argumets to pass to javac')
 
     args = parser.parse_args()
     if not os.path.isdir(args.classdir):
-        os.makedirs(args.classdir)
-    retcode = subprocess.check_call([java_path] + args.rest)
+        os.makedirs(args.classdir, exist_ok=True)
+
+    build_config_json = ReadBuildConfig(args.build_config)
+    classpath = ComputeClasspath(build_config_json)
+    java_args = [java_path]
+    if classpath:
+        java_args += ["-classpath", classpath]
+
+    retcode = subprocess.check_call(java_args + args.rest)
     if retcode != EXIT_SUCCESS:
         return retcode
 

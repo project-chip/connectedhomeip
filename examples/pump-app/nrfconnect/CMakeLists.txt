@@ -36,7 +36,13 @@ endif()
 
 option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)
 if(BUILD_WITH_DFU)
-    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-dfu_support.conf)
+    if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
+        list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-multi_image_dfu_support.conf)
+        set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_multi_image_dfu.conf CACHE INTERNAL "")
+    else()
+        list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-single_image_dfu_support.conf)
+        set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_single_image_dfu.conf CACHE INTERNAL "")
+    endif()
     set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static.yml)
 endif()
 
@@ -48,6 +54,8 @@ target_compile_options(app PRIVATE -Werror)
 project(chip-nrfconnect-pump-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
+include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 target_include_directories(app PRIVATE
                            main/include
@@ -66,48 +74,13 @@ target_sources(app PRIVATE
                ${GEN_DIR}/pump-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/pump-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
-               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
-               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
-               ${CHIP_ROOT}/src/app/util/af-event.cpp
-               ${CHIP_ROOT}/src/app/util/af-main-common.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-list-byte-span.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-table.cpp
-               ${CHIP_ROOT}/src/app/util/binding-table.cpp
-               ${CHIP_ROOT}/src/app/util/chip-message-send.cpp
-               ${CHIP_ROOT}/src/app/util/client-api.cpp
-               ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
-               ${CHIP_ROOT}/src/app/util/ember-print.cpp
-               ${CHIP_ROOT}/src/app/util/error-mapping.cpp
-               ${CHIP_ROOT}/src/app/util/message.cpp
-               ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
-               ${CHIP_ROOT}/src/app/util/process-global-message.cpp
-               ${CHIP_ROOT}/src/app/util/util.cpp
-               ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
-               ${CHIP_ROOT}/src/app/server/Mdns.cpp
-               ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
-               ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
-               ${CHIP_ROOT}/src/app/server/Server.cpp
-               ${CHIP_ROOT}/src/app/server/StorablePeerConnection.cpp
-               ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
-               ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/pump-configuration-and-control-server/pump-configuration-and-control-server.cpp
+               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
+
+chip_configure_data_model(app
+    INCLUDE_SERVER
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../pump-common/pump-app.zap
 )
 
 if(BUILD_WITH_DFU)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()
-
-include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

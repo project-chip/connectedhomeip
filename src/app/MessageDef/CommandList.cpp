@@ -85,7 +85,6 @@ CHIP_ERROR CommandList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -97,7 +96,6 @@ CommandDataElement::Builder & CommandList::Builder::CreateCommandDataElementBuil
     VerifyOrExit(CHIP_NO_ERROR == mError, mCommandDataElementBuilder.ResetError(mError));
 
     mError = mCommandDataElementBuilder.Init(mpWriter);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mCommandDataElementBuilder would be un-/partial initialized and cannot be used to write anything

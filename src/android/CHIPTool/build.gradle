@@ -21,13 +21,6 @@ allprojects {
     }
 }
 
-ext {
-    // point to the SDK build dir ("../../../../out/android_arm64" for example) to build SDK from
-    // source code and debug in Android Studio, use scripts/examples/android_app.sh to prepare it
-    // null to use SDK prebuilt by scripts/examples/android_app.sh
-    matterBuildSrcDir = null
-}
-
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

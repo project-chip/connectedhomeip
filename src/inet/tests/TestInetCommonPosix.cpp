@@ -50,6 +50,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/ScopedBuffer.h>
+#include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -77,7 +78,7 @@
 using namespace chip;
 using namespace chip::Inet;
 
-System::Layer gSystemLayer;
+System::LayerImpl gSystemLayer;
 
 Inet::InetLayer gInet;
 
@@ -465,9 +466,9 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         aSleepTimeMilliseconds, [](System::Layer *, void *) -> void {}, nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    gSystemLayer.WatchableEventsManager().PrepareEvents();
-    gSystemLayer.WatchableEventsManager().WaitForEvents();
-    gSystemLayer.WatchableEventsManager().HandleEvents();
+    gSystemLayer.PrepareEvents();
+    gSystemLayer.WaitForEvents();
+    gSystemLayer.HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -477,13 +478,13 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
         if (sRemainingSystemLayerEventDelay == 0)
         {
-            gSystemLayer.WatchableEventsManager().DispatchEvents();
+            chip::DeviceLayer::PlatformMgr().RunEventLoop();
             sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
         }
         else
             sRemainingSystemLayerEventDelay--;
 
-        gSystemLayer.WatchableEventsManager().HandlePlatformTimer();
+        gSystemLayer.HandlePlatformTimer();
     }
 #if CHIP_TARGET_STYLE_UNIX
     // TapAddrAutoconf and TapInterface are only needed for LwIP on

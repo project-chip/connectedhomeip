@@ -19,11 +19,10 @@ from .gn import GnBuilder
 
 class QpgBuilder(GnBuilder):
 
-    def __init__(self, root, runner, output_prefix):
+    def __init__(self, root, runner):
         super(QpgBuilder, self).__init__(
             root=os.path.join(root, 'examples/lock-app/qpg/'),
-            runner=runner,
-            output_prefix=output_prefix)
+            runner=runner)
 
     def build_outputs(self):
         return {

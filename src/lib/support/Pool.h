@@ -87,7 +87,7 @@ template <class T, size_t N>
 class BitMapObjectPool : public StaticAllocatorBitmap
 {
 public:
-    BitMapObjectPool() : StaticAllocatorBitmap(mMemory, mUsage, N, sizeof(T)) {}
+    BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
 
     static size_t Size() { return N; }
 
@@ -108,6 +108,13 @@ public:
 
         element->~T();
         Deallocate(element);
+    }
+
+    template <typename... Args>
+    void ResetObject(T * element, Args &&... args)
+    {
+        element->~T();
+        new (element) T(std::forward<Args>(args)...);
     }
 
     /**
@@ -144,7 +151,13 @@ private:
     };
 
     std::atomic<tBitChunkType> mUsage[(N + kBitChunkSize - 1) / kBitChunkSize];
-    alignas(alignof(T)) uint8_t mMemory[N * sizeof(T)];
+    union Data
+    {
+        Data() {}
+        ~Data() {}
+        alignas(alignof(T)) uint8_t mMemory[N * sizeof(T)];
+        T mMemoryViewForDebug[N]; // Just for debugger
+    } mData;
 };
 
 } // namespace chip

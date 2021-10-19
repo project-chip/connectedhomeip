@@ -93,10 +93,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
     UDPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumUDPEps],
                                      aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumUDPEps]);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    RawEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumRawEps],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumRawEps]);
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 }
 
 /**
@@ -118,7 +114,7 @@ InetLayer::InetLayer()
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-chip::System::LwIPEventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
+chip::System::LayerLwIP::EventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -188,7 +184,7 @@ CHIP_ERROR InetLayer::InitQueueLimiter(void)
 {
     if (sem_init(&mDroppableEvents, 0, INET_CONFIG_MAX_DROPPABLE_EVENTS) != 0)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
     return CHIP_NO_ERROR;
 }
@@ -225,13 +221,6 @@ void InetLayer::DroppableEventDequeued(void)
  *  LwIP-based adaptations, this will typically be a pointer to the
  *  event queue associated with the InetLayer instance.
  *
- *  Platforms may choose to assert
- *  #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS in their
- *  platform-specific configuration header and enable the
- *  Platform::InetLayer::WillInit and Platform::InetLayer::DidInit
- *  hooks to effect platform-specific customizations or data extensions
- *  to InetLayer.
- *
  *  @param[in]  aSystemLayer  A required instance of the chip System Layer
  *                            already successfully initialized.
  *
@@ -251,8 +240,6 @@ void InetLayer::DroppableEventDequeued(void)
  */
 CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     Inet::RegisterLayerErrorFormatter();
 
     if (State != kState_NotInitialized)
@@ -264,43 +251,27 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     mPlatformData = nullptr;
 
-    err = Platform::InetLayer::WillInit(this, aContext);
-    SuccessOrExit(err);
-
     mSystemLayer = &aSystemLayer;
     mContext     = aContext;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    err = InitQueueLimiter();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(InitQueueLimiter());
 
-    mSystemLayer->AddEventHandlerDelegate(sInetEventHandlerDelegate);
+    static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     State = kState_Initialized;
 
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    err = mAsyncDNSResolver.Init(this);
-    SuccessOrExit(err);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+    ReturnErrorOnFailure(mAsyncDNSResolver.Init(this));
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
-exit:
-    Platform::InetLayer::DidInit(this, mContext, err);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 /**
  *  This is the InetLayer explicit deinitializer and should be called
  *  prior to disposing of an instantiated InetLayer instance.
- *
- *  Platforms may choose to assert
- *  #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS in their
- *  platform-specific configuration header and enable the
- *  Platform::InetLayer::WillShutdown and
- *  Platform::InetLayer::DidShutdown hooks to effect clean-up of
- *  platform-specific customizations or data extensions to InetLayer.
  *
  *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating
  *          the reason for shutdown failure.
@@ -308,10 +279,7 @@ exit:
  */
 CHIP_ERROR InetLayer::Shutdown()
 {
-    CHIP_ERROR err;
-
-    err = Platform::InetLayer::WillShutdown(this, mContext);
-    SuccessOrExit(err);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (State == kState_Initialized)
     {
@@ -331,17 +299,6 @@ CHIP_ERROR InetLayer::Shutdown()
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        // Close all raw endpoints owned by this Inet layer instance.
-        RawEndPoint::sPool.ForEachActiveObject([&](RawEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Close();
-            }
-            return true;
-        });
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         // Abort all TCP endpoints owned by this instance.
@@ -367,9 +324,6 @@ CHIP_ERROR InetLayer::Shutdown()
     }
 
     State = kState_NotInitialized;
-
-exit:
-    Platform::InetLayer::DidShutdown(this, mContext, err);
 
     return err;
 }
@@ -501,50 +455,6 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
 
     return CHIP_NO_ERROR;
 }
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-/**
- *  Creates a new RawEndPoint object for a specific IP version and protocol.
- *
- *  @note
- *    This function gets a free RawEndPoint object from a pre-allocated pool
- *    and also calls the explicit initializer on the new object.
- *
- *  @param[in]      ipVer          IPv4 or IPv6.
- *
- *  @param[in]      ipProto        A protocol within the IP family (e.g., ICMPv4 or ICMPv6).
- *
- *  @param[in,out]  retEndPoint    A pointer to a pointer of the RawEndPoint object that is
- *                                 a return parameter upon completion of the object creation.
- *                                 *retEndPoint is NULL if creation fails.
- *
- *  @retval  #CHIP_ERROR_INCORRECT_STATE    If the InetLayer object is not initialized.
- *  @retval  #CHIP_ERROR_ENDPOINT_POOL_FULL If the InetLayer RawEndPoint pool is full and no new
- *                                          endpoints can be created.
- *  @retval  #CHIP_NO_ERROR                 On success.
- *
- */
-CHIP_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint)
-{
-    assertChipStackLockedByCurrentThread();
-
-    *retEndPoint = nullptr;
-
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
-
-    *retEndPoint = RawEndPoint::sPool.TryCreate();
-    if (*retEndPoint == nullptr)
-    {
-        ChipLogError(Inet, "%s endpoint pool FULL", "Raw");
-        return CHIP_ERROR_ENDPOINT_POOL_FULL;
-    }
-
-    (*retEndPoint)->Inet::RawEndPoint::Init(this, ipVer, ipProto);
-    SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumRawEps);
-
-    return CHIP_NO_ERROR;
-}
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 /**
@@ -1035,13 +945,6 @@ CHIP_ERROR InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip:
         break;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    case kInetEvent_RawDataReceived:
-        static_cast<RawEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
-        break;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     case kInetEvent_UDPDataReceived:
         static_cast<UDPEndPoint &>(aTarget).HandleDataReceived(
@@ -1085,111 +988,6 @@ void IPPacketInfo::Clear()
     SrcPort     = 0;
     DestPort    = 0;
 }
-
-#if !INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
-
-// MARK: InetLayer platform- and system-specific functions for InetLayer
-//       construction and destruction.
-
-namespace Platform {
-namespace InetLayer {
-
-/**
- * This is a platform-specific InetLayer pre-initialization hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          initialized.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating
- *         the reason for initialization failure. Returning non-successful
- *         status will abort initialization.
- *
- */
-DLL_EXPORT CHIP_ERROR WillInit(Inet::InetLayer * aLayer, void * aContext)
-{
-    (void) aLayer;
-    (void) aContext;
-
-    return CHIP_NO_ERROR;
-}
-
-/**
- * This is a platform-specific InetLayer post-initialization hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          initialized.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @param[in]     anError   The overall status being returned via the
- *                          InetLayer \::Init method.
- *
- */
-DLL_EXPORT void DidInit(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError)
-{
-    (void) aLayer;
-    (void) aContext;
-    (void) anError;
-}
-
-/**
- * This is a platform-specific InetLayer pre-shutdown hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          shutdown.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating
- *         the reason for shutdown failure. Returning non-successful
- *         status will abort shutdown.
- *
- */
-DLL_EXPORT CHIP_ERROR WillShutdown(Inet::InetLayer * aLayer, void * aContext)
-{
-    (void) aLayer;
-    (void) aContext;
-
-    return CHIP_NO_ERROR;
-}
-
-/**
- * This is a platform-specific InetLayer post-shutdown hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          shutdown.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @param[in]     anError   The overall status being returned via the
- *                          InetLayer \::Shutdown method.
- *
- */
-DLL_EXPORT void DidShutdown(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError)
-{
-    (void) aLayer;
-    (void) aContext;
-    (void) anError;
-}
-
-} // namespace InetLayer
-} // namespace Platform
-
-#endif // !INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
 
 } // namespace Inet
 } // namespace chip

@@ -28,6 +28,9 @@
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
+#include <app/MessageDef/StatusResponse.h>
+#include <app/MessageDef/SubscribeRequest.h>
+#include <app/MessageDef/SubscribeResponse.h>
 #include <app/ReadPrepareParams.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -52,6 +55,11 @@ namespace app {
 class ReadClient : public Messaging::ExchangeDelegate
 {
 public:
+    enum class InteractionType : uint8_t
+    {
+        Read,
+        Subscribe,
+    };
     /**
      *  Shut down the Client. This terminates this instance of the object and releases
      *  all held resources.  The object must not be used after Shutdown() is called.
@@ -74,9 +82,28 @@ public:
      */
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
 
+    /**
+     *  Send a subscribe Request.  There can be one Subscribe Request outstanding on a given ReadClient.
+     *  If SendSubscribeRequest returns success, no more subscribe Requests can be sent on this ReadClient
+     *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
+     *
+     *  @retval #others fail to send subscribe request
+     *  @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
+    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
-    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
-    CHIP_ERROR SendStatusReport(CHIP_ERROR aError);
+
+    auto GetSubscriptionId() const
+    {
+        using returnType = Optional<decltype(mSubscriptionId)>;
+        return mInteractionType == InteractionType::Subscribe ? returnType(mSubscriptionId) : returnType::Missing();
+    }
+
+    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    bool IsReadType() { return mInteractionType == InteractionType::Read; }
+    bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
+    CHIP_ERROR SendStatusResponse(CHIP_ERROR aError);
 
 private:
     friend class TestReadInteraction;
@@ -84,11 +111,17 @@ private:
 
     enum class ClientState
     {
-        Uninitialized = 0,     ///< The client has not been initialized
-        Initialized,           ///< The client has been initialized and is ready for a SendReadRequest
-        AwaitingInitialReport, ///< The client is waiting for initial report
+        Uninitialized = 0,         ///< The client has not been initialized
+        Initialized,               ///< The client has been initialized and is ready for a SendReadRequest
+        AwaitingInitialReport,     ///< The client is waiting for initial report
+        AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
+        SubscriptionActive,        ///< The client is maintaining subscription
     };
 
+    bool IsMatchingClient(uint64_t aSubscriptionId)
+    {
+        return aSubscriptionId == mSubscriptionId && mInteractionType == InteractionType::Subscribe;
+    }
     /**
      *  Initialize the client object. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -102,12 +135,13 @@ private:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, uint64_t aAppIdentifier);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                    InteractionType aInteractionType, uint64_t aAppIdentifier);
 
     virtual ~ReadClient() = default;
 
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
@@ -115,16 +149,21 @@ private:
      *
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; }
+    bool IsSubscriptionTypeIdle() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
+    bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
+
     CHIP_ERROR GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder, EventPathParams * apEventPathParamsList,
                                      size_t aEventPathParamsListSize);
     CHIP_ERROR GenerateAttributePathList(AttributePathList::Builder & aAttributeathListBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
 
-    void SetExchangeContext(Messaging::ExchangeContext * apExchangeContext) { mpExchangeCtx = apExchangeContext; }
     void ClearExchangeContext() { mpExchangeCtx = nullptr; }
-
+    static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
+    CHIP_ERROR ProcessSubscribeResponse(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR RefreshLivenessCheckTimer();
+    void CancelLivenessCheckTimer();
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
@@ -142,6 +181,11 @@ private:
     ClientState mState                         = ClientState::Uninitialized;
     uint64_t mAppIdentifier                    = 0;
     bool mInitialReport                        = true;
+    uint16_t mMinIntervalFloorSeconds          = 0;
+    uint16_t mMaxIntervalCeilingSeconds        = 0;
+    uint64_t mSubscriptionId                   = 0;
+    NodeId mPeerNodeId                         = kUndefinedNodeId;
+    InteractionType mInteractionType           = InteractionType::Read;
 };
 
 }; // namespace app

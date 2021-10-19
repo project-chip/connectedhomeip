@@ -18,6 +18,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -107,13 +108,21 @@ void ThreadStackManagerImpl::ThreadDevcieRoleChangedHandler(const gchar * role)
         event.Type = DeviceEventType::kThreadConnectivityChange;
         event.ThreadConnectivityChange.Result =
             attached ? ConnectivityChange::kConnectivity_Established : ConnectivityChange::kConnectivity_Lost;
-        PlatformMgr().PostEvent(&event);
+        CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to post thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+        }
     }
     mAttached = attached;
 
     event.Type                          = DeviceEventType::kThreadStateChange;
     event.ThreadStateChange.RoleChanged = true;
-    PlatformMgr().PostEvent(&event);
+    CHIP_ERROR status                   = PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post thread state change: %" CHIP_ERROR_FORMAT, status.Format());
+    }
 }
 
 void ThreadStackManagerImpl::_ProcessThreadActivity() {}
@@ -212,9 +221,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
     ChipDeviceEvent event;
     event.Type                                           = DeviceEventType::kServiceProvisioningChange;
     event.ServiceProvisioningChange.IsServiceProvisioned = true;
-    PlatformMgr().PostEvent(&event);
-
-    return CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
@@ -453,6 +460,14 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
 CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 {
     // TODO: Remove Weave legacy APIs
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
+
+CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                               app::AttributeValueEncoder & encoder)
+{
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 

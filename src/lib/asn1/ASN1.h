@@ -32,6 +32,7 @@
 
 #include <lib/asn1/ASN1Error.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace TLV {
@@ -60,7 +61,7 @@ enum ASN1TagClasses
     kASN1TagClass_Private         = 0xC0
 };
 
-enum ASN1UniversalTags
+enum ASN1UniversalTags : uint8_t
 {
     kASN1UniversalTag_Boolean         = 1,
     kASN1UniversalTag_Integer         = 2,
@@ -101,10 +102,16 @@ struct ASN1UniversalTime
 class DLL_EXPORT ASN1Reader
 {
 public:
-    void Init(const uint8_t * buf, uint32_t len);
+    void Init(const uint8_t * buf, size_t len);
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
 
     uint8_t GetClass(void) const { return Class; };
-    uint32_t GetTag(void) const { return Tag; };
+    uint8_t GetTag(void) const { return Tag; };
     const uint8_t * GetValue(void) const { return Value; };
     uint32_t GetValueLen(void) const { return ValueLen; };
     bool IsConstructed(void) const { return Constructed; };
@@ -138,7 +145,7 @@ private:
     };
 
     uint8_t Class;
-    uint32_t Tag;
+    uint8_t Tag;
     const uint8_t * Value;
     uint32_t ValueLen;
     bool Constructed;
@@ -162,30 +169,36 @@ private:
 class DLL_EXPORT ASN1Writer
 {
 public:
-    void Init(uint8_t * buf, uint32_t maxLen);
+    void Init(uint8_t * buf, size_t maxLen);
+    void Init(const MutableByteSpan & data) { Init(data.data(), data.size()); }
+    template <size_t N>
+    void Init(uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
     void InitNullWriter(void);
-    uint16_t GetLengthWritten(void) const;
+    size_t GetLengthWritten(void) const;
 
     CHIP_ERROR PutInteger(int64_t val);
     CHIP_ERROR PutBoolean(bool val);
     CHIP_ERROR PutObjectId(const uint8_t * val, uint16_t valLen);
     CHIP_ERROR PutObjectId(OID oid);
-    CHIP_ERROR PutString(uint32_t tag, const char * val, uint16_t valLen);
+    CHIP_ERROR PutString(uint8_t tag, const char * val, uint16_t valLen);
     CHIP_ERROR PutOctetString(const uint8_t * val, uint16_t valLen);
-    CHIP_ERROR PutOctetString(uint8_t cls, uint32_t tag, const uint8_t * val, uint16_t valLen);
-    CHIP_ERROR PutOctetString(uint8_t cls, uint32_t tag, chip::TLV::TLVReader & val);
+    CHIP_ERROR PutOctetString(uint8_t cls, uint8_t tag, const uint8_t * val, uint16_t valLen);
+    CHIP_ERROR PutOctetString(uint8_t cls, uint8_t tag, chip::TLV::TLVReader & tlvReader);
     CHIP_ERROR PutBitString(uint32_t val);
     CHIP_ERROR PutBitString(uint8_t unusedBits, const uint8_t * val, uint16_t valLen);
-    CHIP_ERROR PutBitString(uint8_t unusedBits, chip::TLV::TLVReader & val);
+    CHIP_ERROR PutBitString(uint8_t unusedBits, chip::TLV::TLVReader & tlvReader);
     CHIP_ERROR PutTime(const ASN1UniversalTime & val);
     CHIP_ERROR PutNull(void);
     CHIP_ERROR PutConstructedType(const uint8_t * val, uint16_t valLen);
-    CHIP_ERROR StartConstructedType(uint8_t cls, uint32_t tag);
+    CHIP_ERROR StartConstructedType(uint8_t cls, uint8_t tag);
     CHIP_ERROR EndConstructedType(void);
-    CHIP_ERROR StartEncapsulatedType(uint8_t cls, uint32_t tag, bool bitStringEncoding);
+    CHIP_ERROR StartEncapsulatedType(uint8_t cls, uint8_t tag, bool bitStringEncoding);
     CHIP_ERROR EndEncapsulatedType(void);
-    CHIP_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen);
-    CHIP_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, chip::TLV::TLVReader & val);
+    CHIP_ERROR PutValue(uint8_t cls, uint8_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen);
+    CHIP_ERROR PutValue(uint8_t cls, uint8_t tag, bool isConstructed, chip::TLV::TLVReader & tlvReader);
 
 private:
     static constexpr size_t kMaxDeferredLengthDepth = kMaxConstructedAndEncapsulatedTypesDepth;
@@ -196,10 +209,11 @@ private:
     uint8_t * mDeferredLengthLocations[kMaxDeferredLengthDepth];
     uint8_t mDeferredLengthCount;
 
-    CHIP_ERROR EncodeHead(uint8_t cls, uint32_t tag, bool isConstructed, int32_t len);
+    CHIP_ERROR EncodeHead(uint8_t cls, uint8_t tag, bool isConstructed, int32_t len);
     CHIP_ERROR WriteDeferredLength(void);
     static uint8_t BytesForLength(int32_t len);
     static void EncodeLength(uint8_t * buf, uint8_t bytesForLen, int32_t lenToEncode);
+    void WriteData(const uint8_t * p, size_t len);
 };
 
 OID ParseObjectID(const uint8_t * encodedOID, uint16_t encodedOIDLen);

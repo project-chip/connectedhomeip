@@ -72,6 +72,35 @@ enum class HexFlags : int
 
 CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags);
 
+/**
+ * Encode a uin64_t into hexadecimal, with or without null-termination
+ * and using either lowercase or uppercase hex.
+ *
+ * Default is lowercase output, not null-terminated.
+ *
+ * If `flags` has `HexFlags::kNullTerminate` set, treat `dest_hex` as a
+ * null-terminated string buffer. The function returns CHIP_ERROR_BUFFER_TOO_SMALL
+ * if `dest_size_max` can't fit the entire encoded buffer, and the
+ * null-terminator if enabled. This function will never output truncated data.
+ * The result either fits and is written, or does not fit and nothing is written
+ * to `dest_hex`.
+ *
+ * On success, number of bytes written to destination is always
+ *   output_size = 16 + ((flags & HexFlags::kNullTerminate) ? 1 : 0);
+ *
+ * @param src 64-bit number to convert
+ * @param [out] dest_hex Destination buffer to receive hex encoding
+ * @param dest_size_max Maximum buffer size for the hex encoded `dest_hex` buffer
+ *                      including null-terminator if needed.
+ * @param flags Flags from `HexFlags` for formatting options
+ *
+ * @return CHIP_ERROR_BUFFER_TOO_SMALL on dest_max_size too small to fit output
+ * @return CHIP_ERROR_INVALID_ARGUMENT if either src_bytes or dest_hex is nullptr
+ * @return CHIP_NO_ERROR on success
+ */
+
+CHIP_ERROR BytesToHex(uint64_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags);
+
 // Alias for Uppercase option, no null-termination
 inline CHIP_ERROR BytesToUppercaseHexBuffer(const uint8_t * src_bytes, size_t src_size, char * dest_hex_buf, size_t dest_size_max)
 {

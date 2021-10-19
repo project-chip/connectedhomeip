@@ -1112,18 +1112,13 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
                      CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION);
         mState = kState_Aborting;
     }
-    else if ((resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_V1) ||
-             (resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_V2))
+    else
     {
         // Set Rx and Tx fragment sizes to the same value
         mBtpEngine.SetRxFragmentSize(resp.mFragmentSize);
         mBtpEngine.SetTxFragmentSize(resp.mFragmentSize);
     }
-    else // resp.SelectedProtocolVersion >= kBleTransportProtocolVersion_V3
-    {
-        // This is the peripheral, so set Rx fragment size, and leave Tx at default
-        mBtpEngine.SetRxFragmentSize(resp.mFragmentSize);
-    }
+
     ChipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mBtpEngine.GetRxFragmentSize(), mBtpEngine.GetTxFragmentSize());
 
     ReturnErrorOnFailure(resp.Encode(responseBuf));
@@ -1158,17 +1153,9 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandle &&
     // Set fragment size as minimum of (reported ATT MTU, BTP characteristic size)
     resp.mFragmentSize = chip::min(resp.mFragmentSize, BtpEngine::sMaxFragmentSize);
 
-    if ((resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_V1) ||
-        (resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_V2))
-    {
-        mBtpEngine.SetRxFragmentSize(resp.mFragmentSize);
-        mBtpEngine.SetTxFragmentSize(resp.mFragmentSize);
-    }
-    else // resp.SelectedProtocolVersion >= kBleTransportProtocolVersion_V3
-    {
-        // This is the central, so set Tx fragement size, and leave Rx at default.
-        mBtpEngine.SetTxFragmentSize(resp.mFragmentSize);
-    }
+    mBtpEngine.SetRxFragmentSize(resp.mFragmentSize);
+    mBtpEngine.SetTxFragmentSize(resp.mFragmentSize);
+
     ChipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mBtpEngine.GetRxFragmentSize(), mBtpEngine.GetTxFragmentSize());
 
     // Select local and remote max receive window size based on local resources available for both incoming indications

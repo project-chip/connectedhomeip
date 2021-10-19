@@ -42,6 +42,8 @@ static_library("asn1") {
     "ASN1Writer.cpp",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     ":asn1oid_header",
     "${chip_root}/src/lib/core",

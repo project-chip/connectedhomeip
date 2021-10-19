@@ -17,13 +17,9 @@
 
 #include <app/util/af.h>
 
+#include <app/ConcreteAttributePath.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
-
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/enums.h>
 
 using namespace chip;
 
@@ -33,8 +29,9 @@ void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endp
     // TODO
 }
 
-void emberAfPumpConfigurationAndControlClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
+void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", endpoint, attributeId);
+    emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
+                        attributePath.mAttributeId);
     // TODO
 }

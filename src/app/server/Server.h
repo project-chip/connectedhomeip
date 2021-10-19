@@ -18,87 +18,127 @@
 #pragma once
 
 #include <app/server/AppDelegate.h>
+#include <app/server/CommissioningWindowManager.h>
 #include <inet/InetConfig.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/KeyValueStoreManager.h>
+#include <protocols/secure_channel/CASEServer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
+#include <transport/TransportMgrBase.h>
 #include <transport/raw/BLE.h>
 #include <transport/raw/UDP.h>
 
-struct ServerConfigParams
-{
-    uint16_t securedServicePort   = CHIP_PORT;
-    uint16_t unsecuredServicePort = CHIP_UDC_PORT;
-};
+namespace chip {
 
 constexpr size_t kMaxBlePendingPackets = 1;
 
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
+using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
-                                            ,
-                                            chip::Transport::UDP
+                                              ,
+                                              chip::Transport::UDP
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                                            ,
-                                            chip::Transport::BLE<kMaxBlePendingPackets>
+                                              ,
+                                              chip::Transport::BLE<kMaxBlePendingPackets>
 #endif
-                                            >;
-/**
- * Currently, this method must be called BEFORE InitServer.
- * In the future, it would be nice to be able to call it
- * at any time but that requires handling for changes to every
- * field on ServerConfigParams (restarting port listener, etc).
- *
- */
-void SetServerConfig(ServerConfigParams params);
+                                              >;
 
-/**
- * Initialize DataModelHandler and start CHIP datamodel server, the server
- * assumes the platform's networking has been setup already.
- *
- * @param [in] delegate   An optional AppDelegate
- */
-void InitServer(AppDelegate * delegate = nullptr);
+class Server : public Messaging::ExchangeDelegate
+{
+public:
+    CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
+                    uint16_t unsecureServicePort = CHIP_UDC_PORT);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
+    CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-CHIP_ERROR AddTestCommissioning();
+    CHIP_ERROR AddTestCommissioning();
 
-chip::Transport::FabricTable & GetGlobalFabricTable();
+    FabricTable & GetFabricTable() { return mFabrics; }
 
-namespace chip {
+    Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
-enum class ResetFabrics
-{
-    kYes,
-    kNo,
-};
+    SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
 
-enum class PairingWindowAdvertisement
-{
-    kBle,
-    kMdns,
+    SessionManager & GetSecureSessionManager() { return mSessions; }
+
+    TransportMgrBase & GetTransportManager() { return mTransports; }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
+#endif
+
+    CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
+
+    void Shutdown();
+
+    static Server & GetInstance() { return sServer; }
+
+private:
+    Server() : mCommissioningWindowManager(this) {}
+
+    static Server sServer;
+
+    class ServerStorageDelegate : public PersistentStorageDelegate
+    {
+        CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
+        {
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size));
+            ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
+        {
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size));
+            ChipLogProgress(AppServer, "Saved into server storage: %s", key);
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+        {
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key));
+            ChipLogProgress(AppServer, "Deleted from server storage: %s", key);
+            return CHIP_NO_ERROR;
+        }
+    };
+
+    // Messaging::ExchangeDelegate
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+
+    AppDelegate * mAppDelegate = nullptr;
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * mBleLayer = nullptr;
+#endif
+
+    ServerTransportMgr mTransports;
+    SessionManager mSessions;
+    CASEServer mCASEServer;
+    Messaging::ExchangeManager mExchangeMgr;
+    FabricTable mFabrics;
+    SessionIDAllocator mSessionIDAllocator;
+    secure_channel::MessageCounterManager mMessageCounterManager;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    SecurePairingUsingTestSecret mTestPairing;
+
+    ServerStorageDelegate mServerStorage;
+    CommissioningWindowManager mCommissioningWindowManager;
+
+    // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
+    uint16_t mSecuredServicePort;
+    uint16_t mUnsecuredServicePort;
 };
 
 } // namespace chip
-
-constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
-
-/**
- * Open the pairing window using default configured parameters.
- */
-CHIP_ERROR
-OpenBasicCommissioningWindow(chip::ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds = kNoCommissioningTimeout,
-                             chip::PairingWindowAdvertisement advertisementMode = chip::PairingWindowAdvertisement::kBle);
-
-CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                           chip::PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
-                                           uint16_t passcodeID);
-
-void ClosePairingWindow();
-
-bool IsPairingWindowOpen();

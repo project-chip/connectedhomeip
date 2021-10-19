@@ -31,8 +31,9 @@ namespace app {
 namespace SubscribeResponse {
 enum
 {
-    kCsTag_SubscriptionId           = 0,
-    kCsTag_FinalSyncIntervalSeconds = 1,
+    kCsTag_SubscriptionId            = 0,
+    kCsTag_MinIntervalFloorSeconds   = 1,
+    kCsTag_MaxIntervalCeilingSeconds = 2,
 };
 
 class Parser : public chip::app::Parser
@@ -66,12 +67,20 @@ public:
     CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
 
     /**
-     *  @brief Get FinalSyncIntervalSeconds. Next() must be called before accessing them.
+     *  @brief Get Final MinIntervalFloorSeconds. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetFinalSyncIntervalSeconds(uint16_t * const apFinalSyncIntervalSeconds) const;
+    CHIP_ERROR GetMinIntervalFloorSeconds(uint16_t * const apMinIntervalFloorSeconds) const;
+
+    /**
+     *  @brief Get Final MaxIntervalCeilingSeconds. Next() must be called before accessing them.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const;
 };
 
 class Builder : public chip::app::Builder
@@ -85,9 +94,14 @@ public:
     SubscribeResponse::Builder & SubscriptionId(const uint64_t SubscriptionId);
 
     /**
-     *  @brief Final Sync Interval for the subscription back to the clients.
+     *  @brief Final Min Interval for the subscription back to the clients.
      */
-    SubscribeResponse::Builder & FinalSyncIntervalSeconds(const uint16_t aFinalSyncIntervalSeconds);
+    SubscribeResponse::Builder & MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds);
+
+    /**
+     *  @brief Final Max Interval for the subscription back to the clients.
+     */
+    SubscribeResponse::Builder & MaxIntervalCeilingSeconds(const uint16_t aMaxIntervalCeilingSeconds);
 
     /**
      *  @brief Mark the end of this SubscribeResponse

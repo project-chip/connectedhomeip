@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
-#include <credentials/CHIPOperationalCredentials.h>
+#include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
@@ -45,7 +45,7 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 #include <setup_payload/SetupPayload.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
@@ -62,8 +62,9 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-constexpr size_t kMaxBlePendingPackets = 1;
-constexpr uint32_t kOpCSRNonceLength   = 32;
+constexpr size_t kMaxBlePendingPackets   = 1;
+constexpr size_t kOpCSRNonceLength       = 32;
+constexpr size_t kAttestationNonceLength = 32;
 
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
@@ -76,10 +77,17 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #endif
                                         >;
 
+using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                          ,
+                                          Transport::UDP /* IPv4 */
+#endif
+                                          >;
+
 struct ControllerDeviceInitParams
 {
     DeviceTransportMgr * transportMgr           = nullptr;
-    SecureSessionMgr * sessionMgr               = nullptr;
+    SessionManager * sessionManager             = nullptr;
     Messaging::ExchangeManager * exchangeMgr    = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
     PersistentStorageDelegate * storageDelegate = nullptr;
@@ -87,7 +95,8 @@ struct ControllerDeviceInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-    Transport::FabricTable * fabricsTable = nullptr;
+    FabricTable * fabricsTable                            = nullptr;
+    DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
 class Device;
@@ -123,32 +132,12 @@ public:
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
     // ----- Messaging -----
-    /**
-     * @brief
-     *   Send the provided message to the device
-     *
-     * @param[in] protocolId  The protocol identifier of the CHIP message to be sent.
-     * @param[in] msgType     The message type of the message to be sent.  Must be a valid message type for protocolId.
-     * @param [in] sendFlags  SendMessageFlags::kExpectResponse or SendMessageFlags::kNone
-     * @param[in] message     The message payload to be sent.
-     *
-     * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
-                           System::PacketBufferHandle && message);
-
-    /**
-     * A strongly-message-typed version of SendMessage.
-     */
-    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, Messaging::SendFlags sendFlags, System::PacketBufferHandle && message)
-    {
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), sendFlags,
-                           std::move(message));
-    }
-
     CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
                                         Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
+
+    CHIP_ERROR SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
+                                             uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
+                                             Callback::Cancelable * onFailureCallback);
 
     CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
                                          Callback::Cancelable * onFailureCallback);
@@ -182,20 +171,18 @@ public:
      *   still using them, it can lead to unknown behavior and crashes.
      *
      * @param[in] params       Wrapper object for transport manager etc.
-     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] fabric        Local administrator that's initializing this device object
      */
-    void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
+    void Init(ControllerDeviceInitParams params, FabricIndex fabric)
     {
-        mTransportMgr    = params.transportMgr;
-        mSessionManager  = params.sessionMgr;
+        mSessionManager  = params.sessionManager;
         mExchangeMgr     = params.exchangeMgr;
         mInetLayer       = params.inetLayer;
-        mListenPort      = listenPort;
         mFabricIndex     = fabric;
         mStorageDelegate = params.storageDelegate;
         mIDAllocator     = params.idAllocator;
         mFabricsTable    = params.fabricsTable;
+        mpIMDelegate     = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -213,15 +200,13 @@ public:
      *   is actually paired.
      *
      * @param[in] params       Wrapper object for transport manager etc.
-     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
      * @param[in] fabric        Local administrator that's initializing this device object
      */
-    void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,
-              FabricIndex fabric)
+    void Init(ControllerDeviceInitParams params, NodeId deviceId, const Transport::PeerAddress & peerAddress, FabricIndex fabric)
     {
-        Init(params, mListenPort, fabric);
+        Init(params, fabric);
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
 
@@ -277,12 +262,11 @@ public:
      *                          on.  The Device guarantees that it will call
      *                          Close() on exchange when it's done processing
      *                          the message.
-     * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
      * @param[in] msgBuf        The message buffer
      */
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && msgBuf) override;
 
     /**
      * @brief ExchangeDelegate implementation of OnResponseTimeout.
@@ -368,7 +352,9 @@ public:
 
     bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
 
-    SessionHandle GetSecureSession() const { return mSecureSession.Value(); }
+    chip::Optional<SessionHandle> GetSecureSession() const { return mSecureSession; }
+
+    Messaging::ExchangeManager * GetExchangeManager() const { return mExchangeMgr; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
@@ -378,10 +364,11 @@ public:
     void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             app::TLVDataFilter tlvDataFilter = nullptr);
     void CancelResponseHandler(uint8_t seqNum);
-    void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
+    void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback,
+                          app::TLVDataFilter tlvDataFilter);
 
-    // This two functions are pretty tricky, it is used to bridge the response, we need to implement interaction model delegate on
-    // the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
+    // This two functions are pretty tricky, it is used to bridge the response, we need to implement interaction model delegate
+    // on the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
     // type-safe.
     // TODO: Implement interaction model delegate in the application.
     void AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
@@ -412,11 +399,34 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
-    MutableByteSpan GetMutableNOCChain() { return MutableByteSpan(mNOCChainBuffer, sizeof(mNOCChainBuffer)); }
+    CHIP_ERROR SetAttestationNonce(ByteSpan attestationNonce)
+    {
+        VerifyOrReturnError(attestationNonce.size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mAttestationNonce, attestationNonce.data(), attestationNonce.size());
+        return CHIP_NO_ERROR;
+    }
 
-    CHIP_ERROR ReduceNOCChainBufferSize(size_t new_size);
+    ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)); }
 
-    ByteSpan GetNOCChain() const { return ByteSpan(mNOCChainBuffer, mNOCChainBufferSize); }
+    bool AreCredentialsAvailable() const { return (mDAC != nullptr && mDACLen != 0); }
+
+    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
+    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+
+    CHIP_ERROR SetDAC(const ByteSpan & dac);
+    CHIP_ERROR SetPAI(const ByteSpan & pai);
+
+    MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
+
+    CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
+
+    ByteSpan GetNOCCert() const { return ByteSpan(mNOCCertBuffer, mNOCCertBufferSize); }
+
+    MutableByteSpan GetMutableICACert() { return MutableByteSpan(mICACertBuffer, sizeof(mICACertBuffer)); }
+
+    CHIP_ERROR SetICACertBufferSize(size_t new_size);
+
+    ByteSpan GetICACert() const { return ByteSpan(mICACertBuffer, mICACertBufferSize); }
 
     /*
      * This function can be called to establish a secure session with the device.
@@ -434,6 +444,8 @@ public:
      */
     CHIP_ERROR EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+
+    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() { return mpIMDelegate; };
 
 private:
     enum class ConnectionState
@@ -468,13 +480,13 @@ private:
 
     DeviceStatusDelegate * mStatusDelegate = nullptr;
 
-    SecureSessionMgr * mSessionManager = nullptr;
-
-    DeviceTransportMgr * mTransportMgr = nullptr;
+    SessionManager * mSessionManager = nullptr;
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
+
+    DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 
     uint8_t mSequenceNumber = 0;
 
@@ -488,10 +500,8 @@ private:
      *   This function loads the secure session object from the serialized operational
      *   credentials corresponding to the device. This is typically done when the device
      *   does not have an active secure channel.
-     *
-     * @param[in] resetNeeded   Does the underlying network socket require a reset
      */
-    CHIP_ERROR LoadSecureSessionParameters(ResetTransport resetNeeded);
+    CHIP_ERROR LoadSecureSessionParameters();
 
     /**
      * @brief
@@ -510,25 +520,35 @@ private:
 
     CHIP_ERROR WarmupCASESession();
 
+    void ReleaseDAC();
+    void ReleasePAI();
+
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
 
-    uint16_t mListenPort;
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
-    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
-
-    Transport::FabricTable * mFabricsTable = nullptr;
+    FabricTable * mFabricsTable = nullptr;
 
     bool mDeviceOperationalCertProvisioned = false;
 
     CASESession mCASESession;
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
+    // TODO: Offload Nonces and DAC/PAI into a new struct
     uint8_t mCSRNonce[kOpCSRNonceLength];
+    uint8_t mAttestationNonce[kAttestationNonceLength];
 
-    // The chain can contain ICAC and OpCert
-    uint8_t mNOCChainBuffer[Credentials::kMaxCHIPCertLength * 2];
-    size_t mNOCChainBufferSize = 0;
+    uint8_t * mDAC   = nullptr;
+    uint16_t mDACLen = 0;
+    uint8_t * mPAI   = nullptr;
+    uint16_t mPAILen = 0;
+
+    uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
+    size_t mNOCCertBufferSize = 0;
+
+    uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
+    size_t mICACertBufferSize = 0;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

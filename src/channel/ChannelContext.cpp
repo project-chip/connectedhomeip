@@ -48,7 +48,7 @@ bool ChannelContext::MatchNodeId(NodeId nodeId)
     case ChannelState::kPreparing:
         return nodeId == GetPrepareVars().mBuilder.GetPeerNodeId();
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
+        auto state = mExchangeManager->GetSessionManager()->GetSecureSession(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
         return nodeId == state->GetPeerNodeId();
@@ -73,7 +73,7 @@ bool ChannelContext::MatchTransport(Transport::Type transport)
         }
         return false;
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
+        auto state = mExchangeManager->GetSessionManager()->GetSecureSession(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
         return transport == state->GetPeerAddress().GetTransportType();
@@ -121,7 +121,7 @@ bool ChannelContext::IsCasePairing()
     return mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kCasePairing;
 }
 
-bool ChannelContext::MatchesSession(SessionHandle session, SecureSessionMgr * ssm)
+bool ChannelContext::MatchesSession(SessionHandle session, SessionManager * sessionManager)
 {
     switch (mState)
     {
@@ -129,9 +129,9 @@ bool ChannelContext::MatchesSession(SessionHandle session, SecureSessionMgr * ss
         switch (GetPrepareVars().mState)
         {
         case PrepareState::kCasePairing: {
-            auto state = ssm->GetPeerConnectionState(session);
+            auto state = sessionManager->GetSecureSession(session);
             return (state->GetPeerNodeId() == GetPrepareVars().mBuilder.GetPeerNodeId() &&
-                    state->GetPeerKeyID() == GetPrepareVars().mBuilder.GetPeerKeyID());
+                    state->GetPeerSessionId() == GetPrepareVars().mBuilder.GetPeerSessionId());
         }
         default:
             return false;
@@ -181,7 +181,7 @@ void ChannelContext::EnterAddressResolve()
     // The HandleNodeIdResolve may already have been called, recheck the state here before set up the timer
     if (mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kAddressResolving)
     {
-        System::Layer * layer = mExchangeManager->GetSessionMgr()->SystemLayer();
+        System::Layer * layer = mExchangeManager->GetSessionManager()->SystemLayer();
         layer->StartTimer(CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS, AddressResolveTimeout, this);
         Retain(); // Keep the pointer in the timer
     }
@@ -206,7 +206,7 @@ void ChannelContext::AddressResolveTimeout()
     EnterFailedState(CHIP_ERROR_PEER_NODE_NOT_FOUND);
 }
 
-void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Mdns::MdnsService & address)
+void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Dnssd::DnssdService & address)
 {
     switch (mState)
     {
@@ -258,14 +258,23 @@ void ChannelContext::EnterCasePairingState()
     auto & prepare              = GetPrepareVars();
     prepare.mCasePairingSession = Platform::New<CASESession>();
 
-    ExchangeContext * ctxt =
-        mExchangeManager->NewContext(SessionHandle::TemporaryUnauthenticatedSession(), prepare.mCasePairingSession);
-    VerifyOrReturn(ctxt != nullptr);
-
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
-    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+
+    auto session = mExchangeManager->GetSessionManager()->CreateUnauthenticatedSession(addr);
+    if (!session.HasValue())
+    {
+        ExitCasePairingState();
+        ExitPreparingState();
+        EnterFailedState(CHIP_ERROR_NO_MEMORY);
+        return;
+    }
+
+    ExchangeContext * ctxt = mExchangeManager->NewContext(session.Value(), prepare.mCasePairingSession);
+    VerifyOrReturn(ctxt != nullptr);
+
+    FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
     VerifyOrReturn(fabric != nullptr);
     CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, fabric, prepare.mBuilder.GetPeerNodeId(),
                                                                    mExchangeManager->GetNextKeyId(), ctxt, this);

@@ -101,6 +101,7 @@ static_library("core") {
     "CHIPTLVUpdater.cpp",
     "CHIPTLVUtilities.cpp",
     "CHIPTLVWriter.cpp",
+    "GroupId.h",
     "NodeId.h",
     "PeerId.h",
   ]

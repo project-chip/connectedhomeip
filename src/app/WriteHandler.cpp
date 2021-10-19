@@ -62,7 +62,6 @@ CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeC
     err = SendWriteResponse();
 
 exit:
-    ChipLogFunctError(err);
     Shutdown();
     return err;
 }
@@ -71,7 +70,7 @@ CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributeStatusList::Builder attributeStatusList;
-    VerifyOrExit(mState == State::AddAttributeStatusCode, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
     attributeStatusList = mWriteResponseBuilder.GetAttributeStatusListBuilder().EndOfAttributeStatusList();
     err                 = attributeStatusList.GetError();
     SuccessOrExit(err);
@@ -84,7 +83,6 @@ CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -93,7 +91,7 @@ CHIP_ERROR WriteHandler::SendWriteResponse()
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packet;
 
-    VerifyOrExit(mState == State::AddAttributeStatusCode, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = FinalizeMessage(packet);
     SuccessOrExit(err);
@@ -105,7 +103,6 @@ CHIP_ERROR WriteHandler::SendWriteResponse()
     MoveToState(State::Sending);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -164,7 +161,6 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -203,14 +199,13 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     err = ProcessAttributeDataList(attributeDataListReader);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
 CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                                AttributeStatusElement::Builder aAttributeStatusElement)
+                                                AttributeStatusIB::Builder aAttributeStatusIB)
 {
-    AttributePath::Builder attributePath = aAttributeStatusElement.CreateAttributePathBuilder();
+    AttributePath::Builder attributePath = aAttributeStatusIB.CreateAttributePathBuilder();
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
     {
         attributePath.FieldId(aAttributePathParams.mFieldId);
@@ -229,35 +224,32 @@ CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAtt
     return attributePath.GetError();
 }
 
-CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAttributePathParams,
-                                                const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                const Protocols::Id aProtocolId,
-                                                const Protocols::InteractionModel::ProtocolCode aProtocolCode)
+CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,
+                                   const Protocols::InteractionModel::Status aStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusElement::Builder statusElementBuilder;
-    AttributeStatusElement::Builder attributeStatusElement =
+    StatusIB::Builder statusIBBuilder;
+    StatusIB statusIB;
+    AttributeStatusIB::Builder attributeStatusIB =
         mWriteResponseBuilder.GetAttributeStatusListBuilder().CreateAttributeStatusBuilder();
-    err = attributeStatusElement.GetError();
+    err = attributeStatusIB.GetError();
     SuccessOrExit(err);
 
-    err = ConstructAttributePath(aAttributePathParams, attributeStatusElement);
+    err = ConstructAttributePath(aAttributePathParams, attributeStatusIB);
     SuccessOrExit(err);
 
-    statusElementBuilder = attributeStatusElement.CreateStatusElementBuilder();
-    statusElementBuilder
-        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), chip::to_underlying(aProtocolCode))
-        .EndOfStatusElement();
-    err = statusElementBuilder.GetError();
+    statusIB.mStatus = aStatus;
+    statusIBBuilder  = attributeStatusIB.CreateStatusIBBuilder();
+    statusIBBuilder.EncodeStatusIB(statusIB);
+    err = statusIBBuilder.GetError();
     SuccessOrExit(err);
 
-    attributeStatusElement.EndOfAttributeStatusElement();
-    err = attributeStatusElement.GetError();
+    attributeStatusIB.EndOfAttributeStatusIB();
+    err = attributeStatusIB.GetError();
     SuccessOrExit(err);
-    MoveToState(State::AddAttributeStatusCode);
+    MoveToState(State::AddStatus);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -272,8 +264,8 @@ const char * WriteHandler::GetStateStr() const
     case State::Initialized:
         return "Initialized";
 
-    case State::AddAttributeStatusCode:
-        return "AddAttributeStatusCode";
+    case State::AddStatus:
+        return "AddStatus";
     case State::Sending:
         return "Sending";
     }

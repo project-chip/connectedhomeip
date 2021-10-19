@@ -21,18 +21,23 @@ on:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-    cancel-in-progress: true    
+    cancel-in-progress: true
 
 jobs:
     infineon:
         name: Infineon examples building
         timeout-minutes: 30
 
+        env:
+            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
+            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+            GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-infineon:latest
+            image: connectedhomeip/chip-build-infineon:0.5.15
 
         steps:
             - name: Checkout
@@ -44,7 +49,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -54,5 +59,15 @@ jobs:
               timeout-minutes: 10
               run: |
                 scripts/run_in_build_env.sh \
-                  "scripts/build/build_examples.py --no-log-timestamps --platform infineon --app lock build"
+                  "scripts/build/build_examples.py --no-log-timestamps --target-glob 'infineon-*' build"
+                .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    p6 default lock-app \
+                    out/infineon-p6-lock/chip-p6-lock-example.out
 
+            - name: Uploading Size Reports
+              uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
+              with:
+                  name: Size,P6-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  path: |
+                    out/infineon-p6-lock/p6-default-lock-app-sizes.json

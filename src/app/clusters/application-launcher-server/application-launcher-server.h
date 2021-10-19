@@ -20,6 +20,9 @@
  *server implementation of the Application Launcher cluster.
  *******************************************************************************
  ******************************************************************************/
+
+#pragma once
+
 struct ApplicationLauncherResponse
 {
     uint8_t status;

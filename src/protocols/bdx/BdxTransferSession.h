@@ -12,6 +12,8 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
+#include <type_traits>
+
 namespace chip {
 namespace bdx {
 
@@ -86,6 +88,14 @@ public:
         uint8_t MessageType;
 
         MessageTypeData() : ProtocolId(Protocols::NotSpecified), MessageType(0) {}
+
+        bool HasProtocol(Protocols::Id protocol) const { return ProtocolId == protocol; }
+        bool HasMessageType(uint8_t type) const { return MessageType == type; }
+        template <typename TMessageType, typename = std::enable_if_t<std::is_enum<TMessageType>::value>>
+        bool HasMessageType(TMessageType type) const
+        {
+            return HasProtocol(Protocols::MessageTypeTraits<TMessageType>::ProtocolId()) && HasMessageType(to_underlying(type));
+        }
     };
 
     /**

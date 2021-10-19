@@ -16,20 +16,96 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <lib/core/Optional.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::SoftwareDiagnostics;
+using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
+using chip::DeviceLayer::PlatformManager;
 
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+namespace {
+
+class SoftwareDiagosticsAttrAccess : public AttributeAccessInterface
 {
+public:
+    // Register for the SoftwareDiagnostics cluster on all endpoints.
+    SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
+
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), AttributeValueEncoder & aEncoder);
+};
+
+SoftwareDiagosticsAttrAccess gAttrAccess;
+
+CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    if (aPath.mClusterId != SoftwareDiagnostics::Id)
+    {
+        // We shouldn't have been called at all.
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case CurrentHeapFree::Id: {
+        return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aEncoder);
+    }
+    case CurrentHeapUsed::Id: {
+        return ReadIfSupported(&PlatformManager::GetCurrentHeapUsed, aEncoder);
+    }
+    case CurrentHeapHighWatermark::Id: {
+        return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aEncoder);
+    }
+    default: {
+        break;
+    }
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &),
+                                                         AttributeValueEncoder & aEncoder)
+{
+    uint64_t data;
+    CHIP_ERROR err = (DeviceLayer::PlatformMgr().*getter)(data);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        data = 0;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    return aEncoder.Encode(data);
+}
+} // anonymous namespace
+
+bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath,
+                                                              const Commands::ResetWatermarks::DecodableType & commandData)
+{
+    EndpointId endpoint = commandPath.mEndpointId;
+
     uint64_t currentHeapUsed;
 
-    EmberAfStatus status = SoftwareDiagnostics::Attributes::GetCurrentHeapUsed(endpoint, &currentHeapUsed);
+    EmberAfStatus status = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Get(endpoint, &currentHeapUsed);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to get the value of the CurrentHeapUsed attribute"));
 
-    status = SoftwareDiagnostics::Attributes::SetCurrentHeapHighWatermark(endpoint, currentHeapUsed);
+    status = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Set(endpoint, currentHeapUsed);
     VerifyOrExit(
         status == EMBER_ZCL_STATUS_SUCCESS,
         ChipLogError(
@@ -40,4 +116,14 @@ exit:
     emberAfSendImmediateDefaultResponse(status);
 
     return true;
+}
+
+void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+{
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gAttrAccess);
+        attrAccessRegistered = true;
+    }
 }

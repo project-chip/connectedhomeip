@@ -48,7 +48,6 @@ CHIP_ERROR CommandPath::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -148,7 +147,6 @@ CHIP_ERROR CommandPath::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -174,14 +172,13 @@ CHIP_ERROR CommandPath::Parser::GetCommandId(chip::CommandId * const apCommandId
     return GetUnsignedInteger(kCsTag_CommandId, apCommandId);
 }
 
-CHIP_ERROR CommandPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
+CHIP_ERROR CommandPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);
     SuccessOrExit(mError);
 
 exit:
-    ChipLogFunctError(mError);
     return mError;
 }
 
@@ -201,7 +198,6 @@ CommandPath::Builder & CommandPath::Builder::EndpointId(const chip::EndpointId a
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -212,7 +208,6 @@ CommandPath::Builder & CommandPath::Builder::GroupId(const chip::GroupId aGroupI
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_GroupId), aGroupId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -223,7 +218,6 @@ CommandPath::Builder & CommandPath::Builder::ClusterId(const chip::ClusterId aCl
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -234,7 +228,6 @@ CommandPath::Builder & CommandPath::Builder::CommandId(const chip::CommandId aCo
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_CommandId), aCommandId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

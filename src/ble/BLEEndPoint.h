@@ -107,6 +107,7 @@ public:
     bool ConnectionObjectIs(BLE_CONNECTION_OBJECT connObj) { return connObj == mConnObj; }
     void Close();
     void Abort();
+    void ReleaseBleConnection();
 
 private:
     BleLayer * mBle; ///< [READ-ONLY] Pointer to the BleLayer object that owns this object.
@@ -223,7 +224,6 @@ private:
     // Close functions:
     void DoCloseCallback(uint8_t state, uint8_t flags, CHIP_ERROR err);
     void FinalizeClose(uint8_t state, uint8_t flags, CHIP_ERROR err);
-    void ReleaseBleConnection();
     void Free();
     void FreeBtpEngine();
 

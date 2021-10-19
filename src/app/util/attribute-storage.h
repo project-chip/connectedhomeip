@@ -42,6 +42,8 @@
 #pragma once
 
 //#include PLATFORM_HEADER
+#include <app/AttributeAccessInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
@@ -88,8 +90,8 @@
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName) EmberAfAttributeMetadata attrListName[] = {
 
-#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(clusterRevision)                                                                        \
-    , { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(clusterRevision) } /* cluster revision */                               \
+#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
+    , { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() } /* cluster revision */            \
     }
 
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
@@ -199,13 +201,11 @@ void emAfSaveAttributeToToken(uint8_t * data, chip::EndpointId endpoint, chip::C
                               EmberAfAttributeMetadata * metadata);
 
 // Calls the attribute changed callback
-void emAfClusterAttributeChangedCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                         uint8_t clientServerMask, uint16_t manufacturerCode);
+void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t clientServerMask);
 
 // Calls the attribute changed callback for a specific cluster.
-EmberAfStatus emAfClusterPreAttributeChangedCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                     chip::AttributeId attributeId, uint8_t clientServerMask,
-                                                     uint16_t manufacturerCode, EmberAfAttributeType attributeType, uint16_t size,
+EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     uint8_t clientServerMask, EmberAfAttributeType attributeType, uint16_t size,
                                                      uint8_t * value);
 
 // Calls the default response callback for a specific cluster, and wraps emberAfClusterDefaultResponseWithMfgCodeCallback
@@ -254,3 +254,22 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, Emb
                                         uint8_t deviceVersion);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
+
+/**
+ * Register an attribute access override.  It will remain registered until
+ * the endpoint it's registered for is disabled (or until shutdown if it's
+ * registered for all endpoints).  Registration will fail if there is an
+ * already-registered override for the same set of attributes.
+ *
+ * @return false if there is an existing override that the new one would
+ *               conflict with.  In this case the override is not registered.
+ * @return true if registration was successful.
+ */
+bool registerAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
+
+/**
+ * Find an attribute access override, if any, that is registered for the given
+ * endpoint and cluster id.  This might be an override specific to the given
+ * endpoint, or might be one registered for all endpoints.
+ */
+chip::app::AttributeAccessInterface * findAttributeAccessOverride(chip::EndpointId endpointId, chip::ClusterId clusterId);

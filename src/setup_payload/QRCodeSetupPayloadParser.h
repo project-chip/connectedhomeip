@@ -21,6 +21,8 @@
  *      CHIP specification.
  */
 
+#pragma once
+
 #include "SetupPayload.h"
 
 #include <lib/core/CHIPError.h>
@@ -43,6 +45,7 @@ private:
 public:
     QRCodeSetupPayloadParser(std::string base38Representation) : mBase38Representation(std::move(base38Representation)) {}
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
+    static std::string ExtractPayload(std::string inString);
 
 private:
     CHIP_ERROR retrieveOptionalInfos(SetupPayload & outPayload, TLV::ContiguousBufferTLVReader & reader);

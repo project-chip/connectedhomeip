@@ -2772,30 +2772,6 @@
 #define emberAfAttributesPrintString(buffer)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
 
-// Printing macros for Reporting
-// Prints messages related to reporting
-#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_REPORTING)
-#define emberAfReportingPrint(...) emberAfPrint(EMBER_AF_PRINT_REPORTING, __VA_ARGS__)
-#define emberAfReportingPrintln(...) emberAfPrintln(EMBER_AF_PRINT_REPORTING, __VA_ARGS__)
-// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
-#define emberAfReportingFlush()
-#define emberAfReportingDebugExec(x)                                                                                               \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_REPORTING))                                                                             \
-    {                                                                                                                              \
-        x;                                                                                                                         \
-    }
-#define emberAfReportingPrintBuffer(buffer, len, withSpace)                                                                        \
-    emberAfPrintBuffer(EMBER_AF_PRINT_REPORTING, (buffer), (len), (withSpace))
-#define emberAfReportingPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_REPORTING, (buffer))
-#else
-#define emberAfReportingPrint(...)
-#define emberAfReportingPrintln(...)
-#define emberAfReportingFlush()
-#define emberAfReportingDebugExec(x)
-#define emberAfReportingPrintBuffer(buffer, len, withSpace)
-#define emberAfReportingPrintString(buffer)
-#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_REPORTING)
-
 // Printing macros for Service discovery
 // Prints messages related to service discovery
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_SERVICE_DISCOVERY)

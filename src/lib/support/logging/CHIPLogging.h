@@ -253,63 +253,6 @@ bool IsCategoryEnabled(uint8_t category);
 
 #endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
-/**
- *  @def ChipLogFunctError(aErr)
- *
- *  @brief
- *    If the given error value (@a aErr) is not successful (!= CHIP_NO_ERROR),
- *    the method logs the file name, line number, and the error code.
- *
- *  @note
- *    Evaluation of @a aErr is always done, but logging is only enabled when
- *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING is enabled. This can be turned
- *    on or off for each compilation unit by enabling or disabling, as desired,
- *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING before ChipLogging.h is included
- *    by the preprocessor.
- *
- *  Example Usage:
- *
- *  @code
- *  #define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
- *
- *  #include <chip/Support/Logging/ChipLogging.h>
- *
- *  ...
- *
- *  void foo(void)
- *  {
- *      CHIP_ERROR err = CHIP_NO_ERROR;
- *
- *      ...
- *
- *  exit:
- *      ChipLogFunctError(err);
- *  }
- *  @endcode
- *
- *  @param[in]  aErr     A scalar status to be evaluated against CHIP_NO_ERROR.
- *
- *  @sa #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
- *
- */
-
-#if CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING && !defined(ChipLogFunctError)
-
-#define ChipLogFunctError(aErr)                                                                                                    \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if ((aErr) != CHIP_NO_ERROR)                                                                                               \
-        {                                                                                                                          \
-            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(aErr), __FILE__, __LINE__);                                         \
-        }                                                                                                                          \
-    } while (0)
-
-#else // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
-#define ChipLogFunctError(aErr) IgnoreUnusedVariable(aErr)
-
-#endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
 /*
  *  @brief
  *      Macro for use in a string formatter for a 64-bit hex print.
@@ -379,6 +322,40 @@ bool IsCategoryEnabled(uint8_t category);
  *  @param[in]  aValue    "32-bit value that will be split in 16-bit MSB/LSB part
  */
 #define ChipLogValueMEI(aValue) static_cast<uint16_t>(aValue >> 16), static_cast<uint16_t>(aValue)
+
+/**
+ * Logging helpers for exchanges.  For now just log the exchange id and whether
+ * it's an initiator or responder, but eventually we may want to log the peer
+ * node id as well (especially for the responder case).  Some callsites only
+ * have the exchange id and initiator/responder boolean, not an actual exchange,
+ * so we want to have a helper for that case too.
+ */
+#define ChipLogFormatExchangeId "%" PRIu16 "%c"
+#define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
+#define ChipLogFormatExchange ChipLogFormatExchangeId
+#define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
+#define ChipLogValueExchangeIdFromSentHeader(payloadHeader)                                                                        \
+    ChipLogValueExchangeId((payloadHeader).GetExchangeID(), (payloadHeader).IsInitiator())
+// A received header's initiator boolean is the inverse of the exchange's.
+#define ChipLogValueExchangeIdFromReceivedHeader(payloadHeader)                                                                    \
+    ChipLogValueExchangeId((payloadHeader).GetExchangeID(), !(payloadHeader).IsInitiator())
+
+/**
+ * Logging helpers for protocol ids.  A protocol id is a (vendor-id,
+ * protocol-id) pair.
+ */
+#define ChipLogFormatProtocolId "(%" PRIu16 ", %" PRIu16 ")"
+#define ChipLogValueProtocolId(id) (id).GetVendorId(), (id).GetProtocolId()
+
+/**
+ * Logging helpers for message counters, so we format them consistently.
+ */
+#define ChipLogFormatMessageCounter "%" PRIu32
+
+/**
+ * Logging helpers for message types, so we format them consistently.
+ */
+#define ChipLogFormatMessageType "0x%" PRIx8
 
 } // namespace Logging
 } // namespace chip

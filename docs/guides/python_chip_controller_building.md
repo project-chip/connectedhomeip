@@ -223,7 +223,7 @@ with network credentials.
         Done
         ```
 
-    Matter specifiction does not define how the Thread or Wi-Fi credentials are
+    Matter specification does not define how the Thread or Wi-Fi credentials are
     obtained by Controller. For example, for Thread, instead of fetching
     datasets directly from the Thread Border Router, you might also use a
     different out-of-band method.
@@ -248,7 +248,7 @@ with network credentials.
 #### Commissioning a Wi-Fi device
 
 1. Assuming your Wi-Fi SSID is _TESTSSID_, and your Wi-Fi password is
-   _P455W4RD_, inject the credentials to the device by excuting the following
+   _P455W4RD_, inject the credentials to the device by executing the following
    command:
 
     ```
@@ -396,7 +396,7 @@ If no nodeid given, a random Node ID will be used.
 
 ### `close-session <nodeid>`
 
-If case there eixsts an open session (PASE or CASE) to the device with a given
+If case there exists an open session (PASE or CASE) to the device with a given
 Node ID, mark it as expired.
 
 ### `discover`
@@ -470,7 +470,7 @@ chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
 For any integer and char string (null terminated) types, just use `key=value`,
 for example: `rate=2`, `string=123`, `string_2="123 456"`
 
-For byte string type, use `key=encoding:value`, currectly, we support `str` and
+For byte string type, use `key=encoding:value`, currently, we support `str` and
 `hex` encoding, the `str` encoding will encode a NULL terminated string. For
 example, `networkId=hex:0123456789abcdef` (for
 `[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for
@@ -574,10 +574,39 @@ chip-device-ctrl > zclwrite TestCluster CharString 1 1 0 233233
 Note: The format of the value is the same as the format of argument values for
 ZCL cluster commands.
 
-### `zclconfigure <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval> <Change>`
+### `zclsubscribe <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval>`
 
 Configure ZCL attribute reporting settings. For example:
 
 ```
-chip-device-ctrl > zclconfigure OccupancySensing Occupancy 1234 1 0 1000 2000 1
+chip-device-ctrl > zclsubscribe OccupancySensing Occupancy 1234 1 10 20
 ```
+
+### `zclsubscribe -shutdown <subscription id>`
+
+Shutdown an existing attribute subscription.
+
+```
+chip-device-ctrl > zclsubscribe -shutdown 0xdeadbeefcafe
+```
+
+The subscription id can be obtained from previous subscription messages:
+
+```
+chip-device-ctrl > zclsubscribe OnOff OnOff 1 1 10 20
+(omitted messages)
+[1633922898.965587][1117858:1117866] CHIP:DMG: SubscribeResponse =
+[1633922898.965599][1117858:1117866] CHIP:DMG: {
+[1633922898.965610][1117858:1117866] CHIP:DMG:  SubscriptionId = 0xdeadbeefcafe,
+[1633922898.965622][1117858:1117866] CHIP:DMG:  MinIntervalFloorSeconds = 0xa,
+[1633922898.965633][1117858:1117866] CHIP:DMG:  MaxIntervalCeilingSeconds = 0x14,
+[1633922898.965644][1117858:1117866] CHIP:DMG: }
+[1633922898.965662][1117858:1117866] CHIP:ZCL: SubscribeResponse:
+[1633922898.965673][1117858:1117866] CHIP:ZCL:   SubscriptionId:        0xdeadbeefcafe
+[1633922898.965683][1117858:1117866] CHIP:ZCL:   ApplicationIdentifier: 0
+[1633922898.965694][1117858:1117866] CHIP:ZCL:   status: EMBER_ZCL_STATUS_SUCCESS (0x00)
+[1633922898.965709][1117858:1117866] CHIP:ZCL:   attributeValue: false
+(omitted messages)
+```
+
+The subscription id is `0xdeadbeefcafe` in this case

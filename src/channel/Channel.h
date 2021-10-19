@@ -43,7 +43,6 @@
 
 #pragma once
 
-#include <credentials/CHIPOperationalCredentials.h>
 #include <inet/IPAddress.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -90,27 +89,10 @@ public:
     }
     TransportPreference GetTransportPreference() const { return mTransportPreference; }
 
-    uint16_t GetPeerKeyID() const { return mCaseParameters.mPeerKeyId; }
-    ChannelBuilder & SetPeerKeyID(uint16_t keyId)
+    uint16_t GetPeerSessionId() const { return mCaseParameters.mPeerSessionId; }
+    ChannelBuilder & SetPeerSessionId(uint16_t sessionId)
     {
-        mCaseParameters.mPeerKeyId = keyId;
-        return *this;
-    }
-
-    Credentials::OperationalCredentialSet & GetOperationalCredentialSet() const
-    {
-        return *mCaseParameters.mOperationalCredentialSet;
-    }
-    ChannelBuilder & SetOperationalCredentialSet(Credentials::OperationalCredentialSet * operationalCredentialSet)
-    {
-        mCaseParameters.mOperationalCredentialSet = operationalCredentialSet;
-        return *this;
-    }
-
-    uint8_t GetOperationalCredentialSetIndex() const { return mCaseParameters.mOperationalCredentialSetIndex; }
-    ChannelBuilder & SetOperationalCredentialSetIndex(uint8_t operationalCredentialSetIndex)
-    {
-        mCaseParameters.mOperationalCredentialSetIndex = operationalCredentialSetIndex;
+        mCaseParameters.mPeerSessionId = sessionId;
         return *this;
     }
 
@@ -126,9 +108,7 @@ private:
     TransportPreference mTransportPreference = TransportPreference::kDefault;
     struct
     {
-        uint16_t mPeerKeyId;
-        Credentials::OperationalCredentialSet * mOperationalCredentialSet;
-        uint8_t mOperationalCredentialSetIndex;
+        uint16_t mPeerSessionId;
     } mCaseParameters;
 
     Optional<Inet::IPAddress> mForcePeerAddr;

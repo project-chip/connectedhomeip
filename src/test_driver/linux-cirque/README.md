@@ -47,7 +47,7 @@ You can run the tests by:
 scripts/tests/cirque_tests.sh run_all_tests
 ```
 
-You can get more infomation from the terminal output (like the location of
+You can get more information from the terminal output (like the location of
 logs).
 
 > Note: The container (as well as the networks) will be preserved for debugging.
@@ -74,7 +74,7 @@ The output of the test will be written to `stdout` and `stderr`.
 
 ## Specify log directory
 
-To specify log directory, simplily set `LOG_DIR` variable.
+To specify log directory, simply set `LOG_DIR` variable.
 
 ```
 export LOG_DIR=/some/log/directory
@@ -131,5 +131,5 @@ It will print the container id in log, you can execute commands inside them.
 After you finished you test, press `Ctrl-C` and it will clean up testing
 environment.
 
-Refer to `test-manual.py`, `ManualTest.sh`, and tolologies file under
+Refer to `test-manual.py`, `ManualTest.sh`, and topologies file under
 `topologies` for detail.

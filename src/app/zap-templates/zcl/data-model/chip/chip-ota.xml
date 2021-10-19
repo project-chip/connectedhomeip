@@ -17,16 +17,19 @@ limitations under the License.
 <configurator>
     <domain name="CHIP" spec="chip-0.7" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
     <enum name="OTAQueryStatus" type="ENUM8">
+        <cluster code="0x0029"/>
         <item name="UpdateAvailable" value="0x0"/>
         <item name="Busy" value="0x1"/>
         <item name="NotAvailable" value="0x2"/>
     </enum>
     <enum name="OTAApplyUpdateAction" type="ENUM8">
+        <cluster code="0x0029"/>
         <item name="Proceed" value="0x0"/>
         <item name="AwaitNextAction" value="0x1"/>
         <item name="Discontinue" value="0x2"/>
     </enum>
     <enum name="OTADownloadProtocol" type="ENUM8">
+        <cluster code="0x0029"/>
         <item name="BDXSynchronous" value="0x0"/>
         <item name="BDXAsynchronous" value="0x1"/>
         <item name="HTTPS" value="0x2"/>
@@ -44,9 +47,8 @@ limitations under the License.
             <description>Determine availability of a new Software Image</description>
             <arg name="vendorId" type="INT16U"/>
             <arg name="productId" type="INT16U"/>
-            <arg name="imageType" type="INT16U"/>
             <arg name="hardwareVersion" type="INT16U"/>
-            <arg name="currentVersion" type="INT32U"/>
+            <arg name="softwareVersion" type="INT32U"/>
             <arg name="protocolsSupported" type="OTADownloadProtocol"/> <!-- TODO(#8605): add array="true" when lists are supported -->
             <arg name="location" type="CHAR_STRING" length="2"/>
             <arg name="requestorCanConsent" type="BOOLEAN"/>
@@ -60,7 +62,7 @@ limitations under the License.
         <command source="client" code="0x02" name="NotifyUpdateApplied" optional="false" cli="chip ota notifyupdateapplied">
             <description>Notify OTA Provider that an update was applied</description>
             <arg name="updateToken" type="OCTET_STRING" length="32"/>
-            <arg name="currentVersion" type="INT32U"/>
+            <arg name="softwareVersion" type="INT32U"/>
         </command>
         <command source="server" code="0x03" name="QueryImageResponse" optional="false" cli="chip ota queryimageresponse">
             <description>Response to QueryImage command</description>
@@ -68,6 +70,7 @@ limitations under the License.
             <arg name="delayedActionTime" type="INT32U"/>
             <arg name="imageURI" type="CHAR_STRING"/>
             <arg name="softwareVersion" type="INT32U"/>
+            <arg name="softwareVersionString" type="CHAR_STRING"/>
             <arg name="updateToken" type="OCTET_STRING" length="32"/>
             <arg name="userConsentNeeded" type="BOOLEAN" default="false"/>
             <arg name="metadataForRequestor" type="OCTET_STRING" length="512"/>
@@ -79,9 +82,10 @@ limitations under the License.
         </command>
     </cluster>
     <enum name="OTAAnnouncementReason" type="ENUM8">
+        <cluster code="0x002a"/>
         <item name="SimpleAnnouncement" value="0x0"/>
         <item name="UpdateAvailable" value="0x1"/>
-        <item name="CriticalUpdateAvailable" value="0x2"/>
+        <item name="UrgentUpdateAvailable" value="0x2"/>
     </enum>
     <cluster>
         <name>OTA Software Update Requestor</name>
@@ -91,11 +95,11 @@ limitations under the License.
         <define>OTA_REQUESTOR_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
-        <attribute side="client" code="0" define="DEFAULT_OTA_PROVIDER" type="OCTET_STRING" length="16" writable="true" optional="false" default="0">default ota provider</attribute>
-        <attribute side="client" code="1" define="UPDATE_POSSIBLE" type="BOOLEAN" length="32" writable="false" optional="false" default="true">update possible</attribute>
+        <attribute side="server" code="0x0001" define="DEFAULT_OTA_PROVIDER" type="OCTET_STRING" length="16" writable="true"  optional="false">default ota provider</attribute>
+        <attribute side="server" code="0x0002" define="UPDATE_POSSIBLE"      type="BOOLEAN"                  writable="false" optional="false">update possible</attribute>
         <command source="client" code="0" name="AnnounceOtaProvider" optional="true" cli="chip ota announceotaprovider">
             <description>Notify OTA Provider that an update was applied</description>
-            <arg name="serverLocation" type="OCTET_STRING" length="16"/>
+            <arg name="providerLocation" type="OCTET_STRING" length="16"/>
             <arg name="vendorId" type="INT16U"/>
             <arg name="announcementReason" type="OTAAnnouncementReason"/>
             <arg name="metadataForNode" type="OCTET_STRING" length="512" optional="true"/>

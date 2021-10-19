@@ -88,8 +88,6 @@ static_library("support") {
     "Pool.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
-    "RandUtils.cpp",
-    "RandUtils.h",
     "ReferenceCountedHandle.h",
     "SafeInt.h",
     "SerializableIntegerSet.cpp",
@@ -114,6 +112,16 @@ static_library("support") {
     "verhoeff/Verhoeff32.cpp",
     "verhoeff/Verhoeff36.cpp",
   ]
+
+  # added JNI helper on android
+  if (current_os == "android") {
+    sources += [
+      "CHIPJNIError.h",
+      "JniReferences.cpp",
+      "JniReferences.h",
+      "JniTypeWrappers.h",
+    ]
+  }
 
   libs = []
 

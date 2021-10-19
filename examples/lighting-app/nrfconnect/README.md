@@ -219,7 +219,8 @@ opposite one.
 the test mode using the default configuration.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time (15 minutes by default).
+enables Bluetooth LE advertising for the predefined period of time (15 minutes
+by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
@@ -386,18 +387,36 @@ Semiconductor's kit you own (for example `nrf52840dk_nrf52840`):
 
     $ west build -b build-target -- -DBUILD_WITH_DFU=1
 
+> **Note**:
+>
+> There are two types of Device Firmware Upgrade modes: single-image DFU and
+> multi-image DFU. Single-image mode supports upgrading only one firmware image,
+> the application image, and should be used for single-core nRF52840 DK devices.
+> Multi-image mode allows to upgrade more firmware images and is suitable for
+> upgrading the application core and network core firmware in two-core nRF5340
+> DK devices.
+
+#### Changing Device Firmware Upgrade configuration
+
+To change the default DFU configuration, edit the
+`overlay-single_image_dfu_support.conf` or
+`overlay-multi_image_dfu_support.conf` overlay files depending on whether the
+build target device supports multi-image DFU (nRF5340 DK) or single-image DFU
+(nRF52840 DK). The files are located in the `config/nrfconnect/app` directory.
+You can also define the desired options in your example's `prj.conf` file.
+
 #### Changing bootloader configuration
 
-To change the default MCUboot configuration, edit the `overlay-dfu_support.conf`
-overlay file that contains bootloader configuration options. The file is located
-in the `config/nrfconnect/app` directory. You can also define the desired
-options in your example's `prj.conf` file.
+To change the default MCUboot configuration, edit the
+`mcuboot_single_image_dfu.conf` or `mcuboot_multi_image_dfu.conf` overlay files
+depending on whether the build target device supports multi-image DFU (nRF5340
+DK) or single-image DFU (nRF52840 DK). The files are located in the
+`configuration` directory.
 
-Make sure to apply the same configuration changes in the
-`child_image/mcuboot.conf` file. This is necessary for the configuration to
-work, as the bootloader image is a separate application from the user
-application and it has its own configuration file. The contents of this file
-must be consistent with the application configuration.
+Make sure to keep the configuration consistent with changes made to the
+application configuration. This is necessary for the configuration to work, as
+the bootloader image is a separate application from the user application and it
+has its own configuration file.
 
 #### Changing flash memory settings
 
@@ -505,4 +524,4 @@ From within the console you can then invoke rpcs:
 
         rpcs.chip.rpc.Lighting.Get()
 
-        rpcs.chip.rpc.Lighting.Set(on=True)
+        rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))

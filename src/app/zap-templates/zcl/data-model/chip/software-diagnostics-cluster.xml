@@ -17,6 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <struct name="ThreadMetrics">
+    <cluster code="0x0034"/>
     <item name="Id" type="INT64U"/>
     <!-- TODO: CHAR_STRING not supported yet in structs. -->
     <item name="Name" type="OCTET_STRING" length="8"/>

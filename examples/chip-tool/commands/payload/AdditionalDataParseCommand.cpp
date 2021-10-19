@@ -17,39 +17,27 @@
  */
 
 #include "AdditionalDataParseCommand.h"
+#include <math.h>
 #include <setup_payload/AdditionalDataPayload.h>
 #include <setup_payload/AdditionalDataPayloadParser.h>
 #include <string>
 
 using namespace ::chip;
+using namespace ::chip::Encoding;
 using namespace ::chip::SetupPayloadData;
 
 CHIP_ERROR AdditionalDataParseCommand::Run()
 {
-    std::vector<uint8_t> payloadData;
+    VerifyOrReturnError(strlen(mPayload) % 2 == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    size_t additionalDataPayloadBytesLength = strlen(mPayload) / 2;
+    std::unique_ptr<uint8_t[]> additionalDataPayloadBytes(new uint8_t[additionalDataPayloadBytesLength]);
+
     AdditionalDataPayload resultPayload;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    std::string payloadString(mPayload);
-
-    // Decode input payload
-    size_t len = payloadString.length();
-
-    for (size_t i = 0; i < len; i += 2)
-    {
-        auto str  = payloadString.substr(i, 2);
-        uint8_t x = (uint8_t) stoi(str, 0, 16);
-        payloadData.push_back(x);
-    }
-
-    err = AdditionalDataPayloadParser(payloadData.data(), (uint32_t) payloadData.size()).populatePayload(resultPayload);
-    SuccessOrExit(err);
+    size_t bufferSize = HexToBytes(mPayload, strlen(mPayload), additionalDataPayloadBytes.get(), additionalDataPayloadBytesLength);
+    ReturnErrorOnFailure(AdditionalDataPayloadParser(additionalDataPayloadBytes.get(), bufferSize).populatePayload(resultPayload));
 
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
 
-exit:
-    if (err == CHIP_NO_ERROR)
-    {
-        SetCommandExitStatus(CHIP_NO_ERROR);
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }

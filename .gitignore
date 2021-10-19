@@ -51,3 +51,9 @@ docs/html
 
 # VSCode java extensions
 .project
+
+# clangd index files
+.cache
+
+# compilation database for VSCode and other Ides
+compile_commands.json

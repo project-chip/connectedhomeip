@@ -22,12 +22,15 @@
  ******************************************************************************/
 
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <string>
 
 using namespace chip;
+using namespace chip::app::Clusters::AccountLogin;
 
 bool accountLoginClusterIsUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
 std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentifier, EndpointId endpoint);
@@ -49,22 +52,25 @@ exit:
     }
 }
 
-bool emberAfAccountLoginClusterGetSetupPINCallback(EndpointId endpoint, app::CommandHandler * command,
-                                                   uint8_t * tempAccountIdentifier)
+bool emberAfAccountLoginClusterGetSetupPINCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                   const Commands::GetSetupPIN::DecodableType & commandData)
 {
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
+    auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
+
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
     std::string responseSetupPin = accountLoginClusterGetSetupPin(tempAccountIdentifierString, emberAfCurrentEndpoint());
     sendResponse(command, responseSetupPin.c_str());
     return true;
 }
 
-bool emberAfAccountLoginClusterLoginCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * tempAccountIdentifier,
-                                             uint8_t * tempSetupPin)
+bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                             const Commands::Login::DecodableType & commandData)
 {
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
-    std::string tempSetupPinString(reinterpret_cast<char *>(tempSetupPin));
+    auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
+    auto & tempSetupPin          = commandData.setupPIN;
+
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string tempSetupPinString(tempSetupPin.data(), tempSetupPin.size());
     bool isLoggedIn      = accountLoginClusterIsUserLoggedIn(tempAccountIdentifierString, tempSetupPinString);
     EmberAfStatus status = isLoggedIn ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     if (!isLoggedIn)

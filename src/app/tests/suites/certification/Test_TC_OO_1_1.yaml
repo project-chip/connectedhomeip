@@ -28,7 +28,6 @@ tests:
     - label:
           "write the default values to mandatory global attribute:
           ClusterRevision"
-      disabled: true
       command: "writeAttribute"
       attribute: "ClusterRevision"
       arguments:
@@ -49,7 +48,6 @@ tests:
           value: 0
 
     - label: "write the default values to optional global attribute: FeatureMap"
-      disabled: true
       command: "writeAttribute"
       attribute: "FeatureMap"
       arguments:

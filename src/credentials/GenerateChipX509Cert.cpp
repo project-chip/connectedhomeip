@@ -26,6 +26,7 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include <algorithm>
 #include <inttypes.h>
 #include <stddef.h>
 
@@ -320,12 +321,8 @@ CHIP_ERROR EncodeChipECDSASignature(Crypto::P256ECDSASignature & signature, ASN1
     ASN1_START_BIT_STRING_ENCAPSULATED
     {
         // Convert RAW signature to DER when generating X509 certs.
-        uint8_t sig_der[Crypto::kMax_ECDSA_Signature_Length_Der];
-        uint16_t sig_der_size = 0;
         P256ECDSASignatureSpan raw_sig(signature.Bytes());
-
-        ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(raw_sig, &sig_der[0], sizeof(sig_der), sig_der_size));
-        ReturnErrorOnFailure(writer.PutConstructedType(&sig_der[0], static_cast<uint16_t>(sig_der_size)));
+        ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(raw_sig, writer));
     }
     ASN1_END_ENCAPSULATED;
 
@@ -415,15 +412,14 @@ CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, Certific
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ASN1Writer writer;
-    uint32_t size = static_cast<uint32_t>(std::min(static_cast<size_t>(UINT32_MAX), x509Cert.size()));
-    writer.Init(x509Cert.data(), size);
+    writer.Init(x509Cert);
 
     ReturnErrorOnFailure(EncodeTBSCert(requestParams, issuerLevel, subject, subjectPubkey, issuerKeypair.Pubkey(), writer));
 
     Crypto::P256ECDSASignature signature;
     ReturnErrorOnFailure(issuerKeypair.ECDSA_sign_msg(x509Cert.data(), writer.GetLengthWritten(), signature));
 
-    writer.Init(x509Cert.data(), size);
+    writer.Init(x509Cert);
 
     ASN1_START_SEQUENCE
     {

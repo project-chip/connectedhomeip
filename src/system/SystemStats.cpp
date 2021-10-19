@@ -22,9 +22,6 @@
  *  on the state of CHIP, Inet and System resources
  */
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 // Include local headers
 #include <system/SystemTimer.h>
 
@@ -48,9 +45,6 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
     "SystemLayer_NumPacketBufs",
 #endif
     "SystemLayer_NumTimersInUse",
-#if INET_CONFIG_NUM_RAW_ENDPOINTS
-    "InetLayer_NumRawEpsInUse",
-#endif
 #if INET_CONFIG_NUM_TCP_ENDPOINTS
     "InetLayer_NumTCPEpsInUse",
 #endif
@@ -116,6 +110,14 @@ bool Difference(Snapshot & result, Snapshot & after, Snapshot & before)
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
+
+// To use LwIP 1.x, some additional definitions are required here.
+#if LWIP_VERSION_MAJOR < 2
+#ifndef MEMP_STATS_GET
+#define MEMP_STATS_GET(FIELD, INDEX) (lwip_stats.memp[INDEX].FIELD)
+#endif // !defined(MEMP_STATS_GET)
+#endif // LWIP_VERSION_MAJOR
+
 void UpdateLwipPbufCounts(void)
 {
 #if LWIP_PBUF_FROM_CUSTOM_POOLS

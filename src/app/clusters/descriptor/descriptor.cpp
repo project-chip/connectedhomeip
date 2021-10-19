@@ -21,18 +21,125 @@
  ***************************************************************************/
 
 #include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Descriptor::Attributes;
 
 constexpr const char * kErrorStr = "Descriptor cluster (0x%02x) Error setting '%s' attribute: 0x%02x";
+
+namespace {
+
+class DescriptorAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the Descriptor cluster on all endpoints.
+    DescriptorAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Descriptor::Id) {}
+
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server);
+};
+
+CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (endpoint == 0x00)
+    {
+        err = aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+            for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+            {
+                if (emberAfEndpointIndexIsEnabled(index))
+                {
+                    EndpointId endpointId = emberAfEndpointFromIndex(index);
+                    if (endpointId == 0)
+                        continue;
+
+                    ReturnErrorOnFailure(encoder.Encode(endpointId));
+                }
+            }
+
+            return CHIP_NO_ERROR;
+        });
+    }
+    else
+    {
+        err = aEncoder.Encode(DataModel::List<EndpointId>());
+    }
+
+    return err;
+}
+
+CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        Descriptor::Structs::DeviceType::Type deviceStruct;
+        uint16_t index = emberAfIndexFromEndpoint(endpoint);
+
+        deviceStruct.type     = emberAfDeviceIdFromIndex(index);
+        deviceStruct.revision = emberAfDeviceVersionFromIndex(index);
+        return encoder.Encode(deviceStruct);
+    });
+
+    return err;
+}
+
+CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server)
+{
+    CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        uint16_t clusterCount = emberAfClusterCount(endpoint, server);
+
+        for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
+        {
+            EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, clusterIndex, server);
+            ReturnErrorOnFailure(encoder.Encode(cluster->clusterId));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+
+    return err;
+}
+
+DescriptorAttrAccess gAttrAccess;
+
+CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aPath.mClusterId == Descriptor::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    case DeviceList::Id: {
+        return ReadDeviceAttribute(aPath.mEndpointId, aEncoder);
+    }
+    case ServerList::Id: {
+        return ReadClientServerAttribute(aPath.mEndpointId, aEncoder, true);
+    }
+    case ClientList::Id: {
+        return ReadClientServerAttribute(aPath.mEndpointId, aEncoder, false);
+    }
+    case PartsList::Id: {
+        return ReadPartsAttribute(aPath.mEndpointId, aEncoder);
+    }
+    default: {
+        break;
+    }
+    }
+    return CHIP_NO_ERROR;
+}
+} // anonymous namespace
 
 EmberAfStatus writeAttribute(EndpointId endpoint, AttributeId attributeId, uint8_t * buffer, int32_t index = -1)
 {
@@ -57,7 +164,7 @@ EmberAfStatus writeAttribute(EndpointId endpoint, AttributeId attributeId, uint8
 EmberAfStatus writeClientServerAttribute(EndpointId endpoint, bool server)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
-    AttributeId attributeId = server ? Descriptor::Attributes::Ids::ServerList : Descriptor::Attributes::Ids::ClientList;
+    AttributeId attributeId = server ? Descriptor::Attributes::ServerList::Id : Descriptor::Attributes::ClientList::Id;
 
     uint16_t clusterCount = emberAfClusterCount(endpoint, server);
 
@@ -85,13 +192,13 @@ EmberAfStatus writeClientAttribute(EndpointId endpoint)
 EmberAfStatus writeDeviceAttribute(EndpointId endpoint, uint16_t index)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
-    AttributeId attributeId = Descriptor::Attributes::Ids::DeviceList;
+    AttributeId attributeId = Descriptor::Attributes::DeviceList::Id;
 
     uint16_t deviceTypeCount  = 1;
     DeviceTypeId deviceTypeId = emberAfDeviceIdFromIndex(index);
     uint16_t revision         = emberAfDeviceVersionFromIndex(index);
 
-    EmberAfDeviceType deviceType;
+    DeviceType deviceType;
     deviceType.type     = deviceTypeId;
     deviceType.revision = revision;
 
@@ -104,7 +211,7 @@ EmberAfStatus writeDeviceAttribute(EndpointId endpoint, uint16_t index)
 EmberAfStatus writePartsAttribute(EndpointId endpoint)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
-    AttributeId attributeId = Descriptor::Attributes::Ids::PartsList;
+    AttributeId attributeId = Descriptor::Attributes::PartsList::Id;
 
     uint16_t partsCount = 0;
 
@@ -125,19 +232,34 @@ EmberAfStatus writePartsAttribute(EndpointId endpoint)
     return writeAttribute(endpoint, attributeId, (uint8_t *) &partsCount);
 }
 
-void emberAfPluginDescriptorServerInitCallback(void)
+void MatterDescriptorPluginServerInitCallback(void)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
+#if CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+    static bool attrAccessRegistered = false;
+
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gAttrAccess);
+        attrAccessRegistered = true;
+    }
+#endif
+
+    /*
+       To prevent reporting from being broken, we still need to keep following part in case
+       CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ is true. The old setup has the emberAfPluginDescriptorServerInitCallback
+       called in emberAfEndpointEnableDisable which updates the stored values for the new topology.
+    */
     for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
     {
-        EndpointId endpoint = emberAfEndpointFromIndex(index);
-        if (!emberAfContainsCluster(endpoint, Descriptor::Id))
+        if (!emberAfEndpointIndexIsEnabled(index))
         {
             continue;
         }
 
-        if (!emberAfEndpointIndexIsEnabled(index))
+        EndpointId endpoint = emberAfEndpointFromIndex(index);
+        if (!emberAfContainsCluster(endpoint, Descriptor::Id))
         {
             continue;
         }

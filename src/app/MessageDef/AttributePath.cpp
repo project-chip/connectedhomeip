@@ -47,7 +47,6 @@ CHIP_ERROR AttributePath::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -164,7 +163,6 @@ CHIP_ERROR AttributePath::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -195,14 +193,13 @@ CHIP_ERROR AttributePath::Parser::GetListIndex(chip::ListIndex * const apListInd
     return GetUnsignedInteger(kCsTag_ListIndex, apListIndex);
 }
 
-CHIP_ERROR AttributePath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
+CHIP_ERROR AttributePath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);
     SuccessOrExit(mError);
 
 exit:
-    ChipLogFunctError(mError);
     return mError;
 }
 
@@ -222,7 +219,6 @@ AttributePath::Builder & AttributePath::Builder::NodeId(const uint64_t aNodeId)
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_NodeId), aNodeId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -233,7 +229,6 @@ AttributePath::Builder & AttributePath::Builder::EndpointId(const chip::Endpoint
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -244,7 +239,6 @@ AttributePath::Builder & AttributePath::Builder::ClusterId(const chip::ClusterId
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -255,7 +249,6 @@ AttributePath::Builder & AttributePath::Builder::FieldId(const chip::AttributeId
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_FieldId), aFieldId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -266,7 +259,6 @@ AttributePath::Builder & AttributePath::Builder::ListIndex(const chip::ListIndex
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ListIndex), aListIndex);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

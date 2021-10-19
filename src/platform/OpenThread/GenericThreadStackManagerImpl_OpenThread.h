@@ -36,8 +36,9 @@
 #include <openthread/dns_client.h>
 #endif
 
-#include <lib/mdns/Advertiser.h>
-#include <lib/mdns/platform/Mdns.h>
+#include <app/AttributeAccessInterface.h>
+#include <lib/dnssd/Advertiser.h>
+#include <lib/dnssd/platform/Dnssd.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -92,17 +93,23 @@ protected:
     CHIP_ERROR _GetAndLogThreadTopologyFull(void);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    void _ResetThreadNetworkDiagnosticsCounts(void);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
-                              const Span<const char * const> & aSubTypes, const Span<const Mdns::TextEntry> & aTxtEntries,
+                              const Span<const char * const> & aSubTypes, const Span<const Dnssd::TextEntry> & aTxtEntries,
                               uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
-    CHIP_ERROR _RemoveAllSrpServices();
+    CHIP_ERROR _InvalidateAllSrpServices();
+    CHIP_ERROR _RemoveInvalidSrpServices();
+
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
+    CHIP_ERROR _ClearSrpHost(const char * aHostName);
+    CHIP_ERROR _SetSrpDnsCallbacks(DnsAsyncReturnCallback aInitCallback, DnsAsyncReturnCallback aErrorCallback, void * aContext);
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
     CHIP_ERROR _DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext);
     CHIP_ERROR _DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback, void * aContext);
@@ -136,32 +143,31 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
         // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
-        static constexpr size_t kSubTypeMaxNumber   = Mdns::kSubTypeMaxNumber;
-        static constexpr size_t kSubTypeTotalLength = Mdns::kSubTypeTotalLength;
+        static constexpr size_t kSubTypeMaxNumber   = Dnssd::kSubTypeMaxNumber;
+        static constexpr size_t kSubTypeTotalLength = Dnssd::kSubTypeTotalLength;
         static constexpr size_t kTxtMaxNumber =
-            std::max(Mdns::CommissionAdvertisingParameters::kTxtMaxNumber, Mdns::OperationalAdvertisingParameters::kTxtMaxNumber);
-        static constexpr size_t kTxtTotalValueLength = std::max(Mdns::CommissionAdvertisingParameters::kTxtTotalValueSize,
-                                                                Mdns::OperationalAdvertisingParameters::kTxtTotalValueSize);
+            std::max(Dnssd::CommissionAdvertisingParameters::kTxtMaxNumber, Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber);
+        static constexpr size_t kTxtTotalValueLength = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
+                                                                Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
 #else
         // Thread only supports operational discovery.
-        static constexpr size_t kSubTypeMaxNumber    = 0;
-        static constexpr size_t kSubTypeTotalLength  = 0;
-        static constexpr size_t kTxtMaxNumber        = Mdns::OperationalAdvertisingParameters::kTxtMaxNumber;
-        static constexpr size_t kTxtTotalValueLength = Mdns::OperationalAdvertisingParameters::kTxtTotalValueSize;
+        static constexpr size_t kSubTypeMaxNumber    = 1;
+        static constexpr size_t kSubTypeTotalLength  = Dnssd::kSubTypeCompressedFabricIdMaxLength;
+        static constexpr size_t kTxtMaxNumber        = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
+        static constexpr size_t kTxtTotalValueLength = Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize;
 #endif
 
-        static constexpr size_t kServiceBufferSize = Mdns::kMdnsInstanceNameMaxSize + 1 + // add null-terminator
-            Mdns::kMdnsTypeAndProtocolMaxSize + 1 +                                       // add null-terminator
-            kSubTypeTotalLength + kSubTypeMaxNumber +                                     // add null-terminator for each subtype
+        static constexpr size_t kServiceBufferSize = Dnssd::kDnssdInstanceNameMaxSize + 1 + // add null-terminator
+            Dnssd::kDnssdTypeAndProtocolMaxSize + 1 +                                       // add null-terminator
+            kSubTypeTotalLength + kSubTypeMaxNumber +                                       // add null-terminator for each subtype
             kTxtTotalValueLength;
 
         struct Service
         {
             otSrpClientService mService;
+            bool mIsInvalid;
             uint8_t mServiceBuffer[kServiceBufferSize];
-#if OPENTHREAD_API_VERSION >= 132
             const char * mSubTypes[kSubTypeMaxNumber + 1]; // extra entry for null terminator
-#endif
             otDnsTxtEntry mTxtEntries[kTxtMaxNumber];
 
             bool IsUsed() const { return mService.mInstanceName != nullptr; }
@@ -171,6 +177,9 @@ private:
         char mHostName[kMaxHostNameSize + 1];
         otIp6Address mHostAddress;
         Service mServices[kMaxServicesNumber];
+        bool mIsInitialized;
+        DnsAsyncReturnCallback mInitializedCallback;
+        void * mCallbackContext;
     };
 
     SrpClient mSrpClient;
@@ -183,16 +192,16 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
     // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
     static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber =
-        std::max(Mdns::CommissionAdvertisingParameters::kTxtMaxNumber, Mdns::OperationalAdvertisingParameters::kTxtMaxNumber);
-    static constexpr size_t kTotalDnsServiceTxtValueSize = std::max(Mdns::CommissionAdvertisingParameters::kTxtTotalValueSize,
-                                                                    Mdns::OperationalAdvertisingParameters::kTxtTotalValueSize);
-    static constexpr size_t kTotalDnsServiceTxtKeySize =
-        std::max(Mdns::CommissionAdvertisingParameters::kTxtTotalKeySize, Mdns::OperationalAdvertisingParameters::kTxtTotalKeySize);
+        std::max(Dnssd::CommissionAdvertisingParameters::kTxtMaxNumber, Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber);
+    static constexpr size_t kTotalDnsServiceTxtValueSize = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
+                                                                    Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
+    static constexpr size_t kTotalDnsServiceTxtKeySize   = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalKeySize,
+                                                                  Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
 #else
     // Thread only supports operational discovery.
-    static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Mdns::OperationalAdvertisingParameters::kTxtMaxNumber;
-    static constexpr size_t kTotalDnsServiceTxtValueSize    = Mdns::OperationalAdvertisingParameters::kTxtTotalValueSize;
-    static constexpr size_t kTotalDnsServiceTxtKeySize      = Mdns::OperationalAdvertisingParameters::kTxtTotalKeySize;
+    static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
+    static constexpr size_t kTotalDnsServiceTxtValueSize    = Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize;
+    static constexpr size_t kTotalDnsServiceTxtKeySize      = Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
     static constexpr size_t kTotalDnsServiceTxtBufferSize =
         kTotalDnsServiceTxtKeySize + kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtValueSize;
@@ -203,19 +212,20 @@ private:
     struct DnsServiceTxtEntries
     {
         uint8_t mBuffer[kTotalDnsServiceTxtBufferSize];
-        chip::Mdns::TextEntry mTxtEntries[kMaxDnsServiceTxtEntriesNumber];
+        chip::Dnssd::TextEntry mTxtEntries[kMaxDnsServiceTxtEntriesNumber];
     };
 
     struct DnsResult
     {
-        chip::Mdns::MdnsService mMdnsService;
+        chip::Dnssd::DnssdService mMdnsService;
         DnsServiceTxtEntries mServiceTxtEntry;
     };
 
     static void OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
     static void OnDnsResolveResult(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
     static CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
-                                                  chip::Mdns::MdnsService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries);
+                                                  chip::Dnssd::DnssdService & mdnsService,
+                                                  DnsServiceTxtEntries & serviceTxtEntries);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 

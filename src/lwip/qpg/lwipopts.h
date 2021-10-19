@@ -50,13 +50,8 @@
 
 #define LWIP_SOCKET 0
 
-#ifdef INET_CONFIG_ENABLE_RAW_ENDPOINT
-#define LWIP_RAW 1
-#define MEMP_NUM_RAW_PCB (5)
-#else
 #define LWIP_RAW 0
 #define MEMP_NUM_RAW_PCB 0
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 #ifdef INET_CONFIG_ENABLE_TCP_ENDPOINT
 #define LWIP_TCP 1
 #else
@@ -111,7 +106,7 @@
 #define SUB_ETHERNET_HEADER_SPACE (0)
 #define PBUF_LINK_HLEN (0)
 
-#define TCPIP_THREAD_STACKSIZE (4096)
+#define TCPIP_THREAD_STACKSIZE (2048)
 #define TCPIP_THREAD_PRIO (2)
 
 #define NETIF_MAX_HWADDR_LEN 8U
@@ -131,7 +126,7 @@
 // TODO: make LWIP_DEBUG conditional on build type
 
 #ifndef LWIP_DEBUG
-#define LWIP_DEBUG 1
+#define LWIP_DEBUG 0
 #endif
 
 #define MEMP_OVERFLOW_CHECK (0)

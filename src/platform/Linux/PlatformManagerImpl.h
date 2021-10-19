@@ -60,12 +60,23 @@ private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack();
+    CHIP_ERROR _Shutdown();
+    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
+    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
+    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+
+    CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
+    CHIP_ERROR _GetUpTime(uint64_t & upTime);
+    CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
 
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr();
     friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
+
+    uint64_t mStartTimeMilliseconds = 0;
 
     static PlatformManagerImpl sInstance;
 

@@ -87,6 +87,7 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
 bool Command::InitArgument(size_t argIndex, char * argValue)
 {
     bool isValidArgument = false;
+    bool isHexNotation   = strncmp(argValue, "0x", 2) == 0 || strncmp(argValue, "0X", 2) == 0;
 
     Argument arg = mArgs.at(argIndex);
     switch (arg.type)
@@ -97,10 +98,17 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
-    case ArgumentType::CharString: {
+    case ArgumentType::String: {
         const char ** value = reinterpret_cast<const char **>(arg.value);
         *value              = argValue;
         isValidArgument     = true;
+        break;
+    }
+
+    case ArgumentType::CharString: {
+        auto * value    = static_cast<chip::Span<const char> *>(arg.value);
+        *value          = chip::Span<const char>(argValue, strlen(argValue));
+        isValidArgument = true;
         break;
     }
 
@@ -163,7 +171,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
         // stringstream treats uint8_t as char, which is not what we want here.
         uint16_t tmpValue;
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> tmpValue;
         if (chip::CanCastTo<uint8_t>(tmpValue))
         {
@@ -182,7 +191,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint16: {
         uint16_t * value = reinterpret_cast<uint16_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
@@ -193,7 +203,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint32: {
         uint32_t * value = reinterpret_cast<uint32_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
@@ -204,7 +215,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint64: {
         uint64_t * value = reinterpret_cast<uint64_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
@@ -218,7 +230,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
         // stringstream treats int8_t as char, which is not what we want here.
         int16_t tmpValue;
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> tmpValue;
         if (chip::CanCastTo<int8_t>(tmpValue))
         {
@@ -237,7 +250,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int16: {
         int16_t * value = reinterpret_cast<int16_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         int64_t min     = arg.min;
@@ -248,7 +262,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int32: {
         int32_t * value = reinterpret_cast<int32_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         int64_t min     = arg.min;
@@ -259,7 +274,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int64: {
         int64_t * value = reinterpret_cast<int64_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         int64_t min     = arg.min;
@@ -295,6 +311,17 @@ size_t Command::AddArgument(const char * name, const char * value)
 }
 
 size_t Command::AddArgument(const char * name, char ** value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::CharString;
+    arg.name  = name;
+    arg.value = reinterpret_cast<void *>(value);
+
+    mArgs.emplace_back(arg);
+    return mArgs.size();
+}
+
+size_t Command::AddArgument(const char * name, chip::CharSpan * value)
 {
     Argument arg;
     arg.type  = ArgumentType::CharString;
@@ -377,58 +404,3 @@ const char * Command::GetAttribute(void) const
 
     return nullptr;
 }
-
-void Command::UpdateWaitForResponse(bool value)
-{
-#if CONFIG_USE_SEPARATE_EVENTLOOP
-    {
-        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-        mWaitingForResponse = value;
-    }
-    cvWaitingForResponse.notify_all();
-#else  // CONFIG_USE_SEPARATE_EVENTLOOP
-    if (value == false)
-    {
-        if (mCommandExitStatus != CHIP_NO_ERROR)
-        {
-            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(mCommandExitStatus));
-        }
-
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    }
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
-}
-
-#if CONFIG_USE_SEPARATE_EVENTLOOP
-
-void Command::WaitForResponse(uint16_t seconds)
-{
-    std::chrono::seconds waitingForResponseTimeout(seconds);
-    std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
-    auto waitingUntil = std::chrono::system_clock::now() + waitingForResponseTimeout;
-    if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
-    {
-        ChipLogError(chipTool, "No response from device");
-    }
-}
-
-#else // CONFIG_USE_SEPARATE_EVENTLOOP
-
-static void OnResponseTimeout(chip::System::Layer *, void *)
-{
-    ChipLogError(chipTool, "No response from device");
-
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-}
-
-CHIP_ERROR Command::ScheduleWaitForResponse(uint16_t seconds)
-{
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer.StartTimer(seconds * 1000, OnResponseTimeout, this);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(chipTool, "Failed to allocate timer %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    return err;
-}
-
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP

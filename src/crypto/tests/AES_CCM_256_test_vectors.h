@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
+
 typedef struct ccm_test_vector
 {
     const uint8_t * key;
@@ -36,7 +38,7 @@ typedef struct ccm_test_vector
     const uint8_t * tag;
     size_t tag_len;
     unsigned tcId;
-    uint64_t result;
+    CHIP_ERROR result;
 } ccm_test_vector;
 
 static const uint8_t chiptest_12cb0ed34854_key_1[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
@@ -60,7 +62,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_7 = { .key
                                                                             .tag     = chiptest_12cb0ed34854_tag_6,
                                                                             .tag_len = 8,
                                                                             .tcId    = 1,
-                                                                            .result  = 1 };
+                                                                            .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_8[]  = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                        0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                        0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -82,7 +84,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_14 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_13,
                                                                              .tag_len = 12,
                                                                              .tcId    = 2,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_15[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -105,7 +107,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_21 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_20,
                                                                              .tag_len = 16,
                                                                              .tcId    = 3,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_22[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -127,7 +129,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_28 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_27,
                                                                              .tag_len = 8,
                                                                              .tcId    = 4,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_29[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -149,7 +151,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_35 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_34,
                                                                              .tag_len = 12,
                                                                              .tcId    = 5,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_36[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -172,7 +174,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_42 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_41,
                                                                              .tag_len = 16,
                                                                              .tcId    = 6,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_43[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -196,7 +198,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_49 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_48,
                                                                              .tag_len = 8,
                                                                              .tcId    = 7,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_50[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -220,7 +222,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_56 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_55,
                                                                              .tag_len = 12,
                                                                              .tcId    = 8,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_57[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -245,7 +247,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_63 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_62,
                                                                              .tag_len = 16,
                                                                              .tcId    = 9,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_64[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -269,7 +271,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_70 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_69,
                                                                              .tag_len = 8,
                                                                              .tcId    = 10,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_71[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -293,7 +295,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_77 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_76,
                                                                              .tag_len = 12,
                                                                              .tcId    = 11,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_78[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -318,7 +320,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_84 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_83,
                                                                              .tag_len = 16,
                                                                              .tcId    = 12,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_85[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -342,7 +344,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_91 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_90,
                                                                              .tag_len = 8,
                                                                              .tcId    = 13,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_92[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -366,7 +368,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_98 = { .ke
                                                                              .tag     = chiptest_12cb0ed34854_tag_97,
                                                                              .tag_len = 12,
                                                                              .tcId    = 14,
-                                                                             .result  = 1 };
+                                                                             .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_99[]  = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                         0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                         0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -391,7 +393,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_105 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_104,
                                                                               .tag_len = 16,
                                                                               .tcId    = 15,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_106[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -417,7 +419,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_112 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_111,
                                                                               .tag_len = 8,
                                                                               .tcId    = 16,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_113[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -443,7 +445,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_119 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_118,
                                                                               .tag_len = 12,
                                                                               .tcId    = 17,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_120[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -470,7 +472,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_126 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_125,
                                                                               .tag_len = 16,
                                                                               .tcId    = 18,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_127[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -496,7 +498,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_133 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_132,
                                                                               .tag_len = 8,
                                                                               .tcId    = 19,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_134[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -522,7 +524,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_140 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_139,
                                                                               .tag_len = 12,
                                                                               .tcId    = 20,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_141[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -549,7 +551,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_147 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_146,
                                                                               .tag_len = 16,
                                                                               .tcId    = 21,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_148[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -575,7 +577,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_154 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_153,
                                                                               .tag_len = 8,
                                                                               .tcId    = 22,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_155[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -601,7 +603,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_161 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_160,
                                                                               .tag_len = 12,
                                                                               .tcId    = 23,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_162[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -628,7 +630,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_168 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_167,
                                                                               .tag_len = 16,
                                                                               .tcId    = 24,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_169[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -656,7 +658,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_175 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_174,
                                                                               .tag_len = 8,
                                                                               .tcId    = 25,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_176[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -684,7 +686,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_182 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_181,
                                                                               .tag_len = 12,
                                                                               .tcId    = 26,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_183[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -713,7 +715,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_189 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_188,
                                                                               .tag_len = 16,
                                                                               .tcId    = 27,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_190[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -737,7 +739,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_196 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_195,
                                                                               .tag_len = 8,
                                                                               .tcId    = 28,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_197[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -761,7 +763,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_203 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_202,
                                                                               .tag_len = 12,
                                                                               .tcId    = 29,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_204[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -786,7 +788,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_210 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_209,
                                                                               .tag_len = 16,
                                                                               .tcId    = 30,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_211[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -810,7 +812,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_217 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_216,
                                                                               .tag_len = 8,
                                                                               .tcId    = 31,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_218[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -834,7 +836,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_224 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_223,
                                                                               .tag_len = 12,
                                                                               .tcId    = 32,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_225[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -859,7 +861,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_231 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_230,
                                                                               .tag_len = 16,
                                                                               .tcId    = 33,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_232[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -885,7 +887,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_238 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_237,
                                                                               .tag_len = 8,
                                                                               .tcId    = 34,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_239[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -911,7 +913,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_245 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_244,
                                                                               .tag_len = 12,
                                                                               .tcId    = 35,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_246[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -938,7 +940,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_252 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_251,
                                                                               .tag_len = 16,
                                                                               .tcId    = 36,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_253[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -964,7 +966,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_259 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_258,
                                                                               .tag_len = 8,
                                                                               .tcId    = 37,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_260[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -990,7 +992,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_266 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_265,
                                                                               .tag_len = 12,
                                                                               .tcId    = 38,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_267[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1017,7 +1019,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_273 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_272,
                                                                               .tag_len = 16,
                                                                               .tcId    = 39,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_274[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1043,7 +1045,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_280 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_279,
                                                                               .tag_len = 8,
                                                                               .tcId    = 40,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_281[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1069,7 +1071,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_287 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_286,
                                                                               .tag_len = 12,
                                                                               .tcId    = 41,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_288[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1096,7 +1098,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_294 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_293,
                                                                               .tag_len = 16,
                                                                               .tcId    = 42,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_295[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1124,7 +1126,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_301 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_300,
                                                                               .tag_len = 8,
                                                                               .tcId    = 43,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_302[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1152,7 +1154,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_308 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_307,
                                                                               .tag_len = 12,
                                                                               .tcId    = 44,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_309[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1181,7 +1183,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_315 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_314,
                                                                               .tag_len = 16,
                                                                               .tcId    = 45,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_316[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1209,7 +1211,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_322 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_321,
                                                                               .tag_len = 8,
                                                                               .tcId    = 46,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_323[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1237,7 +1239,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_329 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_328,
                                                                               .tag_len = 12,
                                                                               .tcId    = 47,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_330[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1266,7 +1268,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_336 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_335,
                                                                               .tag_len = 16,
                                                                               .tcId    = 48,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_337[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1294,7 +1296,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_343 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_342,
                                                                               .tag_len = 8,
                                                                               .tcId    = 49,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_344[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1322,7 +1324,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_350 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_349,
                                                                               .tag_len = 12,
                                                                               .tcId    = 50,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_351[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1351,7 +1353,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_357 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_356,
                                                                               .tag_len = 16,
                                                                               .tcId    = 51,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_358[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1381,7 +1383,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_364 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_363,
                                                                               .tag_len = 8,
                                                                               .tcId    = 52,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_365[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1411,7 +1413,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_371 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_370,
                                                                               .tag_len = 12,
                                                                               .tcId    = 53,
-                                                                              .result  = 1 };
+                                                                              .result  = CHIP_NO_ERROR };
 static const uint8_t chiptest_12cb0ed34854_key_372[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                          0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
                                                          0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
@@ -1442,8 +1444,218 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_378 = { .k
                                                                               .tag     = chiptest_12cb0ed34854_tag_377,
                                                                               .tag_len = 16,
                                                                               .tcId    = 54,
-                                                                              .result  = 1 };
-static const struct ccm_test_vector * ccm_test_vectors[]                  = {
+                                                                              .result  = CHIP_NO_ERROR };
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_379 = { .key     = chiptest_12cb0ed34854_key_1,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_4,
+                                                                              .iv_len  = 7,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_5,
+                                                                              .aad_len = 0,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_6,
+                                                                              .tag_len = 8,
+                                                                              .tcId    = 1,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_380 = { .key     = chiptest_12cb0ed34854_key_8,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_11,
+                                                                              .iv_len  = 7,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_12,
+                                                                              .aad_len = 0,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_13,
+                                                                              .tag_len = 12,
+                                                                              .tcId    = 2,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_381 = { .key     = chiptest_12cb0ed34854_key_15,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_18,
+                                                                              .iv_len  = 7,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_19,
+                                                                              .aad_len = 0,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_20,
+                                                                              .tag_len = 16,
+                                                                              .tcId    = 3,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_382 = { .key     = chiptest_12cb0ed34854_key_22,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_25,
+                                                                              .iv_len  = 7,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_26,
+                                                                              .aad_len = 1,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_27,
+                                                                              .tag_len = 8,
+                                                                              .tcId    = 4,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_383 = { .key     = chiptest_12cb0ed34854_key_29,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_32,
+                                                                              .iv_len  = 7,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_33,
+                                                                              .aad_len = 1,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_34,
+                                                                              .tag_len = 12,
+                                                                              .tcId    = 5,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_384 = { .key     = chiptest_12cb0ed34854_key_36,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_39,
+                                                                              .iv_len  = 7,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_40,
+                                                                              .aad_len = 1,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_41,
+                                                                              .tag_len = 16,
+                                                                              .tcId    = 6,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_385 = { .key     = chiptest_12cb0ed34854_key_190,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_193,
+                                                                              .iv_len  = 13,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_194,
+                                                                              .aad_len = 0,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_195,
+                                                                              .tag_len = 8,
+                                                                              .tcId    = 28,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_386 = { .key     = chiptest_12cb0ed34854_key_197,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_200,
+                                                                              .iv_len  = 13,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_201,
+                                                                              .aad_len = 0,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_202,
+                                                                              .tag_len = 12,
+                                                                              .tcId    = 29,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_387 = { .key     = chiptest_12cb0ed34854_key_204,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_207,
+                                                                              .iv_len  = 13,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_208,
+                                                                              .aad_len = 0,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_209,
+                                                                              .tag_len = 16,
+                                                                              .tcId    = 30,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_388 = { .key     = chiptest_12cb0ed34854_key_218,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_221,
+                                                                              .iv_len  = 13,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_222,
+                                                                              .aad_len = 1,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_223,
+                                                                              .tag_len = 12,
+                                                                              .tcId    = 32,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_389 = { .key     = chiptest_12cb0ed34854_key_225,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_228,
+                                                                              .iv_len  = 13,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_229,
+                                                                              .aad_len = 1,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_230,
+                                                                              .tag_len = 16,
+                                                                              .tcId    = 33,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_390 = { .key     = chiptest_12cb0ed34854_key_239,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_242,
+                                                                              .iv_len  = 13,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_243,
+                                                                              .aad_len = 32,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_244,
+                                                                              .tag_len = 12,
+                                                                              .tcId    = 35,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_391 = { .key     = chiptest_12cb0ed34854_key_246,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 0,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 0,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_249,
+                                                                              .iv_len  = 13,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_250,
+                                                                              .aad_len = 32,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_251,
+                                                                              .tag_len = 16,
+                                                                              .tcId    = 36,
+                                                                              .result  = CHIP_NO_ERROR };
+
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_392 = { .key     = chiptest_12cb0ed34854_key_246,
+                                                                              .key_len = 32,
+                                                                              .pt      = nullptr,
+                                                                              .pt_len  = 8,
+                                                                              .ct      = nullptr,
+                                                                              .ct_len  = 8,
+                                                                              .iv      = chiptest_12cb0ed34854_iv_249,
+                                                                              .iv_len  = 13,
+                                                                              .aad     = chiptest_12cb0ed34854_aad_250,
+                                                                              .aad_len = 32,
+                                                                              .tag     = chiptest_12cb0ed34854_tag_251,
+                                                                              .tag_len = 16,
+                                                                              .tcId    = 36,
+                                                                              .result  = CHIP_ERROR_INVALID_ARGUMENT };
+
+static const struct ccm_test_vector * ccm_test_vectors[] = {
     &chiptest_12cb0ed34854_test_vector_7,   &chiptest_12cb0ed34854_test_vector_14,  &chiptest_12cb0ed34854_test_vector_21,
     &chiptest_12cb0ed34854_test_vector_28,  &chiptest_12cb0ed34854_test_vector_35,  &chiptest_12cb0ed34854_test_vector_42,
     &chiptest_12cb0ed34854_test_vector_49,  &chiptest_12cb0ed34854_test_vector_56,  &chiptest_12cb0ed34854_test_vector_63,
@@ -1461,7 +1673,12 @@ static const struct ccm_test_vector * ccm_test_vectors[]                  = {
     &chiptest_12cb0ed34854_test_vector_301, &chiptest_12cb0ed34854_test_vector_308, &chiptest_12cb0ed34854_test_vector_315,
     &chiptest_12cb0ed34854_test_vector_322, &chiptest_12cb0ed34854_test_vector_329, &chiptest_12cb0ed34854_test_vector_336,
     &chiptest_12cb0ed34854_test_vector_343, &chiptest_12cb0ed34854_test_vector_350, &chiptest_12cb0ed34854_test_vector_357,
-    &chiptest_12cb0ed34854_test_vector_364, &chiptest_12cb0ed34854_test_vector_371, &chiptest_12cb0ed34854_test_vector_378
+    &chiptest_12cb0ed34854_test_vector_364, &chiptest_12cb0ed34854_test_vector_371, &chiptest_12cb0ed34854_test_vector_378,
+    &chiptest_12cb0ed34854_test_vector_379, &chiptest_12cb0ed34854_test_vector_380, &chiptest_12cb0ed34854_test_vector_381,
+    &chiptest_12cb0ed34854_test_vector_382, &chiptest_12cb0ed34854_test_vector_383, &chiptest_12cb0ed34854_test_vector_384,
+    &chiptest_12cb0ed34854_test_vector_385, &chiptest_12cb0ed34854_test_vector_386, &chiptest_12cb0ed34854_test_vector_387,
+    &chiptest_12cb0ed34854_test_vector_388, &chiptest_12cb0ed34854_test_vector_389, &chiptest_12cb0ed34854_test_vector_390,
+    &chiptest_12cb0ed34854_test_vector_391, &chiptest_12cb0ed34854_test_vector_392
 };
 
 // These are some invalid vectors where the ct bits have been flipped.
@@ -1494,7 +1711,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_3781 = { .
                                                                                .tag     = chiptest_12cb0ed34854_tag_3771,
                                                                                .tag_len = 16,
                                                                                .tcId    = 54,
-                                                                               .result  = 1 };
+                                                                               .result  = CHIP_ERROR_INTERNAL };
 
 static const uint8_t chiptest_12cb0ed34854_key_1411[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
                                                           0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
@@ -1522,7 +1739,7 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_1471 = { .
                                                                                .tag     = chiptest_12cb0ed34854_tag_1461,
                                                                                .tag_len = 16,
                                                                                .tcId    = 21,
-                                                                               .result  = 1 };
+                                                                               .result  = CHIP_ERROR_INTERNAL };
 
 static const struct ccm_test_vector * ccm_invalid_test_vectors[] = { &chiptest_12cb0ed34854_test_vector_3781,
                                                                      &chiptest_12cb0ed34854_test_vector_1471 };

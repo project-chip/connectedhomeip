@@ -29,6 +29,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -41,6 +42,8 @@
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
@@ -61,7 +64,7 @@ static constexpr size_t kMaxSecureSduLengthBytes = 1024;
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeDelegate
+class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback
 {
 public:
     /**
@@ -92,17 +95,6 @@ public:
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
     /**
-     *  Retrieve a CommandSender that the SDK consumer can use to send a set of commands.  If the call succeeds,
-     *  see CommandSender documentation for lifetime handling.
-     *
-     *  @param[out]    apCommandSender    A pointer to the CommandSender object.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no CommandSender available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR NewCommandSender(CommandSender ** const apCommandSender);
-
-    /**
      *  Creates a new read client and send ReadRequest message to the node using the read client,
      *  shutdown if fail to send it out
      *
@@ -111,6 +103,22 @@ public:
      */
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
 
+    /**
+     *  Creates a new read client and sends SubscribeRequest message to the node using the read client.
+     *  Shuts down on transmission failure.
+     *
+     *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
+     *  @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
+
+    /**
+     * Tears down an active subscription.
+     *
+     * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
+     * @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR ShutdownSubscription(uint64_t aSubscriptionId);
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
      *  see WriteClient documentation for lifetime handling.
@@ -141,31 +149,45 @@ public:
 
     void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
     CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoLisst, ClusterInfo & aClusterInfo);
+    // Merges aAttributePath inside apAttributePathList if current path is overlapped with existing path in apAttributePathList
+    // Overlap means the path is superset or subset of another path
+    bool MergeOverlappedAttributePath(ClusterInfo * apAttributePathList, ClusterInfo & aAttributePath);
+    bool IsOverlappedAttributePath(ClusterInfo & aAttributePath);
 
 private:
     friend class reporting::Engine;
-    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    friend class TestCommandInteraction;
+
+    void OnDone(CommandHandler * apCommandObj);
+
+    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                      System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.
      */
-    CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+
+    CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                    System::PacketBufferHandle && aPayload, ReadHandler::InteractionType aInteractionType);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
      * the Write Request are handled entirely within this function.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                              System::PacketBufferHandle && aPayload);
 
+    /**This function handles processing of un-solicited ReportData messages on the client, which can
+     * only occur post subscription establishment
+     */
+    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                       System::PacketBufferHandle && aPayload);
     /**
      *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer
      *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
@@ -173,15 +195,15 @@ private:
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, uint64_t aAppIdentifier);
+    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
+                             uint64_t aAppIdentifier);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
 
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
-    CommandHandler mCommandHandlerObjs[CHIP_IM_MAX_NUM_COMMAND_HANDLER];
-    CommandSender mCommandSenderObjs[CHIP_IM_MAX_NUM_COMMAND_SENDER];
+    BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
     ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
     WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
@@ -191,10 +213,10 @@ private:
     ClusterInfo * mpNextAvailableClusterInfo = nullptr;
 };
 
-void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj);
-void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj);
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
+                                  CommandHandler * apCommandObj);
+void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
+                                          CommandSender * apCommandObj);
 
 /**
  *  Check whether the given cluster exists on the given endpoint and supports the given command.
@@ -206,7 +228,7 @@ void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::Comm
  *  @retval  True if the endpoint contains the server side of the given cluster and that cluster implements the given command, false
  * otherwise.
  */
-bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId);
+bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
  *  Fetch attribute value and version info and write to the TLVWriter provided.
@@ -218,7 +240,7 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
- *  @param[in]    aClusterInfo      The cluster info object, for the path of cluster data.
+ *  @param[in]    aPath             The concrete path of the data being read.
  *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr if the caller does not care
  *                                  the exact value of the attribute.
  *  @param[out]   apDataExists      Tell whether the cluster data exist on server. Can be a nullptr if the caller does not care
@@ -226,7 +248,11 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists);
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists);
+
+/**
+ * TODO: Document.
+ */
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip

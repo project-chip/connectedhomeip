@@ -38,7 +38,6 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
-    bool _HaveServiceConnectivity(void) { return false; }
     CHIP_ERROR _Init(void) { return CHIP_NO_ERROR; }
     void _OnPlatformEvent(const ChipDeviceEvent * event) {}
 

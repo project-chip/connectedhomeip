@@ -48,16 +48,17 @@ class InfineonBuilder(GnBuilder):
     def __init__(self,
                  root,
                  runner,
-                 output_prefix: str,
                  app: InfineonApp = InfineonApp.LOCK,
                  board: InfineonBoard = InfineonBoard.P6BOARD):
         super(InfineonBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExampleName(), 'p6'),
-            runner=runner,
-            output_prefix=output_prefix)
+            runner=runner)
 
         self.app = app
-        self.gn_build_args = ['p6_board="%s"' % board.GnArgName()]
+        self.board = board
+
+    def GnBuildArgs(self):
+        return ['p6_board="%s"' % self.board.GnArgName()]
 
     def build_outputs(self):
         items = {

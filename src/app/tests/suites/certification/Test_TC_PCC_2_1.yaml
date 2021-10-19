@@ -1,0 +1,835 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 15.2.1. [TC-PCC-2.1] Attributes with server as DUT
+
+config:
+    cluster: "Pump Configuration and Control"
+    endpoint: 1
+
+tests:
+    - label: "read the mandatory attribute: MaxPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max pressure"
+      response:
+          value: null
+
+    - label: "read the mandatory attribute: MaxPressure"
+      command: "readAttribute"
+      attribute: "max pressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the mandatory attribute: MaxSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max speed"
+      response:
+          value: null
+
+    - label: "read the mandatory attribute: MaxSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max speed"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the mandatory attribute: MaxFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max flow"
+      response:
+          value: null
+
+    - label: "read the mandatory attribute: MaxFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max flow"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the mandatory attribute: EffectiveOperationMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "effective operation mode"
+      response:
+          value: desc
+
+    - label: "read the mandatory attribute: EffectiveOperationMode"
+      command: "readAttribute"
+      attribute: "effective operation mode"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "read the mandatory attribute: EffectiveControlMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "effective control mode"
+      response:
+          value: desc
+
+    - label: "read the mandatory attribute: EffectiveControlMode"
+      command: "readAttribute"
+      attribute: "effective control mode"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "read the mandatory attribute: Capacity"
+      disabled: true
+      command: "readAttribute"
+      attribute: "capacity"
+      response:
+          value: null
+
+    - label: "read the mandatory attribute: Capacity"
+      command: "readAttribute"
+      attribute: "capacity"
+      response:
+          constraints:
+              type: int16
+
+    - label: "write to the mandatory attribute: MaxPressure"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "max pressure"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the mandatory attribute: MaxSpeed"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "max speed"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the mandatory attribute: MaxFlow"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "max flow"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the mandatory attribute: EffectiveOperationMode"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "effective operation mode"
+      arguments:
+          value: desc
+      response:
+          error: 1
+
+    - label: "write to the mandatory attribute: EffectiveControlMode"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "effective control mode"
+      arguments:
+          value: desc
+      response:
+          error: 1
+
+    - label: "write to the mandatory attribute: Capacity"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "capacity"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "read the mandatory attribute: MaxPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max pressure"
+      response:
+          value: null
+
+    - label: "read the mandatory attribute: MaxPressure"
+      command: "readAttribute"
+      attribute: "max pressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the mandatory attribute: MaxSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max speed"
+      response:
+          value: null
+
+    - label: "read the mandatory attribute: MaxSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max speed"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the mandatory attribute: MaxFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max flow"
+      response:
+          value: null
+
+    - label: "read the mandatory attribute: MaxFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "max flow"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the mandatory attribute: EffectiveOperationMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "effective operation mode"
+      response:
+          value: desc
+
+    - label: "read the mandatory attribute: EffectiveOperationMode"
+      command: "readAttribute"
+      attribute: "effective operation mode"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "read the mandatory attribute: EffectiveControlMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "effective control mode"
+      response:
+          value: desc
+
+    - label: "read the mandatory attribute: EffectiveControlMode"
+      command: "readAttribute"
+      attribute: "effective control mode"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "read the mandatory attribute: Capacity"
+      disabled: true
+      command: "readAttribute"
+      attribute: "capacity"
+      response:
+          value: null
+
+    - label: "read the mandatory attribute: Capacity"
+      command: "readAttribute"
+      attribute: "capacity"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the optional attribute: MinConstPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstPressure"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinConstPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstPressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the optional attribute: MaxConstPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstPressure"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxConstPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstPressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the optional attribute: MinCompPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinCompPressure"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinCompPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinCompPressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the optional attribute: MaxCompPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxCompPressure"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxCompPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxCompPressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the optional attribute: MinConstSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstSpeed"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinConstSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstSpeed"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: MaxConstSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstSpeed"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxConstSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstSpeed"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: MinConstFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstFlow"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinConstFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstFlow"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: MaxConstFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstFlow"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxConstFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstFlow"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: MinConstTemp"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstTemp"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinConstTemp"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstTemp"
+      response:
+          constraints:
+              type: int16
+              minValue: -27315
+
+    - label: "read the optional attribute: MaxConstTemp"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstTemp"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxConstTemp"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstTemp"
+      response:
+          constraints:
+              type: int16
+              minValue: -27315
+
+    - label: "read the optional attribute: PumpStatus"
+      disabled: true
+      command: "readAttribute"
+      attribute: "pump status"
+      response:
+          value: 0
+
+    - label: "read the optional attribute: PumpStatus"
+      disabled: true
+      command: "readAttribute"
+      attribute: "pump status"
+      response:
+          constraints:
+              type: map16
+
+    - label: "read the optional attribute: Speed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "speed"
+      response:
+          value: null
+
+    - label: "read the optional attribute: Speed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "speed"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: LifetimeRunningHours"
+      disabled: true
+      command: "readAttribute"
+      attribute: "lifetime running hours"
+      response:
+          value: 0
+
+    - label: "read the optional attribute: LifetimeRunningHours"
+      disabled: true
+      command: "readAttribute"
+      attribute: "lifetime running hours"
+      response:
+          constraints:
+              type: uint24
+
+    - label: "read the optional attribute: Power"
+      disabled: true
+      command: "readAttribute"
+      attribute: "power"
+      response:
+          value: null
+
+    - label: "read the optional attribute: Power"
+      disabled: true
+      command: "readAttribute"
+      attribute: "power"
+      response:
+          constraints:
+              type: uint24
+
+    - label: "read the optional attribute: LifetimeEnergyConsumed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "lifetime energy consumed"
+      response:
+          value: 0
+
+    - label: "read the optional attribute: LifetimeEnergyConsumed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "lifetime energy consumed"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "write to the optional attribute: MinConstPressure"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MinConstPressure"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: MaxConstPressure"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MaxConstPressure"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: MinCompPressure"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MinCompPressure"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: MaxCompPressure"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MaxCompPressure"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: MinConstSpeed"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MinConstSpeed"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: MaxConstSpeed"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MaxConstSpeed"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: MinConstFlow"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MinConstFlow"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: MaxConstFlow"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MaxConstFlow"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: MinConstTemp"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MinConstTemp"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: MaxConstTemp"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "MaxConstTemp"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: PumpStatus"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "pump status"
+      arguments:
+          value: 0
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: Speed"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "speed"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: LifetimeRunningHours"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "lifetime running hours"
+      arguments:
+          value: 0
+      response:
+          error: 0
+
+    - label: "write to the optional attribute: Power"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "power"
+      arguments:
+          value: null
+      response:
+          error: 1
+
+    - label: "write to the optional attribute: LifetimeEnergyConsumed"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "lifetime energy consumed"
+      arguments:
+          value: 0
+      response:
+          error: 0
+
+    - label: "read the optional attribute: MinConstPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstPressure"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinConstPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstPressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the optional attribute: MaxConstPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstPressure"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxConstPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstPressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the optional attribute: MinCompPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinCompPressure"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinCompPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinCompPressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the optional attribute: MaxCompPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxCompPressure"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxCompPressure"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxCompPressure"
+      response:
+          constraints:
+              type: int16
+
+    - label: "read the optional attribute: MinConstSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstSpeed"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinConstSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstSpeed"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: MaxConstSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstSpeed"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxConstSpeed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstSpeed"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: MinConstFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstFlow"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinConstFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstFlow"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: MaxConstFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstFlow"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxConstFlow"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstFlow"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: MinConstTemp"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstTemp"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MinConstTemp"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinConstTemp"
+      response:
+          constraints:
+              type: int16
+              minValue: -27315
+
+    - label: "read the optional attribute: MaxConstTemp"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstTemp"
+      response:
+          value: null
+
+    - label: "read the optional attribute: MaxConstTemp"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxConstTemp"
+      response:
+          constraints:
+              type: int16
+              minValue: -27315
+
+    - label: "read the optional attribute: PumpStatus"
+      disabled: true
+      command: "readAttribute"
+      attribute: "pump status"
+      response:
+          value: 0
+
+    - label: "read the optional attribute: PumpStatus"
+      disabled: true
+      command: "readAttribute"
+      attribute: "pump status"
+      response:
+          constraints:
+              type: map16
+
+    - label: "read the optional attribute: Speed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "speed"
+      response:
+          value: null
+
+    - label: "read the optional attribute: Speed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "speed"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "read the optional attribute: LifetimeRunningHours"
+      disabled: true
+      command: "readAttribute"
+      attribute: "lifetime running hours"
+      response:
+          value: 0
+
+    - label: "read the optional attribute: LifetimeRunningHours"
+      disabled: true
+      command: "readAttribute"
+      attribute: "lifetime running hours"
+      response:
+          constraints:
+              type: uint24
+
+    - label: "read the optional attribute: Power"
+      disabled: true
+      command: "readAttribute"
+      attribute: "power"
+      response:
+          value: null
+
+    - label: "read the optional attribute: Power"
+      disabled: true
+      command: "readAttribute"
+      attribute: "power"
+      response:
+          constraints:
+              type: uint24
+
+    - label: "read the optional attribute: LifetimeEnergyConsumed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "lifetime energy consumed"
+      response:
+          value: 0
+
+    - label: "read the optional attribute: LifetimeEnergyConsumed"
+      disabled: true
+      command: "readAttribute"
+      attribute: "lifetime energy consumed"
+      response:
+          constraints:
+              type: uint32

@@ -16,11 +16,59 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
+  <struct name="TestListStructOctet">
+    <cluster code="0x050F"/>
+    <item name="fabricIndex" type="INT64U"/>
+    <item name="operationalCert" type="OCTET_STRING" length="32"/>
+  </struct>
 
-   <struct name="TestListStructOctet">
-     <item name="fabricIndex" type="INT64U"/>
-     <item name="operationalCert" type="OCTET_STRING" length="32"/>
-   </struct>
+  <enum name="SimpleEnum" type="ENUM8">
+    <cluster code="0x050F"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="ValueA" value="0x01"/>
+    <item name="ValueB" value="0x02"/>
+    <item name="ValueC" value="0x03"/>
+  </enum>
+
+  <bitmap name="SimpleBitmap" type="BITMAP8">
+    <cluster code="0x050F"/>
+    <field name="ValueA" mask="0x1"/>
+    <field name="ValueB" mask="0x2"/>
+    <field name="ValueC" mask="0x4"/>
+  </bitmap>
+
+  <struct name="SimpleStruct">
+    <cluster code="0x050F"/>
+    <item name="a" type="INT8U" optional="false"/>
+    <item name="b" type="BOOLEAN" optional="false"/>
+    <item name="c" type="SimpleEnum" optional="false"/>
+    <item name="d" type="OCTET_STRING" optional="false"/>
+    <item name="e" type="CHAR_STRING" optional="false"/>
+    <item name="f" type="SimpleBitmap" optional="false"/>
+  </struct>
+
+  <struct name="NestedStruct">
+    <cluster code="0x050F"/>
+    <item name="a" type="INT8U" optional="false"/>
+    <item name="b" type="BOOLEAN" optional="false"/>
+    <item name="c" type="SimpleStruct" optional="false"/>
+  </struct>
+
+  <struct name="NestedStructList">
+    <cluster code="0x050F"/>
+    <item name="a" type="INT8U" optional="false"/>
+    <item name="b" type="BOOLEAN" optional="false"/>
+    <item name="c" type="SimpleStruct" optional="false"/>
+    <item name="d" type="SimpleStruct" array="true" optional="false"/>
+    <item name="e" type="INT32U" array="true" optional="false"/>
+    <item name="f" type="OCTET_STRING" array="true" optional="false"/>
+    <item name="g" type="INT8U" array="true" optional="false"/>
+  </struct>
+
+  <struct name="DoubleNestedStructList">
+    <cluster code="0x050F"/>
+    <item name="a" type="NestedStructList" array="true" optional="false"/>
+  </struct>
 
   <cluster>
     <domain>CHIP</domain>
@@ -62,6 +110,8 @@ limitations under the License.
     <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="LONG_OCTET_STRING" length="1000" writable="true" optional="false">long_octet_string</attribute>
     <attribute side="server" code="0x001E" define="CHAR_STRING" type="CHAR_STRING" length="10" writable="true" optional="false">char_string</attribute>
     <attribute side="server" code="0x001F" define="LONG_CHAR_STRING" type="LONG_CHAR_STRING" length="1000" writable="true" optional="false">long_char_string</attribute>
+    <attribute side="server" code="0x0020" define="EPOCH_US" type="EPOCH_US" writable="true" optional="false">epoch_us</attribute>
+    <attribute side="server" code="0x0021" define="EPOCH_S" type="EPOCH_S" writable="true" optional="false">epoch_s</attribute>
 
     <!-- This attribute should not be enabled on the server side -->
     <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="false">unsupported</attribute>
@@ -69,48 +119,156 @@ limitations under the License.
     <!-- Test Commands -->
     <command source="client" code="0x00" name="Test" optional="false">
       <description>
-          Simple command without any parameters and without a specific response
+        Simple command without any parameters and without a specific response
       </description>
     </command>
 
     <command source="client" code="0x01" name="TestNotHandled" optional="false">
       <description>
-          Simple command without any parameters and without a specific response not handled by the server
+        Simple command without any parameters and without a specific response not handled by the server
       </description>
     </command>
 
     <command source="client" code="0x02" name="TestSpecific" optional="false">
       <description>
-          Simple command without any parameters and with a specific response
+        Simple command without any parameters and with a specific response
       </description>
     </command>
 
     <command source="client" code="0x03" name="TestUnknownCommand" optional="true">
       <description>
-          Simple command that should not be added to the server.
+        Simple command that should not be added to the server.
       </description>
     </command>
 
     <command source="client" code="0x04" name="TestAddArguments" optional="false">
       <description>
-          Command that takes two arguments and returns their sum.
+        Command that takes two arguments and returns their sum.
       </description>
       <arg name="arg1" type="INT8U"/>
       <arg name="arg2" type="INT8U"/>
     </command>
 
+    <command source="client" code="0x05" name="TestSimpleArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is bool
+      </description>
+      <arg name="arg1" type="BOOLEAN"/>
+    </command>
+
+    <command source="client" code="0x06" name="TestStructArrayArgumentRequest" optional="false">
+      <description>
+        Command that takes various arguments that are arrays, including an array of structs which have a list member.
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
+      <arg name="arg2" type="SimpleStruct" array="true"/>
+      <arg name="arg3" type="SimpleEnum" array="true"/>
+      <arg name="arg4" type="BOOLEAN" array="true"/>
+      <arg name="arg5" type="SimpleEnum"/>
+      <arg name="arg6" type="BOOLEAN"/>
+    </command>
+
+    <!--
+      This command expect a success response if:
+        * 'b' field of arg1 is true
+    -->
+    <command source="client" code="0x07" name="TestStructArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is struct
+      </description>
+      <arg name="arg1" type="SimpleStruct"/>
+    </command>
+
+    <!--
+      This command expect a success response if:
+        * 'b' field of arg1.c is true
+    -->
+    <command source="client" code="0x08" name="TestNestedStructArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is nested struct
+      </description>
+      <arg name="arg1" type="NestedStruct"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1 is an empty list
+        * the field 'b' of all the SimpleStruct contained in arg1 are true
+    -->
+    <command source="client" code="0x09" name="TestListStructArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of struct
+      </description>
+      <arg name="arg1" type="SimpleStruct" array="true"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1 is an empty list
+        * no element is 0
+    -->
+    <command source="client" code="0x0A" name="TestListInt8UArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of INT8U
+      </description>
+      <arg name="arg1" type="INT8U" array="true"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1.d is an empty list
+        * the field 'b' of all the SimpleStruct contained in arg1 are true
+    -->
+    <command source="client" code="0x0B" name="TestNestedStructListArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a Nested Struct List
+      </description>
+      <arg name="arg1" type="NestedStructList"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1 is an empty list
+        * the field 'b' of all the SimpleStruct contained in arg1 are true
+    -->
+    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of Nested Struct List
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
       <description>
-          Simple response for TestWithResponse with a simple return value
+        Simple response for TestWithResponse with a simple return value
       </description>
       <arg name="returnValue" type="INT8U"/>
     </command>
 
     <command source="server" code="0x01" name="TestAddArgumentsResponse" optional="false" disableDefaultResponse="true">
       <description>
-          Response for TestAddArguments that returns the sum.
+        Response for TestAddArguments that returns the sum.
       </description>
       <arg name="returnValue" type="INT8U"/>
+    </command>
+
+    <command source="server" code="0x02" name="TestSimpleArgumentResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Simple response for TestSimpleArgumentRequest with a simple return value
+      </description>
+      <arg name="returnValue" type="BOOLEAN"/>
+    </command>
+
+    <command source="server" code="0x03" name="TestStructArrayArgumentResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Response for TestStructArrayArgumentRequest with complicated return arguments
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
+      <arg name="arg2" type="SimpleStruct" array="true"/>
+      <arg name="arg3" type="SimpleEnum" array="true"/>
+      <arg name="arg4" type="BOOLEAN" array="true"/>
+      <arg name="arg5" type="SimpleEnum"/>
+      <arg name="arg6" type="BOOLEAN"/>
     </command>
 
   </cluster>

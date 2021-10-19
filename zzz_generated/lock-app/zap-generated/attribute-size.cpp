@@ -78,6 +78,67 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x001D: // Descriptor Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // device list
+        {
+            entryLength = 6;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _DeviceType
+            _DeviceType * entry = reinterpret_cast<_DeviceType *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->type, write ? (uint8_t *) &entry->type : src, write, &entryOffset,
+                           sizeof(entry->type)); // DEVTYPE_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->revision, write ? (uint8_t *) &entry->revision : src, write,
+                           &entryOffset, sizeof(entry->revision)); // INT16U
+            break;
+        }
+        case 0x0001: // server list
+        {
+            entryLength = 4;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+            break;
+        }
+        case 0x0002: // client list
+        {
+            entryLength = 4;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+            break;
+        }
+        case 0x0003: // parts list
+        {
+            entryLength = 2;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENDPOINT_NO
+            break;
+        }
+        }
+        break;
+    }
     case 0x0030: // General Commissioning Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -144,7 +205,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             }
             entryOffset = static_cast<uint16_t>(entryOffset + 10);
             copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
-                           sizeof(entry->Type)); // ENUM8
+                           sizeof(entry->Type)); // InterfaceType
             break;
         }
         }
@@ -304,7 +365,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         case 0x003B: // SecurityPolicy
         {
-            entryLength = 3;
+            entryLength = 4;
             if (((index - 1) * entryLength) > (am->size - entryLength))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -316,7 +377,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             copyListMember(write ? dest : (uint8_t *) &entry->RotationTime, write ? (uint8_t *) &entry->RotationTime : src, write,
                            &entryOffset, sizeof(entry->RotationTime)); // INT16U
             copyListMember(write ? dest : (uint8_t *) &entry->Flags, write ? (uint8_t *) &entry->Flags : src, write, &entryOffset,
-                           sizeof(entry->Flags)); // INT8U
+                           sizeof(entry->Flags)); // BITMAP16
             break;
         }
         case 0x003D: // OperationalDatasetComponents
@@ -397,6 +458,27 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x001D: // Descriptor Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // device list
+            // Struct _DeviceType
+            entryLength = 6;
+            break;
+        case 0x0001: // server list
+            // chip::ClusterId
+            entryLength = 4;
+            break;
+        case 0x0002: // client list
+            // chip::ClusterId
+            entryLength = 4;
+            break;
+        case 0x0003: // parts list
+            // chip::EndpointId
+            entryLength = 2;
+            break;
+        }
+        break;
     case 0x0030: // General Commissioning Cluster
         switch (attributeId)
         {
@@ -441,7 +523,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         case 0x003B: // SecurityPolicy
             // Struct _SecurityPolicy
-            entryLength = 3;
+            entryLength = 4;
             break;
         case 0x003D: // OperationalDatasetComponents
             // Struct _OperationalDatasetComponents

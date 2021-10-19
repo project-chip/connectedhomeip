@@ -223,7 +223,7 @@ combination with JLinkRTTClient as follows:
         -   _Blinking slowly_ ; The window cover is half-open, either by tilt, or lift
         -   _Blinking quickly_ ; The window cover is being automatically open or closed
 
-    **Push Button 0** Increase seither tilt or lift, and factory reset
+    **Push Button 0** Increase either tilt or lift, and factory reset
 
         -   Pressed and release: The lift/tilt increases by 10%
 
@@ -240,9 +240,9 @@ combination with JLinkRTTClient as follows:
 
     **Push Button0 and Button1** Switch between lift and tilt
 
-        - Pressing and release both buttons at the same time: switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 suport both (default)
+        - Pressing and release both buttons at the same time: switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 support both (default)
 
-        - Pressing and hold both buttons at the same time: Cycles betwen window covering 1, and window covering 2.
+        - Pressing and hold both buttons at the same time: Cycles between window covering 1, and window covering 2.
 
 *   Once the device is provisioned, it will join the Thread network is
     established, look for the RTT log
@@ -274,7 +274,7 @@ combination with JLinkRTTClient as follows:
     The
     [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
     can now be used to send ZCL commands to the window covering device. For
-    instance, to set the window covering lift by percentantage:
+    instance, to set the window covering lift by percentage:
 
         $ sudo chip-device-ctrl
 

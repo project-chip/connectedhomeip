@@ -50,6 +50,8 @@ static_library("Linux") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "ConnectivityUtils.cpp",
+    "ConnectivityUtils.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "InetPlatformConfig.h",
@@ -84,11 +86,11 @@ static_library("Linux") {
 
   if (chip_mdns != "none") {
     sources += [
-      "MdnsImpl.cpp",
-      "MdnsImpl.h",
+      "DnssdImpl.cpp",
+      "DnssdImpl.h",
     ]
 
-    deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
 
     public_configs += [ ":avahi_client_config" ]
   }

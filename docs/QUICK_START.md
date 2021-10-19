@@ -32,8 +32,11 @@ controller.
 
 #### IP Pairing
 
-`chip-tool pairing onnetwork 0 20202021 3840 ::1 5540` will use PASE over IP to
-pair a device.
+`chip-tool pairing onnetwork 20202021` will use PASE over IP to pair a device.
+
+NOTE: On Linux, if the device is actually running after unit tests ran you have
+to use `chip-tool pairing onnetwork 34567890`, because the unit tests change the
+device configuration.
 
 NOTE: to run both the Node and Controller as separate processes on the same
 Linux or Mac machine, build the all-clusters-app with BLE disabled as follows:

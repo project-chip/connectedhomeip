@@ -51,9 +51,6 @@ static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
 
-// The certificate array has additional overhead due to array encoding
-static constexpr uint32_t kMaxCHIPOpCertArrayLength = (2 * kMaxCHIPCertLength + 32);
-
 // The decode buffer is used to reconstruct TBS section of X.509 certificate, which doesn't include signature.
 static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length_Der;
 
@@ -448,33 +445,6 @@ public:
      **/
     CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, ByteSpan chipCert = ByteSpan());
 
-    /**
-     * @brief Load CHIP certificates into set.
-     *        It is required that the CHIP certificates in the chipCerts buffer stays valid while
-     *        the certificates data in the set is used.
-     *        In case of an error the certificate set is left in the same state as prior to this call.
-     *
-     * @param chipCerts     Buffer containing array of certificates or a single certificate encoded in CHIP TLV form.
-     * @param decodeFlags   Certificate decoding option flags.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR LoadCerts(const ByteSpan chipCerts, BitFlags<CertDecodeFlags> decodeFlags);
-
-    /**
-     * @brief Load CHIP certificates into set.
-     *        It is required that the CHIP certificates in the reader's underlying buffer stays valid while
-     *        the certificates data in the set is used.
-     *        In case of an error the certificate set is left in the same state as prior to this call.
-     *
-     * @param reader       A TLVReader positioned at the CHIP certificates TLV array
-     *                     or TLV structure for a single certificate.
-     * @param decodeFlags  Certificate decoding option flags.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR LoadCerts(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
-
     CHIP_ERROR ReleaseLastCert();
 
     /**
@@ -632,40 +602,6 @@ CHIP_ERROR DecodeChipDN(chip::TLV::TLVReader & reader, ChipDN & dn);
 CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & chipCert);
 
 /**
- * @brief Convert standard X.509 certificates to CHIP certificate array.
- *        This function takes NOC, and ICA cert X.509 certificates and
- *        encodes into CHIP certificate array.
- *
- *        NOC certificate must be provided.
- *        ICA certificate is optional. It can be omitted by providing a 0 length ByteSpan.
- *
- *        The API enforces that the NOC is issued by ICA (if ICA is provided).
- *
- * @param x509NOC           Node operational credentials certificate in X.509 DER encoding.
- * @param x509ICAC          Intermediate CA certificate in X.509 DER encoding.
- * @param chipCertArray     Buffer to store converted certificates in CHIP format.
- *
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
-CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteSpan & x509ICAC, MutableByteSpan & chipCertArray);
-
-/**
- * @brief Extract NOC and ICA Certificates from a CHIP certificate array.
- *        This function takes a CHIP certificate array and splits it into single
- *        NOC and ICA CHIP certificates.
- *
- *        NOC certificate must be provided.
- *        ICA certificate is optional. It will be omitted (nullptr, 0) if the CHIP certificate array contains only one entry.
- *
- * @param[in]  opCertArray Chip certificate array.
- * @param[out] noc         Node operational credentials certificate in CHIP format.
- * @param[out] icac        Intermediate CA certificate in CHIP format.
- *
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
-CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & noc, ByteSpan & icac);
-
-/**
  * @brief Convert CHIP certificate to the standard X.509 DER encoded certificate.
  *
  * @param chipCert        CHIP certificate in CHIP TLV encoding.
@@ -804,15 +740,14 @@ CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint1
 /**
  * @brief Convert a raw CHIP signature to an ASN.1 DER encoded signature structure.
  *
- * @param rawSig        P256 ECDSA signature in raw form.
- * @param derSig        Buffer to store converted ASN.1 DER encoded signature.
- * @param derSigBufSize The size of the buffer to store ASN.1 DER encoded signature.
- * @param derSigLen     The length of the ASN.1 DER encoded signature.
+ * @param[in]     rawSig  P256 ECDSA signature in raw form.
+ * @param[in,out] derSig  Output buffer to receive the converted ASN.1 DER encoded signature.
+ *                        `derSig` must be at least `kMax_ECDSA_Signature_Length_Der` bytes long.
+ *                        The `derSig` size will be set to the actual DER encoded signature length on success.
  *
  * @retval  #CHIP_NO_ERROR  If the signature value was successfully converted.
  */
-CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, uint8_t * derSig, const uint16_t derSigBufSize,
-                                         uint16_t & derSigLen);
+CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, MutableByteSpan & derSig);
 
 /**
  * @brief Convert a raw CHIP ECDSA signature to an ASN.1 DER encoded signature structure.
@@ -872,14 +807,22 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId);
 
 /**
- * Extract Node ID and Fabric ID from an operational certificate array in ByteSpan
- * TLV-encoded form.  This does not perform any sort of validation on the
- * certificate structure other than parsing it.
+ * Extract Public Key from a chip certificate in ByteSpan TLV-encoded form.
+ * This does not perform any sort of validation on the certificate structure
+ * structure than parsing it.
  *
- * Can return any error that can be returned from parsing the array or from the
- * ChipCertificateData* version of ExtractNodeIdFabricIdFromOpCert.
+ * Can return any error that can be returned from parsing the cert.
  */
-CHIP_ERROR ExtractNodeIdFabricIdFromOpCertArray(const ByteSpan & opcertarray, NodeId * nodeId, FabricId * fabricId);
+CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKeySpan & publicKey);
+
+/**
+ * Extract Subject Key Identifier from a chip certificate in ByteSpan TLV-encoded form.
+ * This does not perform any sort of validation on the certificate structure
+ * structure than parsing it.
+ *
+ * Can return any error that can be returned from parsing the cert.
+ */
+CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid);
 
 } // namespace Credentials
 } // namespace chip

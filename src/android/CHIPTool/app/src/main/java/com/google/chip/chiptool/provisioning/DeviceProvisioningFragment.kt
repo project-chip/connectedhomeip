@@ -107,7 +107,7 @@ class DeviceProvisioningFragment : Fragment() {
         R.string.rendezvous_over_ble_scanning_text,
         deviceInfo.discriminator.toString()
       )
-      val device = bluetoothManager.getBluetoothDevice(deviceInfo.discriminator) ?: run {
+      val device = bluetoothManager.getBluetoothDevice(requireContext(), deviceInfo.discriminator) ?: run {
         showMessage(R.string.rendezvous_over_ble_scanning_failed_text)
         return@launch
       }
@@ -122,7 +122,8 @@ class DeviceProvisioningFragment : Fragment() {
       deviceController.setCompletionListener(ConnectionCallback())
 
       val deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
-      deviceController.pairDevice(gatt, deviceId, deviceInfo.setupPinCode)
+      val connId = bluetoothManager.connectionId
+      deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
   }
@@ -130,7 +131,9 @@ class DeviceProvisioningFragment : Fragment() {
   private fun showMessage(msgResId: Int, stringArgs: String? = null) {
     requireActivity().runOnUiThread {
       val context = requireContext()
-      Toast.makeText(context, context.getString(msgResId, stringArgs), Toast.LENGTH_SHORT)
+      val msg = context.getString(msgResId, stringArgs)
+      Log.i(TAG, "showMessage:$msg")
+      Toast.makeText(context, msg, Toast.LENGTH_SHORT)
         .show()
     }
   }
@@ -140,23 +143,18 @@ class DeviceProvisioningFragment : Fragment() {
       Log.d(TAG, "onConnectDeviceComplete")
     }
 
-    /**
-     * This would only happen in the on-network case. In other cases, we need network commissioning
-     * first before this callback can be invoked, so we would use the callback implementation in
-     * EnterNetworkFragment.
-     */
-    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-      Log.d(TAG, "Commissioning complete for $nodeId with errorCode $errorCode")
-      FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
-        ?.onCommissioningComplete(0)
-    }
-
     override fun onStatusUpdate(status: Int) {
       Log.d(TAG, "Pairing status update: $status")
     }
 
     override fun onPairingComplete(code: Int) {
       Log.d(TAG, "onPairingComplete: $code")
+      
+      if (deviceInfo.ipAddress != null) {
+        FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
+          ?.onCommissioningComplete(0)
+        return
+      }
 
       if (code == STATUS_PAIRING_SUCCESS) {
         childFragmentManager.beginTransaction()

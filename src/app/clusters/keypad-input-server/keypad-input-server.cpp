@@ -22,12 +22,15 @@
  ******************************************************************************/
 
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::KeypadInput;
 
 EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode);
 
@@ -51,8 +54,11 @@ exit:
     }
 }
 
-bool emberAfKeypadInputClusterSendKeyCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t keyCode)
+bool emberAfKeypadInputClusterSendKeyCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::SendKey::DecodableType & commandData)
 {
+    auto & keyCode = commandData.keyCode;
+
     EmberAfKeypadInputStatus status = keypadInputClusterSendKey(static_cast<EmberAfKeypadInputCecKeyCode>(keyCode));
     sendResponse(command, status);
     return true;

@@ -42,9 +42,11 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 using namespace chip;
 
@@ -109,15 +111,15 @@ const uint16_t attributeManufacturerCodeCount                   = GENERATED_ATTR
 #define endpointNetworkIndex(x) fixedNetworks[x]
 #endif
 
+namespace {
+app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
+} // anonymous namespace
+
 //------------------------------------------------------------------------------
 // Forward declarations
 
 // Returns endpoint index within a given cluster
 static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask, uint16_t manufacturerCode);
-
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-void emberAfPluginDescriptorServerInitCallback(void);
-#endif
 
 //------------------------------------------------------------------------------
 
@@ -148,6 +150,8 @@ void emberAfEndpointConfigure(void)
 #ifdef DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
     {
+        // This is assuming that EMBER_AF_ENDPOINT_DISABLED is 0
+        static_assert(EMBER_AF_ENDPOINT_DISABLED == 0, "We are creating enabled dynamic endpoints!");
         memset(&emAfEndpoints[FIXED_ENDPOINT_COUNT], 0,
                sizeof(EmberAfDefinedEndpoint) * (MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT));
     }
@@ -196,15 +200,14 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     emAfEndpoints[index].deviceVersion = deviceVersion;
     emAfEndpoints[index].endpointType  = ep;
     emAfEndpoints[index].networkIndex  = 0;
-    emAfEndpoints[index].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
+    // Start the endpoint off as disabled.
+    emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
-    emberAfSetDeviceEnabled(id, true);
 
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-    // Rebuild descriptor attributes on all endpoints
-    emberAfPluginDescriptorServerInitCallback();
-#endif
+    // Now enable the endpoint.
+    emberAfEndpointEnableDisable(id, true);
+    emberAfSetDeviceEnabled(id, true);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -221,14 +224,9 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         if (ep)
         {
             emberAfSetDeviceEnabled(ep, false);
+            emberAfEndpointEnableDisable(ep, false);
             emAfEndpoints[index].endpoint = 0;
-            emAfEndpoints[index].bitmask  = 0;
         }
-
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-        // Rebuild descriptor attributes on all endpoints
-        emberAfPluginDescriptorServerInitCallback();
-#endif
     }
 
     return ep;
@@ -333,58 +331,37 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
 }
 
 // This function is used to call the per-cluster attribute changed callback
-void emAfClusterAttributeChangedCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                         uint8_t clientServerMask, uint16_t manufacturerCode)
+void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask)
 {
-    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, clientServerMask, manufacturerCode);
+    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask,
+                                                             EMBER_AF_NULL_MANUFACTURER_CODE);
     if (cluster != NULL)
     {
-        if (manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)
+        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
+        if (f != NULL)
         {
-            EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
-            if (f != NULL)
-            {
-                // emberAfPushEndpointNetworkIndex(endpoint);
-                ((EmberAfClusterAttributeChangedCallback) f)(endpoint, attributeId);
-                // emberAfPopNetworkIndex();
-            }
-        }
-        else
-        {
-            EmberAfGenericClusterFunction f =
-                emberAfFindClusterFunction(cluster, CLUSTER_MASK_MANUFACTURER_SPECIFIC_ATTRIBUTE_CHANGED_FUNCTION);
-            if (f != NULL)
-            {
-                // emberAfPushEndpointNetworkIndex(endpoint);
-                ((EmberAfManufacturerSpecificClusterAttributeChangedCallback) f)(endpoint, attributeId, manufacturerCode);
-                // emberAfPopNetworkIndex();
-            }
+            ((EmberAfClusterAttributeChangedCallback) f)(attributePath);
         }
     }
 }
 
 // This function is used to call the per-cluster pre-attribute changed callback
-EmberAfStatus emAfClusterPreAttributeChangedCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                     uint8_t clientServerMask, uint16_t manufacturerCode,
+EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, clientServerMask, manufacturerCode);
+    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask,
+                                                             EMBER_AF_NULL_MANUFACTURER_CODE);
     if (cluster == NULL)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
     else
     {
-        EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-        if (manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)
+        EmberAfStatus status            = EMBER_ZCL_STATUS_SUCCESS;
+        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
+        if (f != NULL)
         {
-            EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
-            if (f != NULL)
-            {
-                // emberAfPushEndpointNetworkIndex(endpoint);
-                status = ((EmberAfClusterPreAttributeChangedCallback) f)(endpoint, attributeId, attributeType, size, value);
-                // emberAfPopNetworkIndex();
-            }
+            status = ((EmberAfClusterPreAttributeChangedCallback) f)(attributePath, attributeType, size, value);
         }
         return status;
     }
@@ -609,16 +586,18 @@ bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am,
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write, int32_t index)
 {
-    uint8_t i;
     uint16_t attributeOffsetIndex = 0;
 
-    for (i = 0; i < emberAfEndpointCount(); i++)
+    for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
-        if (emAfEndpoints[i].endpoint == attRecord->endpoint)
+        // Is this a dynamic endpoint?
+        bool isDynamicEndpoint = (ep >= emberAfFixedEndpointCount());
+
+        if (emAfEndpoints[ep].endpoint == attRecord->endpoint)
         {
-            EmberAfEndpointType * endpointType = emAfEndpoints[i].endpointType;
+            EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
             uint8_t clusterIndex;
-            if (!emberAfEndpointIndexIsEnabled(i))
+            if (!emberAfEndpointIndexIsEnabled(ep))
             {
                 continue;
             }
@@ -672,15 +651,29 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     }
                                 }
 
-                                return (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE
-                                            ? (write) ? emberAfExternalAttributeWriteCallback(
-                                                            attRecord->endpoint, attRecord->clusterId, am,
-                                                            emAfGetManufacturerCodeForAttribute(cluster, am), buffer, index)
-                                                      : emberAfExternalAttributeReadCallback(
-                                                            attRecord->endpoint, attRecord->clusterId, am,
-                                                            emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
-                                                            emberAfAttributeSize(am), index)
-                                            : typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index));
+                                // Is the attribute externally stored?
+                                if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
+                                {
+                                    return (write ? emberAfExternalAttributeWriteCallback(
+                                                        attRecord->endpoint, attRecord->clusterId, am,
+                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer, index)
+                                                  : emberAfExternalAttributeReadCallback(
+                                                        attRecord->endpoint, attRecord->clusterId, am,
+                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
+                                                        emberAfAttributeSize(am), index));
+                                }
+                                else
+                                {
+                                    // Internal storage is only supported for fixed endpoints
+                                    if (!isDynamicEndpoint)
+                                    {
+                                        return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index);
+                                    }
+                                    else
+                                    {
+                                        return EMBER_ZCL_STATUS_FAILURE;
+                                    }
+                                }
                             }
                         }
                         else
@@ -702,9 +695,9 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
         else
         { // Not the endpoint we are looking for
             // Dynamic endpoints are external and don't factor into storage size
-            if (i < emberAfFixedEndpointCount())
+            if (!isDynamicEndpoint)
             {
-                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[i].endpointType->endpointSize);
+                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
             }
         }
     }
@@ -980,7 +973,40 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     endpoint, cluster->clusterId,
                     (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
             }
+
+            // Clear out any attribute access overrides registered for this
+            // endpoint.
+            app::AttributeAccessInterface * prev = nullptr;
+            app::AttributeAccessInterface * cur  = gAttributeAccessOverrides;
+            while (cur)
+            {
+                app::AttributeAccessInterface * next = cur->GetNext();
+                if (cur->MatchesExactly(endpoint))
+                {
+                    // Remove it from the list
+                    if (prev)
+                    {
+                        prev->SetNext(next);
+                    }
+                    else
+                    {
+                        gAttributeAccessOverrides = next;
+                    }
+
+                    // Do not change prev in this case.
+                }
+                else
+                {
+                    prev = cur;
+                }
+                cur = next;
+            }
         }
+
+#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
+        // Rebuild descriptor attributes on all endpoints
+        MatterDescriptorPluginServerInitCallback();
+#endif
     }
 
     return true;
@@ -1411,3 +1437,31 @@ bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, Cluste
     return true;
 }
 #endif
+
+bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverride)
+{
+    for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(*attrOverride))
+        {
+            ChipLogError(Zcl, "Duplicate attribute override registration failed");
+            return false;
+        }
+    }
+    attrOverride->SetNext(gAttributeAccessOverrides);
+    gAttributeAccessOverrides = attrOverride;
+    return true;
+}
+
+app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
+{
+    for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(endpointId, clusterId))
+        {
+            return cur;
+        }
+    }
+
+    return nullptr;
+}

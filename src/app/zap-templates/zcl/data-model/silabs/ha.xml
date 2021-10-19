@@ -90,7 +90,7 @@ limitations under the License.
     <attribute side="server" code="0x0029" define="THERMOSTAT_RUNNING_STATE" type="BITMAP16" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">hvac relay state</attribute>
     <attribute side="server" code="0x0030" define="SETPOINT_CHANGE_SOURCE" type="ENUM8" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change source</attribute>
     <attribute side="server" code="0x0031" define="SETPOINT_CHANGE_AMOUNT" type="INT16S" writable="false" default="0x8000" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change amount</attribute>
-    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="UTC" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change source timestamp</attribute>
+    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change source timestamp</attribute>
     <attribute side="server" code="0x0040" define="AC_TYPE" type="ENUM8" min="0x00" max="0x04" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">ac type</attribute>
     <attribute side="server" code="0x0041" define="AC_CAPACITY" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">ac capacity</attribute>
     <attribute side="server" code="0x0042" define="AC_REFRIGERANT_TYPE" type="ENUM8" min="0x00" max="0x03" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">ac refrigerant type</attribute>
@@ -1312,13 +1312,13 @@ limitations under the License.
       <description>
         Locks the door
       </description>
-      <arg name="PIN" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
+      <arg name="PIN" type="OCTET_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
     <command source="client" code="0x01" name="UnlockDoor" optional="false" cli="zcl lock unlock">
       <description>
         Unlocks the door
       </description>
-      <arg name="PIN" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
+      <arg name="PIN" type="OCTET_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
     <command source="client" code="0x02" name="Toggle" optional="true" introducedIn="ha-1.2-05-3520-29">
       <description>
@@ -1331,7 +1331,7 @@ limitations under the License.
          Unlock the door with a timeout. When the timeout expires, the door will automatically re-lock.
        </description>
       <arg name="timeoutInSeconds" type="INT16U"/>
-      <arg name="pin" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
+      <arg name="pin" type="OCTET_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
     <command source="client" code="0x04" name="GetLogRecord" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-log-record">
       <description>
@@ -1346,7 +1346,7 @@ limitations under the License.
       <arg name="userId" type="INT16U"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="userType" type="DoorLockUserType"/>
-      <arg name="pin" type="CHAR_STRING"/>
+      <arg name="pin" type="OCTET_STRING"/>
     </command>
     <command source="client" code="0x06" name="GetPin" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-pin">
       <description>
@@ -1468,7 +1468,7 @@ limitations under the License.
       <arg name="userId" type="INT16U"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="userType" type="DoorLockUserType"/>
-      <arg name="id" type="CHAR_STRING"/>
+      <arg name="id" type="OCTET_STRING"/>
     </command>
     <command source="client" code="0x17" name="GetRfid" optional="true" introducedIn="ha-1.2-05-3520-29" cli="zcl lock get-rfid">
       <description>
@@ -1521,7 +1521,7 @@ limitations under the License.
       <arg name="source" type="INT8U"/>
       <arg name="eventIdOrAlarmCode" type="INT8U"/>
       <arg name="userId" type="INT16U"/>
-      <arg name="pin" type="CHAR_STRING"/>
+      <arg name="pin" type="OCTET_STRING"/>
     </command>
     <command source="server" code="0x05" name="SetPinResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1536,7 +1536,7 @@ limitations under the License.
       <arg name="userId" type="INT16U"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="userType" type="DoorLockUserType"/>
-      <arg name="pin" type="CHAR_STRING"/>
+      <arg name="pin" type="OCTET_STRING"/>
     </command>
     <command source="server" code="0x07" name="ClearPinResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1658,7 +1658,7 @@ limitations under the License.
       <arg name="userId" type="INT16U"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="userType" type="DoorLockUserType"/>
-      <arg name="rfid" type="CHAR_STRING"/>
+      <arg name="rfid" type="OCTET_STRING"/>
     </command>
     <command source="server" code="0x18" name="ClearRfidResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1679,8 +1679,8 @@ limitations under the License.
       <arg name="source" type="INT8U"/>
       <arg name="eventCode" type="DoorLockOperationEventCode"/>
       <arg name="userId" type="INT16U"/>
-      <arg name="pin" type="CHAR_STRING"/>
-      <arg name="timeStamp" type="INT32U"/>
+      <arg name="pin" type="OCTET_STRING"/>
+      <arg name="timeStamp" type="epoch_s"/>
       <arg name="data" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
     <command source="server" code="0x21" name="ProgrammingEventNotification" optional="true" introducedIn="ha-1.2-05-3520-29">
@@ -1690,10 +1690,10 @@ limitations under the License.
       <arg name="source" type="INT8U"/>
       <arg name="eventCode" type="DoorLockProgrammingEventCode"/>
       <arg name="userId" type="INT16U"/>
-      <arg name="pin" type="CHAR_STRING"/>
+      <arg name="pin" type="OCTET_STRING"/>
       <arg name="userType" type="DoorLockUserType"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
-      <arg name="timeStamp" type="INT32U"/>
+      <arg name="timeStamp" type="epoch_s"/>
       <arg name="data" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
   </cluster>
@@ -1779,7 +1779,7 @@ limitations under the License.
       </description>
       <arg name="applianceStatus" type="ApplianceStatus"/>
       <arg name="remoteEnableFlagsAndDeviceStatus2" type="RemoteEnableFlagsAndDeviceStatus2"/>
-      <arg name="applianceStatus2" type="INT24U"/>
+      <arg name="applianceStatus2" type="ApplianceStatus"/>
       <!-- optional -->
     </command>
     <command source="server" code="0x01" name="SignalStateNotification" optional="false">
@@ -1788,7 +1788,7 @@ limitations under the License.
       </description>
       <arg name="applianceStatus" type="ApplianceStatus"/>
       <arg name="remoteEnableFlagsAndDeviceStatus2" type="RemoteEnableFlagsAndDeviceStatus2"/>
-      <arg name="applianceStatus2" type="INT24U"/>
+      <arg name="applianceStatus2" type="ApplianceStatus"/>
       <!-- optional -->
     </command>
   </cluster>
@@ -2101,7 +2101,7 @@ limitations under the License.
       <description>
         The Appliance Statistics Cluster server occasionally sends out a Log Notification command to the devices to which it needs to log information related to statistics (e.g., home gateways) which implement the client side of Appliance Statistics Cluster.
       </description>
-      <arg name="timeStamp" type="TIME_OF_DAY"/>
+      <arg name="timeStamp" type="epoch_s"/>
       <arg name="logId" type="INT32U"/>
       <arg name="logLength" type="INT32U"/>
       <arg name="logPayload" type="INT8U" array="true"/>
@@ -2110,7 +2110,7 @@ limitations under the License.
       <description>
         The Appliance Statistics Cluster server sends out a Log Response command to respond to a Log Request command generated by the client side of the Appliance Statistics cluster.
       </description>
-      <arg name="timeStamp" type="TIME_OF_DAY"/>
+      <arg name="timeStamp" type="epoch_s"/>
       <arg name="logId" type="INT32U"/>
       <arg name="logLength" type="INT32U"/>
       <arg name="logPayload" type="INT8U" array="true"/>

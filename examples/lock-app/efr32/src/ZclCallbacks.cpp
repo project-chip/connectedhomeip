@@ -25,33 +25,19 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af-types.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
-    if (clusterId != OnOff::Id)
+    if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
-        EFR32_LOG("Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-        return;
-    }
-
-    if (attributeId != OnOff::Attributes::Ids::OnOff)
-    {
-        EFR32_LOG("Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-        return;
-    }
-
-    if (*value)
-    {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::LOCK_ACTION);
-    }
-    else
-    {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::UNLOCK_ACTION);
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock,
+                                     *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
     }
 }
 

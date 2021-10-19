@@ -45,13 +45,6 @@ CHIP_ERROR QPGConfig::Init()
     return CHIP_NO_ERROR;
 }
 
-uint16_t QPGConfig::GetSettingsMaxValueLength(Key key)
-{
-    uint16_t keyLen;
-
-    return (qvCHIP_Nvm_GetMaxKeyLen(key, &keyLen) == QV_STATUS_NO_ERROR) ? keyLen : 0;
-}
-
 CHIP_ERROR QPGConfig::ReadConfigValue(Key key, bool & val)
 {
     uint16_t length;

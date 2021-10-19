@@ -61,10 +61,6 @@
 #include <inet/DNSResolver.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-#include <inet/RawEndPoint.h>
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -109,21 +105,7 @@
 namespace chip {
 namespace Inet {
 
-// Forward Declarations
-
 class InetLayer;
-
-namespace Platform {
-namespace InetLayer {
-
-extern CHIP_ERROR WillInit(Inet::InetLayer * aLayer, void * aContext);
-extern void DidInit(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError);
-
-extern CHIP_ERROR WillShutdown(Inet::InetLayer * aLayer, void * aContext);
-extern void DidShutdown(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError);
-
-} // namespace InetLayer
-} // namespace Platform
 
 /**
  *  @class InetLayer
@@ -147,11 +129,10 @@ class DLL_EXPORT InetLayer
 {
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
     friend class DNSResolver;
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+    friend class AsyncDNSResolverSockets;
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    friend class RawEndPoint;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     friend class TCPEndPoint;
@@ -160,12 +141,6 @@ class DLL_EXPORT InetLayer
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     friend class UDPEndPoint;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    friend class AsyncDNSResolverSockets;
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 public:
     /**
@@ -185,13 +160,9 @@ public:
     // Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
     CHIP_ERROR Shutdown();
 
-    chip::System::Layer * SystemLayer() const;
+    chip::System::Layer * SystemLayer() const { return mSystemLayer; }
 
     // End Points
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    CHIP_ERROR NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint);
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR NewTCPEndPoint(TCPEndPoint ** retEndPoint);
@@ -230,7 +201,7 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static CHIP_ERROR HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType, uintptr_t aArgument);
 
-    static chip::System::LwIPEventHandlerDelegate sInetEventHandlerDelegate;
+    static chip::System::LayerLwIP::EventHandlerDelegate sInetEventHandlerDelegate;
 
     // In some implementations, there may be a shared event / message
     // queue for the InetLayer used by other system events / messages.
@@ -253,9 +224,6 @@ public:
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
             type == kInetEvent_UDPDataReceived ||
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-            type == kInetEvent_RawDataReceived ||
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
             false;
     }
 
@@ -300,19 +268,8 @@ private:
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    friend CHIP_ERROR Platform::InetLayer::WillInit(Inet::InetLayer * aLayer, void * aContext);
-    friend void Platform::InetLayer::DidInit(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError);
-
-    friend CHIP_ERROR Platform::InetLayer::WillShutdown(Inet::InetLayer * aLayer, void * aContext);
-    friend void Platform::InetLayer::DidShutdown(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError);
-
     bool IsIdleTimerRunning();
 };
-
-inline chip::System::Layer * InetLayer::SystemLayer() const
-{
-    return mSystemLayer;
-}
 
 /**
  *  @class IPPacketInfo
@@ -335,12 +292,6 @@ public:
 
     void Clear();
 };
-
-extern CHIP_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
-                                   uint16_t & aPort);
-
-extern CHIP_ERROR ParseHostPortAndInterface(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
-                                            uint16_t & aPort, const char *& aInterface, uint16_t & aInterfaceLen);
 
 } // namespace Inet
 } // namespace chip

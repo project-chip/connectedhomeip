@@ -58,6 +58,8 @@ namespace System {
 
 // Forward class and class template declarations
 class Layer;
+class LayerSockets;
+class LayerLwIP;
 template <class T, unsigned int N>
 class ObjectPool;
 
@@ -100,8 +102,6 @@ public:
     void Release();
     Layer & SystemLayer() const;
 
-protected:
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
     /**< What to do when DeferredRelease fails to post a kEvent_ReleaseObj. */
     enum ReleaseDeferralErrorTactic
     {
@@ -110,7 +110,9 @@ protected:
         kReleaseDeferralErrorTactic_Die,     /**< Die with message. */
     };
 
-    void DeferredRelease(Layer * aSystemLayer, ReleaseDeferralErrorTactic aTactic);
+protected:
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    void DeferredRelease(LayerLwIP * aSystemLayer, ReleaseDeferralErrorTactic aTactic);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:

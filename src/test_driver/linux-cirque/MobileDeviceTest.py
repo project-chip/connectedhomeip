@@ -23,7 +23,7 @@ import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
-logger = logging.getLogger('CHIPInteractionModelTest')
+logger = logging.getLogger('MobileDeviceTest')
 logger.setLevel(logging.INFO)
 
 sh = logging.StreamHandler()
@@ -45,6 +45,7 @@ DEVICE_CONFIG = {
         'base_image': 'connectedhomeip/chip-cirque-device-base',
         'capability': ['Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
+        'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     },
@@ -53,6 +54,7 @@ DEVICE_CONFIG = {
         'base_image': 'connectedhomeip/chip-cirque-device-base',
         'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
+        'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     }
@@ -71,7 +73,7 @@ class TestPythonController(CHIPVirtualHome):
         self.run_controller_test()
 
     def run_controller_test(self):
-        ethernet_ip = [device['description']['ipv4_addr'] for device in self.non_ap_devices
+        ethernet_ip = [device['description']['ipv6_addr'] for device in self.non_ap_devices
                        if device['type'] == 'CHIPEndDevice'][0]
         server_ids = [device['id'] for device in self.non_ap_devices
                       if device['type'] == 'CHIPEndDevice']

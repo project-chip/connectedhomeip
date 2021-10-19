@@ -52,11 +52,6 @@
             "output": "cluster-id.h"
         },
         {
-            "path": "../../zap-templates/templates/app/client-command-macro.zapt",
-            "name": "ZCL client command",
-            "output": "client-command-macro.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/command-id.zapt",
             "name": "ZCL command-id header",
             "output": "command-id.h"
@@ -70,6 +65,11 @@
             "path": "../../zap-templates/templates/app/print-cluster.zapt",
             "name": "ZCL print-cluster header",
             "output": "print-cluster.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/callbacks/PluginCallbacks.zapt",
+            "name": "Matter Callbacks header",
+            "output": "callbacks/PluginCallbacks.h"
         },
         {
             "path": "../../zap-templates/templates/app/attributes/Accessors.zapt",
@@ -95,6 +95,16 @@
             "path": "../../zap-templates/templates/app/ids/Commands.zapt",
             "name": "Commands Ids header",
             "output": "ids/Commands.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-objects.zapt",
+            "name": "Cluster objects header for Interaction Model",
+            "output": "cluster-objects.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-objects-src.zapt",
+            "name": "Cluster objects header for Interaction Model",
+            "output": "cluster-objects.cpp"
         }
     ]
 }

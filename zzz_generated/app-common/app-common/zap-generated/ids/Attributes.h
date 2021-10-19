@@ -27,1551 +27,4685 @@ namespace Clusters {
 
 namespace Globals {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId FeatureMap      = 0x0000FFFC;
-static constexpr AttributeId ClusterRevision = 0x0000FFFD;
-} // namespace Ids
+
+namespace FeatureMap {
+static constexpr AttributeId Id = 0x0000FFFC;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = 0x0000FFFD;
+} // namespace ClusterRevision
+
 } // namespace Attributes
 } // namespace Globals
 
 namespace PowerConfiguration {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MainsVoltage                   = 0x00000000;
-static constexpr AttributeId MainsFrequency                 = 0x00000001;
-static constexpr AttributeId MainsAlarmMask                 = 0x00000010;
-static constexpr AttributeId MainsVoltageMinThreshold       = 0x00000011;
-static constexpr AttributeId MainsVoltageMaxThreshold       = 0x00000012;
-static constexpr AttributeId MainsVoltageDwellTrip          = 0x00000013;
-static constexpr AttributeId BatteryVoltage                 = 0x00000020;
-static constexpr AttributeId BatteryPercentageRemaining     = 0x00000021;
-static constexpr AttributeId BatteryManufacturer            = 0x00000030;
-static constexpr AttributeId BatterySize                    = 0x00000031;
-static constexpr AttributeId BatteryAhrRating               = 0x00000032;
-static constexpr AttributeId BatteryQuantity                = 0x00000033;
-static constexpr AttributeId BatteryRatedVoltage            = 0x00000034;
-static constexpr AttributeId BatteryAlarmMask               = 0x00000035;
-static constexpr AttributeId BatteryVoltageMinThreshold     = 0x00000036;
-static constexpr AttributeId BatteryVoltageThreshold1       = 0x00000037;
-static constexpr AttributeId BatteryVoltageThreshold2       = 0x00000038;
-static constexpr AttributeId BatteryVoltageThreshold3       = 0x00000039;
-static constexpr AttributeId BatteryPercentageMinThreshold  = 0x0000003A;
-static constexpr AttributeId BatteryPercentageThreshold1    = 0x0000003B;
-static constexpr AttributeId BatteryPercentageThreshold2    = 0x0000003C;
-static constexpr AttributeId BatteryPercentageThreshold3    = 0x0000003D;
-static constexpr AttributeId BatteryAlarmState              = 0x0000003E;
-static constexpr AttributeId Battery2Voltage                = 0x00000040;
-static constexpr AttributeId Battery2PercentageRemaining    = 0x00000041;
-static constexpr AttributeId Battery2Manufacturer           = 0x00000050;
-static constexpr AttributeId Battery2Size                   = 0x00000051;
-static constexpr AttributeId Battery2AhrRating              = 0x00000052;
-static constexpr AttributeId Battery2Quantity               = 0x00000053;
-static constexpr AttributeId Battery2RatedVoltage           = 0x00000054;
-static constexpr AttributeId Battery2AlarmMask              = 0x00000055;
-static constexpr AttributeId Battery2VoltageMinThreshold    = 0x00000056;
-static constexpr AttributeId Battery2VoltageThreshold1      = 0x00000057;
-static constexpr AttributeId Battery2VoltageThreshold2      = 0x00000058;
-static constexpr AttributeId Battery2VoltageThreshold3      = 0x00000059;
-static constexpr AttributeId Battery2PercentageMinThreshold = 0x0000005A;
-static constexpr AttributeId Battery2PercentageThreshold1   = 0x0000005B;
-static constexpr AttributeId Battery2PercentageThreshold2   = 0x0000005C;
-static constexpr AttributeId Battery2PercentageThreshold3   = 0x0000005D;
-static constexpr AttributeId Battery2AlarmState             = 0x0000005E;
-static constexpr AttributeId Battery3Voltage                = 0x00000060;
-static constexpr AttributeId Battery3PercentageRemaining    = 0x00000061;
-static constexpr AttributeId Battery3Manufacturer           = 0x00000070;
-static constexpr AttributeId Battery3Size                   = 0x00000071;
-static constexpr AttributeId Battery3AhrRating              = 0x00000072;
-static constexpr AttributeId Battery3Quantity               = 0x00000073;
-static constexpr AttributeId Battery3RatedVoltage           = 0x00000074;
-static constexpr AttributeId Battery3AlarmMask              = 0x00000075;
-static constexpr AttributeId Battery3VoltageMinThreshold    = 0x00000076;
-static constexpr AttributeId Battery3VoltageThreshold1      = 0x00000077;
-static constexpr AttributeId Battery3VoltageThreshold2      = 0x00000078;
-static constexpr AttributeId Battery3VoltageThreshold3      = 0x00000079;
-static constexpr AttributeId Battery3PercentageMinThreshold = 0x0000007A;
-static constexpr AttributeId Battery3PercentageThreshold1   = 0x0000007B;
-static constexpr AttributeId Battery3PercentageThreshold2   = 0x0000007C;
-static constexpr AttributeId Battery3PercentageThreshold3   = 0x0000007D;
-static constexpr AttributeId Battery3AlarmState             = 0x0000007E;
-} // namespace Ids
+
+namespace MainsVoltage {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MainsVoltage
+
+namespace MainsFrequency {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MainsFrequency
+
+namespace MainsAlarmMask {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace MainsAlarmMask
+
+namespace MainsVoltageMinThreshold {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace MainsVoltageMinThreshold
+
+namespace MainsVoltageMaxThreshold {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace MainsVoltageMaxThreshold
+
+namespace MainsVoltageDwellTrip {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace MainsVoltageDwellTrip
+
+namespace BatteryVoltage {
+static constexpr AttributeId Id = 0x00000020;
+} // namespace BatteryVoltage
+
+namespace BatteryPercentageRemaining {
+static constexpr AttributeId Id = 0x00000021;
+} // namespace BatteryPercentageRemaining
+
+namespace BatteryManufacturer {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace BatteryManufacturer
+
+namespace BatterySize {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace BatterySize
+
+namespace BatteryAhrRating {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace BatteryAhrRating
+
+namespace BatteryQuantity {
+static constexpr AttributeId Id = 0x00000033;
+} // namespace BatteryQuantity
+
+namespace BatteryRatedVoltage {
+static constexpr AttributeId Id = 0x00000034;
+} // namespace BatteryRatedVoltage
+
+namespace BatteryAlarmMask {
+static constexpr AttributeId Id = 0x00000035;
+} // namespace BatteryAlarmMask
+
+namespace BatteryVoltageMinThreshold {
+static constexpr AttributeId Id = 0x00000036;
+} // namespace BatteryVoltageMinThreshold
+
+namespace BatteryVoltageThreshold1 {
+static constexpr AttributeId Id = 0x00000037;
+} // namespace BatteryVoltageThreshold1
+
+namespace BatteryVoltageThreshold2 {
+static constexpr AttributeId Id = 0x00000038;
+} // namespace BatteryVoltageThreshold2
+
+namespace BatteryVoltageThreshold3 {
+static constexpr AttributeId Id = 0x00000039;
+} // namespace BatteryVoltageThreshold3
+
+namespace BatteryPercentageMinThreshold {
+static constexpr AttributeId Id = 0x0000003A;
+} // namespace BatteryPercentageMinThreshold
+
+namespace BatteryPercentageThreshold1 {
+static constexpr AttributeId Id = 0x0000003B;
+} // namespace BatteryPercentageThreshold1
+
+namespace BatteryPercentageThreshold2 {
+static constexpr AttributeId Id = 0x0000003C;
+} // namespace BatteryPercentageThreshold2
+
+namespace BatteryPercentageThreshold3 {
+static constexpr AttributeId Id = 0x0000003D;
+} // namespace BatteryPercentageThreshold3
+
+namespace BatteryAlarmState {
+static constexpr AttributeId Id = 0x0000003E;
+} // namespace BatteryAlarmState
+
+namespace Battery2Voltage {
+static constexpr AttributeId Id = 0x00000040;
+} // namespace Battery2Voltage
+
+namespace Battery2PercentageRemaining {
+static constexpr AttributeId Id = 0x00000041;
+} // namespace Battery2PercentageRemaining
+
+namespace Battery2Manufacturer {
+static constexpr AttributeId Id = 0x00000050;
+} // namespace Battery2Manufacturer
+
+namespace Battery2Size {
+static constexpr AttributeId Id = 0x00000051;
+} // namespace Battery2Size
+
+namespace Battery2AhrRating {
+static constexpr AttributeId Id = 0x00000052;
+} // namespace Battery2AhrRating
+
+namespace Battery2Quantity {
+static constexpr AttributeId Id = 0x00000053;
+} // namespace Battery2Quantity
+
+namespace Battery2RatedVoltage {
+static constexpr AttributeId Id = 0x00000054;
+} // namespace Battery2RatedVoltage
+
+namespace Battery2AlarmMask {
+static constexpr AttributeId Id = 0x00000055;
+} // namespace Battery2AlarmMask
+
+namespace Battery2VoltageMinThreshold {
+static constexpr AttributeId Id = 0x00000056;
+} // namespace Battery2VoltageMinThreshold
+
+namespace Battery2VoltageThreshold1 {
+static constexpr AttributeId Id = 0x00000057;
+} // namespace Battery2VoltageThreshold1
+
+namespace Battery2VoltageThreshold2 {
+static constexpr AttributeId Id = 0x00000058;
+} // namespace Battery2VoltageThreshold2
+
+namespace Battery2VoltageThreshold3 {
+static constexpr AttributeId Id = 0x00000059;
+} // namespace Battery2VoltageThreshold3
+
+namespace Battery2PercentageMinThreshold {
+static constexpr AttributeId Id = 0x0000005A;
+} // namespace Battery2PercentageMinThreshold
+
+namespace Battery2PercentageThreshold1 {
+static constexpr AttributeId Id = 0x0000005B;
+} // namespace Battery2PercentageThreshold1
+
+namespace Battery2PercentageThreshold2 {
+static constexpr AttributeId Id = 0x0000005C;
+} // namespace Battery2PercentageThreshold2
+
+namespace Battery2PercentageThreshold3 {
+static constexpr AttributeId Id = 0x0000005D;
+} // namespace Battery2PercentageThreshold3
+
+namespace Battery2AlarmState {
+static constexpr AttributeId Id = 0x0000005E;
+} // namespace Battery2AlarmState
+
+namespace Battery3Voltage {
+static constexpr AttributeId Id = 0x00000060;
+} // namespace Battery3Voltage
+
+namespace Battery3PercentageRemaining {
+static constexpr AttributeId Id = 0x00000061;
+} // namespace Battery3PercentageRemaining
+
+namespace Battery3Manufacturer {
+static constexpr AttributeId Id = 0x00000070;
+} // namespace Battery3Manufacturer
+
+namespace Battery3Size {
+static constexpr AttributeId Id = 0x00000071;
+} // namespace Battery3Size
+
+namespace Battery3AhrRating {
+static constexpr AttributeId Id = 0x00000072;
+} // namespace Battery3AhrRating
+
+namespace Battery3Quantity {
+static constexpr AttributeId Id = 0x00000073;
+} // namespace Battery3Quantity
+
+namespace Battery3RatedVoltage {
+static constexpr AttributeId Id = 0x00000074;
+} // namespace Battery3RatedVoltage
+
+namespace Battery3AlarmMask {
+static constexpr AttributeId Id = 0x00000075;
+} // namespace Battery3AlarmMask
+
+namespace Battery3VoltageMinThreshold {
+static constexpr AttributeId Id = 0x00000076;
+} // namespace Battery3VoltageMinThreshold
+
+namespace Battery3VoltageThreshold1 {
+static constexpr AttributeId Id = 0x00000077;
+} // namespace Battery3VoltageThreshold1
+
+namespace Battery3VoltageThreshold2 {
+static constexpr AttributeId Id = 0x00000078;
+} // namespace Battery3VoltageThreshold2
+
+namespace Battery3VoltageThreshold3 {
+static constexpr AttributeId Id = 0x00000079;
+} // namespace Battery3VoltageThreshold3
+
+namespace Battery3PercentageMinThreshold {
+static constexpr AttributeId Id = 0x0000007A;
+} // namespace Battery3PercentageMinThreshold
+
+namespace Battery3PercentageThreshold1 {
+static constexpr AttributeId Id = 0x0000007B;
+} // namespace Battery3PercentageThreshold1
+
+namespace Battery3PercentageThreshold2 {
+static constexpr AttributeId Id = 0x0000007C;
+} // namespace Battery3PercentageThreshold2
+
+namespace Battery3PercentageThreshold3 {
+static constexpr AttributeId Id = 0x0000007D;
+} // namespace Battery3PercentageThreshold3
+
+namespace Battery3AlarmState {
+static constexpr AttributeId Id = 0x0000007E;
+} // namespace Battery3AlarmState
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace PowerConfiguration
 
 namespace DeviceTemperatureConfiguration {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId CurrentTemperature     = 0x00000000;
-static constexpr AttributeId MinTempExperienced     = 0x00000001;
-static constexpr AttributeId MaxTempExperienced     = 0x00000002;
-static constexpr AttributeId OverTempTotalDwell     = 0x00000003;
-static constexpr AttributeId DeviceTempAlarmMask    = 0x00000010;
-static constexpr AttributeId LowTempThreshold       = 0x00000011;
-static constexpr AttributeId HighTempThreshold      = 0x00000012;
-static constexpr AttributeId LowTempDwellTripPoint  = 0x00000013;
-static constexpr AttributeId HighTempDwellTripPoint = 0x00000014;
-} // namespace Ids
+
+namespace CurrentTemperature {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CurrentTemperature
+
+namespace MinTempExperienced {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinTempExperienced
+
+namespace MaxTempExperienced {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxTempExperienced
+
+namespace OverTempTotalDwell {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OverTempTotalDwell
+
+namespace DeviceTempAlarmMask {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace DeviceTempAlarmMask
+
+namespace LowTempThreshold {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace LowTempThreshold
+
+namespace HighTempThreshold {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace HighTempThreshold
+
+namespace LowTempDwellTripPoint {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace LowTempDwellTripPoint
+
+namespace HighTempDwellTripPoint {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace HighTempDwellTripPoint
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace DeviceTemperatureConfiguration
 
 namespace Identify {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId IdentifyTime    = 0x00000000;
-static constexpr AttributeId CommissionState = 0x00000001;
-} // namespace Ids
+
+namespace IdentifyTime {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace IdentifyTime
+
+namespace IdentifyType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace IdentifyType
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace Identify
 
 namespace Groups {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId NameSupport = 0x00000000;
-} // namespace Ids
+
+namespace NameSupport {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace NameSupport
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace Groups
 
 namespace Scenes {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId SceneCount       = 0x00000000;
-static constexpr AttributeId CurrentScene     = 0x00000001;
-static constexpr AttributeId CurrentGroup     = 0x00000002;
-static constexpr AttributeId SceneValid       = 0x00000003;
-static constexpr AttributeId NameSupport      = 0x00000004;
-static constexpr AttributeId LastConfiguredBy = 0x00000005;
-} // namespace Ids
+
+namespace SceneCount {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SceneCount
+
+namespace CurrentScene {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentScene
+
+namespace CurrentGroup {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentGroup
+
+namespace SceneValid {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace SceneValid
+
+namespace NameSupport {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace NameSupport
+
+namespace LastConfiguredBy {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastConfiguredBy
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace Scenes
 
 namespace OnOff {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId OnOff                                  = 0x00000000;
-static constexpr AttributeId SampleMfgSpecificAttribute0x00000x1002 = 0x10020000;
-static constexpr AttributeId SampleMfgSpecificAttribute0x00000x1049 = 0x10490000;
-static constexpr AttributeId SampleMfgSpecificAttribute0x00010x1002 = 0x10020001;
-static constexpr AttributeId SampleMfgSpecificAttribute0x00010x1040 = 0x10490001;
-static constexpr AttributeId GlobalSceneControl                     = 0x00004000;
-static constexpr AttributeId OnTime                                 = 0x00004001;
-static constexpr AttributeId OffWaitTime                            = 0x00004002;
-static constexpr AttributeId StartUpOnOff                           = 0x00004003;
-} // namespace Ids
+
+namespace OnOff {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace OnOff
+
+namespace SampleMfgSpecificAttribute0x00000x1002 {
+static constexpr AttributeId Id = 0x10020000;
+} // namespace SampleMfgSpecificAttribute0x00000x1002
+
+namespace SampleMfgSpecificAttribute0x00000x1049 {
+static constexpr AttributeId Id = 0x10490000;
+} // namespace SampleMfgSpecificAttribute0x00000x1049
+
+namespace SampleMfgSpecificAttribute0x00010x1002 {
+static constexpr AttributeId Id = 0x10020001;
+} // namespace SampleMfgSpecificAttribute0x00010x1002
+
+namespace SampleMfgSpecificAttribute0x00010x1040 {
+static constexpr AttributeId Id = 0x10490001;
+} // namespace SampleMfgSpecificAttribute0x00010x1040
+
+namespace GlobalSceneControl {
+static constexpr AttributeId Id = 0x00004000;
+} // namespace GlobalSceneControl
+
+namespace OnTime {
+static constexpr AttributeId Id = 0x00004001;
+} // namespace OnTime
+
+namespace OffWaitTime {
+static constexpr AttributeId Id = 0x00004002;
+} // namespace OffWaitTime
+
+namespace StartUpOnOff {
+static constexpr AttributeId Id = 0x00004003;
+} // namespace StartUpOnOff
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace OnOff
 
 namespace OnOffSwitchConfiguration {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId SwitchType    = 0x00000000;
-static constexpr AttributeId SwitchActions = 0x00000010;
-} // namespace Ids
+
+namespace SwitchType {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SwitchType
+
+namespace SwitchActions {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace SwitchActions
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace OnOffSwitchConfiguration
 
 namespace LevelControl {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId CurrentLevel        = 0x00000000;
-static constexpr AttributeId RemainingTime       = 0x00000001;
-static constexpr AttributeId Options             = 0x0000000F;
-static constexpr AttributeId OnOffTransitionTime = 0x00000010;
-static constexpr AttributeId OnLevel             = 0x00000011;
-static constexpr AttributeId OnTransitionTime    = 0x00000012;
-static constexpr AttributeId OffTransitionTime   = 0x00000013;
-static constexpr AttributeId DefaultMoveRate     = 0x00000014;
-static constexpr AttributeId StartUpCurrentLevel = 0x00004000;
-} // namespace Ids
+
+namespace CurrentLevel {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CurrentLevel
+
+namespace RemainingTime {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace RemainingTime
+
+namespace MinLevel {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MinLevel
+
+namespace MaxLevel {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace MaxLevel
+
+namespace CurrentFrequency {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace CurrentFrequency
+
+namespace MinFrequency {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace MinFrequency
+
+namespace MaxFrequency {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace MaxFrequency
+
+namespace Options {
+static constexpr AttributeId Id = 0x0000000F;
+} // namespace Options
+
+namespace OnOffTransitionTime {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace OnOffTransitionTime
+
+namespace OnLevel {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace OnLevel
+
+namespace OnTransitionTime {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace OnTransitionTime
+
+namespace OffTransitionTime {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace OffTransitionTime
+
+namespace DefaultMoveRate {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace DefaultMoveRate
+
+namespace StartUpCurrentLevel {
+static constexpr AttributeId Id = 0x00004000;
+} // namespace StartUpCurrentLevel
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace LevelControl
 
 namespace Alarms {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId AlarmCount = 0x00000000;
-} // namespace Ids
+
+namespace AlarmCount {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace AlarmCount
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace Alarms
 
 namespace Time {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId Time           = 0x00000000;
-static constexpr AttributeId TimeStatus     = 0x00000001;
-static constexpr AttributeId TimeZone       = 0x00000002;
-static constexpr AttributeId DstStart       = 0x00000003;
-static constexpr AttributeId DstEnd         = 0x00000004;
-static constexpr AttributeId DstShift       = 0x00000005;
-static constexpr AttributeId StandardTime   = 0x00000006;
-static constexpr AttributeId LocalTime      = 0x00000007;
-static constexpr AttributeId LastSetTime    = 0x00000008;
-static constexpr AttributeId ValidUntilTime = 0x00000009;
-} // namespace Ids
+
+namespace Time {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Time
+
+namespace TimeStatus {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace TimeStatus
+
+namespace TimeZone {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace TimeZone
+
+namespace DstStart {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace DstStart
+
+namespace DstEnd {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DstEnd
+
+namespace DstShift {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace DstShift
+
+namespace StandardTime {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace StandardTime
+
+namespace LocalTime {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace LocalTime
+
+namespace LastSetTime {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace LastSetTime
+
+namespace ValidUntilTime {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace ValidUntilTime
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace Time
 
 namespace BinaryInputBasic {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId ActiveText      = 0x00000004;
-static constexpr AttributeId Description     = 0x0000001C;
-static constexpr AttributeId InactiveText    = 0x0000002E;
-static constexpr AttributeId OutOfService    = 0x00000051;
-static constexpr AttributeId Polarity        = 0x00000054;
-static constexpr AttributeId PresentValue    = 0x00000055;
-static constexpr AttributeId Reliability     = 0x00000067;
-static constexpr AttributeId StatusFlags     = 0x0000006F;
-static constexpr AttributeId ApplicationType = 0x00000100;
-} // namespace Ids
+
+namespace ActiveText {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ActiveText
+
+namespace Description {
+static constexpr AttributeId Id = 0x0000001C;
+} // namespace Description
+
+namespace InactiveText {
+static constexpr AttributeId Id = 0x0000002E;
+} // namespace InactiveText
+
+namespace OutOfService {
+static constexpr AttributeId Id = 0x00000051;
+} // namespace OutOfService
+
+namespace Polarity {
+static constexpr AttributeId Id = 0x00000054;
+} // namespace Polarity
+
+namespace PresentValue {
+static constexpr AttributeId Id = 0x00000055;
+} // namespace PresentValue
+
+namespace Reliability {
+static constexpr AttributeId Id = 0x00000067;
+} // namespace Reliability
+
+namespace StatusFlags {
+static constexpr AttributeId Id = 0x0000006F;
+} // namespace StatusFlags
+
+namespace ApplicationType {
+static constexpr AttributeId Id = 0x00000100;
+} // namespace ApplicationType
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace BinaryInputBasic
 
 namespace PowerProfile {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId TotalProfileNum    = 0x00000000;
-static constexpr AttributeId MultipleScheduling = 0x00000001;
-static constexpr AttributeId EnergyFormatting   = 0x00000002;
-static constexpr AttributeId EnergyRemote       = 0x00000003;
-static constexpr AttributeId ScheduleMode       = 0x00000004;
-} // namespace Ids
+
+namespace TotalProfileNum {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TotalProfileNum
+
+namespace MultipleScheduling {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MultipleScheduling
+
+namespace EnergyFormatting {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace EnergyFormatting
+
+namespace EnergyRemote {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace EnergyRemote
+
+namespace ScheduleMode {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ScheduleMode
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace PowerProfile
 
 namespace ApplianceControl {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId StartTime     = 0x00000000;
-static constexpr AttributeId FinishTime    = 0x00000001;
-static constexpr AttributeId RemainingTime = 0x00000002;
-} // namespace Ids
+
+namespace StartTime {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace StartTime
+
+namespace FinishTime {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace FinishTime
+
+namespace RemainingTime {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace RemainingTime
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ApplianceControl
 
 namespace Descriptor {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId DeviceList = 0x00000000;
-static constexpr AttributeId ServerList = 0x00000001;
-static constexpr AttributeId ClientList = 0x00000002;
-static constexpr AttributeId PartsList  = 0x00000003;
-} // namespace Ids
+
+namespace DeviceList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace DeviceList
+
+namespace ServerList {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ServerList
+
+namespace ClientList {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ClientList
+
+namespace PartsList {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PartsList
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace Descriptor
 
 namespace PollControl {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId CheckInInterval     = 0x00000000;
-static constexpr AttributeId LongPollInterval    = 0x00000001;
-static constexpr AttributeId ShortPollInterval   = 0x00000002;
-static constexpr AttributeId FastPollTimeout     = 0x00000003;
-static constexpr AttributeId CheckInIntervalMin  = 0x00000004;
-static constexpr AttributeId LongPollIntervalMin = 0x00000005;
-static constexpr AttributeId FastPollTimeoutMax  = 0x00000006;
-} // namespace Ids
+
+namespace CheckInInterval {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CheckInInterval
+
+namespace LongPollInterval {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace LongPollInterval
+
+namespace ShortPollInterval {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ShortPollInterval
+
+namespace FastPollTimeout {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace FastPollTimeout
+
+namespace CheckInIntervalMin {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace CheckInIntervalMin
+
+namespace LongPollIntervalMin {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LongPollIntervalMin
+
+namespace FastPollTimeoutMax {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace FastPollTimeoutMax
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace PollControl
 
 namespace Basic {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId InteractionModelVersion = 0x00000000;
-static constexpr AttributeId VendorName              = 0x00000001;
-static constexpr AttributeId VendorID                = 0x00000002;
-static constexpr AttributeId ProductName             = 0x00000003;
-static constexpr AttributeId ProductID               = 0x00000004;
-static constexpr AttributeId UserLabel               = 0x00000005;
-static constexpr AttributeId Location                = 0x00000006;
-static constexpr AttributeId HardwareVersion         = 0x00000007;
-static constexpr AttributeId HardwareVersionString   = 0x00000008;
-static constexpr AttributeId SoftwareVersion         = 0x00000009;
-static constexpr AttributeId SoftwareVersionString   = 0x0000000A;
-static constexpr AttributeId ManufacturingDate       = 0x0000000B;
-static constexpr AttributeId PartNumber              = 0x0000000C;
-static constexpr AttributeId ProductURL              = 0x0000000D;
-static constexpr AttributeId ProductLabel            = 0x0000000E;
-static constexpr AttributeId SerialNumber            = 0x0000000F;
-static constexpr AttributeId LocalConfigDisabled     = 0x00000010;
-static constexpr AttributeId Reachable               = 0x00000011;
-} // namespace Ids
+
+namespace InteractionModelVersion {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace InteractionModelVersion
+
+namespace VendorName {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace VendorName
+
+namespace VendorID {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace VendorID
+
+namespace ProductName {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace ProductName
+
+namespace ProductID {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ProductID
+
+namespace UserLabel {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace UserLabel
+
+namespace Location {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace Location
+
+namespace HardwareVersion {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace HardwareVersion
+
+namespace HardwareVersionString {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace HardwareVersionString
+
+namespace SoftwareVersion {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace SoftwareVersion
+
+namespace SoftwareVersionString {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace SoftwareVersionString
+
+namespace ManufacturingDate {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace ManufacturingDate
+
+namespace PartNumber {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace PartNumber
+
+namespace ProductURL {
+static constexpr AttributeId Id = 0x0000000D;
+} // namespace ProductURL
+
+namespace ProductLabel {
+static constexpr AttributeId Id = 0x0000000E;
+} // namespace ProductLabel
+
+namespace SerialNumber {
+static constexpr AttributeId Id = 0x0000000F;
+} // namespace SerialNumber
+
+namespace LocalConfigDisabled {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace LocalConfigDisabled
+
+namespace Reachable {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace Reachable
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace Basic
 
+namespace OtaSoftwareUpdateRequestor {
+namespace Attributes {
+
+namespace DefaultOtaProvider {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DefaultOtaProvider
+
+namespace UpdatePossible {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace UpdatePossible
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
+} // namespace Attributes
+} // namespace OtaSoftwareUpdateRequestor
+
+namespace PowerSource {
+namespace Attributes {
+
+namespace Status {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Status
+
+namespace Order {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Order
+
+namespace Description {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace Description
+
+namespace WiredAssessedInputVoltage {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace WiredAssessedInputVoltage
+
+namespace WiredAssessedInputFrequency {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace WiredAssessedInputFrequency
+
+namespace WiredCurrentType {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace WiredCurrentType
+
+namespace WiredAssessedCurrent {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace WiredAssessedCurrent
+
+namespace WiredNominalVoltage {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace WiredNominalVoltage
+
+namespace WiredMaximumCurrent {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace WiredMaximumCurrent
+
+namespace WiredPresent {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace WiredPresent
+
+namespace ActiveWiredFaults {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace ActiveWiredFaults
+
+namespace BatteryVoltage {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace BatteryVoltage
+
+namespace BatteryPercentRemaining {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace BatteryPercentRemaining
+
+namespace BatteryTimeRemaining {
+static constexpr AttributeId Id = 0x0000000D;
+} // namespace BatteryTimeRemaining
+
+namespace BatteryChargeLevel {
+static constexpr AttributeId Id = 0x0000000E;
+} // namespace BatteryChargeLevel
+
+namespace BatteryReplacementNeeded {
+static constexpr AttributeId Id = 0x0000000F;
+} // namespace BatteryReplacementNeeded
+
+namespace BatteryReplaceability {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace BatteryReplaceability
+
+namespace BatteryPresent {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace BatteryPresent
+
+namespace ActiveBatteryFaults {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace ActiveBatteryFaults
+
+namespace BatteryReplacementDescription {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace BatteryReplacementDescription
+
+namespace BatteryCommonDesignation {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace BatteryCommonDesignation
+
+namespace BatteryANSIDesignation {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace BatteryANSIDesignation
+
+namespace BatteryIECDesignation {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace BatteryIECDesignation
+
+namespace BatteryApprovedChemistry {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace BatteryApprovedChemistry
+
+namespace BatteryCapacity {
+static constexpr AttributeId Id = 0x00000018;
+} // namespace BatteryCapacity
+
+namespace BatteryQuantity {
+static constexpr AttributeId Id = 0x00000019;
+} // namespace BatteryQuantity
+
+namespace BatteryChargeState {
+static constexpr AttributeId Id = 0x0000001A;
+} // namespace BatteryChargeState
+
+namespace BatteryTimeToFullCharge {
+static constexpr AttributeId Id = 0x0000001B;
+} // namespace BatteryTimeToFullCharge
+
+namespace BatteryFunctionalWhileCharging {
+static constexpr AttributeId Id = 0x0000001C;
+} // namespace BatteryFunctionalWhileCharging
+
+namespace BatteryChargingCurrent {
+static constexpr AttributeId Id = 0x0000001D;
+} // namespace BatteryChargingCurrent
+
+namespace ActiveBatteryChargeFaults {
+static constexpr AttributeId Id = 0x0000001E;
+} // namespace ActiveBatteryChargeFaults
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
+} // namespace Attributes
+} // namespace PowerSource
+
 namespace GeneralCommissioning {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId Breadcrumb                 = 0x00000000;
-static constexpr AttributeId BasicCommissioningInfoList = 0x00000001;
-static constexpr AttributeId RegulatoryConfigList       = 0x00000002;
-static constexpr AttributeId LocationCapabilityList     = 0x00000003;
-} // namespace Ids
+
+namespace Breadcrumb {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Breadcrumb
+
+namespace BasicCommissioningInfoList {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace BasicCommissioningInfoList
+
+namespace RegulatoryConfigList {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace RegulatoryConfigList
+
+namespace LocationCapabilityList {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace LocationCapabilityList
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace GeneralCommissioning
 
 namespace GeneralDiagnostics {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId NetworkInterfaces     = 0x00000000;
-static constexpr AttributeId RebootCount           = 0x00000001;
-static constexpr AttributeId UpTime                = 0x00000002;
-static constexpr AttributeId TotalOperationalHours = 0x00000003;
-static constexpr AttributeId BootReasons           = 0x00000004;
-static constexpr AttributeId ActiveHardwareFaults  = 0x00000005;
-static constexpr AttributeId ActiveRadioFaults     = 0x00000006;
-static constexpr AttributeId ActiveNetworkFaults   = 0x00000007;
-} // namespace Ids
+
+namespace NetworkInterfaces {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace NetworkInterfaces
+
+namespace RebootCount {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace RebootCount
+
+namespace UpTime {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace UpTime
+
+namespace TotalOperationalHours {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace TotalOperationalHours
+
+namespace BootReasons {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace BootReasons
+
+namespace ActiveHardwareFaults {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ActiveHardwareFaults
+
+namespace ActiveRadioFaults {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace ActiveRadioFaults
+
+namespace ActiveNetworkFaults {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace ActiveNetworkFaults
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace GeneralDiagnostics
 
 namespace SoftwareDiagnostics {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId ThreadMetrics            = 0x00000000;
-static constexpr AttributeId CurrentHeapFree          = 0x00000001;
-static constexpr AttributeId CurrentHeapUsed          = 0x00000002;
-static constexpr AttributeId CurrentHeapHighWatermark = 0x00000003;
-} // namespace Ids
+
+namespace ThreadMetrics {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ThreadMetrics
+
+namespace CurrentHeapFree {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentHeapFree
+
+namespace CurrentHeapUsed {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentHeapUsed
+
+namespace CurrentHeapHighWatermark {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentHeapHighWatermark
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace SoftwareDiagnostics
 
 namespace ThreadNetworkDiagnostics {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId Channel                           = 0x00000000;
-static constexpr AttributeId RoutingRole                       = 0x00000001;
-static constexpr AttributeId NetworkName                       = 0x00000002;
-static constexpr AttributeId PanId                             = 0x00000003;
-static constexpr AttributeId ExtendedPanId                     = 0x00000004;
-static constexpr AttributeId MeshLocalPrefix                   = 0x00000005;
-static constexpr AttributeId OverrunCount                      = 0x00000006;
-static constexpr AttributeId NeighborTableList                 = 0x00000007;
-static constexpr AttributeId RouteTableList                    = 0x00000008;
-static constexpr AttributeId PartitionId                       = 0x00000009;
-static constexpr AttributeId Weighting                         = 0x0000000A;
-static constexpr AttributeId DataVersion                       = 0x0000000B;
-static constexpr AttributeId StableDataVersion                 = 0x0000000C;
-static constexpr AttributeId LeaderRouterId                    = 0x0000000D;
-static constexpr AttributeId DetachedRoleCount                 = 0x0000000E;
-static constexpr AttributeId ChildRoleCount                    = 0x0000000F;
-static constexpr AttributeId RouterRoleCount                   = 0x00000010;
-static constexpr AttributeId LeaderRoleCount                   = 0x00000011;
-static constexpr AttributeId AttachAttemptCount                = 0x00000012;
-static constexpr AttributeId PartitionIdChangeCount            = 0x00000013;
-static constexpr AttributeId BetterPartitionAttachAttemptCount = 0x00000014;
-static constexpr AttributeId ParentChangeCount                 = 0x00000015;
-static constexpr AttributeId TxTotalCount                      = 0x00000016;
-static constexpr AttributeId TxUnicastCount                    = 0x00000017;
-static constexpr AttributeId TxBroadcastCount                  = 0x00000018;
-static constexpr AttributeId TxAckRequestedCount               = 0x00000019;
-static constexpr AttributeId TxAckedCount                      = 0x0000001A;
-static constexpr AttributeId TxNoAckRequestedCount             = 0x0000001B;
-static constexpr AttributeId TxDataCount                       = 0x0000001C;
-static constexpr AttributeId TxDataPollCount                   = 0x0000001D;
-static constexpr AttributeId TxBeaconCount                     = 0x0000001E;
-static constexpr AttributeId TxBeaconRequestCount              = 0x0000001F;
-static constexpr AttributeId TxOtherCount                      = 0x00000020;
-static constexpr AttributeId TxRetryCount                      = 0x00000021;
-static constexpr AttributeId TxDirectMaxRetryExpiryCount       = 0x00000022;
-static constexpr AttributeId TxIndirectMaxRetryExpiryCount     = 0x00000023;
-static constexpr AttributeId TxErrCcaCount                     = 0x00000024;
-static constexpr AttributeId TxErrAbortCount                   = 0x00000025;
-static constexpr AttributeId TxErrBusyChannelCount             = 0x00000026;
-static constexpr AttributeId RxTotalCount                      = 0x00000027;
-static constexpr AttributeId RxUnicastCount                    = 0x00000028;
-static constexpr AttributeId RxBroadcastCount                  = 0x00000029;
-static constexpr AttributeId RxDataCount                       = 0x0000002A;
-static constexpr AttributeId RxDataPollCount                   = 0x0000002B;
-static constexpr AttributeId RxBeaconCount                     = 0x0000002C;
-static constexpr AttributeId RxBeaconRequestCount              = 0x0000002D;
-static constexpr AttributeId RxOtherCount                      = 0x0000002E;
-static constexpr AttributeId RxAddressFilteredCount            = 0x0000002F;
-static constexpr AttributeId RxDestAddrFilteredCount           = 0x00000030;
-static constexpr AttributeId RxDuplicatedCount                 = 0x00000031;
-static constexpr AttributeId RxErrNoFrameCount                 = 0x00000032;
-static constexpr AttributeId RxErrUnknownNeighborCount         = 0x00000033;
-static constexpr AttributeId RxErrInvalidSrcAddrCount          = 0x00000034;
-static constexpr AttributeId RxErrSecCount                     = 0x00000035;
-static constexpr AttributeId RxErrFcsCount                     = 0x00000036;
-static constexpr AttributeId RxErrOtherCount                   = 0x00000037;
-static constexpr AttributeId ActiveTimestamp                   = 0x00000038;
-static constexpr AttributeId PendingTimestamp                  = 0x00000039;
-static constexpr AttributeId Delay                             = 0x0000003A;
-static constexpr AttributeId SecurityPolicy                    = 0x0000003B;
-static constexpr AttributeId ChannelMask                       = 0x0000003C;
-static constexpr AttributeId OperationalDatasetComponents      = 0x0000003D;
-static constexpr AttributeId ActiveNetworkFaultsList           = 0x0000003E;
-} // namespace Ids
+
+namespace Channel {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Channel
+
+namespace RoutingRole {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace RoutingRole
+
+namespace NetworkName {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace NetworkName
+
+namespace PanId {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PanId
+
+namespace ExtendedPanId {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ExtendedPanId
+
+namespace MeshLocalPrefix {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace MeshLocalPrefix
+
+namespace OverrunCount {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace OverrunCount
+
+namespace NeighborTableList {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace NeighborTableList
+
+namespace RouteTableList {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace RouteTableList
+
+namespace PartitionId {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace PartitionId
+
+namespace Weighting {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace Weighting
+
+namespace DataVersion {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace DataVersion
+
+namespace StableDataVersion {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace StableDataVersion
+
+namespace LeaderRouterId {
+static constexpr AttributeId Id = 0x0000000D;
+} // namespace LeaderRouterId
+
+namespace DetachedRoleCount {
+static constexpr AttributeId Id = 0x0000000E;
+} // namespace DetachedRoleCount
+
+namespace ChildRoleCount {
+static constexpr AttributeId Id = 0x0000000F;
+} // namespace ChildRoleCount
+
+namespace RouterRoleCount {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace RouterRoleCount
+
+namespace LeaderRoleCount {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace LeaderRoleCount
+
+namespace AttachAttemptCount {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace AttachAttemptCount
+
+namespace PartitionIdChangeCount {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace PartitionIdChangeCount
+
+namespace BetterPartitionAttachAttemptCount {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace BetterPartitionAttachAttemptCount
+
+namespace ParentChangeCount {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace ParentChangeCount
+
+namespace TxTotalCount {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace TxTotalCount
+
+namespace TxUnicastCount {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace TxUnicastCount
+
+namespace TxBroadcastCount {
+static constexpr AttributeId Id = 0x00000018;
+} // namespace TxBroadcastCount
+
+namespace TxAckRequestedCount {
+static constexpr AttributeId Id = 0x00000019;
+} // namespace TxAckRequestedCount
+
+namespace TxAckedCount {
+static constexpr AttributeId Id = 0x0000001A;
+} // namespace TxAckedCount
+
+namespace TxNoAckRequestedCount {
+static constexpr AttributeId Id = 0x0000001B;
+} // namespace TxNoAckRequestedCount
+
+namespace TxDataCount {
+static constexpr AttributeId Id = 0x0000001C;
+} // namespace TxDataCount
+
+namespace TxDataPollCount {
+static constexpr AttributeId Id = 0x0000001D;
+} // namespace TxDataPollCount
+
+namespace TxBeaconCount {
+static constexpr AttributeId Id = 0x0000001E;
+} // namespace TxBeaconCount
+
+namespace TxBeaconRequestCount {
+static constexpr AttributeId Id = 0x0000001F;
+} // namespace TxBeaconRequestCount
+
+namespace TxOtherCount {
+static constexpr AttributeId Id = 0x00000020;
+} // namespace TxOtherCount
+
+namespace TxRetryCount {
+static constexpr AttributeId Id = 0x00000021;
+} // namespace TxRetryCount
+
+namespace TxDirectMaxRetryExpiryCount {
+static constexpr AttributeId Id = 0x00000022;
+} // namespace TxDirectMaxRetryExpiryCount
+
+namespace TxIndirectMaxRetryExpiryCount {
+static constexpr AttributeId Id = 0x00000023;
+} // namespace TxIndirectMaxRetryExpiryCount
+
+namespace TxErrCcaCount {
+static constexpr AttributeId Id = 0x00000024;
+} // namespace TxErrCcaCount
+
+namespace TxErrAbortCount {
+static constexpr AttributeId Id = 0x00000025;
+} // namespace TxErrAbortCount
+
+namespace TxErrBusyChannelCount {
+static constexpr AttributeId Id = 0x00000026;
+} // namespace TxErrBusyChannelCount
+
+namespace RxTotalCount {
+static constexpr AttributeId Id = 0x00000027;
+} // namespace RxTotalCount
+
+namespace RxUnicastCount {
+static constexpr AttributeId Id = 0x00000028;
+} // namespace RxUnicastCount
+
+namespace RxBroadcastCount {
+static constexpr AttributeId Id = 0x00000029;
+} // namespace RxBroadcastCount
+
+namespace RxDataCount {
+static constexpr AttributeId Id = 0x0000002A;
+} // namespace RxDataCount
+
+namespace RxDataPollCount {
+static constexpr AttributeId Id = 0x0000002B;
+} // namespace RxDataPollCount
+
+namespace RxBeaconCount {
+static constexpr AttributeId Id = 0x0000002C;
+} // namespace RxBeaconCount
+
+namespace RxBeaconRequestCount {
+static constexpr AttributeId Id = 0x0000002D;
+} // namespace RxBeaconRequestCount
+
+namespace RxOtherCount {
+static constexpr AttributeId Id = 0x0000002E;
+} // namespace RxOtherCount
+
+namespace RxAddressFilteredCount {
+static constexpr AttributeId Id = 0x0000002F;
+} // namespace RxAddressFilteredCount
+
+namespace RxDestAddrFilteredCount {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace RxDestAddrFilteredCount
+
+namespace RxDuplicatedCount {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace RxDuplicatedCount
+
+namespace RxErrNoFrameCount {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace RxErrNoFrameCount
+
+namespace RxErrUnknownNeighborCount {
+static constexpr AttributeId Id = 0x00000033;
+} // namespace RxErrUnknownNeighborCount
+
+namespace RxErrInvalidSrcAddrCount {
+static constexpr AttributeId Id = 0x00000034;
+} // namespace RxErrInvalidSrcAddrCount
+
+namespace RxErrSecCount {
+static constexpr AttributeId Id = 0x00000035;
+} // namespace RxErrSecCount
+
+namespace RxErrFcsCount {
+static constexpr AttributeId Id = 0x00000036;
+} // namespace RxErrFcsCount
+
+namespace RxErrOtherCount {
+static constexpr AttributeId Id = 0x00000037;
+} // namespace RxErrOtherCount
+
+namespace ActiveTimestamp {
+static constexpr AttributeId Id = 0x00000038;
+} // namespace ActiveTimestamp
+
+namespace PendingTimestamp {
+static constexpr AttributeId Id = 0x00000039;
+} // namespace PendingTimestamp
+
+namespace Delay {
+static constexpr AttributeId Id = 0x0000003A;
+} // namespace Delay
+
+namespace SecurityPolicy {
+static constexpr AttributeId Id = 0x0000003B;
+} // namespace SecurityPolicy
+
+namespace ChannelMask {
+static constexpr AttributeId Id = 0x0000003C;
+} // namespace ChannelMask
+
+namespace OperationalDatasetComponents {
+static constexpr AttributeId Id = 0x0000003D;
+} // namespace OperationalDatasetComponents
+
+namespace ActiveNetworkFaultsList {
+static constexpr AttributeId Id = 0x0000003E;
+} // namespace ActiveNetworkFaultsList
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ThreadNetworkDiagnostics
 
 namespace WiFiNetworkDiagnostics {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId Bssid                  = 0x00000000;
-static constexpr AttributeId SecurityType           = 0x00000001;
-static constexpr AttributeId WiFiVersion            = 0x00000002;
-static constexpr AttributeId ChannelNumber          = 0x00000003;
-static constexpr AttributeId Rssi                   = 0x00000004;
-static constexpr AttributeId BeaconLostCount        = 0x00000005;
-static constexpr AttributeId BeaconRxCount          = 0x00000006;
-static constexpr AttributeId PacketMulticastRxCount = 0x00000007;
-static constexpr AttributeId PacketMulticastTxCount = 0x00000008;
-static constexpr AttributeId PacketUnicastRxCount   = 0x00000009;
-static constexpr AttributeId PacketUnicastTxCount   = 0x0000000A;
-static constexpr AttributeId CurrentMaxRate         = 0x0000000B;
-static constexpr AttributeId OverrunCount           = 0x0000000C;
-} // namespace Ids
+
+namespace Bssid {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Bssid
+
+namespace SecurityType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SecurityType
+
+namespace WiFiVersion {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace WiFiVersion
+
+namespace ChannelNumber {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace ChannelNumber
+
+namespace Rssi {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace Rssi
+
+namespace BeaconLostCount {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace BeaconLostCount
+
+namespace BeaconRxCount {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace BeaconRxCount
+
+namespace PacketMulticastRxCount {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace PacketMulticastRxCount
+
+namespace PacketMulticastTxCount {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace PacketMulticastTxCount
+
+namespace PacketUnicastRxCount {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace PacketUnicastRxCount
+
+namespace PacketUnicastTxCount {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace PacketUnicastTxCount
+
+namespace CurrentMaxRate {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace CurrentMaxRate
+
+namespace OverrunCount {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace OverrunCount
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace WiFiNetworkDiagnostics
 
 namespace EthernetNetworkDiagnostics {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId PHYRate        = 0x00000000;
-static constexpr AttributeId FullDuplex     = 0x00000001;
-static constexpr AttributeId PacketRxCount  = 0x00000002;
-static constexpr AttributeId PacketTxCount  = 0x00000003;
-static constexpr AttributeId TxErrCount     = 0x00000004;
-static constexpr AttributeId CollisionCount = 0x00000005;
-static constexpr AttributeId OverrunCount   = 0x00000006;
-static constexpr AttributeId CarrierDetect  = 0x00000007;
-static constexpr AttributeId TimeSinceReset = 0x00000008;
-} // namespace Ids
+
+namespace PHYRate {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PHYRate
+
+namespace FullDuplex {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace FullDuplex
+
+namespace PacketRxCount {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace PacketRxCount
+
+namespace PacketTxCount {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PacketTxCount
+
+namespace TxErrCount {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace TxErrCount
+
+namespace CollisionCount {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CollisionCount
+
+namespace OverrunCount {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace OverrunCount
+
+namespace CarrierDetect {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace CarrierDetect
+
+namespace TimeSinceReset {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace TimeSinceReset
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace EthernetNetworkDiagnostics
 
 namespace BridgedDeviceBasic {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId VendorName            = 0x00000001;
-static constexpr AttributeId VendorID              = 0x00000002;
-static constexpr AttributeId ProductName           = 0x00000003;
-static constexpr AttributeId UserLabel             = 0x00000005;
-static constexpr AttributeId HardwareVersion       = 0x00000007;
-static constexpr AttributeId HardwareVersionString = 0x00000008;
-static constexpr AttributeId SoftwareVersion       = 0x00000009;
-static constexpr AttributeId SoftwareVersionString = 0x0000000A;
-static constexpr AttributeId ManufacturingDate     = 0x0000000B;
-static constexpr AttributeId PartNumber            = 0x0000000C;
-static constexpr AttributeId ProductURL            = 0x0000000D;
-static constexpr AttributeId ProductLabel          = 0x0000000E;
-static constexpr AttributeId SerialNumber          = 0x0000000F;
-static constexpr AttributeId Reachable             = 0x00000011;
-} // namespace Ids
+
+namespace VendorName {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace VendorName
+
+namespace VendorID {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace VendorID
+
+namespace ProductName {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace ProductName
+
+namespace UserLabel {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace UserLabel
+
+namespace HardwareVersion {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace HardwareVersion
+
+namespace HardwareVersionString {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace HardwareVersionString
+
+namespace SoftwareVersion {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace SoftwareVersion
+
+namespace SoftwareVersionString {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace SoftwareVersionString
+
+namespace ManufacturingDate {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace ManufacturingDate
+
+namespace PartNumber {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace PartNumber
+
+namespace ProductURL {
+static constexpr AttributeId Id = 0x0000000D;
+} // namespace ProductURL
+
+namespace ProductLabel {
+static constexpr AttributeId Id = 0x0000000E;
+} // namespace ProductLabel
+
+namespace SerialNumber {
+static constexpr AttributeId Id = 0x0000000F;
+} // namespace SerialNumber
+
+namespace Reachable {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace Reachable
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace BridgedDeviceBasic
 
 namespace Switch {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId NumberOfPositions = 0x00000000;
-static constexpr AttributeId CurrentPosition   = 0x00000001;
-static constexpr AttributeId MultiPressMax     = 0x00000002;
-} // namespace Ids
+
+namespace NumberOfPositions {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace NumberOfPositions
+
+namespace CurrentPosition {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentPosition
+
+namespace MultiPressMax {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MultiPressMax
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace Switch
 
 namespace OperationalCredentials {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId FabricsList             = 0x00000001;
-static constexpr AttributeId SupportedFabrics        = 0x00000002;
-static constexpr AttributeId CommissionedFabrics     = 0x00000003;
-static constexpr AttributeId TrustedRootCertificates = 0x00000004;
-} // namespace Ids
+
+namespace FabricsList {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace FabricsList
+
+namespace SupportedFabrics {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedFabrics
+
+namespace CommissionedFabrics {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace CommissionedFabrics
+
+namespace TrustedRootCertificates {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace TrustedRootCertificates
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace OperationalCredentials
 
 namespace FixedLabel {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId LabelList = 0x00000000;
-} // namespace Ids
+
+namespace LabelList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace LabelList
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace FixedLabel
 
 namespace ShadeConfiguration {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId PhysicalClosedLimit = 0x00000000;
-static constexpr AttributeId MotorStepSize       = 0x00000001;
-static constexpr AttributeId Status              = 0x00000002;
-static constexpr AttributeId ClosedLimit         = 0x00000010;
-static constexpr AttributeId Mode                = 0x00000011;
-} // namespace Ids
+
+namespace PhysicalClosedLimit {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PhysicalClosedLimit
+
+namespace MotorStepSize {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MotorStepSize
+
+namespace Status {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace Status
+
+namespace ClosedLimit {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace ClosedLimit
+
+namespace Mode {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace Mode
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ShadeConfiguration
 
 namespace DoorLock {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId LockState                           = 0x00000000;
-static constexpr AttributeId LockType                            = 0x00000001;
-static constexpr AttributeId ActuatorEnabled                     = 0x00000002;
-static constexpr AttributeId DoorState                           = 0x00000003;
-static constexpr AttributeId DoorOpenEvents                      = 0x00000004;
-static constexpr AttributeId DoorClosedEvents                    = 0x00000005;
-static constexpr AttributeId OpenPeriod                          = 0x00000006;
-static constexpr AttributeId NumLockRecordsSupported             = 0x00000010;
-static constexpr AttributeId NumTotalUsersSupported              = 0x00000011;
-static constexpr AttributeId NumPinUsersSupported                = 0x00000012;
-static constexpr AttributeId NumRfidUsersSupported               = 0x00000013;
-static constexpr AttributeId NumWeekdaySchedulesSupportedPerUser = 0x00000014;
-static constexpr AttributeId NumYeardaySchedulesSupportedPerUser = 0x00000015;
-static constexpr AttributeId NumHolidaySchedulesSupportedPerUser = 0x00000016;
-static constexpr AttributeId MaxPinLength                        = 0x00000017;
-static constexpr AttributeId MinPinLength                        = 0x00000018;
-static constexpr AttributeId MaxRfidCodeLength                   = 0x00000019;
-static constexpr AttributeId MinRfidCodeLength                   = 0x0000001A;
-static constexpr AttributeId EnableLogging                       = 0x00000020;
-static constexpr AttributeId Language                            = 0x00000021;
-static constexpr AttributeId LedSettings                         = 0x00000022;
-static constexpr AttributeId AutoRelockTime                      = 0x00000023;
-static constexpr AttributeId SoundVolume                         = 0x00000024;
-static constexpr AttributeId OperatingMode                       = 0x00000025;
-static constexpr AttributeId SupportedOperatingModes             = 0x00000026;
-static constexpr AttributeId DefaultConfigurationRegister        = 0x00000027;
-static constexpr AttributeId EnableLocalProgramming              = 0x00000028;
-static constexpr AttributeId EnableOneTouchLocking               = 0x00000029;
-static constexpr AttributeId EnableInsideStatusLed               = 0x0000002A;
-static constexpr AttributeId EnablePrivacyModeButton             = 0x0000002B;
-static constexpr AttributeId WrongCodeEntryLimit                 = 0x00000030;
-static constexpr AttributeId UserCodeTemporaryDisableTime        = 0x00000031;
-static constexpr AttributeId SendPinOverTheAir                   = 0x00000032;
-static constexpr AttributeId RequirePinForRfOperation            = 0x00000033;
-static constexpr AttributeId ZigbeeSecurityLevel                 = 0x00000034;
-static constexpr AttributeId AlarmMask                           = 0x00000040;
-static constexpr AttributeId KeypadOperationEventMask            = 0x00000041;
-static constexpr AttributeId RfOperationEventMask                = 0x00000042;
-static constexpr AttributeId ManualOperationEventMask            = 0x00000043;
-static constexpr AttributeId RfidOperationEventMask              = 0x00000044;
-static constexpr AttributeId KeypadProgrammingEventMask          = 0x00000045;
-static constexpr AttributeId RfProgrammingEventMask              = 0x00000046;
-static constexpr AttributeId RfidProgrammingEventMask            = 0x00000047;
-} // namespace Ids
+
+namespace LockState {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace LockState
+
+namespace LockType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace LockType
+
+namespace ActuatorEnabled {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ActuatorEnabled
+
+namespace DoorState {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace DoorState
+
+namespace DoorOpenEvents {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DoorOpenEvents
+
+namespace DoorClosedEvents {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace DoorClosedEvents
+
+namespace OpenPeriod {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace OpenPeriod
+
+namespace NumLockRecordsSupported {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace NumLockRecordsSupported
+
+namespace NumTotalUsersSupported {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace NumTotalUsersSupported
+
+namespace NumPinUsersSupported {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace NumPinUsersSupported
+
+namespace NumRfidUsersSupported {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace NumRfidUsersSupported
+
+namespace NumWeekdaySchedulesSupportedPerUser {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace NumWeekdaySchedulesSupportedPerUser
+
+namespace NumYeardaySchedulesSupportedPerUser {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace NumYeardaySchedulesSupportedPerUser
+
+namespace NumHolidaySchedulesSupportedPerUser {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace NumHolidaySchedulesSupportedPerUser
+
+namespace MaxPinLength {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace MaxPinLength
+
+namespace MinPinLength {
+static constexpr AttributeId Id = 0x00000018;
+} // namespace MinPinLength
+
+namespace MaxRfidCodeLength {
+static constexpr AttributeId Id = 0x00000019;
+} // namespace MaxRfidCodeLength
+
+namespace MinRfidCodeLength {
+static constexpr AttributeId Id = 0x0000001A;
+} // namespace MinRfidCodeLength
+
+namespace EnableLogging {
+static constexpr AttributeId Id = 0x00000020;
+} // namespace EnableLogging
+
+namespace Language {
+static constexpr AttributeId Id = 0x00000021;
+} // namespace Language
+
+namespace LedSettings {
+static constexpr AttributeId Id = 0x00000022;
+} // namespace LedSettings
+
+namespace AutoRelockTime {
+static constexpr AttributeId Id = 0x00000023;
+} // namespace AutoRelockTime
+
+namespace SoundVolume {
+static constexpr AttributeId Id = 0x00000024;
+} // namespace SoundVolume
+
+namespace OperatingMode {
+static constexpr AttributeId Id = 0x00000025;
+} // namespace OperatingMode
+
+namespace SupportedOperatingModes {
+static constexpr AttributeId Id = 0x00000026;
+} // namespace SupportedOperatingModes
+
+namespace DefaultConfigurationRegister {
+static constexpr AttributeId Id = 0x00000027;
+} // namespace DefaultConfigurationRegister
+
+namespace EnableLocalProgramming {
+static constexpr AttributeId Id = 0x00000028;
+} // namespace EnableLocalProgramming
+
+namespace EnableOneTouchLocking {
+static constexpr AttributeId Id = 0x00000029;
+} // namespace EnableOneTouchLocking
+
+namespace EnableInsideStatusLed {
+static constexpr AttributeId Id = 0x0000002A;
+} // namespace EnableInsideStatusLed
+
+namespace EnablePrivacyModeButton {
+static constexpr AttributeId Id = 0x0000002B;
+} // namespace EnablePrivacyModeButton
+
+namespace WrongCodeEntryLimit {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace WrongCodeEntryLimit
+
+namespace UserCodeTemporaryDisableTime {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace UserCodeTemporaryDisableTime
+
+namespace SendPinOverTheAir {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace SendPinOverTheAir
+
+namespace RequirePinForRfOperation {
+static constexpr AttributeId Id = 0x00000033;
+} // namespace RequirePinForRfOperation
+
+namespace ZigbeeSecurityLevel {
+static constexpr AttributeId Id = 0x00000034;
+} // namespace ZigbeeSecurityLevel
+
+namespace AlarmMask {
+static constexpr AttributeId Id = 0x00000040;
+} // namespace AlarmMask
+
+namespace KeypadOperationEventMask {
+static constexpr AttributeId Id = 0x00000041;
+} // namespace KeypadOperationEventMask
+
+namespace RfOperationEventMask {
+static constexpr AttributeId Id = 0x00000042;
+} // namespace RfOperationEventMask
+
+namespace ManualOperationEventMask {
+static constexpr AttributeId Id = 0x00000043;
+} // namespace ManualOperationEventMask
+
+namespace RfidOperationEventMask {
+static constexpr AttributeId Id = 0x00000044;
+} // namespace RfidOperationEventMask
+
+namespace KeypadProgrammingEventMask {
+static constexpr AttributeId Id = 0x00000045;
+} // namespace KeypadProgrammingEventMask
+
+namespace RfProgrammingEventMask {
+static constexpr AttributeId Id = 0x00000046;
+} // namespace RfProgrammingEventMask
+
+namespace RfidProgrammingEventMask {
+static constexpr AttributeId Id = 0x00000047;
+} // namespace RfidProgrammingEventMask
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace DoorLock
 
 namespace WindowCovering {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId Type                             = 0x00000000;
-static constexpr AttributeId PhysicalClosedLimitLift          = 0x00000001;
-static constexpr AttributeId PhysicalClosedLimitTilt          = 0x00000002;
-static constexpr AttributeId CurrentPositionLift              = 0x00000003;
-static constexpr AttributeId CurrentPositionTilt              = 0x00000004;
-static constexpr AttributeId NumberOfActuationsLift           = 0x00000005;
-static constexpr AttributeId NumberOfActuationsTilt           = 0x00000006;
-static constexpr AttributeId ConfigStatus                     = 0x00000007;
-static constexpr AttributeId CurrentPositionLiftPercentage    = 0x00000008;
-static constexpr AttributeId CurrentPositionTiltPercentage    = 0x00000009;
-static constexpr AttributeId OperationalStatus                = 0x0000000A;
-static constexpr AttributeId TargetPositionLiftPercent100ths  = 0x0000000B;
-static constexpr AttributeId TargetPositionTiltPercent100ths  = 0x0000000C;
-static constexpr AttributeId EndProductType                   = 0x0000000D;
-static constexpr AttributeId CurrentPositionLiftPercent100ths = 0x0000000E;
-static constexpr AttributeId CurrentPositionTiltPercent100ths = 0x0000000F;
-static constexpr AttributeId InstalledOpenLimitLift           = 0x00000010;
-static constexpr AttributeId InstalledClosedLimitLift         = 0x00000011;
-static constexpr AttributeId InstalledOpenLimitTilt           = 0x00000012;
-static constexpr AttributeId InstalledClosedLimitTilt         = 0x00000013;
-static constexpr AttributeId VelocityLift                     = 0x00000014;
-static constexpr AttributeId AccelerationTimeLift             = 0x00000015;
-static constexpr AttributeId DecelerationTimeLift             = 0x00000016;
-static constexpr AttributeId Mode                             = 0x00000017;
-static constexpr AttributeId IntermediateSetpointsLift        = 0x00000018;
-static constexpr AttributeId IntermediateSetpointsTilt        = 0x00000019;
-static constexpr AttributeId SafetyStatus                     = 0x0000001A;
-} // namespace Ids
+
+namespace Type {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Type
+
+namespace PhysicalClosedLimitLift {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace PhysicalClosedLimitLift
+
+namespace PhysicalClosedLimitTilt {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace PhysicalClosedLimitTilt
+
+namespace CurrentPositionLift {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentPositionLift
+
+namespace CurrentPositionTilt {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace CurrentPositionTilt
+
+namespace NumberOfActuationsLift {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace NumberOfActuationsLift
+
+namespace NumberOfActuationsTilt {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace NumberOfActuationsTilt
+
+namespace ConfigStatus {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace ConfigStatus
+
+namespace CurrentPositionLiftPercentage {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace CurrentPositionLiftPercentage
+
+namespace CurrentPositionTiltPercentage {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace CurrentPositionTiltPercentage
+
+namespace OperationalStatus {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace OperationalStatus
+
+namespace TargetPositionLiftPercent100ths {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace TargetPositionLiftPercent100ths
+
+namespace TargetPositionTiltPercent100ths {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace TargetPositionTiltPercent100ths
+
+namespace EndProductType {
+static constexpr AttributeId Id = 0x0000000D;
+} // namespace EndProductType
+
+namespace CurrentPositionLiftPercent100ths {
+static constexpr AttributeId Id = 0x0000000E;
+} // namespace CurrentPositionLiftPercent100ths
+
+namespace CurrentPositionTiltPercent100ths {
+static constexpr AttributeId Id = 0x0000000F;
+} // namespace CurrentPositionTiltPercent100ths
+
+namespace InstalledOpenLimitLift {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace InstalledOpenLimitLift
+
+namespace InstalledClosedLimitLift {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace InstalledClosedLimitLift
+
+namespace InstalledOpenLimitTilt {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace InstalledOpenLimitTilt
+
+namespace InstalledClosedLimitTilt {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace InstalledClosedLimitTilt
+
+namespace VelocityLift {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace VelocityLift
+
+namespace AccelerationTimeLift {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace AccelerationTimeLift
+
+namespace DecelerationTimeLift {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace DecelerationTimeLift
+
+namespace Mode {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace Mode
+
+namespace IntermediateSetpointsLift {
+static constexpr AttributeId Id = 0x00000018;
+} // namespace IntermediateSetpointsLift
+
+namespace IntermediateSetpointsTilt {
+static constexpr AttributeId Id = 0x00000019;
+} // namespace IntermediateSetpointsTilt
+
+namespace SafetyStatus {
+static constexpr AttributeId Id = 0x0000001A;
+} // namespace SafetyStatus
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace WindowCovering
 
 namespace BarrierControl {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId BarrierMovingState        = 0x00000001;
-static constexpr AttributeId BarrierSafetyStatus       = 0x00000002;
-static constexpr AttributeId BarrierCapabilities       = 0x00000003;
-static constexpr AttributeId BarrierOpenEvents         = 0x00000004;
-static constexpr AttributeId BarrierCloseEvents        = 0x00000005;
-static constexpr AttributeId BarrierCommandOpenEvents  = 0x00000006;
-static constexpr AttributeId BarrierCommandCloseEvents = 0x00000007;
-static constexpr AttributeId BarrierOpenPeriod         = 0x00000008;
-static constexpr AttributeId BarrierClosePeriod        = 0x00000009;
-static constexpr AttributeId BarrierPosition           = 0x0000000A;
-} // namespace Ids
+
+namespace BarrierMovingState {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace BarrierMovingState
+
+namespace BarrierSafetyStatus {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace BarrierSafetyStatus
+
+namespace BarrierCapabilities {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace BarrierCapabilities
+
+namespace BarrierOpenEvents {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace BarrierOpenEvents
+
+namespace BarrierCloseEvents {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace BarrierCloseEvents
+
+namespace BarrierCommandOpenEvents {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace BarrierCommandOpenEvents
+
+namespace BarrierCommandCloseEvents {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace BarrierCommandCloseEvents
+
+namespace BarrierOpenPeriod {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace BarrierOpenPeriod
+
+namespace BarrierClosePeriod {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace BarrierClosePeriod
+
+namespace BarrierPosition {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace BarrierPosition
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MaxPressure            = 0x00000000;
-static constexpr AttributeId MaxSpeed               = 0x00000001;
-static constexpr AttributeId MaxFlow                = 0x00000002;
-static constexpr AttributeId MinConstPressure       = 0x00000003;
-static constexpr AttributeId MaxConstPressure       = 0x00000004;
-static constexpr AttributeId MinCompPressure        = 0x00000005;
-static constexpr AttributeId MaxCompPressure        = 0x00000006;
-static constexpr AttributeId MinConstSpeed          = 0x00000007;
-static constexpr AttributeId MaxConstSpeed          = 0x00000008;
-static constexpr AttributeId MinConstFlow           = 0x00000009;
-static constexpr AttributeId MaxConstFlow           = 0x0000000A;
-static constexpr AttributeId MinConstTemp           = 0x0000000B;
-static constexpr AttributeId MaxConstTemp           = 0x0000000C;
-static constexpr AttributeId PumpStatus             = 0x00000010;
-static constexpr AttributeId EffectiveOperationMode = 0x00000011;
-static constexpr AttributeId EffectiveControlMode   = 0x00000012;
-static constexpr AttributeId Capacity               = 0x00000013;
-static constexpr AttributeId Speed                  = 0x00000014;
-static constexpr AttributeId LifetimeRunningHours   = 0x00000015;
-static constexpr AttributeId Power                  = 0x00000016;
-static constexpr AttributeId LifetimeEnergyConsumed = 0x00000017;
-static constexpr AttributeId OperationMode          = 0x00000020;
-static constexpr AttributeId ControlMode            = 0x00000021;
-static constexpr AttributeId AlarmMask              = 0x00000022;
-} // namespace Ids
+
+namespace MaxPressure {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MaxPressure
+
+namespace MaxSpeed {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MaxSpeed
+
+namespace MaxFlow {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxFlow
+
+namespace MinConstPressure {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace MinConstPressure
+
+namespace MaxConstPressure {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace MaxConstPressure
+
+namespace MinCompPressure {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace MinCompPressure
+
+namespace MaxCompPressure {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace MaxCompPressure
+
+namespace MinConstSpeed {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace MinConstSpeed
+
+namespace MaxConstSpeed {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MaxConstSpeed
+
+namespace MinConstFlow {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MinConstFlow
+
+namespace MaxConstFlow {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace MaxConstFlow
+
+namespace MinConstTemp {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace MinConstTemp
+
+namespace MaxConstTemp {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace MaxConstTemp
+
+namespace PumpStatus {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace PumpStatus
+
+namespace EffectiveOperationMode {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace EffectiveOperationMode
+
+namespace EffectiveControlMode {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace EffectiveControlMode
+
+namespace Capacity {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace Capacity
+
+namespace Speed {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace Speed
+
+namespace LifetimeRunningHours {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace LifetimeRunningHours
+
+namespace Power {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace Power
+
+namespace LifetimeEnergyConsumed {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace LifetimeEnergyConsumed
+
+namespace OperationMode {
+static constexpr AttributeId Id = 0x00000020;
+} // namespace OperationMode
+
+namespace ControlMode {
+static constexpr AttributeId Id = 0x00000021;
+} // namespace ControlMode
+
+namespace AlarmMask {
+static constexpr AttributeId Id = 0x00000022;
+} // namespace AlarmMask
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace PumpConfigurationAndControl
 
 namespace Thermostat {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId LocalTemperature                   = 0x00000000;
-static constexpr AttributeId OutdoorTemperature                 = 0x00000001;
-static constexpr AttributeId Occupancy                          = 0x00000002;
-static constexpr AttributeId AbsMinHeatSetpointLimit            = 0x00000003;
-static constexpr AttributeId AbsMaxHeatSetpointLimit            = 0x00000004;
-static constexpr AttributeId AbsMinCoolSetpointLimit            = 0x00000005;
-static constexpr AttributeId AbsMaxCoolSetpointLimit            = 0x00000006;
-static constexpr AttributeId PiCoolingDemand                    = 0x00000007;
-static constexpr AttributeId PiHeatingDemand                    = 0x00000008;
-static constexpr AttributeId HvacSystemTypeConfiguration        = 0x00000009;
-static constexpr AttributeId LocalTemperatureCalibration        = 0x00000010;
-static constexpr AttributeId OccupiedCoolingSetpoint            = 0x00000011;
-static constexpr AttributeId OccupiedHeatingSetpoint            = 0x00000012;
-static constexpr AttributeId UnoccupiedCoolingSetpoint          = 0x00000013;
-static constexpr AttributeId UnoccupiedHeatingSetpoint          = 0x00000014;
-static constexpr AttributeId MinHeatSetpointLimit               = 0x00000015;
-static constexpr AttributeId MaxHeatSetpointLimit               = 0x00000016;
-static constexpr AttributeId MinCoolSetpointLimit               = 0x00000017;
-static constexpr AttributeId MaxCoolSetpointLimit               = 0x00000018;
-static constexpr AttributeId MinSetpointDeadBand                = 0x00000019;
-static constexpr AttributeId RemoteSensing                      = 0x0000001A;
-static constexpr AttributeId ControlSequenceOfOperation         = 0x0000001B;
-static constexpr AttributeId SystemMode                         = 0x0000001C;
-static constexpr AttributeId AlarmMask                          = 0x0000001D;
-static constexpr AttributeId ThermostatRunningMode              = 0x0000001E;
-static constexpr AttributeId StartOfWeek                        = 0x00000020;
-static constexpr AttributeId NumberOfWeeklyTransitions          = 0x00000021;
-static constexpr AttributeId NumberOfDailyTransitions           = 0x00000022;
-static constexpr AttributeId TemperatureSetpointHold            = 0x00000023;
-static constexpr AttributeId TemperatureSetpointHoldDuration    = 0x00000024;
-static constexpr AttributeId ThermostatProgrammingOperationMode = 0x00000025;
-static constexpr AttributeId HvacRelayState                     = 0x00000029;
-static constexpr AttributeId SetpointChangeSource               = 0x00000030;
-static constexpr AttributeId SetpointChangeAmount               = 0x00000031;
-static constexpr AttributeId SetpointChangeSourceTimestamp      = 0x00000032;
-static constexpr AttributeId AcType                             = 0x00000040;
-static constexpr AttributeId AcCapacity                         = 0x00000041;
-static constexpr AttributeId AcRefrigerantType                  = 0x00000042;
-static constexpr AttributeId AcCompressor                       = 0x00000043;
-static constexpr AttributeId AcErrorCode                        = 0x00000044;
-static constexpr AttributeId AcLouverPosition                   = 0x00000045;
-static constexpr AttributeId AcCoilTemperature                  = 0x00000046;
-static constexpr AttributeId AcCapacityFormat                   = 0x00000047;
-} // namespace Ids
+
+namespace LocalTemperature {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace LocalTemperature
+
+namespace OutdoorTemperature {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace OutdoorTemperature
+
+namespace Occupancy {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace Occupancy
+
+namespace AbsMinHeatSetpointLimit {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace AbsMinHeatSetpointLimit
+
+namespace AbsMaxHeatSetpointLimit {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace AbsMaxHeatSetpointLimit
+
+namespace AbsMinCoolSetpointLimit {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace AbsMinCoolSetpointLimit
+
+namespace AbsMaxCoolSetpointLimit {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AbsMaxCoolSetpointLimit
+
+namespace PiCoolingDemand {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace PiCoolingDemand
+
+namespace PiHeatingDemand {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace PiHeatingDemand
+
+namespace HvacSystemTypeConfiguration {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace HvacSystemTypeConfiguration
+
+namespace LocalTemperatureCalibration {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace LocalTemperatureCalibration
+
+namespace OccupiedCoolingSetpoint {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace OccupiedCoolingSetpoint
+
+namespace OccupiedHeatingSetpoint {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace OccupiedHeatingSetpoint
+
+namespace UnoccupiedCoolingSetpoint {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace UnoccupiedCoolingSetpoint
+
+namespace UnoccupiedHeatingSetpoint {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace UnoccupiedHeatingSetpoint
+
+namespace MinHeatSetpointLimit {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace MinHeatSetpointLimit
+
+namespace MaxHeatSetpointLimit {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace MaxHeatSetpointLimit
+
+namespace MinCoolSetpointLimit {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace MinCoolSetpointLimit
+
+namespace MaxCoolSetpointLimit {
+static constexpr AttributeId Id = 0x00000018;
+} // namespace MaxCoolSetpointLimit
+
+namespace MinSetpointDeadBand {
+static constexpr AttributeId Id = 0x00000019;
+} // namespace MinSetpointDeadBand
+
+namespace RemoteSensing {
+static constexpr AttributeId Id = 0x0000001A;
+} // namespace RemoteSensing
+
+namespace ControlSequenceOfOperation {
+static constexpr AttributeId Id = 0x0000001B;
+} // namespace ControlSequenceOfOperation
+
+namespace SystemMode {
+static constexpr AttributeId Id = 0x0000001C;
+} // namespace SystemMode
+
+namespace AlarmMask {
+static constexpr AttributeId Id = 0x0000001D;
+} // namespace AlarmMask
+
+namespace ThermostatRunningMode {
+static constexpr AttributeId Id = 0x0000001E;
+} // namespace ThermostatRunningMode
+
+namespace StartOfWeek {
+static constexpr AttributeId Id = 0x00000020;
+} // namespace StartOfWeek
+
+namespace NumberOfWeeklyTransitions {
+static constexpr AttributeId Id = 0x00000021;
+} // namespace NumberOfWeeklyTransitions
+
+namespace NumberOfDailyTransitions {
+static constexpr AttributeId Id = 0x00000022;
+} // namespace NumberOfDailyTransitions
+
+namespace TemperatureSetpointHold {
+static constexpr AttributeId Id = 0x00000023;
+} // namespace TemperatureSetpointHold
+
+namespace TemperatureSetpointHoldDuration {
+static constexpr AttributeId Id = 0x00000024;
+} // namespace TemperatureSetpointHoldDuration
+
+namespace ThermostatProgrammingOperationMode {
+static constexpr AttributeId Id = 0x00000025;
+} // namespace ThermostatProgrammingOperationMode
+
+namespace HvacRelayState {
+static constexpr AttributeId Id = 0x00000029;
+} // namespace HvacRelayState
+
+namespace SetpointChangeSource {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace SetpointChangeSource
+
+namespace SetpointChangeAmount {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace SetpointChangeAmount
+
+namespace SetpointChangeSourceTimestamp {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace SetpointChangeSourceTimestamp
+
+namespace AcType {
+static constexpr AttributeId Id = 0x00000040;
+} // namespace AcType
+
+namespace AcCapacity {
+static constexpr AttributeId Id = 0x00000041;
+} // namespace AcCapacity
+
+namespace AcRefrigerantType {
+static constexpr AttributeId Id = 0x00000042;
+} // namespace AcRefrigerantType
+
+namespace AcCompressor {
+static constexpr AttributeId Id = 0x00000043;
+} // namespace AcCompressor
+
+namespace AcErrorCode {
+static constexpr AttributeId Id = 0x00000044;
+} // namespace AcErrorCode
+
+namespace AcLouverPosition {
+static constexpr AttributeId Id = 0x00000045;
+} // namespace AcLouverPosition
+
+namespace AcCoilTemperature {
+static constexpr AttributeId Id = 0x00000046;
+} // namespace AcCoilTemperature
+
+namespace AcCapacityFormat {
+static constexpr AttributeId Id = 0x00000047;
+} // namespace AcCapacityFormat
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace Thermostat
 
 namespace FanControl {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId FanMode         = 0x00000000;
-static constexpr AttributeId FanModeSequence = 0x00000001;
-} // namespace Ids
+
+namespace FanMode {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace FanMode
+
+namespace FanModeSequence {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace FanModeSequence
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace FanControl
 
 namespace DehumidificationControl {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId RelativeHumidity           = 0x00000000;
-static constexpr AttributeId DehumidificationCooling    = 0x00000001;
-static constexpr AttributeId RhDehumidificationSetpoint = 0x00000010;
-static constexpr AttributeId RelativeHumidityMode       = 0x00000011;
-static constexpr AttributeId DehumidificationLockout    = 0x00000012;
-static constexpr AttributeId DehumidificationHysteresis = 0x00000013;
-static constexpr AttributeId DehumidificationMaxCool    = 0x00000014;
-static constexpr AttributeId RelativeHumidityDisplay    = 0x00000015;
-} // namespace Ids
+
+namespace RelativeHumidity {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace RelativeHumidity
+
+namespace DehumidificationCooling {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DehumidificationCooling
+
+namespace RhDehumidificationSetpoint {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace RhDehumidificationSetpoint
+
+namespace RelativeHumidityMode {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace RelativeHumidityMode
+
+namespace DehumidificationLockout {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace DehumidificationLockout
+
+namespace DehumidificationHysteresis {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace DehumidificationHysteresis
+
+namespace DehumidificationMaxCool {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace DehumidificationMaxCool
+
+namespace RelativeHumidityDisplay {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace RelativeHumidityDisplay
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace DehumidificationControl
 
 namespace ThermostatUserInterfaceConfiguration {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId TemperatureDisplayMode        = 0x00000000;
-static constexpr AttributeId KeypadLockout                 = 0x00000001;
-static constexpr AttributeId ScheduleProgrammingVisibility = 0x00000002;
-} // namespace Ids
+
+namespace TemperatureDisplayMode {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureDisplayMode
+
+namespace KeypadLockout {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace KeypadLockout
+
+namespace ScheduleProgrammingVisibility {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ScheduleProgrammingVisibility
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ThermostatUserInterfaceConfiguration
 
 namespace ColorControl {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId CurrentHue                      = 0x00000000;
-static constexpr AttributeId CurrentSaturation               = 0x00000001;
-static constexpr AttributeId RemainingTime                   = 0x00000002;
-static constexpr AttributeId CurrentX                        = 0x00000003;
-static constexpr AttributeId CurrentY                        = 0x00000004;
-static constexpr AttributeId DriftCompensation               = 0x00000005;
-static constexpr AttributeId CompensationText                = 0x00000006;
-static constexpr AttributeId ColorTemperature                = 0x00000007;
-static constexpr AttributeId ColorMode                       = 0x00000008;
-static constexpr AttributeId ColorControlOptions             = 0x0000000F;
-static constexpr AttributeId NumberOfPrimaries               = 0x00000010;
-static constexpr AttributeId Primary1X                       = 0x00000011;
-static constexpr AttributeId Primary1Y                       = 0x00000012;
-static constexpr AttributeId Primary1Intensity               = 0x00000013;
-static constexpr AttributeId Primary2X                       = 0x00000015;
-static constexpr AttributeId Primary2Y                       = 0x00000016;
-static constexpr AttributeId Primary2Intensity               = 0x00000017;
-static constexpr AttributeId Primary3X                       = 0x00000019;
-static constexpr AttributeId Primary3Y                       = 0x0000001A;
-static constexpr AttributeId Primary3Intensity               = 0x0000001B;
-static constexpr AttributeId Primary4X                       = 0x00000020;
-static constexpr AttributeId Primary4Y                       = 0x00000021;
-static constexpr AttributeId Primary4Intensity               = 0x00000022;
-static constexpr AttributeId Primary5X                       = 0x00000024;
-static constexpr AttributeId Primary5Y                       = 0x00000025;
-static constexpr AttributeId Primary5Intensity               = 0x00000026;
-static constexpr AttributeId Primary6X                       = 0x00000028;
-static constexpr AttributeId Primary6Y                       = 0x00000029;
-static constexpr AttributeId Primary6Intensity               = 0x0000002A;
-static constexpr AttributeId WhitePointX                     = 0x00000030;
-static constexpr AttributeId WhitePointY                     = 0x00000031;
-static constexpr AttributeId ColorPointRX                    = 0x00000032;
-static constexpr AttributeId ColorPointRY                    = 0x00000033;
-static constexpr AttributeId ColorPointRIntensity            = 0x00000034;
-static constexpr AttributeId ColorPointGX                    = 0x00000036;
-static constexpr AttributeId ColorPointGY                    = 0x00000037;
-static constexpr AttributeId ColorPointGIntensity            = 0x00000038;
-static constexpr AttributeId ColorPointBX                    = 0x0000003A;
-static constexpr AttributeId ColorPointBY                    = 0x0000003B;
-static constexpr AttributeId ColorPointBIntensity            = 0x0000003C;
-static constexpr AttributeId EnhancedCurrentHue              = 0x00004000;
-static constexpr AttributeId EnhancedColorMode               = 0x00004001;
-static constexpr AttributeId ColorLoopActive                 = 0x00004002;
-static constexpr AttributeId ColorLoopDirection              = 0x00004003;
-static constexpr AttributeId ColorLoopTime                   = 0x00004004;
-static constexpr AttributeId ColorLoopStartEnhancedHue       = 0x00004005;
-static constexpr AttributeId ColorLoopStoredEnhancedHue      = 0x00004006;
-static constexpr AttributeId ColorCapabilities               = 0x0000400A;
-static constexpr AttributeId ColorTempPhysicalMin            = 0x0000400B;
-static constexpr AttributeId ColorTempPhysicalMax            = 0x0000400C;
-static constexpr AttributeId CoupleColorTempToLevelMinMireds = 0x0000400D;
-static constexpr AttributeId StartUpColorTemperatureMireds   = 0x00004010;
-} // namespace Ids
+
+namespace CurrentHue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CurrentHue
+
+namespace CurrentSaturation {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentSaturation
+
+namespace RemainingTime {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace RemainingTime
+
+namespace CurrentX {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentX
+
+namespace CurrentY {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace CurrentY
+
+namespace DriftCompensation {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace DriftCompensation
+
+namespace CompensationText {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace CompensationText
+
+namespace ColorTemperature {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace ColorTemperature
+
+namespace ColorMode {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace ColorMode
+
+namespace ColorControlOptions {
+static constexpr AttributeId Id = 0x0000000F;
+} // namespace ColorControlOptions
+
+namespace NumberOfPrimaries {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace NumberOfPrimaries
+
+namespace Primary1X {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace Primary1X
+
+namespace Primary1Y {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace Primary1Y
+
+namespace Primary1Intensity {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace Primary1Intensity
+
+namespace Primary2X {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace Primary2X
+
+namespace Primary2Y {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace Primary2Y
+
+namespace Primary2Intensity {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace Primary2Intensity
+
+namespace Primary3X {
+static constexpr AttributeId Id = 0x00000019;
+} // namespace Primary3X
+
+namespace Primary3Y {
+static constexpr AttributeId Id = 0x0000001A;
+} // namespace Primary3Y
+
+namespace Primary3Intensity {
+static constexpr AttributeId Id = 0x0000001B;
+} // namespace Primary3Intensity
+
+namespace Primary4X {
+static constexpr AttributeId Id = 0x00000020;
+} // namespace Primary4X
+
+namespace Primary4Y {
+static constexpr AttributeId Id = 0x00000021;
+} // namespace Primary4Y
+
+namespace Primary4Intensity {
+static constexpr AttributeId Id = 0x00000022;
+} // namespace Primary4Intensity
+
+namespace Primary5X {
+static constexpr AttributeId Id = 0x00000024;
+} // namespace Primary5X
+
+namespace Primary5Y {
+static constexpr AttributeId Id = 0x00000025;
+} // namespace Primary5Y
+
+namespace Primary5Intensity {
+static constexpr AttributeId Id = 0x00000026;
+} // namespace Primary5Intensity
+
+namespace Primary6X {
+static constexpr AttributeId Id = 0x00000028;
+} // namespace Primary6X
+
+namespace Primary6Y {
+static constexpr AttributeId Id = 0x00000029;
+} // namespace Primary6Y
+
+namespace Primary6Intensity {
+static constexpr AttributeId Id = 0x0000002A;
+} // namespace Primary6Intensity
+
+namespace WhitePointX {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace WhitePointX
+
+namespace WhitePointY {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace WhitePointY
+
+namespace ColorPointRX {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace ColorPointRX
+
+namespace ColorPointRY {
+static constexpr AttributeId Id = 0x00000033;
+} // namespace ColorPointRY
+
+namespace ColorPointRIntensity {
+static constexpr AttributeId Id = 0x00000034;
+} // namespace ColorPointRIntensity
+
+namespace ColorPointGX {
+static constexpr AttributeId Id = 0x00000036;
+} // namespace ColorPointGX
+
+namespace ColorPointGY {
+static constexpr AttributeId Id = 0x00000037;
+} // namespace ColorPointGY
+
+namespace ColorPointGIntensity {
+static constexpr AttributeId Id = 0x00000038;
+} // namespace ColorPointGIntensity
+
+namespace ColorPointBX {
+static constexpr AttributeId Id = 0x0000003A;
+} // namespace ColorPointBX
+
+namespace ColorPointBY {
+static constexpr AttributeId Id = 0x0000003B;
+} // namespace ColorPointBY
+
+namespace ColorPointBIntensity {
+static constexpr AttributeId Id = 0x0000003C;
+} // namespace ColorPointBIntensity
+
+namespace EnhancedCurrentHue {
+static constexpr AttributeId Id = 0x00004000;
+} // namespace EnhancedCurrentHue
+
+namespace EnhancedColorMode {
+static constexpr AttributeId Id = 0x00004001;
+} // namespace EnhancedColorMode
+
+namespace ColorLoopActive {
+static constexpr AttributeId Id = 0x00004002;
+} // namespace ColorLoopActive
+
+namespace ColorLoopDirection {
+static constexpr AttributeId Id = 0x00004003;
+} // namespace ColorLoopDirection
+
+namespace ColorLoopTime {
+static constexpr AttributeId Id = 0x00004004;
+} // namespace ColorLoopTime
+
+namespace ColorLoopStartEnhancedHue {
+static constexpr AttributeId Id = 0x00004005;
+} // namespace ColorLoopStartEnhancedHue
+
+namespace ColorLoopStoredEnhancedHue {
+static constexpr AttributeId Id = 0x00004006;
+} // namespace ColorLoopStoredEnhancedHue
+
+namespace ColorCapabilities {
+static constexpr AttributeId Id = 0x0000400A;
+} // namespace ColorCapabilities
+
+namespace ColorTempPhysicalMin {
+static constexpr AttributeId Id = 0x0000400B;
+} // namespace ColorTempPhysicalMin
+
+namespace ColorTempPhysicalMax {
+static constexpr AttributeId Id = 0x0000400C;
+} // namespace ColorTempPhysicalMax
+
+namespace CoupleColorTempToLevelMinMireds {
+static constexpr AttributeId Id = 0x0000400D;
+} // namespace CoupleColorTempToLevelMinMireds
+
+namespace StartUpColorTemperatureMireds {
+static constexpr AttributeId Id = 0x00004010;
+} // namespace StartUpColorTemperatureMireds
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ColorControl
 
 namespace BallastConfiguration {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId PhysicalMinLevel        = 0x00000000;
-static constexpr AttributeId PhysicalMaxLevel        = 0x00000001;
-static constexpr AttributeId BallastStatus           = 0x00000002;
-static constexpr AttributeId MinLevel                = 0x00000010;
-static constexpr AttributeId MaxLevel                = 0x00000011;
-static constexpr AttributeId PowerOnLevel            = 0x00000012;
-static constexpr AttributeId PowerOnFadeTime         = 0x00000013;
-static constexpr AttributeId IntrinsicBallastFactor  = 0x00000014;
-static constexpr AttributeId BallastFactorAdjustment = 0x00000015;
-static constexpr AttributeId LampQuality             = 0x00000020;
-static constexpr AttributeId LampType                = 0x00000030;
-static constexpr AttributeId LampManufacturer        = 0x00000031;
-static constexpr AttributeId LampRatedHours          = 0x00000032;
-static constexpr AttributeId LampBurnHours           = 0x00000033;
-static constexpr AttributeId LampAlarmMode           = 0x00000034;
-static constexpr AttributeId LampBurnHoursTripPoint  = 0x00000035;
-} // namespace Ids
+
+namespace PhysicalMinLevel {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PhysicalMinLevel
+
+namespace PhysicalMaxLevel {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace PhysicalMaxLevel
+
+namespace BallastStatus {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace BallastStatus
+
+namespace MinLevel {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace MinLevel
+
+namespace MaxLevel {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace MaxLevel
+
+namespace PowerOnLevel {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace PowerOnLevel
+
+namespace PowerOnFadeTime {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace PowerOnFadeTime
+
+namespace IntrinsicBallastFactor {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace IntrinsicBallastFactor
+
+namespace BallastFactorAdjustment {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace BallastFactorAdjustment
+
+namespace LampQuality {
+static constexpr AttributeId Id = 0x00000020;
+} // namespace LampQuality
+
+namespace LampType {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace LampType
+
+namespace LampManufacturer {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace LampManufacturer
+
+namespace LampRatedHours {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace LampRatedHours
+
+namespace LampBurnHours {
+static constexpr AttributeId Id = 0x00000033;
+} // namespace LampBurnHours
+
+namespace LampAlarmMode {
+static constexpr AttributeId Id = 0x00000034;
+} // namespace LampAlarmMode
+
+namespace LampBurnHoursTripPoint {
+static constexpr AttributeId Id = 0x00000035;
+} // namespace LampBurnHoursTripPoint
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-static constexpr AttributeId LightSensorType  = 0x00000004;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace LightSensorType {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace LightSensorType
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace IlluminanceMeasurement
 
 namespace IlluminanceLevelSensing {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId LevelStatus            = 0x00000000;
-static constexpr AttributeId LightSensorType        = 0x00000001;
-static constexpr AttributeId IlluminanceLevelTarget = 0x00000010;
-} // namespace Ids
+
+namespace LevelStatus {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace LevelStatus
+
+namespace LightSensorType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace LightSensorType
+
+namespace IlluminanceLevelTarget {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace IlluminanceLevelTarget
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace IlluminanceLevelSensing
 
 namespace TemperatureMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace TemperatureMeasurement
 
 namespace PressureMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-static constexpr AttributeId ScaledValue      = 0x00000010;
-static constexpr AttributeId MinScaledValue   = 0x00000011;
-static constexpr AttributeId MaxScaledValue   = 0x00000012;
-static constexpr AttributeId ScaledTolerance  = 0x00000013;
-static constexpr AttributeId Scale            = 0x00000014;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace ScaledValue {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace ScaledValue
+
+namespace MinScaledValue {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace MinScaledValue
+
+namespace MaxScaledValue {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace MaxScaledValue
+
+namespace ScaledTolerance {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace ScaledTolerance
+
+namespace Scale {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace Scale
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace PressureMeasurement
 
 namespace FlowMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace FlowMeasurement
 
 namespace RelativeHumidityMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace RelativeHumidityMeasurement
 
 namespace OccupancySensing {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId Occupancy                                    = 0x00000000;
-static constexpr AttributeId OccupancySensorType                          = 0x00000001;
-static constexpr AttributeId OccupancySensorTypeBitmap                    = 0x00000002;
-static constexpr AttributeId PirOccupiedToUnoccupiedDelay                 = 0x00000010;
-static constexpr AttributeId PirUnoccupiedToOccupiedDelay                 = 0x00000011;
-static constexpr AttributeId PirUnoccupiedToOccupiedThreshold             = 0x00000012;
-static constexpr AttributeId UltrasonicOccupiedToUnoccupiedDelay          = 0x00000020;
-static constexpr AttributeId UltrasonicUnoccupiedToOccupiedDelay          = 0x00000021;
-static constexpr AttributeId UltrasonicUnoccupiedToOccupiedThreshold      = 0x00000022;
-static constexpr AttributeId PhysicalContactOccupiedToUnoccupiedDelay     = 0x00000030;
-static constexpr AttributeId PhysicalContactUnoccupiedToOccupiedDelay     = 0x00000031;
-static constexpr AttributeId PhysicalContactUnoccupiedToOccupiedThreshold = 0x00000032;
-} // namespace Ids
+
+namespace Occupancy {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Occupancy
+
+namespace OccupancySensorType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace OccupancySensorType
+
+namespace OccupancySensorTypeBitmap {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace OccupancySensorTypeBitmap
+
+namespace PirOccupiedToUnoccupiedDelay {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace PirOccupiedToUnoccupiedDelay
+
+namespace PirUnoccupiedToOccupiedDelay {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace PirUnoccupiedToOccupiedDelay
+
+namespace PirUnoccupiedToOccupiedThreshold {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace PirUnoccupiedToOccupiedThreshold
+
+namespace UltrasonicOccupiedToUnoccupiedDelay {
+static constexpr AttributeId Id = 0x00000020;
+} // namespace UltrasonicOccupiedToUnoccupiedDelay
+
+namespace UltrasonicUnoccupiedToOccupiedDelay {
+static constexpr AttributeId Id = 0x00000021;
+} // namespace UltrasonicUnoccupiedToOccupiedDelay
+
+namespace UltrasonicUnoccupiedToOccupiedThreshold {
+static constexpr AttributeId Id = 0x00000022;
+} // namespace UltrasonicUnoccupiedToOccupiedThreshold
+
+namespace PhysicalContactOccupiedToUnoccupiedDelay {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace PhysicalContactOccupiedToUnoccupiedDelay
+
+namespace PhysicalContactUnoccupiedToOccupiedDelay {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace PhysicalContactUnoccupiedToOccupiedDelay
+
+namespace PhysicalContactUnoccupiedToOccupiedThreshold {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace PhysicalContactUnoccupiedToOccupiedThreshold
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace OccupancySensing
 
 namespace CarbonMonoxideConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace CarbonMonoxideConcentrationMeasurement
 
 namespace CarbonDioxideConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace CarbonDioxideConcentrationMeasurement
 
 namespace EthyleneConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace EthyleneConcentrationMeasurement
 
 namespace EthyleneOxideConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace EthyleneOxideConcentrationMeasurement
 
 namespace HydrogenConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace HydrogenConcentrationMeasurement
 
 namespace HydrogenSulphideConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace HydrogenSulphideConcentrationMeasurement
 
 namespace NitricOxideConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace NitricOxideConcentrationMeasurement
 
 namespace NitrogenDioxideConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace NitrogenDioxideConcentrationMeasurement
 
 namespace OxygenConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace OxygenConcentrationMeasurement
 
 namespace OzoneConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace OzoneConcentrationMeasurement
 
 namespace SulfurDioxideConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace SulfurDioxideConcentrationMeasurement
 
 namespace DissolvedOxygenConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace DissolvedOxygenConcentrationMeasurement
 
 namespace BromateConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace BromateConcentrationMeasurement
 
 namespace ChloraminesConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ChloraminesConcentrationMeasurement
 
 namespace ChlorineConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ChlorineConcentrationMeasurement
 
 namespace FecalColiformAndEColiConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace FecalColiformAndEColiConcentrationMeasurement
 
 namespace FluorideConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace FluorideConcentrationMeasurement
 
 namespace HaloaceticAcidsConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace HaloaceticAcidsConcentrationMeasurement
 
 namespace TotalTrihalomethanesConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace TotalTrihalomethanesConcentrationMeasurement
 
 namespace TotalColiformBacteriaConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace TotalColiformBacteriaConcentrationMeasurement
 
 namespace TurbidityConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace TurbidityConcentrationMeasurement
 
 namespace CopperConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace CopperConcentrationMeasurement
 
 namespace LeadConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace LeadConcentrationMeasurement
 
 namespace ManganeseConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ManganeseConcentrationMeasurement
 
 namespace SulfateConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace SulfateConcentrationMeasurement
 
 namespace BromodichloromethaneConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace BromodichloromethaneConcentrationMeasurement
 
 namespace BromoformConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace BromoformConcentrationMeasurement
 
 namespace ChlorodibromomethaneConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ChlorodibromomethaneConcentrationMeasurement
 
 namespace ChloroformConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ChloroformConcentrationMeasurement
 
 namespace SodiumConcentrationMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasuredValue    = 0x00000000;
-static constexpr AttributeId MinMeasuredValue = 0x00000001;
-static constexpr AttributeId MaxMeasuredValue = 0x00000002;
-static constexpr AttributeId Tolerance        = 0x00000003;
-} // namespace Ids
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace SodiumConcentrationMeasurement
 
 namespace IasZone {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId ZoneState                              = 0x00000000;
-static constexpr AttributeId ZoneType                               = 0x00000001;
-static constexpr AttributeId ZoneStatus                             = 0x00000002;
-static constexpr AttributeId IasCieAddress                          = 0x00000010;
-static constexpr AttributeId ZoneId                                 = 0x00000011;
-static constexpr AttributeId NumberOfZoneSensitivityLevelsSupported = 0x00000012;
-static constexpr AttributeId CurrentZoneSensitivityLevel            = 0x00000013;
-} // namespace Ids
+
+namespace ZoneState {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ZoneState
+
+namespace ZoneType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ZoneType
+
+namespace ZoneStatus {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ZoneStatus
+
+namespace IasCieAddress {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace IasCieAddress
+
+namespace ZoneId {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace ZoneId
+
+namespace NumberOfZoneSensitivityLevelsSupported {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace NumberOfZoneSensitivityLevelsSupported
+
+namespace CurrentZoneSensitivityLevel {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace CurrentZoneSensitivityLevel
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace IasZone
 
 namespace IasWd {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MaxDuration = 0x00000000;
-} // namespace Ids
+
+namespace MaxDuration {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MaxDuration
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace IasWd
 
 namespace WakeOnLan {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId WakeOnLanMacAddress = 0x00000000;
-} // namespace Ids
+
+namespace WakeOnLanMacAddress {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace WakeOnLanMacAddress
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace WakeOnLan
 
 namespace TvChannel {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId TvChannelList    = 0x00000000;
-static constexpr AttributeId TvChannelLineup  = 0x00000001;
-static constexpr AttributeId CurrentTvChannel = 0x00000002;
-} // namespace Ids
+
+namespace TvChannelList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TvChannelList
+
+namespace TvChannelLineup {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace TvChannelLineup
+
+namespace CurrentTvChannel {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentTvChannel
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace TvChannel
 
 namespace TargetNavigator {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId TargetNavigatorList    = 0x00000000;
-static constexpr AttributeId CurrentNavigatorTarget = 0x00000001;
-} // namespace Ids
+
+namespace TargetNavigatorList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TargetNavigatorList
+
+namespace CurrentNavigatorTarget {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentNavigatorTarget
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace TargetNavigator
 
 namespace MediaPlayback {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId PlaybackState  = 0x00000000;
-static constexpr AttributeId StartTime      = 0x00000001;
-static constexpr AttributeId Duration       = 0x00000002;
-static constexpr AttributeId UpdatedAt      = 0x00000003;
-static constexpr AttributeId Posistion      = 0x00000004;
-static constexpr AttributeId PlaybackSpeed  = 0x00000005;
-static constexpr AttributeId SeekRangeEnd   = 0x00000006;
-static constexpr AttributeId SeekRangeStart = 0x00000007;
-} // namespace Ids
+
+namespace PlaybackState {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PlaybackState
+
+namespace StartTime {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace StartTime
+
+namespace Duration {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace Duration
+
+namespace PositionUpdatedAt {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PositionUpdatedAt
+
+namespace Position {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace Position
+
+namespace PlaybackSpeed {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace PlaybackSpeed
+
+namespace SeekRangeEnd {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace SeekRangeEnd
+
+namespace SeekRangeStart {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace SeekRangeStart
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace MediaPlayback
 
 namespace MediaInput {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MediaInputList    = 0x00000000;
-static constexpr AttributeId CurrentMediaInput = 0x00000001;
-} // namespace Ids
+
+namespace MediaInputList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MediaInputList
+
+namespace CurrentMediaInput {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMediaInput
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace MediaInput
 
 namespace ContentLauncher {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId AcceptsHeaderList       = 0x00000000;
-static constexpr AttributeId SupportedStreamingTypes = 0x00000001;
-} // namespace Ids
+
+namespace AcceptsHeaderList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace AcceptsHeaderList
+
+namespace SupportedStreamingTypes {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedStreamingTypes
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ContentLauncher
 
 namespace AudioOutput {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId AudioOutputList    = 0x00000000;
-static constexpr AttributeId CurrentAudioOutput = 0x00000001;
-} // namespace Ids
+
+namespace AudioOutputList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace AudioOutputList
+
+namespace CurrentAudioOutput {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentAudioOutput
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace AudioOutput
 
 namespace ApplicationLauncher {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId ApplicationLauncherList = 0x00000000;
-static constexpr AttributeId CatalogVendorId         = 0x00000001;
-static constexpr AttributeId ApplicationId           = 0x00000002;
-} // namespace Ids
+
+namespace ApplicationLauncherList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ApplicationLauncherList
+
+namespace CatalogVendorId {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CatalogVendorId
+
+namespace ApplicationId {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ApplicationId
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ApplicationLauncher
 
 namespace ApplicationBasic {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId VendorName        = 0x00000000;
-static constexpr AttributeId VendorId          = 0x00000001;
-static constexpr AttributeId ApplicationName   = 0x00000002;
-static constexpr AttributeId ProductId         = 0x00000003;
-static constexpr AttributeId ApplicationId     = 0x00000005;
-static constexpr AttributeId CatalogVendorId   = 0x00000006;
-static constexpr AttributeId ApplicationStatus = 0x00000007;
-} // namespace Ids
+
+namespace VendorName {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace VendorName
+
+namespace VendorId {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace VendorId
+
+namespace ApplicationName {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ApplicationName
+
+namespace ProductId {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace ProductId
+
+namespace ApplicationId {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ApplicationId
+
+namespace CatalogVendorId {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace CatalogVendorId
+
+namespace ApplicationStatus {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace ApplicationStatus
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ApplicationBasic
 
 namespace TestCluster {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId Boolean               = 0x00000000;
-static constexpr AttributeId Bitmap8               = 0x00000001;
-static constexpr AttributeId Bitmap16              = 0x00000002;
-static constexpr AttributeId Bitmap32              = 0x00000003;
-static constexpr AttributeId Bitmap64              = 0x00000004;
-static constexpr AttributeId Int8u                 = 0x00000005;
-static constexpr AttributeId Int16u                = 0x00000006;
-static constexpr AttributeId Int32u                = 0x00000008;
-static constexpr AttributeId Int64u                = 0x0000000C;
-static constexpr AttributeId Int8s                 = 0x0000000D;
-static constexpr AttributeId Int16s                = 0x0000000E;
-static constexpr AttributeId Int32s                = 0x00000010;
-static constexpr AttributeId Int64s                = 0x00000014;
-static constexpr AttributeId Enum8                 = 0x00000015;
-static constexpr AttributeId Enum16                = 0x00000016;
-static constexpr AttributeId OctetString           = 0x00000019;
-static constexpr AttributeId ListInt8u             = 0x0000001A;
-static constexpr AttributeId ListOctetString       = 0x0000001B;
-static constexpr AttributeId ListStructOctetString = 0x0000001C;
-static constexpr AttributeId LongOctetString       = 0x0000001D;
-static constexpr AttributeId CharString            = 0x0000001E;
-static constexpr AttributeId LongCharString        = 0x0000001F;
-static constexpr AttributeId Unsupported           = 0x000000FF;
-} // namespace Ids
+
+namespace Boolean {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Boolean
+
+namespace Bitmap8 {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Bitmap8
+
+namespace Bitmap16 {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace Bitmap16
+
+namespace Bitmap32 {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Bitmap32
+
+namespace Bitmap64 {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace Bitmap64
+
+namespace Int8u {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace Int8u
+
+namespace Int16u {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace Int16u
+
+namespace Int32u {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace Int32u
+
+namespace Int64u {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace Int64u
+
+namespace Int8s {
+static constexpr AttributeId Id = 0x0000000D;
+} // namespace Int8s
+
+namespace Int16s {
+static constexpr AttributeId Id = 0x0000000E;
+} // namespace Int16s
+
+namespace Int32s {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace Int32s
+
+namespace Int64s {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace Int64s
+
+namespace Enum8 {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace Enum8
+
+namespace Enum16 {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace Enum16
+
+namespace OctetString {
+static constexpr AttributeId Id = 0x00000019;
+} // namespace OctetString
+
+namespace ListInt8u {
+static constexpr AttributeId Id = 0x0000001A;
+} // namespace ListInt8u
+
+namespace ListOctetString {
+static constexpr AttributeId Id = 0x0000001B;
+} // namespace ListOctetString
+
+namespace ListStructOctetString {
+static constexpr AttributeId Id = 0x0000001C;
+} // namespace ListStructOctetString
+
+namespace LongOctetString {
+static constexpr AttributeId Id = 0x0000001D;
+} // namespace LongOctetString
+
+namespace CharString {
+static constexpr AttributeId Id = 0x0000001E;
+} // namespace CharString
+
+namespace LongCharString {
+static constexpr AttributeId Id = 0x0000001F;
+} // namespace LongCharString
+
+namespace EpochUs {
+static constexpr AttributeId Id = 0x00000020;
+} // namespace EpochUs
+
+namespace EpochS {
+static constexpr AttributeId Id = 0x00000021;
+} // namespace EpochS
+
+namespace Unsupported {
+static constexpr AttributeId Id = 0x000000FF;
+} // namespace Unsupported
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace TestCluster
 
 namespace ApplianceIdentification {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId BasicIdentification       = 0x00000000;
-static constexpr AttributeId CompanyName               = 0x00000010;
-static constexpr AttributeId CompanyId                 = 0x00000011;
-static constexpr AttributeId BrandName                 = 0x00000012;
-static constexpr AttributeId BrandId                   = 0x00000013;
-static constexpr AttributeId Model                     = 0x00000014;
-static constexpr AttributeId PartNumber                = 0x00000015;
-static constexpr AttributeId ProductRevision           = 0x00000016;
-static constexpr AttributeId SoftwareRevision          = 0x00000017;
-static constexpr AttributeId ProductTypeName           = 0x00000018;
-static constexpr AttributeId ProductTypeId             = 0x00000019;
-static constexpr AttributeId CecedSpecificationVersion = 0x0000001A;
-} // namespace Ids
+
+namespace BasicIdentification {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace BasicIdentification
+
+namespace CompanyName {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace CompanyName
+
+namespace CompanyId {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace CompanyId
+
+namespace BrandName {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace BrandName
+
+namespace BrandId {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace BrandId
+
+namespace Model {
+static constexpr AttributeId Id = 0x00000014;
+} // namespace Model
+
+namespace PartNumber {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace PartNumber
+
+namespace ProductRevision {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace ProductRevision
+
+namespace SoftwareRevision {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace SoftwareRevision
+
+namespace ProductTypeName {
+static constexpr AttributeId Id = 0x00000018;
+} // namespace ProductTypeName
+
+namespace ProductTypeId {
+static constexpr AttributeId Id = 0x00000019;
+} // namespace ProductTypeId
+
+namespace CecedSpecificationVersion {
+static constexpr AttributeId Id = 0x0000001A;
+} // namespace CecedSpecificationVersion
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ApplianceIdentification
 
 namespace MeterIdentification {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId CompanyName      = 0x00000000;
-static constexpr AttributeId MeterTypeId      = 0x00000001;
-static constexpr AttributeId DataQualityId    = 0x00000004;
-static constexpr AttributeId CustomerName     = 0x00000005;
-static constexpr AttributeId Model            = 0x00000006;
-static constexpr AttributeId PartNumber       = 0x00000007;
-static constexpr AttributeId ProductRevision  = 0x00000008;
-static constexpr AttributeId SoftwareRevision = 0x0000000A;
-static constexpr AttributeId UtilityName      = 0x0000000B;
-static constexpr AttributeId Pod              = 0x0000000C;
-static constexpr AttributeId AvailablePower   = 0x0000000D;
-static constexpr AttributeId PowerThreshold   = 0x0000000E;
-} // namespace Ids
+
+namespace CompanyName {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CompanyName
+
+namespace MeterTypeId {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MeterTypeId
+
+namespace DataQualityId {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DataQualityId
+
+namespace CustomerName {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CustomerName
+
+namespace Model {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace Model
+
+namespace PartNumber {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace PartNumber
+
+namespace ProductRevision {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace ProductRevision
+
+namespace SoftwareRevision {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace SoftwareRevision
+
+namespace UtilityName {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace UtilityName
+
+namespace Pod {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace Pod
+
+namespace AvailablePower {
+static constexpr AttributeId Id = 0x0000000D;
+} // namespace AvailablePower
+
+namespace PowerThreshold {
+static constexpr AttributeId Id = 0x0000000E;
+} // namespace PowerThreshold
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace MeterIdentification
 
 namespace ApplianceStatistics {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId LogMaxSize      = 0x00000000;
-static constexpr AttributeId LogQueueMaxSize = 0x00000001;
-} // namespace Ids
+
+namespace LogMaxSize {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace LogMaxSize
+
+namespace LogQueueMaxSize {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace LogQueueMaxSize
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ApplianceStatistics
 
 namespace ElectricalMeasurement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId MeasurementType                          = 0x00000000;
-static constexpr AttributeId DcVoltage                                = 0x00000100;
-static constexpr AttributeId DcVoltageMin                             = 0x00000101;
-static constexpr AttributeId DcVoltageMax                             = 0x00000102;
-static constexpr AttributeId DcCurrent                                = 0x00000103;
-static constexpr AttributeId DcCurrentMin                             = 0x00000104;
-static constexpr AttributeId DcCurrentMax                             = 0x00000105;
-static constexpr AttributeId DcPower                                  = 0x00000106;
-static constexpr AttributeId DcPowerMin                               = 0x00000107;
-static constexpr AttributeId DcPowerMax                               = 0x00000108;
-static constexpr AttributeId DcVoltageMultiplier                      = 0x00000200;
-static constexpr AttributeId DcVoltageDivisor                         = 0x00000201;
-static constexpr AttributeId DcCurrentMultiplier                      = 0x00000202;
-static constexpr AttributeId DcCurrentDivisor                         = 0x00000203;
-static constexpr AttributeId DcPowerMultiplier                        = 0x00000204;
-static constexpr AttributeId DcPowerDivisor                           = 0x00000205;
-static constexpr AttributeId AcFrequency                              = 0x00000300;
-static constexpr AttributeId AcFrequencyMin                           = 0x00000301;
-static constexpr AttributeId AcFrequencyMax                           = 0x00000302;
-static constexpr AttributeId NeutralCurrent                           = 0x00000303;
-static constexpr AttributeId TotalActivePower                         = 0x00000304;
-static constexpr AttributeId TotalReactivePower                       = 0x00000305;
-static constexpr AttributeId TotalApparentPower                       = 0x00000306;
-static constexpr AttributeId Measured1stHarmonicCurrent               = 0x00000307;
-static constexpr AttributeId Measured3rdHarmonicCurrent               = 0x00000308;
-static constexpr AttributeId Measured5thHarmonicCurrent               = 0x00000309;
-static constexpr AttributeId Measured7thHarmonicCurrent               = 0x0000030A;
-static constexpr AttributeId Measured9thHarmonicCurrent               = 0x0000030B;
-static constexpr AttributeId Measured11thHarmonicCurrent              = 0x0000030C;
-static constexpr AttributeId MeasuredPhase1stHarmonicCurrent          = 0x0000030D;
-static constexpr AttributeId MeasuredPhase3rdHarmonicCurrent          = 0x0000030E;
-static constexpr AttributeId MeasuredPhase5thHarmonicCurrent          = 0x0000030F;
-static constexpr AttributeId MeasuredPhase7thHarmonicCurrent          = 0x00000310;
-static constexpr AttributeId MeasuredPhase9thHarmonicCurrent          = 0x00000311;
-static constexpr AttributeId MeasuredPhase11thHarmonicCurrent         = 0x00000312;
-static constexpr AttributeId AcFrequencyMultiplier                    = 0x00000400;
-static constexpr AttributeId AcFrequencyDivisor                       = 0x00000401;
-static constexpr AttributeId PowerMultiplier                          = 0x00000402;
-static constexpr AttributeId PowerDivisor                             = 0x00000403;
-static constexpr AttributeId HarmonicCurrentMultiplier                = 0x00000404;
-static constexpr AttributeId PhaseHarmonicCurrentMultiplier           = 0x00000405;
-static constexpr AttributeId InstantaneousVoltage                     = 0x00000500;
-static constexpr AttributeId InstantaneousLineCurrent                 = 0x00000501;
-static constexpr AttributeId InstantaneousActiveCurrent               = 0x00000502;
-static constexpr AttributeId InstantaneousReactiveCurrent             = 0x00000503;
-static constexpr AttributeId InstantaneousPower                       = 0x00000504;
-static constexpr AttributeId RmsVoltage                               = 0x00000505;
-static constexpr AttributeId RmsVoltageMin                            = 0x00000506;
-static constexpr AttributeId RmsVoltageMax                            = 0x00000507;
-static constexpr AttributeId RmsCurrent                               = 0x00000508;
-static constexpr AttributeId RmsCurrentMin                            = 0x00000509;
-static constexpr AttributeId RmsCurrentMax                            = 0x0000050A;
-static constexpr AttributeId ActivePower                              = 0x0000050B;
-static constexpr AttributeId ActivePowerMin                           = 0x0000050C;
-static constexpr AttributeId ActivePowerMax                           = 0x0000050D;
-static constexpr AttributeId ReactivePower                            = 0x0000050E;
-static constexpr AttributeId ApparentPower                            = 0x0000050F;
-static constexpr AttributeId PowerFactor                              = 0x00000510;
-static constexpr AttributeId AverageRmsVoltageMeasurementPeriod       = 0x00000511;
-static constexpr AttributeId AverageRmsUnderVoltageCounter            = 0x00000513;
-static constexpr AttributeId RmsExtremeOverVoltagePeriod              = 0x00000514;
-static constexpr AttributeId RmsExtremeUnderVoltagePeriod             = 0x00000515;
-static constexpr AttributeId RmsVoltageSagPeriod                      = 0x00000516;
-static constexpr AttributeId RmsVoltageSwellPeriod                    = 0x00000517;
-static constexpr AttributeId AcVoltageMultiplier                      = 0x00000600;
-static constexpr AttributeId AcVoltageDivisor                         = 0x00000601;
-static constexpr AttributeId AcCurrentMultiplier                      = 0x00000602;
-static constexpr AttributeId AcCurrentDivisor                         = 0x00000603;
-static constexpr AttributeId AcPowerMultiplier                        = 0x00000604;
-static constexpr AttributeId AcPowerDivisor                           = 0x00000605;
-static constexpr AttributeId OverloadAlarmsMask                       = 0x00000700;
-static constexpr AttributeId VoltageOverload                          = 0x00000701;
-static constexpr AttributeId CurrentOverload                          = 0x00000702;
-static constexpr AttributeId AcOverloadAlarmsMask                     = 0x00000800;
-static constexpr AttributeId AcVoltageOverload                        = 0x00000801;
-static constexpr AttributeId AcCurrentOverload                        = 0x00000802;
-static constexpr AttributeId AcActivePowerOverload                    = 0x00000803;
-static constexpr AttributeId AcReactivePowerOverload                  = 0x00000804;
-static constexpr AttributeId AverageRmsOverVoltage                    = 0x00000805;
-static constexpr AttributeId AverageRmsUnderVoltage                   = 0x00000806;
-static constexpr AttributeId RmsExtremeOverVoltage                    = 0x00000807;
-static constexpr AttributeId RmsExtremeUnderVoltage                   = 0x00000808;
-static constexpr AttributeId RmsVoltageSag                            = 0x00000809;
-static constexpr AttributeId RmsVoltageSwell                          = 0x0000080A;
-static constexpr AttributeId LineCurrentPhaseB                        = 0x00000901;
-static constexpr AttributeId ActiveCurrentPhaseB                      = 0x00000902;
-static constexpr AttributeId ReactiveCurrentPhaseB                    = 0x00000903;
-static constexpr AttributeId RmsVoltagePhaseB                         = 0x00000905;
-static constexpr AttributeId RmsVoltageMinPhaseB                      = 0x00000906;
-static constexpr AttributeId RmsVoltageMaxPhaseB                      = 0x00000907;
-static constexpr AttributeId RmsCurrentPhaseB                         = 0x00000908;
-static constexpr AttributeId RmsCurrentMinPhaseB                      = 0x00000909;
-static constexpr AttributeId RmsCurrentMaxPhaseB                      = 0x0000090A;
-static constexpr AttributeId ActivePowerPhaseB                        = 0x0000090B;
-static constexpr AttributeId ActivePowerMinPhaseB                     = 0x0000090C;
-static constexpr AttributeId ActivePowerMaxPhaseB                     = 0x0000090D;
-static constexpr AttributeId ReactivePowerPhaseB                      = 0x0000090E;
-static constexpr AttributeId ApparentPowerPhaseB                      = 0x0000090F;
-static constexpr AttributeId PowerFactorPhaseB                        = 0x00000910;
-static constexpr AttributeId AverageRmsVoltageMeasurementPeriodPhaseB = 0x00000911;
-static constexpr AttributeId AverageRmsOverVoltageCounterPhaseB       = 0x00000912;
-static constexpr AttributeId AverageRmsUnderVoltageCounterPhaseB      = 0x00000913;
-static constexpr AttributeId RmsExtremeOverVoltagePeriodPhaseB        = 0x00000914;
-static constexpr AttributeId RmsExtremeUnderVoltagePeriodPhaseB       = 0x00000915;
-static constexpr AttributeId RmsVoltageSagPeriodPhaseB                = 0x00000916;
-static constexpr AttributeId RmsVoltageSwellPeriodPhaseB              = 0x00000917;
-static constexpr AttributeId LineCurrentPhaseC                        = 0x00000A01;
-static constexpr AttributeId ActiveCurrentPhaseC                      = 0x00000A02;
-static constexpr AttributeId ReactiveCurrentPhaseC                    = 0x00000A03;
-static constexpr AttributeId RmsVoltagePhaseC                         = 0x00000A05;
-static constexpr AttributeId RmsVoltageMinPhaseC                      = 0x00000A06;
-static constexpr AttributeId RmsVoltageMaxPhaseC                      = 0x00000A07;
-static constexpr AttributeId RmsCurrentPhaseC                         = 0x00000A08;
-static constexpr AttributeId RmsCurrentMinPhaseC                      = 0x00000A09;
-static constexpr AttributeId RmsCurrentMaxPhaseC                      = 0x00000A0A;
-static constexpr AttributeId ActivePowerPhaseC                        = 0x00000A0B;
-static constexpr AttributeId ActivePowerMinPhaseC                     = 0x00000A0C;
-static constexpr AttributeId ActivePowerMaxPhaseC                     = 0x00000A0D;
-static constexpr AttributeId ReactivePowerPhaseC                      = 0x00000A0E;
-static constexpr AttributeId ApparentPowerPhaseC                      = 0x00000A0F;
-static constexpr AttributeId PowerFactorPhaseC                        = 0x00000A10;
-static constexpr AttributeId AverageRmsVoltageMeasurementPeriodPhaseC = 0x00000A11;
-static constexpr AttributeId AverageRmsOverVoltageCounterPhaseC       = 0x00000A12;
-static constexpr AttributeId AverageRmsUnderVoltageCounterPhaseC      = 0x00000A13;
-static constexpr AttributeId RmsExtremeOverVoltagePeriodPhaseC        = 0x00000A14;
-static constexpr AttributeId RmsExtremeUnderVoltagePeriodPhaseC       = 0x00000A15;
-static constexpr AttributeId RmsVoltageSagPeriodPhaseC                = 0x00000A16;
-static constexpr AttributeId RmsVoltageSwellPeriodPhaseC              = 0x00000A17;
-} // namespace Ids
+
+namespace MeasurementType {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasurementType
+
+namespace DcVoltage {
+static constexpr AttributeId Id = 0x00000100;
+} // namespace DcVoltage
+
+namespace DcVoltageMin {
+static constexpr AttributeId Id = 0x00000101;
+} // namespace DcVoltageMin
+
+namespace DcVoltageMax {
+static constexpr AttributeId Id = 0x00000102;
+} // namespace DcVoltageMax
+
+namespace DcCurrent {
+static constexpr AttributeId Id = 0x00000103;
+} // namespace DcCurrent
+
+namespace DcCurrentMin {
+static constexpr AttributeId Id = 0x00000104;
+} // namespace DcCurrentMin
+
+namespace DcCurrentMax {
+static constexpr AttributeId Id = 0x00000105;
+} // namespace DcCurrentMax
+
+namespace DcPower {
+static constexpr AttributeId Id = 0x00000106;
+} // namespace DcPower
+
+namespace DcPowerMin {
+static constexpr AttributeId Id = 0x00000107;
+} // namespace DcPowerMin
+
+namespace DcPowerMax {
+static constexpr AttributeId Id = 0x00000108;
+} // namespace DcPowerMax
+
+namespace DcVoltageMultiplier {
+static constexpr AttributeId Id = 0x00000200;
+} // namespace DcVoltageMultiplier
+
+namespace DcVoltageDivisor {
+static constexpr AttributeId Id = 0x00000201;
+} // namespace DcVoltageDivisor
+
+namespace DcCurrentMultiplier {
+static constexpr AttributeId Id = 0x00000202;
+} // namespace DcCurrentMultiplier
+
+namespace DcCurrentDivisor {
+static constexpr AttributeId Id = 0x00000203;
+} // namespace DcCurrentDivisor
+
+namespace DcPowerMultiplier {
+static constexpr AttributeId Id = 0x00000204;
+} // namespace DcPowerMultiplier
+
+namespace DcPowerDivisor {
+static constexpr AttributeId Id = 0x00000205;
+} // namespace DcPowerDivisor
+
+namespace AcFrequency {
+static constexpr AttributeId Id = 0x00000300;
+} // namespace AcFrequency
+
+namespace AcFrequencyMin {
+static constexpr AttributeId Id = 0x00000301;
+} // namespace AcFrequencyMin
+
+namespace AcFrequencyMax {
+static constexpr AttributeId Id = 0x00000302;
+} // namespace AcFrequencyMax
+
+namespace NeutralCurrent {
+static constexpr AttributeId Id = 0x00000303;
+} // namespace NeutralCurrent
+
+namespace TotalActivePower {
+static constexpr AttributeId Id = 0x00000304;
+} // namespace TotalActivePower
+
+namespace TotalReactivePower {
+static constexpr AttributeId Id = 0x00000305;
+} // namespace TotalReactivePower
+
+namespace TotalApparentPower {
+static constexpr AttributeId Id = 0x00000306;
+} // namespace TotalApparentPower
+
+namespace Measured1stHarmonicCurrent {
+static constexpr AttributeId Id = 0x00000307;
+} // namespace Measured1stHarmonicCurrent
+
+namespace Measured3rdHarmonicCurrent {
+static constexpr AttributeId Id = 0x00000308;
+} // namespace Measured3rdHarmonicCurrent
+
+namespace Measured5thHarmonicCurrent {
+static constexpr AttributeId Id = 0x00000309;
+} // namespace Measured5thHarmonicCurrent
+
+namespace Measured7thHarmonicCurrent {
+static constexpr AttributeId Id = 0x0000030A;
+} // namespace Measured7thHarmonicCurrent
+
+namespace Measured9thHarmonicCurrent {
+static constexpr AttributeId Id = 0x0000030B;
+} // namespace Measured9thHarmonicCurrent
+
+namespace Measured11thHarmonicCurrent {
+static constexpr AttributeId Id = 0x0000030C;
+} // namespace Measured11thHarmonicCurrent
+
+namespace MeasuredPhase1stHarmonicCurrent {
+static constexpr AttributeId Id = 0x0000030D;
+} // namespace MeasuredPhase1stHarmonicCurrent
+
+namespace MeasuredPhase3rdHarmonicCurrent {
+static constexpr AttributeId Id = 0x0000030E;
+} // namespace MeasuredPhase3rdHarmonicCurrent
+
+namespace MeasuredPhase5thHarmonicCurrent {
+static constexpr AttributeId Id = 0x0000030F;
+} // namespace MeasuredPhase5thHarmonicCurrent
+
+namespace MeasuredPhase7thHarmonicCurrent {
+static constexpr AttributeId Id = 0x00000310;
+} // namespace MeasuredPhase7thHarmonicCurrent
+
+namespace MeasuredPhase9thHarmonicCurrent {
+static constexpr AttributeId Id = 0x00000311;
+} // namespace MeasuredPhase9thHarmonicCurrent
+
+namespace MeasuredPhase11thHarmonicCurrent {
+static constexpr AttributeId Id = 0x00000312;
+} // namespace MeasuredPhase11thHarmonicCurrent
+
+namespace AcFrequencyMultiplier {
+static constexpr AttributeId Id = 0x00000400;
+} // namespace AcFrequencyMultiplier
+
+namespace AcFrequencyDivisor {
+static constexpr AttributeId Id = 0x00000401;
+} // namespace AcFrequencyDivisor
+
+namespace PowerMultiplier {
+static constexpr AttributeId Id = 0x00000402;
+} // namespace PowerMultiplier
+
+namespace PowerDivisor {
+static constexpr AttributeId Id = 0x00000403;
+} // namespace PowerDivisor
+
+namespace HarmonicCurrentMultiplier {
+static constexpr AttributeId Id = 0x00000404;
+} // namespace HarmonicCurrentMultiplier
+
+namespace PhaseHarmonicCurrentMultiplier {
+static constexpr AttributeId Id = 0x00000405;
+} // namespace PhaseHarmonicCurrentMultiplier
+
+namespace InstantaneousVoltage {
+static constexpr AttributeId Id = 0x00000500;
+} // namespace InstantaneousVoltage
+
+namespace InstantaneousLineCurrent {
+static constexpr AttributeId Id = 0x00000501;
+} // namespace InstantaneousLineCurrent
+
+namespace InstantaneousActiveCurrent {
+static constexpr AttributeId Id = 0x00000502;
+} // namespace InstantaneousActiveCurrent
+
+namespace InstantaneousReactiveCurrent {
+static constexpr AttributeId Id = 0x00000503;
+} // namespace InstantaneousReactiveCurrent
+
+namespace InstantaneousPower {
+static constexpr AttributeId Id = 0x00000504;
+} // namespace InstantaneousPower
+
+namespace RmsVoltage {
+static constexpr AttributeId Id = 0x00000505;
+} // namespace RmsVoltage
+
+namespace RmsVoltageMin {
+static constexpr AttributeId Id = 0x00000506;
+} // namespace RmsVoltageMin
+
+namespace RmsVoltageMax {
+static constexpr AttributeId Id = 0x00000507;
+} // namespace RmsVoltageMax
+
+namespace RmsCurrent {
+static constexpr AttributeId Id = 0x00000508;
+} // namespace RmsCurrent
+
+namespace RmsCurrentMin {
+static constexpr AttributeId Id = 0x00000509;
+} // namespace RmsCurrentMin
+
+namespace RmsCurrentMax {
+static constexpr AttributeId Id = 0x0000050A;
+} // namespace RmsCurrentMax
+
+namespace ActivePower {
+static constexpr AttributeId Id = 0x0000050B;
+} // namespace ActivePower
+
+namespace ActivePowerMin {
+static constexpr AttributeId Id = 0x0000050C;
+} // namespace ActivePowerMin
+
+namespace ActivePowerMax {
+static constexpr AttributeId Id = 0x0000050D;
+} // namespace ActivePowerMax
+
+namespace ReactivePower {
+static constexpr AttributeId Id = 0x0000050E;
+} // namespace ReactivePower
+
+namespace ApparentPower {
+static constexpr AttributeId Id = 0x0000050F;
+} // namespace ApparentPower
+
+namespace PowerFactor {
+static constexpr AttributeId Id = 0x00000510;
+} // namespace PowerFactor
+
+namespace AverageRmsVoltageMeasurementPeriod {
+static constexpr AttributeId Id = 0x00000511;
+} // namespace AverageRmsVoltageMeasurementPeriod
+
+namespace AverageRmsUnderVoltageCounter {
+static constexpr AttributeId Id = 0x00000513;
+} // namespace AverageRmsUnderVoltageCounter
+
+namespace RmsExtremeOverVoltagePeriod {
+static constexpr AttributeId Id = 0x00000514;
+} // namespace RmsExtremeOverVoltagePeriod
+
+namespace RmsExtremeUnderVoltagePeriod {
+static constexpr AttributeId Id = 0x00000515;
+} // namespace RmsExtremeUnderVoltagePeriod
+
+namespace RmsVoltageSagPeriod {
+static constexpr AttributeId Id = 0x00000516;
+} // namespace RmsVoltageSagPeriod
+
+namespace RmsVoltageSwellPeriod {
+static constexpr AttributeId Id = 0x00000517;
+} // namespace RmsVoltageSwellPeriod
+
+namespace AcVoltageMultiplier {
+static constexpr AttributeId Id = 0x00000600;
+} // namespace AcVoltageMultiplier
+
+namespace AcVoltageDivisor {
+static constexpr AttributeId Id = 0x00000601;
+} // namespace AcVoltageDivisor
+
+namespace AcCurrentMultiplier {
+static constexpr AttributeId Id = 0x00000602;
+} // namespace AcCurrentMultiplier
+
+namespace AcCurrentDivisor {
+static constexpr AttributeId Id = 0x00000603;
+} // namespace AcCurrentDivisor
+
+namespace AcPowerMultiplier {
+static constexpr AttributeId Id = 0x00000604;
+} // namespace AcPowerMultiplier
+
+namespace AcPowerDivisor {
+static constexpr AttributeId Id = 0x00000605;
+} // namespace AcPowerDivisor
+
+namespace OverloadAlarmsMask {
+static constexpr AttributeId Id = 0x00000700;
+} // namespace OverloadAlarmsMask
+
+namespace VoltageOverload {
+static constexpr AttributeId Id = 0x00000701;
+} // namespace VoltageOverload
+
+namespace CurrentOverload {
+static constexpr AttributeId Id = 0x00000702;
+} // namespace CurrentOverload
+
+namespace AcOverloadAlarmsMask {
+static constexpr AttributeId Id = 0x00000800;
+} // namespace AcOverloadAlarmsMask
+
+namespace AcVoltageOverload {
+static constexpr AttributeId Id = 0x00000801;
+} // namespace AcVoltageOverload
+
+namespace AcCurrentOverload {
+static constexpr AttributeId Id = 0x00000802;
+} // namespace AcCurrentOverload
+
+namespace AcActivePowerOverload {
+static constexpr AttributeId Id = 0x00000803;
+} // namespace AcActivePowerOverload
+
+namespace AcReactivePowerOverload {
+static constexpr AttributeId Id = 0x00000804;
+} // namespace AcReactivePowerOverload
+
+namespace AverageRmsOverVoltage {
+static constexpr AttributeId Id = 0x00000805;
+} // namespace AverageRmsOverVoltage
+
+namespace AverageRmsUnderVoltage {
+static constexpr AttributeId Id = 0x00000806;
+} // namespace AverageRmsUnderVoltage
+
+namespace RmsExtremeOverVoltage {
+static constexpr AttributeId Id = 0x00000807;
+} // namespace RmsExtremeOverVoltage
+
+namespace RmsExtremeUnderVoltage {
+static constexpr AttributeId Id = 0x00000808;
+} // namespace RmsExtremeUnderVoltage
+
+namespace RmsVoltageSag {
+static constexpr AttributeId Id = 0x00000809;
+} // namespace RmsVoltageSag
+
+namespace RmsVoltageSwell {
+static constexpr AttributeId Id = 0x0000080A;
+} // namespace RmsVoltageSwell
+
+namespace LineCurrentPhaseB {
+static constexpr AttributeId Id = 0x00000901;
+} // namespace LineCurrentPhaseB
+
+namespace ActiveCurrentPhaseB {
+static constexpr AttributeId Id = 0x00000902;
+} // namespace ActiveCurrentPhaseB
+
+namespace ReactiveCurrentPhaseB {
+static constexpr AttributeId Id = 0x00000903;
+} // namespace ReactiveCurrentPhaseB
+
+namespace RmsVoltagePhaseB {
+static constexpr AttributeId Id = 0x00000905;
+} // namespace RmsVoltagePhaseB
+
+namespace RmsVoltageMinPhaseB {
+static constexpr AttributeId Id = 0x00000906;
+} // namespace RmsVoltageMinPhaseB
+
+namespace RmsVoltageMaxPhaseB {
+static constexpr AttributeId Id = 0x00000907;
+} // namespace RmsVoltageMaxPhaseB
+
+namespace RmsCurrentPhaseB {
+static constexpr AttributeId Id = 0x00000908;
+} // namespace RmsCurrentPhaseB
+
+namespace RmsCurrentMinPhaseB {
+static constexpr AttributeId Id = 0x00000909;
+} // namespace RmsCurrentMinPhaseB
+
+namespace RmsCurrentMaxPhaseB {
+static constexpr AttributeId Id = 0x0000090A;
+} // namespace RmsCurrentMaxPhaseB
+
+namespace ActivePowerPhaseB {
+static constexpr AttributeId Id = 0x0000090B;
+} // namespace ActivePowerPhaseB
+
+namespace ActivePowerMinPhaseB {
+static constexpr AttributeId Id = 0x0000090C;
+} // namespace ActivePowerMinPhaseB
+
+namespace ActivePowerMaxPhaseB {
+static constexpr AttributeId Id = 0x0000090D;
+} // namespace ActivePowerMaxPhaseB
+
+namespace ReactivePowerPhaseB {
+static constexpr AttributeId Id = 0x0000090E;
+} // namespace ReactivePowerPhaseB
+
+namespace ApparentPowerPhaseB {
+static constexpr AttributeId Id = 0x0000090F;
+} // namespace ApparentPowerPhaseB
+
+namespace PowerFactorPhaseB {
+static constexpr AttributeId Id = 0x00000910;
+} // namespace PowerFactorPhaseB
+
+namespace AverageRmsVoltageMeasurementPeriodPhaseB {
+static constexpr AttributeId Id = 0x00000911;
+} // namespace AverageRmsVoltageMeasurementPeriodPhaseB
+
+namespace AverageRmsOverVoltageCounterPhaseB {
+static constexpr AttributeId Id = 0x00000912;
+} // namespace AverageRmsOverVoltageCounterPhaseB
+
+namespace AverageRmsUnderVoltageCounterPhaseB {
+static constexpr AttributeId Id = 0x00000913;
+} // namespace AverageRmsUnderVoltageCounterPhaseB
+
+namespace RmsExtremeOverVoltagePeriodPhaseB {
+static constexpr AttributeId Id = 0x00000914;
+} // namespace RmsExtremeOverVoltagePeriodPhaseB
+
+namespace RmsExtremeUnderVoltagePeriodPhaseB {
+static constexpr AttributeId Id = 0x00000915;
+} // namespace RmsExtremeUnderVoltagePeriodPhaseB
+
+namespace RmsVoltageSagPeriodPhaseB {
+static constexpr AttributeId Id = 0x00000916;
+} // namespace RmsVoltageSagPeriodPhaseB
+
+namespace RmsVoltageSwellPeriodPhaseB {
+static constexpr AttributeId Id = 0x00000917;
+} // namespace RmsVoltageSwellPeriodPhaseB
+
+namespace LineCurrentPhaseC {
+static constexpr AttributeId Id = 0x00000A01;
+} // namespace LineCurrentPhaseC
+
+namespace ActiveCurrentPhaseC {
+static constexpr AttributeId Id = 0x00000A02;
+} // namespace ActiveCurrentPhaseC
+
+namespace ReactiveCurrentPhaseC {
+static constexpr AttributeId Id = 0x00000A03;
+} // namespace ReactiveCurrentPhaseC
+
+namespace RmsVoltagePhaseC {
+static constexpr AttributeId Id = 0x00000A05;
+} // namespace RmsVoltagePhaseC
+
+namespace RmsVoltageMinPhaseC {
+static constexpr AttributeId Id = 0x00000A06;
+} // namespace RmsVoltageMinPhaseC
+
+namespace RmsVoltageMaxPhaseC {
+static constexpr AttributeId Id = 0x00000A07;
+} // namespace RmsVoltageMaxPhaseC
+
+namespace RmsCurrentPhaseC {
+static constexpr AttributeId Id = 0x00000A08;
+} // namespace RmsCurrentPhaseC
+
+namespace RmsCurrentMinPhaseC {
+static constexpr AttributeId Id = 0x00000A09;
+} // namespace RmsCurrentMinPhaseC
+
+namespace RmsCurrentMaxPhaseC {
+static constexpr AttributeId Id = 0x00000A0A;
+} // namespace RmsCurrentMaxPhaseC
+
+namespace ActivePowerPhaseC {
+static constexpr AttributeId Id = 0x00000A0B;
+} // namespace ActivePowerPhaseC
+
+namespace ActivePowerMinPhaseC {
+static constexpr AttributeId Id = 0x00000A0C;
+} // namespace ActivePowerMinPhaseC
+
+namespace ActivePowerMaxPhaseC {
+static constexpr AttributeId Id = 0x00000A0D;
+} // namespace ActivePowerMaxPhaseC
+
+namespace ReactivePowerPhaseC {
+static constexpr AttributeId Id = 0x00000A0E;
+} // namespace ReactivePowerPhaseC
+
+namespace ApparentPowerPhaseC {
+static constexpr AttributeId Id = 0x00000A0F;
+} // namespace ApparentPowerPhaseC
+
+namespace PowerFactorPhaseC {
+static constexpr AttributeId Id = 0x00000A10;
+} // namespace PowerFactorPhaseC
+
+namespace AverageRmsVoltageMeasurementPeriodPhaseC {
+static constexpr AttributeId Id = 0x00000A11;
+} // namespace AverageRmsVoltageMeasurementPeriodPhaseC
+
+namespace AverageRmsOverVoltageCounterPhaseC {
+static constexpr AttributeId Id = 0x00000A12;
+} // namespace AverageRmsOverVoltageCounterPhaseC
+
+namespace AverageRmsUnderVoltageCounterPhaseC {
+static constexpr AttributeId Id = 0x00000A13;
+} // namespace AverageRmsUnderVoltageCounterPhaseC
+
+namespace RmsExtremeOverVoltagePeriodPhaseC {
+static constexpr AttributeId Id = 0x00000A14;
+} // namespace RmsExtremeOverVoltagePeriodPhaseC
+
+namespace RmsExtremeUnderVoltagePeriodPhaseC {
+static constexpr AttributeId Id = 0x00000A15;
+} // namespace RmsExtremeUnderVoltagePeriodPhaseC
+
+namespace RmsVoltageSagPeriodPhaseC {
+static constexpr AttributeId Id = 0x00000A16;
+} // namespace RmsVoltageSagPeriodPhaseC
+
+namespace RmsVoltageSwellPeriodPhaseC {
+static constexpr AttributeId Id = 0x00000A17;
+} // namespace RmsVoltageSwellPeriodPhaseC
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace ElectricalMeasurement
 
 namespace GroupKeyManagement {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId Groups    = 0x00000000;
-static constexpr AttributeId GroupKeys = 0x00000001;
-} // namespace Ids
+
+namespace Groups {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Groups
+
+namespace GroupKeys {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace GroupKeys
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace GroupKeyManagement
 
 namespace SampleMfgSpecificCluster {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId EmberSampleAttribute  = 0x10020000;
-static constexpr AttributeId EmberSampleAttribute2 = 0x10020001;
-} // namespace Ids
+
+namespace EmberSampleAttribute {
+static constexpr AttributeId Id = 0x10020000;
+} // namespace EmberSampleAttribute
+
+namespace EmberSampleAttribute2 {
+static constexpr AttributeId Id = 0x10020001;
+} // namespace EmberSampleAttribute2
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace SampleMfgSpecificCluster
 
 namespace SampleMfgSpecificCluster2 {
 namespace Attributes {
-namespace Ids {
-static constexpr AttributeId EmberSampleAttribute3 = 0x10490000;
-static constexpr AttributeId EmberSampleAttribute4 = 0x10490001;
-} // namespace Ids
+
+namespace EmberSampleAttribute3 {
+static constexpr AttributeId Id = 0x10490000;
+} // namespace EmberSampleAttribute3
+
+namespace EmberSampleAttribute4 {
+static constexpr AttributeId Id = 0x10490001;
+} // namespace EmberSampleAttribute4
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
 } // namespace Attributes
 } // namespace SampleMfgSpecificCluster2
 

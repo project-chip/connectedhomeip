@@ -175,10 +175,6 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
 {{> clusters_header}}
 
 {{#chip_client_clusters}}
-constexpr chip::ClusterId k{{asUpperCamelCase name}}ClusterId = {{asHex code 4}};
-{{/chip_client_clusters}}
-
-{{#chip_client_clusters}}
 {{> cluster_header}}
 
 {{#chip_cluster_commands}}
@@ -190,13 +186,13 @@ class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ModelCom
 public:
     {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ModelCommand("{{asDelimitedCommand name}}")
     {
-        {{#chip_cluster_command_arguments}}
+        {{#chip_cluster_command_arguments_with_structs_expanded}}
         {{#if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &m{{asUpperCamelCase label}});
         {{else}}
         AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase label}});
         {{/if}}
-        {{/chip_cluster_command_arguments}}
+        {{/chip_cluster_command_arguments_with_structs_expanded}}
         ModelCommand::AddArguments();
     }
     ~{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}()
@@ -211,7 +207,7 @@ public:
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_cluster_command_arguments}}, {{#if (isCharString type)}} chip::ByteSpan(chip::Uint8::from_char(m{{asUpperCamelCase label}}), strlen(m{{asUpperCamelCase label}})){{else}}m{{asUpperCamelCase label}}{{/if}}{{/chip_cluster_command_arguments}});
+        return cluster.{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_cluster_command_arguments_with_structs_expanded}}, m{{asUpperCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
     }
 
 private:
@@ -221,47 +217,12 @@ private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     {{/if}}
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    {{#chip_cluster_command_arguments}}
-    {{#if (isCharString type)}}
-    char * m{{asUpperCamelCase label}};
-    {{else}}
-    {{chipType}} m{{asUpperCamelCase label}};
-    {{/if}}
-    {{/chip_cluster_command_arguments}}
+    {{#chip_cluster_command_arguments_with_structs_expanded}}
+    {{#if (isCharString type)}}chip::ByteSpan{{else}}{{chipType}}{{/if}} m{{asUpperCamelCase label}};
+    {{/chip_cluster_command_arguments_with_structs_expanded}}
 };
 
 {{/chip_cluster_commands}}
-
-/*
- * Discover Attributes
- */
-class Discover{{asUpperCamelCase name}}Attributes: public ModelCommand
-{
-public:
-    Discover{{asUpperCamelCase name}}Attributes(): ModelCommand("discover")
-    {
-        ModelCommand::AddArguments();
-    }
-
-    ~Discover{{asUpperCamelCase name}}Attributes()
-    {
-      delete onSuccessCallback;
-      delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x0C) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::{{asUpperCamelCase name}}Cluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
 
 {{#chip_server_cluster_attributes}}
 /*
@@ -327,17 +288,13 @@ public:
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), {{#if (isCharString type)}} chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)){{else}}mValue{{/if}});
+        return cluster.WriteAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    {{#if (isCharString type)}}
-    char * mValue;
-    {{else}}
-    {{chipType}} mValue;
-    {{/if}}
+    {{#if (isCharString type)}}chip::ByteSpan{{else}}{{chipType}}{{/if}} mValue;
 };
 
 {{/if}}
@@ -350,9 +307,6 @@ public:
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        {{#if isAnalog}}
-        AddArgument("change", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mChange);
-        {{/if}}
         ModelCommand::AddArguments();
     }
 
@@ -376,7 +330,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval{{#if isAnalog}}, mChange{{/if}});
+        return cluster.SubscribeAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
     }
 
 private:
@@ -385,9 +339,6 @@ private:
     chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    {{#if isAnalog}}
-    {{chipType}} mChange;
-    {{/if}}
 };
 
 {{/if}}
@@ -406,7 +357,6 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#chip_cluster_commands}}
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/chip_cluster_commands}}
-        make_unique<Discover{{asUpperCamelCase name}}Attributes>(), //
         {{#chip_server_cluster_attributes}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}

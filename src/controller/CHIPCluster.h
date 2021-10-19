@@ -26,10 +26,17 @@
 
 #pragma once
 
+#include "app/ConcreteCommandPath.h"
+#include <app/util/error-mapping.h>
 #include <controller/CHIPDevice.h>
+#include <controller/InvokeInteraction.h>
 
 namespace chip {
 namespace Controller {
+
+template <typename T>
+using CommandResponseSuccessCallback = void(void * context, const T & responseObject);
+using CommandResponseFailureCallback = void(void * context, EmberAfStatus status);
 
 class DLL_EXPORT ClusterBase
 {
@@ -42,21 +49,18 @@ public:
 
     ClusterId GetClusterId() const { return mClusterId; }
 
+    /*
+     * This function permits sending an invoke request using cluster objects that represent the request and response data payloads.
+     *
+     * Success and Failure callbacks must be passed in through which the decoded response is provided as well as notification of any
+     * failure.
+     */
+    template <typename RequestDataT, typename ResponseDataT>
+    CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
+                             CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb);
+
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
-
-    /**
-     * @brief
-     *   Send the command, contained into the associate buffer, to the device. Add a callback
-     *   handler, that'll be called when the response is received from the device.
-     *
-     * @param[in] seqNum            The sequence number identifier of the command
-     * @param[in] payload           The payload of the encoded command
-     * @param[in] successHandler    The handler function that's called on receiving command response success
-     * @param[in] failureHandler    The handler function that's called on receiving command response failure
-     */
-    CHIP_ERROR SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle && payload, Callback::Cancelable * successHandler,
-                           Callback::Cancelable * failureHandler);
 
     /**
      * @brief
@@ -68,8 +72,10 @@ protected:
      *                              The reporting handler continues to be called as long as the callback
      *                              is active. The user can stop the reporting by cancelling the callback.
      *                              Reference: chip::Callback::Cancel()
+     * @param[in] tlvDataFilter     Filter interface for processing data from TLV
      */
-    CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler);
+    CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler,
+                                         app::TLVDataFilter tlvDataFilter);
 
     const ClusterId mClusterId;
     Device * mDevice;

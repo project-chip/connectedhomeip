@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,140 +16,100 @@
  */
 
 /**
- *    @file
- *      This file defines the CHIP Secure Session object that provides
- *      APIs for encrypting/decryting data using cryptographic keys.
- *
+ * @brief Defines state relevant for an active connection to a peer.
  */
 
 #pragma once
 
-#include <crypto/CHIPCryptoPAL.h>
-#include <lib/core/CHIPCore.h>
-#include <lib/support/Span.h>
+#include <app/util/basic-types.h>
+#include <transport/CryptoContext.h>
+#include <transport/SessionMessageCounter.h>
+#include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
+namespace Transport {
 
-class DLL_EXPORT SecureSession
+static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
+
+/**
+ * Defines state of a peer connection at a transport layer.
+ *
+ * Information contained within the state:
+ *   - PeerAddress represents how to talk to the peer
+ *   - PeerNodeId is the unique ID of the peer
+ *   - SendMessageIndex is an ever increasing index for sending messages
+ *   - LastActivityTimeMs is a monotonic timestamp of when this connection was
+ *     last used. Inactive connections can expire.
+ *   - CryptoContext contains the encryption context of a connection
+ *
+ * TODO: to add any message ACK information
+ */
+class SecureSession
 {
 public:
-    SecureSession();
+    SecureSession() : mPeerAddress(PeerAddress::Uninitialized()) {}
+    SecureSession(const PeerAddress & addr) : mPeerAddress(addr) {}
+    SecureSession(PeerAddress && addr) : mPeerAddress(addr) {}
+
     SecureSession(SecureSession &&)      = default;
     SecureSession(const SecureSession &) = default;
     SecureSession & operator=(const SecureSession &) = default;
     SecureSession & operator=(SecureSession &&) = default;
 
-    /**
-     *    Whether the current node initiated the session, or it is responded to a session request.
-     */
-    enum class SessionRole
+    const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
+    PeerAddress & GetPeerAddress() { return mPeerAddress; }
+    void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
+
+    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
+
+    uint16_t GetPeerSessionId() const { return mPeerSessionId; }
+    void SetPeerSessionId(uint16_t id) { mPeerSessionId = id; }
+
+    // TODO: Rename KeyID to SessionID
+    uint16_t GetLocalSessionId() const { return mLocalSessionId; }
+    void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
+
+    uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
+    void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
+
+    CryptoContext & GetCryptoContext() { return mCryptoContext; }
+
+    FabricIndex GetFabricIndex() const { return mFabric; }
+    void SetFabricIndex(FabricIndex fabricIndex) { mFabric = fabricIndex; }
+
+    bool IsInitialized()
     {
-        kInitiator, /**< We initiated the session. */
-        kResponder, /**< We responded to the session request. */
-    };
+        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerSessionId != UINT16_MAX ||
+                mLocalSessionId != UINT16_MAX);
+    }
 
-    enum class SessionInfoType
+    CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                 MessageAuthenticationCode & mac) const
     {
-        kSessionEstablishment, /**< A new secure session is established. */
-        kSessionResumption,    /**< An old session is being resumed. */
-    };
+        return mCryptoContext.Encrypt(input, input_length, output, header, mac);
+    }
 
-    /**
-     * @brief
-     *   Derive a shared key. The derived key will be used for encrypting/decrypting
-     *   data exchanged on the secure channel.
-     *
-     * @param local_keypair      A reference to local ECP keypair
-     * @param remote_public_key  A reference to peer's public key
-     * @param salt               A reference to the initial salt used for deriving the keys
-     * @param infoType           The info buffer to use for deriving session keys
-     * @param role               Role of the new session (initiator or responder)
-     * @return CHIP_ERROR        The result of key derivation
-     */
-    CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                    const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
+    CHIP_ERROR DecryptOnReceive(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                const MessageAuthenticationCode & mac) const
+    {
+        return mCryptoContext.Decrypt(input, input_length, output, header, mac);
+    }
 
-    /**
-     * @brief
-     *   Derive a shared key. The derived key will be used for encrypting/decrypting
-     *   data exchanged on the secure channel.
-     *
-     * @param secret             A reference to the shared secret
-     * @param salt               A reference to the initial salt used for deriving the keys
-     * @param infoType           The info buffer to use for deriving session keys
-     * @param role               Role of the new session (initiator or responder)
-     * @return CHIP_ERROR        The result of key derivation
-     */
-    CHIP_ERROR InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
-
-    /**
-     * @brief
-     *   Encrypt the input data using keys established in the secure channel
-     *
-     * @param input Unencrypted input data
-     * @param input_length Length of the input data
-     * @param output Output buffer for encrypted data
-     * @param header message header structure. Encryption type will be set on the header.
-     * @param mac - output the resulting mac
-     *
-     * @return CHIP_ERROR The result of encryption
-     */
-    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                       MessageAuthenticationCode & mac) const;
-
-    /**
-     * @brief
-     *   Decrypt the input data using keys established in the secure channel
-     *
-     * @param input Encrypted input data
-     * @param input_length Length of the input data
-     * @param output Output buffer for decrypted data
-     * @param header message header structure
-     * @return CHIP_ERROR The result of decryption
-     * @param mac Input mac
-     */
-    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                       const MessageAuthenticationCode & mac) const;
-
-    /**
-     * @brief
-     *   Memory overhead of encrypting data. The overhead is independent of size of
-     *   the data being encrypted. The extra space is used for storing the common header.
-     *
-     * @return number of bytes.
-     */
-    size_t EncryptionOverhead();
-
-    /**
-     * Clears the internal state of secure session back to the state of a new object.
-     */
-    void Reset();
+    SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
-    static constexpr size_t kAES_CCM128_Key_Length = 16;
-
-    typedef uint8_t CryptoKey[kAES_CCM128_Key_Length];
-
-    enum KeyUsage
-    {
-        kI2RKey                  = 0,
-        kR2IKey                  = 1,
-        kAttestationChallengeKey = 2,
-        kNumCryptoKeys           = 3
-    };
-
-    SessionRole mSessionRole;
-
-    bool mKeyAvailable;
-    CryptoKey mKeys[KeyUsage::kNumCryptoKeys];
-
-    static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
-
-    // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
-    // The encryption operations includes AAD when message authentication tag is generated. This tag
-    // is used at the time of decryption to integrity check the received data.
-    static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len);
+    PeerAddress mPeerAddress;
+    NodeId mPeerNodeId           = kUndefinedNodeId;
+    uint16_t mPeerSessionId      = UINT16_MAX;
+    uint16_t mLocalSessionId     = UINT16_MAX;
+    uint64_t mLastActivityTimeMs = 0;
+    CryptoContext mCryptoContext;
+    SessionMessageCounter mSessionMessageCounter;
+    FabricIndex mFabric = kUndefinedFabricIndex;
 };
 
+} // namespace Transport
 } // namespace chip

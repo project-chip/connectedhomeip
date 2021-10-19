@@ -56,6 +56,8 @@ struct ble_gatt_char_context
 
 #endif
 
+#include "ble/Ble.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

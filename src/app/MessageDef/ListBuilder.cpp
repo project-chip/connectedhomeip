@@ -38,7 +38,6 @@ CHIP_ERROR ListBuilder::Init(chip::TLV::TLVWriter * const apWriter, const uint8_
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(chip::TLV::ContextTag(aContextTagToUse), chip::TLV::kTLVType_Array, mOuterContainerType);
-    ChipLogFunctError(mError);
 
     return mError;
 }
@@ -47,7 +46,6 @@ CHIP_ERROR ListBuilder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Array, mOuterContainerType);
-    ChipLogFunctError(mError);
 
     return mError;
 }

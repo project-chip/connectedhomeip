@@ -19,13 +19,13 @@
 /**
  *    @file
  *      This file implements a process to effect a functional test for
- *      the PeerConnections class within the transport layer
+ *      the SecureSessionTable class within the transport layer
  *
  */
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
-#include <transport/PeerConnections.h>
+#include <transport/SecureSessionTable.h>
 
 #include <nlunit-test.h>
 
@@ -43,9 +43,9 @@ PeerAddress AddressFromString(const char * str)
     return PeerAddress::UDP(addr);
 }
 
-const PeerAddress kPeer1Addr = AddressFromString("10.1.2.3");
-const PeerAddress kPeer2Addr = AddressFromString("10.0.0.32");
-const PeerAddress kPeer3Addr = AddressFromString("100.200.0.1");
+const PeerAddress kPeer1Addr = AddressFromString("fe80::1");
+const PeerAddress kPeer2Addr = AddressFromString("fe80::2");
+const PeerAddress kPeer3Addr = AddressFromString("fe80::3");
 
 const NodeId kPeer1NodeId = 123;
 const NodeId kPeer2NodeId = 6;
@@ -54,8 +54,8 @@ const NodeId kPeer3NodeId = 81;
 void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    PeerConnectionState * statePtr;
-    PeerConnections<2, Time::Source::kTest> connections;
+    SecureSession * statePtr;
+    SecureSessionTable<2, Time::Source::kTest> connections;
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(100);
 
     err = connections.CreateNewPeerConnectionState(kPeer1Addr, nullptr);
@@ -75,12 +75,12 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
 void TestFindByAddress(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    PeerConnectionState * statePtr;
-    PeerConnections<3, Time::Source::kTest> connections;
+    SecureSession * statePtr;
+    SecureSessionTable<3, Time::Source::kTest> connections;
 
-    PeerConnectionState * state1 = nullptr;
-    PeerConnectionState * state2 = nullptr;
-    PeerConnectionState * state3 = nullptr;
+    SecureSession * state1 = nullptr;
+    SecureSession * state2 = nullptr;
+    SecureSession * state3 = nullptr;
 
     err = connections.CreateNewPeerConnectionState(kPeer1Addr, &state1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -111,8 +111,8 @@ void TestFindByAddress(nlTestSuite * inSuite, void * inContext)
 void TestFindByNodeId(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    PeerConnectionState * statePtr;
-    PeerConnections<3, Time::Source::kTest> connections;
+    SecureSession * statePtr;
+    SecureSessionTable<3, Time::Source::kTest> connections;
 
     err = connections.CreateNewPeerConnectionState(kPeer1Addr, &statePtr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -149,8 +149,8 @@ void TestFindByNodeId(nlTestSuite * inSuite, void * inContext)
 void TestFindByKeyId(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    PeerConnectionState * statePtr;
-    PeerConnections<2, Time::Source::kTest> connections;
+    SecureSession * statePtr;
+    SecureSessionTable<2, Time::Source::kTest> connections;
 
     // No Node ID, peer key 1, local key 2
     err = connections.CreateNewPeerConnectionState(Optional<NodeId>::Missing(), 1, 2, &statePtr);
@@ -203,8 +203,8 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
     ExpiredCallInfo callInfo;
-    PeerConnectionState * statePtr;
-    PeerConnections<2, Time::Source::kTest> connections;
+    SecureSession * statePtr;
+    SecureSessionTable<2, Time::Source::kTest> connections;
 
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(100);
 
@@ -222,7 +222,7 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
     // at time 300, this expires ip addr 1
-    connections.ExpireInactiveConnections(150, [&callInfo](const PeerConnectionState & state) {
+    connections.ExpireInactiveConnections(150, [&callInfo](const SecureSession & state) {
         callInfo.callCount++;
         callInfo.lastCallNodeId      = state.GetPeerNodeId();
         callInfo.lastCallPeerAddress = state.GetPeerAddress();
@@ -250,7 +250,7 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
 
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(500);
     callInfo.callCount = 0;
-    connections.ExpireInactiveConnections(150, [&callInfo](const PeerConnectionState & state) {
+    connections.ExpireInactiveConnections(150, [&callInfo](const SecureSession & state) {
         callInfo.callCount++;
         callInfo.lastCallNodeId      = state.GetPeerNodeId();
         callInfo.lastCallPeerAddress = state.GetPeerAddress();
@@ -273,7 +273,7 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     // peer 1 and 2 are active
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(1000);
     callInfo.callCount = 0;
-    connections.ExpireInactiveConnections(100, [&callInfo](const PeerConnectionState & state) {
+    connections.ExpireInactiveConnections(100, [&callInfo](const SecureSession & state) {
         callInfo.callCount++;
         callInfo.lastCallNodeId      = state.GetPeerNodeId();
         callInfo.lastCallPeerAddress = state.GetPeerAddress();
@@ -300,7 +300,7 @@ static const nlTest sTests[] =
 
 int TestPeerConnectionsFn(void)
 {
-    nlTestSuite theSuite = { "Transport-PeerConnections", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "Transport-SecureSessionTable", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

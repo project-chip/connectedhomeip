@@ -55,6 +55,7 @@ enum LogModule
     kLogModule_AppServer,
     kLogModule_Discovery,
     kLogModule_InteractionModel,
+    kLogModule_Test,
 
     kLogModule_Max
 };

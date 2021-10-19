@@ -268,7 +268,6 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
     mpEventBuffer->mAppData               = nullptr;
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -483,7 +482,6 @@ CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOpt
         err = LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
     }
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -498,7 +496,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     CircularEventBuffer * buffer   = nullptr;
     EventLoadOutContext ctxt       = EventLoadOutContext(writer, aEventOptions.mpEventSchema->mPriority,
                                                    GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->GetLastEventNumber());
-    Timestamp timestamp(Timestamp::Type::kSystem, System::Clock::GetMonotonicMilliseconds());
+    Timestamp timestamp(Timestamp::Type::kSystem, System::SystemClock().GetMonotonicMilliseconds());
     EventOptions opts = EventOptions(timestamp);
     // Start the event container (anonymous structure) in the circular buffer
     writer.Init(*mpEventBuffer);
@@ -555,7 +553,6 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     mBytesWritten += writer.GetLengthWritten();
 
 exit:
-    ChipLogFunctError(err);
     if (err != CHIP_NO_ERROR)
     {
         *mpEventBuffer = checkpoint;
@@ -609,7 +606,6 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -915,7 +911,6 @@ CHIP_ERROR CircularEventBufferWrapper::GetNextBuffer(TLVReader & aReader, const 
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 } // namespace app

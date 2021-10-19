@@ -20,11 +20,15 @@ namespace Clusters {
 {{#first}}
 namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
+
 {{/first}}
 {{#if clusterRef}}
 {{#if (canHaveSimpleAccessors type)}}
-EmberAfStatus Get{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}}); // {{type}} {{isArray}}
-EmberAfStatus Set{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}});
+namespace {{asUpperCamelCase label}} {
+EmberAfStatus Get(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}}); // {{type}} {{isArray}}
+EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}});
+} // namespace {{asUpperCamelCase label}}
+
 {{/if}}
 {{/if}}
 {{#last}}

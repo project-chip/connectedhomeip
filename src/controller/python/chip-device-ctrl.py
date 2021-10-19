@@ -202,7 +202,7 @@ class DeviceMgrCmd(Cmd):
         "resolve",
         "zcl",
         "zclread",
-        "zclconfigure",
+        "zclsubscribe",
 
         "discover",
 
@@ -451,32 +451,33 @@ class DeviceMgrCmd(Cmd):
         # Devices may be uncommissioned, or may already be on the network. Need to check both ways.
         # TODO(cecille): implement soft-ap connection.
 
-        if int(setupPayload.attributes["RendezvousInformation"]) & onnetwork:
-            print("Attempting to find device on Network")
-            longDiscriminator = ctypes.c_uint16(
-                int(setupPayload.attributes['Discriminator']))
-            self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
-                longDiscriminator)
-            print("Waiting for device responses...")
-            strlen = 100
-            addrStrStorage = ctypes.create_string_buffer(strlen)
-            # If this device is on the network and we're looking specifically for 1 device,
-            # expect a quick response.
-            if self.wait_for_one_discovered_device():
-                self.devCtrl.GetIPForDiscoveredDevice(
-                    0, addrStrStorage, strlen)
-                addrStr = addrStrStorage.value.decode('utf-8')
-                print("Connecting to device at " + addrStr)
-                pincode = ctypes.c_uint32(
-                    int(setupPayload.attributes['SetUpPINCode']))
-                try:
-                    self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid)
-                    print("Connected")
-                    return 0
-                except Exception as ex:
-                    print(f"Unable to connect on network: {ex}")
-            else:
-                print("Unable to locate device on network")
+        # Any device that is already commissioned into a fabric needs to use on-network
+        # pairing, so look first on the network regardless of the QR code contents.
+        print("Attempting to find device on Network")
+        longDiscriminator = ctypes.c_uint16(
+            int(setupPayload.attributes['Discriminator']))
+        self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
+            longDiscriminator)
+        print("Waiting for device responses...")
+        strlen = 100
+        addrStrStorage = ctypes.create_string_buffer(strlen)
+        # If this device is on the network and we're looking specifically for 1 device,
+        # expect a quick response.
+        if self.wait_for_one_discovered_device():
+            self.devCtrl.GetIPForDiscoveredDevice(
+                0, addrStrStorage, strlen)
+            addrStr = addrStrStorage.value.decode('utf-8')
+            print("Connecting to device at " + addrStr)
+            pincode = ctypes.c_uint32(
+                int(setupPayload.attributes['SetUpPINCode']))
+            try:
+                self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid)
+                print("Connected")
+                return 0
+            except Exception as ex:
+                print(f"Unable to connect on network: {ex}")
+        else:
+            print("Unable to locate device on network")
 
         if int(setupPayload.attributes["RendezvousInformation"]) & ble:
             print("Attempting to connect via BLE")
@@ -584,7 +585,6 @@ class DeviceMgrCmd(Cmd):
                     address = "{}:{}".format(
                         *address) if address else "unknown"
                     print("Current address: " + address)
-                    self.devCtrl.CommissioningComplete(int(args[1]))
             else:
                 self.do_help("resolve")
         except exceptions.ChipStackException as ex:
@@ -617,8 +617,7 @@ class DeviceMgrCmd(Cmd):
         discover -s short_discriminator
         discover -v vendor_id
         discover -t device_type
-        discover -c commissioning_enabled
-        discover -a
+        discover -c
 
         discover command is used to discover available devices.
         """
@@ -643,9 +642,7 @@ class DeviceMgrCmd(Cmd):
             group.add_argument(
                 '-t', help='discover commissionable nodes with given device type', type=int)
             group.add_argument(
-                '-c', help='discover commissionable nodes with given commissioning mode', type=int)
-            group.add_argument(
-                '-a', help='discover commissionable nodes put in commissioning mode from command', action='store_true')
+                '-c', help='discover commissionable nodes in commissioning mode', action='store_true')
             args = parser.parse_args(arglist)
             if args.all:
                 self.commissionableNodeCtrl.DiscoverCommissioners()
@@ -677,11 +674,7 @@ class DeviceMgrCmd(Cmd):
                     ctypes.c_uint16(args.t))
                 self.wait_for_many_discovered_devices()
             elif args.c is not None:
-                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled(
-                    ctypes.c_uint16(args.c))
-                self.wait_for_many_discovered_devices()
-            elif args.a is not None:
-                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabledFromCommand()
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled()
                 self.wait_for_many_discovered_devices()
             else:
                 self.do_help("discover")
@@ -812,10 +805,13 @@ class DeviceMgrCmd(Cmd):
             print("An exception occurred during processing input:")
             print(str(ex))
 
-    def do_zclconfigure(self, line):
+    def do_zclsubscribe(self, line):
         """
-        To configure ZCL attribute reporting:
-        zclconfigure <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval> <change>
+        To subscribe ZCL attribute reporting:
+        zclsubscribe <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval>
+
+        To shut down a subscription:
+        zclsubscribe -shutdown <subscriptionId>
         """
         try:
             args = shlex.split(line)
@@ -828,13 +824,16 @@ class DeviceMgrCmd(Cmd):
                 cluster_attrs = all_attrs.get(args[1], {})
                 print('\n'.join([key for key in cluster_attrs.keys(
                 ) if cluster_attrs[key].get("reportable", False)]))
-            elif len(args) == 7:
+            elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLConfigureAttribute(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), int(args[5]), int(args[6]))
+                self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), int(args[5]))
+            elif len(args) == 2 and args[0] == '-shutdown':
+                subscriptionId = int(args[1], base=0)
+                self.devCtrl.ZCLShutdownSubscription(subscriptionId)
             else:
-                self.do_help("zclconfigure")
+                self.do_help("zclsubscribe")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during configuring reporting of ZCL attribute:")
             print(str(ex))
@@ -864,7 +863,7 @@ class DeviceMgrCmd(Cmd):
 
         Options:
           -t  Timeout (in seconds)     
-          -o  Option  [OriginalSetupCode = 0, TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
+          -o  Option  [TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
           -d  Discriminator Value
           -i  Iteration
 
@@ -881,12 +880,16 @@ class DeviceMgrCmd(Cmd):
             parser.add_argument(
                 "-t", type=int, default=0, dest='timeout')
             parser.add_argument(
-                "-o", type=int, default=0, dest='option')
+                "-o", type=int, default=1, dest='option')
             parser.add_argument(
                 "-i", type=int, default=0, dest='iteration')
             parser.add_argument(
                 "-d", type=int, default=0, dest='discriminator')
             args = parser.parse_args(arglist[1:])
+
+            if args.option < 1 or args.option > 2:
+                print("Invalid option specified!")
+                raise ValueError("Invalid option specified")
 
             self.devCtrl.OpenCommissioningWindow(
                 int(arglist[0]), args.timeout, args.iteration, args.discriminator, args.option)

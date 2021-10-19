@@ -36,6 +36,7 @@ def main(argv):
     try:
         config = memdf.collect.parse_args({
             **memdf.select.CONFIG,
+            **memdf.report.REPORT_DEMANGLE_CONFIG,
             **memdf.report.OUTPUT_CONFIG
         }, argv)
         memdf.report.write_dfs(config, memdf.collect.collect_files(config))

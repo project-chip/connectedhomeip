@@ -178,6 +178,39 @@ static void TestPlatformMgr_AddEventHandler(nlTestSuite * inSuite, void * inCont
 #endif
 }
 
+class MockSystemLayer : public System::LayerImpl
+{
+public:
+    CHIP_ERROR StartTimer(uint32_t aDelayMilliseconds, System::TimerCompleteCallback aComplete, void * aAppState) override
+    {
+        return CHIP_APPLICATION_ERROR(1);
+    }
+    CHIP_ERROR ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
+    {
+        return CHIP_APPLICATION_ERROR(2);
+    }
+};
+
+static void TestPlatformMgr_MockSystemLayer(nlTestSuite * inSuite, void * inContext)
+{
+    MockSystemLayer systemLayer;
+
+    DeviceLayer::SetSystemLayerForTesting(&systemLayer);
+    NL_TEST_ASSERT(inSuite, &DeviceLayer::SystemLayer() == static_cast<chip::System::Layer *>(&systemLayer));
+
+    CHIP_ERROR err = PlatformMgr().InitChipStack();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, &DeviceLayer::SystemLayer() == static_cast<chip::System::Layer *>(&systemLayer));
+
+    NL_TEST_ASSERT(inSuite, DeviceLayer::SystemLayer().StartTimer(0, nullptr, nullptr) == CHIP_APPLICATION_ERROR(1));
+    NL_TEST_ASSERT(inSuite, DeviceLayer::SystemLayer().ScheduleWork(nullptr, nullptr) == CHIP_APPLICATION_ERROR(2));
+
+    err = PlatformMgr().Shutdown();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    DeviceLayer::SetSystemLayerForTesting(nullptr);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -190,6 +223,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test PlatformMgr::RunEventLoop with stop before sleep", TestPlatformMgr_RunEventLoopStopBeforeSleep),
     NL_TEST_DEF("Test PlatformMgr::TryLockChipStack", TestPlatformMgr_TryLockChipStack),
     NL_TEST_DEF("Test PlatformMgr::AddEventHandler", TestPlatformMgr_AddEventHandler),
+    NL_TEST_DEF("Test mock System::Layer", TestPlatformMgr_MockSystemLayer),
 
     NL_TEST_SENTINEL()
 };

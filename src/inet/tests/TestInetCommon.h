@@ -41,7 +41,7 @@
 
 #include <inet/InetLayer.h>
 #include <lib/support/CodeUtils.h>
-#include <system/SystemLayer.h>
+#include <system/SystemLayerImpl.h>
 
 #define CHIP_TOOL_COPYRIGHT "Copyright (c) 2020 Project CHIP Authors\nAll rights reserved.\n"
 
@@ -51,7 +51,7 @@
         InetFailError((ERR), (MSG));                                                                                               \
     } while (0)
 
-extern chip::System::Layer gSystemLayer;
+extern chip::System::LayerImpl gSystemLayer;
 
 extern chip::Inet::InetLayer gInet;
 

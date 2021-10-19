@@ -28,5 +28,5 @@ class MediaInputManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<EmberAfMediaInputInfo> proxyGetInputList();
+    std::vector<MediaInputInfo> proxyGetInputList();
 };

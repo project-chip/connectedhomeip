@@ -46,15 +46,24 @@ CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)
 
 void TransportMgrBase::Close()
 {
-    mSecureSessionMgr = nullptr;
-    mTransport        = nullptr;
+    mSessionManager = nullptr;
+    mTransport      = nullptr;
 }
 
 void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
-    if (mSecureSessionMgr != nullptr)
+    if (msg->HasChainedBuffer())
     {
-        mSecureSessionMgr->OnMessageReceived(peerAddress, std::move(msg));
+        // Something in the lower levels messed up.
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        peerAddress.ToString(addrBuffer);
+        ChipLogError(Inet, "message from %s dropped due to lower layers not ensuring a single packet buffer.", addrBuffer);
+        return;
+    }
+
+    if (mSessionManager != nullptr)
+    {
+        mSessionManager->OnMessageReceived(peerAddress, std::move(msg));
     }
     else
     {

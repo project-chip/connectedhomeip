@@ -41,6 +41,8 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 1
 #define CHIP_CONFIG_ERROR_SOURCE 1
 
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE 1
+
 // ==================== Security Adaptations ====================
 
 #define CHIP_CONFIG_USE_OPENSSL_ECC 0

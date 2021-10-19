@@ -42,7 +42,7 @@ public:
     void UpdateClusterState();
 
 private:
-    friend class chip::rpc::Button;
+    friend class chip::rpc::NrfButton;
     friend AppTask & GetAppTask(void);
 
     int Init();

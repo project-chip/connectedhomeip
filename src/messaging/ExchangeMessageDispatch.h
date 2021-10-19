@@ -25,7 +25,7 @@
 
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/Flags.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 namespace Messaging {
@@ -40,6 +40,8 @@ public:
     virtual ~ExchangeMessageDispatch() {}
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
+
+    virtual bool IsEncryptionRequired() const { return true; }
 
     CHIP_ERROR SendMessage(SessionHandle session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
@@ -58,14 +60,15 @@ public:
                                       EncryptedPacketBufferHandle & preparedMessage)                                         = 0;
     virtual CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const = 0;
 
-    virtual CHIP_ERROR OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader, uint32_t messageId,
+    virtual CHIP_ERROR OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                                          ReliableMessageContext * reliableMessageContext);
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;
+
+    // TODO: remove IsReliableTransmissionAllowed, this function should be provided over session.
     virtual bool IsReliableTransmissionAllowed() const { return true; }
-    virtual bool IsEncryptionRequired() const { return true; }
 };
 
 } // namespace Messaging

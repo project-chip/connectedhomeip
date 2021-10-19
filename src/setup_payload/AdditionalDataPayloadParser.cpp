@@ -30,6 +30,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
@@ -46,16 +47,23 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayloadData::Additi
 
     // Open the container
     ReturnErrorOnFailure(reader.OpenContainer(innerReader));
+    if (innerReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(SetupPayloadData::kRotatingDeviceIdTag)) == CHIP_NO_ERROR)
+    {
+        // Get the value of the rotating device id
+        ByteSpan rotatingDeviceId;
+        ReturnErrorOnFailure(innerReader.GetByteView(rotatingDeviceId));
 
-    ReturnErrorOnFailure(innerReader.Next(TLV::kTLVType_UTF8String, TLV::ContextTag(SetupPayloadData::kRotatingDeviceIdTag)));
+        VerifyOrReturnError(rotatingDeviceId.size() <= RotatingDeviceId::kMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+        char rotatingDeviceIdBufferTemp[RotatingDeviceId::kHexMaxLength];
 
-    // Get the value of the rotating device id
-    Span<const char> rotatingDeviceId;
-    ReturnErrorOnFailure(innerReader.GetStringView(rotatingDeviceId));
-
-    // This test uses <, not <=, because kHexMaxLength includes the null-terminator.
-    VerifyOrReturnError(rotatingDeviceId.size() < RotatingDeviceId::kHexMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
-    outPayload.rotatingDeviceId = std::string(rotatingDeviceId.data(), rotatingDeviceId.size());
+        ReturnErrorOnFailure(Encoding::BytesToUppercaseHexString(rotatingDeviceId.data(), rotatingDeviceId.size(),
+                                                                 rotatingDeviceIdBufferTemp, RotatingDeviceId::kHexMaxLength));
+        outPayload.rotatingDeviceId = std::string(rotatingDeviceIdBufferTemp, rotatingDeviceId.size() * 2);
+    }
+    else
+    {
+        outPayload.rotatingDeviceId = "";
+    }
 
     // Verify the end of the container
     ReturnErrorOnFailure(reader.VerifyEndOfContainer());

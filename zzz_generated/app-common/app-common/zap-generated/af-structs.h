@@ -24,15 +24,68 @@
 
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
 
 #include "enums.h"
+
+// Struct for SimpleStruct
+typedef struct _SimpleStruct
+{
+    uint8_t a;
+    bool b;
+    uint8_t c;
+    chip::ByteSpan d;
+    uint8_t * e;
+    uint8_t f;
+} SimpleStruct;
+
+// Struct for NestedStruct
+typedef struct _NestedStruct
+{
+    uint8_t a;
+    bool b;
+    SimpleStruct c;
+} NestedStruct;
+
+// Struct for NestedStructList
+typedef struct _NestedStructList
+{
+    uint8_t a;
+    bool b;
+    SimpleStruct c;
+    /* TYPE WARNING: array array defaults to */ uint8_t * d;
+    /* TYPE WARNING: array array defaults to */ uint8_t * e;
+    /* TYPE WARNING: array array defaults to */ uint8_t * f;
+    /* TYPE WARNING: array array defaults to */ uint8_t * g;
+} NestedStructList;
+
+// Struct for DoubleNestedStructList
+typedef struct _DoubleNestedStructList
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * a;
+} DoubleNestedStructList;
+
+// Struct for ContentLaunchAdditionalInfo
+typedef struct _ContentLaunchAdditionalInfo
+{
+    uint8_t * name;
+    uint8_t * value;
+} ContentLaunchAdditionalInfo;
+
+// Struct for ContentLaunchParamater
+typedef struct _ContentLaunchParamater
+{
+    uint8_t Type;
+    uint8_t * Value;
+    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+} ContentLaunchParamater;
 
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
 {
     uint16_t catalogVendorId;
     uint8_t * applicationId;
-} EmberAfApplicationLauncherApp;
+} ApplicationLauncherApp;
 
 // Struct for AudioOutputInfo
 typedef struct _AudioOutputInfo
@@ -40,40 +93,27 @@ typedef struct _AudioOutputInfo
     uint8_t index;
     uint8_t outputType;
     chip::ByteSpan name;
-} EmberAfAudioOutputInfo;
+} AudioOutputInfo;
 
 // Struct for BasicCommissioningInfoType
 typedef struct _BasicCommissioningInfoType
 {
     uint32_t FailSafeExpiryLengthMs;
-} EmberAfBasicCommissioningInfoType;
+} BasicCommissioningInfoType;
 
-// Struct for ConfigureReportingRecord
-typedef struct _ConfigureReportingRecord
+// Struct for BatChargeFaultChangeType
+typedef struct _BatChargeFaultChangeType
 {
-    uint8_t direction;
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint16_t minimumReportingInterval;
-    uint16_t maximumReportingInterval;
-    uint8_t * reportableChangeLocation;
-    uint16_t timeoutPeriod;
-} EmberAfConfigureReportingRecord;
+    /* TYPE WARNING: array array defaults to */ uint8_t * current;
+    /* TYPE WARNING: array array defaults to */ uint8_t * previous;
+} BatChargeFaultChangeType;
 
-// Struct for ConfigureReportingStatusRecord
-typedef struct _ConfigureReportingStatusRecord
+// Struct for BatFaultChangeType
+typedef struct _BatFaultChangeType
 {
-    uint8_t status;
-    uint8_t direction;
-    chip::AttributeId attributeId;
-} EmberAfConfigureReportingStatusRecord;
-
-// Struct for ContentLaunchAdditionalInfo
-typedef struct _ContentLaunchAdditionalInfo
-{
-    uint8_t * name;
-    uint8_t * value;
-} EmberAfContentLaunchAdditionalInfo;
+    /* TYPE WARNING: array array defaults to */ uint8_t * current;
+    /* TYPE WARNING: array array defaults to */ uint8_t * previous;
+} BatFaultChangeType;
 
 // Struct for ContentLaunchBrandingInformation
 typedef struct _ContentLaunchBrandingInformation
@@ -84,7 +124,7 @@ typedef struct _ContentLaunchBrandingInformation
     uint8_t progressBar;
     uint8_t splash;
     uint8_t waterMark;
-} EmberAfContentLaunchBrandingInformation;
+} ContentLaunchBrandingInformation;
 
 // Struct for ContentLaunchDimension
 typedef struct _ContentLaunchDimension
@@ -92,15 +132,7 @@ typedef struct _ContentLaunchDimension
     uint8_t * width;
     uint8_t * height;
     uint8_t metric;
-} EmberAfContentLaunchDimension;
-
-// Struct for ContentLaunchParamater
-typedef struct _ContentLaunchParamater
-{
-    uint8_t Type;
-    uint8_t * Value;
-    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
-} EmberAfContentLaunchParamater;
+} ContentLaunchDimension;
 
 // Struct for ContentLaunchStyleInformation
 typedef struct _ContentLaunchStyleInformation
@@ -108,21 +140,21 @@ typedef struct _ContentLaunchStyleInformation
     uint8_t * imageUrl;
     uint8_t * color;
     uint8_t size;
-} EmberAfContentLaunchStyleInformation;
+} ContentLaunchStyleInformation;
 
 // Struct for DeviceType
 typedef struct _DeviceType
 {
     chip::DeviceTypeId type;
     uint16_t revision;
-} EmberAfDeviceType;
+} DeviceType;
 
 // Struct for DiscoverAttributesInfoRecord
 typedef struct _DiscoverAttributesInfoRecord
 {
     chip::AttributeId attributeId;
     uint8_t attributeType;
-} EmberAfDiscoverAttributesInfoRecord;
+} DiscoverAttributesInfoRecord;
 
 // Struct for ExtendedDiscoverAttributesInfoRecord
 typedef struct _ExtendedDiscoverAttributesInfoRecord
@@ -130,7 +162,7 @@ typedef struct _ExtendedDiscoverAttributesInfoRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t attributeAccessControl;
-} EmberAfExtendedDiscoverAttributesInfoRecord;
+} ExtendedDiscoverAttributesInfoRecord;
 
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
@@ -141,7 +173,7 @@ typedef struct _FabricDescriptor
     chip::FabricId FabricId;
     chip::NodeId NodeId;
     chip::ByteSpan Label;
-} EmberAfFabricDescriptor;
+} FabricDescriptor;
 
 // Struct for GroupKey
 typedef struct _GroupKey
@@ -151,7 +183,7 @@ typedef struct _GroupKey
     chip::ByteSpan GroupKeyRoot;
     uint64_t GroupKeyEpochStartTime;
     uint8_t GroupKeySecurityPolicy;
-} EmberAfGroupKey;
+} GroupKey;
 
 // Struct for GroupState
 typedef struct _GroupState
@@ -159,21 +191,21 @@ typedef struct _GroupState
     uint16_t VendorId;
     uint16_t VendorGroupId;
     uint16_t GroupKeySetIndex;
-} EmberAfGroupState;
+} GroupState;
 
 // Struct for IasAceZoneStatusResult
 typedef struct _IasAceZoneStatusResult
 {
     uint8_t zoneId;
     uint16_t zoneStatus;
-} EmberAfIasAceZoneStatusResult;
+} IasAceZoneStatusResult;
 
 // Struct for LabelStruct
 typedef struct _LabelStruct
 {
     chip::ByteSpan label;
     chip::ByteSpan value;
-} EmberAfLabelStruct;
+} LabelStruct;
 
 // Struct for MediaInputInfo
 typedef struct _MediaInputInfo
@@ -182,28 +214,28 @@ typedef struct _MediaInputInfo
     uint8_t inputType;
     chip::ByteSpan name;
     chip::ByteSpan description;
-} EmberAfMediaInputInfo;
+} MediaInputInfo;
 
 // Struct for MediaPlaybackPosition
 typedef struct _MediaPlaybackPosition
 {
     uint64_t updatedAt;
     uint64_t position;
-} EmberAfMediaPlaybackPosition;
+} MediaPlaybackPosition;
 
 // Struct for NOCStruct
 typedef struct _NOCStruct
 {
     uint8_t FabricIndex;
     chip::ByteSpan NOC;
-} EmberAfNOCStruct;
+} NOCStruct;
 
 // Struct for NavigateTargetTargetInfo
 typedef struct _NavigateTargetTargetInfo
 {
     uint8_t identifier;
     chip::ByteSpan name;
-} EmberAfNavigateTargetTargetInfo;
+} NavigateTargetTargetInfo;
 
 // Struct for NeighborTable
 typedef struct _NeighborTable
@@ -222,7 +254,7 @@ typedef struct _NeighborTable
     bool FullThreadDevice;
     bool FullNetworkData;
     bool IsChild;
-} EmberAfNeighborTable;
+} NeighborTable;
 
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
@@ -233,14 +265,14 @@ typedef struct _NetworkInterfaceType
     bool OffPremiseServicesReachableIPv6;
     chip::ByteSpan HardwareAddress;
     uint8_t Type;
-} EmberAfNetworkInterfaceType;
+} NetworkInterfaceType;
 
 // Struct for Notification
 typedef struct _Notification
 {
     uint16_t contentId;
     uint8_t statusFeedback;
-} EmberAfNotification;
+} Notification;
 
 // Struct for OperationalDatasetComponents
 typedef struct _OperationalDatasetComponents
@@ -257,7 +289,7 @@ typedef struct _OperationalDatasetComponents
     bool PskcPresent;
     bool SecurityPolicyPresent;
     bool ChannelMaskPresent;
-} EmberAfOperationalDatasetComponents;
+} OperationalDatasetComponents;
 
 // Struct for PowerProfileRecord
 typedef struct _PowerProfileRecord
@@ -266,52 +298,24 @@ typedef struct _PowerProfileRecord
     uint8_t energyPhaseId;
     bool powerProfileRemoteControl;
     uint8_t powerProfileState;
-} EmberAfPowerProfileRecord;
+} PowerProfileRecord;
 
 // Struct for ReadAttributeStatusRecord
 typedef struct _ReadAttributeStatusRecord
 {
     chip::AttributeId attributeId;
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     uint8_t attributeType;
     uint8_t * attributeLocation;
-} EmberAfReadAttributeStatusRecord;
-
-// Struct for ReadReportingConfigurationAttributeRecord
-typedef struct _ReadReportingConfigurationAttributeRecord
-{
-    uint8_t direction;
-    chip::AttributeId attributeId;
-} EmberAfReadReportingConfigurationAttributeRecord;
-
-// Struct for ReadReportingConfigurationRecord
-typedef struct _ReadReportingConfigurationRecord
-{
-    uint8_t status;
-    uint8_t direction;
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint16_t minimumReportingInterval;
-    uint16_t maximumReportingInterval;
-    uint8_t * reportableChangeLocation;
-    uint16_t timeoutPeriod;
-} EmberAfReadReportingConfigurationRecord;
+} ReadAttributeStatusRecord;
 
 // Struct for ReadStructuredAttributeRecord
 typedef struct _ReadStructuredAttributeRecord
 {
     chip::AttributeId attributeId;
     uint8_t indicator;
-    uint16_t indicies;
-} EmberAfReadStructuredAttributeRecord;
-
-// Struct for ReportAttributeRecord
-typedef struct _ReportAttributeRecord
-{
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint8_t * attributeLocation;
-} EmberAfReportAttributeRecord;
+    /* TYPE WARNING: array array defaults to */ uint8_t * indicies;
+} ReadStructuredAttributeRecord;
 
 // Struct for RouteTable
 typedef struct _RouteTable
@@ -326,14 +330,14 @@ typedef struct _RouteTable
     uint8_t Age;
     bool Allocated;
     bool LinkEstablished;
-} EmberAfRouteTable;
+} RouteTable;
 
 // Struct for SceneExtensionAttributeInfo
 typedef struct _SceneExtensionAttributeInfo
 {
     uint8_t attributeType;
     uint8_t * attributeLocation;
-} EmberAfSceneExtensionAttributeInfo;
+} SceneExtensionAttributeInfo;
 
 // Struct for SceneExtensionFieldSet
 typedef struct _SceneExtensionFieldSet
@@ -341,34 +345,34 @@ typedef struct _SceneExtensionFieldSet
     chip::ClusterId clusterId;
     uint8_t length;
     uint8_t value;
-} EmberAfSceneExtensionFieldSet;
+} SceneExtensionFieldSet;
 
 // Struct for ScheduledPhase
 typedef struct _ScheduledPhase
 {
     uint8_t energyPhaseId;
     uint16_t scheduledTime;
-} EmberAfScheduledPhase;
+} ScheduledPhase;
 
 // Struct for SecurityPolicy
 typedef struct _SecurityPolicy
 {
     uint16_t RotationTime;
-    uint8_t Flags;
-} EmberAfSecurityPolicy;
+    uint16_t Flags;
+} SecurityPolicy;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
 {
     uint64_t fabricIndex;
     chip::ByteSpan operationalCert;
-} EmberAfTestListStructOctet;
+} TestListStructOctet;
 
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
     chip::ByteSpan DiscoveryResponse;
-} EmberAfThreadInterfaceScanResult;
+} ThreadInterfaceScanResult;
 
 // Struct for ThreadMetrics
 typedef struct _ThreadMetrics
@@ -378,7 +382,7 @@ typedef struct _ThreadMetrics
     uint32_t StackFreeCurrent;
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
-} EmberAfThreadMetrics;
+} ThreadMetrics;
 
 // Struct for TransferredPhase
 typedef struct _TransferredPhase
@@ -389,7 +393,7 @@ typedef struct _TransferredPhase
     uint16_t peakPower;
     uint16_t energy;
     uint16_t maxActivationDelay;
-} EmberAfTransferredPhase;
+} TransferredPhase;
 
 // Struct for TvChannelInfo
 typedef struct _TvChannelInfo
@@ -399,7 +403,7 @@ typedef struct _TvChannelInfo
     chip::ByteSpan name;
     chip::ByteSpan callSign;
     chip::ByteSpan affiliateCallSign;
-} EmberAfTvChannelInfo;
+} TvChannelInfo;
 
 // Struct for TvChannelLineupInfo
 typedef struct _TvChannelLineupInfo
@@ -408,7 +412,7 @@ typedef struct _TvChannelLineupInfo
     uint8_t * lineupName;
     uint8_t * postalCode;
     uint8_t lineupInfoType;
-} EmberAfTvChannelLineupInfo;
+} TvChannelLineupInfo;
 
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult
@@ -418,7 +422,14 @@ typedef struct _WiFiInterfaceScanResult
     chip::ByteSpan BSSID;
     uint8_t Channel;
     uint32_t FrequencyBand;
-} EmberAfWiFiInterfaceScanResult;
+} WiFiInterfaceScanResult;
+
+// Struct for WiredFaultChangeType
+typedef struct _WiredFaultChangeType
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * current;
+    /* TYPE WARNING: array array defaults to */ uint8_t * previous;
+} WiredFaultChangeType;
 
 // Struct for WriteAttributeRecord
 typedef struct _WriteAttributeRecord
@@ -426,30 +437,30 @@ typedef struct _WriteAttributeRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t * attributeLocation;
-} EmberAfWriteAttributeRecord;
+} WriteAttributeRecord;
 
 // Struct for WriteAttributeStatusRecord
 typedef struct _WriteAttributeStatusRecord
 {
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     chip::AttributeId attributeId;
-} EmberAfWriteAttributeStatusRecord;
+} WriteAttributeStatusRecord;
 
 // Struct for WriteStructuredAttributeRecord
 typedef struct _WriteStructuredAttributeRecord
 {
     chip::AttributeId attributeId;
     uint8_t indicator;
-    uint16_t indicies;
+    /* TYPE WARNING: array array defaults to */ uint8_t * indicies;
     uint8_t attributeType;
     uint8_t * attributeLocation;
-} EmberAfWriteStructuredAttributeRecord;
+} WriteStructuredAttributeRecord;
 
 // Struct for WriteStructuredAttributeStatusRecord
 typedef struct _WriteStructuredAttributeStatusRecord
 {
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     chip::AttributeId attributeId;
     uint8_t indicator;
-    uint16_t indicies;
-} EmberAfWriteStructuredAttributeStatusRecord;
+    /* TYPE WARNING: array array defaults to */ uint8_t * indicies;
+} WriteStructuredAttributeStatusRecord;

@@ -41,11 +41,12 @@ namespace Internal {
     (key);                                                                                                                         \
     static_assert(sizeof(key) <= SETTINGS_MAX_NAME_LEN, "Config key too long: " key)
 
-// Config namespaces
+// Define the configuration keys to be part of the CHIP_DEVICE_CONFIG_SETTINGS_KEY subtree
+// so that they get erased when KeyValueStoreManagerImpl::DoFactoryReset() is called.
 // clang-format off
-#define NAMESPACE_FACTORY  "chip-fact/"
-#define NAMESPACE_CONFIG   "chip-conf/"
-#define NAMESPACE_COUNTERS "chip-cntr/"
+#define NAMESPACE_FACTORY  CHIP_DEVICE_CONFIG_SETTINGS_KEY "/fct/"
+#define NAMESPACE_CONFIG   CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
+#define NAMESPACE_COUNTERS CHIP_DEVICE_CONFIG_SETTINGS_KEY "/ctr/"
 // clang-format on
 
 // Keys stored in the chip factory nam
@@ -60,38 +61,27 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupPinCode        = CONFIG_KE
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupDiscriminator  = CONFIG_KEY(NAMESPACE_FACTORY "discriminator");
 // Keys stored in the chip config namespace
 // NOTE: update sAllResettableConfigKeys definition when adding a new entry below
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricId                    = CONFIG_KEY(NAMESPACE_CONFIG "fabric-id");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceConfig               = CONFIG_KEY(NAMESPACE_CONFIG "service-config");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_PairedAccountId             = CONFIG_KEY(NAMESPACE_CONFIG "account-id");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceId                   = CONFIG_KEY(NAMESPACE_CONFIG "service-id");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricSecret                = CONFIG_KEY(NAMESPACE_CONFIG "fabric-secret");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_GroupKeyIndex               = CONFIG_KEY(NAMESPACE_CONFIG "group-key-index");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_LastUsedEpochKeyId          = CONFIG_KEY(NAMESPACE_CONFIG "last-ek-id");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_FailSafeArmed               = CONFIG_KEY(NAMESPACE_CONFIG "fail-safe-armed");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_OperationalDeviceId         = CONFIG_KEY(NAMESPACE_CONFIG "op-device-id");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_OperationalDeviceCert       = CONFIG_KEY(NAMESPACE_CONFIG "op-device-cert");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_OperationalDeviceICACerts   = CONFIG_KEY(NAMESPACE_CONFIG "op-device-ca-certs");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_OperationalDevicePrivateKey = CONFIG_KEY(NAMESPACE_CONFIG "op-device-key");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation          = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode                 = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb                  = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricId           = CONFIG_KEY(NAMESPACE_CONFIG "fabric-id");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceConfig      = CONFIG_KEY(NAMESPACE_CONFIG "service-config");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_PairedAccountId    = CONFIG_KEY(NAMESPACE_CONFIG "account-id");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceId          = CONFIG_KEY(NAMESPACE_CONFIG "service-id");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricSecret       = CONFIG_KEY(NAMESPACE_CONFIG "fabric-secret");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_GroupKeyIndex      = CONFIG_KEY(NAMESPACE_CONFIG "group-key-index");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_LastUsedEpochKeyId = CONFIG_KEY(NAMESPACE_CONFIG "last-ek-id");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_FailSafeArmed      = CONFIG_KEY(NAMESPACE_CONFIG "fail-safe-armed");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb         = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
 namespace {
 
-constexpr const char * sAllResettableConfigKeys[] = { ZephyrConfig::kConfigKey_FabricId,
-                                                      ZephyrConfig::kConfigKey_ServiceConfig,
-                                                      ZephyrConfig::kConfigKey_PairedAccountId,
-                                                      ZephyrConfig::kConfigKey_ServiceId,
-                                                      ZephyrConfig::kConfigKey_FabricSecret,
-                                                      ZephyrConfig::kConfigKey_GroupKeyIndex,
-                                                      ZephyrConfig::kConfigKey_LastUsedEpochKeyId,
-                                                      ZephyrConfig::kConfigKey_FailSafeArmed,
-                                                      ZephyrConfig::kConfigKey_OperationalDeviceId,
-                                                      ZephyrConfig::kConfigKey_OperationalDeviceCert,
-                                                      ZephyrConfig::kConfigKey_OperationalDeviceICACerts,
-                                                      ZephyrConfig::kConfigKey_OperationalDevicePrivateKey,
-                                                      ZephyrConfig::kConfigKey_RegulatoryLocation,
-                                                      ZephyrConfig::kConfigKey_CountryCode,
-                                                      ZephyrConfig::kConfigKey_Breadcrumb };
+constexpr const char * sAllResettableConfigKeys[] = {
+    ZephyrConfig::kConfigKey_FabricId,           ZephyrConfig::kConfigKey_ServiceConfig,
+    ZephyrConfig::kConfigKey_PairedAccountId,    ZephyrConfig::kConfigKey_ServiceId,
+    ZephyrConfig::kConfigKey_FabricSecret,       ZephyrConfig::kConfigKey_GroupKeyIndex,
+    ZephyrConfig::kConfigKey_LastUsedEpochKeyId, ZephyrConfig::kConfigKey_FailSafeArmed,
+    ZephyrConfig::kConfigKey_RegulatoryLocation, ZephyrConfig::kConfigKey_CountryCode,
+    ZephyrConfig::kConfigKey_Breadcrumb
+};
 
 // Data structure to be passed as a parameter of Zephyr's settings_load_subtree_direct() function
 struct ReadRequest

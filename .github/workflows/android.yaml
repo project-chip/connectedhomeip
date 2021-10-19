@@ -21,7 +21,7 @@ on:
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
-  
+
 jobs:
     android:
         name: Build Android
@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-android:latest
+            image: connectedhomeip/chip-build-android:0.5.15
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -48,7 +48,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -57,4 +57,8 @@ jobs:
             - name: Build android examples
               run: |
                 ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --platform android build"
+                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-*' build"
+            - name: Run Android build rule tests
+              run: |
+                ./scripts/run_in_build_env.sh \
+                  "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test.tests"

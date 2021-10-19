@@ -59,22 +59,25 @@ const PosixConfig::Key PosixConfig::kConfigKey_SetupPinCode        = { kConfigNa
 const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
 
 // Keys stored in the Chip-config namespace
-const PosixConfig::Key PosixConfig::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
-const PosixConfig::Key PosixConfig::kConfigKey_PairedAccountId             = { kConfigNamespace_ChipConfig, "account-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_ServiceId                   = { kConfigNamespace_ChipConfig, "service-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_FabricSecret                = { kConfigNamespace_ChipConfig, "fabric-secret" };
-const PosixConfig::Key PosixConfig::kConfigKey_GroupKeyIndex               = { kConfigNamespace_ChipConfig, "group-key-index" };
-const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_ChipConfig, "last-ek-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed               = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const PosixConfig::Key PosixConfig::kConfigKey_WiFiStationSecType          = { kConfigNamespace_ChipConfig, "sta-sec-type" };
-const PosixConfig::Key PosixConfig::kConfigKey_OperationalDeviceId         = { kConfigNamespace_ChipConfig, "op-device-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_ChipConfig, "op-device-cert" };
-const PosixConfig::Key PosixConfig::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig, "op-device-ca-certs" };
-const PosixConfig::Key PosixConfig::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
-const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const PosixConfig::Key PosixConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
-const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const PosixConfig::Key PosixConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
+const PosixConfig::Key PosixConfig::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_FabricSecret       = { kConfigNamespace_ChipConfig, "fabric-secret" };
+const PosixConfig::Key PosixConfig::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
+const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const PosixConfig::Key PosixConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
+const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
+
+// Keys stored in the Chip-counters namespace
+const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const PosixConfig::Key PosixConfig::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters,
+                                                                          "total-operational-hours" };
+const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfigNamespace_ChipCounters, "boot-reason" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
@@ -471,9 +474,41 @@ CHIP_ERROR PosixConfig::FactoryResetConfig()
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLinuxStorage * storage;
 
-    ChipLogProgress(DeviceLayer, "Performing factory reset");
+    ChipLogProgress(DeviceLayer, "Performing factory reset configuration");
 
     storage = &gChipLinuxConfigStorage;
+    if (storage == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Storage get failed");
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    SuccessOrExit(err);
+
+    err = storage->ClearAll();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
+    err = storage->Commit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
+    }
+
+exit:
+    return err;
+}
+
+CHIP_ERROR PosixConfig::FactoryResetCounters()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipLinuxStorage * storage;
+
+    ChipLogProgress(DeviceLayer, "Performing factory reset counters");
+
+    storage = &gChipLinuxCountersStorage;
     if (storage == nullptr)
     {
         ChipLogError(DeviceLayer, "Storage get failed");

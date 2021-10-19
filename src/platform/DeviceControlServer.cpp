@@ -46,19 +46,23 @@ void DeviceControlServer::CommissioningFailedTimerComplete()
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;
-    PlatformMgr().PostEvent(&event);
+    CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post commissioning complete: %" CHIP_ERROR_FORMAT, status.Format());
+    }
 }
 
 CHIP_ERROR DeviceControlServer::ArmFailSafe(uint16_t expiryLengthSeconds)
 {
     uint32_t timerMs = expiryLengthSeconds * 1000;
-    SystemLayer.StartTimer(timerMs, HandleArmFailSafe, this);
+    DeviceLayer::SystemLayer().StartTimer(timerMs, HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::DisarmFailSafe()
 {
-    SystemLayer.CancelTimer(HandleArmFailSafe, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
 
@@ -68,18 +72,17 @@ CHIP_ERROR DeviceControlServer::CommissioningComplete()
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.status = CHIP_NO_ERROR;
-    PlatformMgr().PostEvent(&event);
-    return CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb)
+CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = ConfigurationMgr().StoreRegulatoryLocation(location);
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().StoreCountryCode(countryCode, strlen(countryCode));
+    err = ConfigurationMgr().StoreCountryCode(countryCode.data(), countryCode.size());
     SuccessOrExit(err);
 
     err = ConfigurationMgr().StoreBreadcrumb(breadcrumb);

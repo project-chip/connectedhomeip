@@ -25,7 +25,6 @@
 #include <nlunit-test.h>
 
 #include <credentials/CHIPCert.h>
-#include <credentials/CHIPOperationalCredentials.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
@@ -122,13 +121,8 @@ static CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(commissionerFabric.SetEphemeralKey(&opKey));
 
     ReturnErrorOnFailure(commissionerFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
-
-    uint8_t certChainBuf[kMaxCHIPCertLength * 2];
-    MutableByteSpan certChain(certChainBuf);
-
-    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
-                                                         ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len), certChain));
-    ReturnErrorOnFailure(commissionerFabric.SetOperationalCertsFromCertArray(certChain));
+    ReturnErrorOnFailure(commissionerFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
+    ReturnErrorOnFailure(commissionerFabric.SetNOCCert(ByteSpan(sTestCert_Node01_01_Chip, sTestCert_Node01_01_Chip_Len)));
 
     ReturnErrorOnFailure(gCommissionerFabrics.AddNewFabric(commissionerFabric, &gCommissionerFabricIndex));
 
@@ -144,10 +138,8 @@ static CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(deviceFabric.SetEphemeralKey(&opKey));
 
     ReturnErrorOnFailure(deviceFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
-
-    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
-                                                         ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len), certChain));
-    ReturnErrorOnFailure(deviceFabric.SetOperationalCertsFromCertArray(certChain));
+    ReturnErrorOnFailure(deviceFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
+    ReturnErrorOnFailure(deviceFabric.SetNOCCert(ByteSpan(sTestCert_Node01_01_Chip, sTestCert_Node01_01_Chip_Len)));
 
     ReturnErrorOnFailure(gDeviceFabrics.AddNewFabric(deviceFabric, &gDeviceFabricIndex));
 
@@ -176,8 +168,8 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
-    NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * context = ctx.NewExchangeToLocal(&pairing);
+    NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
 
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), nullptr, Node01_01, 0, nullptr,
@@ -191,14 +183,19 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
+    // Clear pending packet in CRMP
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = context->GetReliableMessageContext();
+    rm->ClearRetransTable(rc);
+
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     CASESession pairing1;
-    NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     gLoopback.mSentMessageCount = 0;
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
-    ExchangeContext * context1  = ctx.NewExchangeToLocal(&pairing1);
+    ExchangeContext * context1  = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
                    pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0, context1,
@@ -218,14 +215,14 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     CASESessionSerializable serializableAccessory;
 
     gLoopback.mSentMessageCount = 0;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
-                       Protocols::SecureChannel::MsgType::CASE_SigmaR1, &pairingAccessory) == CHIP_NO_ERROR);
+                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                                     &pairingAccessory) == CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
+    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
     FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
@@ -236,7 +233,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                    pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                         contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
@@ -343,8 +340,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     gLoopback.mSentMessageCount = 0;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner->MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gPairingServer.GetSession().MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner->MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPairingServer.GetSession().MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     SessionIDAllocator idAllocator;
 
@@ -353,7 +350,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                                                                 &ctx.GetSecureSessionManager(), &gDeviceFabrics,
                                                                 &idAllocator) == CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(pairingCommissioner);
+    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
 
     FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
@@ -362,12 +359,12 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                    pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                          contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     auto * pairingCommissioner1 = chip::Platform::New<TestCASESessionIPK>();
-    NL_TEST_ASSERT(inSuite, pairingCommissioner1->MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * contextCommissioner1 = ctx.NewExchangeToLocal(pairingCommissioner1);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner1->MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    ExchangeContext * contextCommissioner1 = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner1);
 
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner1->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
@@ -408,20 +405,24 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     PacketHeader header;
     MessageAuthenticationCode mac;
 
+    header.SetSessionId(1);
+    NL_TEST_ASSERT(inSuite, header.IsEncrypted() == true);
+    NL_TEST_ASSERT(inSuite, header.MICTagLength() == 16);
+
     // Let's try encrypting using original session, and decrypting using deserialized
     {
-        SecureSession session1;
+        CryptoContext session1;
 
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession1->DeriveSecureSession(session1, SecureSession::SessionRole::kInitiator) == CHIP_NO_ERROR);
+                       testPairingSession1->DeriveSecureSession(session1, CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, mac) == CHIP_NO_ERROR);
     }
 
     {
-        SecureSession session2;
+        CryptoContext session2;
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession2->DeriveSecureSession(session2, SecureSession::SessionRole::kResponder) == CHIP_NO_ERROR);
+                       testPairingSession2->DeriveSecureSession(session2, CryptoContext::SessionRole::kResponder) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
         NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);
@@ -430,6 +431,220 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 
     chip::Platform::Delete(testPairingSession1);
     chip::Platform::Delete(testPairingSession2);
+}
+
+struct Sigma1Params
+{
+    // Purposefully not using constants like kSigmaParamRandomNumberSize that
+    // the code uses, so we have a cross-check.
+    static constexpr size_t initiatorRandomLen    = 32;
+    static constexpr uint16_t initiatorSessionId  = 0;
+    static constexpr size_t destinationIdLen      = 32;
+    static constexpr size_t initiatorEphPubKeyLen = 65;
+    static constexpr size_t resumptionIdLen       = 0; // Nonzero means include it.
+    static constexpr size_t initiatorResumeMICLen = 0; // Nonzero means include it.
+
+    static constexpr uint8_t initiatorRandomTag    = 1;
+    static constexpr uint8_t initiatorSessionIdTag = 2;
+    static constexpr uint8_t destinationIdTag      = 3;
+    static constexpr uint8_t initiatorEphPubKeyTag = 4;
+    static constexpr uint8_t resumptionIdTag       = 6;
+    static constexpr uint8_t initiatorResumeMICTag = 7;
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+
+    static constexpr bool includeStructEnd = true;
+
+    static constexpr bool expectSuccess = true;
+};
+
+template <typename Params>
+static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
+{
+    using namespace TLV;
+
+    TLVWriter writer;
+    writer.Init(buf);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Structure, containerType));
+    uint8_t initiatorRandom[Params::initiatorRandomLen] = { 1 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::initiatorRandomTag), ByteSpan(initiatorRandom)));
+
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::initiatorSessionIdTag), Params::initiatorSessionId));
+
+    uint8_t destinationId[Params::destinationIdLen] = { 2 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::destinationIdTag), ByteSpan(destinationId)));
+
+    uint8_t initiatorEphPubKey[Params::initiatorEphPubKeyLen] = { 3 };
+    ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::initiatorEphPubKeyTag), ByteSpan(initiatorEphPubKey)));
+
+    // I wish we had "if constexpr" support here, so the compiler would know
+    // resumptionIdLen is nonzero inside the block....
+    if (Params::resumptionIdLen != 0)
+    {
+        uint8_t resumptionId[Params::resumptionIdLen];
+
+        // to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
+        (&memset)(resumptionId, 4, Params::resumptionIdLen);
+        ReturnErrorOnFailure(
+            writer.Put(Params::NumToTag(Params::resumptionIdTag), ByteSpan(resumptionId, Params::resumptionIdLen)));
+    }
+
+    if (Params::initiatorResumeMICLen != 0)
+    {
+        uint8_t initiatorResumeMIC[Params::initiatorResumeMICLen];
+        // to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
+        (&memset)(initiatorResumeMIC, 5, Params::initiatorResumeMICLen);
+        ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::initiatorResumeMICTag),
+                                        ByteSpan(initiatorResumeMIC, Params::initiatorResumeMICLen)));
+    }
+
+    if (Params::includeStructEnd)
+    {
+        ReturnErrorOnFailure(writer.EndContainer(containerType));
+    }
+
+    buf.reduce_size(writer.GetLengthWritten());
+    return CHIP_NO_ERROR;
+}
+
+// A macro, so we can tell which test failed based on line number.
+#define TestSigma1Parsing(inSuite, mem, bufferSize, params)                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        CHIP_ERROR err = EncodeSigma1<params>(buf);                                                                                \
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);                                                                             \
+                                                                                                                                   \
+        TLV::ContiguousBufferTLVReader reader;                                                                                     \
+        reader.Init(buf);                                                                                                          \
+                                                                                                                                   \
+        ByteSpan initiatorRandom;                                                                                                  \
+        uint16_t initiatorSessionId;                                                                                               \
+        ByteSpan destinationId;                                                                                                    \
+        ByteSpan initiatorEphPubKey;                                                                                               \
+        bool resumptionRequested;                                                                                                  \
+        ByteSpan resumptionId;                                                                                                     \
+        ByteSpan initiatorResumeMIC;                                                                                               \
+        err = CASESession::ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,             \
+                                       resumptionRequested, resumptionId, initiatorResumeMIC);                                     \
+        NL_TEST_ASSERT(inSuite, (err == CHIP_NO_ERROR) == params::expectSuccess);                                                  \
+        if (params::expectSuccess)                                                                                                 \
+        {                                                                                                                          \
+            NL_TEST_ASSERT(inSuite, resumptionRequested == (params::resumptionIdLen != 0 && params::initiatorResumeMICLen != 0));  \
+            /* Add other verification tests here as desired */                                                                     \
+        }                                                                                                                          \
+    } while (0)
+
+struct BadSigma1ParamsBase : public Sigma1Params
+{
+    static constexpr bool expectSuccess = false;
+};
+
+struct Sigma1NoStructEnd : public BadSigma1ParamsBase
+{
+    static constexpr bool includeStructEnd = false;
+};
+
+struct Sigma1WrongTags : public BadSigma1ParamsBase
+{
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ProfileTag(0, num); }
+};
+
+struct Sigma1TooLongRandom : public BadSigma1ParamsBase
+{
+    static constexpr size_t initiatorRandomLen = 33;
+};
+
+struct Sigma1TooShortRandom : public BadSigma1ParamsBase
+{
+    static constexpr size_t initiatorRandomLen = 31;
+};
+
+struct Sigma1TooLongDest : public BadSigma1ParamsBase
+{
+    static constexpr size_t destinationIdLen = 33;
+};
+
+struct Sigma1TooShortDest : public BadSigma1ParamsBase
+{
+    static constexpr size_t destinationIdLen = 31;
+};
+
+struct Sigma1TooLongPubkey : public BadSigma1ParamsBase
+{
+    static constexpr size_t initiatorEphPubKeyLen = 66;
+};
+
+struct Sigma1TooShortPubkey : public BadSigma1ParamsBase
+{
+    static constexpr size_t initiatorEphPubKeyLen = 64;
+};
+
+struct Sigma1WithResumption : public Sigma1Params
+{
+    static constexpr size_t resumptionIdLen       = 16;
+    static constexpr size_t initiatorResumeMICLen = 16;
+};
+
+struct Sigma1TooLongResumptionId : public Sigma1WithResumption
+{
+    static constexpr size_t resumptionIdLen = 17;
+    static constexpr bool expectSuccess     = false;
+};
+
+struct Sigma1TooShortResumptionId : public BadSigma1ParamsBase
+{
+    static constexpr size_t resumptionIdLen = 15;
+    static constexpr bool expectSuccess     = false;
+};
+
+struct Sigma1TooLongResumeMIC : public Sigma1WithResumption
+{
+    static constexpr size_t resumptionIdLen = 17;
+    static constexpr bool expectSuccess     = false;
+};
+
+struct Sigma1TooShortResumeMIC : public Sigma1WithResumption
+{
+    static constexpr size_t initiatorResumeMICLen = 15;
+    static constexpr bool expectSuccess           = false;
+};
+
+struct Sigma1SessionIdMax : public Sigma1Params
+{
+    static constexpr uint32_t initiatorSessionId = UINT16_MAX;
+};
+
+struct Sigma1SessionIdTooBig : public BadSigma1ParamsBase
+{
+    static constexpr uint32_t initiatorSessionId = UINT16_MAX + 1;
+};
+
+static void CASE_Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext)
+{
+    // 1280 bytes must be enough by definition.
+    constexpr size_t bufferSize = 1280;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> mem;
+    NL_TEST_ASSERT(inSuite, mem.Calloc(bufferSize));
+
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1Params);
+
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1NoStructEnd);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1WrongTags);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongRandom);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortRandom);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongDest);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortDest);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongPubkey);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortPubkey);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1WithResumption);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongResumptionId);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortResumptionId);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongResumeMIC);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortResumeMIC);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1SessionIdMax);
+    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1SessionIdTooBig);
 }
 
 // Test Suite
@@ -445,6 +660,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Handshake",   CASE_SecurePairingHandshakeTest),
     NL_TEST_DEF("ServerHandshake", CASE_SecurePairingHandshakeServerTest),
     NL_TEST_DEF("Serialize",   CASE_SecurePairingSerializeTest),
+    NL_TEST_DEF("Sigma1Parsing", CASE_Sigma1ParsingTest),
 
     NL_TEST_SENTINEL()
 };
@@ -480,13 +696,13 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 
     ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr, &gIOContext));
 
-    ctx.SetSourceNodeId(kPlaceholderNodeId);
-    ctx.SetDestinationNodeId(kPlaceholderNodeId);
-    ctx.SetLocalKeyId(0);
-    ctx.SetPeerKeyId(0);
+    ctx.SetBobNodeId(kPlaceholderNodeId);
+    ctx.SetAliceNodeId(kPlaceholderNodeId);
+    ctx.SetBobKeyId(0);
+    ctx.SetAliceKeyId(0);
     ctx.SetFabricIndex(kUndefinedFabricIndex);
 
-    gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
+    gTransportMgr.SetSessionManager(&ctx.GetSecureSessionManager());
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
     gDeviceFabrics.Init(&gDeviceStorageDelegate);

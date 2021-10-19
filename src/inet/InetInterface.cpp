@@ -99,7 +99,7 @@ DLL_EXPORT CHIP_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
         char intfName[IF_NAMESIZE];
         if (if_indextoname(intfId, intfName) == nullptr)
-            return chip::System::MapErrorPOSIX(errno);
+            return CHIP_ERROR_POSIX(errno);
         if (strlen(intfName) >= nameBufSize)
             return CHIP_ERROR_NO_MEMORY;
         strcpy(nameBuf, intfName);
@@ -172,7 +172,7 @@ DLL_EXPORT CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & int
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     intfId = if_nametoindex(intfName);
     if (intfId == 0)
-        return (errno == ENXIO) ? INET_ERROR_UNKNOWN_INTERFACE : chip::System::MapErrorPOSIX(errno);
+        return (errno == ENXIO) ? INET_ERROR_UNKNOWN_INTERFACE : CHIP_ERROR_POSIX(errno);
     return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 

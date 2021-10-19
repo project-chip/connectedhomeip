@@ -25,6 +25,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ClusterInfo.h>
+#include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
@@ -40,6 +41,7 @@ static constexpr uint32_t kImMessageTimeoutMsec = 12000;
 class ReadClient;
 class WriteClient;
 class CommandSender;
+class ReadHandler;
 
 /**
  * @brief
@@ -68,7 +70,7 @@ public:
 
     /**
      * Notification that the interaction model has received a list of attribute data in response to a Read request. apData might be
-     * nullptr if status is not ProtocolCode::Success.
+     * nullptr if status is not Status::Success.
      *
      * @param[in]  apReadClient   The read client object, the application can use GetAppIdentifier() for the read client to
      *                            distinguish different read requests.
@@ -78,7 +80,7 @@ public:
      *
      */
     virtual void OnReportData(const ReadClient * apReadClient, const ClusterInfo & aPath, TLV::TLVReader * apData,
-                              Protocols::InteractionModel::ProtocolCode status)
+                              Protocols::InteractionModel::Status status)
     {}
 
     /**
@@ -100,69 +102,11 @@ public:
     virtual CHIP_ERROR ReadError(const ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
-     * Notification that a Command Send has received an Invoke Command Response containing a status code.
-     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
-     * during multiple command interactions
-     * @param[in]  aGeneralCode   Status code defined by the standard
-     * @param[in]  aProtocolId    Protocol Id
-     * @param[in]  aProtocolCode  Detailed error information, protocol-specific.
-     * @param[in]  aEndpointId    Endpoint identifier
-     * @param[in]  aClusterId     Cluster identifier
-     * @param[in]  aCommandId     Command identifier
-     * @param[in]  aCommandIndex  Current processing command index which can identify command if there exists multiple commands with
-     * same command Id
-     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
-     */
-    virtual CHIP_ERROR CommandResponseStatus(const CommandSender * apCommandSender,
-                                             const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                             const uint32_t aProtocolId, const uint16_t aProtocolCode, EndpointId aEndpointId,
-                                             const ClusterId aClusterId, CommandId aCommandId, uint8_t aCommandIndex)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * Notification that a Command Response has already been processed.
-     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
-     * during multiple command interactions
-     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
-     */
-    virtual CHIP_ERROR CommandResponseProcessed(const CommandSender * apCommandSender) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /**
-     * Notification that a Command Send has received an Invoke Command Response and fails to process a command data element in that
-     * command response
-     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
-     * during multiple command interactions
-     * @param[in]  aCommandIndex  Current processing command index which can identify failed command
-     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
-     */
-    virtual CHIP_ERROR CommandResponseProtocolError(const CommandSender * apCommandSender, uint8_t aCommandIndex)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * Notification that a command sender encountered an asynchronous failure.
-     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
-     * during multiple command interactions
-     * @param[in]  aError         A error that could be CHIP_ERROR_TIMEOUT when command sender fails to receive, or other error when
-     *                            fail to process command response.
-     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
-     */
-    virtual CHIP_ERROR CommandResponseError(const CommandSender * apCommandSender, CHIP_ERROR aError)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
      * Notification that a WriteClient has received a Write Response containing a status code.
      * aAttributeIndex is processing attribute index which can identify attribute if there exists multiple attribute changes with
      * same attribute path
      */
-    virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
-                                           const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                           const uint32_t aProtocolId, const uint16_t aProtocolCode,
+    virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient, const StatusIB & aStatusIB,
                                            AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -196,7 +140,22 @@ public:
     }
 
     /**
-     * Notification that a read client has completed the current interaction.
+     * Notification that a Subscribe Response has been processed and application can do further work .
+     */
+    virtual CHIP_ERROR SubscribeResponseProcessed(const ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that Subscription has been established successfully and application can do further work in handler.
+     */
+    virtual CHIP_ERROR SubscriptionEstablished(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that Subscription has been terminated in handler side.
+     */
+    virtual CHIP_ERROR SubscriptionTerminated(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that a read interaction was completed on the client successfully.
      * @param[in]  apReadClient  A current read client which can identify the read client to the consumer, particularly
      * during multiple read interactions
      * @param[in]  aError  notify final error regarding the current read interaction

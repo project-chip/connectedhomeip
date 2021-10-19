@@ -58,6 +58,15 @@ protected:
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg);
     void _DispatchEvent(const ChipDeviceEvent * event);
 
+    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
+    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
+    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+
+    CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
+    CHIP_ERROR _GetUpTime(uint64_t & upTime);
+    CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
+
     // ===== Support methods that can be overridden by the implementation subclass.
 
     void DispatchEventToSystemLayer(const ChipDeviceEvent * event);
@@ -73,6 +82,48 @@ private:
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 extern template class GenericPlatformManagerImpl<PlatformManagerImpl>;
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetRebootCount(uint16_t & rebootCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetUpTime(uint64_t & upTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBootReasons(uint8_t & bootReasons)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
 } // namespace Internal
 } // namespace DeviceLayer

@@ -65,7 +65,7 @@ static CHIP_ERROR discover(bool printHeader)
         streamer_printf(sout, "Discover:        ");
     }
 
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
+    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
     gCommissioner->DiscoverCommissionableNodes(filter);
 
     streamer_printf(sout, "done\r\n");
@@ -82,7 +82,7 @@ static CHIP_ERROR discover(bool printHeader, char * instance)
         streamer_printf(sout, "Discover Instance:        ");
     }
 
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kInstanceName, instance);
+    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instance);
     gCommissioner->DiscoverCommissionableNodes(filter);
 
     streamer_printf(sout, "done\r\n");
@@ -101,7 +101,7 @@ static CHIP_ERROR display(bool printHeader)
 
     for (int i = 0; i < 10; i++)
     {
-        const chip::Mdns::DiscoveredNodeData * next = gCommissioner->GetDiscoveredDevice(i);
+        const chip::Dnssd::DiscoveredNodeData * next = gCommissioner->GetDiscoveredDevice(i);
         if (next == nullptr)
         {
             streamer_printf(sout, "  Entry %d null\r\n", i);

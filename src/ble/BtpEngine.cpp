@@ -74,7 +74,7 @@ static void PrintBufDebug(const System::PacketBufferHandle & buf)
 }
 
 const uint16_t BtpEngine::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
-const uint16_t BtpEngine::sMaxFragmentSize     = 128; // Size of write and indication characteristics
+const uint16_t BtpEngine::sMaxFragmentSize     = 244; // Maximum size of BTP segment
 
 CHIP_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
 {
@@ -321,6 +321,10 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
 
         mRxBuf->AddToEnd(std::move(data));
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
+
+        // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
+        // TODO add support for BtpEngine messages longer than 1 pbuf
+        VerifyOrExit(!mRxBuf->HasChainedBuffer(), err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     }
     else if (mRxState == kState_InProgress)
     {

@@ -36,16 +36,16 @@ exit:
     return err;
 }
 
-std::vector<EmberAfNavigateTargetTargetInfo> TargetNavigatorManager::proxyGetTargetInfoList()
+std::vector<NavigateTargetTargetInfo> TargetNavigatorManager::proxyGetTargetInfoList()
 {
     // TODO: Insert code here
-    std::vector<EmberAfNavigateTargetTargetInfo> targets;
+    std::vector<NavigateTargetTargetInfo> targets;
     int maximumVectorSize = 2;
     char name[]           = "exampleName";
 
     for (int i = 0; i < maximumVectorSize; ++i)
     {
-        EmberAfNavigateTargetTargetInfo targetInfo;
+        NavigateTargetTargetInfo targetInfo;
         targetInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
         targetInfo.identifier = static_cast<uint8_t>(1 + i);
         targets.push_back(targetInfo);

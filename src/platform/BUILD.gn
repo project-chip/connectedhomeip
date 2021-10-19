@@ -58,10 +58,15 @@ if (chip_device_platform != "none") {
 
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
+
+    # todo: below operates are not work without root permission
+    # pthread_attr_setschedpolicy in GenericPlatformManagerImpl_POSIX.cpp
+    chip_device_config_run_as_root = current_os != "android"
   }
 
   if (chip_stack_lock_tracking == "auto") {
-    if (chip_device_platform == "linux") {
+    if (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
+        chip_device_platform == "android") {
       # TODO: should be fatal for development. Change once bugs are fixed
       chip_stack_lock_tracking = "log"
     } else {
@@ -84,7 +89,7 @@ if (chip_device_platform != "none") {
 
     chip_with_gio = chip_enable_wifi
     chip_device_config_enable_wpa = chip_enable_wifi
-    chip_device_config_enable_mdns = chip_mdns != "none"
+    chip_device_config_enable_dnssd = chip_mdns != "none"
     chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
     chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
 
@@ -94,15 +99,17 @@ if (chip_device_platform != "none") {
       "CHIP_WITH_GIO=${chip_with_gio}",
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
       "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=${chip_use_clusters_for_ip_commissioning}",
-      "CHIP_DEVICE_CONFIG_ENABLE_MDNS=${chip_device_config_enable_mdns}",
+      "CHIP_DEVICE_CONFIG_ENABLE_DNSSD=${chip_device_config_enable_dnssd}",
       "CHIP_BYPASS_RENDEZVOUS=${chip_bypass_rendezvous}",
       "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
       "CHIP_ENABLE_ROTATING_DEVICE_ID=${chip_enable_rotating_device_id}",
+      "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=${chip_device_config_run_as_root}",
     ]
 
-    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
+        chip_device_platform == "tizen" || chip_device_platform == "android") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
@@ -153,7 +160,16 @@ if (chip_device_platform != "none") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
         "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+    } else if (chip_device_platform == "tizen") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_TIZEN=1",
+        "CHIP_DEVICE_LAYER_TARGET=Tizen",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+      defines -=
+          [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
     } else if (chip_device_platform == "nrfconnect") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=1",
@@ -164,10 +180,10 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_QPG=1",
         "CHIP_DEVICE_LAYER_TARGET=qpg",
       ]
-    } else if (chip_device_platform == "k32w") {
+    } else if (chip_device_platform == "k32w0") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_K32W=1",
-        "CHIP_DEVICE_LAYER_TARGET=K32W",
+        "CHIP_DEVICE_LAYER_TARGET=nxp/k32w/k32w0",
       ]
     } else if (chip_device_platform == "telink") {
       defines += [
@@ -184,6 +200,16 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_FAKE=1",
         "CHIP_DEVICE_LAYER_TARGET=fake",
       ]
+    } else if (chip_device_platform == "android") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_ANDROID=1",
+        "CHIP_DEVICE_LAYER_TARGET=android",
+      ]
+    } else if (chip_device_platform == "ameba") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_AMEBA=1",
+        "CHIP_DEVICE_LAYER_TARGET=Ameba",
+      ]
     }
   }
 } else {
@@ -197,9 +223,9 @@ if (chip_device_platform != "none") {
     ]
 
     if (current_os == "android") {
-      chip_device_config_enable_mdns = chip_mdns != "none"
+      chip_device_config_enable_dnssd = chip_mdns != "none"
       defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_MDNS=${chip_device_config_enable_mdns}",
+        "CHIP_DEVICE_CONFIG_ENABLE_DNSSD=${chip_device_config_enable_dnssd}",
         "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=${chip_use_clusters_for_ip_commissioning}",
         "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"",
       ]
@@ -235,7 +261,6 @@ if (chip_device_platform != "none") {
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
-      "../include/platform/SoftwareUpdateManagerImpl.h",
       "../include/platform/ThreadStackManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
@@ -254,8 +279,6 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericPlatformManagerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
-      "../include/platform/internal/GenericSoftwareUpdateManagerImpl.h",
-      "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "DeviceControlServer.cpp",
       "Entropy.cpp",
@@ -283,8 +306,8 @@ if (chip_device_platform != "none") {
       _platform_target = "EFR32"
     } else if (chip_device_platform == "esp32") {
       _platform_target = "ESP32"
-    } else if (chip_device_platform == "k32w") {
-      _platform_target = "K32W"
+    } else if (chip_device_platform == "k32w0") {
+      _platform_target = "nxp/k32w/k32w0"
     } else if (chip_device_platform == "linux") {
       _platform_target = "Linux"
     } else if (chip_device_platform == "nrfconnect") {
@@ -295,10 +318,16 @@ if (chip_device_platform != "none") {
       _platform_target = "telink"
     } else if (chip_device_platform == "mbed") {
       _platform_target = "mbed"
+    } else if (chip_device_platform == "tizen") {
+      _platform_target = "Tizen"
+    } else if (chip_device_platform == "android") {
+      _platform_target = "android"
     } else if (chip_device_platform == "external") {
       _platform_target = chip_platform_target
     } else if (chip_device_platform == "p6") {
       _platform_target = "P6"
+    } else if (chip_device_platform == "ameba") {
+      _platform_target = "Ameba"
     } else if (chip_device_platform == "fake") {
       _platform_target = "fake"
     } else {

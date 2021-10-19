@@ -32,6 +32,7 @@
 // from which the GenericPlatformManagerImpl_Zephyr<> template inherits.
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
 
+#include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
@@ -39,6 +40,13 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+namespace {
+System::LayerSocketsLoop & SystemLayerSocketsLoop()
+{
+    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+}
+} // anonymous namespace
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
@@ -82,7 +90,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_UnlockChipStack(void)
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
 {
-    // Let WatchableEventManager.PrepareEvents() handle timers.
+    // Let Systemlayer.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
@@ -100,15 +108,19 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     // For some reasons mentioned in https://github.com/zephyrproject-rtos/zephyr/issues/22301
     // k_msgq_put takes `void*` instead of `const void*`. Nonetheless, it should be safe to
     // const_cast here and there are components in Zephyr itself which do the same.
-    if (k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT) == 0)
-        SystemLayer.WatchableEventsManager().Signal(); // Trigger wake on CHIP thread
-    else
+    int status = k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT);
+    if (status != 0)
+    {
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
+        return System::MapErrorZephyr(status);
+    }
+    SystemLayerSocketsLoop().Signal(); // Trigger wake on CHIP thread
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -125,21 +137,20 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 {
     Impl()->LockChipStack();
 
-    System::WatchableEventManager & watchState = SystemLayer.WatchableEventsManager();
-    watchState.EventLoopBegins();
+    SystemLayerSocketsLoop().EventLoopBegins();
     while (true)
     {
-        watchState.PrepareEvents();
+        SystemLayerSocketsLoop().PrepareEvents();
 
         Impl()->UnlockChipStack();
-        watchState.WaitForEvents();
+        SystemLayerSocketsLoop().WaitForEvents();
         Impl()->LockChipStack();
 
-        watchState.HandleEvents();
+        SystemLayerSocketsLoop().HandleEvents();
 
         ProcessDeviceEvents();
     }
-    watchState.EventLoopEnds();
+    SystemLayerSocketsLoop().EventLoopEnds();
 
     Impl()->UnlockChipStack();
 }

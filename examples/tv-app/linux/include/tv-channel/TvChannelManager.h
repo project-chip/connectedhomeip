@@ -27,5 +27,5 @@ class TvChannelManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<EmberAfTvChannelInfo> proxyGetTvChannelList();
+    std::vector<TvChannelInfo> proxyGetTvChannelList();
 };

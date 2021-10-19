@@ -45,7 +45,6 @@ CHIP_ERROR WriteResponse::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -99,7 +98,6 @@ CHIP_ERROR WriteResponse::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -135,7 +133,6 @@ AttributeStatusList::Builder & WriteResponse::Builder::CreateAttributeStatusList
     if (mError == CHIP_NO_ERROR)
     {
         mError = mAttributeStatusListBuilder.Init(mpWriter, kCsTag_AttributeStatusList);
-        ChipLogFunctError(mError);
     }
     else
     {

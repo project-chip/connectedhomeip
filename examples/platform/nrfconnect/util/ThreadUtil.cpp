@@ -20,7 +20,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
 #include <zephyr.h>
@@ -46,5 +46,5 @@ void StartDefaultThreadNetwork(void)
     chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
 
-    chip::app::Mdns::StartServer();
+    chip::app::DnssdServer::Instance().StartServer();
 }

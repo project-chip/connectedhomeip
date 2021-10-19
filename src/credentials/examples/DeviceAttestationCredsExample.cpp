@@ -27,18 +27,6 @@ namespace Examples {
 
 namespace {
 
-// Helper to do common logic to all providers
-CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
-{
-    VerifyOrReturnError(IsSpanUsable(span_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    memcpy(out_buf.data(), span_to_copy.data(), span_to_copy.size());
-    out_buf.reduce_size(span_to_copy.size());
-
-    return CHIP_NO_ERROR;
-}
-
 // TODO: This should be moved to a method of P256Keypair
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {

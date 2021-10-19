@@ -102,12 +102,16 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     wifi_mode_t mode;
     esp_wifi_get_mode(&mode);
     if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
         return MapConfigError(esp_wifi_get_mac(WIFI_IF_AP, buf));
     else
         return MapConfigError(esp_wifi_get_mac(WIFI_IF_STA, buf));
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 CHIP_ERROR ConfigurationManagerImpl::MapConfigError(esp_err_t error)
@@ -169,12 +173,15 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     }
 
     // Restore WiFi persistent settings to default values.
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     esp_err_t error = esp_wifi_restore();
     if (error != ESP_OK)
     {
         ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", esp_err_to_name(error));
     }
-
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ThreadStackMgr().ErasePersistentInfo();
+#endif
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     esp_restart();

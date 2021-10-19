@@ -89,7 +89,7 @@ protected:
     void _LockChipStack();
     bool _TryLockChipStack();
     void _UnlockChipStack();
-    void _PostEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop();
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();

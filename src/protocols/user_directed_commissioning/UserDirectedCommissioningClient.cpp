@@ -67,8 +67,6 @@ CHIP_ERROR UserDirectedCommissioningClient::EncodeUDCMessage(System::PacketBuffe
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(payload));
 
-    packetHeader.SetEncryptionType(Header::EncryptionType::kEncryptionTypeNone);
-
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(payload));
 
     return CHIP_NO_ERROR;

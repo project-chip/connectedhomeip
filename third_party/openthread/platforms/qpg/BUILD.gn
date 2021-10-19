@@ -64,9 +64,7 @@ source_set("libopenthread-qpg") {
   ]
   include_dirs += [ "${openthread_root}/examples/apps" ]
 
-  libs = [
-    "${qpg_sdk_root}/${qpg_target_ic}/lib/libOpenThread_${qpg_target_ic}_mtd.a",
-  ]
+  libs = [ "${qpg_sdk_root}/${qpg_target_ic}/lib/libOpenThreadQorvoGlue_${qpg_target_ic}_mtd.a" ]
 
   public_deps = [
     ":openthread_core_config_qpg",

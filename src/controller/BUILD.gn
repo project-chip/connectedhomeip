@@ -25,7 +25,7 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
-    "AbstractMdnsDiscoveryController.cpp",
+    "AbstractDnssdDiscoveryController.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
     "CHIPCommissionableNodeController.cpp",
@@ -34,10 +34,15 @@ static_library("controller") {
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
+    "CHIPDeviceControllerFactory.cpp",
+    "CHIPDeviceControllerFactory.h",
     "DeviceAddressUpdateDelegate.h",
+    "DeviceDiscoveryDelegate.h",
     "EmptyDataModelHandler.cpp",
     "ExampleOperationalCredentialsIssuer.cpp",
     "ExampleOperationalCredentialsIssuer.h",
+    "SetUpCodePairer.cpp",
+    "SetUpCodePairer.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -46,7 +51,7 @@ static_library("controller") {
     "${chip_root}/src/app",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",

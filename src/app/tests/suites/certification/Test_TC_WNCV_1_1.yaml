@@ -23,16 +23,15 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 3
+          value: 5
 
     - label:
           "write the default value to mandatory global attribute:
           ClusterRevision"
-      disabled: true
       command: "writeAttribute"
       attribute: "ClusterRevision"
       arguments:
-          value: 2
+          value: 5
       response:
           error: 1
 
@@ -40,7 +39,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 3
+          value: 5
 
     - label: "read the optional global attribute: FeatureMap"
       disabled: 1

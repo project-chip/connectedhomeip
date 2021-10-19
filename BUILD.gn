@@ -92,6 +92,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (chip_build_tests) {
       deps += [ "//src:tests" ]
+      if (current_os == "android") {
+        deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
+      }
     }
 
     if (chip_with_lwip) {
@@ -123,6 +126,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (current_os == "android") {
       deps += [
         "${chip_root}/src/controller/java",
+        "${chip_root}/src/platform/android:java",
         "${chip_root}/src/setup_payload/java",
       ]
     }

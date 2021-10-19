@@ -44,7 +44,6 @@ CHIP_ERROR WriteRequest::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -138,7 +137,6 @@ CHIP_ERROR WriteRequest::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -203,7 +201,6 @@ WriteRequest::Builder & WriteRequest::Builder::SuppressResponse(const bool aSupp
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_SuppressResponse), aSuppressResponse);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -214,7 +211,6 @@ AttributeDataList::Builder & WriteRequest::Builder::CreateAttributeDataListBuild
     if (mError == CHIP_NO_ERROR)
     {
         mError = mAttributeDataListBuilder.Init(mpWriter, kCsTag_AttributeDataList);
-        ChipLogFunctError(mError);
     }
     else
     {
@@ -230,7 +226,6 @@ AttributeDataVersionList::Builder & WriteRequest::Builder::CreateAttributeDataVe
     if (mError == CHIP_NO_ERROR)
     {
         mError = mAttributeDataVersionListBuilder.Init(mpWriter, kCsTag_AttributeDataVersionList);
-        ChipLogFunctError(mError);
     }
     else
     {
@@ -245,7 +240,6 @@ WriteRequest::Builder & WriteRequest::Builder::MoreChunkedMessages(const bool aM
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_MoreChunkedMessages), aMoreChunkedMessages);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

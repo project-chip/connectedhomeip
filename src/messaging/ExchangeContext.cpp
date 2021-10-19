@@ -50,11 +50,13 @@ using namespace chip::System;
 namespace chip {
 namespace Messaging {
 
-static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, Protocols::Id protocolId,
-                                     uint8_t msgType, PacketBufferHandle && payload)
+static void DefaultOnMessageReceived(ExchangeContext * ec, Protocols::Id protocolId, uint8_t msgType, uint32_t messageCounter,
+                                     PacketBufferHandle && payload)
 {
-    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32,
-                 protocolId.ToFullyQualifiedSpecForm(), msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
+    ChipLogError(ExchangeManager,
+                 "Dropping unexpected message of type " ChipLogFormatMessageType " with protocolId " ChipLogFormatProtocolId
+                 " and MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange,
+                 msgType, ChipLogValueProtocolId(protocolId), messageCounter, ChipLogValueExchange(ec));
 }
 
 bool ExchangeContext::IsInitiator() const
@@ -90,8 +92,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         mFlags.Clear(Flags::kFlagWillSendMessage);
     }
 
-    Transport::PeerConnectionState * state = nullptr;
-
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(mSecureSession.HasValue(), CHIP_ERROR_CONNECTION_ABORTED);
 
@@ -103,18 +103,13 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     ExchangeHandle ref(*this);
 
-    bool reliableTransmissionRequested = true;
-
-    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession.Value());
-    // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
-    if (state != nullptr && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
-    {
-        reliableTransmissionRequested = false;
-    }
-    else
-    {
-        reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
-    }
+    // If sending via UDP and NoAutoRequestAck send flag is not specificed,
+    // request reliable transmission.
+    const Transport::PeerAddress * peerAddress = GetSecureSession().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    // Treat unknown peer address as "not UDP", because we have no idea whether
+    // it's safe to do MRP there.
+    bool isUDPTransport                = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+    bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse))
@@ -199,8 +194,8 @@ void ExchangeContext::Close()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->mContextPool.begin()), mExchangeId,
-                  __func__);
+    ChipLogDetail(ExchangeManager, "ec id: %d [" ChipLogFormatExchange "], %s", (this - mExchangeMgr->mContextPool.begin()),
+                  ChipLogValueExchange(this), __func__);
 #endif
 
     DoClose(false);
@@ -216,8 +211,8 @@ void ExchangeContext::Abort()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->mContextPool.begin()), mExchangeId,
-                  __func__);
+    ChipLogDetail(ExchangeManager, "ec id: %d [" ChipLogFormatExchange "], %s", (this - mExchangeMgr->mContextPool.begin()),
+                  ChipLogValueExchange(this), __func__);
 #endif
 
     DoClose(true);
@@ -243,7 +238,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
     ExchangeMessageDispatch * dispatch = nullptr;
     if (delegate != nullptr)
     {
-        dispatch = delegate->GetMessageDispatch(em->GetReliableMessageMgr(), em->GetSessionMgr());
+        dispatch = delegate->GetMessageDispatch(em->GetReliableMessageMgr(), em->GetSessionManager());
         if (dispatch == nullptr)
         {
             dispatch = &em->mDefaultExchangeDispatch;
@@ -262,7 +257,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
     SetAutoRequestAck(true);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec++ id: %d", ExchangeId);
+    ChipLogDetail(ExchangeManager, "ec++ id: " ChipLogFormatExchange, ChipLogValueExchange(this));
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
@@ -279,12 +274,6 @@ ExchangeContext::~ExchangeContext()
     DoClose(false);
     mExchangeMgr = nullptr;
 
-    if (mExchangeACL != nullptr)
-    {
-        chip::Platform::Delete(mExchangeACL);
-        mExchangeACL = nullptr;
-    }
-
     if (mDispatch != nullptr)
     {
         mDispatch->Release();
@@ -292,7 +281,7 @@ ExchangeContext::~ExchangeContext()
     }
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec-- id: %d", mExchangeId);
+    ChipLogDetail(ExchangeManager, "ec-- id: " ChipLogFormatExchange, ChipLogValueExchange(this));
 #endif
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
@@ -307,6 +296,10 @@ bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & 
 
         // AND The Session ID associated with the incoming message matches the Session ID associated with the exchange.
         && (mSecureSession.HasValue() && mSecureSession.Value().MatchIncomingSession(session))
+
+        // TODO: This check should be already implied by the equality of session check,
+        // It should be removed after we have implemented the temporary node id for PASE and CASE sessions
+        && (IsEncryptionRequired() == packetHeader.IsEncrypted())
 
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
         //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast
@@ -338,7 +331,7 @@ void ExchangeContext::OnConnectionExpired()
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
 {
-    System::Layer * lSystemLayer = mExchangeMgr->GetSessionMgr()->SystemLayer();
+    System::Layer * lSystemLayer = mExchangeMgr->GetSessionManager()->SystemLayer();
     if (lSystemLayer == nullptr)
     {
         // this is an assertion error, which shall never happen
@@ -350,7 +343,7 @@ CHIP_ERROR ExchangeContext::StartResponseTimer()
 
 void ExchangeContext::CancelResponseTimer()
 {
-    System::Layer * lSystemLayer = mExchangeMgr->GetSessionMgr()->SystemLayer();
+    System::Layer * lSystemLayer = mExchangeMgr->GetSessionManager()->SystemLayer();
     if (lSystemLayer == nullptr)
     {
         // this is an assertion error, which shall never happen
@@ -385,7 +378,7 @@ void ExchangeContext::NotifyResponseTimeout()
     MessageHandled();
 }
 
-CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                                           const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                                           PacketBufferHandle && msgBuf)
 {
@@ -427,8 +420,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(mDispatch->OnMessageReceived(packetHeader.GetFlags(), payloadHeader, packetHeader.GetMessageId(),
-                                                      peerAddress, msgFlags, GetReliableMessageContext()));
+    ReturnErrorOnFailure(
+        mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
 
     if (IsAckPending() && !mDelegate)
     {
@@ -459,11 +452,11 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        return mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+        return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
     }
     else
     {
-        DefaultOnMessageReceived(this, packetHeader, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(),
+        DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
                                  std::move(msgBuf));
         return CHIP_NO_ERROR;
     }

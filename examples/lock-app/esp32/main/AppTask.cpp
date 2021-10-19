@@ -53,13 +53,13 @@ Button lockButton;
 BaseType_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sHaveBLEConnections      = false;
-bool sHaveServiceConnectivity = false;
+bool sHaveBLEConnections = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 } // namespace
 
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::System;
 
 AppTask AppTask::sAppTask;
 
@@ -114,7 +114,7 @@ CHIP_ERROR AppTask::Init()
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
-    uint64_t mLastChangeTimeUS = 0;
+    Clock::MonotonicMicroseconds mLastChangeTimeUS = 0;
 
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -140,8 +140,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -158,13 +157,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            // Consider the system to be "fully connected" if it has service
-            // connectivity
-            if (sHaveServiceConnectivity)
-            {
-                sStatusLED.Set(true);
-            }
-            else if (sHaveBLEConnections)
+            if (sHaveBLEConnections)
             {
                 sStatusLED.Blink(100, 100);
             }
@@ -177,10 +170,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sLockLED.Animate();
 
-        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
-        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
+        Clock::MonotonicMicroseconds nowUS            = SystemClock().GetMonotonicMicroseconds();
+        Clock::MonotonicMicroseconds nextChangeTimeUS = Clock::AddOffset(mLastChangeTimeUS, 5 * 1000 * 1000UL);
 
-        if (nowUS > nextChangeTimeUS)
+        if (Clock::IsEarlier(nextChangeTimeUS, nowUS))
         {
             mLastChangeTimeUS = nowUS;
         }

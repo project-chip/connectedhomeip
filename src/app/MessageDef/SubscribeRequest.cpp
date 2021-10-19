@@ -120,15 +120,15 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_KeepExistingSubscriptions:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_KeepExistingSubscriptions)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_KeepExistingSubscriptions);
+        case kCsTag_KeepSubscriptions:
+            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_KeepSubscriptions)), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_KeepSubscriptions);
             VerifyOrReturnLogError(chip::TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                bool keepExistingSubscriptions;
-                ReturnLogErrorOnFailure(reader.Get(keepExistingSubscriptions));
-                PRETTY_PRINT("\tKeepExistingSubscriptions = %s, ", keepExistingSubscriptions ? "true" : "false");
+                bool keepSubscriptions;
+                ReturnLogErrorOnFailure(reader.Get(keepSubscriptions));
+                PRETTY_PRINT("\tKeepSubscriptions = %s, ", keepSubscriptions ? "true" : "false");
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -205,9 +205,9 @@ CHIP_ERROR SubscribeRequest::Parser::GetMaxIntervalSeconds(uint16_t * const apMa
     return GetUnsignedInteger(kCsTag_MaxIntervalSeconds, apMaxIntervalSeconds);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetKeepExistingSubscriptions(bool * const apKeepExistingSubscription) const
+CHIP_ERROR SubscribeRequest::Parser::GetKeepSubscriptions(bool * const apKeepExistingSubscription) const
 {
-    return GetSimpleValue(kCsTag_KeepExistingSubscriptions, chip::TLV::kTLVType_Boolean, apKeepExistingSubscription);
+    return GetSimpleValue(kCsTag_KeepSubscriptions, chip::TLV::kTLVType_Boolean, apKeepExistingSubscription);
 }
 
 CHIP_ERROR SubscribeRequest::Parser::GetIsProxy(bool * const apIsProxy) const
@@ -225,7 +225,6 @@ AttributePathList::Builder & SubscribeRequest::Builder::CreateAttributePathListB
     if (mError == CHIP_NO_ERROR)
     {
         mError = mAttributePathListBuilder.Init(mpWriter, kCsTag_AttributePathList);
-        ChipLogFunctError(mError);
     }
 
     return mAttributePathListBuilder;
@@ -236,7 +235,6 @@ EventPathList::Builder & SubscribeRequest::Builder::CreateEventPathListBuilder()
     if (mError == CHIP_NO_ERROR)
     {
         mError = mEventPathListBuilder.Init(mpWriter, kCsTag_EventPathList);
-        ChipLogFunctError(mError);
     }
 
     return mEventPathListBuilder;
@@ -247,7 +245,6 @@ AttributeDataVersionList::Builder & SubscribeRequest::Builder::CreateAttributeDa
     if (mError == CHIP_NO_ERROR)
     {
         mError = mAttributeDataVersionListBuilder.Init(mpWriter, kCsTag_AttributeDataVersionList);
-        ChipLogFunctError(mError);
     }
 
     return mAttributeDataVersionListBuilder;
@@ -258,7 +255,6 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::EventNumber(const uint64_
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventNumber), aEventNumber);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -268,7 +264,6 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::MinIntervalSeconds(const 
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MinIntervalSeconds), aMinIntervalSeconds);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -278,17 +273,15 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::MaxIntervalSeconds(const 
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MaxIntervalSeconds), aMaxIntervalSeconds);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::KeepExistingSubscriptions(const bool aKeepExistingSubscriptions)
+SubscribeRequest::Builder & SubscribeRequest::Builder::KeepSubscriptions(const bool aKeepSubscriptions)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_KeepExistingSubscriptions), aKeepExistingSubscriptions);
-        ChipLogFunctError(mError);
+        mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_KeepSubscriptions), aKeepSubscriptions);
     }
     return *this;
 }
@@ -298,7 +291,6 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::IsProxy(const bool aIsPro
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_IsProxy), aIsProxy);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

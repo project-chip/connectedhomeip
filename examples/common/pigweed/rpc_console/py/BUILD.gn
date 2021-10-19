@@ -38,9 +38,9 @@ pw_python_package("chip_rpc") {
     "$dir_pw_rpc/py",
     "${chip_root}/examples/common/pigweed:button_service.python",
     "${chip_root}/examples/common/pigweed:device_service.python",
+    "${chip_root}/examples/common/pigweed:lighting_service.python",
+    "${chip_root}/examples/common/pigweed:locking_service.python",
     "${chip_root}/examples/ipv6only-app/common:wifi_service.python",
-    "${chip_root}/examples/lighting-app/lighting-common:lighting_service.python",
-    "${chip_root}/examples/lock-app/lock-common:locking_service.python",
   ]
 }
 

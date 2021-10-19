@@ -22,24 +22,34 @@ pw_python_package("build_examples") {
   setup = [ "setup.py" ]
   inputs = [
     # Dependency for the unit test
-    "expected_all_platform_commands.txt",
+    "testdata/all_targets_except_host.txt",
+    "testdata/build_all_except_host.txt",
+    "testdata/build_linux_on_x64.txt",
   ]
 
   sources = [
     "build/__init__.py",
-    "build/factory.py",
     "build/targets.py",
     "build_examples.py",
     "builders/__init__.py",
+    "builders/ameba.py",
     "builders/builder.py",
     "builders/efr32.py",
     "builders/esp32.py",
+    "builders/gn.py",
     "builders/host.py",
     "builders/infineon.py",
+    "builders/nrf.py",
     "builders/qpg.py",
+    "builders/telink.py",
+    "builders/tizen.py",
     "runner/__init__.py",
     "runner/printonly.py",
     "runner/shell.py",
   ]
-  tests = [ "test.py" ]
+
+  tests = [
+    "test.py",
+    "test_glob_matcher.py",
+  ]
 }

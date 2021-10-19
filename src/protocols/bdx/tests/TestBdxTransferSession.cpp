@@ -23,8 +23,8 @@ namespace {
 // Use this as a timestamp if not needing to test BDX timeouts.
 constexpr uint64_t kNoAdvanceTime = 0;
 
-const uint64_t tlvStrTag  = TLV::ContextTag(4);
-const uint64_t tlvListTag = TLV::ProfileTag(7777, 8888);
+const TLV::Tag tlvStrTag  = TLV::ContextTag(4);
+const TLV::Tag tlvListTag = TLV::ProfileTag(7777, 8888);
 } // anonymous namespace
 
 // Helper method for generating a complete TLV structure with a list containing a single tag and string

@@ -89,12 +89,12 @@ def ServerMain(args):
         "otbr-agent": ShellCommand(["otbr-agent", "-I", "wpan0", "spinel+hdlc+uart:///dev/ttyUSB0"])
     }
 
-    for extraOption in args:
-        cmd = extraOptions.get(extraOption, InvalidCommand())
-        cmd()
-
     with Listener(SERVER_ADDRESS) as listener:
         log.info("Server running on {}".format(SERVER_ADDRESS))
+        for extraOption in args:
+            cmd = extraOptions.get(extraOption, InvalidCommand())
+            cmd()
+
         while True:
             with listener.accept() as conn:
                 log.info("Received connection")

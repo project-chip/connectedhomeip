@@ -47,6 +47,11 @@
 // These are configuration options that are unique to Zephyr platforms.
 // These can be overridden by the application as needed.
 
+#ifndef CHIP_DEVICE_CONFIG_SETTINGS_KEY
+/// Key for all Matter persistent data stored using the Zephyr Settings API
+#define CHIP_DEVICE_CONFIG_SETTINGS_KEY "mt"
+#endif // CHIP_DEVICE_CONFIG_SETTINGS_KEY
+
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY
@@ -73,7 +78,7 @@
 #endif // CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART
 
 #ifdef CONFIG_CHIP_ENABLE_DNSSD_SRP
-#define CHIP_DEVICE_CONFIG_ENABLE_MDNS 1
+#define CHIP_DEVICE_CONFIG_ENABLE_DNSSD 1
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 1
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 1

@@ -27,5 +27,5 @@ class TargetNavigatorManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<EmberAfNavigateTargetTargetInfo> proxyGetTargetInfoList();
+    std::vector<NavigateTargetTargetInfo> proxyGetTargetInfoList();
 };

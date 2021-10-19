@@ -864,6 +864,28 @@
 #endif
 
 /**
+ *  @def CHIP_CONFIG_SHA256_CONTEXT_SIZE
+ *
+ *  @brief
+ *    Size of the statically allocated context for SHA256 operations in CryptoPAL
+ *
+ *    The default size is based on the Worst software implementation, OpenSSL. A
+ *    static assert will tell us if we are wrong, since `typedef SHA_LONG unsigned
+ *    int` is default.
+ *      SHA_LONG h[8];
+ *      SHA_LONG Nl, Nh;
+ *      SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
+ *      unsigned int num, md_len;
+ *
+ *    We also have to account for possibly some custom extensions on some targets,
+ *    especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
+ *
+ */
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t))
+#endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+
+/**
  *  @name chip key export protocol configuration.
  *
  *  @brief
@@ -1387,6 +1409,23 @@
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
 
 /**
+ *  @def CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
+ *
+ *  @brief
+ *    Shared secret to use for unit tests or when CHIP_CONFIG_SECURITY_TEST_MODE is enabled.
+ *
+ *    This parameter is 32 bytes to maximize entropy passed to the CryptoContext::InitWithSecret KDF,
+ *    and can be initialized either as a raw string or array of bytes. The default test secret of
+ *    "Test secret for key derivation." results in the following encryption keys:
+ *
+ *              5E DE D2 44 E5 53 2B 3C DC 23 40 9D BA D0 52 D2
+ *              A9 E0 11 B1 73 7C 6D 4B 70 E4 C0 A2 FE 66 04 76
+ */
+#ifndef CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
+#define CHIP_CONFIG_TEST_SHARED_SECRET_VALUE "Test secret for key derivation."
+#endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
+
+/**
  *  @def CHIP_CONFIG_ENABLE_DNS_RESOLVER
  *
  *  @brief
@@ -1813,17 +1852,6 @@
 #endif
 
 /**
- *  @def CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of errors at function exit via the
- *    ChipLogFunctError() macro.
- */
-#ifndef CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-#define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 0
-#endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
-/**
  *  @def CHIP_CONFIG_ENABLE_CONDITION_LOGGING
  *
  *  @brief
@@ -2049,8 +2077,8 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE)                                                                         \
-    ((CODE) == chip::System::MapErrorPOSIX(EHOSTUNREACH) || (CODE) == chip::System::MapErrorPOSIX(ENETUNREACH) ||                  \
-     (CODE) == chip::System::MapErrorPOSIX(EADDRNOTAVAIL) || (CODE) == chip::System::MapErrorPOSIX(EPIPE))
+    ((CODE) == CHIP_ERROR_POSIX(EHOSTUNREACH) || (CODE) == CHIP_ERROR_POSIX(ENETUNREACH) ||                                        \
+     (CODE) == CHIP_ERROR_POSIX(EADDRNOTAVAIL) || (CODE) == CHIP_ERROR_POSIX(EPIPE))
 #else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -2263,6 +2291,18 @@
 #endif // CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
 
 /**
+ * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP unauthenticated
+ * states. The entries in the pool are automatically rotated by LRU. The size
+ * of the pool limits how many PASE and CASE pairing sessions can be processed
+ * simultaneously.
+ */
+#ifndef CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE 4
+#endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+
+/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP
@@ -2439,7 +2479,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 4
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
 #endif
 
 /**
@@ -2458,6 +2498,97 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+ *
+ * @brief Defines the object pool for allocating attribute path for subscription in device controller.
+ */
+#ifndef CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+#define CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE CHIP_IM_MAX_NUM_READ_CLIENT
+#endif
+
+/**
+ * @def CHIP_CONFIG_LAMBDA_EVENT_SIZE
+ *
+ * @brief The maximum size of the lambda which can be post into system event queue.
+ */
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (16)
+#endif
+
+/**
+ * @def CHIP_CONFIG_LAMBDA_EVENT_ALIGN
+ *
+ * @brief The maximum alignment of the lambda which can be post into system event queue.
+ */
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_ALIGN
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (sizeof(void *))
+#endif
+
+/**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *
+ * @brief If true, VerifyOrDie() calls with no message will use an
+ *        automatically generated message that makes it clear what failed.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
+ *
+ * @brief Number of devices a controller can be simultaneously connected to
+ */
+#ifndef CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
+#define CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES 64
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ *
+ * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
+ *
+ * Binds to number of GroupState entries to support per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 1
+#endif
+
+// TODO: Need to cap number of KeySets
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+ *
+ * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
+ *
+ * Binds to number of GroupMapping entries per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous Group iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 2
+#endif
+
+/**
+ * @def CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+ *
+ * @brief Enable or disable attribute read with complex type.
+ *
+ */
+#ifndef CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+#define CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ 0
 #endif
 
 /**

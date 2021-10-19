@@ -48,7 +48,6 @@ CHIP_ERROR EventPath::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -152,7 +151,6 @@ CHIP_ERROR EventPath::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -178,14 +176,13 @@ CHIP_ERROR EventPath::Parser::GetEventId(chip::EventId * const apEventId) const
     return GetUnsignedInteger(kCsTag_EventId, apEventId);
 }
 
-CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
+CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);
     SuccessOrExit(mError);
 
 exit:
-    ChipLogFunctError(mError);
     return mError;
 }
 
@@ -205,7 +202,6 @@ EventPath::Builder & EventPath::Builder::NodeId(const uint64_t aNodeId)
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_NodeId), aNodeId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -216,7 +212,6 @@ EventPath::Builder & EventPath::Builder::EndpointId(const chip::EndpointId aEndp
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -227,7 +222,6 @@ EventPath::Builder & EventPath::Builder::ClusterId(const chip::ClusterId aCluste
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -238,7 +232,6 @@ EventPath::Builder & EventPath::Builder::EventId(const chip::EventId aEventId)
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventId), aEventId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

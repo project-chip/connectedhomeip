@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:inputType="text"
         android:padding="8dp"
-        android:text="MT:YNJV793700A50324800"
+        android:text="MT:YNJV7VSC00KA0648G00"
         app:layout_constraintTop_toBottomOf="@id/camera_view"
         app:layout_constraintEnd_toStartOf="@id/manualCodeBtn"
         app:layout_constraintBottom_toBottomOf="parent"

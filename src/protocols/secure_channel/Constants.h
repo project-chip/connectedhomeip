@@ -57,22 +57,27 @@ enum class MsgType : uint8_t
     // Password-based session establishment Message Types
     PBKDFParamRequest  = 0x20,
     PBKDFParamResponse = 0x21,
-    PASE_Spake2p1      = 0x22,
-    PASE_Spake2p2      = 0x23,
-    PASE_Spake2p3      = 0x24,
-    PASE_Spake2pError  = 0x2F,
+    PASE_Pake1         = 0x22,
+    PASE_Pake2         = 0x23,
+    PASE_Pake3         = 0x24,
+    PASE_PakeError     = 0x2F,
 
     // Certificate-based session establishment Message Types
-    CASE_SigmaR1  = 0x30,
-    CASE_SigmaR2  = 0x31,
-    CASE_SigmaR3  = 0x32,
-    CASE_SigmaErr = 0x3F,
+    CASE_Sigma1       = 0x30,
+    CASE_Sigma2       = 0x31,
+    CASE_Sigma3       = 0x32,
+    CASE_Sigma2Resume = 0x33,
 
     StatusReport = 0x40,
 };
 
 // Placeholder value for the ProtocolCode field when the GeneralCode is Success or Continue.
-constexpr uint16_t kProtocolCodeSuccess = 0x0000;
+constexpr uint16_t kProtocolCodeSuccess         = 0x0000;
+constexpr uint16_t kProtocolCodeNoSharedRoot    = 0x0001;
+constexpr uint16_t kProtocolCodeInvalidParam    = 0x0002;
+constexpr uint16_t kProtocolCodeCloseSession    = 0x0003;
+constexpr uint16_t kProtocolCodeBusy            = 0x0004;
+constexpr uint16_t kProtocolCodeSessionNotFound = 0x0005;
 
 // Placeholder value for the ProtocolCode field when there is no additional protocol-specific code to provide more information.
 constexpr uint16_t kProtocolCodeGeneralFailure = 0xFFFF;

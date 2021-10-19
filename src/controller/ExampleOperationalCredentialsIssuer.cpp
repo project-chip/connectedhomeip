@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPTLV.h>

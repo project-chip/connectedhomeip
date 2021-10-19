@@ -118,7 +118,7 @@ Instead, it might be better to build this into the ICMP layer itself.
 
 ## DNS
 
-LwIP’s DNS handling isn’t great and breaks down when the router supports
+LwIP's DNS handling isn’t great and breaks down when the router supports
 IPv4/IPv6. There is a single list of DNS servers, DHCP, SLAAC and DHCPv6 all
 update the list without locks. Basically, whatever wrote to the list last gets
 to set the list. Although there is handling for IP type (requesting A or AAAA

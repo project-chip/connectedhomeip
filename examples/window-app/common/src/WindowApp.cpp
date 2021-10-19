@@ -69,7 +69,7 @@ WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
 CHIP_ERROR WindowApp::Init()
 {
     // Init ZCL Data Model
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -107,10 +107,9 @@ CHIP_ERROR WindowApp::Run()
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            mState.isThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            mState.isThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            mState.haveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            mState.haveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            mState.isThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            mState.isThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            mState.haveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -118,12 +117,6 @@ CHIP_ERROR WindowApp::Run()
         {
             // Provisioned state changed
             DispatchEvent(EventId::ProvisionedStateChanged);
-        }
-
-        if (mState.haveServiceConnectivity != oldState.haveServiceConnectivity)
-        {
-            // Provisioned state changed
-            DispatchEvent(EventId::ConnectivityStateChanged);
         }
 
         if (mState.haveBLEConnections != oldState.haveBLEConnections)
@@ -342,11 +335,11 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     mLiftTimer = WindowApp::Instance().CreateTimer("Timer:Lift", COVER_LIFT_TILT_TIMEOUT, OnLiftTimeout, this);
     mTiltTimer = WindowApp::Instance().CreateTimer("Timer:Tilt", COVER_LIFT_TILT_TIMEOUT, OnTiltTimeout, this);
 
-    Attributes::SetInstalledOpenLimitLift(endpoint, LIFT_OPEN_LIMIT);
-    Attributes::SetInstalledClosedLimitLift(endpoint, LIFT_CLOSED_LIMIT);
+    Attributes::InstalledOpenLimitLift::Set(endpoint, LIFT_OPEN_LIMIT);
+    Attributes::InstalledClosedLimitLift::Set(endpoint, LIFT_CLOSED_LIMIT);
     LiftPositionSet(endpoint, LiftToPercent100ths(endpoint, LIFT_CLOSED_LIMIT));
-    Attributes::SetInstalledOpenLimitTilt(endpoint, TILT_OPEN_LIMIT);
-    Attributes::SetInstalledClosedLimitTilt(endpoint, TILT_CLOSED_LIMIT);
+    Attributes::InstalledOpenLimitTilt::Set(endpoint, TILT_OPEN_LIMIT);
+    Attributes::InstalledClosedLimitTilt::Set(endpoint, TILT_CLOSED_LIMIT);
     TiltPositionSet(endpoint, TiltToPercent100ths(endpoint, TILT_CLOSED_LIMIT));
 
     // Attribute: Id  0 Type
@@ -390,7 +383,7 @@ void WindowApp::Cover::LiftUp()
 {
     uint16_t percent100ths = 0;
 
-    Attributes::GetCurrentPositionLiftPercent100ths(mEndpoint, &percent100ths);
+    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, &percent100ths);
     if (percent100ths < 9000)
     {
         percent100ths += 1000;
@@ -406,7 +399,7 @@ void WindowApp::Cover::LiftDown()
 {
     uint16_t percent100ths = 0;
 
-    Attributes::GetCurrentPositionLiftPercent100ths(mEndpoint, &percent100ths);
+    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, &percent100ths);
     if (percent100ths > 1000)
     {
         percent100ths -= 1000;
@@ -422,8 +415,8 @@ void WindowApp::Cover::GotoLift(EventId action)
 {
     uint16_t current = 0;
     uint16_t target  = 0;
-    Attributes::GetTargetPositionLiftPercent100ths(mEndpoint, &target);
-    Attributes::GetCurrentPositionLiftPercent100ths(mEndpoint, &current);
+    Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, &target);
+    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, &current);
 
     if (EventId::None != action)
     {
@@ -462,7 +455,7 @@ void WindowApp::Cover::GotoLift(EventId action)
 void WindowApp::Cover::TiltUp()
 {
     uint16_t percent100ths = 0;
-    Attributes::GetCurrentPositionTiltPercent100ths(mEndpoint, &percent100ths);
+    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, &percent100ths);
     if (percent100ths < 9000)
     {
         percent100ths += 1000;
@@ -477,7 +470,7 @@ void WindowApp::Cover::TiltUp()
 void WindowApp::Cover::TiltDown()
 {
     uint16_t percent100ths = 0;
-    Attributes::GetCurrentPositionTiltPercent100ths(mEndpoint, &percent100ths);
+    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, &percent100ths);
     if (percent100ths > 1000)
     {
         percent100ths -= 1000;
@@ -494,8 +487,8 @@ void WindowApp::Cover::GotoTilt(EventId action)
     uint16_t current = 0;
     uint16_t target  = 0;
 
-    Attributes::GetTargetPositionTiltPercent100ths(mEndpoint, &target);
-    Attributes::GetCurrentPositionTiltPercent100ths(mEndpoint, &current);
+    Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, &target);
+    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, &current);
 
     if (EventId::None != action)
     {

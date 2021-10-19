@@ -221,7 +221,7 @@ combination with JLinkRTTClient as follows:
 
         -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
             for 30 seconds. The device will then switch to a slower interval advertisement.
-            After 15 minutes, the adverstiment stops.
+            After 15 minutes, the advertisement stops.
 
         -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
@@ -280,7 +280,7 @@ via 2002::2
 -   To use the chip-rpc console after it has been installed run:
     `python3 -m chip_rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
--   Then you can simulate a button press or realease using the following command
+-   Then you can simulate a button press or release using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
     RELEASE Test toggling the LED with
     `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
@@ -288,7 +288,7 @@ via 2002::2
 -   You can also Get and Set the light directly using the RPCs:
     `rpcs.chip.rpc.Lighting.Get()`
 
-    `rpcs.chip.rpc.Lighting.Set(on=True)`
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
 
 ## Memory settings
 

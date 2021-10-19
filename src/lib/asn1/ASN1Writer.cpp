@@ -52,7 +52,7 @@ enum
     kUnknownLengthMarker    = 0xFF
 };
 
-void ASN1Writer::Init(uint8_t * buf, uint32_t maxLen)
+void ASN1Writer::Init(uint8_t * buf, size_t maxLen)
 {
     mBuf                 = buf;
     mWritePoint          = buf;
@@ -68,9 +68,9 @@ void ASN1Writer::InitNullWriter(void)
     mDeferredLengthCount = 0;
 }
 
-uint16_t ASN1Writer::GetLengthWritten() const
+size_t ASN1Writer::GetLengthWritten() const
 {
-    return (mBuf != nullptr) ? mWritePoint - mBuf : 0;
+    return (mBuf != nullptr) ? static_cast<size_t>(mWritePoint - mBuf) : 0;
 }
 
 CHIP_ERROR ASN1Writer::PutInteger(int64_t val)
@@ -88,7 +88,7 @@ CHIP_ERROR ASN1Writer::PutInteger(int64_t val)
             continue;
         break;
     }
-    valLen = 8 - valStart;
+    valLen = static_cast<uint8_t>(8 - valStart);
 
     return PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, encodedVal + valStart, valLen);
 }
@@ -110,7 +110,7 @@ CHIP_ERROR ASN1Writer::PutObjectId(const uint8_t * val, uint16_t valLen)
     return PutValue(kASN1TagClass_Universal, kASN1UniversalTag_ObjectId, false, val, valLen);
 }
 
-CHIP_ERROR ASN1Writer::PutString(uint32_t tag, const char * val, uint16_t valLen)
+CHIP_ERROR ASN1Writer::PutString(uint8_t tag, const char * val, uint16_t valLen)
 {
     return PutValue(kASN1TagClass_Universal, tag, false, (const uint8_t *) val, valLen);
 }
@@ -120,24 +120,24 @@ CHIP_ERROR ASN1Writer::PutOctetString(const uint8_t * val, uint16_t valLen)
     return PutValue(kASN1TagClass_Universal, kASN1UniversalTag_OctetString, false, val, valLen);
 }
 
-CHIP_ERROR ASN1Writer::PutOctetString(uint8_t cls, uint32_t tag, const uint8_t * val, uint16_t valLen)
+CHIP_ERROR ASN1Writer::PutOctetString(uint8_t cls, uint8_t tag, const uint8_t * val, uint16_t valLen)
 {
     return PutValue(cls, tag, false, val, valLen);
 }
 
-CHIP_ERROR ASN1Writer::PutOctetString(uint8_t cls, uint32_t tag, chip::TLV::TLVReader & val)
+CHIP_ERROR ASN1Writer::PutOctetString(uint8_t cls, uint8_t tag, chip::TLV::TLVReader & tlvReader)
 {
-    return PutValue(cls, tag, false, val);
+    return PutValue(cls, tag, false, tlvReader);
 }
 
 static uint8_t ReverseBits(uint8_t v)
 {
     // swap adjacent bits
-    v = ((v >> 1) & 0x55) | ((v & 0x55) << 1);
+    v = static_cast<uint8_t>((v >> 1) & 0x55) | static_cast<uint8_t>((v & 0x55) << 1);
     // swap adjacent bit pairs
-    v = ((v >> 2) & 0x33) | ((v & 0x33) << 2);
+    v = static_cast<uint8_t>((v >> 2) & 0x33) | static_cast<uint8_t>((v & 0x33) << 2);
     // swap nibbles
-    v = (v >> 4) | (v << 4);
+    v = static_cast<uint8_t>(v >> 4) | static_cast<uint8_t>(v << 4);
     return v;
 }
 
@@ -167,7 +167,7 @@ static uint8_t HighestBit(uint32_t v)
     }
     highestBit |= (v >> 1);
 
-    return highestBit;
+    return static_cast<uint8_t>(highestBit);
 }
 
 CHIP_ERROR ASN1Writer::PutBitString(uint32_t val)
@@ -212,7 +212,7 @@ CHIP_ERROR ASN1Writer::PutBitString(uint32_t val)
                 }
             }
         }
-        mWritePoint[0] = 7 - HighestBit(val);
+        mWritePoint[0] = static_cast<uint8_t>(7 - HighestBit(val));
     }
 
     mWritePoint += len;
@@ -229,36 +229,37 @@ CHIP_ERROR ASN1Writer::PutBitString(uint8_t unusedBitCount, const uint8_t * enco
 
     *mWritePoint++ = unusedBitCount;
 
-    memcpy(mWritePoint, encodedBits, encodedBitsLen);
-    mWritePoint += encodedBitsLen;
+    WriteData(encodedBits, encodedBitsLen);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ASN1Writer::PutBitString(uint8_t unusedBitCount, chip::TLV::TLVReader & encodedBits)
+CHIP_ERROR ASN1Writer::PutBitString(uint8_t unusedBitCount, chip::TLV::TLVReader & tlvReader)
 {
-    uint32_t encodedBitsLen;
+    ByteSpan encodedBits;
 
     // Do nothing for a null writer.
     VerifyOrReturnError(mBuf != nullptr, CHIP_NO_ERROR);
 
-    encodedBitsLen = encodedBits.GetLength();
+    ReturnErrorOnFailure(tlvReader.Get(encodedBits));
 
-    ReturnErrorOnFailure(EncodeHead(kASN1TagClass_Universal, kASN1UniversalTag_BitString, false, encodedBitsLen + 1));
+    VerifyOrReturnError(CanCastTo<int32_t>(encodedBits.size() + 1), ASN1_ERROR_LENGTH_OVERFLOW);
+
+    ReturnErrorOnFailure(
+        EncodeHead(kASN1TagClass_Universal, kASN1UniversalTag_BitString, false, static_cast<int32_t>(encodedBits.size() + 1)));
 
     *mWritePoint++ = unusedBitCount;
 
-    encodedBits.GetBytes(mWritePoint, encodedBitsLen);
-    mWritePoint += encodedBitsLen;
+    WriteData(encodedBits.data(), encodedBits.size());
 
     return CHIP_NO_ERROR;
 }
 
 static void itoa2(uint32_t val, uint8_t * buf)
 {
-    buf[1] = '0' + (val % 10);
+    buf[1] = static_cast<uint8_t>('0' + (val % 10));
     val /= 10;
-    buf[0] = '0' + (val % 10);
+    buf[0] = static_cast<uint8_t>('0' + (val % 10));
 }
 
 CHIP_ERROR ASN1Writer::PutTime(const ASN1UniversalTime & val)
@@ -298,13 +299,12 @@ CHIP_ERROR ASN1Writer::PutConstructedType(const uint8_t * val, uint16_t valLen)
     // Make sure we have enough space to write
     VerifyOrReturnError((mWritePoint + valLen) <= mBufEnd, ASN1_ERROR_OVERFLOW);
 
-    memcpy(mWritePoint, val, valLen);
-    mWritePoint += valLen;
+    WriteData(val, valLen);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ASN1Writer::StartConstructedType(uint8_t cls, uint32_t tag)
+CHIP_ERROR ASN1Writer::StartConstructedType(uint8_t cls, uint8_t tag)
 {
     return EncodeHead(cls, tag, true, kUnknownLength);
 }
@@ -314,7 +314,7 @@ CHIP_ERROR ASN1Writer::EndConstructedType()
     return WriteDeferredLength();
 }
 
-CHIP_ERROR ASN1Writer::StartEncapsulatedType(uint8_t cls, uint32_t tag, bool bitStringEncoding)
+CHIP_ERROR ASN1Writer::StartEncapsulatedType(uint8_t cls, uint8_t tag, bool bitStringEncoding)
 {
     // Do nothing for a null writer.
     VerifyOrReturnError(mBuf != nullptr, CHIP_NO_ERROR);
@@ -338,37 +338,37 @@ CHIP_ERROR ASN1Writer::EndEncapsulatedType()
     return WriteDeferredLength();
 }
 
-CHIP_ERROR ASN1Writer::PutValue(uint8_t cls, uint32_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen)
+CHIP_ERROR ASN1Writer::PutValue(uint8_t cls, uint8_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen)
 {
     // Do nothing for a null writer.
     VerifyOrReturnError(mBuf != nullptr, CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(EncodeHead(cls, tag, isConstructed, valLen));
 
-    memcpy(mWritePoint, val, valLen);
-    mWritePoint += valLen;
+    WriteData(val, valLen);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ASN1Writer::PutValue(uint8_t cls, uint32_t tag, bool isConstructed, chip::TLV::TLVReader & val)
+CHIP_ERROR ASN1Writer::PutValue(uint8_t cls, uint8_t tag, bool isConstructed, chip::TLV::TLVReader & tlvReader)
 {
-    uint32_t valLen;
+    ByteSpan val;
 
     // Do nothing for a null writer.
     VerifyOrReturnError(mBuf != nullptr, CHIP_NO_ERROR);
 
-    valLen = val.GetLength();
+    ReturnErrorOnFailure(tlvReader.Get(val));
 
-    ReturnErrorOnFailure(EncodeHead(cls, tag, isConstructed, valLen));
+    VerifyOrReturnError(CanCastTo<int32_t>(val.size()), ASN1_ERROR_LENGTH_OVERFLOW);
 
-    val.GetBytes(mWritePoint, valLen);
-    mWritePoint += valLen;
+    ReturnErrorOnFailure(EncodeHead(cls, tag, isConstructed, static_cast<int32_t>(val.size())));
+
+    WriteData(val.data(), val.size());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ASN1Writer::EncodeHead(uint8_t cls, uint32_t tag, bool isConstructed, int32_t len)
+CHIP_ERROR ASN1Writer::EncodeHead(uint8_t cls, uint8_t tag, bool isConstructed, int32_t len)
 {
     uint8_t bytesForLen;
     uint32_t totalLen;
@@ -376,8 +376,8 @@ CHIP_ERROR ASN1Writer::EncodeHead(uint8_t cls, uint32_t tag, bool isConstructed,
     // Do nothing for a null writer.
     VerifyOrReturnError(mBuf != nullptr, CHIP_NO_ERROR);
 
-    // Only tags <= 31 supported. The implication of this is that encoded tags are exactly 1 byte long.
-    VerifyOrReturnError(tag <= 0x1F, ASN1_ERROR_UNSUPPORTED_ENCODING);
+    // Only tags < 31 supported. The implication of this is that encoded tags are exactly 1 byte long.
+    VerifyOrReturnError(tag < 0x1F, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
     // Only positive and kUnknownLength values are supported for len input.
     VerifyOrReturnError(len >= 0 || len == kUnknownLength, ASN1_ERROR_UNSUPPORTED_ENCODING);
@@ -386,11 +386,13 @@ CHIP_ERROR ASN1Writer::EncodeHead(uint8_t cls, uint32_t tag, bool isConstructed,
     bytesForLen = BytesForLength(len);
 
     // Make sure there's enough space to encode the entire value.
-    totalLen = 1 + bytesForLen + (len != kUnknownLength ? len : 0);
+    // Note that the calculated total length doesn't overflow because `len` is a signed value (int32_t).
+    // Note that if `len` is not kUnknownLength then it is non-negative (`len` >= 0).
+    totalLen = 1 + bytesForLen + static_cast<uint32_t>(len != kUnknownLength ? len : 0);
     VerifyOrReturnError((mWritePoint + totalLen) <= mBufEnd, ASN1_ERROR_OVERFLOW);
 
     // Write the tag byte.
-    *mWritePoint++ = cls | (isConstructed ? 0x20 : 0) | tag;
+    *mWritePoint++ = cls | static_cast<uint8_t>(isConstructed ? 0x20 : 0) | tag;
 
     // Encode the length if it is known.
     if (len != kUnknownLength)
@@ -430,7 +432,7 @@ CHIP_ERROR ASN1Writer::WriteDeferredLength()
     VerifyOrReturnError(*lenField == kUnknownLengthMarker, ASN1_ERROR_INVALID_STATE);
 
     // Compute the length of the element's value.
-    uint32_t elemLen = (mWritePoint - lenField) - kLengthFieldReserveSize;
+    size_t elemLen = static_cast<size_t>((mWritePoint - lenField) - kLengthFieldReserveSize);
 
     VerifyOrReturnError(CanCastTo<int32_t>(elemLen), ASN1_ERROR_LENGTH_OVERFLOW);
 
@@ -449,7 +451,7 @@ CHIP_ERROR ASN1Writer::WriteDeferredLength()
 
     // Encode the final length of the element, overwriting the unknown length marker
     // in the process.
-    EncodeLength(lenField, bytesForLen, elemLen);
+    EncodeLength(lenField, bytesForLen, static_cast<int32_t>(elemLen));
 
     mDeferredLengthCount--;
 
@@ -494,6 +496,12 @@ void ASN1Writer::EncodeLength(uint8_t * buf, uint8_t bytesForLen, int32_t lenToE
             lenToEncode >>= 8;
         } while (--bytesForLen);
     }
+}
+
+void ASN1Writer::WriteData(const uint8_t * p, size_t len)
+{
+    memcpy(mWritePoint, p, len);
+    mWritePoint += len;
 }
 
 } // namespace ASN1

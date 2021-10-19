@@ -39,6 +39,9 @@
 namespace chip {
 namespace Messaging {
 
+class ExchangeContext;
+using ExchangeHandle = ReferenceCountedHandle<ExchangeContext>;
+
 enum class SendMessageFlags : uint16_t;
 class ReliableMessageContext;
 
@@ -57,9 +60,10 @@ public:
      */
     struct RetransTableEntry
     {
-        RetransTableEntry();
+        RetransTableEntry(ReliableMessageContext * rc);
+        ~RetransTableEntry();
 
-        ReliableMessageContext * rc;             /**< The context for the stored CHIP message. */
+        ExchangeHandle ec;                       /**< The context for the stored CHIP message. */
         EncryptedPacketBufferHandle retainedBuf; /**< The packet buffer holding the CHIP message. */
         uint16_t nextRetransTimeTick;            /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;                       /**< A counter representing the number of times the message has been sent. */
@@ -69,7 +73,7 @@ public:
     ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 
-    void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr);
+    void Init(chip::System::Layer * systemLayer, SessionManager * sessionManager);
     void Shutdown();
 
     /**
@@ -149,13 +153,12 @@ public:
      *  Iterate through active exchange contexts and retrans table entries. Clear the entry matching
      *  the specified ExchangeContext and the message ID from the retransmision table.
      *
-     *  @param[in]    rc        A pointer to the ExchangeContext object.
-     *
-     *  @param[in]    msgId     message ID which has been acked.
+     *  @param[in]    rc                 A pointer to the ExchangeContext object.
+     *  @param[in]    ackMessageCounter  The acknowledged message counter of the received packet.
      *
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t msgId);
+    bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t ackMessageCounter);
 
     /**
      *  Send the specified entry from the retransmission table.
@@ -227,7 +230,6 @@ public:
 private:
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
-    SecureSessionMgr * mSessionMgr;
     uint64_t mTimeStampBase; // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
     System::Clock::MonotonicMilliseconds mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
     uint16_t mTimerIntervalShift;                             // ReliableMessageProtocol Timer tick period shift
@@ -245,7 +247,7 @@ private:
     void TicklessDebugDumpRetransTable(const char * log);
 
     // ReliableMessageProtocol Global tables for timer context
-    RetransTableEntry mRetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
+    BitMapObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
 };
 
 } // namespace Messaging

@@ -19,10 +19,19 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
+#include <platform/Linux/ConnectivityUtils.h>
 #include <platform/internal/BLEManager.h>
 
 #include <cstdlib>
 #include <new>
+
+#include <ifaddrs.h>
+#include <linux/ethtool.h>
+#include <linux/if_link.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -39,189 +48,170 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 #endif
 
+#ifndef CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD
+#define CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD "dhclient -nw %s"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
-const char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
-const char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
 
-constexpr uint16_t kWiFi_BAND_2_4_GHZ = 2400;
-constexpr uint16_t kWiFi_BAND_5_0_GHZ = 5000;
-
-uint16_t Map2400MHz(const uint8_t inChannel)
+enum class EthernetStatsCountType
 {
-    uint16_t frequency = 0;
+    kEthPacketRxCount,
+    kEthPacketTxCount,
+    kEthTxErrCount,
+    kEthCollisionCount,
+    kEthOverrunCount
+};
 
-    if (inChannel >= 1 && inChannel <= 13)
+enum class WiFiStatsCountType
+{
+    kWiFiUnicastPacketRxCount,
+    kWiFiUnicastPacketTxCount,
+    kWiFiMulticastPacketRxCount,
+    kWiFiMulticastPacketTxCount,
+    kWiFiOverrunCount
+};
+
+CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
+{
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (getifaddrs(&ifaddr) == -1)
     {
-        frequency = static_cast<uint16_t>(2412 + ((inChannel - 1) * 5));
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
     }
-    else if (inChannel == 14)
+    else
     {
-        frequency = 2484;
+        struct ifaddrs * ifa = nullptr;
+
+        /* Walk through linked list, maintaining head pointer so we
+          can free list later */
+        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            {
+                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
+                break;
+            }
+        }
+
+        if (ifa != nullptr)
+        {
+            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
+            {
+                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
+                switch (type)
+                {
+                case EthernetStatsCountType::kEthPacketRxCount:
+                    count = stats->rx_packets;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                case EthernetStatsCountType::kEthPacketTxCount:
+                    count = stats->tx_packets;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                case EthernetStatsCountType::kEthTxErrCount:
+                    count = stats->tx_errors;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                case EthernetStatsCountType::kEthCollisionCount:
+                    count = stats->collisions;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                case EthernetStatsCountType::kEthOverrunCount:
+                    count = stats->rx_over_errors;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                default:
+                    ChipLogError(DeviceLayer, "Unknown Ethernet statistic metric type");
+                    break;
+                }
+            }
+        }
+
+        freeifaddrs(ifaddr);
     }
 
-    return frequency;
+    return err;
 }
 
-uint16_t Map5000MHz(const uint8_t inChannel)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
 {
-    uint16_t frequency = 0;
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
 
-    switch (inChannel)
+    if (getifaddrs(&ifaddr) == -1)
     {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        struct ifaddrs * ifa = nullptr;
 
-    case 183:
-        frequency = 4915;
-        break;
-    case 184:
-        frequency = 4920;
-        break;
-    case 185:
-        frequency = 4925;
-        break;
-    case 187:
-        frequency = 4935;
-        break;
-    case 188:
-        frequency = 4940;
-        break;
-    case 189:
-        frequency = 4945;
-        break;
-    case 192:
-        frequency = 4960;
-        break;
-    case 196:
-        frequency = 4980;
-        break;
-    case 7:
-        frequency = 5035;
-        break;
-    case 8:
-        frequency = 5040;
-        break;
-    case 9:
-        frequency = 5045;
-        break;
-    case 11:
-        frequency = 5055;
-        break;
-    case 12:
-        frequency = 5060;
-        break;
-    case 16:
-        frequency = 5080;
-        break;
-    case 34:
-        frequency = 5170;
-        break;
-    case 36:
-        frequency = 5180;
-        break;
-    case 38:
-        frequency = 5190;
-        break;
-    case 40:
-        frequency = 5200;
-        break;
-    case 42:
-        frequency = 5210;
-        break;
-    case 44:
-        frequency = 5220;
-        break;
-    case 46:
-        frequency = 5230;
-        break;
-    case 48:
-        frequency = 5240;
-        break;
-    case 52:
-        frequency = 5260;
-        break;
-    case 56:
-        frequency = 5280;
-        break;
-    case 60:
-        frequency = 5300;
-        break;
-    case 64:
-        frequency = 5320;
-        break;
-    case 100:
-        frequency = 5500;
-        break;
-    case 104:
-        frequency = 5520;
-        break;
-    case 108:
-        frequency = 5540;
-        break;
-    case 112:
-        frequency = 5560;
-        break;
-    case 116:
-        frequency = 5580;
-        break;
-    case 120:
-        frequency = 5600;
-        break;
-    case 124:
-        frequency = 5620;
-        break;
-    case 128:
-        frequency = 5640;
-        break;
-    case 132:
-        frequency = 5660;
-        break;
-    case 136:
-        frequency = 5680;
-        break;
-    case 140:
-        frequency = 5700;
-        break;
-    case 149:
-        frequency = 5745;
-        break;
-    case 153:
-        frequency = 5765;
-        break;
-    case 157:
-        frequency = 5785;
-        break;
-    case 161:
-        frequency = 5805;
-        break;
-    case 165:
-        frequency = 5825;
-        break;
+        /* Walk through linked list, maintaining head pointer so we
+          can free list later */
+        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionWiFi)
+            {
+                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
+                break;
+            }
+        }
+
+        if (ifa != nullptr)
+        {
+            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
+            {
+                // The usecase of this function is embedded devices,on which we can interact with the WiFi
+                // driver to get the accurate number of muticast and unicast packets accurately.
+                // On Linux simulation, we can only get the total packets received, the total bytes transmitted,
+                // the multicast packets received and receiver ring buff overflow.
+
+                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
+                switch (type)
+                {
+                case WiFiStatsCountType::kWiFiUnicastPacketRxCount:
+                    count = stats->rx_packets;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                case WiFiStatsCountType::kWiFiUnicastPacketTxCount:
+                    count = stats->tx_packets;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                case WiFiStatsCountType::kWiFiMulticastPacketRxCount:
+                    count = stats->multicast;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                case WiFiStatsCountType::kWiFiMulticastPacketTxCount:
+                    count = 0;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                case WiFiStatsCountType::kWiFiOverrunCount:
+                    count = stats->rx_over_errors;
+                    err   = CHIP_NO_ERROR;
+                    break;
+                default:
+                    ChipLogError(DeviceLayer, "Unknown WiFi statistic metric type");
+                    break;
+                }
+            }
+        }
+
+        freeifaddrs(ifaddr);
     }
 
-    return frequency;
+    return err;
 }
+#endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
-{
-    uint16_t frequency = 0;
-
-    if (inBand == kWiFi_BAND_2_4_GHZ)
-    {
-        frequency = Map2400MHz(inChannel);
-    }
-    else if (inBand == kWiFi_BAND_5_0_GHZ)
-    {
-        frequency = Map5000MHz(inChannel);
-    }
-
-    return frequency;
-}
 } // namespace
-#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -230,20 +220,49 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     mWiFiStationMode                = kWiFiStationMode_Disabled;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
+#endif
+
+    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get Ethernet interface");
+        mEthIfName[0] = '\0';
+    }
+
+    if (ResetEthernetStatsCount() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to reset Ethernet statistic counts");
+    }
 
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 
-    SuccessOrExit(err);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (ConnectivityUtils::GetWiFiInterfaceName(mWiFiIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", mWiFiIfName);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get WiFi interface");
+        mWiFiIfName[0] = '\0';
+    }
 
-exit:
-    return err;
+    if (ResetWiFiStatsCount() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to reset WiFi statistic counts");
+    }
+#endif
+
+    return CHIP_NO_ERROR;
 }
 
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -259,16 +278,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>::ConnectivityFlags>
     ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
-
-bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
-{
-    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
-}
-
-bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity()
-{
-    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-}
+std::mutex ConnectivityManagerImpl::mWpaSupplicantMutex;
 
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
 {
@@ -319,6 +329,8 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
     bool ret            = false;
     const gchar * state = nullptr;
 
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationConnected: interface not connected");
@@ -346,6 +358,8 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
     bool ret          = false;
     const gchar * bss = nullptr;
 
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationProvisioned: interface not connected");
@@ -363,6 +377,8 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _ClearWiFiStationProvision: interface not connected");
@@ -385,8 +401,12 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
-    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
         mWpaSupplicant.scanState == GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
+
+    return ret;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -400,7 +420,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
         ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
         mWiFiAPMode = val;
 
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 
 exit:
@@ -412,8 +432,8 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP()
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP");
-        mLastAPDemandTime = System::Clock::GetMonotonicMilliseconds();
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
     {
@@ -427,7 +447,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
         mLastAPDemandTime = 0;
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
     {
@@ -441,7 +461,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
     {
         if (mWiFiAPState == kWiFiAPState_Active)
         {
-            mLastAPDemandTime = System::Clock::GetMonotonicMilliseconds();
+            mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
         }
     }
 }
@@ -449,12 +469,15 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
 {
     mWiFiAPIdleTimeoutMS = val;
-    SystemLayer.ScheduleWork(DriveAPState, NULL);
+    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
-    GError * err                            = nullptr;
+    GError * err = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     WpaFiW1Wpa_supplicant1Interface * iface = wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus_finish(res, &err);
 
     if (mWpaSupplicant.iface)
@@ -484,6 +507,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
 void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     GError * err = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     gboolean result =
         wpa_fi_w1_wpa_supplicant1_call_get_interface_finish(mWpaSupplicant.proxy, &mWpaSupplicant.interfacePath, res, &err);
@@ -548,8 +573,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
 void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                    gpointer user_data)
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.interfacePath)
+    {
         return;
+    }
 
     mWpaSupplicant.interfacePath = const_cast<gchar *>(path);
     if (mWpaSupplicant.interfacePath)
@@ -566,8 +595,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * prox
 void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                      gpointer user_data)
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.interfacePath == nullptr)
+    {
         return;
+    }
 
     if (g_strcmp0(mWpaSupplicant.interfacePath, path) == 0)
     {
@@ -594,6 +627,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
 void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     GError * err = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     mWpaSupplicant.proxy = wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus_finish(res, &err);
     if (mWpaSupplicant.proxy != nullptr && err == nullptr)
@@ -635,7 +670,11 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
-    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+
+    return ret;
 }
 
 void ConnectivityManagerImpl::DriveAPState()
@@ -675,7 +714,7 @@ void ConnectivityManagerImpl::DriveAPState()
         // has been demand for the AP within the idle timeout period.
         else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
         {
-            now = System::Clock::GetMonotonicMilliseconds();
+            now = System::SystemClock().GetMonotonicMilliseconds();
 
             if (mLastAPDemandTime != 0 && now < (mLastAPDemandTime + mWiFiAPIdleTimeoutMS))
             {
@@ -684,7 +723,7 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
+                err       = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
                 SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
             }
@@ -759,7 +798,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     uint16_t discriminator = 0;
     char ssid[32];
 
-    channel = MapFrequency(kWiFi_BAND_2_4_GHZ, CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL);
+    channel = ConnectivityUtils::MapChannelToFrequency(kWiFi_BAND_2_4_GHZ, CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL);
 
     if (ConfigurationMgr().GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
         discriminator = 0;
@@ -840,11 +879,9 @@ void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void 
 {
     sInstance.DriveAPState();
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ret  = CHIP_NO_ERROR;
     GError * err    = nullptr;
     GVariant * args = nullptr;
@@ -937,7 +974,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
                                       event.InternetConnectivityChange.address);
 
-                        PlatformMgr().PostEvent(&event);
+                        PlatformMgr().PostEventOrDie(&event);
                     }
                 }
             }
@@ -945,7 +982,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             // Run dhclient for IP on WiFi.
             // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
             char cmdBuffer[128];
-            sprintf(cmdBuffer, "dhclient -nw %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+            sprintf(cmdBuffer, CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
             int dhclientSystemRet = system(cmdBuffer);
             if (dhclientSystemRet != 0)
             {
@@ -988,10 +1025,317 @@ exit:
         g_error_free(err);
 
     return ret;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthPHYRate(uint8_t & pHYRate)
+{
+    if (mEthIfName[0] == '\0')
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    return ConnectivityUtils::GetEthPHYRate(mEthIfName, pHYRate);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthFullDuplex(bool & fullDuplex)
+{
+    if (mEthIfName[0] == '\0')
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    return ConnectivityUtils::GetEthFullDuplex(mEthIfName, fullDuplex);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthTimeSinceReset(uint64_t & timeSinceReset)
+{
+    return PlatformMgr().GetUpTime(timeSinceReset);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketRxCount(uint64_t & packetRxCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthPacketRxCount, count));
+    VerifyOrReturnError(count >= mEthPacketRxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    packetRxCount = count - mEthPacketRxCount;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketTxCount(uint64_t & packetTxCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthPacketTxCount, count));
+    VerifyOrReturnError(count >= mEthPacketTxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    packetTxCount = count - mEthPacketTxCount;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthTxErrCount(uint64_t & txErrCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthTxErrCount, count));
+    VerifyOrReturnError(count >= mEthTxErrCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    txErrCount = count - mEthTxErrCount;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthCollisionCount(uint64_t & collisionCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthCollisionCount, count));
+    VerifyOrReturnError(count >= mEthCollisionCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    collisionCount = count - mEthCollisionCount;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthOverrunCount(uint64_t & overrunCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthOverrunCount, count));
+    VerifyOrReturnError(count >= mEthOverrunCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    overrunCount = count - mEthOverrunCount;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_ResetEthNetworkDiagnosticsCounts()
+{
+    return ResetEthernetStatsCount();
+}
+
+CHIP_ERROR ConnectivityManagerImpl::ResetEthernetStatsCount()
+{
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        struct ifaddrs * ifa = nullptr;
+
+        /* Walk through linked list, maintaining head pointer so we
+          can free list later */
+        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            {
+                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
+                break;
+            }
+        }
+
+        if (ifa != nullptr)
+        {
+            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
+            {
+                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
+
+                mEthPacketRxCount  = stats->rx_packets;
+                mEthPacketTxCount  = stats->tx_packets;
+                mEthTxErrCount     = stats->tx_errors;
+                mEthCollisionCount = stats->collisions;
+                mEthOverrunCount   = stats->rx_over_errors;
+                err                = CHIP_NO_ERROR;
+            }
+        }
+
+        freeifaddrs(ifaddr);
+    }
+
+    return err;
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiChannelNumber(uint16_t & channelNumber)
+{
+    if (mWiFiIfName[0] == '\0')
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    return ConnectivityUtils::GetWiFiChannelNumber(mWiFiIfName, channelNumber);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiRssi(int8_t & rssi)
+{
+    if (mWiFiIfName[0] == '\0')
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    return ConnectivityUtils::GetWiFiRssi(mWiFiIfName, rssi);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+{
+    uint32_t count;
+
+    if (mWiFiIfName[0] == '\0')
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    ReturnErrorOnFailure(ConnectivityUtils::GetWiFiBeaconLostCount(mWiFiIfName, count));
+    VerifyOrReturnError(count >= mBeaconLostCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+    beaconLostCount = count - mBeaconLostCount;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+{
+    if (mWiFiIfName[0] == '\0')
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    return ConnectivityUtils::GetWiFiCurrentMaxRate(mWiFiIfName, currentMaxRate);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiMulticastPacketRxCount, count));
+    VerifyOrReturnError(count >= mPacketMulticastRxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    count -= mPacketMulticastRxCount;
+    VerifyOrReturnError(count <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    packetMulticastRxCount = static_cast<uint32_t>(count);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiMulticastPacketTxCount, count));
+    VerifyOrReturnError(count >= mPacketMulticastTxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    count -= mPacketMulticastTxCount;
+    VerifyOrReturnError(count <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    packetMulticastTxCount = static_cast<uint32_t>(count);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiUnicastPacketRxCount, count));
+    VerifyOrReturnError(count >= mPacketUnicastRxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    count -= mPacketUnicastRxCount;
+    VerifyOrReturnError(count <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    packetUnicastRxCount = static_cast<uint32_t>(count);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiUnicastPacketTxCount, count));
+    VerifyOrReturnError(count >= mPacketUnicastTxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    count -= mPacketUnicastTxCount;
+    VerifyOrReturnError(count <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    packetUnicastTxCount = static_cast<uint32_t>(count);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiOverrunCount(uint64_t & overrunCount)
+{
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiOverrunCount, count));
+    VerifyOrReturnError(count >= mOverrunCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    overrunCount = count - mOverrunCount;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_ResetWiFiNetworkDiagnosticsCounts()
+{
+    return ResetWiFiStatsCount();
+}
+
+CHIP_ERROR ConnectivityManagerImpl::ResetWiFiStatsCount()
+{
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    ReturnErrorOnFailure(_GetWiFiBeaconLostCount(mBeaconLostCount));
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        struct ifaddrs * ifa = nullptr;
+
+        /* Walk through linked list, maintaining head pointer so we
+          can free list later */
+        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionWiFi)
+            {
+                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
+                break;
+            }
+        }
+
+        if (ifa != nullptr)
+        {
+            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
+            {
+                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
+
+                mPacketMulticastRxCount = stats->multicast;
+                mPacketMulticastTxCount = 0;
+                mPacketUnicastRxCount   = stats->rx_packets;
+                mPacketUnicastTxCount   = stats->tx_packets;
+                mOverrunCount           = stats->rx_over_errors;
+
+                err = CHIP_NO_ERROR;
+            }
+        }
+
+        freeifaddrs(ifaddr);
+    }
+
+    return err;
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace DeviceLayer
 } // namespace chip

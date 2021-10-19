@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2021 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +16,17 @@
  *
  */
 #include "AndroidDeviceControllerWrapper.h"
-#include "CHIPJNIError.h"
-#include "StackLock.h"
+#include <lib/support/CHIPJNIError.h>
 
 #include <algorithm>
 #include <memory>
 
-#include "JniReferences.h"
 #include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
 
+#include <controller/CHIPDeviceControllerFactory.h>
+#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
@@ -34,9 +36,8 @@
 
 using namespace chip;
 using namespace chip::Controller;
+using namespace chip::Credentials;
 using namespace TLV;
-
-extern chip::Ble::BleLayer * GetJNIBleLayer();
 
 constexpr const char kOperationalCredentialsIssuerKeypairStorage[]   = "AndroidDeviceControllerKey";
 constexpr const char kOperationalCredentialsRootCertificateStorage[] = "AndroidCARootCert";
@@ -167,8 +168,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
-                                                                             pthread_mutex_t * stackLock, chip::NodeId nodeId,
-                                                                             chip::System::Layer * systemLayer,
+                                                                             chip::NodeId nodeId, chip::System::Layer * systemLayer,
                                                                              chip::Inet::InetLayer * inetLayer,
                                                                              CHIP_ERROR * errInfoOnFailure)
 {
@@ -199,19 +199,24 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
         return nullptr;
     }
-    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller), stackLock));
+    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller)));
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
-    wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
 
-    chip::Controller::CommissionerInitParams initParams;
+    // Initialize device attestation verifier
+    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
 
-    initParams.storageDelegate                = wrapper.get();
-    initParams.pairingDelegate                = wrapper.get();
-    initParams.operationalCredentialsDelegate = wrapper.get();
-    initParams.systemLayer                    = systemLayer;
-    initParams.inetLayer                      = inetLayer;
-    initParams.bleLayer                       = GetJNIBleLayer();
+    chip::Controller::FactoryInitParams initParams;
+    chip::Controller::SetupParams setupParams;
+
+    initParams.storageDelegate = wrapper.get();
+    initParams.systemLayer     = systemLayer;
+    initParams.inetLayer       = inetLayer;
+    // move bleLayer into platform/android to share with app server
+    initParams.bleLayer                        = DeviceLayer::ConnectivityMgr().GetBleLayer();
+    initParams.listenPort                      = CHIP_PORT + 1;
+    setupParams.pairingDelegate                = wrapper.get();
+    setupParams.operationalCredentialsDelegate = wrapper.get();
 
     wrapper->InitializeOperationalCredentialsIssuer();
 
@@ -246,13 +251,17 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         return nullptr;
     }
 
-    initParams.ephemeralKeypair = &ephemeralKey;
-    initParams.controllerRCAC   = rcacSpan;
-    initParams.controllerICAC   = icacSpan;
-    initParams.controllerNOC    = nocSpan;
+    setupParams.ephemeralKeypair = &ephemeralKey;
+    setupParams.controllerRCAC   = rcacSpan;
+    setupParams.controllerICAC   = icacSpan;
+    setupParams.controllerNOC    = nocSpan;
 
-    *errInfoOnFailure = wrapper->Controller()->Init(initParams);
-
+    *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+    *errInfoOnFailure = DeviceControllerFactory::GetInstance().SetupCommissioner(setupParams, *wrapper->Controller());
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
@@ -263,25 +272,25 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    chip::DeviceLayer::StackUnlock unlock;
     CallJavaMethod("onStatusUpdate", static_cast<jint>(status));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    chip::DeviceLayer::StackUnlock unlock;
     CallJavaMethod("onPairingComplete", static_cast<jint>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    chip::DeviceLayer::StackUnlock unlock;
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningCompleteMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningComplete", "(JI)V",

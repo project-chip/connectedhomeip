@@ -51,7 +51,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
-    SystemLayer.SetDispatchQueue(GetWorkQueue());
+    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
 exit:
     return err;
@@ -114,12 +114,13 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
-void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 {
     const ChipDeviceEvent eventCopy = *event;
     dispatch_async(mWorkQueue, ^{
         Impl()->DispatchEvent(&eventCopy);
     });
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

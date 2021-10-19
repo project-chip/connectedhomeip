@@ -24,17 +24,22 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::ApplicationLauncher;
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(::ApplicationLauncherApp application, std::string data);
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t *, uint8_t *)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * commandObj,
+                                                        const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                        uint8_t *, uint8_t *, Commands::LaunchApp::DecodableType & commandData)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
@@ -59,20 +64,24 @@ exit:
     }
 }
 
-EmberAfApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, uint8_t * applicationId)
+::ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, CharSpan applicationId)
 {
-    EmberAfApplicationLauncherApp application = {};
-    application.applicationId                 = applicationId;
-    application.catalogVendorId               = catalogVendorId;
+    ::ApplicationLauncherApp application = {};
+    // TODO: Need to figure out what types we're using here.
+    // application.applicationId            = applicationId;
+    application.catalogVendorId = catalogVendorId;
     return application;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * requestData,
-                                                        uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::LaunchApp::DecodableType & commandData)
 {
-    EmberAfApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
-    // TODO: Char is not null terminated, verify this code once #7963 gets merged.
-    std::string reqestDataString(reinterpret_cast<char *>(requestData));
+    auto & requestData                       = commandData.data;
+    auto & requestApplicationCatalogVendorId = commandData.catalogVendorId;
+    auto & requestApplicationId              = commandData.applicationId;
+
+    ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
+    std::string reqestDataString(requestData.data(), requestData.size());
     ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
     sendResponse(command, response);
     return true;

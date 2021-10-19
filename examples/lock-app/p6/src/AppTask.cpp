@@ -25,7 +25,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -57,7 +57,6 @@ bool sIsWiFiStationProvisioned = false;
 bool sIsWiFiStationEnabled     = false;
 bool sIsWiFiStationConnected   = false;
 bool sHaveBLEConnections       = false;
-bool sHaveServiceConnectivity  = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
@@ -96,13 +95,13 @@ CHIP_ERROR AppTask::Init()
                 if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
                     event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
                 {
-                    chip::app::Mdns::StartServer();
+                    chip::app::DnssdServer::Instance().StartServer();
                 }
             }
         },
         0);
     // Init ZCL Data Model
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -179,7 +178,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             sIsWiFiStationConnected   = ConnectivityMgr().IsWiFiStationConnected();
             sIsWiFiStationProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
             sHaveBLEConnections       = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity  = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
@@ -197,13 +195,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != Function::kFactoryReset)
         {
-            // Consider the system to be "fully connected" if it has service
-            // connectivity
-            if (sHaveServiceConnectivity)
-            {
-                sStatusLED.Set(true);
-            }
-            else if (sIsWiFiStationEnabled && sIsWiFiStationProvisioned && (!sIsWiFiStationConnected || !sHaveServiceConnectivity))
+            if (sIsWiFiStationEnabled && sIsWiFiStationProvisioned && !sIsWiFiStationConnected)
             {
                 sStatusLED.Blink(950, 50);
             }

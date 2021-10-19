@@ -113,14 +113,13 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     while (CHIP_NO_ERROR == (err = attributeStatusListReader.Next()))
     {
         VerifyOrExit(TLV::AnonymousTag == attributeStatusListReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(TLV::kTLVType_Structure == attributeStatusListReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-        AttributeStatusElement::Parser element;
+        AttributeStatusIB::Parser element;
 
         err = element.Init(attributeStatusListReader);
         SuccessOrExit(err);
 
-        err = ProcessAttributeStatusElement(element);
+        err = ProcessAttributeStatusIB(element);
         SuccessOrExit(err);
     }
 
@@ -131,7 +130,6 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -145,7 +143,6 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
     err = ConstructAttributePath(attributePathParams, attributeDataElement);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -163,7 +160,6 @@ CHIP_ERROR WriteClient::FinishAttribute()
     MoveToState(State::AddAttribute);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -211,7 +207,6 @@ CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -263,7 +258,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricInde
     ClearExistingExchangeContext();
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(apSecureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(apSecureSession.ValueOr(SessionHandle(aNodeId, 1, 1, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(timeout);
 
@@ -277,13 +272,12 @@ exit:
     {
         ClearExistingExchangeContext();
     }
-    ChipLogFunctError(err);
 
     return err;
 }
 
-CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                          System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
@@ -320,8 +314,8 @@ exit:
 
 void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive write response from Exchange: %d",
-                    apExchangeContext->GetExchangeId());
+    ChipLogProgress(DataManagement, "Time out! failed to receive write response from Exchange: " ChipLogFormatExchange,
+                    ChipLogValueExchange(apExchangeContext));
 
     if (mpDelegate != nullptr)
     {
@@ -330,18 +324,16 @@ void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     ShutdownInternal();
 }
 
-CHIP_ERROR WriteClient::ProcessAttributeStatusElement(AttributeStatusElement::Parser & aAttributeStatusElement)
+CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePath::Parser attributePath;
-    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
-    uint32_t protocolId                                     = 0;
-    uint16_t protocolCode                                   = 0;
-    StatusElement::Parser statusElementParser;
+    StatusIB statusIB;
+    StatusIB::Parser StatusIBParser;
     AttributePathParams attributePathParams;
 
     mAttributeStatusIndex++;
-    err = aAttributeStatusElement.GetAttributePath(&attributePath);
+    err = aAttributeStatusIB.GetAttributePath(&attributePath);
     SuccessOrExit(err);
     err = attributePath.GetNodeId(&(attributePathParams.mNodeId));
     SuccessOrExit(err);
@@ -369,20 +361,18 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusElement(AttributeStatusElement::Pa
         attributePathParams.mFlags.Set(AttributePathParams::Flags::kListIndexValid);
     }
 
-    err = aAttributeStatusElement.GetStatusElement(&(statusElementParser));
+    err = aAttributeStatusIB.GetStatusIB(&(StatusIBParser));
     if (CHIP_NO_ERROR == err)
     {
-        err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
+        err = StatusIBParser.DecodeStatusIB(statusIB);
         SuccessOrExit(err);
         if (mpDelegate != nullptr)
         {
-            mpDelegate->WriteResponseStatus(this, generalCode, protocolId, protocolCode, attributePathParams,
-                                            mAttributeStatusIndex);
+            mpDelegate->WriteResponseStatus(this, statusIB, attributePathParams, mAttributeStatusIndex);
         }
     }
 
 exit:
-    ChipLogFunctError(err);
     if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
     {
         mpDelegate->WriteResponseProtocolError(this, mAttributeStatusIndex);

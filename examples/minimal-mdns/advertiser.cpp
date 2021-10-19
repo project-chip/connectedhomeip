@@ -20,7 +20,7 @@
 #include <arpa/inet.h>
 #include <strings.h>
 
-#include <lib/mdns/Advertiser.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
@@ -49,10 +49,9 @@ struct Options
     Optional<const char *> deviceName;
 
     // commisionable node params
-    uint8_t shortDiscriminator       = 52;
-    uint16_t longDiscriminator       = 840;
-    bool commissioningMode           = false;
-    bool commissioningModeOpenWindow = false;
+    uint8_t shortDiscriminator                 = 52;
+    uint16_t longDiscriminator                 = 840;
+    Dnssd::CommissioningMode commissioningMode = Dnssd::CommissioningMode::kDisabled;
     Optional<const char *> rotatingId;
     Optional<const char *> pairingInstr;
     Optional<uint16_t> pairingHint;
@@ -78,14 +77,14 @@ constexpr uint16_t kOptionCommisioningPairingHint        = 0x300;
 constexpr uint16_t kOptionCommisioningDeviceType         = 0x400;
 constexpr uint16_t kOptionCommisioningDeviceName         = 0x500;
 constexpr uint16_t kOptionCommisioningMode               = 0x600;
-constexpr uint16_t kOptionCommisioningModeOpenWindow     = 0x700;
-constexpr uint16_t kOptionCommisioningRotatingId         = 0x800;
+constexpr uint16_t kOptionCommisioningRotatingId         = 0x700;
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
+    uint8_t cm;
     switch (aIdentifier)
     {
     case kOptionEnableIpV4:
@@ -124,10 +123,15 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gOptions.productId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
     case kOptionCommisioningMode:
-        gOptions.commissioningMode = true;
-        return true;
-    case kOptionCommisioningModeOpenWindow:
-        gOptions.commissioningModeOpenWindow = true;
+        cm = static_cast<uint8_t>(atoi(aValue));
+        if (cm == 1)
+        {
+            gOptions.commissioningMode = Dnssd::CommissioningMode::kEnabledBasic;
+        }
+        if (cm == 2)
+        {
+            gOptions.commissioningMode = Dnssd::CommissioningMode::kEnabledEnhanced;
+        }
         return true;
     case kOptionCommisioningDeviceType:
         gOptions.deviceType = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
@@ -174,8 +178,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "long-discriminator", kArgumentRequired, kOptionCommisioningLongDiscriminaotr },
     { "vendor-id", kArgumentRequired, kOptionCommisioningVendorId },
     { "product-id", kArgumentRequired, kOptionCommisioningProductId },
-    { "commissioning-mode-enabled", kNoArgument, kOptionCommisioningMode },
-    { "commissioning-mode-open-window", kNoArgument, kOptionCommisioningModeOpenWindow },
+    { "commissioning-mode", kNoArgument, kOptionCommisioningMode },
     { "device-type", kArgumentRequired, kOptionCommisioningDeviceType },
     { "device-name", kArgumentRequired, kOptionCommisioningDeviceName },
     { "rotating-id", kArgumentRequired, kOptionCommisioningRotatingId },
@@ -207,10 +210,8 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  --product-id <value>\n"
                              "  -p <value>\n"
                              "        Commisioning/commisionable product id.\n"
-                             "  --commissioning-mode-enabled\n"
-                             "        Commissioning Mode Enabled.\n"
-                             "  --commissioning-mode-open-window\n"
-                             "        Commissioning Mode as a result of Open Commissioning Window.\n"
+                             "  --commissioning-mode <value>\n"
+                             "        Commissioning Mode (0=disabled, 1=basic, 2=enhanced).\n"
                              "  --device-type <value>\n"
                              "        Device type id.\n"
                              "  --device-name <value>\n"
@@ -254,7 +255,7 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, Mdns::kMdnsPort) != CHIP_NO_ERROR)
+    if (chip::Dnssd::ServiceAdvertiser::Instance().Init(&DeviceLayer::InetLayer) != CHIP_NO_ERROR)
     {
         fprintf(stderr, "FAILED to start MDNS advertisement\n");
         return 1;
@@ -265,27 +266,25 @@ int main(int argc, char ** args)
     if (gOptions.advertisingMode == AdvertisingMode::kCommissionableNode)
     {
         printf("Advertise Commissionable Node\n");
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(
-            chip::Mdns::CommissionAdvertisingParameters()
-                .EnableIpV4(gOptions.enableIpV4)
-                .SetPort(CHIP_PORT)
-                .SetShortDiscriminator(gOptions.shortDiscriminator)
-                .SetLongDiscriminator(gOptions.longDiscriminator)
-                .SetMac(chip::ByteSpan(gOptions.mac, 6))
-                .SetVendorId(gOptions.vendorId)
-                .SetProductId(gOptions.productId)
-                .SetCommissioningMode(gOptions.commissioningMode)
-                .SetAdditionalCommissioning(gOptions.commissioningModeOpenWindow)
-                .SetDeviceType(gOptions.deviceType)
-                .SetDeviceName(gOptions.deviceName)
-                .SetRotatingId(gOptions.rotatingId)
-                .SetPairingInstr(gOptions.pairingInstr)
-                .SetPairingHint(gOptions.pairingHint));
+        err = chip::Dnssd::ServiceAdvertiser::Instance().Advertise(chip::Dnssd::CommissionAdvertisingParameters()
+                                                                       .EnableIpV4(gOptions.enableIpV4)
+                                                                       .SetPort(CHIP_PORT)
+                                                                       .SetShortDiscriminator(gOptions.shortDiscriminator)
+                                                                       .SetLongDiscriminator(gOptions.longDiscriminator)
+                                                                       .SetMac(chip::ByteSpan(gOptions.mac, 6))
+                                                                       .SetVendorId(gOptions.vendorId)
+                                                                       .SetProductId(gOptions.productId)
+                                                                       .SetCommissioningMode(gOptions.commissioningMode)
+                                                                       .SetDeviceType(gOptions.deviceType)
+                                                                       .SetDeviceName(gOptions.deviceName)
+                                                                       .SetRotatingId(gOptions.rotatingId)
+                                                                       .SetPairingInstr(gOptions.pairingInstr)
+                                                                       .SetPairingHint(gOptions.pairingHint));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kOperational)
     {
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(
-            chip::Mdns::OperationalAdvertisingParameters()
+        err = chip::Dnssd::ServiceAdvertiser::Instance().Advertise(
+            chip::Dnssd::OperationalAdvertisingParameters()
                 .EnableIpV4(gOptions.enableIpV4)
                 .SetPort(CHIP_PORT)
                 .SetMac(chip::ByteSpan(gOptions.mac, 6))
@@ -294,8 +293,8 @@ int main(int argc, char ** args)
     else if (gOptions.advertisingMode == AdvertisingMode::kCommissioner)
     {
         printf("Advertise Commissioner\n");
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(
-            chip::Mdns::CommissionAdvertisingParameters()
+        err = chip::Dnssd::ServiceAdvertiser::Instance().Advertise(
+            chip::Dnssd::CommissionAdvertisingParameters()
                 .EnableIpV4(gOptions.enableIpV4)
                 .SetPort(CHIP_PORT)
                 .SetMac(chip::ByteSpan(gOptions.mac, 6))
@@ -303,7 +302,7 @@ int main(int argc, char ** args)
                 .SetProductId(gOptions.productId)
                 .SetDeviceType(gOptions.deviceType)
                 .SetDeviceName(gOptions.deviceName)
-                .SetCommissionAdvertiseMode(chip::Mdns::CommssionAdvertiseMode::kCommissioner));
+                .SetCommissionAdvertiseMode(chip::Dnssd::CommssionAdvertiseMode::kCommissioner));
     }
     else
     {

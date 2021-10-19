@@ -57,22 +57,21 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     esp_err_t err;
-    wifi_init_config_t cfg;
-    uint8_t ap_mac[6];
-    wifi_mode_t mode;
-
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
     Internal::ESP32Utils::RegisterESP32ErrorFormatter();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    wifi_init_config_t cfg;
+    uint8_t ap_mac[6];
+    wifi_mode_t mode;
     // Make sure the LwIP core lock has been initialized
     ReturnErrorOnFailure(Internal::InitLwIPCoreLock());
-
     err = esp_netif_init();
     if (err != ESP_OK)
     {
         goto exit;
     }
-
+#endif
     // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
     err = esp_event_loop_create_default();
     if (err != ESP_OK)
@@ -80,6 +79,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     esp_netif_create_default_wifi_ap();
     esp_netif_create_default_wifi_sta();
 
@@ -106,6 +106,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
             goto exit;
         }
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 
@@ -115,6 +116,24 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+{
+    currentHeapFree = esp_get_free_heap_size();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+{
+    currentHeapUsed = heap_caps_get_total_size(MALLOC_CAP_DEFAULT) - esp_get_free_heap_size();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+    currentHeapHighWatermark = heap_caps_get_total_size(MALLOC_CAP_DEFAULT) - esp_get_minimum_free_heap_size();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
@@ -192,7 +211,7 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         }
     }
 
-    sInstance.PostEvent(&event);
+    sInstance.PostEventOrDie(&event);
 }
 
 } // namespace DeviceLayer

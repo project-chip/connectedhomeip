@@ -24,7 +24,7 @@
 #pragma once
 
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 namespace Messaging {

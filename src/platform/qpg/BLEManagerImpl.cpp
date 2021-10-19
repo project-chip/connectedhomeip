@@ -82,7 +82,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     }
 
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     appCbacks.stackCback    = ExternalCbHandler;
@@ -199,7 +199,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgr().PostEvent(&connEstEvent);
+        PlatformMgr().PostEventOrDie(&connEstEvent);
     }
     break;
 
@@ -434,8 +434,12 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t mDeviceNameLength   = 0;
     uint8_t mDeviceIdInfoLength = 0;
 
-    memset(mAdvDataBuf, 0, kMaxAdvertisementDataSetSize);
-    memset(mScanRespDataBuf, 0, kMaxAdvertisementDataSetSize);
+    char deviceName[kMaxDeviceNameLength + 1];
+    uint8_t advDataBuf[kMaxAdvertisementDataSetSize];
+    uint8_t scanRespDataBuf[kMaxAdvertisementDataSetSize];
+
+    memset(advDataBuf, 0, kMaxAdvertisementDataSetSize);
+    memset(scanRespDataBuf, 0, kMaxAdvertisementDataSetSize);
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     SuccessOrExit(err);
@@ -444,8 +448,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     {
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
 
-        mDeviceName[kMaxDeviceNameLength] = 0;
-        err                               = MapBLEError(qvCHIP_BleSetDeviceName(mDeviceName));
+        deviceName[kMaxDeviceNameLength] = 0;
+        err                              = MapBLEError(qvCHIP_BleSetDeviceName(deviceName));
         SuccessOrExit(err);
     }
 
@@ -458,31 +462,32 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
                   "Advertisement data buffer is not big enough");
 
     // Fill in advertising data
-    index                = 0;
-    mAdvDataBuf[index++] = 0x02;                     // length
-    mAdvDataBuf[index++] = CHIP_ADV_DATA_TYPE_FLAGS; // AD type : flags
-    mAdvDataBuf[index++] = CHIP_ADV_DATA_FLAGS;      // AD value
+    index               = 0;
+    advDataBuf[index++] = 0x02;                     // length
+    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_FLAGS; // AD type : flags
+    advDataBuf[index++] = CHIP_ADV_DATA_FLAGS;      // AD value
 
-    mAdvDataBuf[index++] = static_cast<uint8_t>(mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1); // AD length
-    mAdvDataBuf[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
-    mAdvDataBuf[index++] = chipUUID_CHIPoBLE_Service[1];                                            // AD value
-    mAdvDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
-    memcpy(&mAdvDataBuf[index], (void *) &mDeviceIdInfo, mDeviceIdInfoLength); // AD value
+    advDataBuf[index++] = static_cast<uint8_t>(mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1); // AD length
+    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
+    advDataBuf[index++] = chipUUID_CHIPoBLE_Service[1];                                            // AD value
+    advDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
+    memcpy(&advDataBuf[index], (void *) &mDeviceIdInfo, mDeviceIdInfoLength); // AD value
     index = static_cast<uint8_t>(index + mDeviceIdInfoLength);
 
-    mAdvDataBuf[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
-    mAdvDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
-    memcpy(&mAdvDataBuf[index], mDeviceName, mDeviceNameLength);        // AD value
+    // TODO remove device name issue #10221
+    advDataBuf[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
+    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
+    memcpy(&advDataBuf[index], deviceName, mDeviceNameLength);         // AD value
     index = static_cast<uint8_t>(index + mDeviceNameLength);
 
     qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_ADV, index, mAdvDataBuf);
 
     // Fill in scan response data
-    index                     = 0;
-    mScanRespDataBuf[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;  // AD length
-    mScanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_UUID;      // AD type : uuid
-    mScanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[1]; // AD value
-    mScanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
+    index                    = 0;
+    scanRespDataBuf[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;  // AD length
+    scanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_UUID;      // AD type : uuid
+    scanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[1]; // AD value
+    scanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
 
     qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_SCAN, index, mScanRespDataBuf);
 
@@ -559,7 +564,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
             ChipDeviceEvent advChange;
             advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
             advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-            PlatformMgr().PostEvent(&advChange);
+            err                                        = PlatformMgr().PostEvent(&advChange);
         }
     }
 
@@ -612,7 +617,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = connId;
         event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-        PlatformMgr().PostEvent(&event);
+        err                               = PlatformMgr().PostEvent(&event);
     }
 
 exit:
@@ -658,7 +663,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * pEvt)
         ChipDeviceEvent event;
         event.Type = (notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = pEvt->hdr.param;
-        PlatformMgr().PostEvent(&event);
+        err                           = PlatformMgr().PostEvent(&event);
     }
 
     ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", notificationsEnabled ? "subscribe" : "unsubscribe");
@@ -706,7 +711,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
                 ChipDeviceEvent advChange;
                 advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
                 advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-                PlatformMgr().PostEvent(&advChange);
+                PlatformMgr().PostEventOrDie(&advChange);
             }
         }
         break;
@@ -764,7 +769,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
                 event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
                 break;
             }
-            PlatformMgr().PostEvent(&event);
+            PlatformMgr().PostEventOrDie(&event);
         }
 
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);
@@ -793,7 +798,7 @@ void BLEManagerImpl::HandleAttMsg(qvCHIP_Ble_AttEvt_t * pAttEvt)
 
         event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = pAttEvt->hdr.param;
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
         break;
     }
     case QVCHIP_ATTC_FIND_BY_TYPE_VALUE_RSP:

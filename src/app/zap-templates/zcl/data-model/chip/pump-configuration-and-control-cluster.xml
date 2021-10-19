@@ -48,9 +48,62 @@ limitations under the License.
     <attribute side="server" code="0x0020" define="OPERATION_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="false">operation mode</attribute>
     <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="true">control mode</attribute>
     <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" optional="true">alarm mask</attribute>
+
+    <event side="server" code="0x00" priority="info" name="SupplyVoltageLow">
+      <description>SupplyVoltageLow</description>
+    </event>
+    <event side="server" code="0x01" priority="info" name="SupplyVoltageHigh">
+      <description>SupplyVoltageHigh</description>
+    </event>
+    <event side="server" code="0x02" priority="info" name="PowerMissingPhase">
+      <description>PowerMissingPhase</description>
+    </event>
+    <event side="server" code="0x03" priority="info" name="SystemPressureLow">
+      <description>SystemPressureLow</description>
+    </event>
+    <event side="server" code="0x04" priority="info" name="SystemPressureHigh">
+      <description>SystemPressureHigh</description>
+    </event>
+    <event side="server" code="0x05" priority="critical" name="DryRunning">
+      <description>DryRunning</description>
+    </event>
+    <event side="server" code="0x06" priority="info" name="MotorTemperatureHigh">
+      <description>MotorTemperatureHigh</description>
+    </event>
+    <event side="server" code="0x07" priority="critical" name="PumpMotorFatalFailure">
+      <description>PumpMotorFatalFailure</description>
+    </event>
+    <event side="server" code="0x08" priority="info" name="ElectronicTemperatureHigh">
+      <description>ElectronicTemperatureHigh</description>
+    </event>
+    <event side="server" code="0x09" priority="critical" name="PumpBlocked">
+      <description>PumpBlocked</description>
+    </event>
+    <event side="server" code="0x0A" priority="info" name="SensorFailure">
+      <description>SensorFailure</description>
+    </event>
+    <event side="server" code="0x0B" priority="info" name="ElectronicNonFatalFailure">
+      <description>ElectronicNonFatalFailure</description>
+    </event>
+    <event side="server" code="0x0C" priority="critical" name="ElectronicFatalFailure">
+      <description>ElectronicFatalFailure</description>
+    </event>
+    <event side="server" code="0x0D" priority="info" name="GeneralFault">
+      <description>GeneralFault</description>
+    </event>
+    <event side="server" code="0x0E" priority="info" name="Leakage">
+      <description>Leakage</description>
+    </event>
+    <event side="server" code="0x0F" priority="info" name="AirDetection">
+      <description>AirDetection</description>
+    </event>
+    <event side="server" code="0x10" priority="info" name="TurbineOperation">
+      <description>TurbineOperation</description>
+    </event>
   </cluster>
 
   <bitmap name="PumpStatus" type="BITMAP16">
+    <cluster code="0x0200"/>
     <field name="DeviceFault" mask="0x1"/>
     <field name="Supplyfault" mask="0x2"/>
     <field name="SpeedLow" mask="0x4"/>
@@ -63,6 +116,7 @@ limitations under the License.
   </bitmap>
 
   <enum name="PumpOperationMode" type="ENUM8">
+    <cluster code="0x0200"/>
     <item name="Normal" value="0x0"/>
     <item name="Minimum" value="0x1"/>
     <item name="Maximum" value="0x2"/>
@@ -70,6 +124,7 @@ limitations under the License.
   </enum>
 
   <enum name="PumpControlMode" type="ENUM8">
+    <cluster code="0x0200"/>
     <item name="ConstantSpeed" value="0x0"/>
     <item name="ConstantPressure" value="0x1"/>
     <item name="ProportionalPressure" value="0x2"/>
@@ -77,25 +132,5 @@ limitations under the License.
     <item name="ConstantTemperature" value="0x5"/>
     <item name="Automatic" value="0x7"/>
   </enum>
-
-  <bitmap name="PumpAlarmMask" type="BITMAP16">
-    <field name="SupplyVoltageLow" mask="0x1"/>
-    <field name="SupplyVoltageHigh" mask="0x2"/>
-    <field name="PowerMissingPhase" mask="0x4"/>
-    <field name="SystemPressureLow" mask="0x8"/>
-    <field name="SystemPressureHigh" mask="0x10"/>
-    <field name="DryRunning" mask="0x20"/>
-    <field name="MotorTemperatureHigh" mask="0x40"/>
-    <field name="PumpMotorFatalFailure" mask="0x80"/>
-    <field name="ElectronicTemperatureHigh" mask="0x100"/>
-    <field name="PumpBlocked" mask="0x200"/>
-    <field name="SensorFailure" mask="0x400"/>
-    <field name="ElectronicNonFatalFailure" mask="0x800"/>
-    <field name="ElectronicFatalFailure" mask="0x1000"/>
-    <field name="GeneralFault" mask="0x2000"/>
-    <field name="Leakage" mask="0x4000"/>
-    <field name="AirDetection" mask="0x8000"/>
-    <field name="TurbineOperation" mask="0x10000"/>
-  </bitmap>
 
 </configurator>

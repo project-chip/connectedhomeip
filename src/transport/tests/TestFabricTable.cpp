@@ -54,7 +54,7 @@ void TestGetCompressedFabricID(nlTestSuite * inSuite, void * inContext)
 {
     FabricInfo fabricInfo;
 
-    fabricInfo.SetRootCert(ByteSpan(sTestRootCert));
+    NL_TEST_ASSERT(inSuite, fabricInfo.SetRootCert(ByteSpan(sTestRootCert)) == CHIP_NO_ERROR);
 
     PeerId compressedId;
     NL_TEST_ASSERT(inSuite, fabricInfo.GetCompressedId(1234, 4321, &compressedId) == CHIP_NO_ERROR);

@@ -131,147 +131,10 @@ namespace {
         return true;                                                                                                               \
     }
 
-#define GET_ATTRIBUTE_RESPONSE_CALLBACKS(name)
-
-#define GET_REPORT_CALLBACK(name)                                                                                                  \
-    Callback::Cancelable * onReportCallback = nullptr;                                                                             \
-    CHIP_ERROR err = gCallbacks.GetReportCallback(sourceId, endpointId, clusterId, attributeId, &onReportCallback);                \
-                                                                                                                                   \
-    if (CHIP_NO_ERROR != err)                                                                                                      \
-    {                                                                                                                              \
-        if (onReportCallback == nullptr)                                                                                           \
-        {                                                                                                                          \
-            ChipLogDetail(Zcl, "%s: Missing report callback", name);                                                               \
-        }                                                                                                                          \
-                                                                                                                                   \
-        return true;                                                                                                               \
-    }
-
 // TODO: These IM related callbacks contains small or no generated code, should be put into seperate file to reduce the size of
 // template. Singleton instance of the callbacks manager
 
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
-
-bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
-{
-    ChipLogProgress(Zcl, "ConfigureReportingResponseCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    GET_RESPONSE_CALLBACKS("emberAfConfigureReportingResponseCallback");
-
-    // struct configureReportingResponseRecord[]
-    while (messageLen)
-    {
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t status = Encoding::Read8(message); // zclStatus
-        LogStatus(status);
-
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
-        {
-            Callback::Callback<DefaultSuccessCallback> * cb =
-                Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-            cb->mCall(cb->mContext);
-        }
-        else
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t direction = Encoding::Read8(message); // reportingRole
-            ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
-            // Silence unused var warning if progress logging is disabled.  Note
-            // that we _do_ want to call Read8 unconditionally here, because we
-            // want to advance the 'message' pointer even if we don't use
-            // direction.
-            UNUSED_VAR(direction);
-
-            CHECK_MESSAGE_LENGTH(4);
-            AttributeId attributeId = Encoding::LittleEndian::Read32(message); // attribId
-            ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-            // Silence unused var warning if progress logging is disabled.  Note
-            // that we _do_ want to call Read32 unconditionally here, because we
-            // want to advance the 'message' pointer even if we don't use
-            // direction.
-            UNUSED_VAR(attributeId);
-
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, status);
-        }
-
-        // The current code is written matching the current API where there is a single attribute report
-        // per configure command. So if multiple attributes are configured at the same time, something is wrong
-        // somewhere.
-        if (messageLen)
-        {
-            ChipLogError(Zcl, "Multiple attributes reports configured at the same time. Something went wrong.");
-            break;
-        }
-    }
-
-    return true;
-}
-
-bool emberAfReadReportingConfigurationResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
-{
-    ChipLogProgress(Zcl, "ReadReportingConfigurationResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    GET_RESPONSE_CALLBACKS("emberAfReadReportingConfigurationResponseCallback");
-
-    // struct readReportingConfigurationResponseRecord[]
-    while (messageLen)
-    {
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t direction = Encoding::Read8(message); // reportingRole
-        ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
-
-        CHECK_MESSAGE_LENGTH(4);
-        AttributeId attributeId = Encoding::LittleEndian::Read32(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-        // Silence unused var warning if progress logging is disabled.  Note
-        // that we _do_ want to call Read32 unconditionally here, because we
-        // want to advance the 'message' pointer even if we don't use
-        // attributeId.
-        UNUSED_VAR(attributeId);
-
-        if (direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t attributeType = Encoding::Read8(message); // zclType
-            ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
-            // Silence unused var warning if progress logging is disabled.  Note
-            // that we _do_ want to call Read8 unconditionally here, because we
-            // want to advance the 'message' pointer even if we don't use
-            // attributeType.
-            UNUSED_VAR(attributeType);
-
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t minimumReportingInterval = Encoding::LittleEndian::Read16(message); // uint16
-            ChipLogProgress(Zcl, "  minimumReportingInterval: %" PRIu16, minimumReportingInterval);
-
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t maximumReportingInterval = Encoding::LittleEndian::Read16(message); // uint16
-            ChipLogProgress(Zcl, "  maximumReportingInterval: %" PRIu16, maximumReportingInterval);
-
-            // FIXME: unk is not supported yet.
-
-            Callback::Callback<ReadReportingConfigurationReportedCallback> * cb =
-                Callback::Callback<ReadReportingConfigurationReportedCallback>::FromCancelable(onSuccessCallback);
-            cb->mCall(cb->mContext, minimumReportingInterval, maximumReportingInterval);
-        }
-        else
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t timeout = Encoding::LittleEndian::Read16(message); // uint16
-            ChipLogProgress(Zcl, "  timeout: %" PRIu16, timeout);
-
-            Callback::Callback<ReadReportingConfigurationReceivedCallback> * cb =
-                Callback::Callback<ReadReportingConfigurationReceivedCallback>::FromCancelable(onSuccessCallback);
-            cb->mCall(cb->mContext, timeout);
-        }
-    }
-
-    return true;
-}
 
 bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discoveryComplete, uint8_t * message, uint16_t messageLen,
                                                bool extended)
@@ -351,6 +214,10 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                               Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback)
@@ -361,15 +228,21 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _BasicCommissioningInfoType data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -380,7 +253,14 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
         Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
@@ -390,15 +270,21 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _FabricDescriptor data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -424,7 +310,14 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV::TLVReader * tlvData,
                                                                              Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback)
@@ -435,15 +328,21 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ByteSpan data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
@@ -455,6 +354,9 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
         Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
 bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                    uint8_t errorCode, uint8_t * debugText)
@@ -636,6 +538,35 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(Endpoin
     return true;
 }
 
+bool emberAfOperationalCredentialsClusterAttestationResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature)
+{
+    ChipLogProgress(Zcl, "AttestationResponse:");
+    ChipLogProgress(Zcl, "  AttestationElements: %zu", AttestationElements.size());
+    ChipLogProgress(Zcl, "  Signature: %zu", Signature.size());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterAttestationResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, AttestationElements, Signature);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                                          chip::ByteSpan Certificate)
+{
+    ChipLogProgress(Zcl, "CertificateChainResponse:");
+    ChipLogProgress(Zcl, "  Certificate: %zu", Certificate.size());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterCertificateChainResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, Certificate);
+    return true;
+}
+
 bool emberAfOperationalCredentialsClusterNOCResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                              uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
 {
@@ -664,254 +595,5 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(EndpointId endpoi
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * cb =
         Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, NOCSRElements, AttestationSignature);
-    return true;
-}
-
-bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
-{
-    ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    NodeId sourceId = emberAfCurrentCommand()->SourceNodeId();
-    ChipLogProgress(Zcl, "  Source NodeId: %" PRIu64, sourceId);
-
-    EndpointId endpointId = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
-    ChipLogProgress(Zcl, "  Source EndpointId: 0x%04x", endpointId);
-
-    // TODO onFailureCallback is just here because of the CHECK_MESSAGE_LENGTH macro. It needs to be removed.
-    Callback::Cancelable * onFailureCallback = nullptr;
-
-    while (messageLen)
-    {
-        CHECK_MESSAGE_LENGTH(4);
-        AttributeId attributeId = Encoding::LittleEndian::Read32(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-
-        GET_REPORT_CALLBACK("emberAfReportAttributesCallback");
-
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t attributeType = Encoding::Read8(message);
-        ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
-
-        switch (attributeType)
-        {
-        case 0x00: // nodata / No data
-        case 0x0A: // data24 / 24-bit data
-        case 0x0C: // data40 / 40-bit data
-        case 0x0D: // data48 / 48-bit data
-        case 0x0E: // data56 / 56-bit data
-        case 0x1A: // map24 / 24-bit bitmap
-        case 0x1C: // map40 / 40-bit bitmap
-        case 0x1D: // map48 / 48-bit bitmap
-        case 0x1E: // map56 / 56-bit bitmap
-        case 0x22: // uint24 / Unsigned 24-bit integer
-        case 0x24: // uint40 / Unsigned 40-bit integer
-        case 0x25: // uint48 / Unsigned 48-bit integer
-        case 0x26: // uint56 / Unsigned 56-bit integer
-        case 0x2A: // int24 / Signed 24-bit integer
-        case 0x2C: // int40 / Signed 40-bit integer
-        case 0x2D: // int48 / Signed 48-bit integer
-        case 0x2E: // int56 / Signed 56-bit integer
-        case 0x38: // semi / Semi-precision
-        case 0x39: // single / Single precision
-        case 0x3A: // double / Double precision
-        case 0x48: // array / Array
-        case 0x49: // struct / Structure
-        case 0x50: // set / Set
-        case 0x51: // bag / Bag
-        case 0xE0: // ToD / Time of day
-        {
-            ChipLogError(Zcl, "attributeType 0x%02x is not supported", attributeType);
-            return true;
-        }
-
-        case 0x41: // octstr / Octet string
-        case 0x42: // string / Character string
-        {
-            // Short Strings must contains at least one byte for the length
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t length = Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  length: 0x%02x", length);
-
-            // When the length is set to 0xFF, it represents a non-value. In this case the data field is zero length.
-            if (length == 0xFF)
-            {
-                length = 0;
-            }
-
-            CHECK_MESSAGE_LENGTH(length);
-            if (attributeType == 0x41)
-            {
-                Callback::Callback<OctetStringAttributeCallback> * cb =
-                    Callback::Callback<OctetStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            else
-            {
-                Callback::Callback<CharStringAttributeCallback> * cb =
-                    Callback::Callback<CharStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            break;
-        }
-
-        case 0x43: // octstr16 / Long octet string
-        case 0x44: // string16 / Long character string
-        {
-            // Long Strings must contains at least two bytes for the length
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t length = Encoding::LittleEndian::Read16(message);
-            ChipLogProgress(Zcl, "  length: 0x%02x", length);
-
-            // When the length is set to 0xFFFF, it represents a non-value. In this case the data field is zero length.
-            if (length == 0xFFFF)
-            {
-                length = 0;
-            }
-
-            CHECK_MESSAGE_LENGTH(length);
-            if (attributeType == 0x43)
-            {
-                Callback::Callback<OctetStringAttributeCallback> * cb =
-                    Callback::Callback<OctetStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            else
-            {
-                Callback::Callback<CharStringAttributeCallback> * cb =
-                    Callback::Callback<CharStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            break;
-        }
-
-        case 0x08: // data8 / 8-bit data
-        case 0x18: // map8 / 8-bit bitmap
-        case 0x20: // uint8 / Unsigned  8-bit integer
-        case 0x30: // enum8 / 8-bit enumeration
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t value = Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  value: 0x%02x", value);
-
-            Callback::Callback<Int8uAttributeCallback> * cb =
-                Callback::Callback<Int8uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x09: // data16 / 16-bit data
-        case 0x19: // map16 / 16-bit bitmap
-        case 0x21: // uint16 / Unsigned 16-bit integer
-        case 0x31: // enum16 / 16-bit enumeration
-        case 0xE8: // clusterId / Cluster ID
-        case 0xE9: // attribId / Attribute ID
-        case 0xEA: // bacOID / BACnet OID
-        case 0xF1: // key128 / 128-bit security key
-        case 0xFF: // unk / Unknown
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t value = Encoding::LittleEndian::Read16(message);
-            ChipLogProgress(Zcl, "  value: 0x%04x", value);
-
-            Callback::Callback<Int16uAttributeCallback> * cb =
-                Callback::Callback<Int16uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x0B: // data32 / 32-bit data
-        case 0x1B: // map32 / 32-bit bitmap
-        case 0x23: // uint32 / Unsigned 32-bit integer
-        case 0xE1: // date / Date
-        case 0xE2: // UTC / UTCTime
-        {
-            CHECK_MESSAGE_LENGTH(4);
-            uint32_t value = Encoding::LittleEndian::Read32(message);
-            ChipLogProgress(Zcl, "  value: 0x%08x", value);
-
-            Callback::Callback<Int32uAttributeCallback> * cb =
-                Callback::Callback<Int32uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x0F: // data64 / 64-bit data
-        case 0x1F: // map64 / 64-bit bitmap
-        case 0x27: // uint64 / Unsigned 64-bit integer
-        case 0xF0: // EUI64 / IEEE address
-        {
-            CHECK_MESSAGE_LENGTH(8);
-            uint64_t value = Encoding::LittleEndian::Read64(message);
-            ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
-
-            Callback::Callback<Int64uAttributeCallback> * cb =
-                Callback::Callback<Int64uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x10: // bool / Boolean
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t value = Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  value: %d", value);
-
-            Callback::Callback<BooleanAttributeCallback> * cb =
-                Callback::Callback<BooleanAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x28: // int8 / Signed 8-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            int8_t value = CastToSigned(Encoding::Read8(message));
-            ChipLogProgress(Zcl, "  value: %" PRId8, value);
-
-            Callback::Callback<Int8sAttributeCallback> * cb =
-                Callback::Callback<Int8sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x29: // int16 / Signed 16-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            int16_t value = CastToSigned(Encoding::LittleEndian::Read16(message));
-            ChipLogProgress(Zcl, "  value: %" PRId16, value);
-
-            Callback::Callback<Int16sAttributeCallback> * cb =
-                Callback::Callback<Int16sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x2B: // int32 / Signed 32-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(4);
-            int32_t value = CastToSigned(Encoding::LittleEndian::Read32(message));
-            ChipLogProgress(Zcl, "  value: %" PRId32, value);
-
-            Callback::Callback<Int32sAttributeCallback> * cb =
-                Callback::Callback<Int32sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x2F: // int64 / Signed 64-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(8);
-            int64_t value = CastToSigned(Encoding::LittleEndian::Read64(message));
-            ChipLogProgress(Zcl, "  value: %" PRId64, value);
-
-            Callback::Callback<Int64sAttributeCallback> * cb =
-                Callback::Callback<Int64sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-        }
-    }
-
     return true;
 }

@@ -21,11 +21,15 @@
 #include "LEDWidget.h"
 #include <app/server/OnboardingCodesUtil.h>
 
+#ifdef CAPSENSE_ENABLED
+#include "capsense.h"
+#endif
+
 // FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
 // from unistd.h to avoid a conflicting declaration with the `sleep()` provided
 // by Mbed-OS in mbed_power_mgmt.h.
 #define sleep unistd_sleep
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -58,15 +62,19 @@ constexpr uint32_t kPublishServicePeriodUs = 5000000;
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 static LEDWidget sLockLED(MBED_CONF_APP_LOCK_STATE_LED);
 
+#ifdef CAPSENSE_ENABLED
+static mbed::CapsenseButton CapFunctionButton(Capsense::getInstance(), 0);
+static mbed::CapsenseButton CapLockButton(Capsense::getInstance(), 1);
+#else
 static mbed::InterruptIn sLockButton(LOCK_BUTTON);
 static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
+#endif
 
 static bool sIsWiFiStationProvisioned = false;
 static bool sIsWiFiStationEnabled     = false;
 static bool sIsWiFiStationConnected   = false;
 static bool sIsPairedToAccount        = false;
 static bool sHaveBLEConnections       = false;
-static bool sHaveServiceConnectivity  = false;
 
 static mbed::Timeout sFunctionTimer;
 
@@ -89,7 +97,7 @@ int AppTask::Init()
                 if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
                     event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
                 {
-                    chip::app::Mdns::StartServer();
+                    chip::app::DnssdServer::Instance().StartServer();
                 }
             }
         },
@@ -99,9 +107,15 @@ int AppTask::Init()
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
     // Initialize buttons
+#ifdef CAPSENSE_ENABLED
+    CapFunctionButton.fall(mbed::callback(this, &AppTask::FunctionButtonPressEventHandler));
+    CapFunctionButton.rise(mbed::callback(this, &AppTask::FunctionButtonReleaseEventHandler));
+    CapLockButton.fall(mbed::callback(this, &AppTask::LockButtonPressEventHandler));
+#else
     sLockButton.fall(mbed::callback(this, &AppTask::LockButtonPressEventHandler));
     sFunctionButton.fall(mbed::callback(this, &AppTask::FunctionButtonPressEventHandler));
     sFunctionButton.rise(mbed::callback(this, &AppTask::FunctionButtonReleaseEventHandler));
+#endif
 
     // Initialize lock manager
     BoltLockMgr().Init();
@@ -113,14 +127,11 @@ int AppTask::Init()
         ChipLogProgress(NotSpecified, "Enabling BLE advertising.");
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
-#ifdef MBED_CONF_APP_DEVICE_NAME
-    ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_DEVICE_NAME);
-#endif
 
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -140,6 +151,8 @@ int AppTask::StartApp()
         return ret;
     }
 
+    ChipLogProgress(NotSpecified, "Mbed lock-app example application run");
+
     while (true)
     {
         sAppEventQueue.dispatch(100);
@@ -156,20 +169,14 @@ int AppTask::StartApp()
             sIsWiFiStationEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
             sIsWiFiStationConnected   = ConnectivityMgr().IsWiFiStationConnected();
             sHaveBLEConnections       = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity  = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
-        // Consider the system to be "fully connected" if it has service
-        // connectivity and it is able to interact with the service on a regular basis.
-        bool isFullyConnected = sHaveServiceConnectivity;
-
         // Update the status LED if factory reset has not been initiated.
         //
-        // If system has "full connectivity", keep the LED On constantly.
+        // If system is connected to Wi-Fi station, keep the LED On constantly.
         //
-        // If thread and service provisioned, but not attached to the thread network yet OR no
-        // connectivity to the service OR subscriptions are not fully established
+        // If Wi-Fi is provisioned, but not connected to Wi-Fi station yet
         // THEN blink the LED Off for a short period of time.
         //
         // If the system has ble connection(s) uptill the stage above, THEN blink the LEDs at an even
@@ -178,12 +185,11 @@ int AppTask::StartApp()
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (isFullyConnected)
+            if (sIsWiFiStationConnected)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsWiFiStationProvisioned && sIsWiFiStationEnabled && sIsPairedToAccount &&
-                     (!sIsWiFiStationConnected || !isFullyConnected))
+            else if (sIsWiFiStationProvisioned && sIsWiFiStationEnabled && sIsPairedToAccount && !sIsWiFiStationConnected)
             {
                 sStatusLED.Blink(950, 50);
             }

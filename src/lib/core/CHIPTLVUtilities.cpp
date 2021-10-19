@@ -35,7 +35,7 @@ namespace Utilities {
 
 struct FindContext
 {
-    const uint64_t & mTag;
+    const Tag & mTag;
     TLVReader & mReader;
 };
 
@@ -272,7 +272,7 @@ static CHIP_ERROR FindHandler(const TLVReader & aReader, size_t aDepth, void * a
  *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified tag @a aTag was not found.
  *
  */
-CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult)
+CHIP_ERROR Find(const TLVReader & aReader, const Tag & aTag, TLVReader & aResult)
 {
     constexpr bool recurse = true;
     return Find(aReader, aTag, aResult, recurse);
@@ -297,7 +297,7 @@ CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aR
  *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified tag @a aTag was not found.
  *
  */
-CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult, const bool aRecurse)
+CHIP_ERROR Find(const TLVReader & aReader, const Tag & aTag, TLVReader & aResult, const bool aRecurse)
 {
     FindContext theContext = { aTag, aResult };
     CHIP_ERROR retval      = Iterate(aReader, FindHandler, &theContext, aRecurse);

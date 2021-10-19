@@ -3,6 +3,11 @@
 This is a reference application that implements an example of an OTA Provider
 Cluster Server.
 
+## Building
+
+Suggest doing the following:
+`scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false`
+
 ## Usage
 
 `./ota-provider-app [--filepath \<filepath\>]`

@@ -29,15 +29,6 @@
 namespace chip {
 namespace app {
 namespace TestClusterInfo {
-void TestDirty(nlTestSuite * apSuite, void * apContext)
-{
-    ClusterInfo clusterInfo1;
-    clusterInfo1.SetDirty();
-    NL_TEST_ASSERT(apSuite, clusterInfo1.IsDirty());
-    clusterInfo1.ClearDirty();
-    NL_TEST_ASSERT(apSuite, !clusterInfo1.IsDirty());
-}
-
 void TestAttributePathIncludedSameFieldId(nlTestSuite * apSuite, void * apContext)
 {
     ClusterInfo clusterInfo1;
@@ -104,7 +95,6 @@ void TestAttributePathIncludedDifferentClusterId(nlTestSuite * apSuite, void * a
 
 namespace {
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty),
     NL_TEST_DEF("TestAttributePathIncludedSameFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedSameFieldId),
     NL_TEST_DEF("TestAttributePathIncludedDifferentFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedDifferentFieldId),
     NL_TEST_DEF("TestAttributePathIncludedDifferentEndpointId",

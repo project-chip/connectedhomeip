@@ -190,10 +190,51 @@ void TestBytesToHexErrors(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestBytesToHexUint64(nlTestSuite * inSuite, void * inContext)
+{
+    // Different values in each byte and each nibble should let us know if the conversion is correct.
+    uint64_t test = 0x0123456789ABCDEF;
+    char buf[17];
+    char upperExpected[] = "0123456789ABCDEF";
+    char lowerExpected[] = "0123456789abcdef";
+
+    // Lower case.
+    memset(buf, 1, sizeof(buf));
+    NL_TEST_ASSERT(inSuite, BytesToHex(test, buf, sizeof(buf), HexFlags::kNone) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, memcmp(buf, lowerExpected, strlen(lowerExpected)) == 0);
+    // No null termination.
+    NL_TEST_ASSERT(inSuite, buf[16] == 1);
+
+    // Upper case.
+    memset(buf, 1, sizeof(buf));
+    NL_TEST_ASSERT(inSuite, BytesToHex(test, buf, sizeof(buf), HexFlags::kUppercase) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, memcmp(buf, upperExpected, strlen(upperExpected)) == 0);
+    // No null termination.
+    NL_TEST_ASSERT(inSuite, buf[16] == 1);
+
+    // Lower case with null termination.
+    memset(buf, 1, sizeof(buf));
+    NL_TEST_ASSERT(inSuite, BytesToHex(test, buf, sizeof(buf), HexFlags::kNullTerminate) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, memcmp(buf, lowerExpected, sizeof(lowerExpected)) == 0);
+
+    // Upper case with null termination.
+    memset(buf, 1, sizeof(buf));
+    NL_TEST_ASSERT(inSuite, BytesToHex(test, buf, sizeof(buf), HexFlags::kUppercaseAndNullTerminate) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, memcmp(buf, upperExpected, sizeof(upperExpected)) == 0);
+
+    // Too small buffer
+    NL_TEST_ASSERT(inSuite, BytesToHex(test, buf, sizeof(buf) - 2, HexFlags::kNone) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    NL_TEST_ASSERT(inSuite, BytesToHex(test, buf, sizeof(buf) - 2, HexFlags::kUppercase) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    NL_TEST_ASSERT(inSuite, BytesToHex(test, buf, sizeof(buf) - 1, HexFlags::kNullTerminate) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    NL_TEST_ASSERT(inSuite,
+                   BytesToHex(test, buf, sizeof(buf) - 1, HexFlags::kUppercaseAndNullTerminate) == CHIP_ERROR_BUFFER_TOO_SMALL);
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestBytesToHexNotNullTerminated", TestBytesToHexNotNullTerminated), //
     NL_TEST_DEF("TestBytesToHexNullTerminated", TestBytesToHexNullTerminated),       //
     NL_TEST_DEF("TestBytesToHexErrors", TestBytesToHexErrors),                       //
+    NL_TEST_DEF("TestBytesToHexUint64", TestBytesToHexUint64),                       //
     NL_TEST_SENTINEL()                                                               //
 };
 

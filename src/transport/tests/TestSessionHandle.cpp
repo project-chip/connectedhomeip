@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements unit tests for the SecureSession implementation.
+ *      This file implements unit tests for the CryptoContext implementation.
  */
 
 #include <errno.h>
@@ -27,8 +27,7 @@
 #include <lib/core/CHIPCore.h>
 
 #include <protocols/secure_channel/PASESession.h>
-#include <transport/FabricTable.h>
-#include <transport/SecureSession.h>
+#include <transport/CryptoContext.h>
 #include <transport/SessionHandle.h>
 
 #include <lib/support/CodeUtils.h>

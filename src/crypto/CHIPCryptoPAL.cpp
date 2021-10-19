@@ -251,7 +251,10 @@ Spake2p::Spake2p(size_t _fe_size, size_t _point_size, size_t _hash_size)
 
 CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
 {
-    state = CHIP_SPAKE2P_STATE::PREINIT;
+    if (state != CHIP_SPAKE2P_STATE::PREINIT)
+    {
+        Clear();
+    }
 
     ReturnErrorOnFailure(InitImpl());
     ReturnErrorOnFailure(PointLoad(spake2p_M_p256, sizeof(spake2p_M_p256), M));

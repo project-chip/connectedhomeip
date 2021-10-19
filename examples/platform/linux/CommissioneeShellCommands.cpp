@@ -20,7 +20,7 @@
  */
 
 #include <CommissioneeShellCommands.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
@@ -46,7 +46,7 @@ static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commiss
         streamer_printf(sout, "SendUDC:        ");
     }
 
-    SendUserDirectedCommissioningRequest(commissioner);
+    Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
 
     streamer_printf(sout, "done\r\n");
 
@@ -59,9 +59,15 @@ static CHIP_ERROR PrintAllCommands()
     streamer_t * sout = streamer_get();
     streamer_printf(sout, "  help                       Usage: commissionee <subcommand>\r\n");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    streamer_printf(sout,
-                    "  sendudc <address> <port>   Send UDC message to address. Usage: commissionee sendudc 127.0.0.1 5543\r\n");
+    streamer_printf(sout, "  sendudc <address> <port>   Send UDC message to address. Usage: commissionee sendudc ::1 5543\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    streamer_printf(
+        sout, "  setdiscoverytimeout <timeout>   Set discovery timeout in seconds. Usage: commissionee setdiscoverytimeout 30\r\n");
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    streamer_printf(sout,
+                    "  setextendeddiscoverytimeout <timeout>   Set extendeddiscovery timeout in seconds. Usage: commissionee "
+                    "setextendeddiscoverytimeout 30\r\n");
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     streamer_printf(sout,
                     "  restartmdns <commissioningMode> (disabled|enabled_basic|enabled_enhanced)   Start Mdns with given "
                     "settings. Usage: commissionee "
@@ -89,6 +95,22 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         return error  = SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    else if (strcmp(argv[0], "setdiscoverytimeout") == 0)
+    {
+        char * eptr;
+        int16_t timeout = (int16_t) strtol(argv[1], &eptr, 10);
+        chip::app::DnssdServer::Instance().SetDiscoveryTimeoutSecs(timeout);
+        return CHIP_NO_ERROR;
+    }
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    else if (strcmp(argv[0], "setextendeddiscoverytimeout") == 0)
+    {
+        char * eptr;
+        int16_t timeout = (int16_t) strtol(argv[1], &eptr, 10);
+        chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(timeout);
+        return CHIP_NO_ERROR;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     else if (strcmp(argv[0], "restartmdns") == 0)
     {
         if (argc < 2)
@@ -97,17 +119,17 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         }
         if (strcmp(argv[1], "disabled") == 0)
         {
-            chip::app::Mdns::StartServer(chip::app::Mdns::CommissioningMode::kDisabled);
+            chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
             return CHIP_NO_ERROR;
         }
         if (strcmp(argv[1], "enabled_basic") == 0)
         {
-            chip::app::Mdns::StartServer(chip::app::Mdns::CommissioningMode::kEnabledBasic);
+            chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledBasic);
             return CHIP_NO_ERROR;
         }
         else if (strcmp(argv[1], "enabled_enhanced") == 0)
         {
-            chip::app::Mdns::StartServer(chip::app::Mdns::CommissioningMode::kEnabledEnhanced);
+            chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledEnhanced);
             return CHIP_NO_ERROR;
         }
         return PrintAllCommands();

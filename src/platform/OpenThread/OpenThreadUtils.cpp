@@ -24,6 +24,7 @@
 
 #include "OpenThreadUtils.h"
 
+#include <inet/IPAddress.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -131,10 +132,15 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
         }
 #if CHIP_CONFIG_SECURITY_TEST_MODE
         {
+#if OPENTHREAD_API_VERSION >= 126
+            const otNetworkKey * otKey = otThreadGetNetworkKey(otInst);
+            for (int i = 0; i < OT_NETWORK_KEY_SIZE; i++)
+#else
             const otMasterKey * otKey = otThreadGetMasterKey(otInst);
             for (int i = 0; i < OT_MASTER_KEY_SIZE; i++)
+#endif
                 snprintf(&strBuf[i * 2], 3, "%02X", otKey->m8[i]);
-            ChipLogDetail(DeviceLayer, "   Master Key: %s", strBuf);
+            ChipLogDetail(DeviceLayer, "   Network Key: %s", strBuf);
         }
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
     }
@@ -166,7 +172,7 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 
     char srcStr[50], destStr[50], typeBuf[20];
     const char * type = typeBuf;
-    IPAddress addr;
+    Inet::IPAddress addr;
     uint8_t headerData[44];
     uint16_t pktLen;
 
@@ -243,7 +249,7 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 #endif // CHIP_DETAIL_LOGGING
 }
 
-bool IsOpenThreadMeshLocalAddress(otInstance * otInst, const IPAddress & addr)
+bool IsOpenThreadMeshLocalAddress(otInstance * otInst, const Inet::IPAddress & addr)
 {
     const otMeshLocalPrefix * otMeshPrefix = otThreadGetMeshLocalPrefix(otInst);
 

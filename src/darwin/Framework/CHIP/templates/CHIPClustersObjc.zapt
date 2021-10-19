@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#chip_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler;
+- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments_with_structs_expanded}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments_with_structs_expanded}}responseHandler:(ResponseHandler)responseHandler;
 {{else}}
 - (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler;
 {{/if}}
@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{#if isReportableAttribute}}
-- (void) configure{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler;
+- (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler;
 - (void) report{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{/chip_server_cluster_attributes}}

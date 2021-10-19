@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <sys/select.h>
@@ -73,7 +74,7 @@ protected:
     void _LockChipStack(void);
     bool _TryLockChipStack(void);
     void _UnlockChipStack(void);
-    void _PostEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop(void);
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StopEventLoopTask();

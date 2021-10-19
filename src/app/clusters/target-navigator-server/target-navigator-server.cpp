@@ -24,13 +24,16 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::TargetNavigator;
 
 TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data);
 
@@ -52,11 +55,15 @@ exit:
     }
 }
 
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t target,
-                                                         uint8_t * data)
+bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * command,
+                                                         const app::ConcreteCommandPath & commandPath,
+                                                         const Commands::NavigateTarget::DecodableType & commandData)
 {
+    auto & target = commandData.target;
+    auto & data   = commandData.data;
+
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string dataString(reinterpret_cast<char *>(data));
+    std::string dataString(data.data(), data.size());
     TargetNavigatorResponse response = targetNavigatorClusterNavigateTarget(target, dataString);
     sendResponse(command, response);
     return true;

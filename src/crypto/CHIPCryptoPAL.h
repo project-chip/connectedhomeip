@@ -26,7 +26,10 @@
 #include <crypto/CryptoBuildConfig.h>
 #endif
 
+#include <system/SystemConfig.h>
+
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -47,6 +50,8 @@ constexpr size_t kSHA1_Hash_Length                = 20;
 constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
 
+constexpr size_t CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES = 16;
+
 constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
 constexpr size_t kMax_ECDSA_Signature_Length = kP256_ECDSA_Signature_Length_Raw;
 constexpr size_t kMAX_FE_Length              = kP256_FE_Length;
@@ -62,6 +67,13 @@ constexpr size_t kMax_Salt_Length = 16;
 constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
 constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
+constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
+constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
+
+// TODO: Remove AES-256 from CryptoPAL since not required by V1 spec
+constexpr size_t kAES_CCM256_Key_Length   = 256u / 8u;
+constexpr size_t kAES_CCM256_Block_Length = kAES_CCM256_Key_Length;
+
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.
@@ -72,18 +84,7 @@ constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
 constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
 
-/*
- * Worst case is OpenSSL, so let's use its worst case and let static assert tell us if
- * we are wrong, since `typedef SHA_LONG unsigned int` is default.
- *   SHA_LONG h[8];
- *   SHA_LONG Nl, Nh;
- *   SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
- *   unsigned int num, md_len;
- *
- * We also have to account for possibly some custom extensions on some targets,
- * especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
- */
-constexpr size_t kMAX_Hash_SHA256_Context_Size = ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t));
+constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE;
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
@@ -154,6 +155,12 @@ enum class SupportedECPKeyTypes : uint8_t
     ECP256R1 = 0,
 };
 
+/** @brief Safely clears the first `len` bytes of memory area `buf`.
+ * @param buf Pointer to a memory buffer holding secret data that must be cleared.
+ * @param len Specifies secret data size in bytes.
+ **/
+void ClearSecretData(uint8_t * buf, size_t len);
+
 template <typename Sig>
 class ECPKey
 {
@@ -176,6 +183,12 @@ template <size_t Cap>
 class CapacityBoundBuffer
 {
 public:
+    ~CapacityBoundBuffer()
+    {
+        // Sanitize after use
+        ClearSecretData(&bytes[0], Cap);
+    }
+
     /** @brief Set current length of the buffer that's being used
      * @return Returns error if new length is > capacity
      **/
@@ -338,7 +351,7 @@ class P256Keypair : public P256KeypairBase
 {
 public:
     P256Keypair() {}
-    ~P256Keypair();
+    virtual ~P256Keypair();
 
     /**
      * @brief Initialize the keypair.
@@ -476,7 +489,9 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @brief A function that implements AES-CCM encryption
  *
  * This implements the CHIP_Crypto_AEAD_GenerateEncrypt() cryptographic primitive
- * from the specification.
+ * from the specification. For an empty plaintext, the user of the API can provide
+ * an empty string, or a nullptr, and provide plaintext_length as 0. The output buffer,
+ * ciphertext can also be an empty string, or a nullptr for this case.
  *
  * @param plaintext Plaintext to encrypt
  * @param plaintext_length Length of plain_text
@@ -499,7 +514,9 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @brief A function that implements AES-CCM decryption
  *
  * This implements the CHIP_Crypto_AEAD_DecryptVerify() cryptographic primitive
- * from the specification.
+ * from the specification. For an empty ciphertext, the user of the API can provide
+ * an empty string, or a nullptr, and provide ciphertext_length as 0. The output buffer,
+ * plaintext can also be an empty string, or a nullptr for this case.
  *
  * @param ciphertext Ciphertext to decrypt
  * @param ciphertext_length Length of ciphertext
@@ -771,6 +788,11 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR Init(const uint8_t * context, size_t context_len);
+
+    /**
+     * @brief Free Spake2+ underlying objects.
+     **/
+    virtual void Clear() = 0;
 
     /**
      * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned).
@@ -1094,7 +1116,7 @@ protected:
                            size_t info_len, uint8_t * out, size_t out_len) = 0;
 
     CHIP_SPAKE2P_ROLE role;
-    CHIP_SPAKE2P_STATE state;
+    CHIP_SPAKE2P_STATE state = CHIP_SPAKE2P_STATE::PREINIT;
     size_t fe_size;
     size_t hash_size;
     size_t point_size;
@@ -1119,8 +1141,9 @@ public:
         memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
     }
 
-    ~Spake2p_P256_SHA256_HKDF_HMAC() override { FreeImpl(); }
+    ~Spake2p_P256_SHA256_HKDF_HMAC() override { Spake2p_P256_SHA256_HKDF_HMAC::Clear(); }
 
+    void Clear() override;
     CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
                          size_t in_len) override;
@@ -1146,11 +1169,6 @@ protected:
                    size_t info_length, uint8_t * out, size_t out_length) override;
 
 private:
-    /**
-     * @brief Free any underlying implementation curve, points, field elements, etc.
-     **/
-    void FreeImpl();
-
     CHIP_ERROR InitInternal();
     Hash_SHA256_stream sha256_hash_ctx;
 
@@ -1175,12 +1193,6 @@ private:
 CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
                                       MutableByteSpan & out_compressed_fabric_id);
 
-/** @brief Safely clears the first `len` bytes of memory area `buf`.
- * @param buf Pointer to a memory buffer holding secret data that must be cleared.
- * @param len Specifies secret data size in bytes.
- **/
-void ClearSecretData(uint8_t * buf, size_t len);
-
 typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
 
 CHIP_ERROR LoadCertsFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs);
@@ -1193,6 +1205,21 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
 
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
+
+/**
+ * @brief Extracts the Subject Key Identifier from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & skid);
+
+/**
+ * @brief Extracts the Authority Key Identifier from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
+
+/**
+ * @brief Extracts the Vendor ID from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid);
 
 } // namespace Crypto
 } // namespace chip

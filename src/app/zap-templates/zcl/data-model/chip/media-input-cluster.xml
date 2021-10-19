@@ -50,6 +50,7 @@ limitations under the License.
   </cluster>
 
   <struct name="MediaInputInfo">
+    <cluster code="0x0507"/>
     <item name="index" type="INT8U"/>
     <item name="inputType" type="MediaInputType"/>
     <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
@@ -57,6 +58,7 @@ limitations under the License.
   </struct>
 
   <enum name="MediaInputType" type="ENUM8">
+    <cluster code="0x0507"/>
     <item name="Internal" value="0x00"/>
     <item name="Aux" value="0x01"/>
     <item name="Coax" value="0x02"/>

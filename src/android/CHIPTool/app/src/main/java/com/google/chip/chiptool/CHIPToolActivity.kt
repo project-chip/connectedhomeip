@@ -30,9 +30,12 @@ import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
+import com.google.chip.chiptool.clusterclient.ClusterInteractionFragment
+import com.google.chip.chiptool.clusterclient.MultiAdminClientFragment
+import com.google.chip.chiptool.clusterclient.OpCredClientFragment
+import com.google.chip.chiptool.clusterclient.BasicClientFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.clusterclient.SensorClientFragment
-import com.google.chip.chiptool.echoclient.EchoClientFragment
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
@@ -110,8 +113,8 @@ class CHIPToolActivity :
     showFragment(AddressCommissioningFragment.newInstance(), false)
   }
 
-  override fun handleEchoClientClicked() {
-    showFragment(EchoClientFragment.newInstance())
+  override fun handleClusterInteractionClicked() {
+    showFragment(ClusterInteractionFragment.newInstance())
   }
 
   override fun handleOnOffClicked() {
@@ -120,6 +123,18 @@ class CHIPToolActivity :
 
   override fun handleSensorClicked() {
     showFragment(SensorClientFragment.newInstance())
+  }
+
+  override fun handleMultiAdminClicked() {
+    showFragment(MultiAdminClientFragment.newInstance())
+  }
+
+  override fun handleOpCredClicked() {
+    showFragment(OpCredClientFragment.newInstance())
+  }
+
+  override fun handleBasicClicked() {
+    showFragment(BasicClientFragment.newInstance())
   }
 
   override fun handleAttestationTestClicked() {

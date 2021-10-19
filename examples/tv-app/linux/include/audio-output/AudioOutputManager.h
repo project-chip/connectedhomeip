@@ -26,5 +26,5 @@ class AudioOutputManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<EmberAfAudioOutputInfo> proxyGetListOfAudioOutputInfo();
+    std::vector<AudioOutputInfo> proxyGetListOfAudioOutputInfo();
 };

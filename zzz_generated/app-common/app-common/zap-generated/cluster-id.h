@@ -76,6 +76,9 @@ static constexpr chip::ClusterId ZCL_OTA_PROVIDER_CLUSTER_ID = 0x0029;
 // Definitions for cluster: OTA Software Update Requestor
 static constexpr chip::ClusterId ZCL_OTA_REQUESTOR_CLUSTER_ID = 0x002A;
 
+// Definitions for cluster: Power Source
+static constexpr chip::ClusterId ZCL_POWER_SOURCE_CLUSTER_ID = 0x002F;
+
 // Definitions for cluster: General Commissioning
 static constexpr chip::ClusterId ZCL_GENERAL_COMMISSIONING_CLUSTER_ID = 0x0030;
 

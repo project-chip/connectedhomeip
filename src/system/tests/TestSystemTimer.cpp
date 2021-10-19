@@ -34,7 +34,7 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <system/SystemError.h>
-#include <system/SystemLayer.h>
+#include <system/SystemLayerImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
@@ -52,15 +52,15 @@ using namespace chip::System;
 static void ServiceEvents(Layer & aLayer)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    aLayer.WatchableEventsManager().PrepareEvents();
-    aLayer.WatchableEventsManager().WaitForEvents();
-    aLayer.WatchableEventsManager().HandleEvents();
+    static_cast<LayerSocketsLoop &>(aLayer).PrepareEvents();
+    static_cast<LayerSocketsLoop &>(aLayer).WaitForEvents();
+    static_cast<LayerSocketsLoop &>(aLayer).HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (aLayer.IsInitialized())
     {
-        aLayer.WatchableEventsManager().HandlePlatformTimer();
+        static_cast<LayerImplLwIP &>(aLayer).HandlePlatformTimer();
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
@@ -195,7 +195,7 @@ static nlTestSuite kTheSuite =
 };
 // clang-format on
 
-static Layer sLayer;
+static LayerImpl sLayer;
 
 /**
  *  Set up the test suite.

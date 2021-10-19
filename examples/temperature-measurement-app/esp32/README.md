@@ -214,5 +214,13 @@ Optimization related to WiFi, BLuetooth, Asserts etc are the part of this
 example by default. To enable this option set is_debug=false from command-line.
 
 ```
-idf.py -p /dev/tty.SLAB_USBtoUART -Dis_debug=false build flash monitor
+# Reconfigure the project for additional optimizations
+rm -rf sdkconfig build/
+idf.py -Dis_debug=false reconfigure
+
+# Set additional configurations if required
+idf.py menuconfig
+
+# Build, flash, and monitor the device
+idf.py -p /dev/tty.SLAB_USBtoUART build flash monitor
 ```

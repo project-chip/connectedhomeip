@@ -37,7 +37,7 @@ bool IsIgnoredMulticastSendError(CHIP_ERROR err)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         err == System::MapErrorLwIP(ERR_RTE)
 #else
-        err == System::MapErrorPOSIX(ENETUNREACH) || err == System::MapErrorPOSIX(EADDRNOTAVAIL)
+        err == CHIP_ERROR_POSIX(ENETUNREACH) || err == CHIP_ERROR_POSIX(EADDRNOTAVAIL)
 #endif
         ;
 }
@@ -57,7 +57,7 @@ CHIP_ERROR FilterUDPSendError(CHIP_ERROR err, bool isMulticast)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-        if (err == System::MapErrorPOSIX(ENETUNREACH) || err == System::MapErrorPOSIX(EADDRNOTAVAIL))
+        if (err == CHIP_ERROR_POSIX(ENETUNREACH) || err == CHIP_ERROR_POSIX(EADDRNOTAVAIL))
         {
             err = CHIP_NO_ERROR;
         }

@@ -17,16 +17,19 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <enum name="GeneralCommissioningError" type="ENUM8">
+    <cluster code="0x0030"/>
     <item name="Ok" value="0x0"/>
     <item name="ValueOutsideRange" value="0x1"/>
     <item name="InvalidAuthentication" value="0x2"/>
   </enum>
   <enum name="RegulatoryLocationType" type="ENUM8">
+    <cluster code="0x0030"/>
     <item name="Indoor" value="0x0"/>
     <item name="Outdoor" value="0x1"/>
     <item name="IndoorOutdoor" value="0x2"/>
   </enum>
   <struct name="BasicCommissioningInfoType">
+    <cluster code="0x0030"/>
     <item name="FailSafeExpiryLengthMs" type="INT32U"/>
   </struct>  
   <cluster>

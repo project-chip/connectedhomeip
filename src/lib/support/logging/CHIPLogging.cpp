@@ -92,6 +92,7 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SVR"   // AppServer
                                   "DIS"   // Discovery
                                   "IM"    // InteractionModel
+                                  "TST"   // Test
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)

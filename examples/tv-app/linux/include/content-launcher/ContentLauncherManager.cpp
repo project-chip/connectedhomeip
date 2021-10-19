@@ -21,10 +21,12 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 
 #include <app/Command.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -72,8 +74,8 @@ vector<EmberAfContentLaunchStreamingType> ContentLauncherManager::proxyGetSuppor
     return supportedStreamingTypes;
 }
 
-ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<EmberAfContentLaunchParamater> parameterList,
-                                                                        bool autoplay, string data)
+ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                                        string data)
 {
     // TODO: Insert code here
     ContentLaunchResponse response;
@@ -82,7 +84,7 @@ ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<Emb
     return response;
 }
 ContentLaunchResponse ContentLauncherManager::proxyLaunchUrlRequest(string contentUrl, string displayString,
-                                                                    EmberAfContentLaunchBrandingInformation brandingInformation)
+                                                                    ContentLaunchBrandingInformation brandingInformation)
 {
     // TODO: Insert code here
     ContentLaunchResponse response;
@@ -103,23 +105,30 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
     }
 }
 
-bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
-                                                        bool autoplay, unsigned char * data)
+bool emberAfContentLauncherClusterLaunchContentCallback(
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
+    auto & autoplay = commandData.autoPlay;
+    auto & data     = commandData.data;
 
-    string dataString(reinterpret_cast<char *>(data));
-    list<EmberAfContentLaunchParamater> parameterList;
+    string dataString(data.data(), data.size());
+    list<ContentLaunchParamater> parameterList;
     ContentLaunchResponse response = ContentLauncherManager().proxyLaunchContentRequest(parameterList, autoplay, dataString);
     sendResponse("LaunchContent", response, ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID);
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
-                                                    unsigned char * contentUrl, unsigned char * displayString)
+bool emberAfContentLauncherClusterLaunchURLCallback(
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
-    string contentUrlString(reinterpret_cast<char *>(contentUrl));
-    string displayStringString(reinterpret_cast<char *>(displayString));
-    EmberAfContentLaunchBrandingInformation brandingInformation;
+    auto & contentUrl    = commandData.contentURL;
+    auto & displayString = commandData.displayString;
+
+    string contentUrlString(contentUrl.data(), contentUrl.size());
+    string displayStringString(displayString.data(), displayString.size());
+    ContentLaunchBrandingInformation brandingInformation;
     ContentLaunchResponse response =
         ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);
     sendResponse("LaunchURL", response, ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID);

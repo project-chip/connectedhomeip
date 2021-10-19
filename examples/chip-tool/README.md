@@ -64,7 +64,7 @@ where:
 
 -   ssid is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX where
     the bytes of the SSID are encoded as two-digit hex numbers.
--   paswword is the Wi-Fi password, again either as a string or as hex data
+-   password is the Wi-Fi password, again either as a string or as hex data
 -   The 0 is the fabric id, until more complete support for multiple fabrics is
     implemented in our commissioning process.
 
@@ -78,10 +78,20 @@ or equivalently:
 
 #### Pair a device over IP
 
-The command below will pair to a localhost device (`::1`) running the
-`all-clusters-app` on the default port (`5540`) over IPv6:
+The command below will discover devices and try to pair with the first one it
+discovers using the provided setup code.
 
-    $ chip-tool pairing onnetwork 0 20202021 3840 ::1 5540
+    $ chip-tool pairing onnetwork 20202021
+
+The command below will discover devices with long discriminator 3840 and try to
+pair with the first one it discovers using the provided setup code.
+
+    $ chip-tool pairing onnetwork-long 20202021 3840
+
+The command below will discover devices based on the given QR code (which
+devices log when they start up) and try to pair with the first one it discovers.
+
+    $ chip-tool pairing qrcode MT:#######
 
 ### Forget the currently-commissioned device
 

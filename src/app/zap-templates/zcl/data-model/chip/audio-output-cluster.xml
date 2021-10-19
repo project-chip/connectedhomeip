@@ -42,12 +42,14 @@ limitations under the License.
   </cluster>
 
   <struct name="AudioOutputInfo">
+    <cluster code="0x050b"/>
     <item name="index" type="INT8U"/>
     <item name="outputType" type="AudioOutputType"/>
     <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
   </struct>
 
   <enum name="AudioOutputType" type="ENUM8">
+    <cluster code="0x050b"/>
     <item name="Hdmi" value="0x00"/>
     <item name="Bt" value="0x01"/>
     <item name="Optical" value="0x02"/>

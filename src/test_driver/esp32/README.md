@@ -1,6 +1,6 @@
 # CHIP Tests on Device
 
-An appplication that runs CHIP's unit tests on ESP32 device or QEMU.
+An application that runs CHIP's unit tests on ESP32 device or QEMU.
 
 ---
 

@@ -71,6 +71,7 @@ def getSpecificTemplatesTargets():
         'src/controller/python/templates/templates.json': None,
         'src/darwin/Framework/CHIP/templates/templates.json': None,
         'src/controller/java/templates/templates.json': None,
+        'src/app/tests/suites/templates/templates.json': 'zzz_generated/controller-clusters/zap-generated',
     }
 
     for template, output_dir in templates.items():

@@ -78,7 +78,6 @@ CHIP_ERROR AttributePathList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -91,7 +90,6 @@ AttributePath::Builder & AttributePathList::Builder::CreateAttributePathBuilder(
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathBuilder.ResetError(mError));
 
     mError = mAttributePathBuilder.Init(mpWriter);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mAttributePathBuilder would be un-/partial initialized and cannot be used to write anything

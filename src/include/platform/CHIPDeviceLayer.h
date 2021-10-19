@@ -28,11 +28,10 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/GeneralUtils.h>
+#include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#include <platform/SoftwareUpdateManager.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#include <system/SystemLayerImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -43,9 +42,29 @@
 namespace chip {
 namespace DeviceLayer {
 
+namespace Internal {
+extern chip::System::Layer * gSystemLayer;
+} // namespace Internal
+
 struct ChipDeviceEvent;
-extern chip::System::Layer SystemLayer;
 extern Inet::InetLayer InetLayer;
+
+inline chip::System::Layer & SystemLayer()
+{
+    return *Internal::gSystemLayer;
+}
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+inline chip::System::LayerSockets & SystemLayerSockets()
+{
+    return *static_cast<chip::System::LayerSockets *>(Internal::gSystemLayer);
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+inline void SetSystemLayerForTesting(System::Layer * layer)
+{
+    Internal::gSystemLayer = layer;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

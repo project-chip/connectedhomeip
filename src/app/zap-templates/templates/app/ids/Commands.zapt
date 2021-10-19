@@ -8,15 +8,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace Globals {
-namespace Commands {
-namespace Ids {
-{{#zcl_global_commands}}
-static constexpr CommandId {{asUpperCamelCase label}} = {{asMEI manufacturerCode code}};
-{{/zcl_global_commands}}
-} // namespace Ids
-} // namespace Commands
-} // namespace Globals
+// Matter does not have global commands
 
 {{#zcl_clusters}}
 
@@ -24,11 +16,13 @@ static constexpr CommandId {{asUpperCamelCase label}} = {{asMEI manufacturerCode
 {{#first}}
 namespace {{asUpperCamelCase parent.label}} {
 namespace Commands {
-namespace Ids {
+
 {{/first}}
-static constexpr CommandId {{asUpperCamelCase label}} = {{asMEI manufacturerCode code}};
+namespace {{asUpperCamelCase label}} {
+static constexpr CommandId Id = {{asMEI manufacturerCode code}};
+} // namespace {{asUpperCamelCase label}}
+
 {{#last}}
-} // namespace Ids
 } // namespace Commands
 } // namespace {{asUpperCamelCase parent.label}}
 {{/last}}

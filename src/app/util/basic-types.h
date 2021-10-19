@@ -25,7 +25,7 @@
 
 #include <stdint.h>
 
-// Pull in NodeId
+#include <lib/core/GroupId.h>
 #include <lib/core/NodeId.h>
 
 // Pull in VendorId
@@ -35,6 +35,7 @@ namespace chip {
 typedef uint8_t ActionId;
 typedef uint32_t AttributeId;
 typedef uint32_t ClusterId;
+typedef uint8_t ClusterStatus;
 typedef uint32_t CommandId;
 typedef uint32_t DataVersion;
 typedef uint32_t DeviceTypeId;
@@ -44,10 +45,10 @@ typedef uint64_t EventNumber;
 typedef uint64_t FabricId;
 typedef uint8_t FabricIndex;
 typedef uint32_t FieldId;
-typedef uint16_t GroupId;
 typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
-typedef uint32_t StatusCode;
 typedef uint8_t Percent;
 typedef uint16_t Percent100ths;
+
+static constexpr FabricIndex kUndefinedFabricIndex = 0;
 } // namespace chip

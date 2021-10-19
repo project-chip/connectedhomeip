@@ -1,0 +1,161 @@
+{{> header}}
+
+#pragma once
+
+#include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
+#include <app/data-model/List.h>
+#include <app/util/basic-types.h>
+#include <lib/support/BitFlags.h>
+#include <protocols/interaction_model/Constants.h>
+#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase name}} {
+{{#zcl_enums}}
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for {{label}}
+enum class {{asType label}} : {{asUnderlyingZclType type}} {
+{{#zcl_enum_items}}
+k{{asUpperCamelCase label}} = {{asHex value 2}},
+{{/zcl_enum_items}}
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using {{asType label}} = EmberAf{{asType label}};
+#endif
+{{/zcl_enums}}
+
+{{#zcl_bitmaps}}
+
+// Bitmap for {{label}}
+enum class {{asType label}} : {{asUnderlyingZclType type}} {
+{{#zcl_bitmap_items}}
+k{{asUpperCamelCase label}} = {{asOffset mask}},
+{{/zcl_bitmap_items}}
+};
+{{/zcl_bitmaps}}
+
+{{#zcl_structs}}
+{{#first}}
+namespace Structs {
+{{/first}}
+namespace {{name}} {
+    enum class Fields {
+    {{#zcl_struct_items}}
+    k{{asUpperCamelCase label}} = {{index}},
+    {{/zcl_struct_items}}
+    };
+
+    struct Type {
+    public:
+        {{#zcl_struct_items}}
+        {{#if isArray}}DataModel::List<{{/if}}{{zapTypeToEncodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
+        {{/zcl_struct_items}}
+
+        CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+        {{#unless struct_contains_array}}
+        CHIP_ERROR Decode(TLV::TLVReader &reader);
+        {{/unless}}
+    };
+
+    {{#if struct_contains_array}}
+    struct DecodableType {
+    public:
+        {{#zcl_struct_items}}
+        {{#if isArray}}DataModel::DecodableList<{{/if}}{{zapTypeToDecodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
+        {{/zcl_struct_items}}
+        CHIP_ERROR Decode(TLV::TLVReader &reader);
+    };
+    {{else}}
+    using DecodableType = Type;
+    {{/if}}
+
+} // namespace {{name}}
+{{#last}}
+} // namespace Structs
+{{/last}}
+{{/zcl_structs}}
+
+{{#zcl_commands}}
+{{#first}}
+namespace Commands {
+{{/first}}
+namespace {{asUpperCamelCase name}} {
+enum class Fields {
+    {{#zcl_command_arguments}}
+    k{{asUpperCamelCase label}} = {{index}},
+    {{/zcl_command_arguments}}
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return {{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+
+    {{#zcl_command_arguments}}
+    {{#if isArray}}DataModel::List<{{/if}}{{zapTypeToEncodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
+    {{/zcl_command_arguments}}
+
+    CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+};
+
+struct DecodableType {
+public:
+    static constexpr CommandId GetCommandId() { return {{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+
+    {{#zcl_command_arguments}}
+    {{#if isArray}}DataModel::DecodableList<{{/if}}{{zapTypeToDecodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
+    {{/zcl_command_arguments}}
+    CHIP_ERROR Decode(TLV::TLVReader &reader);
+};
+}; // namespace {{asUpperCamelCase name}}
+{{#last}}
+} // namespace Commands
+{{/last}}
+{{/zcl_commands}}
+
+{{#zcl_attributes_server}}
+{{#if (hasSpecificAttributes)}}
+{{#first}}
+namespace Attributes {
+{{/first}}
+{{#if clusterRef}}
+namespace {{asUpperCamelCase label}} {
+    struct TypeInfo {
+    {{#if entryType}}
+        using Type = DataModel::List<{{zapTypeToEncodableClusterObjectType entryType}}>;
+        using DecodableType = DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType entryType}}>;
+    {{else}}
+        using Type = {{zapTypeToEncodableClusterObjectType type}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType type}};
+    {{/if}}
+
+        static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+        static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
+    };
+} // namespace {{asUpperCamelCase label}}
+{{/if}}
+{{#last}}
+} // namespace Attributes
+{{/last}}
+{{/if}}
+{{/zcl_attributes_server}}
+} // namespace {{asUpperCamelCase name}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

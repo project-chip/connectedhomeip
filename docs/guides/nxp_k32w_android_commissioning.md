@@ -27,7 +27,7 @@ onto a CHIP-enabled Thread network.
 
 The commissioning process is composed of the following main stages:
 
--   K32W061 (CHIP accessory) device is put in BLE advertisment mode by pressing
+-   K32W061 (CHIP accessory) device is put in BLE advertisement mode by pressing
     the USERINTERFACE button;
 -   CHIPTool discovers the CHIP accessory over BLE;
 -   CHIPTool establishes a secure channel with the accessory using a SPAKE2+
@@ -182,7 +182,7 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
     -   On System startup, dnsmasq will not wait for wlan0 interface to
         initialize and will fail. We need to tell systemd to launch it after
-        networks get ready, so we will modify dnsmasq service file by specifing
+        networks get ready, so we will modify dnsmasq service file by specifying
         the initialization order under the _After=_ and _Wants=_ sections:
 
               $ sudo vim /lib/systemd/system/dnsmasq.service

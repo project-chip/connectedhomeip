@@ -20,10 +20,9 @@
 
 #pragma once
 
-#include <transport/FabricTable.h>
+#include <transport/CryptoContext.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
-#include <transport/SecureSession.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -34,12 +33,6 @@ namespace Transport {
 class SessionMessageCounter
 {
 public:
-    void Reset()
-    {
-        mLocalMessageCounter.Reset();
-        mPeerMessageCounter.Reset();
-    }
-
     MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 

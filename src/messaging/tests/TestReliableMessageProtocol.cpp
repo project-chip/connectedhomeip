@@ -26,11 +26,12 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 
 #include <nlbyteorder.h>
@@ -65,7 +66,7 @@ chip::Test::IOContext gIOContext;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -76,9 +77,9 @@ public:
         if (mDropAckResponse)
         {
             auto * rc = ec->GetReliableMessageContext();
-            if (rc->IsAckPending())
+            if (rc->HasPiggybackAckPending())
             {
-                (void) rc->TakePendingPeerAckId();
+                (void) rc->TakePendingPeerAckMessageCounter();
             }
         }
 
@@ -124,26 +125,9 @@ public:
     nlTestSuite * mTestSuite       = nullptr;
 };
 
-class MockSessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
+class MockSessionEstablishmentExchangeDispatch : public Messaging::ApplicationExchangeDispatch
 {
 public:
-    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
-                              EncryptedPacketBufferHandle & preparedMessage) override
-    {
-        PacketHeader packetHeader;
-
-        ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
-        ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
-
-        preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override
-    {
-        return gTransportMgr.SendMessage(Transport::PeerAddress(), preparedMessage.CastToWritable());
-    }
-
     bool IsReliableTransmissionAllowed() const override { return mRetainMessageOnSend; }
 
     bool MessagePermitted(uint16_t protocol, uint8_t type) override { return true; }
@@ -158,7 +142,7 @@ public:
 class MockSessionEstablishmentDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -172,7 +156,7 @@ public:
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
 
-    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) override
+    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SessionManager * sessionManager) override
     {
         return &mMessageDispatch;
     }
@@ -192,7 +176,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -215,7 +199,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -243,7 +227,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockSender;
     // TODO: temporarily create a SessionHandle from node id, will be fix in PR 3602
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -308,7 +292,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     MockAppDelegate mockSender;
     // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -367,7 +351,10 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockSessionEstablishmentDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    err = mockSender.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -379,9 +366,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
         1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
-
-    err = mockSender.mMessageDispatch.Init();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
 
@@ -414,23 +398,26 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     MockSessionEstablishmentDelegate mockReceiver;
-    CHIP_ERROR err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    CHIP_ERROR err = mockReceiver.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Expect the received messages to be encrypted
     mockReceiver.mMessageDispatch.mRequireEncryption = true;
 
     MockSessionEstablishmentDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    err = mockSender.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ExchangeContext * exchange = ctx.NewUnauthenticatedExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
-
-    err = mockSender.mMessageDispatch.Init();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
@@ -463,7 +450,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -525,7 +512,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -584,23 +571,23 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     CHIP_ERROR err = ctx.Init(inSuite, &gTransportMgr, &gIOContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.SetSourceNodeId(kPlaceholderNodeId);
-    ctx.SetDestinationNodeId(kPlaceholderNodeId);
-    ctx.SetLocalKeyId(0);
-    ctx.SetPeerKeyId(0);
-    ctx.SetFabricIndex(kUndefinedFabricIndex);
-
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     MockSessionEstablishmentDelegate mockReceiver;
+    err = mockReceiver.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     mockReceiver.mTestSuite = inSuite;
 
     MockSessionEstablishmentDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    err = mockSender.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ExchangeContext * exchange = ctx.NewUnauthenticatedExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -612,9 +599,6 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
         1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
-
-    err = mockSender.mMessageDispatch.Init();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Let's drop the initial message
     gLoopback.mSentMessageCount    = 0;
@@ -657,7 +641,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     // Let's reset the state of transport manager so that other tests are not impacted
     // as those could be using the global test context.
     TestContext & inctx = *static_cast<TestContext *>(inContext);
-    gTransportMgr.SetSecureSessionMgr(&inctx.GetSecureSessionManager());
+    gTransportMgr.SetSessionManager(&inctx.GetSecureSessionManager());
 }
 
 void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
@@ -676,7 +660,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -746,7 +730,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     mockSender.mTestSuite = inSuite;
@@ -815,7 +799,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
-void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
+void CheckPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -831,7 +815,7 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     mockSender.mTestSuite = inSuite;
@@ -929,10 +913,9 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
-    // Ensure that we have received that response and it did not have a piggyback
-    // ack.
+    // Ensure that we have received that response and it had a piggyback ack.
     NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
-    NL_TEST_ASSERT(inSuite, !mockSender.mReceivedPiggybackAck);
+    NL_TEST_ASSERT(inSuite, mockSender.mReceivedPiggybackAck);
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -958,7 +941,7 @@ void CheckSendUnsolicitedStandaloneAckMessage(nlTestSuite * inSuite, void * inCo
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     mockSender.mTestSuite = inSuite;
@@ -994,7 +977,7 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -1038,7 +1021,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     mockSender.mTestSuite = inSuite;
@@ -1128,6 +1111,292 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
+void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
+{
+    /**
+     * This tests the following scenario:
+     * 1) A reliable message is sent from initiator to responder.
+     * 2) The responder sends a response with a piggybacked ack, which is lost.
+     * 3) Initiator resends the message.
+     * 4) Responder responds to the resent message with a standalone ack.
+     * 5) The responder retransmits the application-level response.
+     * 4) The initiator should receive the application-level response.
+     */
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver;
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    mockReceiver.mTestSuite = inSuite;
+
+    MockAppDelegate mockSender;
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    mockSender.mTestSuite = inSuite;
+
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    // Make sure that we resend our message before the other side does.
+    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    rc->SetConfig({
+        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    });
+
+    // We send a message, the other side sends an application-level response
+    // (which is lost), then we do a retransmit that is acked, then the other
+    // side does a retransmit.  We need to keep the receiver exchange alive (so
+    // we can send the response from the receiver), but don't need anything
+    // special for the sender exchange, because it will be waiting for the
+    // application-level response.
+    gLoopback.mSentMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 0;
+    gLoopback.mDroppedMessageCount = 0;
+    mockReceiver.mRetainExchange   = true;
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // And that it was received.
+    NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
+
+    // And that we have not gotten any app-level responses or acks so far.
+    NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    ReliableMessageContext * receiverRc = mockReceiver.mExchange->GetReliableMessageContext();
+    // Should have pending ack here.
+    NL_TEST_ASSERT(inSuite, receiverRc->IsAckPending());
+    // Make sure receiver resends after sender does, and there's enough of a gap
+    // that we are very unlikely to actually trigger the resends on the receiver
+    // when we trigger the resends on the sender.
+    receiverRc->SetConfig({
+        4, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        4, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    });
+
+    // Now send a message from the other side, but drop it.
+    gLoopback.mNumMessagesToDrop = 1;
+
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    // Stop keeping receiver exchange alive.
+    mockReceiver.mRetainExchange = true;
+
+    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+
+    // Ensure the response was sent but dropped.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
+
+    // Ensure that we have not received that response.
+    NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, !mockSender.mReceivedPiggybackAck);
+    // We now have our un-acked message still waiting to retransmit and the
+    // message that the other side sent is waiting for an ack.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 2);
+
+    // Reset various state so we can measure things again.
+    mockReceiver.IsOnMessageReceivedCalled = false;
+    mockReceiver.mReceivedPiggybackAck     = false;
+    mockSender.IsOnMessageReceivedCalled   = false;
+    mockSender.mReceivedPiggybackAck       = false;
+
+    // 1 tick is 64 ms, sleep 65 ms to trigger re-transmit from sender
+    test_os_sleep_ms(65);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+
+    // We resent our first message, which did not make it to the app-level
+    // listener on the receiver (because it's a duplicate) but did trigger a
+    // standalone ack.
+    //
+    // Now the annoying part is that depending on how long we _actually_ slept
+    // we might have also triggered the retransmit from the other side, even
+    // though we did not want to.  Handle both cases here.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4 || gLoopback.mSentMessageCount == 6);
+    if (gLoopback.mSentMessageCount == 4)
+    {
+        // Just triggered the retransmit from the sender.
+        NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
+        NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
+        NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
+        NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+    }
+    else
+    {
+        // Also triggered the retransmit from the receiver.
+        NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
+        NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
+        NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
+        NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+    }
+
+    // 1 tick is 64 ms, sleep 65*3 ms to trigger re-transmit from receiver
+    test_os_sleep_ms(65 * 3);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+
+    // And now we've definitely resent our response message, which should show
+    // up as an app-level message and trigger a standalone ack.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 6);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
+
+    // Should be all done now.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+}
+
+void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
+{
+    /**
+     * This tests the following scenario:
+     * 1) A reliable message is sent from initiator to responder.
+     * 2) The responder sends a standalone ack, which is lost.
+     * 3) The responder sends an application-level response.
+     * 4) The initiator sends a reliable response to the app-level response.
+     *
+     * This should succeed, with all application-level messages being delivered
+     * and no crashes.
+     */
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver;
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    mockReceiver.mTestSuite = inSuite;
+
+    MockAppDelegate mockSender;
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    mockSender.mTestSuite = inSuite;
+
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    // We send a message, the other side sends a standalone ack first (which is
+    // lost), then an application response, then we respond to that response.
+    // We need to keep both exchanges alive for that (so we can send the
+    // response from the receiver and so the initial sender exchange can send a
+    // response to that).
+    gLoopback.mSentMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 0;
+    gLoopback.mDroppedMessageCount = 0;
+    mockReceiver.mRetainExchange   = true;
+    mockSender.mRetainExchange     = true;
+
+    // And ensure the ack heading back our way is dropped.
+    mockReceiver.mDropAckResponse = true;
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // And that it was received.
+    NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
+
+    // And that we have not gotten any app-level responses or acks so far.
+    NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    ReliableMessageContext * receiverRc = mockReceiver.mExchange->GetReliableMessageContext();
+    // Ack should have been dropped.
+    NL_TEST_ASSERT(inSuite, !receiverRc->IsAckPending());
+
+    // Don't drop any more acks.
+    mockReceiver.mDropAckResponse = false;
+
+    // Now send a message from the other side.
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer),
+                                        SendFlags(SendMessageFlags::kExpectResponse));
+
+    // Ensure the response was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // Ensure that we have received that response and had a piggyback ack.
+    NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, mockSender.mReceivedPiggybackAck);
+    // We now have just the received message waiting for an ack.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    // Reset various state so we can measure things again.
+    mockReceiver.IsOnMessageReceivedCalled = false;
+    mockReceiver.mReceivedPiggybackAck     = false;
+    mockSender.IsOnMessageReceivedCalled   = false;
+    mockSender.mReceivedPiggybackAck       = false;
+
+    // Stop retaining the recipient exchange.
+    mockReceiver.mRetainExchange = false;
+
+    // Now send a new message to the other side.
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message and the standalone ack to it were sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // And that it was received.
+    NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, mockReceiver.mReceivedPiggybackAck);
+
+    // And that receiver has no ack pending.
+    NL_TEST_ASSERT(inSuite, !receiverRc->IsAckPending());
+
+    // And that there are no un-acked messages left.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+}
+
+/**
+ * TODO: A test that we should have but can't write with the existing
+ * infrastructure we have:
+ *
+ * 1. A sends message 1 to B
+ * 2. B is slow to respond, A does a resend and the resend is delayed in the network.
+ * 3. B responds with message 2, which acks message 1.
+ * 4. A sends message 3 to B
+ * 5. B sends standalone ack to message 3, which is lost
+ * 6. The duplicate message from step 3 is delivered and triggers a standalone ack.
+ * 7. B responds with message 4, which should carry a piggyback ack for message 3
+ *    (this is the part that needs testing!)
+ * 8. A sends message 5 to B.
+ */
+
 // Test Suite
 
 /**
@@ -1146,11 +1415,13 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessage", CheckDuplicateMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessageClosedExchange", CheckDuplicateMessageClosedExchange),
     NL_TEST_DEF("Test that a reply after a standalone ack comes through correctly", CheckReceiveAfterStandaloneAck),
-    NL_TEST_DEF("Test that a reply to a non-MRP message does not piggyback an ack even if there were MRP things happening on the context before", CheckNoPiggybackAfterPiggyback),
+    NL_TEST_DEF("Test that a reply to a non-MRP message piggybacks an ack if there were MRP things happening on the context before", CheckPiggybackAfterPiggyback),
     NL_TEST_DEF("Test sending an unsolicited ack-soliciting 'standalone ack' message", CheckSendUnsolicitedStandaloneAckMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
     NL_TEST_DEF("Test command, response, default response, with receiver closing exchange after sending response", CheckMessageAfterClosed),
     NL_TEST_DEF("Test that unencrypted message is dropped if exchange requires encryption", CheckUnencryptedMessageReceiveFailure),
+    NL_TEST_DEF("Test that dropping an application-level message with a piggyback ack works ok once both sides retransmit", CheckLostResponseWithPiggyback),
+    NL_TEST_DEF("Test that an application-level response-to-response after a lost standalone ack to the initial message works", CheckLostStandaloneAck),
 
     NL_TEST_SENTINEL()
 };
@@ -1182,7 +1453,7 @@ int Initialize(void * aContext)
     auto * ctx = static_cast<TestContext *>(aContext);
     VerifyOrReturnError(ctx->Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
-    gTransportMgr.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
+    gTransportMgr.SetSessionManager(&ctx->GetSecureSessionManager());
     return SUCCESS;
 }
 
@@ -1209,3 +1480,5 @@ int TestReliableMessageProtocol()
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestReliableMessageProtocol)

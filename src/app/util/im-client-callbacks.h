@@ -30,8 +30,9 @@
 // #6308 should handle IM error code on the application side, either modify this function or remove this.
 bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status);
 bool IMReadReportAttributesResponseCallback(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
-                                            chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status);
+                                            chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::Status status);
 bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, EmberAfStatus status);
+bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status);
 void LogStatus(uint8_t status);
 
 // Global Response Callbacks

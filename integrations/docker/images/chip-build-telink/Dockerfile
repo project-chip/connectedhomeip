@@ -31,4 +31,5 @@ RUN apt update \
     && python3 -m pip install -U pip \
     && pip3 install --user -r ${ZEPHYR_PROJECT_DIR}/zephyr/scripts/requirements.txt
 
+ENV TELINK_ZEPHYR_BASE=${ZEPHYR_PROJECT_DIR}/zephyr
 ENV ZEPHYR_BASE=${ZEPHYR_PROJECT_DIR}/zephyr

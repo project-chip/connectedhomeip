@@ -21,7 +21,7 @@
 
 using namespace ::chip;
 
-CHIP_ERROR DiscoverCommissionersCommand::Run()
+CHIP_ERROR DiscoverCommissionersCommand::RunCommand()
 {
     return mCommissionableNodeController.DiscoverCommissioners();
 }
@@ -31,7 +31,7 @@ void DiscoverCommissionersCommand::Shutdown()
     int commissionerCount = 0;
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
-        const Mdns::DiscoveredNodeData * commissioner = mCommissionableNodeController.GetDiscoveredCommissioner(i);
+        const Dnssd::DiscoveredNodeData * commissioner = mCommissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
             ChipLogProgress(chipTool, "Discovered Commisioner #%d", commissionerCount);

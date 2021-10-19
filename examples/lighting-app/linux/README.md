@@ -5,9 +5,9 @@ to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
 on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
-This example can also be cross-compiled on x64 host and run on NXP i.MX 8M Mini
-EVK, see the associated [README document](../nxp/linux-imx/imx8m/README.md) for
-details.
+To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
+**EVK**, see the associated
+[README document](../../../docs/guides/nxp_imx8m_linux_examples.md) for details.
 
 <hr>
 
@@ -146,4 +146,4 @@ details.
 -   Then you can Get and Set the light using the RPCs:
     `rpcs.chip.rpc.Lighting.Get()`
 
-    `rpcs.chip.rpc.Lighting.Set(on=True)`
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`

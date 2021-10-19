@@ -46,7 +46,7 @@ enum class MessageFlagValues : uint32_t
     /**< Indicates that the message is a duplicate of a previously received message. */
     kDuplicateMessage = 0x00004000,
     /**< Indicates that the peer's group key message counter is not synchronized. */
-    kPeerGroupMsgIdNotSynchronized = 0x00008000,
+    kPeerGroupMessageCounterNotSynchronized = 0x00008000,
     /**< Indicates that the source of the message is the initiator of the CHIP exchange. */
     kFromInitiator = 0x00010000,
     /**< Indicates that message is being sent/received via the local ephemeral UDP port. */

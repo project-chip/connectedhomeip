@@ -39,19 +39,22 @@ config("ti_simplelink_mbedtls_config") {
 
   include_dirs = [
     "${chip_root}/src/platform/cc13x2_26x2",
+    "${chip_root}/src/platform/cc13x2_26x2/crypto",
     "${ti_simplelink_sdk_root}/source",
-    "${ti_simplelink_sdk_root}/source/ti/thread/cc13x2_26x2/libmbedcrypto/config",
   ]
 }
 
 mbedtls_target("mbedtls") {
+  # Hardware acceleration
   sources = [
-    # XXX: fill in hardware accelerated versions, how to link sysconfig dependent code?
+    "${chip_root}/src/platform/cc13x2_26x2/crypto/aes_alt.c",
+    "${chip_root}/src/platform/cc13x2_26x2/crypto/ecjpake_alt.c",
+    "${chip_root}/src/platform/cc13x2_26x2/crypto/sha256_alt.c",
   ]
 
   public_configs = [ ":ti_simplelink_mbedtls_config" ]
 
-  public_deps = []
+  public_deps = [ ti_simplelink_sysconfig_target ]
 }
 
 config("ti_simplelink_freertos_config") {

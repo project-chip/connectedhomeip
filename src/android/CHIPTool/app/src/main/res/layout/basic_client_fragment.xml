@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/addressUpdateFragment"
+        android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <Button
+        android:id="@+id/readUserLabelBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/basic_cluster_read_user_label_btn_text"
+        android:layout_below="@id/addressUpdateFragment"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/writeUserLabelBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_below="@id/readUserLabelBtn"
+        android:layout_alignParentStart="true"
+        android:text="@string/basic_cluster_write_user_label_btn_text" />
+
+    <EditText
+        android:id="@+id/userLabelEd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/readUserLabelBtn"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="10dp"
+        android:layout_toEndOf="@id/writeUserLabelBtn"
+        android:hint="@string/basic_cluster_write_user_label_hint_text"
+        android:inputType="text"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/readProductNameBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_below="@id/writeUserLabelBtn"
+        android:layout_alignParentStart="true"
+        android:text="@string/basic_cluster_read_product_name_btn_text" />
+
+    <TextView
+        android:id="@+id/basicClusterCommandStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/readProductNameBtn"
+        android:minLines="4"
+        android:padding="16dp"
+        android:singleLine="false"
+        android:textSize="20sp" />
+
+</RelativeLayout>

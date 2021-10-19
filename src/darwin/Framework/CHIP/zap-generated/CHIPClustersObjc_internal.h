@@ -145,6 +145,10 @@
 @property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster;
 @end
 
+@interface CHIPOtaSoftwareUpdateRequestor ()
+@property (readonly) chip::Controller::OtaSoftwareUpdateRequestorCluster cppCluster;
+@end
+
 @interface CHIPOccupancySensing ()
 @property (readonly) chip::Controller::OccupancySensingCluster cppCluster;
 @end
@@ -159,6 +163,10 @@
 
 @interface CHIPOperationalCredentials ()
 @property (readonly) chip::Controller::OperationalCredentialsCluster cppCluster;
+@end
+
+@interface CHIPPowerSource ()
+@property (readonly) chip::Controller::PowerSourceCluster cppCluster;
 @end
 
 @interface CHIPPressureMeasurement ()

@@ -27,7 +27,6 @@
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPCluster.h>
 #include <lib/support/CodeUtils.h>
-#include <protocols/temp_zcl/TempZCL.h>
 
 namespace chip {
 namespace Controller {
@@ -48,42 +47,12 @@ void ClusterBase::Dissociate()
     mDevice = nullptr;
 }
 
-CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle && payload,
-                                    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    Messaging::SendFlags sendFlags;
-
-    VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(!payload.IsNull(), err = CHIP_ERROR_INTERNAL);
-
-    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
-    {
-        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
-    }
-
-    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
-    {
-        sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
-    }
-
-    err = mDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, sendFlags, std::move(payload));
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed in sending cluster command. Err %" CHIP_ERROR_FORMAT, err.Format());
-        mDevice->CancelResponseHandler(seqNum);
-    }
-
-    return err;
-}
-
-CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback)
+CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback,
+                                                  app::TLVDataFilter tlvDataFilter)
 {
     VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback);
+    VerifyOrReturnError(tlvDataFilter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback, tlvDataFilter);
 
     return CHIP_NO_ERROR;
 }

@@ -35,16 +35,17 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <system/SystemLayerImpl.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/UDP.h>
 
 #include <nlunit-test.h>
 
 namespace {
-static chip::System::Layer gSystemLayer;
-static chip::SecureSessionMgr gSessionManager;
+static chip::System::LayerImpl gSystemLayer;
+static chip::SessionManager gSessionManager;
 static chip::Messaging::ExchangeManager gExchangeManager;
 static chip::secure_channel::MessageCounterManager gMessageCounterManager;
 static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
@@ -56,6 +57,7 @@ class TestInteractionModelEngine
 {
 public:
     static void TestClusterInfoPushRelease(nlTestSuite * apSuite, void * apContext);
+    static void TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext);
     static int GetClusterInfoListLength(ClusterInfo * apClusterInfoList);
 };
 
@@ -100,6 +102,31 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(clusterInfoList);
     NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 0);
 }
+
+void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    err            = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ClusterInfo clusterInfoList[2];
+
+    clusterInfoList[0].mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
+    clusterInfoList[0].mFieldId = 1;
+    clusterInfoList[1].mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
+    clusterInfoList[1].mFieldId = 2;
+
+    chip::app::ClusterInfo testClusterInfo;
+    testClusterInfo.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
+    testClusterInfo.mFieldId = 3;
+
+    NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
+    testClusterInfo.mFieldId = 0xFFFFFFFF;
+    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
+    testClusterInfo.mFlags.Set(chip::app::ClusterInfo::Flags::kListIndexValid);
+    testClusterInfo.mFieldId   = 1;
+    testClusterInfo.mListIndex = 2;
+    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
+}
 } // namespace app
 } // namespace chip
 
@@ -108,14 +135,13 @@ void InitializeChip(nlTestSuite * apSuite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::FabricTable fabrics;
 
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     gSystemLayer.Init();
 
-    err = gSessionManager.Init(&gSystemLayer, &gTransportManager, &fabrics, &gMessageCounterManager);
+    err = gSessionManager.Init(&gSystemLayer, &gTransportManager, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gExchangeManager.Init(&gSessionManager);
@@ -129,6 +155,7 @@ void InitializeChip(nlTestSuite * apSuite)
 const nlTest sTests[] =
         {
                 NL_TEST_DEF("TestClusterInfoPushRelease", chip::app::TestInteractionModelEngine::TestClusterInfoPushRelease),
+                NL_TEST_DEF("TestMergeOverlappedAttributePath", chip::app::TestInteractionModelEngine::TestMergeOverlappedAttributePath),
                 NL_TEST_SENTINEL()
         };
 // clang-format on

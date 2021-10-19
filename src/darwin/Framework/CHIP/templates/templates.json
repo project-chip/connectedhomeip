@@ -51,6 +51,16 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.mm"
         },
         {
+            "path": "CHIPTestClustersObjc.zapt",
+            "name": "Test Objc API Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPTestClustersObjc.h"
+        },
+        {
+            "path": "CHIPTestClustersObjc-src.zapt",
+            "name": "Test Objc API",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPTestClustersObjc.mm"
+        },
+        {
             "path": "clusters-tests.zapt",
             "name": "Cluster Tests",
             "output": "src/darwin/Framework/CHIPTests/CHIPClustersTests.m"

@@ -28,12 +28,11 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ReferenceCountedHandle.h>
 #include <lib/support/TypeTraits.h>
-#include <messaging/ExchangeACL.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <protocols/Protocols.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -74,6 +73,8 @@ public:
      *  @return Returns 'true' if it is the initiator, else 'false'.
      */
     bool IsInitiator() const;
+
+    bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
 
     /**
      *  Send a CHIP message on this exchange.
@@ -124,22 +125,18 @@ public:
     /**
      *  Handle a received CHIP message on this exchange.
      *
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *
-     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
-     *
-     *  @param[in]    peerAddress   The address of the sender
-     *
-     *  @param[in]    msgFlags      The message flags corresponding to the received message
-     *
-     *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
+     *  @param[in]    messageCounter  The message counter of the packet.
+     *  @param[in]    payloadHeader   A reference to the PayloadHeader object.
+     *  @param[in]    peerAddress     The address of the sender
+     *  @param[in]    msgFlags        The message flags corresponding to the received message
+     *  @param[in]    msgBuf          A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
      *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
      */
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                              const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                              System::PacketBufferHandle && msgBuf);
 
@@ -152,21 +149,8 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    ExchangeACL * GetExchangeACL(Transport::FabricTable & table)
-    {
-        if (mExchangeACL == nullptr)
-        {
-            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.Value().GetFabricIndex());
-            if (fabric != nullptr)
-            {
-                mExchangeACL = chip::Platform::New<CASEExchangeACL>(fabric);
-            }
-        }
-
-        return mExchangeACL;
-    }
-
     SessionHandle GetSecureSession() { return mSecureSession.Value(); }
+    bool HasSecureSession() const { return mSecureSession.HasValue(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -184,7 +168,6 @@ private:
     Timeout mResponseTimeout       = 0; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
-    ExchangeACL * mExchangeACL     = nullptr;
 
     ExchangeMessageDispatch * mDispatch = nullptr;
 

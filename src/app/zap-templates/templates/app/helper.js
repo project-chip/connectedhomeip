@@ -16,7 +16,7 @@
  */
 
 // Import helpers from zap core
-const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
+const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
@@ -135,8 +135,21 @@ function asReadType(type)
 
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
-  'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/Off', 'Level Control', 'Color Control', 'IAS Zone',
-  'Pump Configuration and Control'
+  'Basic',
+  'Identify',
+  'Groups',
+  'Scenes',
+  'Occupancy Sensing',
+  'On/Off',
+  'Level Control',
+  'Color Control',
+  'IAS Zone',
+  'Pump Configuration and Control',
+  'Ethernet Network Diagnostics',
+  'Software Diagnostics',
+  'Thread Network Diagnostics',
+  'General Diagnostics',
+  'WiFi Network Diagnostics',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
@@ -166,7 +179,7 @@ function chip_endpoint_generated_functions()
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
@@ -178,7 +191,7 @@ function chip_endpoint_generated_functions()
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
@@ -297,20 +310,33 @@ function asPrintFormat(type)
 
 function asTypeLiteralSuffix(type)
 {
-  switch (type) {
-  case 'int32_t':
-    return 'L';
-  case 'int64_t':
-    return 'LL';
-  case 'uint16_t':
-    return 'U';
-  case 'uint32_t':
-    return 'UL';
-  case 'uint64_t':
-    return 'ULL';
-  default:
-    return '';
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
+      case 'int32_t':
+        return 'L';
+      case 'int64_t':
+        return 'LL';
+      case 'uint16_t':
+        return 'U';
+      case 'uint32_t':
+        return 'UL';
+      case 'uint64_t':
+        return 'ULL';
+      default:
+        return '';
+      }
+    })
   }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
+  return templateUtil.templatePromise(this.global, promise)
 }
 
 function hasSpecificAttributes(options)
@@ -321,6 +347,19 @@ function hasSpecificAttributes(options)
 function asLowerCamelCase(label)
 {
   let str = string.toCamelCase(label, true);
+  // Check for the case when were:
+  // 1. A single word (that's the regexp at the beginning, which matches the
+  //    word-splitting regexp in string.toCamelCase).
+  // 2. Starting with multiple capital letters in a row.
+  // 3. But not _all_ capital letters (which we purposefully
+  //    convert to all-lowercase).
+  //
+  // and if all those conditions hold, preserve the leading capital letters by
+  // uppercasing the first one, which got lowercased.
+  if (!/ |_|-|\//.test(label) && label.length > 1 && label.substring(0, 2).toUpperCase() == label.substring(0, 2)
+      && label.toUpperCase() != label) {
+    str = str[0].toUpperCase() + str.substring(1);
+  }
   return str.replace(/[\.:]/g, '');
 }
 
@@ -335,16 +374,77 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
+/*
+ * @brief
+ *
+ * This function converts a given ZAP type to a Cluster Object
+ * type used by the Matter SDK.
+ *
+ * Args:
+ *
+ * type:            ZAP type specified in the XML
+ * isDecodable:     Whether to emit an Encodable or Decodable cluster
+ *                  object type.
+ *
+ * These types can be found in src/app/data-model/.
+ *
+ */
+async function zapTypeToClusterObjectType(type, isDecodable, options)
+{
+  if (StringHelper.isCharString(type)) {
+    return 'chip::Span<const char>';
+  }
+
+  if (type == 'single') {
+    return 'float';
+  }
+
+  async function fn(pkgId)
+  {
+    const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
+    const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+    if (await typeChecker('isEnum')) {
+      return ns + type;
+    }
+
+    if (await typeChecker('isBitmap')) {
+      return 'chip::BitFlags<' + ns + type + '>';
+    }
+
+    if (await typeChecker('isStruct')) {
+      return ns + 'Structs::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
+    }
+
+    return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  return templateUtil.templatePromise(this.global, promise)
+}
+
+function zapTypeToEncodableClusterObjectType(type, options)
+{
+  return zapTypeToClusterObjectType.call(this, type, false, options)
+}
+
+function zapTypeToDecodableClusterObjectType(type, options)
+{
+  return zapTypeToClusterObjectType.call(this, type, true, options)
+}
+
 //
 // Module exports
 //
-exports.asPrintFormat                     = asPrintFormat;
-exports.asReadType                        = asReadType;
-exports.asReadTypeLength                  = asReadTypeLength;
-exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list        = chip_endpoint_cluster_list
-exports.asTypeLiteralSuffix               = asTypeLiteralSuffix;
-exports.asLowerCamelCase                  = asLowerCamelCase;
-exports.asUpperCamelCase                  = asUpperCamelCase;
-exports.hasSpecificAttributes             = hasSpecificAttributes;
-exports.asMEI                             = asMEI;
+exports.asPrintFormat                       = asPrintFormat;
+exports.asReadType                          = asReadType;
+exports.asReadTypeLength                    = asReadTypeLength;
+exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
+exports.asTypeLiteralSuffix                 = asTypeLiteralSuffix;
+exports.asLowerCamelCase                    = asLowerCamelCase;
+exports.asUpperCamelCase                    = asUpperCamelCase;
+exports.hasSpecificAttributes               = hasSpecificAttributes;
+exports.asMEI                               = asMEI;
+exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
+exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;

@@ -844,7 +844,6 @@ using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::BigEndian::Buf
 namespace chip {
 
 namespace Inet {
-class RawEndPoint;
 class UDPEndPoint;
 class IPEndPointBasis;
 } // namespace Inet
@@ -865,7 +864,6 @@ private:
      * @note This should be used ONLY by low-level code interfacing with LwIP.
      */
     static struct pbuf * UnsafeGetLwIPpbuf(const PacketBufferHandle & handle) { return PacketBufferHandle::GetLwIPpbuf(handle); }
-    friend class Inet::RawEndPoint;
     friend class Inet::UDPEndPoint;
     friend class Inet::IPEndPointBasis;
 };

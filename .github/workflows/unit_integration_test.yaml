@@ -26,7 +26,6 @@ jobs:
     unit_tests:
         name: Unit / Interation Tests
         timeout-minutes: 60
-        
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
@@ -38,7 +37,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build:0.5.15
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
                 - "/tmp/happy_test_logs:/tmp/happy_test_logs"
@@ -60,7 +59,7 @@ jobs:
                   scripts/build/gn_bootstrap.sh ;
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -69,6 +68,7 @@ jobs:
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
+              if: ${{ !env.ACT }}
               with:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
@@ -87,11 +87,11 @@ jobs:
               timeout-minutes: 5
               run: scripts/build/gn_build.sh
             - name: Run Tests
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: RUN_HAPPY_TESTS=1 scripts/tests/gn_tests.sh
             - name: Uploading Happy Test Log
-              uses: actions/upload-artifact@v1
-              if: ${{ always() }}
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name:
                       happy_log-${{ steps.outsuffix.outputs.value }}-${{ matrix.type }}

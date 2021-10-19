@@ -4,14 +4,14 @@
 #include <zap-generated/CHIPClusters.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
-#include <controller/java/CHIPJNIError.h>
-#include <controller/java/JniReferences.h>
-#include <controller/java/JniTypeWrappers.h>
-#include <controller/java/StackLock.h>
+#include <lib/support/CHIPJNIError.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <platform/PlatformManager.h>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -20,8 +20,8 @@ using namespace chip;
 using namespace chip::Controller;
 
 static CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable & outEx);
-static CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], jint errorCode, jthrowable & outEx);
-static void ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[], jint errorCode);
+static CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], ChipError errorCode, jthrowable & outEx);
+static void ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[], ChipError errorCode);
 
 CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable & outEx) {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -41,7 +41,7 @@ CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable &
     return err;
 }
 
-CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], jint errorCode, jthrowable & outEx) {
+CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], ChipError errorCode, jthrowable & outEx) {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID exceptionConstructor;
     jclass exceptionClass;
@@ -55,7 +55,7 @@ CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], jint 
     VerifyOrReturnError(exceptionConstructor != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
     
     char buf[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    snprintf(buf, sizeof(buf), "%s: %d", message, errorCode);
+    snprintf(buf, sizeof(buf), "%s: %d", message, errorCode.AsInteger());
     errStr = env->NewStringUTF(buf);
 
     outEx = (jthrowable) env->NewObject(exceptionClass, exceptionConstructor, errStr);
@@ -64,26 +64,27 @@ CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], jint 
     return err;
 }
 
-void ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[], jint errorCode) {
+void ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[], ChipError errorCode) {
     VerifyOrReturn(callback == nullptr, ChipLogDetail(Zcl, "Callback is null in ReturnIllegalStateException(), exiting early"));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID method;
     err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
     if (err != CHIP_NO_ERROR) {
-        ChipLogError(Zcl, "Error throwing IllegalStateException %d", errorCode);
+        ChipLogError(Zcl, "Error throwing IllegalStateException %d", err.AsInteger());
         return;
     }
 
     jthrowable exception;
     err = CreateIllegalStateException(env, message, errorCode, exception);
     if (err != CHIP_NO_ERROR) {
-        ChipLogError(Zcl, "Error throwing IllegalStateException %d", errorCode);
+        ChipLogError(Zcl, "Error throwing IllegalStateException %d", err.AsInteger());
         return;
     }
     env->CallVoidMethod(callback, method, exception);
 }
 
+// TODO(#8773): Clean up callbacks.
 class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallback> {
     public:
         CHIPDefaultSuccessCallback(jobject javaCallback): Callback::Callback<DefaultSuccessCallback>(CallbackFn, this)
@@ -111,7 +112,7 @@ class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallb
 
         static void CallbackFn(void * context)
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
             jmethodID javaMethod;
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -174,7 +175,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
 
         static void CallbackFn(void * context, uint8_t status)
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
             jmethodID javaMethod;
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -240,7 +241,7 @@ class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{c
 
         static void CallbackFn(void * context, {{chipCallback.type}} value)
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
 
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -317,7 +318,7 @@ class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callba
 
         static void CallbackFn(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             jobject javaCallbackRef;
@@ -413,7 +414,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
 
         static void CallbackFn(void * context, uint16_t count, {{chipType}} * entries)
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             jobject javaCallbackRef;
@@ -502,7 +503,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
 
 JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlong clusterPtr)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ClusterBase * cluster = reinterpret_cast<ClusterBase *>(clusterPtr);
     if (cluster != nullptr) {
         delete cluster;
@@ -512,7 +513,7 @@ JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlo
 {{#chip_client_clusters}}
 JNI_METHOD(jlong, {{asUpperCamelCase name}}Cluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     {{asUpperCamelCase name}}Cluster * cppCluster = new {{asUpperCamelCase name}}Cluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -520,50 +521,38 @@ JNI_METHOD(jlong, {{asUpperCamelCase name}}Cluster, initWithDevice)(JNIEnv * env
 }
 
 {{#chip_cluster_commands}}
-{{#if (zcl_command_arguments_count this.id)}}
-JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{#chip_cluster_command_arguments}}{{asJniBasicType type}} {{asLowerCamelCase label}}{{#not_last}}, {{/not_last}}{{/chip_cluster_command_arguments}})
-{{else}}
-JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-{{/if}}
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asJniBasicType type}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}})
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     {{asUpperCamelCase ../name}}Cluster * cppCluster;
     
-    {{#chip_cluster_command_arguments}}
+    {{#chip_cluster_command_arguments_with_structs_expanded}}
     {{#if (isOctetString type)}}
     JniByteArray {{asLowerCamelCase label}}Arr(env, {{asLowerCamelCase label}});
     {{else if (isCharString type)}}
     JniUtfString {{asLowerCamelCase label}}Str(env, {{asLowerCamelCase label}});
     {{/if}}
-    {{/chip_cluster_command_arguments}}
+    {{/chip_cluster_command_arguments_with_structs_expanded}}
+
     {{#if hasSpecificResponse}}
-    CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}Callback * onSuccess;
+    std::unique_ptr<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback, void (*)(CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback *)> onSuccess(
+        Platform::New<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback>(callback), Platform::Delete<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback>);
     {{else}}
-    CHIPDefaultSuccessCallback * onSuccess;
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     {{/if}}
-    CHIPDefaultFailureCallback * onFailure;
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     cppCluster = reinterpret_cast<{{asUpperCamelCase ../name}}Cluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    {{#if hasSpecificResponse}}
-    onSuccess = new CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}Callback(callback);
-    {{else}}
-    onSuccess = new CHIPDefaultSuccessCallback(callback);
-    {{/if}}
-    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    onFailure = new CHIPDefaultFailureCallback(callback);
-    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = cppCluster->{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asLowerCamelCase label}}Arr.data(), {{asLowerCamelCase label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asLowerCamelCase label}}, strlen({{asLowerCamelCase label}}Str.c_str())){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments}});
+    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asLowerCamelCase label}}Arr.data(), {{asLowerCamelCase label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asLowerCamelCase label}}, strlen({{asLowerCamelCase label}}Str.c_str())){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}});
     SuccessOrExit(err);
 
 exit: 
     if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-
         jthrowable exception;
         jmethodID method;
 
@@ -573,12 +562,15 @@ exit:
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
         env->CallVoidMethod(callback, method, exception);
+    } else {
+        onSuccess.release();
+        onFailure.release();
     }
 }
 {{/chip_cluster_commands}}
@@ -586,66 +578,43 @@ exit:
 
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
 {{#if isList}}
-    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback * onSuccess = new CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(callback);
+    std::unique_ptr<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback, void (*)(CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback *)> onSuccess(
+        Platform::New<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>(callback), Platform::Delete<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>);
 {{else}}
-    CHIP{{chipCallback.name}}AttributeCallback * onSuccess = new CHIP{{chipCallback.name}}AttributeCallback(callback);
+    std::unique_ptr<CHIP{{chipCallback.name}}AttributeCallback, void (*)(CHIP{{chipCallback.name}}AttributeCallback *)> onSuccess(Platform::New<CHIP{{chipCallback.name}}AttributeCallback>(callback{{#if (isString type)}},
+        {{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}), Platform::Delete<CHIP{{chipCallback.name}}AttributeCallback>);
 {{/if}}
-    if (!onSuccess) {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
-        return;
-    }
+    VerifyOrReturn(onSuccess.get() != nullptr, ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
-    if (!onFailure) {
-        delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
-        return;
-    }
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr, ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    {{asUpperCamelCase ../name}}Cluster * cppCluster = reinterpret_cast<{{asUpperCamelCase ../name}}Cluster *>(clusterPtr);
-    if (cppCluster == nullptr) {
-        delete onSuccess;
-        delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
-        return;
-    }
+    {{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr, ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->ReadAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
-    }
+    err = cppCluster->ReadAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
 }
 {{#if isWritableAttribute}}
 
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{asJniBasicType type}} value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
-    if (!onSuccess) {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
-        return;
-    }
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr, ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
-    if (!onFailure) {
-        delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
-        return;
-    }
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr, ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    {{asUpperCamelCase ../name}}Cluster * cppCluster = reinterpret_cast<{{asUpperCamelCase ../name}}Cluster *>(clusterPtr);
-    if (cppCluster == nullptr) {
-        delete onSuccess;
-        delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
-        return;
-    }
+    {{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr, ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     {{#if (isOctetString type)}}
     JniByteArray jniArr(env, value);
@@ -656,11 +625,48 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     {{else}}
     err = cppCluster->WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), static_cast<{{chipCallback.type}}>(value));
     {{/if}}
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
-    }
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+{{/if}}
+{{#if isReportableAttribute}}
+
+JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, subscribe{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr, ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr, ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    {{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr, ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->SubscribeAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, report{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIP{{chipCallback.name}}AttributeCallback, void (*)(CHIP{{chipCallback.name}}AttributeCallback *)> onReport(Platform::New<CHIP{{chipCallback.name}}AttributeCallback>(callback{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true), Platform::Delete<CHIP{{chipCallback.name}}AttributeCallback>);
+    VerifyOrReturn(onReport.get() != nullptr, ReturnIllegalStateException(env, callback, "Error creating native report callback", CHIP_ERROR_NO_MEMORY));
+    
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    {{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr, ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReportAttribute{{asCamelCased name false}}(onReport->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error registering for attribute reporting", err));
+
+    onReport.release();
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}

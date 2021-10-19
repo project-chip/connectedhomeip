@@ -24,6 +24,7 @@
  */
 
 #include "UserDirectedCommissioning.h"
+#include <lib/core/CHIPSafeCasts.h>
 
 namespace chip {
 namespace Protocols {
@@ -37,7 +38,7 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
 
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
+    if (packetHeader.IsEncrypted())
     {
         ChipLogError(AppServer, "UDC encryption flag set - ignoring");
         return;
@@ -46,9 +47,9 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    char instanceName[chip::Mdns::kMaxInstanceNameSize + 1];
+    char instanceName[chip::Dnssd::kMaxInstanceNameSize + 1];
     size_t instanceNameLength =
-        (msg->DataLength() > (chip::Mdns::kMaxInstanceNameSize)) ? chip::Mdns::kMaxInstanceNameSize : msg->DataLength();
+        (msg->DataLength() > (chip::Dnssd::kMaxInstanceNameSize)) ? chip::Dnssd::kMaxInstanceNameSize : msg->DataLength();
     msg->Read(Uint8::from_char(instanceName), instanceNameLength);
 
     instanceName[instanceNameLength] = '\0';
@@ -107,7 +108,7 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
     return;
 }
 
-void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Mdns::DiscoveredNodeData & nodeData)
+void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::DiscoveredNodeData & nodeData)
 {
     UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)

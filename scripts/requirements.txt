@@ -41,6 +41,7 @@ protobuf
 # scripts/tools/memory
 anytree
 cxxfilt
+ghapi
 pandas ; platform_machine != 'aarch64'
 
 # scripts/build

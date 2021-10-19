@@ -123,7 +123,7 @@ if __name__ == "__main__":
     if not options.topologyFile:
         raise Exception("Must specify a topology file!")
 
-    with open(options.topologyFile, "r") as fp:
+    with open(os.path.join(CHIP_REPO, options.topologyFile), "r") as fp:
         config_operations = [_parse_mount_dir]
         DEVICE_CONFIG = json.load(fp)
         for op in config_operations:

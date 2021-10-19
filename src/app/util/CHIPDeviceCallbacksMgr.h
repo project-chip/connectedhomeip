@@ -51,6 +51,7 @@ constexpr size_t kTLVFilterPoolSize = CHIP_DEVICE_CALLBACK_MANAGER_TLV_FILTER_PO
  * The possible implementation of this function might be:
  *  - Unpack the data with some schema from TLV
  *  - Call success callback and failure callback according to the result of unpack routine.
+ *  - onFailure MAY be nullptr, in this case, response error will be ignored. (Usually for subscribe responses.)
  */
 using TLVDataFilter = void (*)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
                                chip::Callback::Cancelable * onFailure);
@@ -75,9 +76,9 @@ public:
                                    Callback::Cancelable ** onFailureCallback, TLVDataFilter * callbackFilter = nullptr);
 
     CHIP_ERROR AddReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                 Callback::Cancelable * onReportCallback);
+                                 Callback::Cancelable * onReportCallback, TLVDataFilter callbackFilter);
     CHIP_ERROR GetReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                 Callback::Cancelable ** onReportCallback);
+                                 Callback::Cancelable ** onReportCallback, TLVDataFilter * callbackFilter);
 
 private:
     CHIPDeviceCallbacksMgr() {}
@@ -93,10 +94,25 @@ private:
         }
     };
 
+    struct ReportCallbackInfo
+    {
+        chip::NodeId nodeId;
+        chip::EndpointId endpointId;
+        chip::ClusterId clusterId;
+        chip::AttributeId attributeId;
+
+        bool operator==(ReportCallbackInfo const & other)
+        {
+            return nodeId == other.nodeId && endpointId == other.endpointId && clusterId == other.clusterId &&
+                attributeId == other.attributeId;
+        }
+    };
+
+    template <typename T>
     struct TLVFilterItem
     {
-        ResponseCallbackInfo info = { kPlaceholderNodeId, 0 };
-        TLVDataFilter filter      = nullptr;
+        T info               = { .nodeId = kPlaceholderNodeId };
+        TLVDataFilter filter = nullptr;
     };
 
     template <typename T>
@@ -138,10 +154,14 @@ private:
     CHIP_ERROR AddResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter callbackFilter);
     CHIP_ERROR PopResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter * callbackFilter);
 
+    CHIP_ERROR SetSubscribeFilter(const ReportCallbackInfo & info, TLVDataFilter callbackFilter);
+    CHIP_ERROR GetSubscribeFilter(const ReportCallbackInfo & info, TLVDataFilter * callbackFilter);
+
     Callback::CallbackDeque mResponsesSuccess;
     Callback::CallbackDeque mResponsesFailure;
-    TLVFilterItem mTLVFilterPool[kTLVFilterPoolSize];
+    TLVFilterItem<ResponseCallbackInfo> mTLVFilterPool[kTLVFilterPoolSize];
     Callback::CallbackDeque mReports;
+    TLVFilterItem<ReportCallbackInfo> mReportFilterPool[kTLVFilterPoolSize];
 };
 
 } // namespace app

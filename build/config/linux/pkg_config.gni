@@ -48,6 +48,7 @@
 #   ignore_libs = true
 
 import("//build_overrides/build.gni")
+import("${build_root}/config/sysroot.gni")
 
 declare_args() {
   # A pkg-config wrapper to call instead of trying to find and call the right
@@ -59,6 +60,8 @@ declare_args() {
 
   # A optional pkg-config wrapper to use for tools built on the host.
   host_pkg_config = ""
+
+  system_libdir = "lib"
 }
 
 pkg_config_script = "${build_root}/config/linux/pkg-config.py"
@@ -81,6 +84,20 @@ if (host_pkg_config != "") {
   ]
 } else {
   host_pkg_config_args = pkg_config_args
+}
+
+if (sysroot != "") {
+  pkg_config_args += [
+    "-s",
+    sysroot,
+  ]
+
+  if (system_libdir != "") {
+    pkg_config_args += [
+      "--system_libdir",
+      system_libdir,
+    ]
+  }
 }
 
 template("pkg_config") {

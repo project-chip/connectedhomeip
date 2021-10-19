@@ -22,9 +22,9 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <lib/mdns/minimal/QueryBuilder.h>
-#include <lib/mdns/minimal/Server.h>
-#include <lib/mdns/minimal/core/QName.h>
+#include <lib/dnssd/minimal_mdns/QueryBuilder.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
+#include <lib/dnssd/minimal_mdns/core/QName.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -309,6 +309,7 @@ int main(int argc, char ** args)
 
     mdns::Minimal::Server<20> mdnsServer;
     ReportDelegate reporter;
+    CHIP_ERROR err;
 
     mdnsServer.SetDelegate(&reporter);
 
@@ -316,7 +317,7 @@ int main(int argc, char ** args)
 
         MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
 
-        CHIP_ERROR err = mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort);
+        err = mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort);
         if (err != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces: %s\n", chip::ErrorStr(err));
@@ -326,9 +327,9 @@ int main(int argc, char ** args)
 
     BroadcastPacket(&mdnsServer);
 
-    CHIP_ERROR err = DeviceLayer::SystemLayer.StartTimer(
+    err = DeviceLayer::SystemLayer().StartTimer(
         gOptions.runtimeMs,
-        [](System::Layer *, void *, CHIP_ERROR err) {
+        [](System::Layer *, void *) {
             DeviceLayer::PlatformMgr().StopEventLoopTask();
             DeviceLayer::PlatformMgr().Shutdown();
         },

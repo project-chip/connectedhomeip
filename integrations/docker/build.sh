@@ -31,7 +31,7 @@ ORG=${DOCKER_BUILD_ORG:-connectedhomeip}
 IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 
 # version
-VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
+VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
 
 [[ ${*/--help//} != "${*}" ]] && {
     set +x

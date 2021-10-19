@@ -52,42 +52,38 @@ class TelinkBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
-                 output_prefix: str,
                  app: TelinkApp = TelinkApp.LIGHT,
                  board: TelinkBoard = TelinkBoard.TLSR9518ADK80D):
-        super(TelinkBuilder, self).__init__(root, runner, output_prefix)
+        super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
 
     def generate(self):
+        if os.path.exists(self.output_dir):
+            return
 
-        if not os.path.exists(self.output_dir):
+        if not self._runner.dry_run:
+            # Zephyr base
+            if 'TELINK_ZEPHYR_BASE' not in os.environ:
+                raise Exception("Telink builds require TELINK_ZEPHYR_BASE")
 
-            if not self._runner.dry_run:
+        cmd = 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"\n'
 
-                # Check Zephyr base
-                if 'TELINK_ZEPHYR_BASE' not in os.environ:
-                    raise Exception(
-                        "Telink builds require TELINK_ZEPHYR_BASE to be set")
+        if 'TELINK_ZEPHYR_SDK_DIR' in os.environ:
+            cmd += 'export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"\n'
 
-                # Check Telink toolchain
-                if 'TELINK_TOOLCHAIN_PATH' not in os.environ:
-                    raise Exception(
-                        "Telink requires TELINK_TOOLCHAIN_PATH to be set")
-
-            cmd = '''
-source "$TELINK_ZEPHYR_BASE/zephyr-env.sh";
-export ZEPHYR_TOOLCHAIN_VARIANT=cross-compile;
-export CROSS_COMPILE=$TELINK_TOOLCHAIN_PATH/riscv32-elf-;
-west build -d {outdir} -b {board} {sourcedir}
+        cmd += '''
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {outdir} -b {board} {sourcedir}
         '''.format(
-                outdir=shlex.quote(
-                    self.output_dir), board=self.board.GnArgName(), sourcedir=shlex.quote(
-                    os.path.join(
-                        self.root, 'examples', self.app.ExampleName(), 'telink'))).strip()
+            outdir=shlex.quote(
+                self.output_dir), board=self.board.GnArgName(), sourcedir=shlex.quote(
+                os.path.join(
+                    self.root, 'examples', self.app.ExampleName(), 'telink'))).strip()
 
-            self._Execute(['bash', '-c', cmd],
-                          title='Generating ' + self.identifier)
+        self._Execute(['bash', '-c', cmd],
+                      title='Generating ' + self.identifier)
 
     def _build(self):
         logging.info('Compiling Telink at %s', self.output_dir)

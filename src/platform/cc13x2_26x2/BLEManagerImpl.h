@@ -22,33 +22,30 @@
  * Instruments cc13xx_cc26xx platform.
  */
 
-#ifndef BLEManager_IMPL_H
-#define BLEManager_IMPL_H
-
 #pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "FreeRTOS.h"
 #include <queue.h>
 #include <task.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <icall.h>
 #include <icall_ble_api.h>
 
 #include "hal_types.h"
 
-#include "chipOBleProfile.h"
 #include "ti_ble_config.h"
 #include "ti_drivers_config.h"
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "chipOBleProfile.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -367,5 +364,3 @@ inline BleLayer * BLEManagerImpl::_GetBleLayer()
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#endif // BLEManager_IMPL_H

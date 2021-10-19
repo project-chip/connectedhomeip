@@ -76,8 +76,8 @@ static_library("EFR32") {
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../OpenThread/MdnsImpl.cpp" ]
-      deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+      sources += [ "../OpenThread/DnssdImpl.cpp" ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
 }

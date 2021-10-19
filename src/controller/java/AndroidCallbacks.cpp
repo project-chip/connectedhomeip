@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 #include "AndroidCallbacks.h"
-#include "JniReferences.h"
-#include "JniTypeWrappers.h"
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 #include <jni.h>
 #include <lib/support/CodeUtils.h>
@@ -28,7 +28,7 @@ using namespace chip::Controller;
 GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject javaCallback) :
     mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnDeviceConnectionFailureFn, this)
 {
-    JNIEnv * env = chip::Controller::JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     mJavaCallbackRef = env->NewGlobalRef(javaCallback);
     if (mJavaCallbackRef == nullptr)
@@ -39,7 +39,7 @@ GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject javaCallback) :
 
 GetConnectedDeviceCallback::~GetConnectedDeviceCallback()
 {
-    JNIEnv * env = chip::Controller::JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     env->DeleteGlobalRef(mJavaCallbackRef);
 }

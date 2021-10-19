@@ -268,6 +268,10 @@ def main():
     pull_artifact_re = re.compile('^(.*)-pull-(\\d+)$')
     binary_count = 0
     for a in artifacts:
+        # Ignore size reports; they are handled by a separate script.
+        if a.name.startswith('Size,'):
+            continue
+
         # logs cleanup after 3 days
         is_log = a.name.endswith('-logs')
 

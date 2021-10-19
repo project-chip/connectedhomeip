@@ -40,7 +40,7 @@ vector<uint16_t> ApplicationLauncherManager::proxyGetApplicationList()
     return applications;
 }
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data)
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(ApplicationLauncherApp application, std::string data)
 {
     // TODO: Insert your code
     ApplicationLauncherResponse response;

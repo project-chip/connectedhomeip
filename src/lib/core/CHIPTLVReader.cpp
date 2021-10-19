@@ -130,41 +130,73 @@ CHIP_ERROR TLVReader::Get(bool & v)
 
 CHIP_ERROR TLVReader::Get(int8_t & v)
 {
-    uint64_t v64   = 0;
+    int64_t v64    = 0;
     CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(static_cast<uint8_t>(v64));
+    if (!CanCastTo<int8_t>(v64))
+    {
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+    v = static_cast<int8_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(int16_t & v)
 {
-    uint64_t v64   = 0;
+    int64_t v64    = 0;
     CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(static_cast<uint16_t>(v64));
+    if (!CanCastTo<int16_t>(v64))
+    {
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+    v = static_cast<int16_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(int32_t & v)
 {
-    uint64_t v64   = 0;
+    int64_t v64    = 0;
     CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(static_cast<uint32_t>(v64));
+    if (!CanCastTo<int32_t>(v64))
+    {
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+    v = static_cast<int32_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(int64_t & v)
 {
-    uint64_t v64   = 0;
-    CHIP_ERROR err = Get(v64);
-    v              = CastToSigned(v64);
-    return err;
+    // Internal callers of this method depend on it not modifying "v" on failure.
+    switch (ElementType())
+    {
+    case TLVElementType::Int8:
+        v = CastToSigned(static_cast<uint8_t>(mElemLenOrVal));
+        break;
+    case TLVElementType::Int16:
+        v = CastToSigned(static_cast<uint16_t>(mElemLenOrVal));
+        break;
+    case TLVElementType::Int32:
+        v = CastToSigned(static_cast<uint32_t>(mElemLenOrVal));
+        break;
+    case TLVElementType::Int64:
+        v = CastToSigned(mElemLenOrVal);
+        break;
+    default:
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVReader::Get(uint8_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = static_cast<uint8_t>(v64);
+    if (!CanCastTo<uint8_t>(v64))
+    {
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+    v = static_cast<uint8_t>(v64);
     return err;
 }
 
@@ -172,7 +204,11 @@ CHIP_ERROR TLVReader::Get(uint16_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = static_cast<uint16_t>(v64);
+    if (!CanCastTo<uint16_t>(v64))
+    {
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+    v = static_cast<uint16_t>(v64);
     return err;
 }
 
@@ -180,24 +216,19 @@ CHIP_ERROR TLVReader::Get(uint32_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = static_cast<uint32_t>(v64);
+    if (!CanCastTo<uint32_t>(v64))
+    {
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+    v = static_cast<uint32_t>(v64);
     return err;
 }
 
 CHIP_ERROR TLVReader::Get(uint64_t & v)
 {
+    // Internal callers of this method depend on it not modifying "v" on failure.
     switch (ElementType())
     {
-    case TLVElementType::Int8:
-        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint8_t>(mElemLenOrVal))));
-        break;
-    case TLVElementType::Int16:
-        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint16_t>(mElemLenOrVal))));
-        break;
-    case TLVElementType::Int32:
-        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint32_t>(mElemLenOrVal))));
-        break;
-    case TLVElementType::Int64:
     case TLVElementType::UInt8:
     case TLVElementType::UInt16:
     case TLVElementType::UInt32:
@@ -474,15 +505,23 @@ CHIP_ERROR TLVReader::Next()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Next(TLVType expectedType, uint64_t expectedTag)
+CHIP_ERROR TLVReader::Next(Tag expectedTag)
 {
     CHIP_ERROR err = Next();
     if (err != CHIP_NO_ERROR)
         return err;
-    if (GetType() != expectedType)
-        return CHIP_ERROR_WRONG_TLV_TYPE;
     if (mElemTag != expectedTag)
         return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TLVReader::Next(TLVType expectedType, Tag expectedTag)
+{
+    CHIP_ERROR err = Next(expectedTag);
+    if (err != CHIP_NO_ERROR)
+        return err;
+    if (GetType() != expectedType)
+        return CHIP_ERROR_WRONG_TLV_TYPE;
     return CHIP_NO_ERROR;
 }
 
@@ -732,7 +771,7 @@ CHIP_ERROR TLVReader::VerifyElement()
     return CHIP_NO_ERROR;
 }
 
-uint64_t TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
+Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
 {
     uint16_t vendorId;
     uint16_t profileNum;
@@ -873,7 +912,7 @@ TLVElementType TLVReader::ElementType() const
     return static_cast<TLVElementType>(mControlByte & kTLVTypeMask);
 }
 
-CHIP_ERROR TLVReader::FindElementWithTag(const uint64_t tag, TLVReader & destReader) const
+CHIP_ERROR TLVReader::FindElementWithTag(Tag tag, TLVReader & destReader) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

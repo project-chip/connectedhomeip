@@ -33,47 +33,34 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    // Error if already initialized.
-    VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+Command::Command() {}
 
-    mpExchangeMgr = apExchangeMgr;
-    mpDelegate    = apDelegate;
-    err           = Reset();
-    SuccessOrExit(err);
-
-exit:
-    ChipLogFunctError(err);
-    return err;
-}
-
-CHIP_ERROR Command::Reset()
+CHIP_ERROR Command::AllocateBuffer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandList::Builder commandListBuilder;
-    AbortExistingExchangeContext();
 
-    mCommandMessageWriter.Reset();
+    if (!mBufferAllocated)
+    {
+        mCommandMessageWriter.Reset();
 
-    System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    VerifyOrExit(!commandPacket.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+        System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+        VerifyOrExit(!commandPacket.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    mCommandMessageWriter.Init(std::move(commandPacket));
-    err = mInvokeCommandBuilder.Init(&mCommandMessageWriter);
-    SuccessOrExit(err);
+        mCommandMessageWriter.Init(std::move(commandPacket));
+        err = mInvokeCommandBuilder.Init(&mCommandMessageWriter);
+        SuccessOrExit(err);
 
-    commandListBuilder = mInvokeCommandBuilder.CreateCommandListBuilder();
-    err                = commandListBuilder.GetError();
-    SuccessOrExit(err);
-    MoveToState(CommandState::Initialized);
+        commandListBuilder = mInvokeCommandBuilder.CreateCommandListBuilder();
+        err                = commandListBuilder.GetError();
+        SuccessOrExit(err);
 
-    mCommandIndex = 0;
+        mCommandIndex = 0;
+
+        mBufferAllocated = true;
+    }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -122,34 +109,22 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
-void Command::Shutdown()
-{
-    VerifyOrReturn(mState != CommandState::Uninitialized);
-    AbortExistingExchangeContext();
-    ShutdownInternal();
-}
-
-void Command::ShutdownInternal()
-{
-    mCommandMessageWriter.Reset();
-
-    mpExchangeMgr = nullptr;
-    mpExchangeCtx = nullptr;
-    mpDelegate    = nullptr;
-    ClearState();
-
-    mCommandIndex = 0;
-}
-
-CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus)
+CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandDataElement::Builder commandDataElement;
-    VerifyOrExit(mState == CommandState::Initialized || mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = AllocateBuffer();
+    SuccessOrExit(err);
+
+    //
+    // We must not be in the middle of preparing a command, or having prepared or sent one.
+    //
+    VerifyOrExit(mState == CommandState::Idle, err = CHIP_ERROR_INCORRECT_STATE);
+
     commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
     err                = commandDataElement.GetError();
     SuccessOrExit(err);
@@ -157,39 +132,55 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams,
     err = ConstructCommandPath(aCommandPathParams, commandDataElement);
     SuccessOrExit(err);
 
-    if (!aIsStatus)
+    if (aStartDataStruct)
     {
         err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data),
                                                              TLV::kTLVType_Structure, mDataElementContainerType);
     }
+
+    MoveToState(CommandState::AddingCommand);
+
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
 TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
 {
-    return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
+    if (mState != CommandState::AddingCommand)
+    {
+        return nullptr;
+    }
+    else
+    {
+        return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
+    }
 }
 
-CHIP_ERROR Command::FinishCommand(bool aIsStatus)
+CHIP_ERROR Command::Finalize(System::PacketBufferHandle & commandPacket)
+{
+    VerifyOrReturnError(mState == CommandState::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    return mCommandMessageWriter.Finalize(&commandPacket);
+}
+
+CHIP_ERROR Command::FinishCommand(bool aEndDataStruct)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
-    if (!aIsStatus)
-    {
-        err = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
-        SuccessOrExit(err);
-    }
-    commandDataElement.EndOfCommandDataElement();
-    err = commandDataElement.GetError();
-    SuccessOrExit(err);
-    MoveToState(CommandState::AddCommand);
+    VerifyOrReturnError(mState == CommandState::AddingCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
-exit:
-    ChipLogFunctError(err);
-    return err;
+    CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
+    if (aEndDataStruct)
+    {
+        ReturnErrorOnFailure(commandDataElement.GetWriter()->EndContainer(mDataElementContainerType));
+    }
+
+    ReturnErrorOnFailure(commandDataElement.EndOfCommandDataElement().GetError());
+    ReturnErrorOnFailure(mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList().GetError());
+    ReturnErrorOnFailure(mInvokeCommandBuilder.EndOfInvokeCommand().GetError());
+
+    MoveToState(CommandState::AddedCommand);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams,
@@ -211,37 +202,48 @@ CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathP
     return commandPath.GetError();
 }
 
-CHIP_ERROR Command::AbortExistingExchangeContext()
+void Command::Abort()
 {
-    // Discard any existing exchange context. Effectively we can only have one Echo exchange with
-    // a single node at any one time.
+    //
+    // If the exchange context hasn't already been gracefully closed
+    // (signaled by setting it to null), then we need to forcibly
+    // tear it down.
+    //
     if (mpExchangeCtx != nullptr)
     {
+        // We (or more precisely our subclass) might be a delegate for this
+        // exchange, and we don't want the OnExchangeClosing notification in
+        // that case.  Null out the delegate to avoid that.
+        //
+        // TODO: This makes all sorts of assumptions about what the delegate is
+        // (notice the "might" above!) that might not hold in practice.  We
+        // really need a better solution here....
+        mpExchangeCtx->SetDelegate(nullptr);
         mpExchangeCtx->Abort();
         mpExchangeCtx = nullptr;
     }
-
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Command::FinalizeCommandsMessage(System::PacketBufferHandle & commandPacket)
+void Command::Close()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandList::Builder commandListBuilder;
-    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
-    commandListBuilder = mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList();
-    err                = commandListBuilder.GetError();
-    SuccessOrExit(err);
+    //
+    // Shortly after this call to close and when handling an inbound message, it's entirely possible
+    // for this object (courtesy of its derived class) to be destroyed
+    // *before* the call unwinds all the way back to ExchangeContext::HandleMessage.
+    //
+    // As part of tearing down the exchange, there is logic there to invoke the delegate to notify
+    // it of impending closure - which is this object, which just got destroyed!
+    //
+    // So prevent a use-after-free, set delegate to null.
+    //
+    // For more details, see #10344.
+    //
+    if (mpExchangeCtx != nullptr)
+    {
+        mpExchangeCtx->SetDelegate(nullptr);
+    }
 
-    mInvokeCommandBuilder.EndOfInvokeCommand();
-    err = mInvokeCommandBuilder.GetError();
-    SuccessOrExit(err);
-
-    err = mCommandMessageWriter.Finalize(&commandPacket);
-    SuccessOrExit(err);
-exit:
-    ChipLogFunctError(err);
-    return err;
+    mpExchangeCtx = nullptr;
 }
 
 const char * Command::GetStateStr() const
@@ -249,17 +251,20 @@ const char * Command::GetStateStr() const
 #if CHIP_DETAIL_LOGGING
     switch (mState)
     {
-    case CommandState::Uninitialized:
-        return "Uninitialized";
+    case CommandState::Idle:
+        return "Idle";
 
-    case CommandState::Initialized:
-        return "Initialized";
+    case CommandState::AddingCommand:
+        return "AddingCommand";
 
-    case CommandState::AddCommand:
-        return "AddCommand";
+    case CommandState::AddedCommand:
+        return "AddedCommand";
 
-    case CommandState::Sending:
-        return "Sending";
+    case CommandState::CommandSent:
+        return "CommandSent";
+
+    case CommandState::AwaitingDestruction:
+        return "AwaitingDestruction";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
@@ -269,11 +274,6 @@ void Command::MoveToState(const CommandState aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
-}
-
-void Command::ClearState(void)
-{
-    MoveToState(CommandState::Uninitialized);
 }
 
 } // namespace app

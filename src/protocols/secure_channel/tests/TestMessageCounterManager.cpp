@@ -31,7 +31,7 @@
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
@@ -60,7 +60,7 @@ const char PAYLOAD[] = "Hello!";
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && msgBuf) override
     {
         ++ReceiveHandlerCallCount;
@@ -78,11 +78,11 @@ void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    SessionHandle localSession = ctx.GetSessionLocalToPeer();
-    SessionHandle peerSession  = ctx.GetSessionPeerToLocal();
+    SessionHandle localSession = ctx.GetSessionBobToAlice();
+    SessionHandle peerSession  = ctx.GetSessionAliceToBob();
 
-    Transport::PeerConnectionState * localState = ctx.GetSecureSessionManager().GetPeerConnectionState(localSession);
-    Transport::PeerConnectionState * peerState  = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
+    Transport::SecureSession * localState = ctx.GetSecureSessionManager().GetSecureSession(localSession);
+    Transport::SecureSession * peerState  = ctx.GetSecureSessionManager().GetSecureSession(peerSession);
 
     localState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
     err = ctx.GetMessageCounterManager().SendMsgCounterSyncReq(localSession, localState);
@@ -99,8 +99,8 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
 
-    SessionHandle peerSession                  = ctx.GetSessionPeerToLocal();
-    Transport::PeerConnectionState * peerState = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
+    SessionHandle peerSession            = ctx.GetSessionAliceToBob();
+    Transport::SecureSession * peerState = ctx.GetSecureSessionManager().GetSecureSession(peerSession);
     peerState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
 
     MockAppDelegate callback;
@@ -110,7 +110,7 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle msgBuf = MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
 
-    Messaging::ExchangeContext * ec = ctx.NewExchangeToPeer(nullptr);
+    Messaging::ExchangeContext * ec = ctx.NewExchangeToAlice(nullptr);
     NL_TEST_ASSERT(inSuite, ec != nullptr);
 
     err = ec->SendMessage(chip::Protocols::Echo::MsgType::EchoRequest, std::move(msgBuf),

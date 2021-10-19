@@ -22,7 +22,7 @@
  */
 
 #include "AttributeStatusList.h"
-#include "AttributeStatusElement.h"
+#include "AttributeStatusIB.h"
 
 #include "MessageDefHelper.h"
 
@@ -37,13 +37,12 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-AttributeStatusElement::Builder & AttributeStatusList::Builder::CreateAttributeStatusBuilder()
+AttributeStatusIB::Builder & AttributeStatusList::Builder::CreateAttributeStatusBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeStatusBuilder.ResetError(mError));
 
     mError = mAttributeStatusBuilder.Init(mpWriter);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mAttributeStatusBuilder would be un-/partial initialized and cannot be used to write anything
@@ -71,10 +70,9 @@ CHIP_ERROR AttributeStatusList::Parser::CheckSchemaValidity() const
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrExit(chip::TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
         {
-            AttributeStatusElement::Parser status;
+            AttributeStatusIB::Parser status;
             err = status.Init(reader);
             SuccessOrExit(err);
 
@@ -108,7 +106,6 @@ CHIP_ERROR AttributeStatusList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }

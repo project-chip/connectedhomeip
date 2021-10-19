@@ -32,7 +32,7 @@
 #define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
 
 extern chip::Messaging::ExchangeManager gExchangeManager;
-extern chip::SecureSessionMgr gSessionManager;
+extern chip::SessionManager gSessionManager;
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
 
 constexpr chip::NodeId kTestNodeId         = 0x1ULL;

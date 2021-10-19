@@ -92,6 +92,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
     // clang-format off
 
 #ifndef DISABLE_BROKEN_DNS_TESTS
+#if INET_CONFIG_ENABLE_IPV4
     // Test resolving a name with only IPv4 addresses.
     RunTestCase(testSuite,
         DNSResolutionTestCase
@@ -104,6 +105,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
             false
         }
     );
+#endif
 
     // Test resolving a name with only IPv6 addresses.
     RunTestCase(testSuite,
@@ -118,6 +120,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
         }
     );
 
+#if INET_CONFIG_ENABLE_IPV4
     // Test resolving a name with IPv4 and IPv6 addresses.
     RunTestCase(testSuite,
         DNSResolutionTestCase
@@ -130,6 +133,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
             true
         }
     );
+#endif
 #endif
     // clang-format on
 }
@@ -183,7 +187,6 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
             true
         }
     );
-#endif // INET_CONFIG_ENABLE_IPV4
 
     // Test requesting IPv6 address preferentially.
     RunTestCase(testSuite,
@@ -197,6 +200,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
             true
         }
     );
+#endif // INET_CONFIG_ENABLE_IPV4
 
 #endif
     // clang-format on
@@ -251,7 +255,6 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
             true
         }
     );
-#endif // INET_CONFIG_ENABLE_IPV4
 
     // Test requesting 2 addresses, preferring IPv6.  This should result in 1 IPv6 address
     // followed by 1 IPv4 address.
@@ -267,6 +270,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
         }
     );
     // clang-format on
+#endif // INET_CONFIG_ENABLE_IPV4
 }
 
 /**
@@ -350,6 +354,7 @@ static void TestDNSResolution_NoHostRecord(nlTestSuite * testSuite, void * testC
 static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
+#if INET_CONFIG_ENABLE_IPV4
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
@@ -361,6 +366,7 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
             false
         }
     );
+#endif
 
     RunTestCase(testSuite,
         DNSResolutionTestCase
@@ -377,6 +383,7 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
     // Test resolving text form IPv4 and IPv6 addresses while requesting an
     // incompatible address type.
 
+#if INET_CONFIG_ENABLE_IPV4
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
@@ -400,13 +407,14 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
             false
         }
     );
+#endif
     // clang-format on
 }
 
 static void TestDNSResolution_Cancel(nlTestSuite * testSuite, void * inContext)
 {
     DNSResolutionTestContext testContext{
-        testSuite, DNSResolutionTestCase{ "www.google.com", kDNSOption_Default, kMaxResults, CHIP_NO_ERROR, true, false }
+        testSuite, DNSResolutionTestCase{ "ipv6.google.com", kDNSOption_Default, kMaxResults, CHIP_NO_ERROR, false, true }
     };
 
     // Start DNS resolution.
@@ -440,35 +448,11 @@ static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inCon
             testSuite,
             DNSResolutionTestCase
             {
-                "www.nest.com",
-                kDNSOption_Default,
+                "example.net",
+                kDNSOption_AddrFamily_IPv6Only,
                 kMaxResults,
                 CHIP_NO_ERROR,
-                true,
-                false
-            }
-        },
-        {
-            testSuite,
-            DNSResolutionTestCase
-            {
-                "10.0.0.1",
-                kDNSOption_Default,
-                kMaxResults,
-                CHIP_NO_ERROR,
-                true,
-                false
-            }
-        },
-        {
-            testSuite,
-            DNSResolutionTestCase
-            {
-                "www.google.com",
-                kDNSOption_Default,
-                kMaxResults,
-                CHIP_NO_ERROR,
-                true,
+                false,
                 true
             }
         },
@@ -476,12 +460,36 @@ static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inCon
             testSuite,
             DNSResolutionTestCase
             {
-                "pool.ntp.org",
+                "2607:f8b0:4005:804::200e",
                 kDNSOption_Default,
                 kMaxResults,
                 CHIP_NO_ERROR,
-                true,
-                false
+                false,
+                true
+            }
+        },
+        {
+            testSuite,
+            DNSResolutionTestCase
+            {
+                "ipv6.google.com",
+                kDNSOption_Default,
+                kMaxResults,
+                CHIP_NO_ERROR,
+                false,
+                true
+            }
+        },
+        {
+            testSuite,
+            DNSResolutionTestCase
+            {
+                "ibm.com",
+                kDNSOption_AddrFamily_IPv6Only,
+                kMaxResults,
+                CHIP_NO_ERROR,
+                false,
+                true
             }
         }
     };
@@ -587,7 +595,9 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
 
         for (uint8_t i = 0; i < addrCount; i++)
         {
+#if INET_CONFIG_ENABLE_IPV4
             respContainsIPv4Addrs = respContainsIPv4Addrs || (addrArray[i].Type() == kIPAddressType_IPv4);
+#endif
             respContainsIPv6Addrs = respContainsIPv6Addrs || (addrArray[i].Type() == kIPAddressType_IPv6);
         }
 
@@ -604,8 +614,14 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
         {
             if (testCase.expectIPv4Addrs)
             {
+#if INET_CONFIG_ENABLE_IPV4
                 NL_TEST_ASSERT(testSuite, respContainsIPv4Addrs);
+#else
+                // IP-v4 test ran without IPv4 support
+                NL_TEST_ASSERT(testSuite, false);
+#endif
             }
+
             if (testCase.expectIPv6Addrs)
             {
                 NL_TEST_ASSERT(testSuite, respContainsIPv6Addrs);
@@ -618,6 +634,7 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
         {
         case kDNSOption_AddrFamily_Any:
             break;
+#if INET_CONFIG_ENABLE_IPV4
         case kDNSOption_AddrFamily_IPv4Only:
             NL_TEST_ASSERT(testSuite, !respContainsIPv6Addrs);
             break;
@@ -627,6 +644,7 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
                 NL_TEST_ASSERT(testSuite, addrArray[0].Type() == kIPAddressType_IPv4);
             }
             break;
+#endif
         case kDNSOption_AddrFamily_IPv6Only:
             NL_TEST_ASSERT(testSuite, !respContainsIPv4Addrs);
             break;
@@ -653,14 +671,14 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
 
 static void ServiceNetworkUntilDone(uint32_t timeoutMilliseconds)
 {
-    uint64_t timeoutTimeMilliseconds          = System::Clock::GetMonotonicMilliseconds() + timeoutMilliseconds;
+    uint64_t timeoutTimeMilliseconds          = System::SystemClock().GetMonotonicMilliseconds() + timeoutMilliseconds;
     constexpr uint32_t kSleepTimeMilliseconds = 10;
 
     while (!gDone)
     {
         ServiceNetwork(kSleepTimeMilliseconds);
 
-        if (System::Clock::GetMonotonicMilliseconds() >= timeoutTimeMilliseconds)
+        if (System::SystemClock().GetMonotonicMilliseconds() >= timeoutTimeMilliseconds)
         {
             break;
         }

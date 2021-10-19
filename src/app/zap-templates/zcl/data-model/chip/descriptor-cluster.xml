@@ -18,6 +18,7 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <struct name="DeviceType">
+    <cluster code="0x001d"/>
     <item name="type" type="DEVTYPE_ID"/>
     <item name="revision" type="INT16U"/>
   </struct>

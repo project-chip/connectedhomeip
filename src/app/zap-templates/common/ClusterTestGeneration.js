@@ -24,10 +24,11 @@ const fs                = require('fs');
 const path              = require('path');
 
 // Import helpers from zap core
-const templateUtil = require(zapPath + 'src-electron/generator/template-util.js')
+const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
 const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
+const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templates/templates/app/helper.js');
 
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
@@ -64,17 +65,32 @@ function setDefaultType(test)
   const type = test[kCommandName];
   switch (type) {
   case 'readAttribute':
+    test.commandName     = 'Read';
     test.isAttribute     = true;
     test.isReadAttribute = true;
     break;
 
   case 'writeAttribute':
+    test.commandName      = 'Write';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
     break;
 
+  case 'subscribeAttribute':
+    test.commandName          = 'Subscribe';
+    test.isAttribute          = true;
+    test.isSubscribeAttribute = true;
+    break;
+
+  case 'waitForReport':
+    test.commandName     = 'Report';
+    test.isAttribute     = true;
+    test.isWaitForReport = true;
+    break;
+
   default:
-    test.isCommand = true;
+    test.commandName = test.command;
+    test.isCommand   = true;
     break;
   }
 }
@@ -131,16 +147,21 @@ function setDefaultResponse(test)
     throwError(test, errorStr);
   }
 
-  if (test.isWriteAttribute && hasResponseValueOrConstraints) {
-    const errorStr = 'Attribute write test has a "value" or a "constraints" defined.';
-    throwError(test, errorStr);
+  if (!test.isAttribute) {
+    return;
   }
 
-  if (!test.isReadAttribute) {
+  if (test.isWriteAttribute || test.isSubscribeAttribute) {
+    if (hasResponseValueOrConstraints) {
+      const errorStr = 'Attribute test has a "value" or a "constraints" defined.';
+      throwError(test, errorStr);
+    }
+
     return;
   }
 
   if (!hasResponseValueOrConstraints) {
+    console.log(test);
     console.log(test[kResponseName]);
     const errorStr = 'Test does not have a "value" or a "constraints" defined.';
     throwError(test, errorStr);
@@ -183,6 +204,34 @@ function parse(filename)
 
   const data = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
   const yaml = YAML.parse(data);
+
+  // "subscribeAttribute" command expects a report to be acked before
+  // it got a success response.
+  // In order to validate that the report has been received with the proper value
+  // a "subscribeAttribute" command can have a response configured into the test step
+  // definition. In this case, a new async "waitForReport" test step will be synthesized
+  // and added to the list of tests.
+  yaml.tests.forEach((test, index) => {
+    if (test.command == "subscribeAttribute" && test.response) {
+      // Create a new report test where the expected response is the response argument
+      // for the "subscribeAttributeTest"
+      const reportTest = {
+        label : "Report: " + test.label,
+        command : "waitForReport",
+        attribute : test.attribute,
+        response : test.response,
+        async : true
+      };
+      delete test.response;
+
+      // insert the new report test into the tests list
+      yaml.tests.splice(index, 0, reportTest);
+
+      // Associate the "subscribeAttribute" test with the synthesized report test
+      test.hasWaitForReport = true;
+      test.waitForReport    = reportTest;
+    }
+  });
 
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
@@ -294,11 +343,34 @@ function isTestOnlyCluster(name)
   return name == DelayCommands.name;
 }
 
+function chip_tests_item_response_type(options)
+{
+  const promise = assertCommandOrAttribute(this).then(item => {
+    if (item.hasSpecificResponse) {
+      return 'Clusters::' + asUpperCamelCase(this.cluster) + '::Commands::' + asUpperCamelCase(item.response.name)
+          + '::DecodableType';
+    }
+
+    return 'DataModel::NullObjectType';
+  });
+
+  return asPromise.call(this, promise, options);
+}
+
 function chip_tests_item_parameters(options)
 {
   const commandValues = this.arguments.values;
 
   const promise = assertCommandOrAttribute(this).then(item => {
+    if (this.isAttribute && !this.isWriteAttribute) {
+      if (this.isSubscribeAttribute) {
+        const minInterval = { name : 'minInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.minInterval };
+        const maxInterval = { name : 'maxInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.maxInterval };
+        return [ minInterval, maxInterval ];
+      }
+      return [];
+    }
+
     const commandArgs = item.arguments;
     const commands    = commandArgs.map(commandArg => {
       commandArg = JSON.parse(JSON.stringify(commandArg));
@@ -309,7 +381,37 @@ function chip_tests_item_parameters(options)
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
       }
-      commandArg.definedValue = expected.value;
+      // test_cluster_command_value is a recursive partial using #each. At some point the |global|
+      // context is lost and it fails. Make sure to attach the global context as a property of the | value |
+      // that is evaluated.
+      function attachGlobal(global, value)
+      {
+        if (Array.isArray(value)) {
+          value = value.map(v => attachGlobal(global, v));
+        } else if (value instanceof Object) {
+          for (key in value) {
+            value[key] = attachGlobal(global, value[key]);
+          }
+        } else {
+          switch (typeof value) {
+          case 'number':
+            value = new Number(value);
+            break;
+          case 'string':
+            value = new String(value);
+            break;
+          case 'boolean':
+            value = new Boolean(value);
+            break;
+          default:
+            throw new Error('Unsupported value: ', value);
+          }
+        }
+
+        value.global = global;
+        return value;
+      }
+      commandArg.definedValue = attachGlobal(this.global, expected.value);
 
       return commandArg;
     });
@@ -344,14 +446,14 @@ function chip_tests_item_response_parameters(options)
         }
       }
 
-      const unusedResponseValues = responseValues.filter(response => 'value' in response);
-      unusedResponseValues.forEach(unusedResponseValue => {
-        printErrorAndExit(this,
-            'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
-                + responseArgs.map(response => response.name).join('\n\t* '));
-      });
-
       return responseArg;
+    });
+
+    const unusedResponseValues = responseValues.filter(response => 'value' in response);
+    unusedResponseValues.forEach(unusedResponseValue => {
+      printErrorAndExit(this,
+          'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
+              + responseArgs.map(response => response.name).join('\n\t* '));
     });
 
     return responses;
@@ -366,5 +468,6 @@ function chip_tests_item_response_parameters(options)
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
+exports.chip_tests_item_response_type       = chip_tests_item_response_type;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;

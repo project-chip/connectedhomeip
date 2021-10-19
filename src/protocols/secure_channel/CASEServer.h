@@ -33,26 +33,26 @@ public:
     {
         if (mExchangeManager != nullptr)
         {
-            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
+            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
         }
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             Ble::BleLayer * bleLayer, SecureSessionMgr * sessionMgr,
-                                             Transport::FabricTable * fabrics, SessionIDAllocator * idAllocator);
+                                             Ble::BleLayer * bleLayer, SessionManager * sessionManager, FabricTable * fabrics,
+                                             SessionIDAllocator * idAllocator);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
     //// ExchangeDelegate Implementation ////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
-                                                            SecureSessionMgr * sessionMgr) override
+                                                            SessionManager * sessionManager) override
     {
-        return GetSession().GetMessageDispatch(reliableMessageManager, sessionMgr);
+        return GetSession().GetMessageDispatch(reliableMessageManager, sessionManager);
     }
 
     virtual CASESession & GetSession() { return mPairingSession; }
@@ -61,11 +61,11 @@ private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
     CASESession mPairingSession;
-    uint16_t mSessionKeyId         = 0;
-    SecureSessionMgr * mSessionMgr = nullptr;
-    Ble::BleLayer * mBleLayer      = nullptr;
+    uint16_t mSessionKeyId           = 0;
+    SessionManager * mSessionManager = nullptr;
+    Ble::BleLayer * mBleLayer        = nullptr;
 
-    Transport::FabricTable * mFabrics = nullptr;
+    FabricTable * mFabrics = nullptr;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
 

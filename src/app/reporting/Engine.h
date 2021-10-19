@@ -60,6 +60,8 @@ public:
      */
     CHIP_ERROR Init();
 
+    void Shutdown();
+
     /**
      * Main work-horse function that executes the run-loop.
      */
@@ -77,6 +79,11 @@ public:
      */
     CHIP_ERROR ScheduleRun();
 
+    /**
+     * Application marks mutated change path and would be sent out in later report.
+     */
+    CHIP_ERROR SetDirty(ClusterInfo & aClusterInfo);
+
 private:
     friend class TestReportingEngine;
     /**
@@ -90,6 +97,12 @@ private:
     CHIP_ERROR RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
+    /**
+     * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
+     * it would clear dirty flag for that subscription
+     *
+     */
+    void UpdateReadHandlerDirty(ReadHandler & aReadHandler);
     /**
      * Send Report via ReadHandler
      *
@@ -119,6 +132,15 @@ private:
      *
      */
     uint32_t mCurReadHandlerIdx = 0;
+
+    /**
+     *  mpGlobalDirtySet is used to track the dirty cluster info application modified for attributes during
+     *  post-subscription via SetDirty API, and further form the report. This reporting engine acquires this global dirty
+     *  set from mClusterInfoPool managed by InteractionModelEngine, where all active read handlers also acquire the interested
+     *  cluster Info list from mClusterInfoPool.
+     *
+     */
+    ClusterInfo * mpGlobalDirtySet = nullptr;
 };
 
 }; // namespace reporting

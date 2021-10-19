@@ -44,7 +44,7 @@
 
 /*
  * If the CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION option is not applicable, then the "InetProjectConfig.h"
- * header was not included by <SystemLayer/SystemConfig.h> and therefore it must be included here.
+ * header was not included by <system/SystemConfig.h> and therefore it must be included here.
  */
 #if !CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
 
@@ -114,19 +114,6 @@
 #endif // INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
 
 /**
- *  @def INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
- *
- *  @brief
- *    This defines whether (1) or not (0) your platform will override
- *    the platform- and system-specific InetLayer WillInit, DidInit,
- *    WillShutdown, and DidShutdown.
- *
- */
-#ifndef INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
-#define INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS       0
-#endif // INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
-
-/**
  *  @def INET_CONFIG_MAX_DROPPABLE_EVENTS
  *
  *  @brief
@@ -152,21 +139,6 @@
 #ifndef INET_CONFIG_MAX_DROPPABLE_EVENTS
 #define INET_CONFIG_MAX_DROPPABLE_EVENTS                    0
 #endif // INET_CONFIG_MAX_DROPPABLE_EVENTS
-
-/**
- *  @def INET_CONFIG_NUM_RAW_ENDPOINTS
- *
- *  @brief
- *    This is the total number of "raw" (direct-IP, non-TCP/-UDP) end
- *    point context structures.
- *
- *    Up to this many outstanding "raw" communication flows may be in
- *    use.
- *
- */
-#ifndef INET_CONFIG_NUM_RAW_ENDPOINTS
-#define INET_CONFIG_NUM_RAW_ENDPOINTS                       8
-#endif // INET_CONFIG_NUM_RAW_ENDPOINTS
 
 /**
  *  @def INET_CONFIG_NUM_TCP_ENDPOINTS
@@ -245,18 +217,6 @@
 #ifndef INET_CONFIG_ENABLE_DNS_RESOLVER
 #define INET_CONFIG_ENABLE_DNS_RESOLVER                     0
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-/**
- *  @def INET_CONFIG_ENABLE_RAW_ENDPOINT
- *
- *  @brief
- *    Defines whether (1) or not (0) to enable the ability
- *    to instantiate a Raw endpoint.
- *
- */
-#ifndef INET_CONFIG_ENABLE_RAW_ENDPOINT
-#define INET_CONFIG_ENABLE_RAW_ENDPOINT                     0
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 /**
  *  @def INET_CONFIG_ENABLE_TCP_ENDPOINT

@@ -72,24 +72,31 @@ public:
 
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
 
-    CHIP_ERROR AddAttributeStatusCode(const AttributePathParams & aAttributePathParams,
-                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                      const Protocols::Id aProtocolId,
-                                      const Protocols::InteractionModel::ProtocolCode aProtocolCode);
+    CHIP_ERROR AddStatus(const AttributePathParams & aAttributePathParams, const Protocols::InteractionModel::Status aStatus);
+
+    CHIP_ERROR AddClusterSpecificSuccess(const AttributePathParams & aAttributePathParams, uint8_t aClusterStatus)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR AddClusterSpecificFailure(const AttributePathParams & aAttributePathParams, uint8_t aClusterStatus)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
 private:
     enum class State
     {
-        Uninitialized = 0,      // The handler has not been initialized
-        Initialized,            // The handler has been initialized and is ready
-        AddAttributeStatusCode, // The handler has added attribute status code
-        Sending,                // The handler has sent out the write response
+        Uninitialized = 0, // The handler has not been initialized
+        Initialized,       // The handler has been initialized and is ready
+        AddStatus,         // The handler has added status code
+        Sending,           // The handler has sent out the write response
     };
     CHIP_ERROR ProcessWriteRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & packet);
     CHIP_ERROR SendWriteResponse();
     CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                      AttributeStatusElement::Builder aAttributeStatusElement);
+                                      AttributeStatusIB::Builder aAttributeStatusIB);
 
     void MoveToState(const State aTargetState);
     void ClearState();

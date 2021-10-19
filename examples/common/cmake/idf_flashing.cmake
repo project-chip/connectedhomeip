@@ -44,8 +44,14 @@ macro(flashing_script)
 
   set(flashing_utils_dir "${project_path}/third_party/connectedhomeip/scripts/flashing/")
   set(board_firmware_utils "${board_type}_firmware_utils.py")
+  set(common_firmware_utils "firmware_utils.py")
+  set(application "${CMAKE_PROJECT_NAME}.bin")
+  set(bootloader "bootloader/bootloader.bin")
+  set(partition_table "partition_table/partition-table.bin")
+  set(flashing_script "${CMAKE_PROJECT_NAME}.flash.py")
+  set(manifest "${CMAKE_PROJECT_NAME}.flashbundle.txt")
   configure_file("${flashing_utils_dir}/${board_firmware_utils}" "${build_dir}/${board_firmware_utils}" COPYONLY)
-  configure_file("${flashing_utils_dir}/firmware_utils.py" "${build_dir}/firmware_utils.py" COPYONLY)
+  configure_file("${flashing_utils_dir}/${common_firmware_utils}" "${build_dir}/${common_firmware_utils}" COPYONLY)
 
   get_additional_flashing_depends(${ARGN})
   foreach(dep IN LISTS additional_flashing_depends)
@@ -54,18 +60,26 @@ macro(flashing_script)
     list(APPEND build_dir_depends "${build_dir}/${filename}")
   endforeach(dep)
 
+  set(manifest_files ${application} ${bootloader} ${partition_table} ${flashing_script} ${board_firmware_utils} ${common_firmware_utils})
+  list(JOIN manifest_files "\n" manifest_content)
+
+  file(GENERATE
+    OUTPUT "${build_dir}/${manifest}"
+    CONTENT "${manifest_content}\n")
+
   add_custom_target(flashing_script
+    ALL
     COMMAND ${python}
             "${project_path}/../../../scripts/flashing/gen_flashing_script.py" ${board_type}
-            --output "${build_dir}/${CMAKE_PROJECT_NAME}.flash.py"
+            --output "${build_dir}/${flashing_script}"
             --port "$ENV{ESPPORT}"
             --baud 460800
             --before ${CONFIG_ESPTOOLPY_BEFORE}
             --after ${CONFIG_ESPTOOLPY_AFTER}
-            --application "${CMAKE_PROJECT_NAME}.bin"
-            --bootloader "bootloader/bootloader.bin"
-            --partition "partition_table/partition-table.bin"
-            --use-partition-file "${build_dir}/partition_table/partition-table.bin"
+            --application "${application}"
+            --bootloader "${bootloader}"
+            --partition "${partition_table}"
+            --use-partition-file "${build_dir}/${partition_table}"
             --use-parttool ${idf_path}/components/partition_table/parttool.py
             --use-sdkconfig ${project_path}/sdkconfig
     WORKING_DIRECTORY ${build_dir}

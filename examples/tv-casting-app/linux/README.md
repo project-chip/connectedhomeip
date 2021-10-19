@@ -3,7 +3,7 @@
 This is a CHIP TV Casting app that can be used to cast content to a TV. This app
 discovers TVs on the local network that act as commissioners, lets the user
 select one, sends the TV a User Directed Commissioning request, enters
-commisioning mode, advertises itself as a Commissionable Node and gets
+commissioning mode, advertises itself as a Commissionable Node and gets
 commissioned. Then it allows the user to send CHIP ContentLauncher commands to
 the TV.
 

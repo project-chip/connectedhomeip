@@ -16,20 +16,90 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/Optional.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/ConnectivityManager.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ThreadNetworkDiagnostics;
+using namespace chip::app::Clusters::ThreadNetworkDiagnostics::Attributes;
+using namespace chip::DeviceLayer;
 
-bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+namespace {
+
+class ThreadDiagosticsAttrAccess : public AttributeAccessInterface
 {
-    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::SetOverrunCount(endpoint, 0);
+public:
+    // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
+    ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
+
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+};
+
+ThreadDiagosticsAttrAccess gAttrAccess;
+
+CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    if (aPath.mClusterId != ThreadNetworkDiagnostics::Id)
+    {
+        // We shouldn't have been called at all.
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
+
+    // If it isn't a run time assigned attribute, e.g. ClusterRevision, or if
+    // not implemented, clear the error so we fall back to the standard read
+    // path.
+    //
+    // TODO: This is probably broken in practice.  The standard read path is not
+    // going to produce useful values for these things.  We need to either have
+    // fallbacks in the connectivity manager that encode some sort of default
+    // values or error out on reads we can't actually handle.
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE || err == CHIP_ERROR_NOT_IMPLEMENTED)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+    return err;
+}
+} // anonymous namespace
+
+bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
+                                                               const app::ConcreteCommandPath & commandPath,
+                                                               const Commands::ResetCounts::DecodableType & commandData)
+{
+    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::OverrunCount::Set(commandPath.mEndpointId, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to reset OverrunCount attribute");
     }
 
+    ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
+
     emberAfSendImmediateDefaultResponse(status);
     return true;
+}
+
+void emberAfThreadNetworkDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+{
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gAttrAccess);
+        attrAccessRegistered = true;
+    }
 }

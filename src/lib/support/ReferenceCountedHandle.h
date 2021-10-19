@@ -28,13 +28,18 @@ public:
     explicit ReferenceCountedHandle(Target & target) : mTarget(target) { mTarget.Retain(); }
     ~ReferenceCountedHandle() { mTarget.Release(); }
 
-    ReferenceCountedHandle(const ReferenceCountedHandle & that) = delete;
+    ReferenceCountedHandle(const ReferenceCountedHandle & that) : mTarget(that.mTarget) { mTarget.Retain(); }
+
+    ReferenceCountedHandle(ReferenceCountedHandle && that) : mTarget(that.mTarget) { mTarget.Retain(); }
+
     ReferenceCountedHandle & operator=(const ReferenceCountedHandle & that) = delete;
-    ReferenceCountedHandle(ReferenceCountedHandle && that)                  = delete;
     ReferenceCountedHandle & operator=(ReferenceCountedHandle && that) = delete;
 
     bool operator==(const ReferenceCountedHandle & that) const { return &mTarget == &that.mTarget; }
     bool operator!=(const ReferenceCountedHandle & that) const { return !(*this == that); }
+
+    Target * operator->() { return &mTarget; }
+    Target & Get() const { return mTarget; }
 
 private:
     Target & mTarget;
