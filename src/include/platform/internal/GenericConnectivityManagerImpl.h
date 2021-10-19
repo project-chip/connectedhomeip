@@ -85,7 +85,7 @@ inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedModeTimeo
 {}
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl<ImplClass>::_ReleaseNetworkInterfaces(struct NetworkInterface ** netifp)
+inline void GenericConnectivityManagerImpl<ImplClass>::_ReleaseNetworkInterfaces(NetworkInterface ** netifp)
 {}
 
 template <class ImplClass>
