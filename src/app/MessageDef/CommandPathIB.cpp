@@ -17,11 +17,11 @@
  */
 /**
  *    @file
- *      This file defines CommandPath parser and builder in CHIP interaction model
+ *      This file defines CommandPathIB parser and builder in CHIP interaction model
  *
  */
 
-#include "CommandPath.h"
+#include "CommandPathIB.h"
 
 #include "MessageDefHelper.h"
 
@@ -36,7 +36,7 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR CommandPath::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR CommandPathIB::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -53,12 +53,12 @@ exit:
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR CommandPath::Parser::CheckSchemaValidity() const
+CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    PRETTY_PRINT("CommandPath =");
+    PRETTY_PRINT("CommandPathIB =");
     PRETTY_PRINT("{");
 
     // make a copy of the Path reader
@@ -80,19 +80,6 @@ CHIP_ERROR CommandPath::Parser::CheckSchemaValidity() const
                 uint16_t endpointId;
                 reader.Get(endpointId);
                 PRETTY_PRINT("\tEndpointId = 0x%" PRIx16 ",", endpointId);
-            }
-#endif // CHIP_DETAIL_LOGGING
-            break;
-        case kCsTag_GroupId:
-            // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_GroupId)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_GroupId);
-            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-#if CHIP_DETAIL_LOGGING
-            {
-                uint32_t groupId;
-                reader.Get(groupId);
-                PRETTY_PRINT("\tGroupId = 0x%" PRIx64 ",", groupId);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -152,27 +139,22 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR CommandPath::Parser::GetEndpointId(chip::EndpointId * const apEndpointID) const
+CHIP_ERROR CommandPathIB::Parser::GetEndpointId(chip::EndpointId * const apEndpointID) const
 {
     return GetUnsignedInteger(kCsTag_EndpointId, apEndpointID);
 }
 
-CHIP_ERROR CommandPath::Parser::GetGroupId(chip::GroupId * const apGroupId) const
-{
-    return GetUnsignedInteger(kCsTag_GroupId, apGroupId);
-}
-
-CHIP_ERROR CommandPath::Parser::GetClusterId(chip::ClusterId * const apClusterId) const
+CHIP_ERROR CommandPathIB::Parser::GetClusterId(chip::ClusterId * const apClusterId) const
 {
     return GetUnsignedInteger(kCsTag_ClusterId, apClusterId);
 }
 
-CHIP_ERROR CommandPath::Parser::GetCommandId(chip::CommandId * const apCommandId) const
+CHIP_ERROR CommandPathIB::Parser::GetCommandId(chip::CommandId * const apCommandId) const
 {
     return GetUnsignedInteger(kCsTag_CommandId, apCommandId);
 }
 
-CHIP_ERROR CommandPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
+CHIP_ERROR CommandPathIB::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);
@@ -182,17 +164,17 @@ exit:
     return mError;
 }
 
-CHIP_ERROR CommandPath::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR CommandPathIB::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return _Init(apWriter, chip::TLV::AnonymousTag);
 }
 
-CHIP_ERROR CommandPath::Builder::Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
+CHIP_ERROR CommandPathIB::Builder::Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
 {
     return _Init(apWriter, chip::TLV::ContextTag(aContextTagToUse));
 }
 
-CommandPath::Builder & CommandPath::Builder::EndpointId(const chip::EndpointId aEndpointId)
+CommandPathIB::Builder & CommandPathIB::Builder::EndpointId(const chip::EndpointId aEndpointId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -202,17 +184,7 @@ CommandPath::Builder & CommandPath::Builder::EndpointId(const chip::EndpointId a
     return *this;
 }
 
-CommandPath::Builder & CommandPath::Builder::GroupId(const chip::GroupId aGroupId)
-{
-    // skip if error has already been set
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_GroupId), aGroupId);
-    }
-    return *this;
-}
-
-CommandPath::Builder & CommandPath::Builder::ClusterId(const chip::ClusterId aClusterId)
+CommandPathIB::Builder & CommandPathIB::Builder::ClusterId(const chip::ClusterId aClusterId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -222,7 +194,7 @@ CommandPath::Builder & CommandPath::Builder::ClusterId(const chip::ClusterId aCl
     return *this;
 }
 
-CommandPath::Builder & CommandPath::Builder::CommandId(const chip::CommandId aCommandId)
+CommandPathIB::Builder & CommandPathIB::Builder::CommandId(const chip::CommandId aCommandId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -232,7 +204,7 @@ CommandPath::Builder & CommandPath::Builder::CommandId(const chip::CommandId aCo
     return *this;
 }
 
-CommandPath::Builder & CommandPath::Builder::EndOfCommandPath()
+CommandPathIB::Builder & CommandPathIB::Builder::EndOfCommandPath()
 {
     EndOfContainer();
     return *this;

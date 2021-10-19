@@ -39,7 +39,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/Command.h>
-#include <app/MessageDef/CommandPath.h>
+#include <app/MessageDef/CommandPathIB.h>
 #include <app/MessageDef/StatusIB.h>
 
 #define COMMON_STATUS_SUCCESS 0

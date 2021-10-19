@@ -24,7 +24,7 @@
 #pragma once
 
 #include "Builder.h"
-#include "CommandPath.h"
+#include "CommandPathIB.h"
 
 #include "Parser.h"
 #include "StatusIB.h"
@@ -76,7 +76,7 @@ public:
 #endif
 
     /**
-     *  @brief Get a TLVReader for the CommandPath. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the CommandPathIB. Next() must be called before accessing them.
      *
      *  @param [in] apCommandPath    A pointer to apCommandPath
      *
@@ -84,7 +84,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetCommandPath(CommandPath::Parser * const apCommandPath) const;
+    CHIP_ERROR GetCommandPath(CommandPathIB::Parser * const apCommandPath) const;
 
     /**
      *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
@@ -125,11 +125,11 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Initialize a CommandPath::Builder for writing into the TLV stream
+     *  @brief Initialize a CommandPathIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to CommandPath::Builder
+     *  @return A reference to CommandPathIB::Builder
      */
-    CommandPath::Builder & CreateCommandPathBuilder();
+    CommandPathIB::Builder & CreateCommandPathBuilder();
 
     /**
      *  @brief Initialize a StatusIB::Builder for writing into the TLV stream
@@ -146,7 +146,7 @@ public:
     CommandDataElement::Builder & EndOfCommandDataElement();
 
 private:
-    CommandPath::Builder mCommandPathBuilder;
+    CommandPathIB::Builder mCommandPathBuilder;
     StatusIB::Builder mStatusIBBuilder;
 };
 }; // namespace CommandDataElement
