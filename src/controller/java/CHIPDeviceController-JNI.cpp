@@ -62,6 +62,8 @@ using namespace chip::Controller;
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
+static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jint passcodeId, jbyteArray pakeVerifier,
+                                         jobject & outParams);
 
 namespace {
 
@@ -439,6 +441,44 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
     }
 }
 
+JNI_METHOD(jobject, computePaseVerifier)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jlong setupPincode, jint iterations, jbyteArray salt)
+{
+    chip::DeviceLayer::StackLock lock;
+    Device * chipDevice = nullptr;
+
+    ChipLogProgress(Controller, "computePaseVerifier() called");
+    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jobject params;
+    jbyteArray verifierBytes;
+    uint32_t passcodeId;
+    PASEVerifier verifier;
+
+    JniByteArray jniSalt(env, salt);
+
+    err = chipDevice->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier, passcodeId);
+    SuccessOrExit(err);
+
+    uint8_t serializedVerifier[sizeof(verifier.mW0) + sizeof(verifier.mL)];
+    memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
+    memcpy(&serializedVerifier[sizeof(verifier.mW0)], verifier.mL, sizeof(verifier.mL));
+
+    err = JniReferences::GetInstance().N2J_ByteArray(env, serializedVerifier, sizeof(serializedVerifier), verifierBytes);
+    SuccessOrExit(err);
+
+    err = N2J_PaseVerifierParams(env, setupPincode, static_cast<jlong>(passcodeId), verifierBytes, params);
+    SuccessOrExit(err);
+    return params;
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ThrowError(env, err);
+    }
+    return nullptr;
+}
+
 void * IOThreadMain(void * arg)
 {
     JNIEnv * env;
@@ -475,6 +515,27 @@ void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)
     {
         env->Throw(ex);
     }
+}
+
+CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jint passcodeId, jbyteArray paseVerifier, jobject & outParams)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jmethodID constructor;
+    jclass paramsClass;
+
+    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/PaseVerifierParams", paramsClass);
+    JniClass paseVerifierParamsClass(paramsClass);
+    SuccessOrExit(err);
+
+    env->ExceptionClear();
+    constructor = env->GetMethodID(paramsClass, "<init>", "(JI[B)V");
+    VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+
+    outParams = (jobject) env->NewObject(paramsClass, constructor, setupPincode, passcodeId, paseVerifier);
+
+    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+exit:
+    return err;
 }
 
 CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
