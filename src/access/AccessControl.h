@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "DataProvider.h"
+#include "AccessControlDataProvider.h"
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
@@ -26,33 +26,29 @@
 #include <lib/core/CHIPCore.h>
 
 namespace chip {
-namespace access {
+namespace Access {
 
 class AccessControl
 {
 public:
     /**
-     * Create an access control module. One is provided by default (see
-     * GetInstance) but others can be created as needed (e.g. for testing). An
-     * uninitialized DataProvider must be provided, and the module must then be
-     * initialized before use, and deinitialized when finished.
+     * Create an access control module. This module must be initialized before
+     * first use, and deinitialized when finished.
      */
-    AccessControl(DataProvider & dataProvider) : mDataProvider(dataProvider) {}
+    AccessControl(AccessControlDataProvider & dataProvider) : mDataProvider(dataProvider) {}
 
     AccessControl(const AccessControl &) = delete;
     AccessControl & operator=(const AccessControl &) = delete;
 
     /**
-     * Initialize the access control module. Will also initialize its data
-     * provider.
+     * Initialize the access control module. Must be called before first use.
      *
      * @retval various errors, probably fatal.
      */
     CHIP_ERROR Init();
 
     /**
-     * Deinitialize the access control module. Will also deinitialize its data
-     * provider.
+     * Deinitialize the access control module. Must be called when finished.
      */
     void Finish();
 
@@ -61,33 +57,33 @@ public:
      * requiring a privilege) should be allowed or denied.
      *
      * @retval #CHIP_ERROR_ACCESS_DENIED if denied.
-     * @retval other errors should be treated as denied.
+     * @retval other errors should also be treated as denied.
      * @retval #CHIP_NO_ERROR if allowed.
      */
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege privilege);
 
-public:
-    /**
-     * Get the configured instance, for general use (i.e. non-testing). By
-     * default an instance is preconfigured, but advanced use can configure
-     * alternate instances, or even clear the configured instance.
-     *
-     * @retval nullptr if configured so.
-     */
-    static AccessControl * GetInstance() { return mInstance; }
-
-    /**
-     * Set the configured instance, for advanced use (e.g. testing). Does not
-     * call Init or Finish (so ensure that happens appropriately). The
-     * configured instance can be cleared (by setting to nullptr).
-     */
-    static void SetInstance(AccessControl * instance) { mInstance = instance; }
-
 private:
-    DataProvider & mDataProvider;
-
-    static AccessControl * mInstance;
+    AccessControlDataProvider & mDataProvider;
 };
 
-} // namespace access
+/**
+ * Instance getter for the global AccessControl.
+ *
+ * Callers have to externally synchronize usage of this function.
+ *
+ * @return The global AccessControl instance. Assume never null.
+ */
+AccessControl * GetAccessControl();
+
+/**
+ * Instance setter for the global AccessControl.
+ *
+ * Callers have to externally synchronize usage of this function.
+ *
+ * @param[in] accessControl the instance to start returning with the getter;
+ *                          if nullptr, no change occurs.
+ */
+void SetAccessControl(AccessControl * accessControl);
+
+} // namespace Access
 } // namespace chip

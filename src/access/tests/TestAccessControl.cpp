@@ -17,8 +17,6 @@
  */
 
 #include "access/AccessControl.h"
-#include "access/Config.h"
-#include "access/DataProvider.h"
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -27,7 +25,7 @@
 
 namespace {
 
-using namespace chip::access;
+using namespace chip::Access;
 
 constexpr EndpointId kEndpoint0 = 0;
 constexpr EndpointId kEndpoint1 = 1;
@@ -37,6 +35,9 @@ constexpr ClusterId kOnOffCluster         = 0x00000006;
 constexpr ClusterId kLevelControlCluster  = 0x00000008;
 constexpr ClusterId kColorControlCluster  = 0x00000300;
 constexpr ClusterId kAccessControlCluster = 0x0000001F;
+
+constexpr size_t kSubjectsPerEntry = 4;
+constexpr size_t kTargetsPerEntry = 3;
 
 // Used to detect empty subjects, targets, etc.
 constexpr int kEmptyFlags = 0;
@@ -116,8 +117,8 @@ struct TestEntryDelegate
     FabricIndex fabricIndex = 0;
     AuthMode authMode       = AuthMode::kNone; // kNone used as sentinel
     Privilege privilege     = Privilege::kView;
-    TestSubject subjects[Config::kSubjectsPerEntry + 1];
-    TestTarget targets[Config::kTargetsPerEntry + 1];
+    TestSubject subjects[kSubjectsPerEntry + 1];
+    TestTarget targets[kTargetsPerEntry + 1];
 };
 
 TestEntryDelegate entries[] = {
@@ -254,7 +255,6 @@ public:
     {
         fabricFiltered = false;
         entry.delegate = nullptr;
-        FindNext();
     }
 
     void Initialize(FabricIndex fabricIndex_)
@@ -262,35 +262,24 @@ public:
         fabricFiltered    = true;
         this->fabricIndex = fabricIndex_;
         entry.delegate    = nullptr;
-        FindNext();
     }
 
-    void FindNext()
+    Entry * Next() override
     {
-        next = (entry.delegate == nullptr) ? entries : next + 1;
-
-        while (next->authMode != AuthMode::kNone && fabricFiltered && next->fabricIndex != fabricIndex)
+        do
         {
-            ++next;
-        }
+            if (entry.delegate == nullptr)
+            {
+                entry.delegate = entries;
+            }
+            else if (entry.delegate->authMode != AuthMode::kNone)
+            {
+                entry.delegate++;
+            }
+        } while (entry.delegate->authMode != AuthMode::kNone && fabricFiltered && entry.delegate->fabricIndex != fabricIndex);
 
-        if (next->authMode == AuthMode::kNone)
-        {
-            next = nullptr;
-        }
+        return (entry.delegate->authMode != AuthMode::kNone) ? &entry : nullptr;
     }
-
-    Entry & Next() override
-    {
-        if (HasNext())
-        {
-            entry.delegate = next;
-            FindNext();
-        }
-        return entry;
-    }
-
-    bool HasNext() override { return next != nullptr; }
 
     void Release() override {}
 
@@ -301,7 +290,7 @@ public:
     TestEntryDelegate * next;
 };
 
-class TestDataProvider : public DataProvider
+class TestDataProvider : public AccessControlDataProvider
 {
 public:
     TestDataProvider()          = default;
@@ -335,10 +324,9 @@ void MetaTestIterator(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, iterator != nullptr);
 
     TestEntryDelegate * p = entries;
-    while (iterator->HasNext())
+    while (auto entry = iterator->Next())
     {
-        auto & entry = iterator->Next();
-        NL_TEST_ASSERT_LOOP(inSuite, int(p - entries), static_cast<TestEntry &>(entry).delegate == p);
+        NL_TEST_ASSERT_LOOP(inSuite, int(p - entries), static_cast<TestEntry *>(entry)->delegate == p);
         ++p;
     }
 
@@ -364,34 +352,40 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ACCESS_DENIED);
 }
 
-void TestInstance(nlTestSuite * inSuite, void * inContext)
+void TestGlobalInstance(nlTestSuite * inSuite, void * inContext)
 {
-    AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
-
-    AccessControl * instance = AccessControl::GetInstance();
+    // Initial instance should not be nullptr
+    AccessControl * instance = GetAccessControl();
     NL_TEST_ASSERT(inSuite, instance != nullptr);
 
-    AccessControl::SetInstance(&context);
-    NL_TEST_ASSERT(inSuite, AccessControl::GetInstance() == &context);
+    // Attempting to set nullptr should have no effect
+    SetAccessControl(nullptr);
+    NL_TEST_ASSERT(inSuite, GetAccessControl() == instance);
 
-    AccessControl::SetInstance(nullptr);
-    NL_TEST_ASSERT(inSuite, AccessControl::GetInstance() == nullptr);
+    // Setting another instance should have immediate effect
+    SetAccessControl(&testAccessControl);
+    NL_TEST_ASSERT(inSuite, GetAccessControl() == &testAccessControl);
 
-    AccessControl::SetInstance(instance);
-    NL_TEST_ASSERT(inSuite, AccessControl::GetInstance() == instance);
+    // Restoring initial instance should also work
+    SetAccessControl(instance);
+    NL_TEST_ASSERT(inSuite, GetAccessControl() == instance);
 }
 
 int Setup(void * inContext)
 {
-    AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
-    CHIP_ERROR err          = context.Init();
-    return err == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+    CHIP_ERROR err = testDataProvider.Init();
+    if (err != CHIP_NO_ERROR)
+        return FAILURE;
+    err = testAccessControl.Init();
+    if (err != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
 }
 
 int Teardown(void * inContext)
 {
-    AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
-    context.Finish();
+    testDataProvider.Finish();
+    testAccessControl.Finish();
     return SUCCESS;
 }
 
@@ -409,8 +403,14 @@ int Terminate(void * inContext)
 
 int TestAccessControl()
 {
-    const nlTest tests[] = { NL_TEST_DEF("MetaTestIterator", MetaTestIterator), NL_TEST_DEF("TestInstance", TestInstance),
-                             NL_TEST_DEF("TestCheck", TestCheck), NL_TEST_SENTINEL() };
+// clang-format off
+    constexpr nlTest tests[] = {
+        NL_TEST_DEF("MetaTestIterator", MetaTestIterator),
+        NL_TEST_DEF("TestGlobalInstance", TestGlobalInstance),
+        NL_TEST_DEF("TestCheck", TestCheck),
+        NL_TEST_SENTINEL()
+    };
+// clang-format on
 
     nlTestSuite suite = {
         .name       = "AccessControl",

@@ -20,15 +20,14 @@ static_library("access") {
   sources = [
     "AccessControl.cpp",
     "AccessControl.h",
+    "AccessControlDataProvider.h",
     "AuthMode.h",
     "BasicTypes.h",
-    "Config.h",
-    "DataProvider.h",
-    "DataProviderImpl.cpp",
-    "DataProviderImpl.h",
     "Privilege.h",
     "RequestPath.h",
     "SubjectDescriptor.h",
+    "examples/ExampleAccessControlDataProvider.cpp",
+    "examples/ExampleAccessControlDataProvider.h",
   ]
 
   cflags = [ "-Wconversion" ]

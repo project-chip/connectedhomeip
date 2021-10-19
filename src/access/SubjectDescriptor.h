@@ -22,10 +22,10 @@
 #include "BasicTypes.h"
 
 namespace chip {
-namespace access {
+namespace Access {
 
 // Can store a PasscodeId, NodeId, CatId, GroupId, etc. as appropriate.
-typedef uint64_t SubjectId;
+typedef NodeId SubjectId;
 
 struct SubjectDescriptor
 {
@@ -33,20 +33,14 @@ struct SubjectDescriptor
     SubjectId subject = 0;
 
     // Holds (optional) CAT1/CAT2 if kCase
-    SubjectId subject1 = 0;
-
-    // Holds (optional) CAT1/CAT2 if kCase
-    SubjectId subject2 = 0;
+    SubjectId catSubjects[2] = {};
 
     // Holds AuthMode of subject(s), kNone if no access
     AuthMode authMode = AuthMode::kNone;
 
     // Holds FabricIndex of fabric, 0 if no fabric
     FabricIndex fabricIndex = 0;
-
-    // Holds whether the subject is commissioning
-    bool isCommissioning = false;
 };
 
-} // namespace access
+} // namespace Access
 } // namespace chip

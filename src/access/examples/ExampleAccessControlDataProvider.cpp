@@ -16,22 +16,47 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "ExampleAccessControlDataProvider.h"
+
+namespace {
+
+using namespace chip::Access;
+
+class ExampleDataProvider : public AccessControlDataProvider
+{
+    CHIP_ERROR Init() override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    void Finish() override
+    {
+    }
+
+    EntryIterator * Entries() const override
+    {
+        return nullptr;
+    }
+
+    EntryIterator * Entries(FabricIndex fabricIndex) const override
+    {
+        return nullptr;
+    }
+};
+
+} // namespace
+
 
 namespace chip {
 namespace Access {
+namespace Examples {
 
-// Using bitfield values so privilege set and auth mode can be stored together.
-// Privilege set can have more than one value expressed (e.g. View,
-// ProxyView, and Operate).
-enum Privilege
+AccessControlDataProvider * GetExampleAccessControlDataProvider()
 {
-    kView       = 1 << 0,
-    kProxyView  = 1 << 1,
-    kOperate    = 1 << 2,
-    kManage     = 1 << 3,
-    kAdminister = 1 << 4
-};
+    static ExampleDataProvider exampleProvider;
+    return &exampleProvider;
+}
 
+} // namespace Examples
 } // namespace Access
 } // namespace chip

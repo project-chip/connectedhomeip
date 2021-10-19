@@ -18,31 +18,55 @@
 
 #include "AccessControl.h"
 
-#include "Config.h"
-#include "DataProvider.h"
-
 namespace {
 
-chip::access::Config::DataProvider dataProviderInstance;
-chip::access::AccessControl accessControlInstance(dataProviderInstance);
+using namespace chip::Access;
+
+// Avoid GetAccessControl returning nullptr before SetAccessControl is called.
+class UnimplementedDataProvider : public AccessControlDataProvider
+{
+    CHIP_ERROR Init() override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    void Finish() override
+    {
+    }
+
+    EntryIterator * Entries() const override
+    {
+        return nullptr;
+    }
+
+    EntryIterator * Entries(FabricIndex fabricIndex) const override
+    {
+        return nullptr;
+    }
+};
+
+// Avoid GetAccessControl returning nullptr before SetAccessControl is called.
+UnimplementedDataProvider gUnimplementedDataProvider;
+AccessControl gUnimplementedAccessControl(gUnimplementedDataProvider);
+
+AccessControl * gAccessControl = &gUnimplementedAccessControl;
 
 } // namespace
 
 namespace chip {
-namespace access {
-
-AccessControl * AccessControl::mInstance = &accessControlInstance;
+namespace Access {
 
 CHIP_ERROR AccessControl::Init()
 {
     ChipLogDetail(DataManagement, "access control: initializing");
-    return mDataProvider.Init();
+    // ...
+    return CHIP_NO_ERROR;
 }
 
 void AccessControl::Finish()
 {
     ChipLogDetail(DataManagement, "access control: finishing");
-    mDataProvider.Finish();
+    // ...
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege privilege)
@@ -57,22 +81,21 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     ReturnErrorCodeIf(iterator == nullptr, CHIP_NO_ERROR);
 #endif
 
-    while (iterator->HasNext())
+    while (auto entry = iterator->Next())
     {
         ChipLogDetail(DataManagement, "Checking entry");
-        auto & entry = iterator->Next();
 
-        if (!entry.MatchesPrivilege(privilege))
+        if (!entry->MatchesPrivilege(privilege))
             continue;
         ChipLogDetail(DataManagement, "  --> matched privilege");
-        if (!entry.MatchesAuthMode(subjectDescriptor.authMode))
+        if (!entry->MatchesAuthMode(subjectDescriptor.authMode))
             continue;
         ChipLogDetail(DataManagement, "  --> matched authmode");
         // TODO: check CATs (subject1, subject2)
-        if (!entry.MatchesSubject(subjectDescriptor.subject))
+        if (!entry->MatchesSubject(subjectDescriptor.subject))
             continue;
         ChipLogDetail(DataManagement, "  --> matched subject");
-        if (!entry.MatchesTarget(requestPath.endpoint, requestPath.cluster))
+        if (!entry->MatchesTarget(requestPath.endpoint, requestPath.cluster))
             continue;
         ChipLogDetail(DataManagement, "  --> matched target");
 
@@ -84,5 +107,18 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     return err;
 }
 
-} // namespace access
+AccessControl * GetAccessControl()
+{
+    return gAccessControl;
+}
+
+void SetAccessControl(AccessControl * accessControl)
+{
+    if (accessControl != nullptr)
+    {
+        gAccessControl = accessControl;
+    }
+}
+
+} // namespace Access
 } // namespace chip

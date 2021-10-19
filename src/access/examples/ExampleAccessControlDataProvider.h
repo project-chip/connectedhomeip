@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,30 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-#include "DataProviderImpl.h"
+#include "access/AccessControlDataProvider.h"
 
 namespace chip {
-namespace access {
+namespace Access {
+namespace Examples {
 
-CHIP_ERROR DataProviderImpl::Init()
-{
-    return CHIP_NO_ERROR;
-}
+AccessControlDataProvider * GetExampleAccessControlDataProvider();
 
-void DataProviderImpl::Finish() {}
-
-EntryIterator * DataProviderImpl::Entries() const
-{
-    // TODO: provide iterator
-    return nullptr;
-}
-
-EntryIterator * DataProviderImpl::Entries(FabricIndex fabricIndex) const
-{
-    // TODO: provide iterator
-    return nullptr;
-}
-
-} // namespace access
+} // namespace Examples
+} // namespace Access
 } // namespace chip
