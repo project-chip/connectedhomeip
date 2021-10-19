@@ -60,8 +60,9 @@ bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd)
     // or identify cluster (see device enabled attr of basic cluster)
     if (!emberAfIsDeviceEnabled(cmd->apsFrame->destinationEndpoint) && cmd->apsFrame->clusterId != ZCL_IDENTIFY_CLUSTER_ID)
     {
-        emberAfCorePrintln("%pd, dropping ep 0x%x clus 0x%2x cmd 0x%x", "disable", cmd->apsFrame->destinationEndpoint,
-                           cmd->apsFrame->clusterId, cmd->commandId);
+        emberAfCorePrintln("%pd, dropping ep 0x%x clus " ChipLogFormatMEI " cmd " ChipLogFormatMEI, "disable",
+                           cmd->apsFrame->destinationEndpoint, ChipLogValueMEI(cmd->apsFrame->clusterId),
+                           ChipLogValueMEI(cmd->commandId));
         emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_FAILURE);
         return true;
     }
