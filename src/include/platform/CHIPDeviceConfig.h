@@ -297,7 +297,7 @@
  * Enable support for a WiFi AP interface.
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 1
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 #endif
 
 /**
