@@ -29,6 +29,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import struct
+from typing import NewType
 from collections import Mapping, Sequence, OrderedDict
 
 
@@ -111,9 +112,7 @@ TagControls = {
     0xE0: "Fully Qualified 8-byte",
 }
 
-
-class uint(int):
-    pass
+uint = NewType('uint', int)
 
 
 class TLVWriter(object):
