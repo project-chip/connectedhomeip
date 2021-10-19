@@ -31,7 +31,6 @@ import
 =======
 import chip.devicecontroller.ClusterInfoMapping
 import java.lang.Exception
-import java.util.Objects
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getClusterMappingBtn
 import kotlinx.coroutines.launch
 >>>>>>> a4fd0282e (no error code generation)
@@ -60,6 +59,7 @@ class ClusterInteractionFragment : Fragment() {
       deviceController.setCompletionListener(ChipControllerCallback())
       addressUpdateFragment =
         childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
       clusterMap = ClusterInfoMapping().clusterMap;
@@ -115,45 +115,41 @@ class ClusterInteractionFragment : Fragment() {
       val clusterMapping = ClusterInfoMapping()
       clusterMap = clusterMapping.clusterMap;
       getClusterMappingBtn.setOnClickListener { scope.launch {getClusterMapping()} }
+=======
+      clusterMap = ClusterInfoMapping().clusterMap;
+      getClusterMappingBtn.setOnClickListener { scope.launch { getClusterMapping() } }
+>>>>>>> fde1d13c0 (fix comments)
     }
   }
 
   private suspend fun getClusterMapping() {
-    // In real code: get the device ptr using ChipClient.getConnectedDevicePointer
-    showMessage("initialized")
     // In real code: "OnOff" would be selected by the user.
-    val selectedClusterInfo = clusterMap["onOff"]
+    val methodSelected = "onOff"
+    showMessage(methodSelected + " is initialized")
+    val selectedClusterInfo = clusterMap[methodSelected]!!
     val devicePtr =
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
     val endpointId = 1
-    val selectedCluster = selectedClusterInfo!!.createClusterFunction.create(devicePtr, endpointId)
+    val selectedCluster = selectedClusterInfo.createClusterFunction.create(devicePtr, endpointId)
     // Imagine user wants to execute the command "OffWithEffect", pass the string here
-    val selectedCommandInfo: CommandInfo? = selectedClusterInfo!!.commands["on"]
+    val selectedCommandInfo: CommandInfo = selectedClusterInfo.commands["on"]!!
 
-    var selectedCommandCallback =  selectedCommandInfo?.commandCallbackSupplier?.get()
+    var selectedCommandCallback =  selectedCommandInfo.commandCallbackSupplier.get()
     selectedCommandCallback?.setCallbackDelegate(object : ClusterCommandCallback {
-      override fun onSuccess(responseValues: List<Any?>?) {
-        showMessage("command success")
+      override fun onSuccess(responseValues: List<Any>) {
+        showMessage("Command success")
         // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
-        for (responseValue in responseValues!!) {
-           Log.d("test", responseValue.toString());
-        }
-
+        responseValues.forEach { Log.d(TAG, it.toString()) }
       }
 
       override fun onFailure(exception: Exception?) {
-        showMessage("command failed")
-        Log.e(ClusterInteractionFragment.TAG, exception.toString())
-
+        showMessage("Command failed")
+        Log.e(TAG, exception.toString())
       }
     })
 
     var commandArguments: HashMap<String, Any> = HashMap<String, Any>()
-    for ((key, value) in selectedCommandInfo!!.commandParameters.entries) {
-      commandArguments.put(key, 123)
-    }
     selectedCommandInfo.getCommandFunction().invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
-
   }
 
   private fun showMessage(msg: String) {

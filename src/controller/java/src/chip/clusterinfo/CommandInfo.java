@@ -77,7 +77,7 @@ import chip.devicecontroller.ChipClusters.BaseChipCluster;
 public class CommandInfo {
   public ClusterCommandFunction commandFunction;
   private Supplier<DelegatedClusterCallback> commandCallbackSupplier;
-  private Map<String, CommandParameter> commandParameters;
+  private Map<String, CommandParameterInfo> commandParameters;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -100,8 +100,12 @@ public class CommandInfo {
   public CommandInfo(
       ClusterCommandFunction commandFunction,
       Supplier<DelegatedClusterCallback> commandCallbackSupplier,
+<<<<<<< HEAD
       Map<String, CommandParameter> commandParameters) {
 >>>>>>> 46c963914 (Restyled by google-java-format)
+=======
+      Map<String, CommandParameterInfo> commandParameters) {
+>>>>>>> fde1d13c0 (fix comments)
     this.commandFunction = commandFunction;
     this.commandCallbackSupplier = commandCallbackSupplier;
     this.commandParameters = commandParameters;
@@ -115,7 +119,7 @@ public class CommandInfo {
     return commandCallbackSupplier;
   }
 
-  public Map<String, CommandParameter> getCommandParameters() {
+  public Map<String, CommandParameterInfo> getCommandParameters() {
     return commandParameters;
   }
 
