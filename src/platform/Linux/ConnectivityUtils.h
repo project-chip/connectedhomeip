@@ -42,10 +42,8 @@ class ConnectivityUtils
 public:
     static uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel);
     static uint8_t MapFrequencyToChannel(const uint16_t frequency);
-    static bool CheckReachableIPv4(struct ifaddrs * ifap, const char * ifname);
-    static bool CheckReachableIPv6(struct ifaddrs * ifap, const char * ifname);
-    static InterfaceType GetInterfaceConnectionType(const char * ifname);
-    static CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, char * outMacAddr);
+    static EmberAfInterfaceType GetInterfaceConnectionType(const char * ifname);
+    static CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, ByteSpan & address);
     static CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
     static CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
     static CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi);

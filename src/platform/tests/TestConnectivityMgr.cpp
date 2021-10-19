@@ -61,8 +61,7 @@ static void TestConnectivityMgr_GetNetworkInterfaces(nlTestSuite * inSuite, void
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, netifs != nullptr);
 
-    ConnectivityMgr().ReleaseNetworkInterfaces(&netifs);
-    NL_TEST_ASSERT(inSuite, netifs == nullptr);
+    ConnectivityMgr().ReleaseNetworkInterfaces(netifs);
 }
 
 /**

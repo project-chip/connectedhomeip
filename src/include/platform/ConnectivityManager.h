@@ -29,6 +29,7 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
+#include <app-common/zap-generated/enums.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -49,32 +50,14 @@ template <class>
 class GenericPlatformManagerImpl_POSIX;
 } // namespace Internal
 
-constexpr size_t kMaxIfNameSize = 32;
-
-// 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
-constexpr size_t kMaxHardwareAddrSize = 8;
-
-/**
- * InterfaceType Types.
- */
-enum class InterfaceType : uint8_t
-{
-    Unspecified = 0x00,
-    WiFi        = 0x01,
-    Ethernet    = 0x02,
-    Cellular    = 0x03,
-    Thread      = 0x04,
-};
-
 struct NetworkInterface
 {
-    char Name[kMaxIfNameSize];
+    CharSpan Name;
+    ByteSpan HardwareAddress;
+    EmberAfInterfaceType Type;
     bool FabricConnected;
     bool OffPremiseServicesReachableIPv4;
     bool OffPremiseServicesReachableIPv6;
-    bool Is64MacAddress;
-    char HardwareAddress[kMaxHardwareAddrSize];
-    InterfaceType Type;
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
@@ -197,8 +180,14 @@ public:
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     // General diagnostics methods
-    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifp);
-    void ReleaseNetworkInterfaces(NetworkInterface ** netifp);
+
+    /*
+     * Get the linked list of network interfaces of the current plaform. After usage, each caller of GetNetworkInterfaces
+     * needs to release the network interface list it gets via ReleaseNetworkInterfaces.
+     *
+     */
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp);
+    void ReleaseNetworkInterfaces(NetworkInterface * netifp);
 
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
@@ -423,12 +412,12 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
 }
 
-inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(NetworkInterface ** netifp)
+inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    return static_cast<ImplClass *>(this)->_GetNetworkInterfaces(netifp);
+    return static_cast<ImplClass *>(this)->_GetNetworkInterfaces(netifpp);
 }
 
-inline void ConnectivityManager::ReleaseNetworkInterfaces(NetworkInterface ** netifp)
+inline void ConnectivityManager::ReleaseNetworkInterfaces(NetworkInterface * netifp)
 {
     return static_cast<ImplClass *>(this)->_ReleaseNetworkInterfaces(netifp);
 }
