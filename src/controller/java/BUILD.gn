@@ -107,7 +107,7 @@ java_library("cluster_info") {
     "src/chip/clusterinfo/CommandParameterInfo.java",
     "src/chip/clusterinfo/DelegatedClusterCallback.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
-    ]
+  ]
 }
 
 java_prebuilt("android") {
