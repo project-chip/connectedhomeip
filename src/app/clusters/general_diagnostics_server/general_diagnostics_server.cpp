@@ -121,7 +121,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath
 
     switch (aPath.mAttributeId)
     {
-#if CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ        
+#if CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
     case NetworkInterfaces::Id: {
         return ReadNetworkInterfaces(aEncoder);
     }
