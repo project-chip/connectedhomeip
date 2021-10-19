@@ -54,18 +54,29 @@ using namespace chip::DeviceLayer;
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
-static TaskHandle_t sAppTaskHandle;
-static QueueHandle_t sAppEventQueue;
 
-static bool sIsThreadProvisioned = false;
-static bool sIsThreadEnabled     = false;
-static bool sHaveBLEConnections  = false;
+namespace {
+ TaskHandle_t sAppTaskHandle;
+ QueueHandle_t sAppEventQueue;
+
+ bool sIsThreadProvisioned     = false;
+ bool sIsThreadEnabled         = false;
+ bool sHaveBLEConnections      = false;
+ bool sHaveServiceConnectivity = false;
+
+uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
+
+StaticQueue_t sAppEventQueueStruct;
+
+StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t appTaskStruct;
+} // namespace
 
 AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (sAppEventQueue == NULL)
     {
         ChipLogError(NotSpecified, "Failed to allocate app event queue");
@@ -73,9 +84,10 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     // Start App task.
-    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, &sAppTaskHandle) != pdPASS)
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
+    if (sAppTaskHandle != NULL)
     {
-        return CHIP_ERROR_NO_MEMORY;
+        return CHIP_NO_ERROR;
     }
 
     return CHIP_NO_ERROR;
@@ -425,6 +437,10 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         {
             ChipLogError(NotSpecified, "Failed to post event to app task event queue");
         }
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
     }
 }
 

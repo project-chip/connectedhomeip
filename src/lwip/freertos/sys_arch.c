@@ -56,6 +56,16 @@ static StaticQueue_t gTCPIPMsgQueue;
 static uint8_t gTCPIPMsgQueueStorage[SYS_MESG_QUEUE_LENGTH * sizeof(void *)];
 #endif
 
+#if LWIP_FREERTOS_USE_STATIC_SEMAPHORES
+typedef struct
+{
+    StaticSemaphore_t semBuffer;
+    sys_sem_t * sem;
+} semPoolItem_t;
+
+static semPoolItem_t gSemPool[LWIP_FREERTOS_SEMAPHORE_POOL_ITEMS_NUM];
+#endif
+
 static inline u32_t TicksToMS(TickType_t ticks)
 {
     return (ticks * 1000) / configTICK_RATE_HZ;
@@ -63,12 +73,63 @@ static inline u32_t TicksToMS(TickType_t ticks)
 
 void sys_init(void)
 {
-    // nothing to do.
+#if LWIP_FREERTOS_USE_STATIC_SEMAPHORES
+    memset(gSemPool, 0, LWIP_FREERTOS_SEMAPHORE_POOL_ITEMS_NUM * sizeof(semPoolItem_t));
+#endif
 }
+
+#if LWIP_FREERTOS_USE_STATIC_SEMAPHORES
+static err_t sem_pool_get_spare_item(semPoolItem_t ** semPoolItem)
+{
+    u8_t emptySlotIdx = 0;
+    do
+    {
+        if (!gSemPool[emptySlotIdx].sem)
+        {
+            *semPoolItem = &gSemPool[emptySlotIdx];
+            break;
+        }
+        if (emptySlotIdx == (LWIP_FREERTOS_SEMAPHORE_POOL_ITEMS_NUM - 1))
+        {
+            return ERR_MEM;
+        }
+        emptySlotIdx++;
+    } while (emptySlotIdx < LWIP_FREERTOS_SEMAPHORE_POOL_ITEMS_NUM);
+
+    return ERR_OK;
+}
+
+static void sem_pool_free_item(sys_sem_t * sem)
+{
+    semPoolItem_t * pool_sem = &gSemPool[0];
+    do
+    {
+        if (sem == pool_sem->sem)
+        {
+            pool_sem->sem = NULL;
+            return;
+        }
+        pool_sem++;
+    } while (pool_sem <= &gSemPool[LWIP_FREERTOS_SEMAPHORE_POOL_ITEMS_NUM - 1]);
+
+    LWIP_ASSERT("Free called for non-allocated semaphore", 0);
+}
+#endif // LWIP_FREERTOS_USE_STATIC_SEMAPHORES
 
 err_t sys_sem_new(sys_sem_t * sem, u8_t count)
 {
-    *sem = xSemaphoreCreateBinary();
+#if LWIP_FREERTOS_USE_STATIC_SEMAPHORES
+    err_t result;
+    semPoolItem_t * freeSemPoolItem;
+    result = sem_pool_get_spare_item(&freeSemPoolItem);
+    if (result != ERR_OK)
+        return ERR_MEM;
+
+    *sem                 = xSemaphoreCreateBinaryStatic(&freeSemPoolItem->semBuffer);
+    freeSemPoolItem->sem = sem;
+#else
+    *sem   = xSemaphoreCreateBinary();
+#endif
     if (*sem != NULL)
     {
         if (count != 0)
@@ -88,6 +149,9 @@ err_t sys_sem_new(sys_sem_t * sem, u8_t count)
 void sys_sem_free(sys_sem_t * sem)
 {
     vSemaphoreDelete(*sem);
+#if LWIP_FREERTOS_USE_STATIC_SEMAPHORES
+    sem_pool_free_item(sem);
+#endif
     SYS_STATS_DEC(sem);
 }
 
@@ -126,7 +190,18 @@ u32_t sys_arch_sem_wait(sys_sem_t * sem, u32_t timeout)
 
 err_t sys_mutex_new(sys_mutex_t * mutex)
 {
+#if LWIP_FREERTOS_USE_STATIC_SEMAPHORES
+    err_t result;
+    semPoolItem_t * freeSemPoolItem;
+    result = sem_pool_get_spare_item(&freeSemPoolItem);
+    if (result != ERR_OK)
+        return ERR_MEM;
+
+    *mutex               = xSemaphoreCreateMutexStatic(&freeSemPoolItem->semBuffer);
+    freeSemPoolItem->sem = mutex;
+#else
     *mutex = xSemaphoreCreateMutex();
+#endif
     if (*mutex != NULL)
     {
         xSemaphoreGive(*mutex);
@@ -143,6 +218,9 @@ err_t sys_mutex_new(sys_mutex_t * mutex)
 void sys_mutex_free(sys_mutex_t * mutex)
 {
     vSemaphoreDelete(*mutex);
+#if LWIP_FREERTOS_USE_STATIC_SEMAPHORES
+    sem_pool_free_item(mutex);
+#endif
     SYS_STATS_DEC(mutex);
 }
 
@@ -167,7 +245,7 @@ err_t sys_mbox_new(sys_mbox_t * mbox, int size)
 #if LWIP_FREERTOS_USE_STATIC_TCPIP_QUEUE
     *mbox = xQueueCreateStatic((UBaseType_t) size, (UBaseType_t) sizeof(void *), gTCPIPMsgQueueStorage, &gTCPIPMsgQueue);
 #else
-    *mbox = xQueueCreate((UBaseType_t) size, (UBaseType_t) sizeof(void *));
+    *mbox  = xQueueCreate((UBaseType_t) size, (UBaseType_t) sizeof(void *));
 #endif
     if (*mbox != NULL)
     {

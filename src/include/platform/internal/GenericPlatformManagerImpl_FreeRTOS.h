@@ -96,6 +96,11 @@ private:
     StackType_t mEventLoopStack[CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t)];
     StaticTask_t mventLoopTaskStruct;
 #endif
+
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
+    StaticSemaphore_t mChipStackLockMutex;
+#endif
+
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
