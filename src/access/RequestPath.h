@@ -21,7 +21,7 @@
 #include "BasicTypes.h"
 
 namespace chip {
-namespace access {
+namespace Access {
 
 struct RequestPath
 {
@@ -30,5 +30,5 @@ struct RequestPath
     ClusterId cluster   = 0;
 };
 
-} // namespace access
+} // namespace Access
 } // namespace chip

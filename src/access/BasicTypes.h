@@ -21,12 +21,15 @@
 #include <cinttypes>
 
 namespace chip {
-namespace access {
+namespace Access {
 
 // TODO: these basic types need to come from a lower layer
 //       "app/util/basic-types.h" has a lot but isn't a lower layer
-//       so organization and refactoring needs to happen sometime
-//       and this will change the namespace also
+//       it was preferable to duplicate here for now rather than
+//       hook up this module to a higher level module
+//       but of course the correct solution is to refactor the
+//       basic types into a lower level location that all modules can use
+//       note that this will change the namespace of these (should be fine)
 
 typedef uint64_t CatId;
 typedef uint32_t ClusterId;
@@ -37,5 +40,5 @@ typedef uint16_t GroupId;
 typedef uint64_t NodeId;
 typedef uint16_t PasscodeId;
 
-} // namespace access
+} // namespace Access
 } // namespace chip

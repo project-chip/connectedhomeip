@@ -26,7 +26,7 @@
 #include <lib/core/CHIPCore.h>
 
 namespace chip {
-namespace access {
+namespace Access {
 
 class Entry
 {
@@ -74,20 +74,9 @@ public:
     virtual ~EntryIterator() = default;
 
     /**
-     * Returns the next entry. Must only be called if a next entry exists (see
-     * HasNext).
-     *
-     * @retval the next entry.
+     * Returns the next entry, or nullptr if there is no next entry.
      */
-    virtual Entry & Next() = 0;
-
-    /**
-     * Whether a next entry exists.
-     *
-     * @retval true if a next entry exists (next can be called).
-     * @retval false if no next entry exists (next must not be called).
-     */
-    virtual bool HasNext() = 0;
+    virtual Entry * Next() = 0;
 
     /**
      * Release the iterator, which must be called when finished.
@@ -95,19 +84,19 @@ public:
     virtual void Release() = 0;
 };
 
-class DataProvider
+class AccessControlDataProvider
 {
 public:
     /**
      * Create a data provider, which must be initialized before use, and
      * deinitialized when finished.
      */
-    DataProvider() = default;
+    AccessControlDataProvider() = default;
 
-    virtual ~DataProvider() = default;
+    virtual ~AccessControlDataProvider() = default;
 
-    DataProvider(const DataProvider &) = delete;
-    DataProvider & operator=(const DataProvider &) = delete;
+    AccessControlDataProvider(const AccessControlDataProvider &) = delete;
+    AccessControlDataProvider & operator=(const AccessControlDataProvider &) = delete;
 
     /**
      * Initialize the data provider.
@@ -138,5 +127,5 @@ public:
     virtual EntryIterator * Entries(FabricIndex fabricIndex) const = 0;
 };
 
-} // namespace access
+} // namespace Access
 } // namespace chip

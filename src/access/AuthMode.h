@@ -19,8 +19,10 @@
 #pragma once
 
 namespace chip {
-namespace access {
+namespace Access {
 
+// Using bitfield values so auth mode and privilege set can be stored together.
+// Auth mode should have only one value expressed, which should not be None.
 enum AuthMode
 {
     kNone  = 0,
@@ -29,5 +31,5 @@ enum AuthMode
     kGroup = 1 << 7
 };
 
-} // namespace access
+} // namespace Access
 } // namespace chip
