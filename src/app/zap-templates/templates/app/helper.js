@@ -447,6 +447,29 @@ function zapTypeToPythonClusterObjectType(type, options)
     return 'float';
   }
 
+  if (type.toLowerCase() == 'boolean') {
+    return 'bool'
+  }
+
+  if (type.toLowerCase().match(/^int\d+$/)) {
+    return 'int'
+  }
+
+  if (type.toLowerCase().match(/^int\d+u$/)) {
+    return 'uint'
+  }
+
+  // Hack for chip::Xxxx types
+  {
+    basicType = ChipTypesHelper.asBasicType(type);
+    if (basicType.match(/^int\d+_t$/)) {
+      return 'int'
+    }
+    if (basicType.match(/^uint\d+_t$/)) {
+      return 'uint'
+    }
+  }
+
   async function fn(pkgId)
   {
     const ns          = asUpperCamelCase(options.hash.ns);
@@ -464,25 +487,18 @@ function zapTypeToPythonClusterObjectType(type, options)
       return ns + '.Structs.' + type;
     }
 
-    return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options).then((type) => {
-      switch (ChipTypesHelper.asBasicType(type)) {
-      case 'bool':
-        return 'bool';
-      case 'int8_t':
-      case 'uint8_t':
-      case 'int16_t':
-      case 'uint16_t':
-      case 'int24_t':
-      case 'uint24_t':
-      case 'int32_t':
-      case 'uint32_t':
-      case 'int64_t':
-      case 'uint64_t':
-        return 'int';
-      default:
-        throw 'Unhandled type ' + type;
+    resolvedType = await zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
+    {
+      basicType = ChipTypesHelper.asBasicType(resolvedType);
+      if (basicType.match(/^int\d+_t$/)) {
+        return 'int'
       }
-    });
+      if (basicType.match(/^uint\d+_t$/)) {
+        return 'uint'
+      }
+    }
+
+    throw "Unhandled type " + resolvedType + " (from " + type + ")"
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));

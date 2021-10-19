@@ -10,7 +10,9 @@ import typing
 from enum import IntEnum
 from chip import ChipUtility
 
-from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand
+from chip.tlv import uint
+
+from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor
 
 
 {{#zcl_clusters}}
@@ -76,4 +78,30 @@ class {{asUpperCamelCase name}}:
             {{/zcl_command_arguments}}
 
 {{/zcl_commands}}
+
+{{#zcl_attributes_server}}
+{{#first}}
+    class Attributes:
+{{/first}}
+        class {{asUpperCamelCase label}}(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return {{ asHex parent.code 4 }}
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return {{ asHex code 4 }}
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+            {{#if entryType}}
+                return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}, IsArray=True)
+            {{else}}
+                return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}})
+            {{/if}}
+
+
+{{/zcl_attributes_server}}
+
+
 {{/zcl_clusters}}

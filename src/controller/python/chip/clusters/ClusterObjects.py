@@ -15,19 +15,48 @@
 #    limitations under the License.
 #
 
-from dataclasses import dataclass, asdict
-from typing import List, Dict, Any, Mapping, Type
-import typing
+from dataclasses import dataclass, asdict, field, make_dataclass
+from typing import ClassVar, List, Dict, Any, Mapping, Type, Union, ClassVar
 from chip import tlv, ChipUtility
 from dacite import from_dict
 
 
 @dataclass
 class ClusterObjectFieldDescriptor:
-    Label: str
-    Tag: int
-    Type: Type
+    Label: str = ''
+    Tag: int = None
+    Type: Type = None
     IsArray: bool = False
+
+    def _PutSingleElementToTLV(self, tag, val, writer: tlv.TLVWriter, debugPath: str = '?'):
+        if issubclass(self.Type, ClusterObject):
+            if not isinstance(val, dict):
+                raise ValueError(
+                    f"Field {debugPath}.{self.Label} expected a struct, but got {type(val)}")
+            self.Type.descriptor.DictToTLVWithWriter(
+                f'{debugPath}.{self.Label}', tag, val, writer)
+            return
+        try:
+            val = self.Type(val)
+        except Exception:
+            raise ValueError(
+                f"Field {debugPath}.{self.Label} expected {self.Type}, but got {type(val)}")
+        writer.put(tag, val)
+
+    def PutFieldToTLV(self, tag, val, writer: tlv.TLVWriter, debugPath: str = '?'):
+        if not self.IsArray:
+            self._PutSingleElementToTLV(tag, val, writer, debugPath)
+            return
+        if not isinstance(val, List):
+            raise ValueError(
+                f"Field {debugPath}.{self.Label} expected List[{self.Type}], but got {type(val)}")
+        index = 0
+        writer.startArray(tag)
+        for v in val:
+            self._PutSingleElementToTLV(
+                None, v, writer, debugPath + f'[{index}]')
+            index += 1
+        writer.endContainer()
 
 
 @dataclass
@@ -46,18 +75,18 @@ class ClusterObjectDescriptor:
                 return field
         return None
 
-    def _ConvertNonArray(self, path: List[int], descriptor: ClusterObjectFieldDescriptor, value: Any) -> Any:
+    def _ConvertNonArray(self, debugPath: str, descriptor: ClusterObjectFieldDescriptor, value: Any) -> Any:
         if not issubclass(descriptor.Type, ClusterObject):
             if not isinstance(value, descriptor.Type):
-                raise Exception(
-                    f"Failed to decode field {path}, expected type {descriptor.Type}, got {type(value)}")
+                raise ValueError(
+                    f"Failed to decode field {debugPath}, expected type {descriptor.Type}, got {type(value)}")
             return value
         if not isinstance(value, Mapping):
-            raise Exception(
-                f"Failed to decode field {path}, struct expected.")
-        return descriptor.Type.descriptor._TagDictToLabelDict(path, value)
+            raise ValueError(
+                f"Failed to decode field {debugPath}, struct expected.")
+        return descriptor.Type.descriptor.TagDictToLabelDict(debugPath, value)
 
-    def _TagDictToLabelDict(self, path: List[int], tlvData: Dict[int, Any]) -> Dict[str, Any]:
+    def TagDictToLabelDict(self, debugPath: str, tlvData: Dict[int, Any]) -> Dict[str, Any]:
         ret = {}
         for tag, value in tlvData.items():
             descriptor = self.GetFieldByTag(tag)
@@ -67,41 +96,35 @@ class ClusterObjectDescriptor:
                 continue
             if descriptor.IsArray:
                 res = []
+                index = 0
                 for v in value:
-                    res += [self._ConvertNonArray(path, descriptor, v)]
+                    res += [self._ConvertNonArray(
+                        f'{debugPath}[{index}]', descriptor, v)]
+                    index += 1
                 ret[descriptor.Label] = res
                 continue
             ret[descriptor.Label] = self._ConvertNonArray(
-                path, descriptor, value)
+                f'{debugPath}.{descriptor.Label}', descriptor, value)
         return ret
 
     def TLVToDict(self, tlvBuf: bytes) -> Dict[str, Any]:
-        tlvData = tlv.TLVReader(tlvBuf).get()
-        return self._TagDictToLabelDict([], tlvData)
+        tlvData = tlv.TLVReader(tlvBuf).get().get('Any', {})
+        return self.TagDictToLabelDict([], tlvData)
 
-    def _DictToTLV(self, path: List[str], tag, data: Mapping, writer: tlv.TLVWriter):
+    def DictToTLVWithWriter(self, debugPath: str, tag, data: Mapping, writer: tlv.TLVWriter):
         writer.startStructure(tag)
         for field in self.Fields:
             val = data.get(field.Label, None)
-            if not val:
-                raise Exception(
-                    f"Field {path + [field.Label]} is missing in the given dict")
-            if isinstance(field.Type, ClusterObjectDescriptor):
-                if not isinstance(val, dict):
-                    raise Exception(
-                        f"Field {path + [field.Label]} is a struct in TLV, {type(val)} given")
-                self._DictToTLV(
-                    path + [field.Label], field.Tag, val, writer)
-                continue
-            if not isinstance(val, field.Type):
-                raise Exception(
-                    f"Field {path + [field.Label]} is expecting type {field.Type}, {type(val)} given")
-            writer.put(field.Tag, val)
+            if val is None:
+                raise ValueError(
+                    f"Field {debugPath}.{field.Label} is missing in the given dict")
+            field.PutFieldToTLV(field.Tag, val, writer,
+                                debugPath + f'.{field.Label}')
         writer.endContainer()
 
     def DictToTLV(self, data: dict) -> bytes:
         tlvwriter = tlv.TLVWriter(bytearray())
-        self._DictToTLV([], None, data, tlvwriter)
+        self.DictToTLVWithWriter('', None, data, tlvwriter)
         return bytes(tlvwriter.encoding)
 
 
@@ -130,3 +153,54 @@ class ClusterCommand(ClusterObject):
     @ChipUtility.classproperty
     def command_id(self) -> int:
         raise NotImplementedError()
+
+
+class ClusterAttributeDescriptor:
+    '''
+    The ClusterAttributeDescriptor is used for holding an attribute's metadata like its cluster id, attribute id and its type.
+
+    Users should not initialize an object based on this class. Instead, users should pass the subclass objects to tell some methods what they want.
+
+    The implementation of this functions is quite tricky, it will create a cluster object on-the-fly, and use it for actual encode / decode routine to save lines of code.
+    '''
+    @classmethod
+    def ToTLV(cls, tag: Union[int, None], value):
+        writer = tlv.TLVWriter()
+        wrapped_value = cls._cluster_object(Value=value)
+        cls.attribute_type.PutFieldToTLV(tag,
+                                         asdict(wrapped_value)['Value'], writer, '')
+        return writer.encoding
+
+    @classmethod
+    def FromTLV(cls, tlvBuffer: bytes):
+        obj_class = cls._cluster_object
+        return obj_class.FromDict(obj_class.descriptor.TagDictToLabelDict('', {0: tlv.TLVReader(tlvBuffer).get().get('Any', {})})).Value
+
+    @ChipUtility.classproperty
+    def cluster_id(self) -> int:
+        raise NotImplementedError()
+
+    @ChipUtility.classproperty
+    def attribute_id(self) -> int:
+        raise NotImplementedError()
+
+    @ChipUtility.classproperty
+    def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+        raise NotImplementedError()
+
+    @ChipUtility.classproperty
+    def _cluster_object(cls) -> ClusterObject:
+        return make_dataclass('InternalClass',
+                              [
+                                  ('Value', List[cls.attribute_type.Type]
+                                   if cls.attribute_type.IsArray else cls.attribute_type.Type, field(default=None)),
+                                  ('descriptor', ClassVar[ClusterObjectDescriptor],
+                                   field(
+                                      default=ClusterObjectDescriptor(
+                                          Fields=[ClusterObjectFieldDescriptor(
+                                              Label='Value', Tag=0, Type=cls.attribute_type.Type, IsArray=cls.attribute_type.IsArray)]
+                                      )
+                                  )
+                                  )
+                              ],
+                              bases=(ClusterObject,))
