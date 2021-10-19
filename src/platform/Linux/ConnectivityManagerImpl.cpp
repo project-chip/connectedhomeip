@@ -1033,7 +1033,7 @@ void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(struct NetworkInterface 
 {
     if (*netifp != nullptr)
     {
-        struct NetworkInterface * p = *netifp;
+        NetworkInterface * p = *netifp;
 
         while (p)
         {
