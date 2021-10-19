@@ -30,7 +30,7 @@ namespace Dnssd {
 
 CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId)
 {
-    ReturnErrorCodeIf(bufferLen <= kOperationalServiceNamePrefix, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(bufferLen <= Operational::kInstanceNameMaxLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     NodeId nodeId               = peerId.GetNodeId();
     CompressedFabricId fabricId = peerId.GetCompressedFabricId();
