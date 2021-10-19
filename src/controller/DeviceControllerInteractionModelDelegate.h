@@ -25,7 +25,7 @@ public:
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::Status status) override;
-    CHIP_ERROR ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
+    CHIP_ERROR ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError) override;
 
     CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient, const app::StatusIB & aStatusIB,
                                    app::AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex) override;
@@ -36,7 +36,7 @@ public:
 
     CHIP_ERROR SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient) override;
 
-    CHIP_ERROR ReadDone(const app::ReadClient * apReadClient) override;
+    CHIP_ERROR ReadDone(app::ReadClient * apReadClient) override;
 
     // TODO: FreeAttributePathParam and AllocateAttributePathParam are used by CHIPDevice.cpp for getting a long-live attribute path
     // object.
