@@ -427,8 +427,10 @@ void Device::Reset()
     }
     mExchangeMgr = nullptr;
 
+#ifndef CONFIG_OPERATIONAL_NETWORK
     ReleaseDAC();
     ReleasePAI();
+#endif
 }
 
 CHIP_ERROR Device::LoadSecureSessionParameters()
@@ -565,6 +567,7 @@ void Device::OnSessionEstablished()
     }
 }
 
+#ifndef CONFIG_OPERATIONAL_NETWORK
 void Device::ReleaseDAC()
 {
     if (mDAC != nullptr)
@@ -636,6 +639,7 @@ CHIP_ERROR Device::SetPAI(const chip::ByteSpan & pai)
 
     return CHIP_NO_ERROR;
 }
+#endif
 
 CHIP_ERROR Device::EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
                                          Callback::Callback<OnDeviceConnectionFailure> * onFailure)
@@ -807,10 +811,13 @@ Device::~Device()
         mExchangeMgr->CloseAllContextsForDelegate(this);
     }
 
+#ifndef CONFIG_OPERATIONAL_NETWORK
     ReleaseDAC();
     ReleasePAI();
+#endif
 }
 
+#ifndef CONFIG_OPERATIONAL_NETWORK
 CHIP_ERROR Device::SetNOCCertBufferSize(size_t new_size)
 {
     ReturnErrorCodeIf(new_size > sizeof(mNOCCertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
@@ -824,6 +831,7 @@ CHIP_ERROR Device::SetICACertBufferSize(size_t new_size)
     mICACertBufferSize = new_size;
     return CHIP_NO_ERROR;
 }
+#endif
 
 } // namespace Controller
 } // namespace chip

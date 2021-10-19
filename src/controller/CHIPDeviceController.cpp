@@ -723,6 +723,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
+#ifndef CONFIG_OPERATIONAL_NETWORK
     // If the CSRNonce is passed in, using that else using a random one..
     if (params.HasCSRNonce())
     {
@@ -746,6 +747,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
         ReturnErrorOnFailure(device->SetAttestationNonce(ByteSpan(mAttestationNonce)));
     }
+#endif
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
@@ -1115,6 +1117,7 @@ void DeviceCommissioner::OnCertificateChainResponse(void * context, ByteSpan cer
 
 CHIP_ERROR DeviceCommissioner::ProcessCertificateChain(const ByteSpan & certificate)
 {
+#ifndef CONFIG_OPERATIONAL_NETWORK
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1152,6 +1155,7 @@ CHIP_ERROR DeviceCommissioner::ProcessCertificateChain(const ByteSpan & certific
             return err;
         }
     }
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -1194,6 +1198,7 @@ void DeviceCommissioner::OnAttestationResponse(void * context, chip::ByteSpan at
 
 CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature)
 {
+#ifndef CONFIG_OPERATIONAL_NETWORK
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1235,6 +1240,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
 
     // TODO: Validate Certification Declaration
     // TODO: Validate Firmware Information
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -1266,6 +1272,7 @@ void DeviceCommissioner::HandleAttestationResult(CHIP_ERROR err)
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(Device * device)
 {
+#ifndef CONFIG_OPERATIONAL_NETWORK
     ChipLogDetail(Controller, "Sending OpCSR request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
@@ -1277,6 +1284,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
 
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -1311,6 +1319,7 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
 void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                                     const ByteSpan & rcac)
 {
+#ifndef CONFIG_OPERATIONAL_NETWORK
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -1365,6 +1374,7 @@ exit:
         ChipLogError(Controller, "Failed in generating device's operational credentials. Error %s", ErrorStr(err));
         commissioner->OnSessionEstablishmentError(err);
     }
+#endif
 }
 
 CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature)
@@ -1489,6 +1499,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device, const
 
 void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
 {
+#ifndef CONFIG_OPERATIONAL_NETWORK
     ChipLogProgress(Controller, "Device confirmed that it has received the root certificate");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
@@ -1513,6 +1524,7 @@ exit:
     {
         commissioner->OnSessionEstablishmentError(err);
     }
+#endif
 }
 
 void DeviceCommissioner::OnRootCertFailureResponse(void * context, uint8_t status)

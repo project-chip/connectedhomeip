@@ -25,7 +25,6 @@ namespace device {
 CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnOperationalDeviceConnected> * onConnection,
                                            Callback::Callback<OnOperationalDeviceConnectionFailure> * onFailure)
 {
-
     // Secure session already established
     if (mDevice.IsSecureConnected())
     {

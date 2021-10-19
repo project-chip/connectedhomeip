@@ -390,6 +390,7 @@ public:
 
     CASESession & GetCASESession() { return mCASESession; }
 
+#ifndef CONFIG_OPERATIONAL_NETWORK
     CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
     {
         VerifyOrReturnError(csrNonce.size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
@@ -427,6 +428,7 @@ public:
     CHIP_ERROR SetICACertBufferSize(size_t new_size);
 
     ByteSpan GetICACert() const { return ByteSpan(mICACertBuffer, mICACertBufferSize); }
+#endif
 
     /*
      * This function can be called to establish a secure session with the device.
@@ -520,8 +522,10 @@ private:
 
     CHIP_ERROR WarmupCASESession();
 
+#ifndef CONFIG_OPERATIONAL_NETWORK
     void ReleaseDAC();
     void ReleasePAI();
+#endif
 
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
@@ -535,6 +539,7 @@ private:
     CASESession mCASESession;
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
+#ifndef CONFIG_OPERATIONAL_NETWORK
     // TODO: Offload Nonces and DAC/PAI into a new struct
     uint8_t mCSRNonce[kOpCSRNonceLength];
     uint8_t mAttestationNonce[kAttestationNonceLength];
@@ -549,6 +554,7 @@ private:
 
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
     size_t mICACertBufferSize = 0;
+#endif
 
     SessionIDAllocator * mIDAllocator = nullptr;
 
