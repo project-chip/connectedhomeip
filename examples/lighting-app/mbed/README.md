@@ -123,7 +123,7 @@ example ported to the mbed-os platform.
 -   **by using generic vscode task**:
 
 ```
-Command Palette (F1) => Run Task... => Run Mbed application => build => lighting-app => (board name) => (build profile)`
+Command Palette (F1) => Run Task... => Run Mbed Application => build => lighting-app => (board name) => (build profile)`
 ```
 
 -   **by calling explicitly building script:**
@@ -165,7 +165,7 @@ ${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=flash -a=lighting-app -b=<boa
 -   **by using VSCode launch task**:
 
 ```
-Run and Debug (Ctrl+Shift+D) => Flash Mbed (board name) => Start Debugging (F5) => lighting-app => (build profile)
+Run and Debug (Ctrl+Shift+D) => Flash Mbed examples => Start Debugging (F5) => (board name) => lighting-app => (build profile)
 ```
 
 The last option uses the Open On-Chip Debugger to open and manage the gdb-server
@@ -173,7 +173,7 @@ session. Then gdb-client (arm-none-eabi-gdb) upload binary image and reset
 device.
 
 It is possible to connect to an external gdb-server session by using specific
-**'Flash Mbed (board name) remote'** task.
+**'Flash Mbed examples [remote]'** task.
 
 ## Debugging
 
@@ -185,11 +185,11 @@ the gdb-server session. Then gdb-client (arm-none-eabi-gdb) connect the server
 to upload binary image and control debugging.
 
 ```
-Run and Debug (Ctrl+Shift+D) => Debug Mbed (board name) => Start Debugging (F5) => lighting-app => (build profile)
+Run and Debug (Ctrl+Shift+D) => Debug Mbed examples => Start Debugging (F5) => (board name) => lighting-app => (build profile)
 ```
 
 It is possible to connect to an external gdb-server session by using specific
-**'Debug Mbed (board name) remote'** task.
+**'Debug Mbed examples [remote]'** task.
 
 ## Testing
 
@@ -206,15 +206,10 @@ command can be invoked. It is a complete solution for interacting with hardware
 devices using pw_rpc over a pw_hdlc transport. For more details about Pigweed
 modules visit [Pigweed modules](https://pigweed.dev/module_guides.html).
 
-**<h3> Installation </h3>**
+**<h3> Building and installing </h3>**
 
-The necessary installation files are building automatically with the example.
-You can find them in _`build-(board name)/(build profile)/python_env`_
-directory. It contains set of Python Wheels which can be install with **pip**
-
-    pip install python_env/*.whl
-
-Now, all Python packages should be installed and RPC console can be run.
+To build and install the RPC console check the guide
+[CHIP RPC console](../../common/pigweed/rpc_console/README.md).
 
 **<h3> Run </h3>**
 
@@ -249,7 +244,8 @@ The response from the device should contain the current lighting state:
 
     Out[1]: Status.OK, chip.rpc.LightingState(on=True))
 
-For more details about RPC console and supported services visit [**LINK_HERE**]
+For more details about RPC console and supported services visit
+[CHIP RPC console](../../common/pigweed/rpc_console/README.md).
 
 ## Supported devices
 

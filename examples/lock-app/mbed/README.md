@@ -22,20 +22,21 @@ paired into an existing Matter network and can be controlled by this network.
 
 <hr>
 
--   [Overview](#overview)
-    -   [Bluetooth Low Energy advertising](#bluetooth-low-energy-advertising)
-    -   [Bluetooth Low Energy rendezvous](#bluetooth-low-energy-rendezvous)
-    -   [WiFi provisioning](#wifi-provisioning)
--   [Run application](#run-application)
-    -   [Environment setup](#environment-setup)
-    -   [Building](#building)
-    -   [Flashing](#flashing)
-    -   [Debugging](#debugging)
-    -   [Testing](#testing)
-        -   [CHIP Tools](#chip-tools)
-    -   [Supported devices](#supported-devices)
-        -   [Notes](#notes)
-    -   [Device UI](#device-ui)
+- [Overview](#overview)
+  - [Bluetooth Low Energy advertising](#bluetooth-low-energy-advertising)
+  - [Bluetooth Low Energy rendezvous](#bluetooth-low-energy-rendezvous)
+  - [WiFi provisioning](#wifi-provisioning)
+- [Run application](#run-application)
+  - [Environment setup](#environment-setup)
+  - [Building](#building)
+  - [Flashing](#flashing)
+  - [Debugging](#debugging)
+  - [Testing](#testing)
+    - [CHIP Tools](#chip-tools)
+    - [RPC console](#rpc-console)
+  - [Supported devices](#supported-devices)
+      - [Notes](#notes)
+  - [Device UI](#device-ui)
 
 <hr>
 
@@ -112,7 +113,7 @@ ported to the mbed-os platform.
 -   **by using generic vscode task**:
 
 ```
-Command Palette (F1) => Run Task... => Run Mbed application => build => lock-app => (board name) => (build profile)`
+Command Palette (F1) => Run Task... => Run Mbed Application => build => lock-app => (board name) => (build profile)`
 ```
 
 -   **by calling explicitly building script:**
@@ -154,7 +155,7 @@ ${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=flash -a=lock-app -b=<board n
 -   **by using VSCode launch task**:
 
 ```
-Run and Debug (Ctrl+Shift+D) => Flash Mbed (board name) => Start Debugging (F5) => lock-app => (build profile)
+Run and Debug (Ctrl+Shift+D) => Flash Mbed examples => Start Debugging (F5) => (board name) => lock-app => (build profile)
 ```
 
 The last option uses the Open On-Chip Debugger to open and manage the gdb-server
@@ -162,7 +163,7 @@ session. Then gdb-client (arm-none-eabi-gdb) upload binary image and reset
 device.
 
 It is possible to connect to an external gdb-server session by using specific
-**'Flash Mbed (board name) remote'** task.
+**'Flash Mbed examples [remote]'** task.
 
 ## Debugging
 
@@ -174,11 +175,11 @@ the gdb-server session. Then gdb-client (arm-none-eabi-gdb) connect the server
 to upload binary image and control debugging.
 
 ```
-Run and Debug (Ctrl+Shift+D) => Debug Mbed (board name) => Start Debugging (F5) => lock-app => (build profile)
+Run and Debug (Ctrl+Shift+D) => Debug Mbed examples => Start Debugging (F5) => (board name) => lock-app => (build profile)
 ```
 
 It is possible to connect to an external gdb-server session by using specific
-**'Debug Mbed (board name) remote'** task.
+**'Debug Mbed examples [remote]'** task.
 
 ## Testing
 
@@ -187,6 +188,54 @@ It is possible to connect to an external gdb-server session by using specific
 Read the [MbedCommissioning](../../../docs/guides/mbedos_commissioning.md) to
 see how to use different CHIP tools to commission and control the application
 within a WiFi network.
+
+### RPC console
+
+The RPC console is an interactive Python shell console, where the different RPC
+command can be invoked. It is a complete solution for interacting with hardware
+devices using pw_rpc over a pw_hdlc transport. For more details about Pigweed
+modules visit [Pigweed modules](https://pigweed.dev/module_guides.html).
+
+**<h3> Building and installing </h3>**
+
+To build and install the RPC console check the guide
+[CHIP RPC console](../../common/pigweed/rpc_console/README.md).
+
+**<h3> Run </h3>**
+
+To start the RPC console run the following command and provide device connection
+parameters as arguments:
+
+-   --device/-d the serial port to use.
+-   --baudrate/-b the baud rate to use.
+-   --output/-o the file to which to write device output (HDLC channel 1),
+    provide - or omit for stdout.
+-   --socket-addr/-s alternatively use socket to connect to server, type default
+    for localhost:33000, or manually input the server address:port.
+
+Example:
+
+      python -m chip_app.rpc_console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
+
+To control the lock type the following command, where you define if 'on' state
+is true or false:
+
+    In [1]: rpcs.chip.rpc.Locking.Set(locked=True)
+
+The response from the device should be:
+
+    Out[1]: (Status.OK, pw.protobuf.Empty())
+
+To check the lock state type the following command:
+
+    In [1]: rpcs.chip.rpc.Locking.Get()
+
+The response from the device should contain the current lock state:
+
+    Out[1]: Status.OK, chip.rpc.LockingState(locked=True))
+
+For more details about RPC console and supported services visit
+[CHIP RPC console](../../common/pigweed/rpc_console/README.md).
 
 ## Supported devices
 
