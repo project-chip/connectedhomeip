@@ -197,7 +197,7 @@ public:
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     // General diagnostics methods
-    CHIP_ERROR GetNetworkInterfaces(struct NetworkInterface ** netifp);
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifp);
     void ReleaseNetworkInterfaces(struct NetworkInterface ** netifp);
 
     // Ethernet network diagnostics methods
