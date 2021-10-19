@@ -1057,7 +1057,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(struct NetworkInterfac
     }
     else
     {
-        struct NetworkInterface dummy;
+        NetworkInterface dummy;
 
         dummy.Next = nullptr;
 
