@@ -1046,7 +1046,7 @@ void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(struct NetworkInterface 
     }
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(struct NetworkInterface ** netifp)
+CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** netifp)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
