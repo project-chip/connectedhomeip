@@ -75,7 +75,7 @@ struct NetworkInterface
     bool Is64MacAddress;
     char HardwareAddress[kMaxHardwareAddrSize];
     InterfaceType Type;
-    struct NetworkInterface * Next; /* Pointer to the next structure.  */
+    NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
 class ConnectivityManagerImpl;
