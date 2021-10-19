@@ -723,6 +723,15 @@ static void OnTestClusterClusterTestAddArgumentsResponse(void * context, uint8_t
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
+static void OnTestClusterClusterTestListInt8UReverseResponse(void * context,
+                                                             /* TYPE WARNING: array array defaults to */ uint8_t * arg1)
+{
+    ChipLogProgress(chipTool, "TestClusterClusterTestListInt8UReverseResponse");
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
 static void OnTestClusterClusterTestSpecificResponse(void * context, uint8_t returnValue)
 {
     ChipLogProgress(chipTool, "TestClusterClusterTestSpecificResponse");
@@ -18184,6 +18193,7 @@ private:
 | * Test                                                              |   0x00 |
 | * TestAddArguments                                                  |   0x04 |
 | * TestListInt8UArgumentRequest                                      |   0x0A |
+| * TestListInt8UReverseRequest                                       |   0x0D |
 | * TestListStructArgumentRequest                                     |   0x09 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
@@ -18314,6 +18324,41 @@ public:
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mArg1;
+};
+
+/*
+ * Command TestListInt8UReverseRequest
+ */
+class TestClusterTestListInt8UReverseRequest : public ModelCommand
+{
+public:
+    TestClusterTestListInt8UReverseRequest() : ModelCommand("test-list-int8ureverse-request")
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mArg1);
+        ModelCommand::AddArguments();
+    }
+    ~TestClusterTestListInt8UReverseRequest()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x0D) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.TestListInt8UReverseRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mArg1);
+    }
+
+private:
+    chip::Callback::Callback<TestClusterClusterTestListInt8UReverseResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<TestClusterClusterTestListInt8UReverseResponseCallback>(
+            OnTestClusterClusterTestListInt8UReverseResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mArg1;
@@ -26565,6 +26610,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<TestClusterTest>(),                          //
         make_unique<TestClusterTestAddArguments>(),              //
         make_unique<TestClusterTestListInt8UArgumentRequest>(),  //
+        make_unique<TestClusterTestListInt8UReverseRequest>(),   //
         make_unique<TestClusterTestListStructArgumentRequest>(), //
         make_unique<TestClusterTestNotHandled>(),                //
         make_unique<TestClusterTestSpecific>(),                  //

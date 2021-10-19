@@ -20955,6 +20955,34 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestAddArguments
+namespace TestListInt8UReverseResponse {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListInt8UReverseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<uint8_t> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListInt8UReverseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<uint8_t> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListInt8UReverseResponse
 namespace TestSimpleArgumentRequest {
 enum class Fields
 {
@@ -21194,6 +21222,34 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestListNestedStructListArgumentRequest
+namespace TestListInt8UReverseRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListInt8UReverseRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<uint8_t> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListInt8UReverseRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<uint8_t> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListInt8UReverseRequest
 } // namespace Commands
 
 namespace Attributes {
