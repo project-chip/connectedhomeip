@@ -33,7 +33,7 @@ namespace Controller {
  *     delegate interface stipulated by by InteractionModelDelegate.
  *
  *  2. Automatic decoding of attribute data provided in the TLVReader by InteractionModelDelegate::OnReportData into a decoded
- * cluster object.
+ *     cluster object.
  */
 template <typename AttributeTypeInfo>
 class TypedReadCallback final : public app::InteractionModelDelegate
