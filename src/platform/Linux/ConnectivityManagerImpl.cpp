@@ -1029,7 +1029,7 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(struct NetworkInterface ** netifp)
+void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface ** netifp)
 {
     if (*netifp != nullptr)
     {
