@@ -1038,7 +1038,7 @@ void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface ** neti
         while (p)
         {
             NetworkInterface * del = p;
-            p                             = p->Next;
+            p                      = p->Next;
             delete del;
         }
 
