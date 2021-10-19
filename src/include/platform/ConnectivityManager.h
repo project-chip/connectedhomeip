@@ -198,7 +198,7 @@ public:
 
     // General diagnostics methods
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifp);
-    void ReleaseNetworkInterfaces(struct NetworkInterface ** netifp);
+    void ReleaseNetworkInterfaces(NetworkInterface ** netifp);
 
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
