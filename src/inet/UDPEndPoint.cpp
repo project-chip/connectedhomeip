@@ -134,10 +134,19 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t ipAddr = addr.ToLwIPAddr();
-#if INET_CONFIG_ENABLE_IPV4
-        lwip_ip_addr_type lType = IPAddress::ToLwIPAddrType(addrType);
-        IP_SET_TYPE_VAL(ipAddr, lType);
-#endif // INET_CONFIG_ENABLE_IPV4
+
+        // TODO: IPAddress ANY has only one constant state, however addrType
+        // has separate IPV4 and IPV6 'any' settings. This tries to correct
+        // for this as LWIP default if IPv4 is compiled in is to consider
+        // 'any == any_v4'
+        //
+        // We may want to consider having separate AnyV4 and AnyV6 constants
+        // inside CHIP to resolve this ambiguity
+        if ((addr.Type() == kIPAddressType_Any) && (addrType == kIPAddressType_IPv6))
+        {
+            ipAddr = *IP6_ADDR_ANY;
+        }
+
         res = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipAddr, port));
 #else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
         if (addrType == kIPAddressType_IPv6)

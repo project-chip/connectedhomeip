@@ -1846,7 +1846,7 @@ public:
     static constexpr CommandId GetCommandId() { return CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
 
-    BitFlags<ScenesCopyMode> mode;
+    chip::BitFlags<ScenesCopyMode> mode;
     uint16_t groupIdFrom;
     uint8_t sceneIdFrom;
     uint16_t groupIdTo;
@@ -1861,7 +1861,7 @@ public:
     static constexpr CommandId GetCommandId() { return CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Scenes::Id; }
 
-    BitFlags<ScenesCopyMode> mode;
+    chip::BitFlags<ScenesCopyMode> mode;
     uint16_t groupIdFrom;
     uint8_t sceneIdFrom;
     uint16_t groupIdTo;
@@ -2275,7 +2275,7 @@ public:
     static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    BitFlags<OnOffControl> onOffControl;
+    chip::BitFlags<OnOffControl> onOffControl;
     uint16_t onTime;
     uint16_t offWaitTime;
 
@@ -2288,7 +2288,7 @@ public:
     static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
     static constexpr ClusterId GetClusterId() { return OnOff::Id; }
 
-    BitFlags<OnOffControl> onOffControl;
+    chip::BitFlags<OnOffControl> onOffControl;
     uint16_t onTime;
     uint16_t offWaitTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -2729,6 +2729,56 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
 };
 } // namespace RemainingTime
+namespace MinLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
+};
+} // namespace MinLevel
+namespace MaxLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
+};
+} // namespace MaxLevel
+namespace CurrentFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFrequency::Id; }
+};
+} // namespace CurrentFrequency
+namespace MinFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinFrequency::Id; }
+};
+} // namespace MinFrequency
+namespace MaxFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxFrequency::Id; }
+};
+} // namespace MaxFrequency
 namespace Options {
 struct TypeInfo
 {
@@ -4108,7 +4158,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -4121,7 +4171,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4166,7 +4216,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -4179,7 +4229,7 @@ public:
     static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
-    BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
     ApplianceStatus applianceStatus2;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -9815,7 +9865,7 @@ public:
 
     uint8_t scheduleId;
     uint16_t userId;
-    BitFlags<DoorLockDayOfWeek> daysMask;
+    chip::BitFlags<DoorLockDayOfWeek> daysMask;
     uint8_t startHour;
     uint8_t startMinute;
     uint8_t endHour;
@@ -9832,7 +9882,7 @@ public:
 
     uint8_t scheduleId;
     uint16_t userId;
-    BitFlags<DoorLockDayOfWeek> daysMask;
+    chip::BitFlags<DoorLockDayOfWeek> daysMask;
     uint8_t startHour;
     uint8_t startMinute;
     uint8_t endHour;
@@ -12377,8 +12427,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    BitFlags<DayOfWeek> dayOfWeekForSequence;
-    BitFlags<ModeForSequence> modeForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
     DataModel::List<uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -12391,8 +12441,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    BitFlags<DayOfWeek> dayOfWeekForSequence;
-    BitFlags<ModeForSequence> modeForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
     DataModel::DecodableList<uint8_t> payload;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12414,8 +12464,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    BitFlags<DayOfWeek> dayOfWeekForSequence;
-    BitFlags<ModeForSequence> modeForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
     DataModel::List<uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -12428,8 +12478,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
-    BitFlags<DayOfWeek> dayOfWeekForSequence;
-    BitFlags<ModeForSequence> modeForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
     DataModel::DecodableList<uint8_t> payload;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12491,8 +12541,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
-    BitFlags<DayOfWeek> daysToReturn;
-    BitFlags<ModeForSequence> modeToReturn;
+    chip::BitFlags<DayOfWeek> daysToReturn;
+    chip::BitFlags<ModeForSequence> modeToReturn;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12503,8 +12553,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
 
-    BitFlags<DayOfWeek> daysToReturn;
-    BitFlags<ModeForSequence> modeToReturn;
+    chip::BitFlags<DayOfWeek> daysToReturn;
+    chip::BitFlags<ModeForSequence> modeToReturn;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeeklySchedule
@@ -13861,7 +13911,7 @@ public:
     static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
 
-    BitFlags<ColorLoopUpdateFlags> updateFlags;
+    chip::BitFlags<ColorLoopUpdateFlags> updateFlags;
     ColorLoopAction action;
     ColorLoopDirection direction;
     uint16_t time;
@@ -13878,7 +13928,7 @@ public:
     static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
     static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
 
-    BitFlags<ColorLoopUpdateFlags> updateFlags;
+    chip::BitFlags<ColorLoopUpdateFlags> updateFlags;
     ColorLoopAction action;
     ColorLoopDirection direction;
     uint16_t time;
@@ -16598,7 +16648,7 @@ public:
     static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
 
-    BitFlags<IasZoneStatus> zoneStatus;
+    chip::BitFlags<IasZoneStatus> zoneStatus;
     uint8_t extendedStatus;
     uint8_t zoneId;
     uint16_t delay;
@@ -16612,7 +16662,7 @@ public:
     static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
     static constexpr ClusterId GetClusterId() { return IasZone::Id; }
 
-    BitFlags<IasZoneStatus> zoneStatus;
+    chip::BitFlags<IasZoneStatus> zoneStatus;
     uint8_t extendedStatus;
     uint8_t zoneId;
     uint16_t delay;
@@ -16980,7 +17030,7 @@ struct Type
 {
 public:
     uint8_t zoneId;
-    BitFlags<IasZoneStatus> zoneStatus;
+    chip::BitFlags<IasZoneStatus> zoneStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -17652,7 +17702,7 @@ public:
     static constexpr CommandId GetCommandId() { return StartWarning::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    BitFlags<WarningInfo> warningInfo;
+    chip::BitFlags<WarningInfo> warningInfo;
     uint16_t warningDuration;
     uint8_t strobeDutyCycle;
     uint8_t strobeLevel;
@@ -17666,7 +17716,7 @@ public:
     static constexpr CommandId GetCommandId() { return StartWarning::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    BitFlags<WarningInfo> warningInfo;
+    chip::BitFlags<WarningInfo> warningInfo;
     uint16_t warningDuration;
     uint8_t strobeDutyCycle;
     uint8_t strobeLevel;
@@ -17686,7 +17736,7 @@ public:
     static constexpr CommandId GetCommandId() { return Squawk::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    BitFlags<SquawkInfo> squawkInfo;
+    chip::BitFlags<SquawkInfo> squawkInfo;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -17697,7 +17747,7 @@ public:
     static constexpr CommandId GetCommandId() { return Squawk::Id; }
     static constexpr ClusterId GetClusterId() { return IasWd::Id; }
 
-    BitFlags<SquawkInfo> squawkInfo;
+    chip::BitFlags<SquawkInfo> squawkInfo;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Squawk
@@ -20056,7 +20106,7 @@ public:
     SimpleEnum c;
     chip::ByteSpan d;
     chip::Span<const char> e;
-    BitFlags<SimpleBitmap> f;
+    chip::BitFlags<SimpleBitmap> f;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20497,6 +20547,174 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestStructArrayArgumentRequest
+namespace TestStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::SimpleStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::SimpleStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestStructArgumentRequest
+namespace TestNestedStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNestedStructArgumentRequest
+namespace TestListStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::SimpleStruct::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListStructArgumentRequest
+namespace TestListInt8UArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<uint8_t> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<uint8_t> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListInt8UArgumentRequest
+namespace TestNestedStructListArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStructList::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStructList::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNestedStructListArgumentRequest
+namespace TestListNestedStructListArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::NestedStructList::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListNestedStructListArgumentRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -20939,11 +21157,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20955,11 +21173,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisplayMessage
@@ -21002,7 +21220,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21014,7 +21232,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CancelMessage
@@ -21074,11 +21292,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21090,11 +21308,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Messaging::Id; }
 
     uint32_t messageId;
-    BitFlags<MessagingControlMask> messageControl;
+    chip::BitFlags<MessagingControlMask> messageControl;
     uint32_t startTime;
     uint16_t durationInMinutes;
     chip::Span<const char> message;
-    BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisplayProtectedMessage
@@ -21478,8 +21696,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    BitFlags<AlertCount> alertsCount;
-    DataModel::List<BitFlags<AlertStructure>> alertStructures;
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21490,8 +21708,8 @@ public:
     static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    BitFlags<AlertCount> alertsCount;
-    DataModel::DecodableList<BitFlags<AlertStructure>> alertStructures;
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::DecodableList<chip::BitFlags<AlertStructure>> alertStructures;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetAlertsResponse
@@ -21509,8 +21727,8 @@ public:
     static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    BitFlags<AlertCount> alertsCount;
-    DataModel::List<BitFlags<AlertStructure>> alertStructures;
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21521,8 +21739,8 @@ public:
     static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
     static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
 
-    BitFlags<AlertCount> alertsCount;
-    DataModel::DecodableList<BitFlags<AlertStructure>> alertStructures;
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::DecodableList<chip::BitFlags<AlertStructure>> alertStructures;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AlertsNotification

@@ -444,7 +444,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (238)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (244)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -764,6 +764,12 @@
             { 0x050F, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestSpecific */                                                \
             { 0x050F, 0x03, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* TestUnknownCommand */                                          \
             { 0x050F, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestAddArguments */                                            \
+            { 0x050F, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestStructArgumentRequest */                                   \
+            { 0x050F, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestNestedStructArgumentRequest */                             \
+            { 0x050F, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestListStructArgumentRequest */                               \
+            { 0x050F, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestListInt8UArgumentRequest */                                \
+            { 0x050F, 0x0B, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestNestedStructListArgumentRequest */                         \
+            { 0x050F, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestListNestedStructListArgumentRequest */                     \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Binding (client) */                                                                           \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Bind */                                                        \

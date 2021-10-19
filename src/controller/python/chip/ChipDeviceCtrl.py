@@ -27,11 +27,14 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
+import asyncio
 from ctypes import *
 from .ChipStack import *
 from .clusters.CHIPClusters import *
 from .interaction_model import delegate as im
 from .exceptions import *
+from .clusters import Command as ClusterCommand
+from .clusters import ClusterObjects as ClusterObjects
 import enum
 import threading
 
@@ -130,6 +133,7 @@ class ChipDeviceController(object):
             self._ChipStack.completeEvent.set()
 
         im.InitIMDelegate()
+        ClusterCommand.Init(self)
 
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(
             HandleKeyExchangeComplete)
@@ -333,6 +337,23 @@ class ChipDeviceController(object):
         if returnDevice == c_void_p(None):
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
+
+    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None):
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid)
+        res = self._ChipStack.Call(
+            lambda: ClusterCommand.SendCommand(
+                future, eventLoop, responseType, device, ClusterCommand.CommandPath(
+                    EndpointId=endpoint,
+                    ClusterId=payload.cluster_id,
+                    CommandId=payload.command_id,
+                ), payload)
+        )
+        if res != 0:
+            future.set_exception(self._ChipStack.ErrorToException(res))
+        return await future
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = self.GetConnectedDeviceSync(nodeid)

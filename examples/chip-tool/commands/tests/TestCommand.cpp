@@ -18,9 +18,9 @@
 
 #include "TestCommand.h"
 
-CHIP_ERROR TestCommand::Run(NodeId remoteId)
+CHIP_ERROR TestCommand::RunCommand()
 {
-    return mController.GetConnectedDevice(remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)

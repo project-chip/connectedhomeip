@@ -117,6 +117,7 @@ try:
         "coloredlogs",
         'construct',
         'ipython',
+        'dacite',
     ]
 
     if platform.system() == 'Darwin':
