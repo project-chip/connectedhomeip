@@ -220,8 +220,10 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     mWiFiStationMode                = kWiFiStationMode_Disabled;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
+#endif
 
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
     {
@@ -877,11 +879,9 @@ void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void 
 {
     sInstance.DriveAPState();
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ret  = CHIP_NO_ERROR;
     GError * err    = nullptr;
     GVariant * args = nullptr;
@@ -1025,10 +1025,8 @@ exit:
         g_error_free(err);
 
     return ret;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthPHYRate(uint8_t & pHYRate)
 {

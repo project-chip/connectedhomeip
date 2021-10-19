@@ -344,7 +344,7 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
     }
 
     setupPayload.version               = 0;
-    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
+    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
     return CHIP_NO_ERROR;
 }

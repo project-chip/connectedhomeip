@@ -104,10 +104,10 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
                                           CommandSender * apCommandObj)
 {
-    ChipLogDetail(Controller,
-                  "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
     // Nothing todo.
+    (void) aCommandPath;
+    (void) aReader;
+    (void) apCommandObj;
 }
 
 CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
