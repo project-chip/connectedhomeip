@@ -442,21 +442,22 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
 }
 
 JNI_METHOD(jobject, computePaseVerifier)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jlong setupPincode, jint iterations, jbyteArray salt)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jlong setupPincode, jint iterations, jbyteArray salt)
 {
     chip::DeviceLayer::StackLock lock;
+
     Device * chipDevice = nullptr;
-
-    ChipLogProgress(Controller, "computePaseVerifier() called");
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
-
     CHIP_ERROR err = CHIP_NO_ERROR;
     jobject params;
     jbyteArray verifierBytes;
     uint32_t passcodeId;
     PASEVerifier verifier;
-
     JniByteArray jniSalt(env, salt);
+
+    ChipLogProgress(Controller, "computePaseVerifier() called");
+
+    chipDevice = reinterpret_cast<Device *>(devicePtr);
+    VerifyOrExit(chipDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = chipDevice->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier, passcodeId);
     SuccessOrExit(err);
