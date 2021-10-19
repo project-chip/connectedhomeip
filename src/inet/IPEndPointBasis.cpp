@@ -616,7 +616,7 @@ CHIP_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
     return (lRetval);
 }
 
-CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags)
+CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer)
 {
     // Ensure the destination address type is compatible with the endpoint address type.
     VerifyOrReturnError(mAddrType == aPktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1063,7 +1063,7 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags)
+CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer)
 {
     dispatch_data_t content;
 

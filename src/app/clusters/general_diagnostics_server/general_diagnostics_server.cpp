@@ -35,7 +35,7 @@ public:
     // Register for the GeneralDiagnostics cluster on all endpoints.
     GeneralDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
@@ -62,15 +62,15 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMana
 
 GeneralDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR GeneralDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != GeneralDiagnostics::Id)
+    if (aPath.mClusterId != GeneralDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case RebootCount::Id: {
         return ReadIfSupported(&PlatformManager::GetRebootCount, aEncoder);

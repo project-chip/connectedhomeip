@@ -151,8 +151,8 @@ private:
                                                                 Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
 #else
         // Thread only supports operational discovery.
-        static constexpr size_t kSubTypeMaxNumber    = 0;
-        static constexpr size_t kSubTypeTotalLength  = 0;
+        static constexpr size_t kSubTypeMaxNumber    = 1;
+        static constexpr size_t kSubTypeTotalLength  = Dnssd::kSubTypeCompressedFabricIdMaxLength;
         static constexpr size_t kTxtMaxNumber        = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
         static constexpr size_t kTxtTotalValueLength = Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize;
 #endif

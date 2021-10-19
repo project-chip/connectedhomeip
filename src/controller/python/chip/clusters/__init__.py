@@ -21,3 +21,5 @@
 #
 
 """Provides Python APIs for CHIP."""
+
+from . import TestObjects

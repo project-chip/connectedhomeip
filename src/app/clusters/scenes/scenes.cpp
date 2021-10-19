@@ -215,7 +215,7 @@ void emAfPluginScenesServerPrintInfo(void)
                              entry.targetPositionTiltPercent100thsValue);
 #endif
         }
-        emberAfCorePrintln("");
+        emberAfCorePrintln("%s", "");
     }
 }
 
@@ -759,7 +759,7 @@ bool emberAfPluginScenesServerParseAddScene(
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
     emberAfScenesClusterPrintln("RX: %pAddScene 0x%2x, 0x%x, 0x%2x, \"%.*s\"", (enhanced ? "Enhanced" : ""), groupId, sceneId,
-                                transitionTime, sceneName.size(), sceneName.data());
+                                transitionTime, static_cast<int>(sceneName.size()), sceneName.data());
 
     auto fieldSetIter = extensionFieldSets.begin();
 

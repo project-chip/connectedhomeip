@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.13
+            image: connectedhomeip/chip-build:0.5.15
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -82,6 +82,10 @@ jobs:
                     qpg qpg6100+debug persistent-storage-app \
                     out/persistent-storage_app_debug/chip-qpg6100-persistent_storage-example.out \
                     /tmp/bloat_reports/
+            - name: Build Matter SDK library
+              timeout-minutes: 5
+              run: |
+                  config/qpg/chip-gn/build.sh
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

@@ -39,8 +39,7 @@ namespace app {
 namespace {
 void ReportCommandUnsupported(Command * aCommandObj, const ConcreteCommandPath & aCommandPath)
 {
-    aCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-                               Protocols::InteractionModel::Status::UnsupportedCommand);
+    aCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
     ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                  ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
 }
@@ -103,8 +102,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -152,8 +150,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -211,8 +208,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -324,8 +320,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -440,8 +435,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -452,9 +446,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
-    ChipLogDetail(Zcl, "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
-
     Compatibility::SetupEmberAfObjects(apCommandObj, aCommandPath);
 
     switch (aCommandPath.mClusterId)
@@ -479,8 +470,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::UnsupportedCluster);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCluster);
         break;
     }
 
@@ -490,9 +480,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
 void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader,
                                           CommandSender * apCommandObj)
 {
-    ChipLogDetail(Zcl, "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
-
     Compatibility::SetupEmberAfObjects(apCommandObj, aCommandPath);
 
     TLV::TLVType dataTlvType;
@@ -501,8 +488,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     {
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::UnsupportedCluster);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCluster);
         break;
     }
 

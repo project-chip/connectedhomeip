@@ -36,6 +36,7 @@ limitations under the License.
   </enum>
 
   <bitmap name="OnOffControl" type="BITMAP8">
+    <cluster code="0x0006"/>
     <field name="AcceptOnlyWhenOn" mask="0x01"/>
   </bitmap>
 

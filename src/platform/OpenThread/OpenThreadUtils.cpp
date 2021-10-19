@@ -24,6 +24,7 @@
 
 #include "OpenThreadUtils.h"
 
+#include <inet/IPAddress.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -171,7 +172,7 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 
     char srcStr[50], destStr[50], typeBuf[20];
     const char * type = typeBuf;
-    IPAddress addr;
+    Inet::IPAddress addr;
     uint8_t headerData[44];
     uint16_t pktLen;
 
@@ -248,7 +249,7 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 #endif // CHIP_DETAIL_LOGGING
 }
 
-bool IsOpenThreadMeshLocalAddress(otInstance * otInst, const IPAddress & addr)
+bool IsOpenThreadMeshLocalAddress(otInstance * otInst, const Inet::IPAddress & addr)
 {
     const otMeshLocalPrefix * otMeshPrefix = otThreadGetMeshLocalPrefix(otInst);
 
