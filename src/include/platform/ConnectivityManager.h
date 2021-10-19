@@ -423,7 +423,7 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
 }
 
-inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(struct NetworkInterface ** netifp)
+inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(NetworkInterface ** netifp)
 {
     return static_cast<ImplClass *>(this)->_GetNetworkInterfaces(netifp);
 }
