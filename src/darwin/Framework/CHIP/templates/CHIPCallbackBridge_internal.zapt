@@ -4,6 +4,9 @@
 #import <Foundation/Foundation.h>
 #import "CHIPCallbackBridgeBase_internal.h"
 
+#include <app/data-model/DecodableList.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
 {{#>CHIPCallbackBridge header="1" partial-type=""            }}DefaultSuccessCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge header="1" partial-type="Octet_String"}}OctetStringAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge header="1" partial-type="Char_String" }}CharStringAttributeCallback{{/CHIPCallbackBridge}}

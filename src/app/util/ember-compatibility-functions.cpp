@@ -340,13 +340,21 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
         break;
     }
     case ZCL_ARRAY_ATTRIBUTE_TYPE: {
+        // We only get here for attributes of list type that have no override
+        // registered.  There should not be any nonempty lists like that.
+        uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
+        if (size != 2)
+        {
+            // We expect 2 bytes for the length, but the length value itself
+            // should be 0.  If it's not, we are not going to do the right
+            // thing.
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        // Just encode an empty array.
         TLV::TLVType containerType;
         ReturnErrorOnFailure(
-            apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_List, containerType));
-        // TODO: Encode data in TLV, now raw buffers
-        ReturnErrorOnFailure(
-            apWriter->PutBytes(TLV::AnonymousTag, attributeData,
-                               emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData)));
+            apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_Array, containerType));
         ReturnErrorOnFailure(apWriter->EndContainer(containerType));
         break;
     }
