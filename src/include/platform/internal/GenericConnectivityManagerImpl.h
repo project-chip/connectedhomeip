@@ -47,8 +47,8 @@ public:
     uint16_t _GetUserSelectedModeTimeout();
     void _SetUserSelectedModeTimeout(uint16_t val);
 
-    void _ReleaseNetworkInterfaces(struct NetworkInterface ** netifp);
-    CHIP_ERROR _GetNetworkInterfaces(struct NetworkInterface ** netifp);
+    void _ReleaseNetworkInterfaces(NetworkInterface ** netifp);
+    CHIP_ERROR _GetNetworkInterfaces(NetworkInterface ** netifp);
     CHIP_ERROR _GetEthPHYRate(uint8_t & pHYRate);
     CHIP_ERROR _GetEthFullDuplex(bool & fullDuplex);
     CHIP_ERROR _GetEthCarrierDetect(bool & carrierDetect);
@@ -85,11 +85,11 @@ inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedModeTimeo
 {}
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl<ImplClass>::_ReleaseNetworkInterfaces(struct NetworkInterface ** netifp)
+inline void GenericConnectivityManagerImpl<ImplClass>::_ReleaseNetworkInterfaces(NetworkInterface ** netifp)
 {}
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetNetworkInterfaces(struct NetworkInterface ** netifp)
+inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetNetworkInterfaces(NetworkInterface ** netifp)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

@@ -1036,15 +1036,15 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(struct NetworkInterface ** netifp)
+void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface ** netifp)
 {
     if (*netifp != nullptr)
     {
-        struct NetworkInterface * p = *netifp;
+        NetworkInterface * p = *netifp;
 
         while (p)
         {
-            struct NetworkInterface * del = p;
+            NetworkInterface * del = p;
             p                             = p->Next;
             delete del;
         }
@@ -1053,7 +1053,7 @@ void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(struct NetworkInterface 
     }
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(struct NetworkInterface ** netifp)
+CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** netifp)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
@@ -1064,7 +1064,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(struct NetworkInterfac
     }
     else
     {
-        struct NetworkInterface dummy;
+        NetworkInterface dummy;
 
         dummy.Next = nullptr;
 
@@ -1074,7 +1074,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(struct NetworkInterfac
         {
             if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_PACKET)
             {
-                struct NetworkInterface * ifp = new NetworkInterface();
+                NetworkInterface * ifp = new NetworkInterface();
 
                 strncpy(ifp->Name, ifa->ifa_name, kMaxIfNameSize);
                 ifp->Name[kMaxIfNameSize - 1] = '\0';

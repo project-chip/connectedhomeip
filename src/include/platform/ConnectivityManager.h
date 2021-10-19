@@ -59,11 +59,11 @@ constexpr size_t kMaxHardwareAddrSize = 8;
  */
 enum class InterfaceType : uint8_t
 {
-    kInterfaceType_Unspecified = 0x00,
-    kInterfaceType_WiFi        = 0x01,
-    kInterfaceType_Ethernet    = 0x02,
-    kInterfaceType_Cellular    = 0x03,
-    kInterfaceType_Thread      = 0x04,
+    Unspecified = 0x00,
+    WiFi        = 0x01,
+    Ethernet    = 0x02,
+    Cellular    = 0x03,
+    Thread      = 0x04,
 };
 
 struct NetworkInterface
@@ -75,7 +75,7 @@ struct NetworkInterface
     bool Is64MacAddress;
     char HardwareAddress[kMaxHardwareAddrSize];
     InterfaceType Type;
-    struct NetworkInterface * Next; /* Pointer to the next structure.  */
+    NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
 class ConnectivityManagerImpl;
@@ -197,8 +197,8 @@ public:
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     // General diagnostics methods
-    CHIP_ERROR GetNetworkInterfaces(struct NetworkInterface ** netifp);
-    void ReleaseNetworkInterfaces(struct NetworkInterface ** netifp);
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifp);
+    void ReleaseNetworkInterfaces(NetworkInterface ** netifp);
 
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
@@ -423,12 +423,12 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
 }
 
-inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(struct NetworkInterface ** netifp)
+inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(NetworkInterface ** netifp)
 {
     return static_cast<ImplClass *>(this)->_GetNetworkInterfaces(netifp);
 }
 
-inline void ConnectivityManager::ReleaseNetworkInterfaces(struct NetworkInterface ** netifp)
+inline void ConnectivityManager::ReleaseNetworkInterfaces(NetworkInterface ** netifp)
 {
     return static_cast<ImplClass *>(this)->_ReleaseNetworkInterfaces(netifp);
 }
