@@ -428,7 +428,7 @@ inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(NetworkInterface ** 
     return static_cast<ImplClass *>(this)->_GetNetworkInterfaces(netifp);
 }
 
-inline void ConnectivityManager::ReleaseNetworkInterfaces(struct NetworkInterface ** netifp)
+inline void ConnectivityManager::ReleaseNetworkInterfaces(NetworkInterface ** netifp)
 {
     return static_cast<ImplClass *>(this)->_ReleaseNetworkInterfaces(netifp);
 }
