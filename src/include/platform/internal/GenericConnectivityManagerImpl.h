@@ -89,7 +89,7 @@ inline void GenericConnectivityManagerImpl<ImplClass>::_ReleaseNetworkInterfaces
 {}
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetNetworkInterfaces(struct NetworkInterface ** netifp)
+inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetNetworkInterfaces(NetworkInterface ** netifp)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
