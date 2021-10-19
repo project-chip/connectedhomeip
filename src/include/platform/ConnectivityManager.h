@@ -59,11 +59,11 @@ constexpr size_t kMaxHardwareAddrSize = 8;
  */
 enum class InterfaceType : uint8_t
 {
-    kInterfaceType_Unspecified = 0x00,
-    kInterfaceType_WiFi        = 0x01,
-    kInterfaceType_Ethernet    = 0x02,
-    kInterfaceType_Cellular    = 0x03,
-    kInterfaceType_Thread      = 0x04,
+    Unspecified = 0x00,
+    WiFi        = 0x01,
+    Ethernet    = 0x02,
+    Cellular    = 0x03,
+    Thread      = 0x04,
 };
 
 struct NetworkInterface
