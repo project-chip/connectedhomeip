@@ -405,6 +405,10 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     PacketHeader header;
     MessageAuthenticationCode mac;
 
+    header.SetSessionId(1);
+    NL_TEST_ASSERT(inSuite, header.IsEncrypted() == true);
+    NL_TEST_ASSERT(inSuite, header.MICTagLength() == 16);
+
     // Let's try encrypting using original session, and decrypting using deserialized
     {
         CryptoContext session1;
@@ -479,7 +483,9 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
     if (Params::resumptionIdLen != 0)
     {
         uint8_t resumptionId[Params::resumptionIdLen];
-        memset(resumptionId, 4, Params::resumptionIdLen);
+
+        // to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
+        (&memset)(resumptionId, 4, Params::resumptionIdLen);
         ReturnErrorOnFailure(
             writer.Put(Params::NumToTag(Params::resumptionIdTag), ByteSpan(resumptionId, Params::resumptionIdLen)));
     }
@@ -487,7 +493,8 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
     if (Params::initiatorResumeMICLen != 0)
     {
         uint8_t initiatorResumeMIC[Params::initiatorResumeMICLen];
-        memset(initiatorResumeMIC, 5, Params::initiatorResumeMICLen);
+        // to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
+        (&memset)(initiatorResumeMIC, 5, Params::initiatorResumeMICLen);
         ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::initiatorResumeMICTag),
                                         ByteSpan(initiatorResumeMIC, Params::initiatorResumeMICLen)));
     }

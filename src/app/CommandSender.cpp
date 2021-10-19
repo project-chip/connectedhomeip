@@ -26,18 +26,14 @@
 #include "Command.h"
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
-#include "protocols/Protocols.h"
-#include "protocols/interaction_model/Constants.h"
-
-#include <protocols/secure_channel/Constants.h>
-
-using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
+#include <protocols/Protocols.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr) :
-    Command(apExchangeMgr), mpCallback(apCallback)
+    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr)
 {}
 
 CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
@@ -52,7 +48,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabric
     SuccessOrExit(err);
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 1, 1, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(timeout);
@@ -145,40 +141,53 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         chip::TLV::TLVReader commandDataReader;
 
         // Default to success when an invoke response is received.
-        StatusElement::Type statusElement{ chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                           chip::Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
-                                           to_underlying(Protocols::InteractionModel::Status::Success) };
-        StatusElement::Parser statusElementParser;
-        err = aCommandElement.GetStatusElement(&statusElementParser);
+        StatusIB statusIB;
+        StatusIB::Parser statusIBParser;
+        err = aCommandElement.GetStatusIB(&statusIBParser);
         if (CHIP_NO_ERROR == err)
         {
-            err = statusElementParser.DecodeStatusElement(statusElement);
+            err = statusIBParser.DecodeStatusIB(statusIB);
         }
         else if (CHIP_END_OF_TLV == err)
         {
             hasDataResponse = true;
             err             = aCommandElement.GetData(&commandDataReader);
         }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "Received malformed Command Response, err=%" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            if (hasDataResponse)
+            {
+                ChipLogProgress(DataManagement,
+                                "Received Command Response Data, Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                                " Command=" ChipLogFormatMEI,
+                                endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+            }
+            else
+            {
+                ChipLogProgress(DataManagement,
+                                "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                                " Command=" ChipLogFormatMEI " Status=0x%" PRIx16,
+                                endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId),
+                                to_underlying(statusIB.mStatus));
+            }
+        }
         SuccessOrExit(err);
 
         if (mpCallback != nullptr)
         {
-            if (statusElement.protocolId == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm())
+            if (statusIB.mStatus == Protocols::InteractionModel::Status::Success)
             {
-                if (statusElement.protocolCode == to_underlying(Protocols::InteractionModel::Status::Success))
-                {
-                    mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId),
-                                           hasDataResponse ? &commandDataReader : nullptr);
-                }
-                else
-                {
-                    mpCallback->OnError(this, static_cast<Protocols::InteractionModel::Status>(statusElement.protocolCode),
-                                        CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
-                }
+                mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId),
+                                       hasDataResponse ? &commandDataReader : nullptr);
             }
             else
             {
-                mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+                mpCallback->OnError(this, statusIB.mStatus, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
             }
         }
     }

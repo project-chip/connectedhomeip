@@ -90,7 +90,11 @@ ip_addr_t IPAddress::ToLwIPAddr(void) const
         break;
 
     default:
+#if INET_CONFIG_ENABLE_IPV4
         ret = *IP_ADDR_ANY;
+#else
+        ret = *IP6_ADDR_ANY;
+#endif
         break;
     }
 

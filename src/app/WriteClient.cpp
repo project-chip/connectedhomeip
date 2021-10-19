@@ -113,14 +113,13 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     while (CHIP_NO_ERROR == (err = attributeStatusListReader.Next()))
     {
         VerifyOrExit(TLV::AnonymousTag == attributeStatusListReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(TLV::kTLVType_Structure == attributeStatusListReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-        AttributeStatusElement::Parser element;
+        AttributeStatusIB::Parser element;
 
         err = element.Init(attributeStatusListReader);
         SuccessOrExit(err);
 
-        err = ProcessAttributeStatusElement(element);
+        err = ProcessAttributeStatusIB(element);
         SuccessOrExit(err);
     }
 
@@ -259,7 +258,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricInde
     ClearExistingExchangeContext();
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(apSecureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(apSecureSession.ValueOr(SessionHandle(aNodeId, 1, 1, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(timeout);
 
@@ -325,18 +324,16 @@ void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     ShutdownInternal();
 }
 
-CHIP_ERROR WriteClient::ProcessAttributeStatusElement(AttributeStatusElement::Parser & aAttributeStatusElement)
+CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePath::Parser attributePath;
-    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
-    uint32_t protocolId                                     = 0;
-    uint16_t protocolCode                                   = 0;
-    StatusElement::Parser statusElementParser;
+    StatusIB statusIB;
+    StatusIB::Parser StatusIBParser;
     AttributePathParams attributePathParams;
 
     mAttributeStatusIndex++;
-    err = aAttributeStatusElement.GetAttributePath(&attributePath);
+    err = aAttributeStatusIB.GetAttributePath(&attributePath);
     SuccessOrExit(err);
     err = attributePath.GetNodeId(&(attributePathParams.mNodeId));
     SuccessOrExit(err);
@@ -364,15 +361,14 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusElement(AttributeStatusElement::Pa
         attributePathParams.mFlags.Set(AttributePathParams::Flags::kListIndexValid);
     }
 
-    err = aAttributeStatusElement.GetStatusElement(&(statusElementParser));
+    err = aAttributeStatusIB.GetStatusIB(&(StatusIBParser));
     if (CHIP_NO_ERROR == err)
     {
-        err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
+        err = StatusIBParser.DecodeStatusIB(statusIB);
         SuccessOrExit(err);
         if (mpDelegate != nullptr)
         {
-            mpDelegate->WriteResponseStatus(this, generalCode, protocolId, protocolCode, attributePathParams,
-                                            mAttributeStatusIndex);
+            mpDelegate->WriteResponseStatus(this, statusIB, attributePathParams, mAttributeStatusIndex);
         }
     }
 

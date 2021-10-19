@@ -16,9 +16,9 @@
  */
 
 #include <app/server/CommissioningWindowManager.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <lib/mdns/Advertiser.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -66,7 +66,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        app::MdnsServer::Instance().AdvertiseOperational();
+        app::DnssdServer::Instance().AdvertiseOperational();
         ChipLogError(AppServer, "Operational advertising enabled");
     }
 }
@@ -86,7 +86,7 @@ void CommissioningWindowManager::Cleanup()
     memset(mECMSalt, 0, sizeof(mECMSalt));
 
     // reset all advertising
-    app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kDisabled);
+    app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kDisabled);
 }
 
 void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
@@ -175,7 +175,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
                                                             mECMPasscodeID, keyID, this));
 
         // reset all advertising, indicating we are in commissioningMode
-        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledEnhanced);
+        app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledEnhanced);
     }
     else
     {
@@ -187,7 +187,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
             ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID, this));
 
         // reset all advertising, indicating we are in commissioningMode
-        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
+        app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledBasic);
     }
 
     return CHIP_NO_ERROR;

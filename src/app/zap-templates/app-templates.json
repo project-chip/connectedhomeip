@@ -30,6 +30,11 @@
     ],
     "templates": [
         {
+            "path": "templates/app/callbacks/PluginApplicationCallbacks.zapt",
+            "name": "Matter Application Callbacks header",
+            "output": "PluginApplicationCallbacks.h"
+        },
+        {
             "path": "templates/app/attribute-size-src.zapt",
             "name": "ZCL attribute-size",
             "output": "attribute-size.cpp"

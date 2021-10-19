@@ -35,7 +35,7 @@
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
-#include "MdnsImpl.h"
+#include "DnssdImpl.h"
 
 using namespace chip;
 
@@ -204,14 +204,14 @@ JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject man
 JNI_METHOD(void, nativeSetServiceResolver)(JNIEnv * env, jclass self, jobject resolver, jobject chipMdnsCallback)
 {
     chip::DeviceLayer::StackLock lock;
-    chip::Mdns::InitializeWithObjects(resolver, chipMdnsCallback);
+    chip::Dnssd::InitializeWithObjects(resolver, chipMdnsCallback);
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)
 (JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle,
  jlong contextHandle)
 {
-    using ::chip::Mdns::HandleResolve;
+    using ::chip::Dnssd::HandleResolve;
     HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
 }
 

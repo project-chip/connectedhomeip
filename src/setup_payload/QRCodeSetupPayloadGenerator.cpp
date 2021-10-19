@@ -31,7 +31,6 @@
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <protocols/Protocols.h>
 
 #include <stdlib.h>

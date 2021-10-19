@@ -49,7 +49,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/AppDelegate.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
@@ -360,10 +360,10 @@ public:
         }
         else if (i == 2)
         {
-            app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
+            app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledBasic);
             chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
             chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
-                kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdnsOnly);
+                kNoCommissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly);
         }
     }
 

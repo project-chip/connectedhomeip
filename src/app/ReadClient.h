@@ -94,6 +94,12 @@ public:
     CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
 
+    auto GetSubscriptionId() const
+    {
+        using returnType = Optional<decltype(mSubscriptionId)>;
+        return mInteractionType == InteractionType::Subscribe ? returnType(mSubscriptionId) : returnType::Missing();
+    }
+
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };

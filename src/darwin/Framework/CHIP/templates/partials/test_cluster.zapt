@@ -13,7 +13,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     dispatch_queue_t queue = dispatch_get_main_queue();
     {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{definedValue}}{{/chip_tests_item_parameters}});
 {{else}}
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTest{{asUpperCamelCase cluster}} * cluster = [[CHIPTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:queue];
     XCTAssertNotNil(cluster);
@@ -27,7 +27,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     NSString * {{asLowerCamelCase name}}Argument= @"{{definedValue}}";
     {{/if}}
     {{else}}
-    {{chipType}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
+    {{chipType}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix type}};
     {{/if}}
     {{/chip_tests_item_parameters}}
     {{#if isCommand}}
@@ -73,7 +73,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         XCTAssertTrue([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asLowerCamelCase name}}Argument]);
         {{/if}}
         {{else}}
-        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix}});
+        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix type}});
         {{/if}}
         {{/if}}
         {{/if}}

@@ -641,6 +641,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     request.MinIntervalSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
         .MaxIntervalSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
+        .KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
         .EndOfSubscribeRequest();
     SuccessOrExit(err = request.GetError());
 

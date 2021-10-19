@@ -14,7 +14,7 @@
 
 import os
 
-from builders.android import AndroidBoard, AndroidBuilder
+from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp, HostBoard
@@ -23,6 +23,7 @@ from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
+from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 
 
 class Target:
@@ -73,21 +74,29 @@ def HostTargets():
             HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName()):
         targets.append(target.Extend('arm64', board=HostBoard.ARM64))
 
+    app_targets = []
     for target in targets:
-        yield target.Extend('all-clusters', app=HostApp.ALL_CLUSTERS)
-        yield target.Extend('chip-tool', app=HostApp.CHIP_TOOL)
-        yield target.Extend('thermostat', app=HostApp.THERMOSTAT)
+        app_targets.append(target.Extend(
+            'all-clusters', app=HostApp.ALL_CLUSTERS))
+        app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
+        app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
+
+    for target in app_targets:
+        yield target
+        yield target.Extend('ipv6only', enable_ipv4=False)
 
 
 def Esp32Targets():
-    target = Target('esp32', Esp32Builder)
+    esp32_target = Target('esp32', Esp32Builder)
 
-    yield target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
-    yield target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
+    yield esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
+    yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
+    yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
-    devkitc = target.Extend('devkitc', board=Esp32Board.DevKitC)
+    devkitc = esp32_target.Extend('devkitc', board=Esp32Board.DevKitC)
 
     yield devkitc.Extend('all-clusters', app=Esp32App.ALL_CLUSTERS)
+    yield devkitc.Extend('all-clusters-ipv6only', app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
     yield devkitc.Extend('shell', app=Esp32App.SHELL)
     yield devkitc.Extend('lock', app=Esp32App.LOCK)
     yield devkitc.Extend('bridge', app=Esp32App.BRIDGE)
@@ -129,10 +138,17 @@ def NrfTargets():
 def AndroidTargets():
     target = Target('android', AndroidBuilder)
 
-    yield target.Extend('arm-chip-tool', board=AndroidBoard.ARM)
-    yield target.Extend('arm64-chip-tool', board=AndroidBoard.ARM64)
-    yield target.Extend('x64-chip-tool', board=AndroidBoard.X64)
-    yield target.Extend('x86-chip-tool', board=AndroidBoard.X86)
+    yield target.Extend('arm-chip-tool', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('arm64-chip-tool', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('x64-chip-tool', board=AndroidBoard.X64, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('x86-chip-tool', board=AndroidBoard.X86, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('arm64-chip-test', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TEST)
+    # TODO: android studio build is broken:
+    #   - When compile succeeds, build artifact copy fails with "No such file or
+    #     directory: '<out_prefix>/android-androidstudio-chip-tool/outputs/apk/debug/app-debug.apk'
+    #   - Compiling locally in the vscode image fails with
+    #     "2 files found with path 'lib/armeabi-v7a/libCHIPController.so'"
+    # yield target.Extend('androidstudio-chip-tool', board=AndroidBoard.AndroidStudio, app=AndroidApp.CHIP_TOOL)
 
 
 ALL = []
@@ -157,6 +173,8 @@ ALL.append(Target('infineon-p6-lock', InfineonBuilder,
                   board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK))
 ALL.append(Target('tizen-arm-light', TizenBuilder,
                   board=TizenBoard.ARM, app=TizenApp.LIGHT))
+ALL.append(Target('ameba-amebad-all-clusters', AmebaBuilder,
+                  board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)

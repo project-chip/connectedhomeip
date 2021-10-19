@@ -17,11 +17,11 @@
 
 #include <lib/shell/Engine.h>
 
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -56,7 +56,7 @@ CHIP_ERROR cmd_log(int argc, char ** argv)
 
 CHIP_ERROR cmd_rand(int argc, char ** argv)
 {
-    streamer_printf(streamer_get(), "%d\n\r", GetRandU8());
+    streamer_printf(streamer_get(), "%d\n\r", static_cast<int>(chip::Crypto::GetRandU8()));
     return CHIP_NO_ERROR;
 }
 

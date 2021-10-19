@@ -809,6 +809,9 @@ class DeviceMgrCmd(Cmd):
         """
         To subscribe ZCL attribute reporting:
         zclsubscribe <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval>
+
+        To shut down a subscription:
+        zclsubscribe -shutdown <subscriptionId>
         """
         try:
             args = shlex.split(line)
@@ -826,6 +829,9 @@ class DeviceMgrCmd(Cmd):
                     raise exceptions.UnknownCluster(args[0])
                 self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), int(args[5]))
+            elif len(args) == 2 and args[0] == '-shutdown':
+                subscriptionId = int(args[1], base=0)
+                self.devCtrl.ZCLShutdownSubscription(subscriptionId)
             else:
                 self.do_help("zclsubscribe")
         except exceptions.ChipStackException as ex:

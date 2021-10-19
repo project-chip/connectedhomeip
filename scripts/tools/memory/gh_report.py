@@ -222,11 +222,11 @@ class SizeDatabase(memdf.util.sqlite.Database):
         origin = {'file': filename}
         path = Path(filename)
         if path.suffix == '.json':
-            logging.info('Reading JSON %s', path)
+            logging.info('ASJ: reading JSON %s', path)
             with open(path) as f:
                 self.add_sizes_from_json(f.read(), origin)
         elif path.suffix == '.zip':
-            logging.info('Reading ZIP %s', path)
+            logging.info('ASZ: reading ZIP %s', path)
             self.add_sizes_from_zipfile(path, origin)
         else:
             logging.warning('Unknown file type "%s" ignored', filename)
@@ -239,13 +239,13 @@ class SizeDatabase(memdf.util.sqlite.Database):
         artifact_limit = self.config['github.limit-artifacts']
         artifact_pages = self.config['github.limit-artifact-pages']
 
-        # Size artifacts have names of the form
+        # Size artifacts have names of the form:
         #   Size,{group},{pr},{commit_hash},{parent_hash}
         # Record them keyed by group and commit_hash to match them up
         # after we have the entire list.
         page = 0
         size_artifacts: Dict[str, Dict[str, fastcore.basics.AttrDict]] = {}
-        for i in ghapi.all.paged(self.gh.actions.list_artifacts_for_repo):
+        for i in ghapi.all.paged(self.gh.actions.list_artifacts_for_repo, 100):
             if not i.artifacts:
                 break
             for a in i.artifacts:
@@ -258,19 +258,20 @@ class SizeDatabase(memdf.util.sqlite.Database):
                     if group not in size_artifacts:
                         size_artifacts[group] = {}
                     size_artifacts[group][commit] = a
+                    logging.debug('ASG: artifact %d %s', a.id, a.name)
             page += 1
-            logging.debug('Artifact list page %d of %d', page, artifact_pages)
+            logging.debug('ASP: artifact page %d of %d', page, artifact_pages)
             if artifact_pages and page >= artifact_pages:
                 break
 
         # Determine required size artifacts.
         required_artifact_ids: set[int] = set()
         for group, group_reports in size_artifacts.items():
-            logging.info('Group %s', group)
+            logging.info('ASG: group %s', group)
             for report in group_reports.values():
                 if self.config['report.pr' if report.pr else 'report.push']:
                     if report.parent not in group_reports:
-                        logging.info('  No match for %s', report.name)
+                        logging.info('ASN:  No match for %s', report.name)
                         continue
                     if (artifact_limit
                             and len(required_artifact_ids) >= artifact_limit):
@@ -280,13 +281,13 @@ class SizeDatabase(memdf.util.sqlite.Database):
                     parent = group_reports[report.parent]
                     required_artifact_ids.add(report.id)
                     required_artifact_ids.add(parent.id)
-                    logging.info('  Match %s', report.parent)
-                    logging.info('    %s %s', report.id, report.name)
-                    logging.info('    %s %s', parent.id, parent.name)
+                    logging.info('ASM:  Match %s', report.parent)
+                    logging.info('ASR:    %s %s', report.id, report.name)
+                    logging.info('ASP:    %s %s', parent.id, parent.name)
 
         # Download and add required artifacts.
         for i in required_artifact_ids:
-            logging.debug('Download artifact %d', i)
+            logging.debug('ASD: download artifact %d', i)
             try:
                 blob = self.gh.actions.download_artifact(i, 'zip')
             except Exception as e:
@@ -307,7 +308,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
                 FROM build c
                 INNER JOIN build p ON p.hash = c.parent
                 WHERE c.commented = 0
-                ORDER BY c.pr, c.hash, p.hash ASC
+                ORDER BY c.time DESC, c.pr, c.hash, p.hash
             ''')
 
     def set_commented(self, build_ids: Iterable[int]):
@@ -324,7 +325,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         if not build_ids:
             return
         for build_id in build_ids:
-            logging.info('Deleting obsolete build %d', build_id)
+            logging.info('DSB: deleting obsolete build %d', build_id)
             self.execute('DELETE FROM size WHERE build_id = ?', (build_id, ))
             self.execute('DELETE FROM build WHERE id = ?', (build_id, ))
         self.commit()
@@ -337,7 +338,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
     def delete_stale_artifacts(self, stale_artifacts: Iterable[int]):
         if not self.config['github.keep']:
             for artifact_id in stale_artifacts:
-                logging.info('Deleting obsolete artifact %d', artifact_id)
+                logging.info('DSA: deleting obsolete artifact %d', artifact_id)
                 self.delete_artifact(artifact_id)
 
 
@@ -383,10 +384,11 @@ def changes_for_commit(db: SizeDatabase, pr: int, commit: str,
            pb.id AS parent_build,
            cb.id AS commit_build,
            t.platform, t.config, t.target,
-           cs.name,
+           cs.name AS name,
            ps.size AS parent_size,
            cs.size AS commit_size,
-           cs.size - ps.size AS change
+           cs.size - ps.size AS change,
+           cb.time AS time
          FROM thing t
          INNER JOIN build cb ON cb.thing_id = t.id
          INNER JOIN build pb ON pb.thing_id = t.id AND pb.hash = cb.parent
@@ -434,9 +436,9 @@ def changes_for_commit(db: SizeDatabase, pr: int, commit: str,
                       columns=('platform', 'target', 'config', 'section',
                                parent[:8], commit[:8], 'change', '% change'))
     df.attrs = {
-        'name': f'{pr},{commit},{parent}',
+        'name': f'{pr},{parent},{commit}',
         'title': (f'PR #{pr}: ' if pr else '') +
-        f'Size comparison from {commit} to {parent}',
+        f'Size comparison from {parent} to {commit}',
         'things': things,
         'builds': builds,
         'artifacts': artifacts,
@@ -476,7 +478,8 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame,
                               tabulate={'floatfmt': '5.1f'})
 
     count = len(df.attrs['things'])
-    summary = f'{count} build{"" if count == 1 else "s"}'
+    platforms = ', '.join(sorted(list(set(df['platform']))))
+    summary = f'{count} build{"" if count == 1 else "s"} (for {platforms})'
     md.write(f'\n<details>\n<summary>{summary}</summary>\n\n')
     memdf.report.write_df(db.config,
                           df,
@@ -493,7 +496,7 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame,
         comment = f'updating comment {existing_comment_id}'
     else:
         comment = 'as new comment'
-    logging.info('%s for %s %s', df.attrs['title'], summary, comment)
+    logging.info('SCR: %s for %s %s', df.attrs['title'], summary, comment)
 
     if db.config['github.dryrun-comment']:
         return False
@@ -518,10 +521,14 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
     comment_enabled = (db.config['github.comment']
                        or db.config['github.dryrun-comment'])
 
+    report_push = db.config['report.push']
+    report_pr = db.config['report.pr']
+
     dfs = {}
     for pr, commit, parent in db.select_matching_commits().fetchall():
-        if not db.config['report.pr' if pr else 'report.push']:
+        if not (report_pr if pr else report_push):
             continue
+
         df = changes_for_commit(db, pr, commit, parent)
         dfs[df.attrs['name']] = df
 
@@ -534,7 +541,7 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
             parent = df.attrs['parent']
             tdf.attrs['name'] = f'L,{commit},{parent}'
             tdf.attrs['title'] = (
-                f'Increases above {threshold:.1f}% from {commit} to {parent}')
+                f'Increases above {threshold:.1f}% from {parent} to {commit}')
             dfs[tdf.attrs['name']] = tdf
 
         if (pr and comment_enabled
@@ -547,7 +554,7 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
                 db.set_commented(df.attrs['builds'])
                 if not db.config['github.keep']:
                     for artifact_id in df.attrs['artifacts']:
-                        logging.info('Deleting artifact %d', artifact_id)
+                        logging.info('RMC: deleting artifact %d', artifact_id)
                         db.delete_artifact(artifact_id)
     return dfs
 

@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -51,7 +51,7 @@ constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
 
 CommissionableNodeController gCommissionableNodeController;
 chip::System::SocketWatchToken gToken;
-Mdns::DiscoveryFilter gDiscoveryFilter = Mdns::DiscoveryFilter();
+Dnssd::DiscoveryFilter gDiscoveryFilter = Dnssd::DiscoveryFilter();
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -62,7 +62,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         long deviceType = strtol(aValue, &endPtr, 10);
         if (*endPtr == '\0' && deviceType > 0 && CanCastTo<uint16_t>(deviceType))
         {
-            gDiscoveryFilter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(deviceType));
+            gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(deviceType));
             return true;
         }
         else
@@ -71,7 +71,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             {
                 if (strcasecmp(aValue, kKnownDeviceTypes[i].name) == 0)
                 {
-                    gDiscoveryFilter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, kKnownDeviceTypes[i].id);
+                    gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, kKnownDeviceTypes[i].id);
                     return true;
                 }
             }
@@ -105,7 +105,7 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
  * If non-null selectedCommissioner is provided, sends user directed commissioning
  * request to the selectedCommissioner and advertises self as commissionable node over DNS-SD
  */
-void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommissioner = nullptr)
+void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr)
 {
     // Enter commissioning mode, open commissioning window
     Server::GetInstance().Init();
@@ -120,7 +120,7 @@ void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommission
     if (selectedCommissioner != nullptr)
     {
         // Advertise self as Commissionable Node over mDNS
-        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
+        app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledBasic);
 
         // Send User Directed commissioning request
         ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
@@ -143,7 +143,7 @@ void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data
     printf("%d\n", selectedCommissionerNumber);
     chip::DeviceLayer::SystemLayerSockets().StopWatchingSocket(&gToken);
 
-    const Mdns::DiscoveredNodeData * selectedCommissioner =
+    const Dnssd::DiscoveredNodeData * selectedCommissioner =
         gCommissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
     VerifyOrReturn(selectedCommissioner != nullptr, ChipLogError(AppServer, "No such commissioner!"));
     PrepareForCommissioning(selectedCommissioner);
@@ -156,7 +156,7 @@ void InitCommissioningFlow(intptr_t commandArg)
     // Display discovered commissioner TVs to ask user to select one
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
-        const Mdns::DiscoveredNodeData * commissioner = gCommissionableNodeController.GetDiscoveredCommissioner(i);
+        const Dnssd::DiscoveredNodeData * commissioner = gCommissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
             ChipLogProgress(AppServer, "Discovered Commissioner #%d", ++commissionerCount);

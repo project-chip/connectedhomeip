@@ -34,14 +34,14 @@ namespace app {
 namespace SubscribeRequest {
 enum
 {
-    kCsTag_AttributePathList         = 0,
-    kCsTag_EventPathList             = 1,
-    kCsTag_AttributeDataVersionList  = 2,
-    kCsTag_EventNumber               = 3,
-    kCsTag_MinIntervalSeconds        = 4,
-    kCsTag_MaxIntervalSeconds        = 5,
-    kCsTag_KeepExistingSubscriptions = 6,
-    kCsTag_IsProxy                   = 7,
+    kCsTag_AttributePathList        = 0,
+    kCsTag_EventPathList            = 1,
+    kCsTag_AttributeDataVersionList = 2,
+    kCsTag_EventNumber              = 3,
+    kCsTag_MinIntervalSeconds       = 4,
+    kCsTag_MaxIntervalSeconds       = 5,
+    kCsTag_KeepSubscriptions        = 6,
+    kCsTag_IsProxy                  = 7,
 };
 
 class Parser : public chip::app::Parser
@@ -118,7 +118,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetKeepExistingSubscriptions(bool * const apKeepExistingSubscription) const;
+    CHIP_ERROR GetKeepSubscriptions(bool * const apKeepExistingSubscription) const;
 
     /**
      *  @brief Check if subscription is kept. Next() must be called before accessing them.
@@ -159,7 +159,7 @@ public:
      *  @brief This is set to 'true' by the subscriber to indicate preservation of previous subscriptions. If omitted, it implies
      * 'false' as a value.
      */
-    SubscribeRequest::Builder & KeepExistingSubscriptions(const bool aKeepExistingSubscriptions);
+    SubscribeRequest::Builder & KeepSubscriptions(const bool aKeepSubscriptions);
 
     /**
      *  @brief This is set to true by the subscriber if it is a proxy-type device proxying for another client. This

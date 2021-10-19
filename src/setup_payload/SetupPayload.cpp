@@ -28,7 +28,6 @@
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <utility>
 
 namespace chip {

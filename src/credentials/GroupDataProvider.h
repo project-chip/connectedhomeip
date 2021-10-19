@@ -176,29 +176,32 @@ public:
     virtual void Finish()     = 0;
 
     // Endpoints
-    virtual bool GroupMappingExists(chip::FabricIndex fabric_index, GroupMapping & mapping)                       = 0;
-    virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping, const char * name) = 0;
-    virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping)                 = 0;
-    virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index)                                     = 0;
-    virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)      = 0;
+    virtual bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping)                       = 0;
+    virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping, const char * name) = 0;
+    virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping)                 = 0;
+    virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index)                                           = 0;
+    virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)            = 0;
 
     // States
-    virtual CHIP_ERROR SetGroupState(uint16_t state_index, const GroupState & state) = 0;
-    virtual CHIP_ERROR GetGroupState(uint16_t state_index, GroupState & state)       = 0;
-    virtual CHIP_ERROR RemoveGroupState(uint16_t state_index)                        = 0;
-    virtual GroupStateIterator * IterateGroupStates()                                = 0;
-    virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index)  = 0;
+    virtual CHIP_ERROR SetGroupState(size_t state_index, const GroupState & state)  = 0;
+    virtual CHIP_ERROR GetGroupState(size_t state_index, GroupState & state)        = 0;
+    virtual CHIP_ERROR RemoveGroupState(size_t state_index)                         = 0;
+    virtual GroupStateIterator * IterateGroupStates()                               = 0;
+    virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index) = 0;
 
     // Keys
-    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys) = 0;
-    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys) = 0;
-    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index)             = 0;
-    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index)                             = 0;
+    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, const KeySet & keys) = 0;
+    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys)       = 0;
+    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index)                   = 0;
+    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index)                                   = 0;
 
+    // Fabrics
+    virtual CHIP_ERROR RemoveFabric(chip::FabricIndex fabric_index) = 0;
+
+    // Listener
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
 
-    // TODO: handle fabric deletion (reindex fabric entries!)
 protected:
     GroupListener * mListener = nullptr;
 };

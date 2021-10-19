@@ -574,10 +574,39 @@ chip-device-ctrl > zclwrite TestCluster CharString 1 1 0 233233
 Note: The format of the value is the same as the format of argument values for
 ZCL cluster commands.
 
-### `zclconfigure <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval> <Change>`
+### `zclsubscribe <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval>`
 
 Configure ZCL attribute reporting settings. For example:
 
 ```
-chip-device-ctrl > zclconfigure OccupancySensing Occupancy 1234 1 0 1000 2000 1
+chip-device-ctrl > zclsubscribe OccupancySensing Occupancy 1234 1 10 20
 ```
+
+### `zclsubscribe -shutdown <subscription id>`
+
+Shutdown an existing attribute subscription.
+
+```
+chip-device-ctrl > zclsubscribe -shutdown 0xdeadbeefcafe
+```
+
+The subscription id can be obtained from previous subscription messages:
+
+```
+chip-device-ctrl > zclsubscribe OnOff OnOff 1 1 10 20
+(omitted messages)
+[1633922898.965587][1117858:1117866] CHIP:DMG: SubscribeResponse =
+[1633922898.965599][1117858:1117866] CHIP:DMG: {
+[1633922898.965610][1117858:1117866] CHIP:DMG:  SubscriptionId = 0xdeadbeefcafe,
+[1633922898.965622][1117858:1117866] CHIP:DMG:  MinIntervalFloorSeconds = 0xa,
+[1633922898.965633][1117858:1117866] CHIP:DMG:  MaxIntervalCeilingSeconds = 0x14,
+[1633922898.965644][1117858:1117866] CHIP:DMG: }
+[1633922898.965662][1117858:1117866] CHIP:ZCL: SubscribeResponse:
+[1633922898.965673][1117858:1117866] CHIP:ZCL:   SubscriptionId:        0xdeadbeefcafe
+[1633922898.965683][1117858:1117866] CHIP:ZCL:   ApplicationIdentifier: 0
+[1633922898.965694][1117858:1117866] CHIP:ZCL:   status: EMBER_ZCL_STATUS_SUCCESS (0x00)
+[1633922898.965709][1117858:1117866] CHIP:ZCL:   attributeValue: false
+(omitted messages)
+```
+
+The subscription id is `0xdeadbeefcafe` in this case

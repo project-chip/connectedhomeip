@@ -179,7 +179,7 @@ function chip_endpoint_generated_functions()
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
@@ -191,7 +191,7 @@ function chip_endpoint_generated_functions()
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
@@ -310,20 +310,33 @@ function asPrintFormat(type)
 
 function asTypeLiteralSuffix(type)
 {
-  switch (type) {
-  case 'int32_t':
-    return 'L';
-  case 'int64_t':
-    return 'LL';
-  case 'uint16_t':
-    return 'U';
-  case 'uint32_t':
-    return 'UL';
-  case 'uint64_t':
-    return 'ULL';
-  default:
-    return '';
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
+      case 'int32_t':
+        return 'L';
+      case 'int64_t':
+        return 'LL';
+      case 'uint16_t':
+        return 'U';
+      case 'uint32_t':
+        return 'UL';
+      case 'uint64_t':
+        return 'ULL';
+      default:
+        return '';
+      }
+    })
   }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
+  return templateUtil.templatePromise(this.global, promise)
 }
 
 function hasSpecificAttributes(options)
@@ -376,84 +389,48 @@ function asMEI(prefix, suffix)
  * These types can be found in src/app/data-model/.
  *
  */
-function zapTypeToClusterObjectType(type, isDecodable)
+async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
-  if (StringHelper.isOctetString(type)) {
-    return 'chip::ByteSpan';
-  }
-
   if (StringHelper.isCharString(type)) {
-    return 'Span<const char>';
+    return 'chip::Span<const char>';
   }
 
-  switch (type) {
-  case 'BOOLEAN':
-    return 'bool';
-  case 'INT8S':
-    return 'int8_t';
-  case 'INT16S':
-    return 'int16_t';
-  case 'INT24S':
-    return 'int24_t';
-  case 'INT32S':
-    return 'int32_t';
-  case 'INT64S':
-    return 'int64_t';
-  case 'INT8U':
-    return 'uint8_t';
-  case 'INT16U':
-    return 'uint16_t';
-  case 'INT24U':
-    return 'uint24_t';
-  case 'INT32U':
-    return 'uint32_t';
-  case 'INT64U':
-    return 'uint64_t';
+  if (type == 'single') {
+    return 'float';
   }
 
-  function fn(pkgId)
+  async function fn(pkgId)
   {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'bool':
-      case 'int8_t':
-      case 'uint8_t':
-      case 'int16_t':
-      case 'uint16_t':
-      case 'int24_t':
-      case 'uint24_t':
-      case 'int32_t':
-      case 'uint32_t':
-      case 'int64_t':
-      case 'uint64_t':
-        return zclType;
-      default:
-        if (isDecodable) {
-          return type + '::DecodableType'
-        } else {
-          return type + '::Type'
-        }
-      }
-    })
+    const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
+    const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+    if (await typeChecker('isEnum')) {
+      return ns + type;
+    }
+
+    if (await typeChecker('isBitmap')) {
+      return 'chip::BitFlags<' + ns + type + '>';
+    }
+
+    if (await typeChecker('isStruct')) {
+      return ns + 'Structs::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
+    }
+
+    return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
-    console.log(err);
-    throw err;
-  });
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function zapTypeToEncodableClusterObjectType(type)
+function zapTypeToEncodableClusterObjectType(type, options)
 {
-  return zapTypeToClusterObjectType.call(this, type, false)
+  return zapTypeToClusterObjectType.call(this, type, false, options)
 }
 
-function zapTypeToDecodableClusterObjectType(type)
+function zapTypeToDecodableClusterObjectType(type, options)
 {
-  return zapTypeToClusterObjectType.call(this, type, true)
+  return zapTypeToClusterObjectType.call(this, type, true, options)
 }
 
 //

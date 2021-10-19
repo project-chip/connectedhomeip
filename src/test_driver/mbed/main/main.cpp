@@ -32,7 +32,8 @@ int main()
 {
     mbed_logging_init();
 
-    ChipLogProgress(NotSpecified, "Starting CHIP tests!");
+    ChipLogProgress(NotSpecified, "Mbed unit-tests application start");
+
     ChipLogProgress(NotSpecified, "Connect to the network...");
     auto interface = WiFiInterface::get_default_instance();
     if (interface != nullptr)
@@ -59,6 +60,8 @@ int main()
     {
         ChipLogProgress(NotSpecified, "WARNING: WiFi interface not available");
     }
+
+    ChipLogProgress(NotSpecified, "Mbed unit-tests application run");
 
     int status = RunRegisteredUnitTests();
     ChipLogProgress(NotSpecified, "CHIP test status: %d", status);

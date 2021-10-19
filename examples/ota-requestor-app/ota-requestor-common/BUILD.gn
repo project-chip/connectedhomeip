@@ -35,5 +35,7 @@ chip_data_model("ota-requestor-common") {
     "BDXDownloader.h",
   ]
 
+  is_server = true
+
   public_configs = [ ":config" ]
 }

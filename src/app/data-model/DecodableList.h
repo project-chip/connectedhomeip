@@ -134,6 +134,8 @@ private:
 template <typename X>
 CHIP_ERROR Decode(TLV::TLVReader & reader, DecodableList<X> & x)
 {
+    VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
+
     TLV::TLVType type;
 
     ReturnErrorOnFailure(reader.EnterContainer(type));

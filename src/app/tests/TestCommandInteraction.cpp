@@ -86,8 +86,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     {
         if (aCommandPath.mCommandId == kTestCommandId)
         {
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
         }
         else
         {
@@ -125,11 +124,10 @@ public:
                       aPath.mClusterId, aPath.mCommandId, aPath.mEndpointId);
         onResponseCalledTimes++;
     }
-    void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aProtocolCode,
+    void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aStatus,
                  CHIP_ERROR aError) override
     {
-        ChipLogError(Controller, "OnError happens with %" PRIx16 " %" CHIP_ERROR_FORMAT, to_underlying(aProtocolCode),
-                     aError.Format());
+        ChipLogError(Controller, "OnError happens with %" PRIx16 " %" CHIP_ERROR_FORMAT, to_underlying(aStatus), aError.Format());
         onErrorCalledTimes++;
     }
     void OnDone(chip::app::CommandSender * apCommandSender) override { onFinalCalledTimes++; }
@@ -276,8 +274,7 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
                                                    3, // ClusterId
                                                    4  // CommandId
         );
-        apCommand->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-                                 Protocols::InteractionModel::Status::Success);
+        apCommand->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     }
     else
     {
@@ -310,7 +307,7 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
     CHIP_ERROR err         = CHIP_NO_ERROR;
     auto commandPathParams = MakeTestCommandPath();
 
-    app::CommandHandler commandHandler(gExchangeManager, &mockCommandHandlerDelegate);
+    app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
 
     err = commandHandler.PrepareCommand(commandPathParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -346,7 +343,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     CHIP_ERROR err         = CHIP_NO_ERROR;
     auto commandPathParams = MakeTestCommandPath();
 
-    app::CommandHandler commandHandler(gExchangeManager, &mockCommandHandlerDelegate);
+    app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     auto exchangeCtx             = gExchangeManager->NewContext(SessionHandle(0, 0, 0, 0), nullptr);
@@ -378,7 +375,7 @@ void TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg(nlTestSuite
 void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    app::CommandHandler commandHandler(gExchangeManager, &mockCommandHandlerDelegate);
+    app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     System::PacketBufferHandle commandPacket;
 
     auto exchangeCtx = gExchangeManager->NewContext(SessionHandle(0, 0, 0, 0), nullptr);
@@ -412,7 +409,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestS
 
 struct Fields
 {
-    static constexpr chip::CommandId CommandId = 4;
+    static constexpr chip::CommandId GetCommandId() { return 4; }
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     {
         TLV::TLVType outerContainerType;
@@ -425,7 +422,7 @@ struct Fields
 void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    app::CommandHandler commandHandler(gExchangeManager, nullptr);
+    app::CommandHandler commandHandler(nullptr);
     System::PacketBufferHandle commandPacket;
 
     commandHandler.mpExchangeCtx = gExchangeManager->NewContext(SessionHandle(0, 0, 0, 0), nullptr);
@@ -461,7 +458,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode(nlTestSu
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    app::CommandHandler commandHandler(gExchangeManager, &mockCommandHandlerDelegate);
+    app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     GenerateReceivedCommand(apSuite, apContext, commandDatabuf, true /*aNeedCommandData*/);
@@ -472,7 +469,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuit
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    app::CommandHandler commandHandler(gExchangeManager, &mockCommandHandlerDelegate);
+    app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     // Use some invalid endpoint / cluster / command.
@@ -489,7 +486,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistComman
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    app::CommandHandler commandHandler(gExchangeManager, &mockCommandHandlerDelegate);
+    app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     chip::isCommandDispatched = false;

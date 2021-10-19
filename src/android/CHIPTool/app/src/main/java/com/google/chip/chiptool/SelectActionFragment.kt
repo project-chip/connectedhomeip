@@ -56,6 +56,7 @@ class SelectActionFragment : Fragment() {
       opCredClustersBtn.setOnClickListener{ getCallback()?.handleOpCredClicked() }
       basicClusterBtn.setOnClickListener{ getCallback()?.handleBasicClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
+      clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
     }
   }
 
@@ -122,6 +123,8 @@ class SelectActionFragment : Fragment() {
     fun handleAttestationTestClicked()
     /** Notifies listener of a click to manually input the CHIP device address.. */
     fun onShowDeviceAddressInput()
+    /** Notifies listener of cluster interaction button click.. */
+    fun handleClusterInteractionClicked()
   }
 
   companion object {

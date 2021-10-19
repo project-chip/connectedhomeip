@@ -11,8 +11,10 @@
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
 
 /** @brief Cluster Init
  *
@@ -67,39 +69,17 @@ void emberAf{{asUpperCamelCase label}}ClusterClientInitCallback(chip::EndpointId
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAf{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void Matter{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief {{label}} Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAf{{asUpperCamelCase label}}ClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief {{label}} Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAf{{asUpperCamelCase label}}ClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief {{label}} Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAf{{asUpperCamelCase label}}ClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void Matter{{asUpperCamelCase label}}ClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief {{label}} Cluster Server Message Sent
  *
@@ -129,25 +109,23 @@ void emberAf{{asUpperCamelCase label}}ClusterClientMessageSentCallback(const chi
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAf{{asUpperCamelCase label}}ClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status Matter{{asUpperCamelCase label}}ClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief {{label}} Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAf{{asUpperCamelCase label}}ClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status Matter{{asUpperCamelCase label}}ClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief {{label}} Cluster Server Tick
  *
@@ -177,11 +155,11 @@ void emberAf{{asUpperCamelCase label}}ClusterClientTickCallback(chip::EndpointId
  {{#if (isServer source)}}
 bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::EndpointId endpoint,
        chip::app::CommandSender * commandObj
-       {{#zcl_command_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/zcl_command_arguments}});
+       {{#zcl_command_arguments}}, {{#if isArray}}{{asUnderlyingZclType type}}{{else}}{{#if_is_struct type}}{{zapTypeToDecodableClusterObjectType type ns=parent.parent.label}}{{else}}{{asUnderlyingZclType type}}{{/if_is_struct}}{{/if}} {{asSymbol label}}{{/zcl_command_arguments}});
  {{else}}
 bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::app::CommandHandler * commandObj,
-      const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-      {{#zcl_command_arguments}}{{asUnderlyingZclType type}} {{asSymbol label}},{{/zcl_command_arguments}} chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & fields);
+      const chip::app::ConcreteCommandPath & commandPath,
+      const chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & commandData);
 {{/if}}
 {{/zcl_commands}}
 {{/zcl_clusters}}
@@ -289,34 +267,6 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * detected in the received command.  Ver.: always
  */
 bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status);
-
-/** @brief Configure Reporting Response
- *
- * This function is called by the application framework when a Configure
- * Reporting Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute status records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfConfigureReportingResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
-
-/** @brief Read Reporting Configuration Response
- *
- * This function is called by the application framework when a Read Reporting
- * Configuration Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute reporting configuration
- * records.  Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief Discover Attributes Response
  *
@@ -433,45 +383,6 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
 bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief Pre Attribute Change
- *
- * This function is called by the application framework before it changes an
- * attribute value.  The value passed into this callback is the value to which
- * the attribute is to be set by the framework.  The application should return
- * ::EMBER_ZCL_STATUS_SUCCESS to permit the change or any other ::EmberAfStatus
- * to reject it.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size,
-                                                uint8_t * value);
-
-/** @brief Post Attribute Change
- *
- * This function is called by the application framework after it changes an
- * attribute value. The value passed into this callback is the value to which
- * the attribute was set by the framework.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
-
 /** @brief External Attribute Read
  *
  * Like emberAfExternalAttributeWriteCallback above, this function is called
@@ -564,19 +475,6 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, c
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                     uint8_t * buffer, int32_t index = -1);
 
-/** @brief Report Attributes
- *
- * This function is called by the application framework when a Report Attributes
- * command is received from an external device.  The application should return
- * true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this command.  Ver.: always
- * @param buffer Buffer containing the list of attribute report records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfReportAttributesCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
-
 /** @brief Get Current Time
  *
  * This callback is called when device attempts to get current time from the
@@ -634,3 +532,35 @@ EmberStatus emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, u
  *
  */
 bool emberAfStartMoveCallback();
+
+/** @brief Pre Attribute Change
+ *
+ * This function is called by the application framework before it changes an
+ * attribute value.  The value passed into this callback is the value to which
+ * the attribute is to be set by the framework.  The application should return
+ * chip::Protocols::InteractionModel::Status::Success to permit the change or
+ * any other code to reject it.
+ *
+ * @param attributePath
+ * @param mask
+ * @param type
+ * @param size
+ * @param value
+ */
+chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                           uint8_t mask, uint8_t type, uint16_t size, uint8_t * value);
+
+/** @brief Post Attribute Change
+ *
+ * This function is called by the application framework after it changes an
+ * attribute value. The value passed into this callback is the value to which
+ * the attribute was set by the framework.
+ *
+ * @param attributePath
+ * @param mask
+ * @param type
+ * @param size
+ * @param value
+ */
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                       uint8_t mask, uint8_t type, uint16_t size, uint8_t * value);

@@ -18,9 +18,9 @@
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/PeerId.h>
-#include <lib/mdns/Advertiser.h>
-#include <lib/mdns/Resolver.h>
-#include <lib/mdns/platform/Mdns.h>
+#include <lib/dnssd/Advertiser.h>
+#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/platform/Dnssd.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
@@ -37,10 +37,10 @@ namespace {
 Shell::Engine sShellDnsBrowseSubcommands;
 Shell::Engine sShellDnsSubcommands;
 
-class DnsShellResolverDelegate : public Mdns::ResolverDelegate
+class DnsShellResolverDelegate : public Dnssd::ResolverDelegate
 {
 public:
-    void OnNodeIdResolved(const Mdns::ResolvedNodeData & nodeData) override
+    void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\n",
                         ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
@@ -63,7 +63,7 @@ public:
 
     void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
 
-    void OnNodeDiscoveryComplete(const Mdns::DiscoveredNodeData & nodeData) override
+    void OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData) override
     {
         if (!nodeData.IsValid())
         {
@@ -71,7 +71,7 @@ public:
             return;
         }
 
-        char rotatingId[Mdns::kMaxRotatingIdLen * 2 + 1];
+        char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1];
         Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
 
         streamer_printf(streamer_get(), "DNS browse succeeded: \n");
@@ -121,10 +121,10 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
     peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
     peerId.SetNodeId(strtoull(argv[1], NULL, 10));
 
-    return Mdns::Resolver::Instance().ResolveNodeId(peerId, Inet::kIPAddressType_Any);
+    return Dnssd::Resolver::Instance().ResolveNodeId(peerId, Inet::kIPAddressType_Any);
 }
 
-bool ParseSubType(int argc, char ** argv, Mdns::DiscoveryFilter & filter)
+bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
 {
     if (argc == 0)
     {
@@ -139,24 +139,24 @@ bool ParseSubType(int argc, char ** argv, Mdns::DiscoveryFilter & filter)
     VerifyOrReturnError(strlen(subtype) >= 3, false);
     VerifyOrReturnError(subtype[0] == '_', false);
 
-    auto filterType = Mdns::DiscoveryFilterType::kNone;
+    auto filterType = Dnssd::DiscoveryFilterType::kNone;
 
     switch (subtype[1])
     {
     case 'S':
-        filterType = Mdns::DiscoveryFilterType::kShort;
+        filterType = Dnssd::DiscoveryFilterType::kShort;
         break;
     case 'L':
-        filterType = Mdns::DiscoveryFilterType::kLong;
+        filterType = Dnssd::DiscoveryFilterType::kLong;
         break;
     case 'V':
-        filterType = Mdns::DiscoveryFilterType::kVendor;
+        filterType = Dnssd::DiscoveryFilterType::kVendor;
         break;
     case 'T':
-        filterType = Mdns::DiscoveryFilterType::kDeviceType;
+        filterType = Dnssd::DiscoveryFilterType::kDeviceType;
         break;
     case 'C':
-        filterType = Mdns::DiscoveryFilterType::kCommissioningMode;
+        filterType = Dnssd::DiscoveryFilterType::kCommissioningMode;
         break;
     default:
         return false;
@@ -165,13 +165,13 @@ bool ParseSubType(int argc, char ** argv, Mdns::DiscoveryFilter & filter)
     uint16_t code;
     VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
 
-    filter = Mdns::DiscoveryFilter(filterType, code);
+    filter = Dnssd::DiscoveryFilter(filterType, code);
     return true;
 }
 
 CHIP_ERROR BrowseCommissionableHandler(int argc, char ** argv)
 {
-    Mdns::DiscoveryFilter filter;
+    Dnssd::DiscoveryFilter filter;
 
     if (!ParseSubType(argc, argv, filter))
     {
@@ -181,12 +181,12 @@ CHIP_ERROR BrowseCommissionableHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissionable nodes...\n");
 
-    return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+    return Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
 }
 
 CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
 {
-    Mdns::DiscoveryFilter filter;
+    Dnssd::DiscoveryFilter filter;
 
     if (!ParseSubType(argc, argv, filter))
     {
@@ -196,7 +196,7 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissioners...\n");
 
-    return Mdns::Resolver::Instance().FindCommissioners(filter);
+    return Dnssd::Resolver::Instance().FindCommissioners(filter);
 }
 
 CHIP_ERROR BrowseHandler(int argc, char ** argv)
@@ -218,8 +218,8 @@ CHIP_ERROR DnsHandler(int argc, char ** argv)
         return CHIP_NO_ERROR;
     }
 
-    Mdns::Resolver::Instance().Init(&DeviceLayer::InetLayer);
-    Mdns::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
+    Dnssd::Resolver::Instance().Init(&DeviceLayer::InetLayer);
+    Dnssd::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsSubcommands.ExecCommand(argc, argv);
 }

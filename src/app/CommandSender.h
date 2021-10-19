@@ -26,6 +26,7 @@
 
 #include <type_traits>
 
+#include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -39,7 +40,7 @@
 
 #include <app/Command.h>
 #include <app/MessageDef/CommandPath.h>
-#include <app/MessageDef/StatusElement.h>
+#include <app/MessageDef/StatusIB.h>
 
 #define COMMON_STATUS_SUCCESS 0
 
@@ -65,7 +66,7 @@ public:
          *
          * @param[in] apCommandSender: The command sender object that initiated the command transaction.
          * @param[in] aPath: The command path field in invoke command response.
-         * @param[in] aData: The command data, will be nullptr if the server returns a StatusElement.
+         * @param[in] aData: The command data, will be nullptr if the server returns a StatusIB.
          */
         virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, TLV::TLVReader * aData) {}
 
@@ -115,6 +116,25 @@ public:
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr);
 
+    /**
+     * API for adding a data request.  The template parameter T is generally
+     * expected to be a ClusterName::Commands::CommandName::Type struct, but any
+     * object that can be encoded using the DataModel::Encode machinery and
+     * exposes the right command id will work.
+     *
+     * @param [in] aRequestCommandPath the path of the command being requested.
+     * @param [in] aData the data for the request.
+     */
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
+    {
+        ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
+        TLV::TLVWriter * writer = GetCommandDataElementTLVWriter();
+        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataElement::kCsTag_Data), aData));
+        return FinishCommand(/* aEndDataStruct = */ false);
+    }
+
     // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
     //
     // Sends a queued up command request to the target encapsulated by the secureSession handle.
@@ -153,7 +173,8 @@ private:
 
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 
-    Callback * mpCallback = nullptr;
+    Callback * mpCallback                      = nullptr;
+    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
 };
 
 } // namespace app

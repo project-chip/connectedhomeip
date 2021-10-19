@@ -10,6 +10,7 @@
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/basic-types.h>
 #include <app/CommandSender.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <controller/CommandSenderAllocator.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -37,7 +38,7 @@ namespace Controller {
 
 // {{asUpperCamelCase name}} Cluster Commands
 {{#chip_cluster_commands}}
-CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}})
+CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}})
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter * writer     = nullptr;
@@ -58,7 +59,7 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-{{#chip_cluster_command_arguments}}
+{{#chip_cluster_command_arguments_with_structs_expanded}}
 {{#first}}
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
@@ -72,7 +73,7 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
 {{/if}}
 {{else}}
     // Command takes no arguments.
-{{/chip_cluster_command_arguments}}
+{{/chip_cluster_command_arguments_with_structs_expanded}}
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -112,7 +113,7 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamel
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -136,7 +137,32 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReportAttribute{{asUpperCame
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
+
+{{#chip_cluster_commands}}
+{{#*inline "requestType"}}chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type{{/inline}}
+{{#*inline "responseType"}}chip::app::{{#if hasSpecificResponse}}Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase response.name}}::DecodableType{{else}}DataModel::NullObjectType{{/if}}{{/inline}}
+template CHIP_ERROR ClusterBase::InvokeCommand<{{>requestType}}, {{>responseType}}>(const {{>requestType}} &, void *, CommandResponseSuccessCallback<{{>responseType}}>, CommandResponseFailureCallback);
+{{/chip_cluster_commands}}
 {{/chip_client_clusters}}
+
+template <typename RequestDataT, typename ResponseDataT>
+CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
+                         CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
+
+    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
+        successCb(context, responseData);
+    };
+
+    auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+        failureCb(context, app::ToEmberAfStatus(aIMStatus));
+    };
+
+    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                               requestData, onSuccessCb, onFailureCb);
+};
 
 } // namespace Controller
 } // namespace chip

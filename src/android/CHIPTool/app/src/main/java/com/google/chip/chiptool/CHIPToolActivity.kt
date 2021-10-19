@@ -30,6 +30,7 @@ import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
+import com.google.chip.chiptool.clusterclient.ClusterInteractionFragment
 import com.google.chip.chiptool.clusterclient.MultiAdminClientFragment
 import com.google.chip.chiptool.clusterclient.OpCredClientFragment
 import com.google.chip.chiptool.clusterclient.BasicClientFragment
@@ -110,6 +111,10 @@ class CHIPToolActivity :
 
   override fun onShowDeviceAddressInput() {
     showFragment(AddressCommissioningFragment.newInstance(), false)
+  }
+
+  override fun handleClusterInteractionClicked() {
+    showFragment(ClusterInteractionFragment.newInstance())
   }
 
   override fun handleOnOffClicked() {

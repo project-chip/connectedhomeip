@@ -33,10 +33,10 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/Command.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
-#include <lib/mdns/Advertiser.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 
 static const char * TAG = "app-devicecallbacks";
@@ -81,7 +81,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // will not trigger a 'internet connectivity change' as there is no internet
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
-            chip::app::MdnsServer::Instance().StartServer();
+            chip::app::DnssdServer::Instance().StartServer();
         }
         break;
     }
@@ -127,7 +127,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
-        chip::app::MdnsServer::Instance().StartServer();
+        chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -137,7 +137,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
-        chip::app::MdnsServer::Instance().StartServer();
+        chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

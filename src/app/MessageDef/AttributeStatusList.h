@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "AttributeStatusElement.h"
+#include "AttributeStatusIB.h"
 #include "ListBuilder.h"
 #include "ListParser.h"
 
@@ -45,7 +45,7 @@ public:
      *
      *  @return A reference to AttributeStatus::Builder
      */
-    AttributeStatusElement::Builder & CreateAttributeStatusBuilder();
+    AttributeStatusIB::Builder & CreateAttributeStatusBuilder();
 
     /**
      *  @brief Mark the end of this AttributeStatusList
@@ -55,7 +55,7 @@ public:
     AttributeStatusList::Builder & EndOfAttributeStatusList();
 
 private:
-    AttributeStatusElement::Builder mAttributeStatusBuilder;
+    AttributeStatusIB::Builder mAttributeStatusBuilder;
 };
 
 class Parser : public ListParser

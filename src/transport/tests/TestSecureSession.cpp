@@ -79,6 +79,10 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
     PacketHeader packetHeader;
     MessageAuthenticationCode mac;
 
+    packetHeader.SetSessionId(1);
+    NL_TEST_ASSERT(inSuite, packetHeader.IsEncrypted() == true);
+    NL_TEST_ASSERT(inSuite, packetHeader.MICTagLength() == 16);
+
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
@@ -113,6 +117,10 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
     uint8_t encrypted[128];
     PacketHeader packetHeader;
     MessageAuthenticationCode mac;
+
+    packetHeader.SetSessionId(1);
+    NL_TEST_ASSERT(inSuite, packetHeader.IsEncrypted() == true);
+    NL_TEST_ASSERT(inSuite, packetHeader.MICTagLength() == 16);
 
     const char * salt = "Test Salt";
 

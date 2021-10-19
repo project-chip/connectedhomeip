@@ -33,7 +33,10 @@ shared_library("jni") {
 
   deps = [
     "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/inet",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/platform/android",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]

@@ -123,6 +123,19 @@ list(APPEND CHIP_CFLAGS_C ${CMAKE_C_FLAGS_INIT})
 mbed_get_lang_compile_flags(CHIP_CFLAGS_CC mbed-core CXX)
 list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
 
+mbed_get_target_common_compile_flags(CHIP_MBEDCMSISCM_CFLAGS mbed-cmsis-cortex-m)
+list(APPEND CHIP_CFLAGS ${CHIP_MBEDCMSISCM_CFLAGS})
+if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
+    mbed_get_target_common_compile_flags(CHIP_MBEDCMSISCY8_CFLAGS mbed-cy8cproto-062-4343w) 
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDCMSISCY8_CFLAGS})
+    mbed_get_target_common_compile_flags(CHIP_MBEDPSOC6_CFLAGS mbed-psoc6)
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDPSOC6_CFLAGS})
+    mbed_get_target_common_compile_flags(CHIP_MBEDCAT1_CFLAGS mbed-cat1a)
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDCAT1_CFLAGS})
+    mbed_get_target_common_compile_flags(CHIP_MBEDCMSISCY8MODUS_CFLAGS  mbed-cy8cproto-062-4343w-bsp-design-modus)
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDCMSISCY8MODUS_CFLAGS})
+endif()
+
 # Add support for Mbed Posix Socket 
 mbed_get_target_common_compile_flags(CHIP_MBEDPOSIXSOCKET_CFLAGS mbed-os-posix-socket)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDPOSIXSOCKET_CFLAGS})
@@ -264,11 +277,8 @@ list(APPEND CHIP_INCLUDES)
 # CHIP defines
 list(APPEND CHIP_DEFINES)
 
-
 list(APPEND CHIP_INCLUDES 
     ${CHIP_ROOT}/config/mbed/mbedtls
-    ${CHIP_ROOT}/src/platform/mbed/posix/include
-    ${CHIP_ROOT}/src/platform/mbed/net/include
 )
 
 list(APPEND CHIP_DEFINES 

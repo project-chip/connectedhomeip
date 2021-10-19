@@ -206,7 +206,7 @@ void ChannelContext::AddressResolveTimeout()
     EnterFailedState(CHIP_ERROR_PEER_NODE_NOT_FOUND);
 }
 
-void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Mdns::MdnsService & address)
+void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Dnssd::DnssdService & address)
 {
     switch (mState)
     {

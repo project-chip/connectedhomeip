@@ -451,31 +451,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return YES;
 }
 
-- (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
-{
-    __block CHIPDevice * chipDevice = nil;
-    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    if (![self isRunning]) {
-        [self checkForError:errorCode logMsg:kErrorNotRunning error:error];
-        return chipDevice;
-    }
-    dispatch_sync(_chipWorkQueue, ^{
-        chip::Controller::Device * device = nullptr;
-
-        if ([self isRunning]) {
-            errorCode = self.cppCommissioner->GetDevice(deviceID, &device);
-        }
-
-        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:error]) {
-            return;
-        }
-
-        chipDevice = [[CHIPDevice alloc] initWithDevice:device];
-    });
-
-    return chipDevice;
-}
-
 - (void)setListenPort:(uint16_t)port
 {
     _listenPort = port;

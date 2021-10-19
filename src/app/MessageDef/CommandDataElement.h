@@ -27,7 +27,7 @@
 #include "CommandPath.h"
 
 #include "Parser.h"
-#include "StatusElement.h"
+#include "StatusIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -41,9 +41,9 @@ namespace app {
 namespace CommandDataElement {
 enum
 {
-    kCsTag_CommandPath   = 0,
-    kCsTag_Data          = 1,
-    kCsTag_StatusElement = 2,
+    kCsTag_CommandPath = 0,
+    kCsTag_Data        = 1,
+    kCsTag_StatusIB    = 2,
 };
 
 class Parser : public chip::app::Parser
@@ -97,15 +97,15 @@ public:
     CHIP_ERROR GetData(chip::TLV::TLVReader * const apReader) const;
 
     /**
-     *  @brief Get a TLVReader for the StatusElement. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the StatusIB. Next() must be called before accessing them.
      *
-     *  @param [in] apStatusElement    A pointer to apStatusElement
+     *  @param [in] apStatusIB    A pointer to apStatusIB
      *
      *  @return #CHIP_NO_ERROR on success
      *          # CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a structure
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetStatusElement(StatusElement::Parser * const apStatusElement) const;
+    CHIP_ERROR GetStatusIB(StatusIB::Parser * const apStatusIB) const;
 
 protected:
     // A recursively callable function to parse a data element and pretty-print it.
@@ -132,11 +132,11 @@ public:
     CommandPath::Builder & CreateCommandPathBuilder();
 
     /**
-     *  @brief Initialize a StatusElement::Builder for writing into the TLV stream
+     *  @brief Initialize a StatusIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to StatusElement::Builder
+     *  @return A reference to StatusIB::Builder
      */
-    StatusElement::Builder & CreateStatusElementBuilder();
+    StatusIB::Builder & CreateStatusIBBuilder();
 
     /**
      *  @brief Mark the end of this CommandDataElement
@@ -147,7 +147,7 @@ public:
 
 private:
     CommandPath::Builder mCommandPathBuilder;
-    StatusElement::Builder mStatusElementBuilder;
+    StatusIB::Builder mStatusIBBuilder;
 };
 }; // namespace CommandDataElement
 }; // namespace app

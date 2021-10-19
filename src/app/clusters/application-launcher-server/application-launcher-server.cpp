@@ -64,22 +64,24 @@ exit:
     }
 }
 
-::ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, uint8_t * applicationId)
+::ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, CharSpan applicationId)
 {
     ::ApplicationLauncherApp application = {};
-    application.applicationId            = applicationId;
-    application.catalogVendorId          = catalogVendorId;
+    // TODO: Need to figure out what types we're using here.
+    // application.applicationId            = applicationId;
+    application.catalogVendorId = catalogVendorId;
     return application;
 }
 
 bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        EndpointId endpoint, uint8_t * requestData,
-                                                        uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId,
-                                                        Commands::LaunchApp::DecodableType & commandData)
+                                                        const Commands::LaunchApp::DecodableType & commandData)
 {
+    auto & requestData                       = commandData.data;
+    auto & requestApplicationCatalogVendorId = commandData.catalogVendorId;
+    auto & requestApplicationId              = commandData.applicationId;
+
     ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
-    // TODO: Char is not null terminated, verify this code once #7963 gets merged.
-    std::string reqestDataString(reinterpret_cast<char *>(requestData));
+    std::string reqestDataString(requestData.data(), requestData.size());
     ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
     sendResponse(command, response);
     return true;

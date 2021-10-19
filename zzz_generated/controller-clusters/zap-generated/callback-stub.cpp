@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 
@@ -579,40 +580,6 @@ bool __attribute__((weak)) emberAfDefaultResponseCallback(ClusterId clusterId, C
     return false;
 }
 
-/** @brief Configure Reporting Response
- *
- * This function is called by the application framework when a Configure
- * Reporting Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute status records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool __attribute__((weak)) emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
-
-/** @brief Read Reporting Configuration Response
- *
- * This function is called by the application framework when a Read Reporting
- * Configuration Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute reporting configuration
- * records.  Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool __attribute__((weak)) emberAfReadReportingConfigurationResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
-
 /** @brief Discover Attributes Response
  *
  * This function is called by the application framework when a Discover
@@ -747,50 +714,6 @@ bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestinati
     return false;
 }
 
-/** @brief Pre Attribute Change
- *
- * This function is called by the application framework before it changes an
- * attribute value.  The value passed into this callback is the value to which
- * the attribute is to be set by the framework.  The application should return
- * ::EMBER_ZCL_STATUS_SUCCESS to permit the change or any other ::EmberAfStatus
- * to reject it.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-EmberAfStatus __attribute__((weak))
-emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
-{
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
-/** @brief Post Attribute Change
- *
- * This function is called by the application framework after it changes an
- * attribute value. The value passed into this callback is the value to which
- * the attribute was set by the framework.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-void __attribute__((weak))
-emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                   uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
-{}
-
 /** @brief External Attribute Read
  *
  * Like emberAfExternalAttributeWriteCallback above, this function is called
@@ -889,22 +812,6 @@ emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, 
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-/** @brief Report Attributes
- *
- * This function is called by the application framework when a Report Attributes
- * command is received from an external device.  The application should return
- * true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this command.  Ver.: always
- * @param buffer Buffer containing the list of attribute report records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool __attribute__((weak)) emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
-
 /** @brief Get Current Time
  *
  * This callback is called when device attempts to get current time from the
@@ -976,3 +883,40 @@ bool __attribute__((weak)) emberAfStartMoveCallback()
 {
     return false;
 }
+
+/** @brief Pre Attribute Change
+ *
+ * This function is called by the application framework before it changes an
+ * attribute value.  The value passed into this callback is the value to which
+ * the attribute is to be set by the framework.  The application should return
+ * chip::Protocols::InteractionModel::Status::Success to permit the change or
+ * any other code to reject it.
+ *
+ * @param attributePath
+ * @param mask
+ * @param type
+ * @param size
+ * @param value
+ */
+chip::Protocols::InteractionModel::Status __attribute__((weak))
+MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
+                                 uint8_t * value)
+{
+    return chip::Protocols::InteractionModel::Status::Success;
+}
+
+/** @brief Post Attribute Change
+ *
+ * This function is called by the application framework after it changes an
+ * attribute value. The value passed into this callback is the value to which
+ * the attribute was set by the framework.
+ *
+ * @param attributePath
+ * @param mask
+ * @param type
+ * @param size
+ * @param value
+ */
+void __attribute__((weak)) MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask,
+                                                             uint8_t type, uint16_t size, uint8_t * value)
+{}

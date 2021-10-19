@@ -1,5 +1,2 @@
-cmake_build/
+config/
 build-*/
-mbed-os
-mbed-os-posix-socket
-wifi-ism43362

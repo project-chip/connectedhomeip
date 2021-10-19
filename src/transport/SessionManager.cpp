@@ -79,7 +79,9 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mTransportMgr          = transportMgr;
     mMessageCounterManager = messageCounterManager;
 
-    mGlobalEncryptedMessageCounter.Init();
+    // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
+    (void) mGlobalEncryptedMessageCounter.Init();
+    mGlobalUnencryptedMessageCounter.Init();
 
     ScheduleExpiryTimer();
 
@@ -324,7 +326,7 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
 
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
+    if (packetHeader.IsEncrypted())
     {
         SecureMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
@@ -401,7 +403,7 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
                  ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding"));
 
     // Verify message counter
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
+    if (packetHeader.IsSecureSessionControlMsg())
     {
         // TODO: control message counter is not implemented yet
     }
@@ -460,7 +462,7 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
         }
     }
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
+    if (packetHeader.IsSecureSessionControlMsg())
     {
         // TODO: control message counter is not implemented yet
     }

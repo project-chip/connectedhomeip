@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <lib/mdns/Resolver.h>
+#include <lib/dnssd/Resolver.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -94,7 +94,7 @@ public:
 
 private:
     PeerAddress mPeerAddress;
-    char mInstanceName[chip::Mdns::kMaxInstanceNameSize + 1];
+    char mInstanceName[chip::Dnssd::kMaxInstanceNameSize + 1];
     UDCClientProcessingState mUDCClientProcessingState;
     uint64_t mExpirationTimeMs = 0;
 };

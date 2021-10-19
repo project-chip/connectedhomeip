@@ -53,23 +53,24 @@ exit:
 }
 
 bool emberAfAccountLoginClusterGetSetupPINCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                   EndpointId endpoint, uint8_t * tempAccountIdentifier,
-                                                   Commands::GetSetupPIN::DecodableType & commandData)
+                                                   const Commands::GetSetupPIN::DecodableType & commandData)
 {
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
+    auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
+
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
     std::string responseSetupPin = accountLoginClusterGetSetupPin(tempAccountIdentifierString, emberAfCurrentEndpoint());
     sendResponse(command, responseSetupPin.c_str());
     return true;
 }
 
 bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                             EndpointId endpoint, uint8_t * tempAccountIdentifier, uint8_t * tempSetupPin,
-                                             Commands::Login::DecodableType & commandData)
+                                             const Commands::Login::DecodableType & commandData)
 {
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
-    std::string tempSetupPinString(reinterpret_cast<char *>(tempSetupPin));
+    auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
+    auto & tempSetupPin          = commandData.setupPIN;
+
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string tempSetupPinString(tempSetupPin.data(), tempSetupPin.size());
     bool isLoggedIn      = accountLoginClusterIsUserLoggedIn(tempAccountIdentifierString, tempSetupPinString);
     EmberAfStatus status = isLoggedIn ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     if (!isLoggedIn)

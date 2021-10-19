@@ -28,7 +28,7 @@ static_library("minimal-mdns-example-common") {
 
   public_deps = [
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/mdns/minimal",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
   ]
 }
 
@@ -38,7 +38,7 @@ executable("minimal-mdns-client") {
   deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/mdns/minimal",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -52,8 +52,8 @@ executable("minimal-mdns-server") {
   deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/mdns/minimal",
-    "${chip_root}/src/lib/mdns/minimal/responders",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -67,7 +67,7 @@ executable("mdns-advertiser") {
   deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/dnssd",
   ]
 
   cflags = [ "-Wconversion" ]

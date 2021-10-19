@@ -33,7 +33,7 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}ClusterTest::WriteAttribute{{asUpperC
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, {{asLowerCamelCase name}}));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, {{asLowerCamelCase name}}));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }

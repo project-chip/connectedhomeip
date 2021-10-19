@@ -26,6 +26,7 @@ limitations under the License.
   </domain>
  <!-- Messaging Cluster - Structs, BITMAPs & ENUMs -->
    <bitmap name="MessagingControlMask" type="BITMAP8">
+     <cluster code="0x0703"/>
      <field name="transMechanism" mask="0x03"/>
      <field name="messageUrgency" mask="0x0C"/>
      <field name="enhancedConfirmationRequest" mask="0x20"/>
@@ -56,9 +57,11 @@ limitations under the License.
      <item name="required" value="0x80"/>
    </enum>
    <bitmap name="MessagingExtendedControlMask" type="BITMAP8">
+     <cluster code="0x0703"/>
      <field name="messageConfirmationStatus" mask="0x01"/>
    </bitmap>
    <bitmap name="MessagingConfirmationControl" type="BITMAP8">
+     <cluster code="0x0703"/>
      <field name="NoReturned" mask="0x01"/>
      <field name="YesReturned" mask="0x02"/>
    </bitmap>

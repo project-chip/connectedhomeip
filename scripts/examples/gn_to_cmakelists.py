@@ -297,7 +297,7 @@ def WriteAction(out, target, project, sources, synthetic_dependencies):
     arguments = [
         x if x != "{{response_file_name}}" else "${PROJECT_BINARY_DIR}/${target}_tmp" for x in arguments]
 
-    out.write('  COMMAND python "')
+    out.write('  COMMAND python3 "')
     out.write(CMakeStringEscape(project.GetAbsolutePath(script)))
     out.write('"')
     if arguments:
@@ -367,7 +367,7 @@ def WriteActionForEach(out, target, project, sources, synthetic_dependencies):
         script = target.properties['script']
         # TODO: need to expand {{xxx}} in arguments
         arguments = target.properties['args']
-        out.write('  COMMAND python "')
+        out.write('  COMMAND python3 "')
         out.write(CMakeStringEscape(project.GetAbsolutePath(script)))
         out.write('"')
         if arguments:
@@ -719,7 +719,11 @@ def WriteTarget(out, target, project):
                     out.write('"')
                 out.write(')\n')
                 system_libraries.append(system_library)
-        out.write('target_link_libraries("${target}"')
+        if (target.cmake_type.command == "add_library" and target.cmake_type.modifier == "SHARED") \
+                or (target.cmake_type.command == "add_executable"):
+            out.write('target_link_libraries("${target}" -Wl,--start-group')
+        else:
+            out.write('target_link_libraries("${target}"')
         librarieslist = list(libraries)
         librarieslist.sort()
         for library in librarieslist:
@@ -729,6 +733,9 @@ def WriteTarget(out, target, project):
         for system_library in system_libraries:
             WriteVariable(out, system_library, '\n  "')
             out.write('"')
+        if (target.cmake_type.command == "add_library" and target.cmake_type.modifier == "SHARED") \
+                or (target.cmake_type.command == "add_executable"):
+            out.write('\n  -Wl,--end-group')
         out.write(')\n')
 
 

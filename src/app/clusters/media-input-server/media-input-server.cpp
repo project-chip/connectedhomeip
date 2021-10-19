@@ -50,9 +50,10 @@ static void storeCurrentInput(EndpointId endpoint, uint8_t currentInput)
 }
 
 bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                 EndpointId endpoint, uint8_t input,
-                                                 Commands::SelectInput::DecodableType & commandData)
+                                                 const Commands::SelectInput::DecodableType & commandData)
 {
+    auto & input = commandData.index;
+
     bool success         = mediaInputClusterSelectInput(input);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     if (success)
@@ -64,7 +65,7 @@ bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, 
 }
 
 bool emberAfMediaInputClusterShowInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                     EndpointId endpoint, Commands::ShowInputStatus::DecodableType & commandData)
+                                                     const Commands::ShowInputStatus::DecodableType & commandData)
 {
     bool success         = mediaInputClusterShowInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -73,7 +74,7 @@ bool emberAfMediaInputClusterShowInputStatusCallback(app::CommandHandler * comma
 }
 
 bool emberAfMediaInputClusterHideInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                     EndpointId endpoint, Commands::HideInputStatus::DecodableType & commandData)
+                                                     const Commands::HideInputStatus::DecodableType & commandData)
 {
     bool success         = mediaInputClusterHideInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -82,11 +83,13 @@ bool emberAfMediaInputClusterHideInputStatusCallback(app::CommandHandler * comma
 }
 
 bool emberAfMediaInputClusterRenameInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                 EndpointId endpoint, uint8_t input, uint8_t * name,
-                                                 Commands::RenameInput::DecodableType & commandData)
+                                                 const Commands::RenameInput::DecodableType & commandData)
 {
+    auto & input = commandData.index;
+    auto & name  = commandData.name;
+
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string nameString(reinterpret_cast<char *>(name));
+    std::string nameString(name.data(), name.size());
     bool success         = mediaInputClusterRenameInput(input, nameString);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

@@ -16,14 +16,14 @@
  */
 
 #include <chip/internal/ChipThreadWork.h>
-#include <lib/mdns/Resolver.h>
+#include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <type_traits>
 
 using namespace chip;
-using namespace chip::Mdns;
+using namespace chip::Dnssd;
 
 static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
 

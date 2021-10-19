@@ -1,41 +1,86 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
 # Generating linux-arm64-all-clusters
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters'
+
+# Generating linux-arm64-all-clusters-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-ipv6only'
 
 # Generating linux-arm64-chip-tool
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool'
 
+# Generating linux-arm64-chip-tool-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-ipv6only'
+
 # Generating linux-arm64-thermostat
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-thermostat'
 
+# Generating linux-arm64-thermostat-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-thermostat-ipv6only'
+
 # Generating linux-x64-all-clusters
 gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux {out}/linux-x64-all-clusters
+
+# Generating linux-x64-all-clusters-ipv6only
+gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-all-clusters-ipv6only
 
 # Generating linux-x64-chip-tool
 gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool {out}/linux-x64-chip-tool
 
+# Generating linux-x64-chip-tool-ipv6only
+gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-chip-tool-ipv6only
+
 # Generating linux-x64-thermostat
 gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux {out}/linux-x64-thermostat
+
+# Generating linux-x64-thermostat-ipv6only
+gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-thermostat-ipv6only
 
 # Building linux-arm64-all-clusters
 ninja -C {out}/linux-arm64-all-clusters
 
+# Building linux-arm64-all-clusters-ipv6only
+ninja -C {out}/linux-arm64-all-clusters-ipv6only
+
 # Building linux-arm64-chip-tool
 ninja -C {out}/linux-arm64-chip-tool
+
+# Building linux-arm64-chip-tool-ipv6only
+ninja -C {out}/linux-arm64-chip-tool-ipv6only
 
 # Building linux-arm64-thermostat
 ninja -C {out}/linux-arm64-thermostat
 
+# Building linux-arm64-thermostat-ipv6only
+ninja -C {out}/linux-arm64-thermostat-ipv6only
+
 # Building linux-x64-all-clusters
 ninja -C {out}/linux-x64-all-clusters
+
+# Building linux-x64-all-clusters-ipv6only
+ninja -C {out}/linux-x64-all-clusters-ipv6only
 
 # Building linux-x64-chip-tool
 ninja -C {out}/linux-x64-chip-tool
 
+# Building linux-x64-chip-tool-ipv6only
+ninja -C {out}/linux-x64-chip-tool-ipv6only
+
 # Building linux-x64-thermostat
 ninja -C {out}/linux-x64-thermostat
+
+# Building linux-x64-thermostat-ipv6only
+ninja -C {out}/linux-x64-thermostat-ipv6only

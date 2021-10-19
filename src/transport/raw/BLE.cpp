@@ -171,7 +171,11 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err)
     {
         if (!mPendingPackets[i].IsNull())
         {
-            endPoint->Send(std::move(mPendingPackets[i]));
+            err = endPoint->Send(std::move(mPendingPackets[i]));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "Deferred sending failed: %s", ErrorStr(err));
+            }
         }
     }
     ChipLogDetail(Inet, "BLE EndPoint %p Connection Complete", endPoint);

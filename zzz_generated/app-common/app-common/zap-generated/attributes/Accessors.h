@@ -403,6 +403,11 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * nameSupport); // bitmap8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t nameSupport);
 } // namespace NameSupport
 
+namespace LastConfiguredBy {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * lastConfiguredBy); // node_id
+EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId lastConfiguredBy);
+} // namespace LastConfiguredBy
+
 } // namespace Attributes
 } // namespace Scenes
 
@@ -485,6 +490,31 @@ namespace RemainingTime {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * remainingTime); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t remainingTime);
 } // namespace RemainingTime
+
+namespace MinLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * minLevel); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t minLevel);
+} // namespace MinLevel
+
+namespace MaxLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * maxLevel); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t maxLevel);
+} // namespace MaxLevel
+
+namespace CurrentFrequency {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentFrequency); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentFrequency);
+} // namespace CurrentFrequency
+
+namespace MinFrequency {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * minFrequency); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t minFrequency);
+} // namespace MinFrequency
+
+namespace MaxFrequency {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxFrequency); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxFrequency);
+} // namespace MaxFrequency
 
 namespace Options {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * options); // bitmap8

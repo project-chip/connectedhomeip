@@ -92,9 +92,13 @@ EmberStatus getUnusedBindingIndex(uint8_t * bindingIndex)
 }
 
 bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                       EndpointId endpoint, NodeId nodeId, GroupId groupId, EndpointId endpointId,
-                                       ClusterId clusterId, Commands::Bind::DecodableType & commandData)
+                                       const Commands::Bind::DecodableType & commandData)
 {
+    auto & nodeId     = commandData.nodeId;
+    auto & groupId    = commandData.groupId;
+    auto & endpointId = commandData.endpointId;
+    auto & clusterId  = commandData.clusterId;
+
     ChipLogDetail(Zcl, "RX: BindCallback");
 
     EmberBindingTableEntry bindingEntry;
@@ -123,9 +127,13 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
 }
 
 bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                         EndpointId endpoint, NodeId nodeId, GroupId groupId, EndpointId endpointId,
-                                         ClusterId clusterId, Commands::Unbind::DecodableType & commandData)
+                                         const Commands::Unbind::DecodableType & commandData)
 {
+    auto & nodeId     = commandData.nodeId;
+    auto & groupId    = commandData.groupId;
+    auto & endpointId = commandData.endpointId;
+    auto & clusterId  = commandData.clusterId;
+
     ChipLogDetail(Zcl, "RX: UnbindCallback");
 
     EmberBindingTableEntry bindingEntry;

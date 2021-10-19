@@ -215,30 +215,38 @@ void emAfPluginScenesServerPrintInfo(void)
                              entry.targetPositionTiltPercent100thsValue);
 #endif
         }
-        emberAfCorePrintln("");
+        emberAfCorePrintln("%s", "");
     }
 }
 
 bool emberAfScenesClusterAddSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          EndpointId endpoint, GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
-                                          uint8_t * sceneName, uint8_t * extensionFieldSets,
-                                          Commands::AddScene::DecodableType & commandData)
+                                          const Commands::AddScene::DecodableType & commandData)
 {
+    auto & groupId            = commandData.groupId;
+    auto & sceneId            = commandData.sceneId;
+    auto & transitionTime     = commandData.transitionTime;
+    auto & sceneName          = commandData.sceneName;
+    auto & extensionFieldSets = commandData.extensionFieldSets;
+
     return emberAfPluginScenesServerParseAddScene(commandObj, emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
 }
 
 bool emberAfScenesClusterViewSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           EndpointId endpoint, GroupId groupId, uint8_t sceneId,
-                                           Commands::ViewScene::DecodableType & commandData)
+                                           const Commands::ViewScene::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+    auto & sceneId = commandData.sceneId;
+
     return emberAfPluginScenesServerParseViewScene(commandObj, emberAfCurrentCommand(), groupId, sceneId);
 }
 
 bool emberAfScenesClusterRemoveSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             EndpointId endpoint, GroupId groupId, uint8_t sceneId,
-                                             Commands::RemoveScene::DecodableType & commandData)
+                                             const Commands::RemoveScene::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+    auto & sceneId = commandData.sceneId;
+
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
 
@@ -292,9 +300,10 @@ exit:
 }
 
 bool emberAfScenesClusterRemoveAllScenesCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 EndpointId endpoint, GroupId groupId,
-                                                 Commands::RemoveAllScenes::DecodableType & commandData)
+                                                 const Commands::RemoveAllScenes::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
     CHIP_ERROR err       = CHIP_NO_ERROR;
 
@@ -343,9 +352,11 @@ exit:
 }
 
 bool emberAfScenesClusterStoreSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                            EndpointId endpoint, GroupId groupId, uint8_t sceneId,
-                                            Commands::StoreScene::DecodableType & commandData)
+                                            const Commands::StoreScene::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+    auto & sceneId = commandData.sceneId;
+
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
     emberAfScenesClusterPrintln("RX: StoreScene 0x%2x, 0x%x", groupId, sceneId);
@@ -376,9 +387,11 @@ exit:
 }
 
 bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             EndpointId endpoint, GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
-                                             Commands::RecallScene::DecodableType & commandData)
+                                             const Commands::RecallScene::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+    auto & sceneId = commandData.sceneId;
+
     // NOTE: TransitionTime field in the RecallScene command is currently
     // ignored. Per Zigbee Alliance ZCL 7 (07-5123-07):
     //
@@ -411,9 +424,10 @@ bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, c
 }
 
 bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                    EndpointId endpoint, GroupId groupId,
-                                                    Commands::GetSceneMembership::DecodableType & commandData)
+                                                    const Commands::GetSceneMembership::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     uint8_t sceneCount   = 0;
@@ -732,27 +746,22 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-bool emberAfPluginScenesServerParseAddScene(app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId,
-                                            uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                            uint8_t * extensionFieldSets)
+bool emberAfPluginScenesServerParseAddScene(
+    app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
+    const CharSpan & sceneName,
+    const app::DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> & extensionFieldSets)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfSceneTableEntry entry;
     EmberAfStatus status;
-    bool enhanced                  = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
-    uint16_t extensionFieldSetsLen = static_cast<uint16_t>(
-        cmd->bufLen -
-        (cmd->payloadStartIndex + sizeof(groupId) + sizeof(sceneId) + sizeof(transitionTime) + emberAfStringLength(sceneName) + 1));
-    uint16_t extensionFieldSetsIndex = 0;
-    EndpointId endpoint              = cmd->apsFrame->destinationEndpoint;
+    bool enhanced       = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
+    EndpointId endpoint = cmd->apsFrame->destinationEndpoint;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
-    emberAfScenesClusterPrint("RX: %pAddScene 0x%2x, 0x%x, 0x%2x, \"", (enhanced ? "Enhanced" : ""), groupId, sceneId,
-                              transitionTime);
-    emberAfScenesClusterPrintString(sceneName);
-    emberAfScenesClusterPrint("\", ");
-    emberAfScenesClusterPrintBuffer(extensionFieldSets, extensionFieldSetsLen, false);
-    emberAfScenesClusterPrintln("");
+    emberAfScenesClusterPrintln("RX: %pAddScene 0x%2x, 0x%x, 0x%2x, \"%.*s\"", (enhanced ? "Enhanced" : ""), groupId, sceneId,
+                                transitionTime, static_cast<int>(sceneName.size()), sceneName.data());
+
+    auto fieldSetIter = extensionFieldSets.begin();
 
     // Add Scene commands can only reference groups to which we belong.
     if (!isEndpointInGroup(endpoint, groupId))
@@ -837,37 +846,17 @@ bool emberAfPluginScenesServerParseAddScene(app::CommandHandler * commandObj, co
 #endif
     }
 
-    while (extensionFieldSetsIndex < extensionFieldSetsLen)
+    while (fieldSetIter.Next())
     {
-        ClusterId clusterId;
-        uint8_t length;
+        auto & fieldSet = fieldSetIter.GetValue();
 
-        // Each extension field set must contain a two-byte cluster id and a one-
-        // byte length.  Otherwise, the command is malformed.
-        if (extensionFieldSetsLen < extensionFieldSetsIndex + 3)
-        {
-            status = EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            goto kickout;
-        }
+        ClusterId clusterId = fieldSet.clusterId;
 
-        clusterId               = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-        extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
-        length                  = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-        extensionFieldSetsIndex++;
-
-        // If the length is off, the command is also malformed.
-        if (length == 0)
-        {
-            continue;
-        }
-        else if (extensionFieldSetsLen < extensionFieldSetsIndex + length)
-        {
-            status = EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            goto kickout;
-        }
-
+        // TODO: We need to encode scene field sets in TLV.
+        // https://github.com/project-chip/connectedhomeip/issues/10334
         switch (clusterId)
         {
+#if 0
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
         case ZCL_ON_OFF_CLUSTER_ID:
             // We only know of one extension for the On/Off cluster and it is just one
@@ -1039,11 +1028,16 @@ bool emberAfPluginScenesServerParseAddScene(app::CommandHandler * commandObj, co
             // and length variables here.
             break;
 #endif
+#endif // if 0 disabling all the code.
         default:
             break;
         }
+    }
 
-        extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + length);
+    if (fieldSetIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        status = EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+        goto kickout;
     }
 
     // If we got this far, we either added a new entry or updated an existing one.

@@ -75,14 +75,14 @@ CHIP_ERROR DeviceControlServer::CommissioningComplete()
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb)
+CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = ConfigurationMgr().StoreRegulatoryLocation(location);
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().StoreCountryCode(countryCode, strlen(countryCode));
+    err = ConfigurationMgr().StoreCountryCode(countryCode.data(), countryCode.size());
     SuccessOrExit(err);
 
     err = ConfigurationMgr().StoreBreadcrumb(breadcrumb);

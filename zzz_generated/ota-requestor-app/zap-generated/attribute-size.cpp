@@ -78,6 +78,76 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x0030: // General Commissioning Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0001: // BasicCommissioningInfoList
+        {
+            entryLength = 4;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _BasicCommissioningInfoType
+            _BasicCommissioningInfoType * entry = reinterpret_cast<_BasicCommissioningInfoType *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FailSafeExpiryLengthMs,
+                           write ? (uint8_t *) &entry->FailSafeExpiryLengthMs : src, write, &entryOffset,
+                           sizeof(entry->FailSafeExpiryLengthMs)); // INT32U
+            break;
+        }
+        }
+        break;
+    }
+    case 0x003E: // Operational Credentials Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0001: // fabrics list
+        {
+            entryLength = 120;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _FabricDescriptor
+            _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricIndex, write ? (uint8_t *) &entry->FabricIndex : src, write,
+                           &entryOffset, sizeof(entry->FabricIndex)); // INT8U
+            ByteSpan * RootPublicKeySpan = &entry->RootPublicKey;     // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 67, RootPublicKeySpan)
+                       : ReadByteSpan(src + entryOffset, 67, RootPublicKeySpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 67);
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
+                           &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
+                           &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
+                           sizeof(entry->NodeId)); // NODE_ID
+            ByteSpan * LabelSpan = &entry->Label;  // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            break;
+        }
+        }
+        break;
+    }
     }
 
     return entryLength;
@@ -97,6 +167,24 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x0030: // General Commissioning Cluster
+        switch (attributeId)
+        {
+        case 0x0001: // BasicCommissioningInfoList
+            // Struct _BasicCommissioningInfoType
+            entryLength = 4;
+            break;
+        }
+        break;
+    case 0x003E: // Operational Credentials Cluster
+        switch (attributeId)
+        {
+        case 0x0001: // fabrics list
+            // Struct _FabricDescriptor
+            entryLength = 120;
+            break;
+        }
+        break;
     }
 
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);

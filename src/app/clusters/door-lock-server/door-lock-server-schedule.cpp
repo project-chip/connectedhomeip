@@ -124,11 +124,17 @@ void emAfPluginDoorLockServerInitSchedule(void)
 }
 
 bool emberAfDoorLockClusterSetWeekdayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                      uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
-                                                      uint8_t startMinute, uint8_t stopHour, uint8_t stopMinute,
-                                                      Commands::SetWeekdaySchedule::DecodableType & commandData)
+                                                      const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::SetWeekdaySchedule::DecodableType & commandData)
 {
+    auto & scheduleId  = commandData.scheduleId;
+    auto & userId      = commandData.userId;
+    auto & daysMask    = commandData.daysMask;
+    auto & startHour   = commandData.startHour;
+    auto & startMinute = commandData.startMinute;
+    auto & stopHour    = commandData.endHour;
+    auto & stopMinute  = commandData.endMinute;
+
     uint8_t status                  = 0x00;
     uint8_t userPin                 = 0x00;
     uint16_t rfProgrammingEventMask = 0xffff; // event sent by default
@@ -144,7 +150,7 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(app::CommandHandler * comm
         EmberAfDoorLockScheduleEntry * entry = &weekdayScheduleTable[scheduleId];
         entry->inUse                         = true;
         entry->userId                        = userId;
-        entry->daysMask                      = daysMask;
+        entry->daysMask                      = daysMask.Raw();
         entry->startHour                     = startHour;
         entry->startMinute                   = startMinute;
         entry->stopHour                      = stopHour;
@@ -184,10 +190,12 @@ exit:
 }
 
 bool emberAfDoorLockClusterGetWeekdayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                      uint8_t scheduleId, uint16_t userId,
-                                                      Commands::GetWeekdaySchedule::DecodableType & commandData)
+                                                      const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::GetWeekdaySchedule::DecodableType & commandData)
 {
+    auto & scheduleId = commandData.scheduleId;
+    auto & userId     = commandData.userId;
+
     EmberAfStatus zclStatus =
         ((scheduleId > EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE) ? EMBER_ZCL_STATUS_INVALID_FIELD
                                                                                      : EMBER_ZCL_STATUS_SUCCESS);
@@ -226,10 +234,12 @@ exit:
 }
 
 bool emberAfDoorLockClusterClearWeekdayScheduleCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                        uint8_t scheduleId, uint16_t userId,
-                                                        Commands::ClearWeekdaySchedule::DecodableType & commandData)
+                                                        const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::ClearWeekdaySchedule::DecodableType & commandData)
 {
+    auto & scheduleId = commandData.scheduleId;
+    auto & userId     = commandData.userId;
+
     EmberAfStatus zclStatus =
         ((scheduleId > EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE) ? EMBER_ZCL_STATUS_INVALID_FIELD
                                                                                      : EMBER_ZCL_STATUS_SUCCESS);
@@ -259,11 +269,14 @@ exit:
 }
 
 bool emberAfDoorLockClusterSetYeardayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                      uint8_t scheduleId, uint16_t userId, uint32_t localStartTime,
-                                                      uint32_t localEndTime,
-                                                      Commands::SetYeardaySchedule::DecodableType & commandData)
+                                                      const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::SetYeardaySchedule::DecodableType & commandData)
 {
+    auto & scheduleId     = commandData.scheduleId;
+    auto & userId         = commandData.userId;
+    auto & localStartTime = commandData.localStartTime;
+    auto & localEndTime   = commandData.localEndTime;
+
     uint8_t status;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (scheduleId >= EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_YEARDAY_SCHEDULE_TABLE_SIZE)
@@ -298,10 +311,12 @@ exit:
 }
 
 bool emberAfDoorLockClusterGetYeardayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                      uint8_t scheduleId, uint16_t userId,
-                                                      Commands::GetYeardaySchedule::DecodableType & commandData)
+                                                      const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::GetYeardaySchedule::DecodableType & commandData)
 {
+    auto & scheduleId = commandData.scheduleId;
+    auto & userId     = commandData.userId;
+
     EmberAfPluginDoorLockServerYeardayScheduleEntry * entry = &yeardayScheduleTable[0];
     EmberAfStatus zclStatus;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -346,10 +361,12 @@ exit:
 }
 
 bool emberAfDoorLockClusterClearYeardayScheduleCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                        uint8_t scheduleId, uint16_t userId,
-                                                        Commands::ClearYeardaySchedule::DecodableType & commandData)
+                                                        const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::ClearYeardaySchedule::DecodableType & commandData)
 {
+    auto & scheduleId = commandData.scheduleId;
+    auto & userId     = commandData.userId;
+
     uint8_t status;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (scheduleId >= EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_YEARDAY_SCHEDULE_TABLE_SIZE)
@@ -382,11 +399,14 @@ exit:
 }
 
 bool emberAfDoorLockClusterSetHolidayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                      uint8_t holidayScheduleId, uint32_t localStartTime, uint32_t localEndTime,
-                                                      uint8_t operatingModeDuringHoliday,
-                                                      Commands::SetHolidaySchedule::DecodableType & commandData)
+                                                      const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::SetHolidaySchedule::DecodableType & commandData)
 {
+    auto & holidayScheduleId          = commandData.scheduleId;
+    auto & localStartTime             = commandData.localStartTime;
+    auto & localEndTime               = commandData.localEndTime;
+    auto & operatingModeDuringHoliday = commandData.operatingModeDuringHoliday;
+
     uint8_t status;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (holidayScheduleId >= EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_HOLIDAY_SCHEDULE_TABLE_SIZE)
@@ -423,10 +443,11 @@ exit:
 }
 
 bool emberAfDoorLockClusterGetHolidayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                      uint8_t holidayScheduleId,
-                                                      Commands::GetHolidaySchedule::DecodableType & commandData)
+                                                      const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::GetHolidaySchedule::DecodableType & commandData)
 {
+    auto & holidayScheduleId = commandData.scheduleId;
+
     EmberAfPluginDoorLockServerHolidayScheduleEntry * entry = &holidayScheduleTable[0];
     EmberAfStatus zclStatus;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -470,10 +491,11 @@ exit:
 }
 
 bool emberAfDoorLockClusterClearHolidayScheduleCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                        uint8_t holidayScheduleId,
-                                                        Commands::ClearHolidaySchedule::DecodableType & commandData)
+                                                        const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::ClearHolidaySchedule::DecodableType & commandData)
 {
+    auto & holidayScheduleId = commandData.scheduleId;
+
     uint8_t status;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (holidayScheduleId >= EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_YEARDAY_SCHEDULE_TABLE_SIZE)

@@ -1082,6 +1082,21 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t nameSupport)
 
 } // namespace NameSupport
 
+namespace LastConfiguredBy {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * lastConfiguredBy)
+{
+    return emberAfReadServerAttribute(endpoint, Scenes::Id, LastConfiguredBy::Id, (uint8_t *) lastConfiguredBy,
+                                      sizeof(*lastConfiguredBy));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId lastConfiguredBy)
+{
+    return emberAfWriteServerAttribute(endpoint, Scenes::Id, LastConfiguredBy::Id, (uint8_t *) &lastConfiguredBy,
+                                       ZCL_NODE_ID_ATTRIBUTE_TYPE);
+}
+
+} // namespace LastConfiguredBy
+
 } // namespace Attributes
 } // namespace Scenes
 
@@ -1290,6 +1305,77 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t remainingTime)
 }
 
 } // namespace RemainingTime
+
+namespace MinLevel {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * minLevel)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MinLevel::Id, (uint8_t *) minLevel, sizeof(*minLevel));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t minLevel)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MinLevel::Id, (uint8_t *) &minLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace MinLevel
+
+namespace MaxLevel {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * maxLevel)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MaxLevel::Id, (uint8_t *) maxLevel, sizeof(*maxLevel));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t maxLevel)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MaxLevel::Id, (uint8_t *) &maxLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace MaxLevel
+
+namespace CurrentFrequency {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentFrequency)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, CurrentFrequency::Id, (uint8_t *) currentFrequency,
+                                      sizeof(*currentFrequency));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentFrequency)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, CurrentFrequency::Id, (uint8_t *) &currentFrequency,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace CurrentFrequency
+
+namespace MinFrequency {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * minFrequency)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MinFrequency::Id, (uint8_t *) minFrequency,
+                                      sizeof(*minFrequency));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t minFrequency)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MinFrequency::Id, (uint8_t *) &minFrequency,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace MinFrequency
+
+namespace MaxFrequency {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxFrequency)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MaxFrequency::Id, (uint8_t *) maxFrequency,
+                                      sizeof(*maxFrequency));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxFrequency)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MaxFrequency::Id, (uint8_t *) &maxFrequency,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace MaxFrequency
 
 namespace Options {
 

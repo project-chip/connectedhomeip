@@ -83,8 +83,8 @@ static_library("cc13x2_26x2") {
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../OpenThread/MdnsImpl.cpp" ]
-      deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+      sources += [ "../OpenThread/DnssdImpl.cpp" ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
 }

@@ -36,7 +36,6 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
@@ -78,12 +77,21 @@ public:
     TLV::TLVWriter * GetCommandDataElementTLVWriter();
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
-    virtual CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,
-                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                     const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
+
+    virtual CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
-    };
+    }
+
+    virtual CHIP_ERROR AddClusterSpecificSuccess(ConcreteCommandPath & aCommandPath, uint8_t aClusterStatus)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    virtual CHIP_ERROR AddClusterSpecificFailure(ConcreteCommandPath & aCommandPath, uint8_t aClusterStatus)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -97,7 +105,7 @@ public:
     virtual CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) = 0;
 
 protected:
-    Command(Messaging::ExchangeManager * apExchangeMgr);
+    Command();
 
     /*
      * Allocates a packet buffer used for encoding an invoke request/response payload.
@@ -120,7 +128,6 @@ protected:
     const char * GetStateStr() const;
 
     InvokeCommand::Builder mInvokeCommandBuilder;
-    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     uint8_t mCommandIndex                      = 0;
     CommandState mState                        = CommandState::Idle;

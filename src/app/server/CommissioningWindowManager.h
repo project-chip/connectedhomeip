@@ -28,7 +28,7 @@ constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
 enum class CommissioningWindowAdvertisement
 {
     kAllSupported,
-    kMdnsOnly,
+    kDnssdOnly,
 };
 
 class Server;

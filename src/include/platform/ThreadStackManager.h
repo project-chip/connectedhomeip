@@ -29,10 +29,10 @@
 
 namespace chip {
 
-namespace Mdns {
+namespace Dnssd {
 struct TextEntry;
-struct MdnsService;
-} // namespace Mdns
+struct DnssdService;
+} // namespace Dnssd
 
 namespace DeviceLayer {
 
@@ -60,9 +60,9 @@ class GenericThreadStackManagerImpl_FreeRTOS;
 } // namespace Internal
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
-// Declaration of callback types corresponding to MdnsResolveCallback and MdnsBrowseCallback to avoid circular including.
-using DnsResolveCallback = void (*)(void * context, chip::Mdns::MdnsService * result, CHIP_ERROR error);
-using DnsBrowseCallback  = void (*)(void * context, chip::Mdns::MdnsService * services, size_t servicesSize, CHIP_ERROR error);
+// Declaration of callback types corresponding to DnssdResolveCallback and DnssdBrowseCallback to avoid circular including.
+using DnsResolveCallback = void (*)(void * context, chip::Dnssd::DnssdService * result, CHIP_ERROR error);
+using DnsBrowseCallback  = void (*)(void * context, chip::Dnssd::DnssdService * services, size_t servicesSize, CHIP_ERROR error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -100,7 +100,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
-                             const Span<const char * const> & aSubTypes, const Span<const Mdns::TextEntry> & aTxtEntries,
+                             const Span<const char * const> & aSubTypes, const Span<const Dnssd::TextEntry> & aTxtEntries,
                              uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR InvalidateAllSrpServices(); ///< Mark all SRP services as invalid
@@ -254,7 +254,7 @@ inline CHIP_ERROR ThreadStackManager::SetThreadEnabled(bool val)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 inline CHIP_ERROR ThreadStackManager::AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
                                                     const Span<const char * const> & aSubTypes,
-                                                    const Span<const Mdns::TextEntry> & aTxtEntries, uint32_t aLeaseInterval = 0,
+                                                    const Span<const Dnssd::TextEntry> & aTxtEntries, uint32_t aLeaseInterval = 0,
                                                     uint32_t aKeyLeaseInterval = 0)
 {
     return static_cast<ImplClass *>(this)->_AddSrpService(aInstanceName, aName, aPort, aSubTypes, aTxtEntries, aLeaseInterval,

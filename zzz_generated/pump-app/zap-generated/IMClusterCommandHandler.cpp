@@ -39,8 +39,7 @@ namespace app {
 namespace {
 void ReportCommandUnsupported(Command * aCommandObj, const ConcreteCommandPath & aCommandPath)
 {
-    aCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-                               Protocols::InteractionModel::Status::UnsupportedCommand);
+    aCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
     ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                  ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
 }
@@ -69,7 +68,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.commissioningTimeout, commandData);
+                    apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -78,10 +77,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.commissioningTimeout,
-                    commandData.PAKEVerifier, commandData.discriminator, commandData.iterations, commandData.salt,
-                    commandData.passcodeID, commandData);
+                wasHandled = emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(apCommandObj, aCommandPath,
+                                                                                                     commandData);
             }
             break;
         }
@@ -90,8 +87,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
+                wasHandled =
+                    emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -105,8 +102,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -140,9 +136,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, to_underlying(commandData.intent),
-                    to_underlying(commandData.requestedProtocol), commandData.transferFileDesignator, commandData);
+                wasHandled = emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -156,8 +150,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -182,9 +175,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.expiryLengthSeconds, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -193,8 +184,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj, aCommandPath,
-                                                                                             aCommandPath.mEndpointId, commandData);
+                wasHandled =
+                    emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -203,10 +194,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, to_underlying(commandData.location),
-                    const_cast<uint8_t *>(Uint8::from_const_char(commandData.countryCode.data())), commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -220,8 +208,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -246,9 +233,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfLevelControlClusterMoveCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, to_underlying(commandData.moveMode), commandData.rate,
-                    commandData.optionMask, commandData.optionOverride, commandData);
+                wasHandled = emberAfLevelControlClusterMoveCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -257,9 +242,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfLevelControlClusterMoveToLevelCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.level, commandData.transitionTime,
-                    commandData.optionMask, commandData.optionOverride, commandData);
+                wasHandled = emberAfLevelControlClusterMoveToLevelCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -268,9 +251,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfLevelControlClusterMoveToLevelWithOnOffCallback(apCommandObj, aCommandPath,
-                                                                                    aCommandPath.mEndpointId, commandData.level,
-                                                                                    commandData.transitionTime, commandData);
+                wasHandled = emberAfLevelControlClusterMoveToLevelWithOnOffCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -279,9 +260,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
-                                                                             to_underlying(commandData.moveMode), commandData.rate,
-                                                                             commandData);
+                wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -290,9 +269,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfLevelControlClusterStepCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, to_underlying(commandData.stepMode), commandData.stepSize,
-                    commandData.transitionTime, commandData.optionMask, commandData.optionOverride, commandData);
+                wasHandled = emberAfLevelControlClusterStepCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -301,9 +278,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfLevelControlClusterStepWithOnOffCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, to_underlying(commandData.stepMode), commandData.stepSize,
-                    commandData.transitionTime, commandData);
+                wasHandled = emberAfLevelControlClusterStepWithOnOffCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -312,9 +287,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled =
-                    emberAfLevelControlClusterStopCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
-                                                           commandData.optionMask, commandData.optionOverride, commandData);
+                wasHandled = emberAfLevelControlClusterStopCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -323,8 +296,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
-                                                                             commandData);
+                wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -338,8 +310,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -364,9 +335,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.operationalDataset, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -375,9 +344,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.ssid, commandData.credentials,
-                    commandData.breadcrumb, commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -386,9 +353,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.networkID, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -397,9 +362,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.networkID, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -408,9 +371,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.networkID, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -419,9 +380,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.ssid, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -430,9 +389,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.operationalDataset, commandData.breadcrumb,
-                    commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -441,9 +398,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.ssid, commandData.credentials,
-                    commandData.breadcrumb, commandData.timeoutMs, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -457,8 +412,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -483,7 +437,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOnOffClusterOffCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
+                wasHandled = emberAfOnOffClusterOffCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -492,7 +446,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOnOffClusterOnCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
+                wasHandled = emberAfOnOffClusterOnCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -501,7 +455,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOnOffClusterToggleCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
+                wasHandled = emberAfOnOffClusterToggleCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -515,8 +469,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -541,9 +494,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.NOCValue, commandData.ICACValue,
-                    commandData.IPKValue, commandData.caseAdminNode, commandData.adminVendorId, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -552,8 +503,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.rootCertificate, commandData);
+                wasHandled =
+                    emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -562,8 +513,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAttestationRequestCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.attestationNonce, commandData);
+                wasHandled =
+                    emberAfOperationalCredentialsClusterAttestationRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -572,8 +523,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.certificateType, commandData);
+                wasHandled =
+                    emberAfOperationalCredentialsClusterCertificateChainRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -582,8 +533,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.CSRNonce, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -592,8 +542,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.fabricIndex, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -602,8 +551,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.trustedRootIdentifier, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(apCommandObj, aCommandPath,
+                                                                                                      commandData);
             }
             break;
         }
@@ -612,9 +561,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId,
-                    const_cast<uint8_t *>(Uint8::from_const_char(commandData.label.data())), commandData);
+                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -623,8 +570,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(
-                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData.NOCValue, commandData.ICACValue, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -638,8 +584,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || !wasHandled)
     {
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
     }
 }
@@ -650,9 +595,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
-    ChipLogDetail(Zcl, "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
-
     Compatibility::SetupEmberAfObjects(apCommandObj, aCommandPath);
 
     switch (aCommandPath.mClusterId)
@@ -683,8 +625,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::UnsupportedCluster);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCluster);
         break;
     }
 
@@ -694,9 +635,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
 void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader,
                                           CommandSender * apCommandObj)
 {
-    ChipLogDetail(Zcl, "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
-
     Compatibility::SetupEmberAfObjects(apCommandObj, aCommandPath);
 
     TLV::TLVType dataTlvType;
@@ -705,8 +643,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     {
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::UnsupportedCluster);
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCluster);
         break;
     }
 

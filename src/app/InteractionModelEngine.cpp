@@ -142,6 +142,22 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
     return err;
 }
 
+CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
+{
+    CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
+
+    for (auto & readClient : mReadClients)
+    {
+        if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.IsMatchingClient(aSubscriptionId))
+        {
+            readClient.Shutdown();
+            err = CHIP_NO_ERROR;
+        }
+    }
+
+    return err;
+}
+
 CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier)
 {
     apWriteClient.SetWriteClient(nullptr);
@@ -191,7 +207,7 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
                                                           const PayloadHeader & aPayloadHeader,
                                                           System::PacketBufferHandle && aPayload)
 {
-    CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(mpExchangeMgr, this);
+    CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(this);
     if (commandHandler == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -206,8 +222,28 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(InteractionModel, "Receive %s request",
+    ChipLogDetail(InteractionModel, "Received %s request",
                   aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
+
+    for (auto & readHandler : mReadHandlers)
+    {
+        if (!readHandler.IsFree() && readHandler.IsSubscriptionType() &&
+            readHandler.GetInitiatorNodeId() == apExchangeContext->GetSecureSession().GetPeerNodeId() &&
+            readHandler.GetFabricIndex() == apExchangeContext->GetSecureSession().GetFabricIndex())
+        {
+            bool keepSubscriptions = true;
+            System::PacketBufferTLVReader reader;
+            reader.Init(aPayload.Retain());
+            SuccessOrExit(err = reader.Next());
+            SubscribeRequest::Parser subscribeRequestParser;
+            SuccessOrExit(err = subscribeRequestParser.Init(reader));
+            err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
+            if (err == CHIP_NO_ERROR && !keepSubscriptions)
+            {
+                readHandler.Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
+            }
+        }
+    }
 
     for (auto & readHandler : mReadHandlers)
     {
@@ -235,7 +271,7 @@ CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * a
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(InteractionModel, "Receive Write request");
+    ChipLogDetail(InteractionModel, "Received Write request");
 
     for (auto & writeHandler : mWriteHandlers)
     {
@@ -320,7 +356,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(InteractionModel, "Time out! failed to receive echo response from Exchange: " ChipLogFormatExchange,
+    ChipLogProgress(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(ec));
 }
 
@@ -378,7 +414,7 @@ CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, Cl
     ClusterInfo * last = aClusterInfoList;
     if (mpNextAvailableClusterInfo == nullptr)
     {
-        ChipLogProgress(InteractionModel, "There is no available cluster info in mClusterInfoPool");
+        ChipLogError(InteractionModel, "ClusterInfo pool full, cannot handle more entries!");
         return CHIP_ERROR_NO_MEMORY;
     }
     aClusterInfoList           = mpNextAvailableClusterInfo;
@@ -429,7 +465,6 @@ bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributeP
             }
         }
     }
-    ChipLogDetail(DataManagement, "AttributePath is not interested");
     return false;
 }
 

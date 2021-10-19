@@ -134,12 +134,12 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         params.systemState->ExchangeMgr()->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this));
     params.systemState->ExchangeMgr()->SetDelegate(this);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    Mdns::Resolver::Instance().Init(params.systemState->InetLayer());
-    Mdns::Resolver::Instance().SetResolverDelegate(this);
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    Dnssd::Resolver::Instance().Init(params.systemState->InetLayer());
+    Dnssd::Resolver::Instance().SetResolverDelegate(this);
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     InitDataModelHandler(params.systemState->ExchangeMgr());
 
@@ -216,9 +216,9 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mState = State::NotInitialized;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    Mdns::Resolver::Instance().Shutdown();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    Dnssd::Resolver::Instance().Shutdown();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     mStorageDelegate = nullptr;
 
@@ -228,11 +228,11 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemState->Release();
     mSystemState = nullptr;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    Mdns::Resolver::Instance().SetResolverDelegate(nullptr);
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    Dnssd::Resolver::Instance().SetResolverDelegate(nullptr);
     mDeviceAddressUpdateDelegate = nullptr;
     mDeviceDiscoveryDelegate     = nullptr;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     return CHIP_NO_ERROR;
 }
@@ -326,12 +326,12 @@ exit:
 
 CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    return Mdns::Resolver::Instance().ResolveNodeId(PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(deviceId),
-                                                    chip::Inet::kIPAddressType_Any);
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    return Dnssd::Resolver::Instance().ResolveNodeId(PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(deviceId),
+                                                     chip::Inet::kIPAddressType_Any);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 }
 
 void DeviceController::PersistDevice(Device * device)
@@ -531,8 +531,17 @@ void DeviceController::PersistNextKeyId()
     }
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-void DeviceController::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
+CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
+{
+    VerifyOrReturnError(GetCompressedFabricId() == peerId.GetCompressedFabricId(), CHIP_ERROR_INVALID_ARGUMENT);
+    uint16_t index = FindDeviceIndex(peerId.GetNodeId());
+    VerifyOrReturnError(index < kNumMaxActiveDevices, CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrReturnError(mActiveDevices[index].GetAddress(addr, port), CHIP_ERROR_NOT_CONNECTED);
+    return CHIP_NO_ERROR;
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
     Device * device               = nullptr;
@@ -574,7 +583,7 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
     }
 };
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
@@ -1608,19 +1617,19 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 {
     static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Mdns::DiscoveryFilter filter)
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return chip::Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+    return chip::Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
 }
 
-const Mdns::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
+const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
 {
     return GetDiscoveredNode(idx);
 }
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
 
@@ -1637,23 +1646,23 @@ CHIP_ERROR DeviceCommissioner::SetUdcListenPort(uint16_t listenPort)
 
 void DeviceCommissioner::FindCommissionableNode(char * instanceName)
 {
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kInstanceName, instanceName);
+    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instanceName);
     DiscoverCommissionableNodes(filter);
 }
 
-void DeviceCommissioner::OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData)
+void DeviceCommissioner::OnUserDirectedCommissioningRequest(const Dnssd::DiscoveredNodeData & nodeData)
 {
     ChipLogDetail(Controller, "------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s", nodeData.instanceName);
 }
 
-void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData)
+void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     if (mUdcServer != nullptr)
     {
         mUdcServer->OnCommissionableNodeFound(nodeData);
     }
 
-    AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(nodeData);
+    AbstractDnssdDiscoveryController::OnNodeDiscoveryComplete(nodeData);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
@@ -1677,7 +1686,7 @@ void DeviceControllerInteractionModelDelegate::OnResponse(app::CommandSender * a
 }
 
 void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender,
-                                                       Protocols::InteractionModel::Status aProtocolCode, CHIP_ERROR aError)
+                                                       Protocols::InteractionModel::Status aClusterStatus, CHIP_ERROR aError)
 {
     // The IMDefaultResponseCallback started out life as an Ember function, so it only accepted
     // Ember status codes. Consequently, let's convert the IM code over to a meaningful Ember status before dispatching.
@@ -1686,7 +1695,7 @@ void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender 
     // well, this will be an even bigger problem.
     //
     // For now, #10331 tracks this issue.
-    IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aProtocolCode));
+    IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aClusterStatus));
 }
 
 void DeviceControllerInteractionModelDelegate::OnDone(app::CommandSender * apCommandSender)
@@ -1718,12 +1727,12 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(const app::ReadCli
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(
-    const app::WriteClient * apWriteClient, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-    const uint32_t aProtocolId, const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
-    uint8_t aCommandIndex)
+CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
+                                                                         const app::StatusIB & aStatusIB,
+                                                                         app::AttributePathParams & aAttributePathParams,
+                                                                         uint8_t aAttributeIndex)
 {
-    IMWriteResponseCallback(apWriteClient, chip::app::ToEmberAfStatus(Protocols::InteractionModel::Status(aProtocolCode)));
+    IMWriteResponseCallback(apWriteClient, chip::app::ToEmberAfStatus(aStatusIB.mStatus));
     return CHIP_NO_ERROR;
 }
 
@@ -1765,8 +1774,8 @@ void BasicFailure(void * context, uint8_t status)
     commissioner->OnSessionEstablishmentError(static_cast<CHIP_ERROR>(status));
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-void DeviceCommissioner::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
     DeviceController::OnNodeIdResolved(nodeData);
     OperationalDiscoveryComplete(nodeData.mPeerId.GetNodeId());
@@ -1838,7 +1847,7 @@ CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
     case CommissioningStage::kCheckCertificates:
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
         return CommissioningStage::kFindOperational; // TODO : once case is working, need to add stages to find and reconnect
                                                      // here.
 #else
@@ -1901,7 +1910,8 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         GeneralCommissioningCluster genCom;
         // TODO: should get the endpoint information from the descriptor cluster.
         genCom.Associate(device, 0);
-        uint16_t commissioningExpirySeconds = 5;
+        // TODO(cecille): Make this a parameter
+        uint16_t commissioningExpirySeconds = 60;
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
     }
     break;
@@ -1986,9 +1996,9 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
     }
     break;
     case CommissioningStage::kFindOperational: {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
         ChipLogProgress(Controller, "Finding node on operational network");
-        Mdns::Resolver::Instance().ResolveNodeId(
+        Dnssd::Resolver::Instance().ResolveNodeId(
             PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(device->GetDeviceId()),
             Inet::IPAddressType::kIPAddressType_Any);
 #endif
@@ -2031,29 +2041,3 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
 } // namespace Controller
 } // namespace chip
-
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // not needed with app/server is included
-namespace chip {
-namespace Platform {
-namespace PersistedStorage {
-
-/*
- * Dummy implementations of PersistedStorage platform methods. These aren't
- * used in the context of the Device Controller, but are required to satisfy
- * the linker.
- */
-
-CHIP_ERROR Read(const char * aKey, uint32_t & aValue)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Write(const char * aKey, uint32_t aValue)
-{
-    return CHIP_NO_ERROR;
-}
-
-} // namespace PersistedStorage
-} // namespace Platform
-} // namespace chip
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

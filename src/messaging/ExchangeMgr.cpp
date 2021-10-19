@@ -33,11 +33,11 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -72,7 +72,7 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
 
     mSessionManager = sessionManager;
 
-    mNextExchangeId = GetRandU16();
+    mNextExchangeId = chip::Crypto::GetRandU16();
     mNextKeyId      = 0;
 
     for (auto & handler : UMHandlerPool)
@@ -293,7 +293,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: 0x%p", ChipLogValueExchange(ec),
                       ec->GetDelegate());
 
-        if (ec->IsEncryptionRequired() != packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
+        if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
         {
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
             ec->Close();

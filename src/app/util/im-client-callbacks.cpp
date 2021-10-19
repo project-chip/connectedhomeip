@@ -427,7 +427,16 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
 
 bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status)
 {
+    auto subscriptionId = apSubscribeClient->GetSubscriptionId();
     ChipLogProgress(Zcl, "SubscribeResponse:");
+    if (subscriptionId.HasValue())
+    {
+        ChipLogProgress(Zcl, "  SubscriptionId:        0x%" PRIx64, subscriptionId.Value());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  SubscriptionId:        <missing>");
+    }
     ChipLogProgress(Zcl, "  ApplicationIdentifier: %" PRIx64, apSubscribeClient->GetAppIdentifier());
     LogStatus(status);
 

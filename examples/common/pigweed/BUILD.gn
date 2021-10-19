@@ -73,7 +73,5 @@ pw_source_set("system_rpc_server") {
     dir_pw_log,
   ]
 
-  cflags = [ "-Wconversion" ]
-
   public_configs = [ ":default_config" ]
 }

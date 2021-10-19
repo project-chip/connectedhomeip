@@ -30,7 +30,7 @@
 
 #include <app/InteractionModelDelegate.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
-#include <controller/AbstractMdnsDiscoveryController.h>
+#include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/DeviceControllerInteractionModelDelegate.h>
@@ -61,10 +61,10 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <controller/DeviceDiscoveryDelegate.h>
-#include <lib/mdns/Resolver.h>
+#include <lib/dnssd/Resolver.h>
 #endif
 
 namespace chip {
@@ -86,7 +86,7 @@ struct ControllerInitParams
 {
     PersistentStorageDelegate * storageDelegate = nullptr;
     DeviceControllerSystemState * systemState   = nullptr;
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
     DeviceDiscoveryDelegate * deviceDiscoveryDelegate         = nullptr;
 #endif
@@ -182,8 +182,8 @@ struct CommissionerInitParams : public ControllerInitParams
  */
 class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
                                     public Messaging::ExchangeMgrDelegate,
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-                                    public AbstractMdnsDiscoveryController,
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+                                    public AbstractDnssdDiscoveryController,
 #endif
                                     public app::InteractionModelDelegate
 {
@@ -216,6 +216,8 @@ public:
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
+    CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
+
     /**
      *   This function returns true if the device corresponding to `deviceId` has previously been commissioned
      *   on the fabric.
@@ -245,7 +247,9 @@ public:
 
     virtual void ReleaseDevice(Device * device);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    void ReleaseDeviceById(NodeId remoteDeviceId);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
 #endif
@@ -291,11 +295,11 @@ protected:
     FabricId mFabricId = kUndefinedFabricId;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
-    Mdns::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
+    Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
     DeviceControllerSystemState * mSystemState = nullptr;
 
@@ -303,7 +307,6 @@ protected:
     uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
-    void ReleaseDeviceById(NodeId remoteDeviceId);
     CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
@@ -318,12 +321,12 @@ protected:
 
     uint16_t mVendorId;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     //////////// ResolverDelegate Implementation ///////////////
-    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
@@ -482,7 +485,7 @@ public:
      */
     CHIP_ERROR CloseBleConnection();
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     /**
      * @brief
      *   Discover all devices advertising as commissionable.
@@ -490,7 +493,7 @@ public:
      * * @param[in] filter  Browse filter - controller will look for only the specified subtype.
      * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR DiscoverCommissionableNodes(Mdns::DiscoveryFilter filter);
+    CHIP_ERROR DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter);
 
     /**
      * @brief
@@ -498,7 +501,7 @@ public:
      *   Should be called on main loop thread.
      * @return const DiscoveredNodeData* info about the selected device. May be nullptr if no information has been returned yet.
      */
-    const Mdns::DiscoveredNodeData * GetDiscoveredDevice(int idx);
+    const Dnssd::DiscoveredNodeData * GetDiscoveredDevice(int idx);
 
     /**
      * @brief
@@ -507,7 +510,7 @@ public:
      */
     int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
 
-    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
@@ -531,16 +534,16 @@ public:
      * @param nodeData DNS-SD node information for the client requesting commissioning
      *
      */
-    void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) override;
+    void OnUserDirectedCommissioningRequest(const Dnssd::DiscoveredNodeData & nodeData) override;
 
     /**
      * @brief
-     *   Overrides method from AbstractMdnsDiscoveryController
+     *   Overrides method from AbstractDnssdDiscoveryController
      *
      * @param nodeData DNS-SD node information
      *
      */
-    void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override;
+    void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     /**
      * @brief

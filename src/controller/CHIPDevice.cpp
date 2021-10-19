@@ -344,7 +344,7 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
     }
 
     setupPayload.version               = 0;
-    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
+    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
     return CHIP_NO_ERROR;
 }
@@ -753,6 +753,7 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
     params.mAttributePathParamsListSize = 1;
     params.mMinIntervalFloorSeconds     = mMinIntervalFloorSeconds;
     params.mMaxIntervalCeilingSeconds   = mMaxIntervalCeilingSeconds;
+    params.mKeepSubscriptions           = false;
 
     CHIP_ERROR err =
         chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(params, seqNum /* application context */);

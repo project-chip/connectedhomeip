@@ -26,19 +26,15 @@
 #include "Command.h"
 #include "CommandSender.h"
 #include "InteractionModelEngine.h"
-#include "messaging/ExchangeMgr.h"
+#include "messaging/ExchangeContext.h"
 
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
 
-using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
-
 namespace chip {
 namespace app {
 
-CommandHandler::CommandHandler(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback) :
-    Command(apExchangeMgr), mpCallback(apCallback)
-{}
+CommandHandler::CommandHandler(Callback * apCallback) : mpCallback(apCallback) {}
 
 CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                                   System::PacketBufferHandle && payload)
@@ -119,11 +115,17 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
+        ChipLogDetail(DataManagement,
+                      "Received command without data for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                      " Command=" ChipLogFormatMEI,
+                      endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
         err = CHIP_NO_ERROR;
-        ChipLogDetail(DataManagement, "Received command without data for cluster " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
     }
     if (CHIP_NO_ERROR == err)
     {
+        ChipLogDetail(DataManagement,
+                      "Received command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+                      endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
         DispatchSingleClusterCommand(ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader, this);
     }
 
@@ -142,9 +144,8 @@ exit:
                           endpointId);
         }
 
-        AddStatusCode(path,
-                      err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
-                      Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::InvalidCommand);
+        // TODO:in particular different reasons for ServerClusterCommandExists to test false should result in different errors here
+        AddStatus(path, Protocols::InteractionModel::Status::InvalidCommand);
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
@@ -152,12 +153,11 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::AddStatusCode(const ConcreteCommandPath & aCommandPath,
-                                         const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                         const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusElement::Builder statusElementBuilder;
+    StatusIB::Builder statusIBBuilder;
+    StatusIB statusIB;
 
     chip::app::CommandPathParams commandPathParams = { aCommandPath.mEndpointId,
                                                        0, // GroupId
@@ -167,18 +167,16 @@ CHIP_ERROR CommandHandler::AddStatusCode(const ConcreteCommandPath & aCommandPat
     err = PrepareCommand(commandPathParams, false /* aStartDataStruct */);
     SuccessOrExit(err);
 
-    statusElementBuilder =
-        mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
+    statusIBBuilder = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusIBBuilder();
 
     //
     // TODO: Most of the callers are incorrectly passing SecureChannel as the protocol ID, when in fact, the status code provided
     // above is always an IM code. Instead of fixing all the callers (which is a fairly sizeable change), we'll embark on fixing
     // this more completely when we fix #9530.
     //
-    statusElementBuilder
-        .EncodeStatusElement(aGeneralCode, Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
-        .EndOfStatusElement();
-    err = statusElementBuilder.GetError();
+    statusIB.mStatus = aStatus;
+    statusIBBuilder.EncodeStatusIB(statusIB);
+    err = statusIBBuilder.GetError();
     SuccessOrExit(err);
 
     err = FinishCommand(false /* aEndDataStruct */);

@@ -1,6 +1,6 @@
 # NOTE: /workspace/ is the persistent directory across steps
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.5.11"
+    - name: "connectedhomeip/chip-build-vscode:0.5.17"
       id: "CompileAll"
       entrypoint: "./scripts/run_in_build_env.sh"
       args:

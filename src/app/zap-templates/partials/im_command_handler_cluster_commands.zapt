@@ -2,31 +2,7 @@
 Commands::{{asUpperCamelCase name}}::DecodableType commandData;
 TLVError = DataModel::Decode(aDataTlv, commandData);
 if (TLVError == CHIP_NO_ERROR) {
-{{! A few things going on here:
-  1) isArray should override other type checks, because you can test true for
-     both isArray and other things.
-  2) Enums are enum classes in the struct but raw integers in the args.  Need
-     to use to_underlying for them.
-  3) Char strings are Span<const char> in the struct but uint8_t* in the args.
-     Do the same broken casting we used to do.  Need to stop using the args!
-  4) Lists are DecodableList<> in the struct but the args expect
-     uint8_t*.  Just pass nullptr and convert the relevant commands to
-     using the struct argument later.  They don't work properly right
-     now anyway.
-}}
-wasHandled = emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, {{#zcl_command_arguments}}{{#if isArray}}
-nullptr
-{{else}}
-{{#if_is_enum type}}
-to_underlying(commandData.{{asLowerCamelCase label}})
-{{else}}
-{{#if (isCharString type)}}
-const_cast<uint8_t*>(Uint8::from_const_char(commandData.{{asLowerCamelCase label}}.data()))
-{{else}}
-commandData.{{asLowerCamelCase label}}
-{{/if}}
-{{/if_is_enum}}
-{{/if}},{{/zcl_command_arguments}} commandData);
+wasHandled = emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(apCommandObj, aCommandPath, commandData);
 }
 {{else}}
 {{#if (zcl_command_arguments_count this.id)}}
