@@ -9,6 +9,7 @@ RUN set -x \
     && cd ${AMEBA_DIR} \
     && git clone --depth 1 --progress -b cmake_build https://github.com/pankore/ambd_sdk_with_chip_non_NDA.git \
     && cd ambd_sdk_with_chip_non_NDA \
+    && git pull \
     && git reset --hard 299dd4a \
     && git submodule update --depth 1 --init --progress \
     && : # last line
