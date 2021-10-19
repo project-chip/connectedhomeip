@@ -12,7 +12,7 @@ The following diagram shows a simplified structure of a Matter application which
 runs on the top of the Mbed-OS.
 
 <p align="center">
-    <img src="../images/matter_mbedos_overview_simplified.png" alt="matter_mbedos_overview_simplified">
+    <img src="images/matter_mbedos_overview_simplified.png" alt="matter_mbedos_overview_simplified">
 </p>
 
 # ARM Mbed-OS
@@ -94,6 +94,13 @@ used to speed up development:
 -   [lock-app](../../examples/lock-app/mbed/README.md)
 -   [lighting-app](../../examples/lighting-app/mbed/README.md)
 -   [pigweed-app](../../examples/pigweed-app/mbed/README.md)
+
+## Example configuration
+
+Each of the supporting examples contains the `config.in` file which allows you
+to configure the application in a proper way. You can define/disable/enable
+application settings. Then they are propagated through Mbed-OS and Matter stack
+build systems.
 
 ## Matter stack configuration
 

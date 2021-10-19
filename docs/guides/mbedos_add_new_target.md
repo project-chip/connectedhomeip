@@ -72,97 +72,33 @@ target to `scripts/examples/mbed_example.sh` and `.vscode/task.json` files
 allows the use of available flashing processes.
 
 Additional flashing option is based on VSCode launch task. Adding the new target
-to it required `.vscode/launch.json` modification. The new definition of the
-launch task should be implemented according to the pattern:
+to it required `.vscode/launch.json` modification. Extend the **options**
+variable in **mbedTarget** input setting.
+
+Example:
 
     {
-        "name": "Flash NEW_TARGET_NAME",
-        "type": "cortex-debug",
-        "request": "launch",
-        "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-        "executable": "./build-NEW_TARGET_NAME/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.elf",
-        "servertype": "openocd",
-        "searchDir": [
-            "${workspaceRoot}/config/mbed/scripts",
-            "${env:OPENOCD_PATH/scripts}"
-        ],
-        "configFiles": ["NEW_TARGET_NAME.tcl"],
-        "overrideLaunchCommands": [
-            "monitor reset halt",
-            "monitor program {./build-NEW_TARGET_NAME/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex}",
-            "monitor reset run",
-            "quit"
-        ],
-        "showDevDebugOutput": false // When set to true, displays output of GDB.
-    }
-
-There is also option for flashing target remote (with external GDB server). To
-do this, add a new definition of the according to the pattern:
-
-    {
-        "name": "Flash Mbed NEW_TARGET_NAME [remote]",
-        "type": "cortex-debug",
-        "request": "launch",
-        "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-        "executable": "./build-NEW_TARGET_NAME/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.elf",
-        "servertype": "external",
-        "gdbTarget": "host.docker.internal:GDB_SERVER_PORT",
-        "overrideLaunchCommands": [
-            "monitor reset halt",
-            "load ./build-NEW_TARGET_NAME/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex",
-            "monitor reset run",
-            "quit"
-        ],
-        "showDevDebugOutput": false // When set to true, displays output of GDB.
+        "type": "pickString",
+        "id": "mbedTarget",
+        "description": "What mbed target do you want to use?",
+        "options": ["CY8CPROTO_062_4343W", "NEW_TARGET_NAME"],
+        "default": "CY8CPROTO_062_4343W"
     }
 
 # Debugging
 
 Debugging process of Mbed OS applications is also based on VSCode launch task.
-Adding the new target to it required `.vscode/launch.json` modification. The new
-definition of the launch task should be implemented according to the pattern:
+Adding the new target to it required `.vscode/launch.json` modification. Extend
+the **options** variable in **mbedTarget** input setting.
+
+Example:
 
     {
-        "name": "Debug Mbed NEW_TARGET_NAME",
-        "type": "cortex-debug",
-        "request": "launch",
-        "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-        "executable": "./build-NEW_TARGET_NAME/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.elf",
-        "servertype": "openocd",
-        "searchDir": [
-            "${workspaceRoot}/config/mbed/scripts",
-            "${env:OPENOCD_PATH/scripts}"
-        ],
-        "configFiles": ["NEW_TARGET_NAME.tcl"],
-        "overrideLaunchCommands": [
-            ...
-                Debugger launch commands specific for the target
-            ...
-        ],
-        "overrideRestartCommands": ["monitor reset halt", "continue"],
-        "runToMain": true, // if true, program will halt at main. Not used for a restart
-        "showDevDebugOutput": false // When set to true, displays output of GDB.
-    }
-
-There is also option for debugging target remote (with external GDB server). To
-do this, add a new definition of the according to the pattern:
-
-    {
-        "name": "Debug Mbed NEW_TARGET_NAME [remote]",
-        "type": "cortex-debug",
-        "request": "launch",
-        "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-        "executable": "./build-NEW_TARGET_NAME/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.elf",
-        "servertype": "external",
-        "gdbTarget": "host.docker.internal:GDB_SERVER_PORT",
-        "overrideLaunchCommands": [
-            ...
-                Debugger launch commands specific for the target
-            ...
-        ],
-        "overrideRestartCommands": ["monitor reset halt", "continue"],
-        "runToMain": true, // if true, program will halt at main. Not used for a restart
-        "showDevDebugOutput": false // When set to true, displays output of GDB.
+        "type": "pickString",
+        "id": "mbedTarget",
+        "description": "What mbed target do you want to use?",
+        "options": ["CY8CPROTO_062_4343W", "NEW_TARGET_NAME"],
+        "default": "CY8CPROTO_062_4343W"
     }
 
 # CI
