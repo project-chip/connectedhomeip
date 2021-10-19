@@ -1,1 +1,1 @@
-0.5.18 Version bump reason: Fix Mbed docker image for CI
+0.5.19 Update AmebaD to not require python2 anymore
