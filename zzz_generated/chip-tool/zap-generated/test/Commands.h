@@ -4955,45 +4955,45 @@ private:
     chip::Callback::Callback<void (*)(void * context, uint16_t interactionModelVersion)> mOnSuccessCallback_0{ OnSuccessCallback_0,
                                                                                                                this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan vendorName)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan vendorName)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint16_t vendorID)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan productName)> mOnSuccessCallback_3{ OnSuccessCallback_3,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan productName)> mOnSuccessCallback_3{ OnSuccessCallback_3,
                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint16_t productID)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan userLabel)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan userLabel)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan location)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan location)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
     chip::Callback::Callback<void (*)(void * context, uint16_t hardwareVersion)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan hardwareVersionString)> mOnSuccessCallback_8{
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan hardwareVersionString)> mOnSuccessCallback_8{
         OnSuccessCallback_8, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
     chip::Callback::Callback<void (*)(void * context, uint32_t softwareVersion)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan softwareVersionString)> mOnSuccessCallback_10{
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan softwareVersionString)> mOnSuccessCallback_10{
         OnSuccessCallback_10, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan manufacturingDate)> mOnSuccessCallback_11{
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan manufacturingDate)> mOnSuccessCallback_11{
         OnSuccessCallback_11, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_12{ OnFailureCallback_12, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan partNumber)> mOnSuccessCallback_12{ OnSuccessCallback_12,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan partNumber)> mOnSuccessCallback_12{ OnSuccessCallback_12,
                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan productURL)> mOnSuccessCallback_13{ OnSuccessCallback_13,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan productURL)> mOnSuccessCallback_13{ OnSuccessCallback_13,
                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_14{ OnFailureCallback_14, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan productLabel)> mOnSuccessCallback_14{ OnSuccessCallback_14,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan productLabel)> mOnSuccessCallback_14{ OnSuccessCallback_14,
                                                                                                            this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_15{ OnFailureCallback_15, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan serialNumber)> mOnSuccessCallback_15{ OnSuccessCallback_15,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan serialNumber)> mOnSuccessCallback_15{ OnSuccessCallback_15,
                                                                                                            this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_16{ OnFailureCallback_16, this };
     chip::Callback::Callback<void (*)(void * context, bool localConfigDisabled)> mOnSuccessCallback_16{ OnSuccessCallback_16,
@@ -5016,7 +5016,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, chip::ByteSpan vendorName)
+    static void OnSuccessCallback_1(void * context, chip::CharSpan vendorName)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_1(vendorName);
     }
@@ -5036,7 +5036,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, chip::ByteSpan productName)
+    static void OnSuccessCallback_3(void * context, chip::CharSpan productName)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_3(productName);
     }
@@ -5056,7 +5056,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, chip::ByteSpan userLabel)
+    static void OnSuccessCallback_5(void * context, chip::CharSpan userLabel)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_5(userLabel);
     }
@@ -5066,7 +5066,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, chip::ByteSpan location)
+    static void OnSuccessCallback_6(void * context, chip::CharSpan location)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_6(location);
     }
@@ -5086,7 +5086,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, chip::ByteSpan hardwareVersionString)
+    static void OnSuccessCallback_8(void * context, chip::CharSpan hardwareVersionString)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_8(hardwareVersionString);
     }
@@ -5106,7 +5106,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, chip::ByteSpan softwareVersionString)
+    static void OnSuccessCallback_10(void * context, chip::CharSpan softwareVersionString)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_10(softwareVersionString);
     }
@@ -5116,7 +5116,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, chip::ByteSpan manufacturingDate)
+    static void OnSuccessCallback_11(void * context, chip::CharSpan manufacturingDate)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_11(manufacturingDate);
     }
@@ -5126,7 +5126,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_12(status);
     }
 
-    static void OnSuccessCallback_12(void * context, chip::ByteSpan partNumber)
+    static void OnSuccessCallback_12(void * context, chip::CharSpan partNumber)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_12(partNumber);
     }
@@ -5136,7 +5136,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_13(status);
     }
 
-    static void OnSuccessCallback_13(void * context, chip::ByteSpan productURL)
+    static void OnSuccessCallback_13(void * context, chip::CharSpan productURL)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_13(productURL);
     }
@@ -5146,7 +5146,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_14(status);
     }
 
-    static void OnSuccessCallback_14(void * context, chip::ByteSpan productLabel)
+    static void OnSuccessCallback_14(void * context, chip::CharSpan productLabel)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_14(productLabel);
     }
@@ -5156,7 +5156,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_15(status);
     }
 
-    static void OnSuccessCallback_15(void * context, chip::ByteSpan serialNumber)
+    static void OnSuccessCallback_15(void * context, chip::CharSpan serialNumber)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_15(serialNumber);
     }
@@ -5211,7 +5211,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(chip::ByteSpan vendorName)
+    void OnSuccessResponse_1(chip::CharSpan vendorName)
     {
         VerifyOrReturn(CheckConstraintType("vendorName", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("vendorName", vendorName.size(), 32));
@@ -5244,7 +5244,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(chip::ByteSpan productName)
+    void OnSuccessResponse_3(chip::CharSpan productName)
     {
         VerifyOrReturn(CheckConstraintType("productName", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("productName", productName.size(), 32));
@@ -5277,7 +5277,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(chip::ByteSpan userLabel)
+    void OnSuccessResponse_5(chip::CharSpan userLabel)
     {
         VerifyOrReturn(CheckConstraintType("userLabel", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("userLabel", userLabel.size(), 32));
@@ -5294,7 +5294,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(chip::ByteSpan location)
+    void OnSuccessResponse_6(chip::CharSpan location)
     {
         VerifyOrReturn(CheckConstraintType("location", "", "string"));
         VerifyOrReturn(CheckConstraintFormat("location", "", "ISO 3166-1 alpha-2"));
@@ -5328,7 +5328,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(chip::ByteSpan hardwareVersionString)
+    void OnSuccessResponse_8(chip::CharSpan hardwareVersionString)
     {
         VerifyOrReturn(CheckConstraintType("hardwareVersionString", "", "string"));
         VerifyOrReturn(CheckConstraintMinLength("hardwareVersionString", hardwareVersionString.size(), 1));
@@ -5362,7 +5362,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(chip::ByteSpan softwareVersionString)
+    void OnSuccessResponse_10(chip::CharSpan softwareVersionString)
     {
         VerifyOrReturn(CheckConstraintType("softwareVersionString", "", "string"));
         VerifyOrReturn(CheckConstraintFormat("softwareVersionString", "", "ASCII"));
@@ -5384,7 +5384,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11(chip::ByteSpan manufacturingDate)
+    void OnSuccessResponse_11(chip::CharSpan manufacturingDate)
     {
         VerifyOrReturn(CheckConstraintType("manufacturingDate", "", "string"));
         VerifyOrReturn(CheckConstraintFormat("manufacturingDate", "", "ISO 8601"));
@@ -5406,7 +5406,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12(chip::ByteSpan partNumber)
+    void OnSuccessResponse_12(chip::CharSpan partNumber)
     {
         VerifyOrReturn(CheckConstraintType("partNumber", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("partNumber", partNumber.size(), 32));
@@ -5426,7 +5426,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(chip::ByteSpan productURL)
+    void OnSuccessResponse_13(chip::CharSpan productURL)
     {
         VerifyOrReturn(CheckConstraintType("productURL", "", "string"));
         VerifyOrReturn(CheckConstraintFormat("productURL", "", "RFC3986"));
@@ -5447,7 +5447,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14(chip::ByteSpan productLabel)
+    void OnSuccessResponse_14(chip::CharSpan productLabel)
     {
         VerifyOrReturn(CheckConstraintType("productLabel", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("productLabel", productLabel.size(), 64));
@@ -5467,7 +5467,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15(chip::ByteSpan serialNumber)
+    void OnSuccessResponse_15(chip::CharSpan serialNumber)
     {
         VerifyOrReturn(CheckConstraintType("serialNumber", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("serialNumber", serialNumber.size(), 32));
@@ -10385,7 +10385,10 @@ private:
     const uint16_t mTestCount = 2;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, _NavigateTargetTargetInfo * targetNavigatorList)>
+    chip::Callback::Callback<void (*)(
+        void * context,
+        const chip::app::DataModel::DecodableList<
+            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & targetNavigatorList)>
         mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
@@ -10393,9 +10396,12 @@ private:
         (static_cast<TV_TargetNavigatorCluster *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, uint16_t count, _NavigateTargetTargetInfo * targetNavigatorList)
+    static void OnSuccessCallback_0(
+        void * context,
+        const chip::app::DataModel::DecodableList<
+            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & targetNavigatorList)
     {
-        (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_0(count, targetNavigatorList);
+        (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_0(targetNavigatorList);
     }
 
     //
@@ -10412,9 +10418,11 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(uint16_t count, _NavigateTargetTargetInfo * targetNavigatorList)
+    void OnSuccessResponse_0(
+        const chip::app::DataModel::DecodableList<
+            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & targetNavigatorList)
     {
-        VerifyOrReturn(CheckValueAsList("targetNavigatorList", count, 2));
+        VerifyOrReturn(CheckValueAsListLength("targetNavigatorList", targetNavigatorList, 2));
         NextTest();
     }
 
@@ -10431,9 +10439,7 @@ private:
         request.data   = chip::Span<const char>("1", strlen("1"));
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TV_TargetNavigatorCluster *>(context))
-                ->OnSuccessResponse_1(data.status,
-                                      chip::ByteSpan(reinterpret_cast<const unsigned char *>(data.data.data()), data.data.size()));
+            (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_1(data.status, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -10444,7 +10450,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(uint8_t status, chip::ByteSpan data) { NextTest(); }
+    void OnSuccessResponse_1(chip::app::Clusters::TargetNavigator::NavigateTargetStatus status, chip::CharSpan data) { NextTest(); }
 };
 
 class TV_AudioOutputCluster : public TestCommand
@@ -10503,18 +10509,23 @@ private:
     const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, _AudioOutputInfo * audioOutputList)> mOnSuccessCallback_0{
-        OnSuccessCallback_0, this
-    };
+    chip::Callback::Callback<void (*)(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
+            audioOutputList)>
+        mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, uint16_t count, _AudioOutputInfo * audioOutputList)
+    static void OnSuccessCallback_0(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
+            audioOutputList)
     {
-        (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_0(count, audioOutputList);
+        (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_0(audioOutputList);
     }
 
     //
@@ -10531,9 +10542,11 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(uint16_t count, _AudioOutputInfo * audioOutputList)
+    void OnSuccessResponse_0(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
+            audioOutputList)
     {
-        VerifyOrReturn(CheckValueAsList("audioOutputList", count, 3));
+        VerifyOrReturn(CheckValueAsListLength("audioOutputList", audioOutputList, 3));
         NextTest();
     }
 
@@ -10649,9 +10662,9 @@ private:
     const uint16_t mTestCount = 4;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, uint16_t * applicationLauncherList)> mOnSuccessCallback_0{
-        OnSuccessCallback_0, this
-    };
+    chip::Callback::Callback<void (*)(void * context,
+                                      const chip::app::DataModel::DecodableList<uint16_t> & applicationLauncherList)>
+        mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t catalogVendorId)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
@@ -10662,9 +10675,9 @@ private:
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, uint16_t count, uint16_t * applicationLauncherList)
+    static void OnSuccessCallback_0(void * context, const chip::app::DataModel::DecodableList<uint16_t> & applicationLauncherList)
     {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_0(count, applicationLauncherList);
+        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_0(applicationLauncherList);
     }
 
     static void OnFailureCallback_2(void * context, uint8_t status)
@@ -10701,9 +10714,9 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(uint16_t count, uint16_t * applicationLauncherList)
+    void OnSuccessResponse_0(const chip::app::DataModel::DecodableList<uint16_t> & applicationLauncherList)
     {
-        VerifyOrReturn(CheckValueAsList("applicationLauncherList", count, 2));
+        VerifyOrReturn(CheckValueAsListLength("applicationLauncherList", applicationLauncherList, 2));
         NextTest();
     }
 
@@ -10721,9 +10734,7 @@ private:
         request.applicationId   = chip::Span<const char>("appId", strlen("appId"));
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))
-                ->OnSuccessResponse_1(data.status,
-                                      chip::ByteSpan(reinterpret_cast<const unsigned char *>(data.data.data()), data.data.size()));
+            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(data.status, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -10734,7 +10745,11 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(uint8_t status, chip::ByteSpan data) { NextTest(); }
+    void OnSuccessResponse_1(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
+    {
+
+        NextTest();
+    }
 
     CHIP_ERROR TestReadAttributeCatalogVendorId_2()
     {
@@ -10843,7 +10858,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(uint8_t status) { NextTest(); }
+    void OnSuccessResponse_0(chip::app::Clusters::KeypadInput::KeypadInputStatus status) { NextTest(); }
 };
 
 class TV_AccountLoginCluster : public TestCommand
@@ -10913,9 +10928,7 @@ private:
         request.tempAccountIdentifier = chip::Span<const char>("asdf", strlen("asdf"));
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TV_AccountLoginCluster *>(context))
-                ->OnSuccessResponse_0(
-                    chip::ByteSpan(reinterpret_cast<const unsigned char *>(data.setupPIN.data()), data.setupPIN.size()));
+            (static_cast<TV_AccountLoginCluster *>(context))->OnSuccessResponse_0(data.setupPIN);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -10926,7 +10939,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(chip::ByteSpan setupPIN) { NextTest(); }
+    void OnSuccessResponse_0(chip::CharSpan setupPIN) { NextTest(); }
 
     CHIP_ERROR TestLoginCommand_1()
     {
@@ -11003,7 +11016,7 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan wakeOnLanMacAddress)> mOnSuccessCallback_0{
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan wakeOnLanMacAddress)> mOnSuccessCallback_0{
         OnSuccessCallback_0, this
     };
 
@@ -11012,7 +11025,7 @@ private:
         (static_cast<TV_WakeOnLanCluster *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, chip::ByteSpan wakeOnLanMacAddress)
+    static void OnSuccessCallback_0(void * context, chip::CharSpan wakeOnLanMacAddress)
     {
         (static_cast<TV_WakeOnLanCluster *>(context))->OnSuccessResponse_0(wakeOnLanMacAddress);
     }
@@ -11031,7 +11044,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(chip::ByteSpan wakeOnLanMacAddress)
+    void OnSuccessResponse_0(chip::CharSpan wakeOnLanMacAddress)
     {
         VerifyOrReturn(CheckValueAsString("wakeOnLanMacAddress", wakeOnLanMacAddress, "00:00:00:00:00"));
         NextTest();
@@ -11325,7 +11338,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_0(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11353,7 +11366,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_1(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11381,7 +11394,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_2(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11409,7 +11422,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_3(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11437,7 +11450,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_4(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11465,7 +11478,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_5(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11493,7 +11506,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_6(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11521,7 +11534,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11550,7 +11563,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_8(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11579,7 +11592,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_9(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11608,7 +11621,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(uint8_t mediaPlaybackStatus)
+    void OnSuccessResponse_10(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11671,18 +11684,22 @@ private:
     const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, _TvChannelInfo * tvChannelList)> mOnSuccessCallback_0{
-        OnSuccessCallback_0, this
-    };
+    chip::Callback::Callback<void (*)(void * context,
+                                      const chip::app::DataModel::DecodableList<
+                                          chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & tvChannelList)>
+        mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, uint16_t count, _TvChannelInfo * tvChannelList)
+    static void OnSuccessCallback_0(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &
+            tvChannelList)
     {
-        (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_0(count, tvChannelList);
+        (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_0(tvChannelList);
     }
 
     //
@@ -11699,9 +11716,11 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(uint16_t count, _TvChannelInfo * tvChannelList)
+    void OnSuccessResponse_0(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &
+            tvChannelList)
     {
-        VerifyOrReturn(CheckValueAsList("tvChannelList", count, 2));
+        VerifyOrReturn(CheckValueAsListLength("tvChannelList", tvChannelList, 2));
         NextTest();
     }
 
@@ -11901,9 +11920,11 @@ private:
     const uint16_t mTestCount = 6;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, _MediaInputInfo * mediaInputList)> mOnSuccessCallback_0{
-        OnSuccessCallback_0, this
-    };
+    chip::Callback::Callback<void (*)(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> &
+            mediaInputList)>
+        mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t currentMediaInput)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
 
@@ -11912,9 +11933,12 @@ private:
         (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, uint16_t count, _MediaInputInfo * mediaInputList)
+    static void OnSuccessCallback_0(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> &
+            mediaInputList)
     {
-        (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_0(count, mediaInputList);
+        (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_0(mediaInputList);
     }
 
     static void OnFailureCallback_2(void * context, uint8_t status)
@@ -11941,9 +11965,11 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(uint16_t count, _MediaInputInfo * mediaInputList)
+    void OnSuccessResponse_0(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> &
+            mediaInputList)
     {
-        VerifyOrReturn(CheckValueAsList("mediaInputList", count, 2));
+        VerifyOrReturn(CheckValueAsListLength("mediaInputList", mediaInputList, 2));
         NextTest();
     }
 
@@ -12791,39 +12817,40 @@ private:
     chip::Callback::Callback<void (*)(void * context, chip::ByteSpan longOctetString)> mOnSuccessCallback_97{ OnSuccessCallback_97,
                                                                                                               this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_98{ OnFailureCallback_98, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan charString)> mOnSuccessCallback_98{ OnSuccessCallback_98,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan charString)> mOnSuccessCallback_98{ OnSuccessCallback_98,
                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_99{ OnFailureCallback_99, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan charString)> mOnSuccessCallback_99{ OnSuccessCallback_99,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan charString)> mOnSuccessCallback_99{ OnSuccessCallback_99,
                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_100{ OnFailureCallback_100, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan charString)> mOnSuccessCallback_100{ OnSuccessCallback_100,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan charString)> mOnSuccessCallback_100{ OnSuccessCallback_100,
                                                                                                           this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_101{ OnFailureCallback_101, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan charString)> mOnSuccessCallback_101{ OnSuccessCallback_101,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan charString)> mOnSuccessCallback_101{ OnSuccessCallback_101,
                                                                                                           this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_102{ OnFailureCallback_102, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan longCharString)> mOnSuccessCallback_102{ OnSuccessCallback_102,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan longCharString)> mOnSuccessCallback_102{ OnSuccessCallback_102,
                                                                                                               this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_103{ OnFailureCallback_103, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan longCharString)> mOnSuccessCallback_103{ OnSuccessCallback_103,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan longCharString)> mOnSuccessCallback_103{ OnSuccessCallback_103,
                                                                                                               this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_104{ OnFailureCallback_104, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan longCharString)> mOnSuccessCallback_104{ OnSuccessCallback_104,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan longCharString)> mOnSuccessCallback_104{ OnSuccessCallback_104,
                                                                                                               this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_105{ OnFailureCallback_105, this };
-    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan longCharString)> mOnSuccessCallback_105{ OnSuccessCallback_105,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan longCharString)> mOnSuccessCallback_105{ OnSuccessCallback_105,
                                                                                                               this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_106{ OnFailureCallback_106, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, uint8_t * listInt8u)> mOnSuccessCallback_106{
-        OnSuccessCallback_106, this
-    };
+    chip::Callback::Callback<void (*)(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)>
+        mOnSuccessCallback_106{ OnSuccessCallback_106, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_107{ OnFailureCallback_107, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, chip::ByteSpan * listOctetString)> mOnSuccessCallback_107{
-        OnSuccessCallback_107, this
-    };
+    chip::Callback::Callback<void (*)(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)>
+        mOnSuccessCallback_107{ OnSuccessCallback_107, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_108{ OnFailureCallback_108, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, _TestListStructOctet * listStructOctetString)>
+    chip::Callback::Callback<void (*)(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+            listStructOctetString)>
         mOnSuccessCallback_108{ OnSuccessCallback_108, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_109{ OnFailureCallback_109, this };
     chip::Callback::Callback<void (*)(void * context, uint64_t epochUs)> mOnSuccessCallback_109{ OnSuccessCallback_109, this };
@@ -13785,7 +13812,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_98(status);
     }
 
-    static void OnSuccessCallback_98(void * context, chip::ByteSpan charString)
+    static void OnSuccessCallback_98(void * context, chip::CharSpan charString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_98(charString);
     }
@@ -13795,7 +13822,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_99(status);
     }
 
-    static void OnSuccessCallback_99(void * context, chip::ByteSpan charString)
+    static void OnSuccessCallback_99(void * context, chip::CharSpan charString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_99(charString);
     }
@@ -13805,7 +13832,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_100(status);
     }
 
-    static void OnSuccessCallback_100(void * context, chip::ByteSpan charString)
+    static void OnSuccessCallback_100(void * context, chip::CharSpan charString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_100(charString);
     }
@@ -13815,7 +13842,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_101(status);
     }
 
-    static void OnSuccessCallback_101(void * context, chip::ByteSpan charString)
+    static void OnSuccessCallback_101(void * context, chip::CharSpan charString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_101(charString);
     }
@@ -13825,7 +13852,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_102(status);
     }
 
-    static void OnSuccessCallback_102(void * context, chip::ByteSpan longCharString)
+    static void OnSuccessCallback_102(void * context, chip::CharSpan longCharString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_102(longCharString);
     }
@@ -13835,7 +13862,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_103(status);
     }
 
-    static void OnSuccessCallback_103(void * context, chip::ByteSpan longCharString)
+    static void OnSuccessCallback_103(void * context, chip::CharSpan longCharString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_103(longCharString);
     }
@@ -13845,7 +13872,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_104(status);
     }
 
-    static void OnSuccessCallback_104(void * context, chip::ByteSpan longCharString)
+    static void OnSuccessCallback_104(void * context, chip::CharSpan longCharString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_104(longCharString);
     }
@@ -13855,7 +13882,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_105(status);
     }
 
-    static void OnSuccessCallback_105(void * context, chip::ByteSpan longCharString)
+    static void OnSuccessCallback_105(void * context, chip::CharSpan longCharString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_105(longCharString);
     }
@@ -13865,9 +13892,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_106(status);
     }
 
-    static void OnSuccessCallback_106(void * context, uint16_t count, uint8_t * listInt8u)
+    static void OnSuccessCallback_106(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_106(count, listInt8u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_106(listInt8u);
     }
 
     static void OnFailureCallback_107(void * context, uint8_t status)
@@ -13875,9 +13902,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_107(status);
     }
 
-    static void OnSuccessCallback_107(void * context, uint16_t count, chip::ByteSpan * listOctetString)
+    static void OnSuccessCallback_107(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_107(count, listOctetString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_107(listOctetString);
     }
 
     static void OnFailureCallback_108(void * context, uint8_t status)
@@ -13885,9 +13912,12 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_108(status);
     }
 
-    static void OnSuccessCallback_108(void * context, uint16_t count, _TestListStructOctet * listStructOctetString)
+    static void OnSuccessCallback_108(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+            listStructOctetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_108(count, listStructOctetString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_108(listStructOctetString);
     }
 
     static void OnFailureCallback_109(void * context, uint8_t status)
@@ -15583,7 +15613,7 @@ private:
 
     void OnFailureResponse_98(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_98(chip::ByteSpan charString)
+    void OnSuccessResponse_98(chip::CharSpan charString)
     {
         VerifyOrReturn(CheckValueAsString("charString", charString, ""));
         NextTest();
@@ -15601,7 +15631,7 @@ private:
 
     void OnFailureResponse_99(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_99(chip::ByteSpan charString) { NextTest(); }
+    void OnSuccessResponse_99(chip::CharSpan charString) { NextTest(); }
 
     CHIP_ERROR TestWriteAttributeCharStringValueTooLong_100()
     {
@@ -15617,7 +15647,7 @@ private:
 
     void OnFailureResponse_100(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_100(chip::ByteSpan charString) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_100(chip::CharSpan charString) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteAttributeCharStringEmpty_101()
     {
@@ -15632,7 +15662,7 @@ private:
 
     void OnFailureResponse_101(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_101(chip::ByteSpan charString) { NextTest(); }
+    void OnSuccessResponse_101(chip::CharSpan charString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongCharStringDefaultValue_102()
     {
@@ -15644,7 +15674,7 @@ private:
 
     void OnFailureResponse_102(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_102(chip::ByteSpan longCharString)
+    void OnSuccessResponse_102(chip::CharSpan longCharString)
     {
         VerifyOrReturn(CheckValueAsString("longCharString", longCharString, ""));
         NextTest();
@@ -15670,7 +15700,7 @@ private:
 
     void OnFailureResponse_103(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_103(chip::ByteSpan longCharString) { NextTest(); }
+    void OnSuccessResponse_103(chip::CharSpan longCharString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongCharString_104()
     {
@@ -15682,7 +15712,7 @@ private:
 
     void OnFailureResponse_104(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_104(chip::ByteSpan longCharString)
+    void OnSuccessResponse_104(chip::CharSpan longCharString)
     {
         VerifyOrReturn(CheckValueAsString(
             "longCharString", longCharString,
@@ -15705,7 +15735,7 @@ private:
 
     void OnFailureResponse_105(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_105(chip::ByteSpan longCharString) { NextTest(); }
+    void OnSuccessResponse_105(chip::CharSpan longCharString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeList_106()
     {
@@ -15717,9 +15747,9 @@ private:
 
     void OnFailureResponse_106(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_106(uint16_t count, uint8_t * listInt8u)
+    void OnSuccessResponse_106(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
     {
-        VerifyOrReturn(CheckValueAsList("listInt8u", count, 4));
+        VerifyOrReturn(CheckValueAsListLength("listInt8u", listInt8u, 4));
         NextTest();
     }
 
@@ -15733,9 +15763,9 @@ private:
 
     void OnFailureResponse_107(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_107(uint16_t count, chip::ByteSpan * listOctetString)
+    void OnSuccessResponse_107(const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
     {
-        VerifyOrReturn(CheckValueAsList("listOctetString", count, 4));
+        VerifyOrReturn(CheckValueAsListLength("listOctetString", listOctetString, 4));
         NextTest();
     }
 
@@ -15749,9 +15779,11 @@ private:
 
     void OnFailureResponse_108(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_108(uint16_t count, _TestListStructOctet * listStructOctetString)
+    void OnSuccessResponse_108(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+            listStructOctetString)
     {
-        VerifyOrReturn(CheckValueAsList("listStructOctetString", count, 4));
+        VerifyOrReturn(CheckValueAsListLength("listStructOctetString", listStructOctetString, 4));
         NextTest();
     }
 
@@ -16216,7 +16248,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(chip::app::DataModel::DecodableList<uint8_t> arg1)
+    void OnSuccessResponse_4(const chip::app::DataModel::DecodableList<uint8_t> & arg1)
     {
         VerifyOrReturn(CheckValueAsList("arg1", arg1, 9, 8, 7, 6, 5, 4, 3, 2, 1));
         NextTest();
@@ -16596,30 +16628,30 @@ private:
     const uint16_t mTestCount = 4;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, _DeviceType * deviceList)> mOnSuccessCallback_0{
-        OnSuccessCallback_0, this
-    };
+    chip::Callback::Callback<void (*)(void * context,
+                                      const chip::app::DataModel::DecodableList<
+                                          chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & deviceList)>
+        mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, chip::ClusterId * serverList)> mOnSuccessCallback_1{
-        OnSuccessCallback_1, this
-    };
+    chip::Callback::Callback<void (*)(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & serverList)>
+        mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, chip::ClusterId * clientList)> mOnSuccessCallback_2{
-        OnSuccessCallback_2, this
-    };
+    chip::Callback::Callback<void (*)(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & clientList)>
+        mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t count, chip::EndpointId * partsList)> mOnSuccessCallback_3{
-        OnSuccessCallback_3, this
-    };
+    chip::Callback::Callback<void (*)(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & partsList)>
+        mOnSuccessCallback_3{ OnSuccessCallback_3, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<TestDescriptorCluster *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, uint16_t count, _DeviceType * deviceList)
+    static void OnSuccessCallback_0(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & deviceList)
     {
-        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_0(count, deviceList);
+        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_0(deviceList);
     }
 
     static void OnFailureCallback_1(void * context, uint8_t status)
@@ -16627,9 +16659,9 @@ private:
         (static_cast<TestDescriptorCluster *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, uint16_t count, chip::ClusterId * serverList)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & serverList)
     {
-        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_1(count, serverList);
+        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_1(serverList);
     }
 
     static void OnFailureCallback_2(void * context, uint8_t status)
@@ -16637,9 +16669,9 @@ private:
         (static_cast<TestDescriptorCluster *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, uint16_t count, chip::ClusterId * clientList)
+    static void OnSuccessCallback_2(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & clientList)
     {
-        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_2(count, clientList);
+        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_2(clientList);
     }
 
     static void OnFailureCallback_3(void * context, uint8_t status)
@@ -16647,9 +16679,9 @@ private:
         (static_cast<TestDescriptorCluster *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t count, chip::EndpointId * partsList)
+    static void OnSuccessCallback_3(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & partsList)
     {
-        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_3(count, partsList);
+        (static_cast<TestDescriptorCluster *>(context))->OnSuccessResponse_3(partsList);
     }
 
     //
@@ -16666,9 +16698,10 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(uint16_t count, _DeviceType * deviceList)
+    void OnSuccessResponse_0(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & deviceList)
     {
-        VerifyOrReturn(CheckValueAsList("deviceList", count, 1));
+        VerifyOrReturn(CheckValueAsListLength("deviceList", deviceList, 1));
         NextTest();
     }
 
@@ -16682,9 +16715,9 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(uint16_t count, chip::ClusterId * serverList)
+    void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<chip::ClusterId> & serverList)
     {
-        VerifyOrReturn(CheckValueAsList("serverList", count, 18));
+        VerifyOrReturn(CheckValueAsListLength("serverList", serverList, 18));
         NextTest();
     }
 
@@ -16698,9 +16731,9 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(uint16_t count, chip::ClusterId * clientList)
+    void OnSuccessResponse_2(const chip::app::DataModel::DecodableList<chip::ClusterId> & clientList)
     {
-        VerifyOrReturn(CheckValueAsList("clientList", count, 0));
+        VerifyOrReturn(CheckValueAsListLength("clientList", clientList, 0));
         NextTest();
     }
 
@@ -16714,9 +16747,9 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint16_t count, chip::EndpointId * partsList)
+    void OnSuccessResponse_3(const chip::app::DataModel::DecodableList<chip::EndpointId> & partsList)
     {
-        VerifyOrReturn(CheckValueAsList("partsList", count, 2));
+        VerifyOrReturn(CheckValueAsListLength("partsList", partsList, 2));
         NextTest();
     }
 };

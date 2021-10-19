@@ -46,7 +46,9 @@ using namespace chip::app::Clusters::TestCluster;
 using namespace chip::app::Clusters::TestCluster::Commands;
 using namespace chip::app::Clusters::TestCluster::Attributes;
 
+#if !CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 constexpr const char * kErrorStr = "Test Cluster: List Octet cluster (0x%02x) Error setting '%s' attribute: 0x%02x";
+#endif // CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
 
 namespace {
 
