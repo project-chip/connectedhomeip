@@ -24,8 +24,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/support/CHIPMem.h>
-#include <platform/nxp/k32w/k32w0/K32W0Config.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/nxp/k32w/k32w0/K32W0Config.h>
 #include <set>
 #include <string>
 
