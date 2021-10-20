@@ -5,6 +5,7 @@ package chip.clusterinfo;
 import java.util.List;
 <<<<<<< HEAD
 
+<<<<<<< HEAD
 /**
  * Interface for making customized callback that implements both onSuccess and onFailure functions.
  */
@@ -17,6 +18,9 @@ import java.util.*;
 >>>>>>> ef97f0702 (resolve type, nullable and format comments)
 
 >>>>>>> 2d2bbd2e1 (new design solution)
+=======
+/** Interface for making customized callback that implements both onSuccess and onFailure function */
+>>>>>>> 2185ce827 (add descriptive documentation on each new class)
 public interface ClusterCommandCallback {
   void onSuccess(List<Object> responseValues);
 
