@@ -18,7 +18,7 @@
 
 cd "$(dirname "$0")"/../../..
 CHIP_ROOT=$PWD
-cd "$CHIP_ROOT"/src/test_driver/mbed/
+cd "$CHIP_ROOT"/src/test_driver/mbed/unit_tests/
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(CY8CPROTO_062_4343W)
@@ -32,25 +32,25 @@ PROFILE=release
 
 for i in "$@"; do
     case $i in
-        -b=* | --board=*)
-            TARGET_BOARD="${i#*=}"
-            shift
-            ;;
-        -t=* | --toolchain=*)
-            TOOLCHAIN="${i#*=}"
-            shift
-            ;;
-        -p=* | --profile=*)
-            PROFILE="${i#*=}"
-            shift
-            ;;
-        -c=* | --command=*)
-            COMMAND="${i#*=}"
-            shift
-            ;;
-        *)
-            # unknown option
-            ;;
+    -b=* | --board=*)
+        TARGET_BOARD="${i#*=}"
+        shift
+        ;;
+    -t=* | --toolchain=*)
+        TOOLCHAIN="${i#*=}"
+        shift
+        ;;
+    -p=* | --profile=*)
+        PROFILE="${i#*=}"
+        shift
+        ;;
+    -c=* | --command=*)
+        COMMAND="${i#*=}"
+        shift
+        ;;
+    *)
+        # unknown option
+        ;;
     esac
 done
 
