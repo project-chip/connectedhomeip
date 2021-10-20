@@ -1142,32 +1142,12 @@ public:
     virtual void OnStatusChange(void){};
 };
 
-#ifdef IFNAMSIZ
-constexpr uint16_t kMaxInterfaceName = IFNAMSIZ;
-#else
-constexpr uint16_t kMaxInterfaceName = 32;
-#endif
-
-typedef struct SerializableDevice
-{
-    PASESessionSerializable mOpsCreds;
-    uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
-    uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort;  /* This field is serialized in LittleEndian byte order */
-    uint16_t mFabricIndex; /* This field is serialized in LittleEndian byte order */
-    uint8_t mDeviceTransport;
-    uint8_t mDeviceOperationalCertProvisioned;
-    uint8_t mInterfaceName[kMaxInterfaceName];
-    uint32_t mLocalMessageCounter; /* This field is serialized in LittleEndian byte order */
-    uint32_t mPeerMessageCounter;  /* This field is serialized in LittleEndian byte order */
-} SerializableDevice;
-
 typedef struct SerializedDevice
 {
     // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
     // The encoder may not include a NULL character, and there are maximum 2 bytes of padding.
     // So extra 8 bytes should be sufficient to absorb this overhead.
-    uint8_t inner[BASE64_ENCODED_LEN(sizeof(SerializableDevice) + sizeof(uint64_t))];
+    uint8_t inner[1];
 } SerializedDevice;
 
 } // namespace Controller

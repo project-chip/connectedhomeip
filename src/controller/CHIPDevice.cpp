@@ -911,131 +911,11 @@ CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
 {
-    SerializableDevice serializable;
-
-    static_assert(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
-                  "Size of serializable should be <= size of output");
-
-    CHIP_ZERO_AT(serializable);
-    CHIP_ZERO_AT(output);
-
-    serializable.mOpsCreds    = mPairing;
-    serializable.mDeviceId    = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mDevicePort  = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
-    serializable.mFabricIndex = Encoding::LittleEndian::HostSwap16(mFabricIndex);
-
-    // The connection state could be null if the device is moving from PASE connection to CASE connection.
-    // The device parameters (e.g. mDeviceOperationalCertProvisioned) are updated during this transition.
-    // The state during this transistion is being persisted so that the next access of the device will
-    // trigger the CASE based secure session.
-    if (mSecureSession.HasValue())
-    {
-        Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
-        const uint32_t localMessageCounter       = secureSession->GetSessionMessageCounter().GetLocalMessageCounter().Value();
-        const uint32_t peerMessageCounter        = secureSession->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
-
-        serializable.mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(localMessageCounter);
-        serializable.mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(peerMessageCounter);
-    }
-    else
-    {
-        serializable.mLocalMessageCounter = 0;
-        serializable.mPeerMessageCounter  = 0;
-    }
-
-    serializable.mDeviceOperationalCertProvisioned = (mDeviceOperationalCertProvisioned) ? 1 : 0;
-
-    serializable.mDeviceTransport = to_underlying(mDeviceAddress.GetTransportType());
-
-    ReturnErrorOnFailure(Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
-                                                sizeof(serializable.mInterfaceName)));
-    static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
-    mDeviceAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
-
-    const uint16_t serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
-                                                      static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
-    VerifyOrReturnError(serializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(serializedLen < sizeof(output.inner), CHIP_ERROR_INVALID_ARGUMENT);
-    output.inner[serializedLen] = '\0';
-
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 {
-    SerializableDevice serializable;
-    constexpr size_t maxlen = BASE64_ENCODED_LEN(sizeof(serializable));
-    const size_t len        = strnlen(Uint8::to_const_char(&input.inner[0]), maxlen);
-
-    VerifyOrReturnError(len < sizeof(SerializedDevice), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_INVALID_ARGUMENT);
-
-    CHIP_ZERO_AT(serializable);
-    const uint16_t deserializedLen = Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len),
-                                                  Uint8::to_uchar(reinterpret_cast<uint8_t *>(&serializable)));
-
-    VerifyOrReturnError(deserializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(deserializedLen <= sizeof(serializable), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // The second parameter to FromString takes the strlen value. We are subtracting 1
-    // from the sizeof(serializable.mDeviceAddr) to account for null termination, since
-    // strlen doesn't include null character in the size.
-    Inet::IPAddress ipAddress = {};
-    VerifyOrReturnError(
-        IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, ipAddress),
-        CHIP_ERROR_INVALID_ADDRESS);
-
-    mPairing             = serializable.mOpsCreds;
-    mDeviceId            = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
-    const uint16_t port  = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
-    const uint16_t index = Encoding::LittleEndian::HostSwap16(serializable.mFabricIndex);
-    mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(serializable.mLocalMessageCounter);
-    mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(serializable.mPeerMessageCounter);
-
-    VerifyOrReturnError(CanCastTo<FabricIndex>(index), CHIP_ERROR_INVALID_ARGUMENT);
-    mFabricIndex = static_cast<FabricIndex>(index);
-
-    // TODO - Remove the hack that's incrementing message counter while deserializing device
-    // This hack was added as a quick workaround for TE3 testing. The commissioning code
-    // is closing the exchange after the device has already been serialized and persisted to the storage.
-    // While closing the exchange, the outstanding ack gets sent to the device, thus incrementing
-    // the local message counter. As the device information was stored prior to sending the ack, it now has
-    // the old counter value (which is 1 less than the updated counter).
-    mLocalMessageCounter++;
-
-    mDeviceOperationalCertProvisioned = (serializable.mDeviceOperationalCertProvisioned != 0);
-
-    // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
-    // LwIP stack.
-    Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
-    if (serializable.mInterfaceName[0] != '\0')
-    {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-        LOCK_TCPIP_CORE();
-#endif
-        CHIP_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), interfaceId);
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-        UNLOCK_TCPIP_CORE();
-#endif
-        ReturnErrorOnFailure(inetErr);
-    }
-
-    static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
-                  "The underlying type of Transport::Type is not uint8_t.");
-    switch (static_cast<Transport::Type>(serializable.mDeviceTransport))
-    {
-    case Transport::Type::kUdp:
-        mDeviceAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
-        break;
-    case Transport::Type::kBle:
-        mDeviceAddress = Transport::PeerAddress::BLE();
-        break;
-    case Transport::Type::kTcp:
-    case Transport::Type::kUndefined:
-    default:
-        return CHIP_ERROR_INTERNAL;
-    }
-
     return CHIP_NO_ERROR;
 }
 
@@ -1370,33 +1250,66 @@ void Device::OnSessionEstablished()
 CHIP_ERROR Device::EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
                                          Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    bool loadedSecureSession = false;
-    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+    // Create a UnauthenticatedSession for CASE pairing.
+    // Don't use mSecureSession here, because mSecureSession is for encrypted communication.
+    Optional<SessionHandle> session = mSessionManager->CreateUnauthenticatedSession(mDeviceAddress);
+    VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
 
-    if (loadedSecureSession)
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(session.Value(), &mCASESession);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
+
+    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager));
+
+    uint16_t keyID = 0;
+    ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
+
+    FabricInfo * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, fabricInfo, mDeviceId, keyID, exchange, this));
+
+    // EnqueueConnectionCallbacks(onConnection, onFailure);
+    // mState = State::Connecting;
+
+    if (onConnection != nullptr)
     {
-        if (IsOperationalCertProvisioned())
-        {
-            if (onConnection != nullptr)
-            {
-                mConnectionSuccess.Enqueue(onConnection->Cancel());
-            }
+        mConnectionSuccess.Enqueue(onConnection->Cancel());
+    }
 
-            if (onFailure != nullptr)
-            {
-                mConnectionFailure.Enqueue(onFailure->Cancel());
-            }
-        }
-        else
-        {
-            if (onConnection != nullptr)
-            {
-                onConnection->mCall(onConnection->mContext, this);
-            }
-        }
+    if (onFailure != nullptr)
+    {
+        mConnectionFailure.Enqueue(onFailure->Cancel());
     }
 
     return CHIP_NO_ERROR;
+
+    // bool loadedSecureSession = false;
+    // ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    // if (loadedSecureSession)
+    // {
+    //     if (IsOperationalCertProvisioned())
+    //     {
+    //         if (onConnection != nullptr)
+    //         {
+    //             mConnectionSuccess.Enqueue(onConnection->Cancel());
+    //         }
+
+    //         if (onFailure != nullptr)
+    //         {
+    //             mConnectionFailure.Enqueue(onFailure->Cancel());
+    //         }
+    //     }
+    //     else
+    //     {
+    //         if (onConnection != nullptr)
+    //         {
+    //             onConnection->mCall(onConnection->mContext, this);
+    //         }
+    //     }
+    // }
+
+    // return CHIP_NO_ERROR;
 }
 
 void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
