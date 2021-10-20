@@ -370,7 +370,14 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  if (options.hash.isList) {
+    let listType = isDecodable ? "DecodableList" : "List";
+    // If we did not have a namespace provided, we can assume we're inside
+    // chip::app.
+    let listNamespace = options.hash.ns ? "chip::app::" : ""
+    promise = promise.then(typeStr => `${listNamespace}DataModel::${listType}<${typeStr}>`);
+  }
   return templateUtil.templatePromise(this.global, promise)
 }
 
