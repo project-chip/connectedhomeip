@@ -3,7 +3,11 @@ package chip.clusterinfo;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 /** Interface for a callback that delegates to {@link ClusterCommandCallback}. */
+=======
+/** Interface for setting customized ClusterCommandCallback in ClusterInteractionFragment.kt */
+>>>>>>> 2185ce827 (add descriptive documentation on each new class)
 public interface DelegatedClusterCallback {
   void setCallbackDelegate(ClusterCommandCallback callback);
 }
