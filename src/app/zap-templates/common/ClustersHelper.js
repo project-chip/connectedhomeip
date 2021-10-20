@@ -189,7 +189,7 @@ function asChipCallback(item)
   }
 
   if (StringHelper.isCharString(item.type)) {
-    return { name : 'CharString', type : 'const chip::ByteSpan' };
+    return { name : 'CharString', type : 'const chip::CharSpan' };
   }
 
   if (ListHelper.isList(item.type)) {

@@ -79,6 +79,23 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertFalse(GlobMatcher('{a,b}x{c,d}').matches('axe'))
         self.assertFalse(GlobMatcher('{a,b}x{c,d}').matches('exd'))
 
+    def test_combined(self):
+        self.assertTrue(GlobMatcher('a{,bc}').matches('a'))
+        self.assertTrue(GlobMatcher('a{,bc}').matches('abc'))
+        self.assertTrue(GlobMatcher('ab{c*d,ef}xz').matches('abcdxz'))
+        self.assertTrue(GlobMatcher('ab{c*d,ef}xz').matches('abc1234dxz'))
+        self.assertTrue(GlobMatcher('ab{c*d,ef}xz').matches('abefxz'))
+
+        self.assertFalse(GlobMatcher('a{,bc}').matches('ab'))
+        self.assertFalse(GlobMatcher('a{,bc}').matches('ax'))
+        self.assertFalse(GlobMatcher('a{,bc}').matches('abcd'))
+        self.assertFalse(GlobMatcher('ab{c*d,ef}xz').matches('abxz'))
+        self.assertFalse(GlobMatcher('ab{c*d,ef}xz').matches('abcxz'))
+        self.assertFalse(GlobMatcher('ab{c*d,ef}xz').matches('abdxz'))
+        self.assertFalse(GlobMatcher('ab{c*d,ef}xz').matches('abxz'))
+        self.assertFalse(GlobMatcher('ab{c*d,ef}xz').matches('abexz'))
+        self.assertFalse(GlobMatcher('ab{c*d,ef}xz').matches('abfxz'))
+
 
 if __name__ == '__main__':
     unittest.main()

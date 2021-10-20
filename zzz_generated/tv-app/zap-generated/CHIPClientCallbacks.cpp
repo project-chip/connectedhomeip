@@ -28,13 +28,13 @@
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
-#include <app/util/prepare-list.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
+using namespace ::chip::app::DataModel;
 using namespace ::chip::app::List;
 
 namespace {
@@ -214,157 +214,86 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
-#if !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif // __clang__
 void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                               Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback)
 {
-    // TODO: Add actual support for array and lists.
-    const uint8_t * message = nullptr;
-    uint16_t messageLen     = 0;
-    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
-    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    DecodableList<chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
         {
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, res);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
         }
         return;
     }
 
-    CHECK_MESSAGE_LENGTH_VOID(2);
-    uint16_t count = Encoding::LittleEndian::Read16(message);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wvla"
-    _BasicCommissioningInfoType data[count];
-#pragma GCC diagnostic pop
-    for (size_t i = 0; i < count; i++)
-    {
-        CHECK_MESSAGE_LENGTH_VOID(4);
-        data[i].FailSafeExpiryLengthMs = emberAfGetInt32u(message, 0, 4);
-        message += 4;
-    }
     Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * cb =
         Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, count, data);
+    cb->mCall(cb->mContext, list);
 }
 #if !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif // __clang__
 
-#if !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif // __clang__
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
-    // TODO: Add actual support for array and lists.
-    const uint8_t * message = nullptr;
-    uint16_t messageLen     = 0;
-    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
-    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    DecodableList<chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
         {
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, res);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
         }
         return;
     }
 
-    CHECK_MESSAGE_LENGTH_VOID(2);
-    uint16_t count = Encoding::LittleEndian::Read16(message);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wvla"
-    _FabricDescriptor data[count];
-#pragma GCC diagnostic pop
-    for (size_t i = 0; i < count; i++)
-    {
-        CHECK_MESSAGE_LENGTH_VOID(1);
-        data[i].FabricIndex = emberAfGetInt8u(message, 0, 1);
-        message += 1;
-        CHECK_STATUS_VOID(ReadByteSpan(message, 67, &data[i].RootPublicKey));
-        messageLen = static_cast<uint16_t>(messageLen - 67);
-        message += 67;
-        CHECK_MESSAGE_LENGTH_VOID(2);
-        data[i].VendorId = emberAfGetInt16u(message, 0, 2);
-        message += 2;
-        CHECK_MESSAGE_LENGTH_VOID(8);
-        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
-        message += 8;
-        CHECK_MESSAGE_LENGTH_VOID(8);
-        data[i].NodeId = emberAfGetInt64u(message, 0, 8);
-        message += 8;
-        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].Label));
-        messageLen = static_cast<uint16_t>(messageLen - 34);
-        message += 34;
-    }
     Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, count, data);
+    cb->mCall(cb->mContext, list);
 }
 #if !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif // __clang__
 
-#if !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif // __clang__
 void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV::TLVReader * tlvData,
                                                                              Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback)
 {
-    // TODO: Add actual support for array and lists.
-    const uint8_t * message = nullptr;
-    uint16_t messageLen     = 0;
-    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
-    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    DecodableList<chip::ByteSpan> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
     {
         if (onFailureCallback != nullptr)
         {
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, res);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
         }
         return;
     }
 
-    CHECK_MESSAGE_LENGTH_VOID(2);
-    uint16_t count = Encoding::LittleEndian::Read16(message);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wvla"
-    chip::ByteSpan data[count];
-#pragma GCC diagnostic pop
-    for (size_t i = 0; i < count; i++)
-    {
-        CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
-        uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
-        messageLen           = static_cast<uint16_t>(messageLen - entryLength);
-        message += entryLength;
-    }
     Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * cb =
         Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, count, data);
+    cb->mCall(cb->mContext, list);
 }
 #if !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif // __clang__
 
 bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                   uint8_t errorCode, uint8_t * debugText)
+                                                                   uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "ArmFailSafeResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterArmFailSafeResponseCallback");
 
@@ -375,12 +304,11 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId en
 }
 
 bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                             uint8_t errorCode, uint8_t * debugText)
+                                                                             uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
 
@@ -391,12 +319,11 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(End
 }
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                           uint8_t errorCode, uint8_t * debugText)
+                                                                           uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "SetRegulatoryConfigResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetRegulatoryConfigResponseCallback");
 
@@ -407,12 +334,11 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(Endpo
 }
 
 bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                        uint8_t errorCode, uint8_t * debugText)
+                                                                        uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "AddThreadNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddThreadNetworkResponseCallback");
 
@@ -423,12 +349,11 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(Endpoint
 }
 
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                      uint8_t errorCode, uint8_t * debugText)
+                                                                      uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "AddWiFiNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddWiFiNetworkResponseCallback");
 
@@ -439,12 +364,11 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(EndpointId
 }
 
 bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                      uint8_t errorCode, uint8_t * debugText)
+                                                                      uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "DisableNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterDisableNetworkResponseCallback");
 
@@ -455,12 +379,11 @@ bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(EndpointId
 }
 
 bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                     uint8_t errorCode, uint8_t * debugText)
+                                                                     uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "EnableNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterEnableNetworkResponseCallback");
 
@@ -471,12 +394,11 @@ bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(EndpointId 
 }
 
 bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                     uint8_t errorCode, uint8_t * debugText)
+                                                                     uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "RemoveNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterRemoveNetworkResponseCallback");
 
@@ -487,14 +409,13 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(EndpointId 
 }
 
 bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-    EndpointId endpoint, app::CommandSender * commandObj, uint8_t errorCode, uint8_t * debugText,
+    EndpointId endpoint, app::CommandSender * commandObj, uint8_t errorCode, chip::CharSpan debugText,
     /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
     /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
 {
     ChipLogProgress(Zcl, "ScanNetworksResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
     ChipLogProgress(Zcl, "  wifiScanResults: %p", wifiScanResults);
     ChipLogProgress(Zcl, "  threadScanResults: %p", threadScanResults);
 
@@ -507,12 +428,11 @@ bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
 }
 
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                           uint8_t errorCode, uint8_t * debugText)
+                                                                           uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "UpdateThreadNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateThreadNetworkResponseCallback");
 
@@ -523,12 +443,11 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(Endpo
 }
 
 bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                         uint8_t errorCode, uint8_t * debugText)
+                                                                         uint8_t errorCode, chip::CharSpan debugText)
 {
     ChipLogProgress(Zcl, "UpdateWiFiNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback");
 

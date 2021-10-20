@@ -237,7 +237,7 @@ combination with JLinkRTTClient as follows:
 
       close-ble
 
-      resolve 0 1234
+      resolve 1234
 
       zcl OnOff Toggle 1234 1 0
     ```

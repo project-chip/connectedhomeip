@@ -367,6 +367,18 @@ menu "CHIP Device Layer"
             help
                 The size (in bytes) of the service directory cache.  This limits the maximum size of the directory
                 that can be returned in response to a service directory query.
+        
+        config ENABLE_EXTENDED_DISCOVERY
+            bool "Enable Extended discovery Support"
+            default n
+            help
+                Enables support for Extended Discovery.
+
+        config ENABLE_COMMISSIONABLE_DEVICE_TYPE
+            bool "Enable Device type in commissionable node discovery."
+            default n
+            help
+                Enables or Disables the support for Commissionable Device Type.
 
     endmenu
 
@@ -408,6 +420,12 @@ menu "CHIP Device Layer"
             default ""
             help
                 A string identifying the firmware revision running on the device.
+
+        config DEVICE_TYPE
+            int "Default Device type"
+            default 0
+            help
+                The default device type.
 
     endmenu
 

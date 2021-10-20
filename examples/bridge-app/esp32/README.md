@@ -1,40 +1,84 @@
-# CHIP ESP32 All Clusters Example
+# CHIP ESP32 Bridge App Example
 
-A prototype application that demonstrates device commissioning and cluster
-control.
+A prototype application that demonstrates dynamic endpoint with device
+commissioning and cluster control. It adds the non-chip device as endpoints on a
+bridge(Matter device). In this example four light devices supporting on-off
+cluster have been added as endpoints
+
+1. Light1 at endpoint 2
+2. Light2 at endpoint 6
+3. Light3 at endpoint 4
+4. Light4 at endpoint 5
 
 ---
 
--   [CHIP ESP32 All Clusters Example](#chip-esp32-all-clusters-example)
-    -   [Supported Devices](#supported-devices)
+-   [CHIP ESP32 Bridge App Example](#chip-esp32-bridge-app-example)
+    -   [Dynamic Endpoints](#dynamic-endpoints)
     -   [Building the Example Application](#building-the-example-application)
     -   [Commissioning and cluster control](#commissioning-and-cluster-control)
         -   [Setting up Python Controller](#setting-up-python-controller)
         -   [Commissioning over BLE](#commissioning-over-ble)
         -   [Cluster control](#cluster-control)
-    -   [Flashing app using script](#flashing-app-using-script)
-    -   [Note](#note)
 
 ---
 
-## Supported Devices
+## Dynamic Endpoints
 
-The CHIP demo application is intended to work on three categories of ESP32
-devices: the
-[ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
-the
-[ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
-the [M5Stack](http://m5stack.com), and the
-[ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html).
+The Bridge Example makes use of Dynamic Endpoints. Current SDK support is
+limited for dynamic endpoints, since endpoints are typically defined (along with
+the clusters and attributes they contain) in a .zap file which then generates
+code and static structures to define the endpoints.
 
-Note: M5Stack Core 2 display is not supported in the tft component, while other
-functionality can still work fine.
+To support endpoints that are not statically defined, the ZCL attribute storage
+mechanisms will hold additional endpoint information for `NUM_DYNAMIC_ENDPOINTS`
+additional endpoints. These additional endpoint structures must be defined by
+the application and can change at runtime.
+
+To facilitate the creation of these endpoint structures, several macros are
+defined:
+
+`DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName)`
+`DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)`
+`DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(clusterRevision)`
+
+-   These three macros are used to declare a list of attributes for use within a
+    cluster. The declaration must begin with the
+    `DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN` macro which will define the name of
+    the allocated attribute structure. Each attribute is then added by the
+    `DECLARE_DYNAMIC_ATTRIBUTE` macro. Finally,
+    `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END` macro should be used to close the
+    definition.
+
+-   All attributes defined with these macros will be configured as
+    `ATTRIBUTE_MASK_EXTERNAL_STORAGE` in the ZCL database and therefore will
+    rely on the application to maintain storage for the attribute. Consequently,
+    reads or writes to these attributes must be handled within the application
+    by the `emberAfExternalAttributeWriteCallback` and
+    `emberAfExternalAttributeReadCallback` functions. See the bridge
+    application's `main.cpp` for an example of this implementation.
+
+`DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName)`
+`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs)`
+`DECLARE_DYNAMIC_CLUSTER_LIST_END`
+
+-   These three macros are used to declare a list of clusters for use within a
+    endpoint. The declaration must begin with the
+    `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN` macro which will define the name of the
+    allocated cluster structure. Each cluster is then added by the
+    `DECLARE_DYNAMIC_CLUSTER` macro referencing attribute list previously
+    defined by the `DECLARE_DYNAMIC_ATTRIBUTE...` macros. Finally,
+    `DECLARE_DYNAMIC_CLUSTER_LIST_END` macro should be used to close the
+    definition.
+
+`DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)`
+
+-   This macro is used to declare an endpoint and its associated cluster list,
+    which must be previously defined by the `DECLARE_DYNAMIC_CLUSTER...` macros.
 
 ## Building the Example Application
 
 Building the example application requires the use of the Espressif ESP32 IoT
-Development Framework and the xtensa-esp32-elf toolchain for ESP32 modules or
-the riscv-esp32-elf toolchain for ESP32C3 modules.
+Development Framework and the xtensa-esp32-elf toolchain.
 
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
@@ -73,22 +117,11 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
         $ source ./scripts/activate.sh
 
--   Target Set
-
-To set IDF target, run set-target with one of the commands.
-
-          $ idf.py set-target esp32
-          $ idf.py set-target esp32c3
-
 -   Configuration Options
 
-To choose from the different configuration options, run menuconfig.
-
-          $ idf.py menuconfig
-
-Select ESP32 based `Device Type` through `Demo`->`Device Type`. The device types
-that are currently supported include `ESP32-DevKitC` (default),
-`ESP32-WROVER-KIT_V4.1`, `M5Stack` and `ESP32C3-DevKitM`.
+    This application uses `ESP32-DevKitC` as a default device type. To use other
+    ESP32 based device types, please refer
+    [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
 
 -   To build the demo application.
 
@@ -128,7 +161,7 @@ Commissioning can be carried out using WiFi, BLE or Bypass.
          $ idf.py menuconfig
 
 Select the Rendezvous Mode via `Demo -> Rendezvous Mode`. If Rendezvous Mode is
-ByPass then set the credentials of the WiFi Network (i.e. SSID and Password from
+Bypass then set the credentials of the WiFi Network (i.e. SSID and Password from
 menuconfig).
 
 `idf.py menuconfig -> Component config -> CHIP Device Layer -> WiFi Station Options`
@@ -146,18 +179,18 @@ menuconfig).
 
 4.  Use
     [python based device controller](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python)
-    or
+    or  
     [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
-    or
+    or  
     [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin/CHIPTool)
-    or
+    or  
     [Android chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/android/CHIPTool)
     to communicate with the device.
 
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
 your network configuration. To erase it, simply run.
 
-          $ idf.py -p /dev/tty.SLAB_USBtoUART erase_flash
+    $ idf.py -p /dev/tty.SLAB_USBtoUART erase_flash
 
 ### Setting up Python Controller
 
@@ -204,83 +237,18 @@ commissioning and cluster control.
          - chip-device-ctrl > close-ble
 
 -   Resolve DNS-SD name and update address of the node in the device controller.
+    Get fabric ID using `get-fabricid` and use the decimal value of compressed
+    fabric id.
 
-         - chip-device-ctrl > resolve 135246
+         - chip-device-ctrl > get-fabricid
 
-### Cluster control
+         - chip-device-ctrl > resolve <Compressed Fabric ID> 135246
+
+### Cluster Control
 
 -   After successful commissioning, use the OnOff cluster commands to control
-    the OnOff attribute. This allows you to toggle a parameter implemented by
-    the device to be On or Off.
+    the OnOff attribute on different light devices connected on specific
+    endpoints. This allows you to toggle a parameter implemented by the device
+    to be On or Off.
 
-    `chip-device-ctrl > zcl OnOff Off 135246 1 1`
-
--   Use the LevelControl cluster commands to control the CurrentLevel attribute.
-    This allows you to control the brightness of the led.
-
-    `chip-device-ctrl > zcl LevelControl MoveToLevel 135246 1 1 level=10 transitionTime=0 optionMask=0 optionOverride=0`
-
--   For ESP32C3-DevKitM, use the ColorControl cluster commands to control the
-    CurrentHue and CurrentSaturation attribute. This allows you to control the
-    color of on-board LED.
-
-    `zcl ColorControl MoveToHue 135246 1 1 hue=100 direction=0 transitionTime=0 optionsMask=0 optionsOverride=0`
-    `zcl ColorControl MoveToSaturation 135245 1 1 saturation=200 transitionTime=0 optionsMask=0 optionsOverride=0`
-
-### Flashing app using script
-
--   Follow these steps to use `${app_name}.flash.py`.
-
-    -   First set IDF target, run set-target with one of the commands.
-
-            $ idf.py set-target esp32
-            $ idf.py set-target esp32c3
-
-    -   Execute below sequence of commands
-
-```
-        $ export ESPPORT=/dev/tty.SLAB_USBtoUART
-        $ idf.py build
-        $ idf.py flashing_script
-        $ python ${app_name}.flash.py
-```
-
-### Note
-
-This demo app illustrates controlling OnOff cluster (Server) attributes of an
-endpoint. For `ESP32-DevKitC`, `ESP32-WROVER-KIT_V4.1` and `ESP32C3-DevKitM`, a
-GPIO (configurable through `STATUS_LED_GPIO_NUM` in `main/main.cpp`) is updated
-through the on/off/toggle commands from the `python-controller`. For `M5Stack`,
-a virtual Green LED on the display is used for the same.
-
-If you wish to see the actual effect of the commands on `ESP32-DevKitC`,
-`ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
-`STATUS_LED_GPIO_NUM`. For `ESP32C3-DevKitM`, the on-board LED will show the
-actual effect of the commands.
-
-## Using the RPC console
-
-Enable RPCs in the build using menuconfig:
-
-    $ idf.py menuconfig
-
-Enable the RPC library:
-
-    Component config → CHIP Core → General Options → Enable Pigweed PRC library
-
-After flashing a build with RPCs enabled you can use the rpc console to send
-commands to the device.
-
-Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
-
-Start the console
-
-    python -m chip_rpc.console --device /dev/ttyUSB0
-
-From within the console you can then invoke rpcs:
-
-    rpcs.chip.rpc.Wifi.Connect(ssid=b"MySSID", secret=b"MyPASSWORD")
-    rpcs.chip.rpc.Wifi.GetIP6Address()
-
-    rpcs.chip.rpc.Lighting.Get()
-    rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
+    `chip-device-ctrl > zcl OnOff On 135246 2 0`

@@ -326,9 +326,10 @@ function assertCommandOrAttribute(context)
 //
 // Templates
 //
-function chip_tests(items, options)
+function chip_tests(list, options)
 {
-  const names = items.split(',').map(name => name.trim());
+  const items = Array.isArray(list) ? list : list.split(',');
+  const names = items.map(name => name.trim());
   const tests = names.map(item => parse(item));
   return templateUtil.collectBlocks(tests, options, this);
 }
