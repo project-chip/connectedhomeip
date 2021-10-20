@@ -10,7 +10,7 @@ public:
       {{#if (isStrEqual partial-type "Command")}}
       {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
       {{else if (isStrEqual partial-type "List")}}
-      , const chip::app::DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list
+      , const {{zapTypeToDecodableClusterObjectType type ns=parent.name}} & list
       {{else if partial-type}}
       , {{asUnderlyingZclType partial-type}} value
       {{else}}
@@ -22,8 +22,7 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
   {{#if (isStrEqual partial-type "Command")}}
   {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
   {{else if (isStrEqual partial-type "List")}}
-  , const chip::app::DataModel::DecodableList
-  <{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list
+  , const {{zapTypeToDecodableClusterObjectType type ns=parent.name}} & list
   {{else if partial-type}}
   , {{asUnderlyingZclType partial-type}} value
   {{else}}

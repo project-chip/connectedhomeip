@@ -53,7 +53,7 @@ class {{filename}}: public TestCommand
     {{#*inline "successCallback"}}mOnSuccessCallback_{{index}}{{/inline}}
     {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
     {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
-    {{#*inline "successArguments"}}void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}const chip::app::DataModel::DecodableList<{{/if}}{{zapTypeToDecodableClusterObjectType type ns=parent.cluster}}{{#if isList}}> &{{/if}} {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
+    {{#*inline "successArguments"}}void * context{{#chip_tests_item_response_parameters}}, const {{zapTypeToDecodableClusterObjectType type ns=parent.cluster}} & {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
     {{#*inline "failureArguments"}}void * context, uint8_t status{{/inline}}
 
     {{#chip_tests_items}}
@@ -102,7 +102,7 @@ class {{filename}}: public TestCommand
     {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}
     {{#*inline "successResponse"}}OnSuccessResponse_{{index}}{{/inline}}
     {{#*inline "failureArguments"}}uint8_t status{{/inline}}
-    {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{#if isList}}const chip::app::DataModel::DecodableList<{{/if}}{{#if isArray}}const chip::app::DataModel::DecodableList<{{/if}}{{zapTypeToDecodableClusterObjectType type ns=parent.cluster}}{{#if isList}}>& {{/if}}{{#if isArray}}>& {{/if}} {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
+    {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}const {{zapTypeToDecodableClusterObjectType type ns=parent.cluster}} & {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
 
     CHIP_ERROR {{>testCommand}}()
     {

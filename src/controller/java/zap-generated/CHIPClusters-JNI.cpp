@@ -5981,7 +5981,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<uint16_t> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6057,7 +6057,7 @@ public:
 
     static void CallbackFn(
         void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & list)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6147,7 +6147,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::ByteSpan> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6222,7 +6222,7 @@ public:
 
     static void
     CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list)
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6296,9 +6296,9 @@ public:
         }
     }
 
-    static void
-    CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list)
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6384,7 +6384,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::ClusterId> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6458,7 +6458,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::ClusterId> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6532,7 +6532,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::EndpointId> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6606,9 +6606,9 @@ public:
         }
     }
 
-    static void
-    CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list)
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6699,7 +6699,7 @@ public:
 
     static void
     CallbackFn(void * context,
-               const app::DataModel::DecodableList<
+               const chip::app::DataModel::DecodableList<
                    chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
@@ -6791,10 +6791,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6893,7 +6892,8 @@ public:
 
     static void CallbackFn(
         void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> &
+            list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6981,7 +6981,7 @@ public:
 
     static void CallbackFn(
         void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7074,9 +7074,9 @@ public:
         }
     }
 
-    static void
-    CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list)
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7167,10 +7167,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7266,7 +7265,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<uint8_t> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7340,9 +7339,9 @@ public:
         }
     }
 
-    static void
-    CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7438,7 +7437,7 @@ public:
     }
 
     static void CallbackFn(void * context,
-                           const app::DataModel::DecodableList<
+                           const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
@@ -7528,7 +7527,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<uint8_t> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7602,7 +7601,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::ByteSpan> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7677,7 +7676,8 @@ public:
 
     static void CallbackFn(
         void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> & list)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+            list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7767,10 +7767,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7873,10 +7872,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7974,10 +7972,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8068,7 +8065,7 @@ public:
 
     static void
     CallbackFn(void * context,
-               const app::DataModel::DecodableList<
+               const chip::app::DataModel::DecodableList<
                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
@@ -8175,8 +8172,9 @@ public:
         }
     }
 
-    static void CallbackFn(void * context,
-                           const app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;

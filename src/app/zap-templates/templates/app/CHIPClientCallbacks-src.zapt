@@ -129,7 +129,7 @@ app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInsta
 {{#if isList}}
 void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> list;
+    {{zapTypeToDecodableClusterObjectType type ns=parent.name}} list;
     CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {

@@ -88,7 +88,7 @@ void OnAttributeResponse<bool>(void * /* context */, bool value)
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, const DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list)
+static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, const {{zapTypeToDecodableClusterObjectType type ns=parent.name}} & list)
 {
     uint16_t count = 0;
     auto iter = list.begin();
