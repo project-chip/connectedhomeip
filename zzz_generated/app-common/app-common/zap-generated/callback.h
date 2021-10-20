@@ -13883,6 +13883,11 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestAddArguments::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestListInt8UReverseResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                                   /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+/**
  * @brief Test Cluster Cluster TestSimpleArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestSimpleArgumentRequestCallback(
@@ -13930,6 +13935,12 @@ bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
 bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestListInt8UReverseRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */

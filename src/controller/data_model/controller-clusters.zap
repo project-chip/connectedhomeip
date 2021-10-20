@@ -1,5 +1,5 @@
 {
-  "featureLevel": 62,
+  "featureLevel": 63,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -10748,6 +10748,14 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 0
+            },
+            {
+              "name": "TestListInt8UReverseRequest",
+              "code": 13,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -10787,6 +10795,14 @@
             {
               "name": "TestAddArgumentsResponse",
               "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "TestListInt8UReverseResponse",
+              "code": 4,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,

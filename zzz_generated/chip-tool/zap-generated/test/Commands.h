@@ -5704,15 +5704,19 @@ public:
             err = TestSendTestCommandWithListOfInt8uAndOneOfThemIsSetTo0_3();
             break;
         case 4:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 4 : Send Test Command With List of Struct Argument and arg1.b of first item is true\n");
-            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Send Test Command With List of INT8U and get it reversed\n");
+            err = TestSendTestCommandWithListOfInt8uAndGetItReversed_4();
             break;
         case 5:
             ChipLogProgress(
+                chipTool, " ***** Test Step 5 : Send Test Command With List of Struct Argument and arg1.b of first item is true\n");
+            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_5();
+            break;
+        case 6:
+            ChipLogProgress(
                 chipTool,
-                " ***** Test Step 5 : Send Test Command With List of Struct Argument and arg1.b of first item is false\n");
-            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_5();
+                " ***** Test Step 6 : Send Test Command With List of Struct Argument and arg1.b of first item is false\n");
+            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_6();
             break;
         }
 
@@ -5725,7 +5729,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 7;
 
     //
     // Tests methods
@@ -5866,7 +5870,47 @@ private:
 
     void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_4()
+    CHIP_ERROR TestSendTestCommandWithListOfInt8uAndGetItReversed_4()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
+        using responseType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
+
+        chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+
+        uint8_t arg1List[9];
+        arg1List[0]  = 1;
+        arg1List[1]  = 2;
+        arg1List[2]  = 3;
+        arg1List[3]  = 4;
+        arg1List[4]  = 5;
+        arg1List[5]  = 6;
+        arg1List[6]  = 7;
+        arg1List[7]  = 8;
+        arg1List[8]  = 9;
+        request.arg1 = arg1List;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_4(data.arg1);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_4(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(chip::app::DataModel::DecodableList<uint8_t> arg1)
+    {
+        VerifyOrReturn(CheckValueAsList("arg1", arg1, 9, 8, 7, 6, 5, 4, 3, 2, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_5()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -5895,20 +5939,20 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_4();
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_4(status);
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_5(status);
         };
         return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
     }
 
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4() { NextTest(); }
+    void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_5()
+    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_6()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -5937,18 +5981,18 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_5();
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_5(status);
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_6(status);
         };
         return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
     }
 
-    void OnFailureResponse_5(uint8_t status) { NextTest(); }
+    void OnFailureResponse_6(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
 };
 
 class TestConstraints : public TestCommand

@@ -36,6 +36,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -384,6 +385,43 @@ bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
     }
 
     emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
+    CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+    Commands::TestListInt8UReverseRequest::DecodableType const & commandData)
+{
+    size_t count = 0;
+    {
+        auto iter = commandData.arg1.begin();
+        while (iter.Next())
+        {
+            ++count;
+        }
+        VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR, );
+    }
+
+    {
+        auto iter = commandData.arg1.begin();
+        Commands::TestListInt8UReverseResponse::Type responseData;
+        size_t cur = count;
+        Platform::ScopedMemoryBuffer<uint8_t> responseBuf;
+        VerifyOrExit(responseBuf.Calloc(count), );
+        while (iter.Next() && cur > 0)
+        {
+            responseBuf[cur - 1] = iter.GetValue();
+            --cur;
+        }
+        VerifyOrExit(cur == 0, );
+        VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR, );
+        responseData.arg1 = DataModel::List<uint8_t>(responseBuf.Get(), count);
+        SuccessOrExit(commandObj->AddResponseData(commandPath, responseData));
+        return true;
+    }
+
+exit:
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     return true;
 }
 

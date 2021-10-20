@@ -4380,6 +4380,14 @@ using chip::Callback::Cancelable;
     });
 }
 
+- (void)testListInt8UReverseRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.TestListInt8UReverseRequest(success, failure, arg1);
+        });
+}
+
 - (void)testListStructArgumentRequest:(uint8_t)a
                                     b:(bool)b
                                     c:(uint8_t)c

@@ -1,16 +1,16 @@
-## CHIP Project Flow
+## Matter Project Flow
 
-This section is intended to cover how CHIP uses GitHub Projects, Issues,
+This section is intended to cover how Matter uses GitHub Projects, Issues,
 Milestones, Releases, and Branches for program/project management in the code
 repository.
 
 ### Issues
 
-CHIP uses issues as simple problem descriptions or feature requests. In general,
-all work contributed to the repository in the form of pull requests (PR) should
-be under the auspices of some open issue. This may seem onerous and in some
-cases duplicative, so consider these guidelines when deciding whether to you can
-get away with not creating an issue:
+Matter uses issues as simple problem descriptions or feature requests. In
+general, all work contributed to the repository in the form of pull requests
+(PR) should be under the auspices of some open issue. This may seem onerous and
+in some cases duplicative, so consider these guidelines when deciding whether to
+you can get away with not creating an issue:
 
 -   Trivial fixes: issues can function as TODO lists, simple reminders that
     something should be addressed. Sometimes, though, the work required to fix
@@ -38,7 +38,7 @@ PR Don'ts:
 
 ### Milestones
 
-In CHIP parlance, a milestone is simply a tag for an expected due date or
+In Matter parlance, a milestone is simply a tag for an expected due date or
 release. Milestones are intended to help contributors and their managers to
 prioritize work. There are 2 types: Date-based and Release-based.
 
@@ -80,6 +80,6 @@ one of the task-tracking projects (the first type).
 
 ### Branches, releases, and general development flow
 
-Master should always be CHIPs best branch. Release branches, once cut, are
+Master should always be Matter's best branch. Release branches, once cut, are
 closed for any feature work. Software fixes for release branches must first land
 on master unless demonstrably infeasible.

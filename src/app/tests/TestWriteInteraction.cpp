@@ -267,9 +267,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     writer.Init(attributeDataTLV);
     writer.CopyElement(TLV::AnonymousTag, aReader);
     attributeDataTLVLen = writer.GetLengthWritten();
-    return aWriteHandler->AddStatus(AttributePathParams(aClusterInfo.mNodeId, aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                        aClusterInfo.mFieldId, aClusterInfo.mListIndex,
-                                                        AttributePathParams::Flags::kFieldIdValid),
+    return aWriteHandler->AddStatus(AttributePathParams(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId),
                                     Protocols::InteractionModel::Status::Success);
 }
 

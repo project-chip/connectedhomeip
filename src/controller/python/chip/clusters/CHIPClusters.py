@@ -3061,6 +3061,13 @@ class ChipClusters:
                     "arg1": "int",
                 },
             },
+            0x0000000D: {
+                "commandId": 0x0000000D,
+                "commandName": "TestListInt8UReverseRequest",
+                "args": {
+                    "arg1": "int",
+                },
+            },
             0x00000009: {
                 "commandId": 0x00000009,
                 "commandName": "TestListStructArgumentRequest",
@@ -4946,6 +4953,11 @@ class ChipClusters:
 
     def ClusterTestCluster_CommandTestListInt8UArgumentRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest(
+            device, ZCLendpoint, ZCLgroupid, arg1
+        )
+
+    def ClusterTestCluster_CommandTestListInt8UReverseRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int):
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UReverseRequest(
             device, ZCLendpoint, ZCLgroupid, arg1
         )
 
@@ -8663,6 +8675,10 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestListInt8UReverseRequest
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UReverseRequest.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UReverseRequest.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestListStructArgumentRequest
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestListStructArgumentRequest.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_bool, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint8]
