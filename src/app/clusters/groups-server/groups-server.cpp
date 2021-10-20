@@ -162,7 +162,7 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    emberAfGroupsClusterPrintln("RX: AddGroup 0x%2x, \"%.*s\"", groupId, groupName.size(), groupName.data());
+    emberAfGroupsClusterPrintln("RX: AddGroup 0x%2x, \"%.*s\"", groupId, static_cast<int>(groupName.size()), groupName.data());
 
     status = addEntryToGroupTable(emberAfCurrentEndpoint(), groupId, groupName);
 
@@ -444,7 +444,8 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
     EmberAfStatus status;
     EmberStatus sendStatus = EMBER_SUCCESS;
 
-    emberAfGroupsClusterPrintln("RX: AddGroupIfIdentifying 0x%2x, \"%.*s\"", groupId, groupName.size(), groupName.data());
+    emberAfGroupsClusterPrintln("RX: AddGroupIfIdentifying 0x%2x, \"%.*s\"", groupId, static_cast<int>(groupName.size()),
+                                groupName.data());
 
     if (!emberAfIsDeviceIdentifying(emberAfCurrentEndpoint()))
     {

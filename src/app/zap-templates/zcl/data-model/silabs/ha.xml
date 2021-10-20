@@ -2068,20 +2068,14 @@ limitations under the License.
         This message is used to return household appliance current alerts.
       </description>
       <arg name="alertsCount" type="AlertCount"/>
-      <!--
       <arg name="alertStructures" type="AlertStructure" array="true"/>
-      TODO: Add back when zap#248 is resolved
-      -->
     </command>
     <command source="server" code="0x01" name="AlertsNotification" optional="false">
       <description>
         This message is used to notify the current modification of warning and/or fault conditions.
       </description>
       <arg name="alertsCount" type="AlertCount"/>
-      <!--
       <arg name="alertStructures" type="AlertStructure" array="true"/>
-      TODO: Add back when zap#248 is resolved
-      -->
     </command>
     <command source="server" code="0x02" name="EventsNotification" optional="false">
       <description>

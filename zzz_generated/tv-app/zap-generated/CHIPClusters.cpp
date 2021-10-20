@@ -21,6 +21,7 @@
 
 #include <cstdint>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
@@ -238,6 +239,28 @@ CHIP_ERROR GeneralCommissioningCluster::ReadAttributeClusterRevision(Callback::C
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type,
+                           chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>(
+    const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type,
+                           chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>(
+    const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type &, void *,
+    CommandResponseSuccessCallback<
+        chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type,
+                           chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>(
+    const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>,
+    CommandResponseFailureCallback);
 
 // NetworkCommissioning Cluster Commands
 CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * onSuccessCallback,
@@ -480,6 +503,40 @@ CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::C
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type,
+                           chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>(
+    const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type,
+                           chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>(
+    const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type,
+                           chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type,
+                           chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>(
+    const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type,
+                           chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>(
+    const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>,
+    CommandResponseFailureCallback);
 
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -847,6 +904,70 @@ CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback:
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type,
+                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
+    const chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type,
+                           chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type,
+                           chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>(
+    const chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type,
+                           chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>(
+    const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type,
+                                               chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>(
+    const chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type,
+                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
+    const chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type,
+                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
+    const chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template <typename RequestDataT, typename ResponseDataT>
+CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
+                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
+                                      CommandResponseFailureCallback failureCb)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
+
+    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
+        successCb(context, responseData);
+    };
+
+    auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+        failureCb(context, app::ToEmberAfStatus(aIMStatus));
+    };
+
+    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                               requestData, onSuccessCb, onFailureCb);
+};
 
 } // namespace Controller
 } // namespace chip

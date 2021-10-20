@@ -188,7 +188,7 @@ CHIP_ERROR AttributeStatusIB::Parser::GetStatusIB(StatusIB::Parser * const apSta
     err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusIB), reader);
     SuccessOrExit(err);
 
-    VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     err = apStatusIB->Init(reader);
     SuccessOrExit(err);

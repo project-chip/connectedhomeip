@@ -2440,7 +2440,7 @@ bool emberAfColorControlClusterColorLoopSetCallback(app::CommandHandler * comman
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
-    return ColorControlServer::Instance().colorLoopCommand(updateFlags, action, direction, time, startHue, optionsMask,
+    return ColorControlServer::Instance().colorLoopCommand(updateFlags.Raw(), action, direction, time, startHue, optionsMask,
                                                            optionsOverride);
 }
 

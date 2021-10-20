@@ -132,14 +132,14 @@ CHIP_ERROR LayerImplSelect::StartTimer(uint32_t delayMilliseconds, TimerComplete
     if (dispatchQueue)
     {
         (void) mTimerList.Add(timer);
-        dispatch_source_t timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatchQueue);
+        dispatch_source_t timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, DISPATCH_TIMER_STRICT, dispatchQueue);
         if (timerSource == nullptr)
         {
             chipDie();
         }
 
         timer->mTimerSource = timerSource;
-        dispatch_source_set_timer(timerSource, dispatch_walltime(NULL, delayMilliseconds * NSEC_PER_MSEC), 0, 100 * NSEC_PER_MSEC);
+        dispatch_source_set_timer(timerSource, dispatch_walltime(NULL, delayMilliseconds * NSEC_PER_MSEC), 0, 2 * NSEC_PER_MSEC);
         dispatch_source_set_event_handler(timerSource, ^{
             dispatch_source_cancel(timerSource);
             dispatch_release(timerSource);

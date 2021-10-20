@@ -145,7 +145,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
     JniUtfString jniAddress(env, address);
     Inet::IPAddress ipAddress;
 
-    VerifyOrReturn(strlen(jniInstanceName.c_str()) <= kDnssdInstanceNameMaxSize, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturn(strlen(jniInstanceName.c_str()) <= Operational::kInstanceNameMaxLength, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturn(strlen(jniServiceType.c_str()) <= kDnssdTypeAndProtocolMaxSize, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturn(CanCastTo<uint16_t>(port), dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturn(Inet::IPAddress::FromString(jniAddress.c_str(), ipAddress), dispatch(CHIP_ERROR_INVALID_ARGUMENT));

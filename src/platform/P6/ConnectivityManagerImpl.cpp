@@ -43,10 +43,6 @@
 #error "WiFi Station support must be enabled when building for PSoC6"
 #endif
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-#error "WiFi AP support must be enabled when building for PSoC6"
-#endif
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;

@@ -27,6 +27,7 @@
 #include "system/SystemClock.h"
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <chrono>
@@ -160,12 +161,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadError(chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient) override
+    CHIP_ERROR ReadDone(chip::app::ReadClient * apReadClient) override
     {
         if (!apReadClient->IsSubscriptionType())
         {
@@ -190,7 +191,7 @@ public:
                static_cast<double>(gCommandRespCount) * 100 / static_cast<double>(gCommandCount),
                static_cast<double>(transitTime) / 1000);
     }
-    void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aProtocolCode,
+    void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aStatus,
                  CHIP_ERROR aError) override
     {
         gCommandRespCount += (aError == CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
@@ -307,12 +308,11 @@ CHIP_ERROR SendReadRequest()
     eventPathParams[1].mClusterId  = kTestClusterId;
     eventPathParams[1].mEventId    = kTestChangeEvent2;
 
-    chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, 1, 0,
-                                                       chip::app::AttributePathParams::Flags::kFieldIdValid);
+    chip::app::AttributePathParams attributePathParams(kTestEndpointId, kTestClusterId, 1);
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex));
+    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 1, 1, gFabricIndex));
     readPrepareParams.mTimeout                     = gMessageTimeoutMsec;
     readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
@@ -373,7 +373,7 @@ CHIP_ERROR SendSubscribeRequest()
     CHIP_ERROR err   = CHIP_NO_ERROR;
     gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
 
-    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex));
+    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 1, 1, gFabricIndex));
     chip::app::EventPathParams eventPathParams[2];
     chip::app::AttributePathParams attributePathParams[1];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
@@ -635,7 +635,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     // We do not really care about the value, just return a not found status code.
     VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);

@@ -706,7 +706,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     output.SetLength(bbuf.Needed());
 
 exit:
-    memset(privkey, 0, sizeof(privkey));
+    ClearSecretData(privkey, sizeof(privkey));
     _log_mbedTLS_error(result);
     return error;
 }

@@ -36,6 +36,7 @@ class DLL_EXPORT CryptoContext
 {
 public:
     CryptoContext();
+    ~CryptoContext();
     CryptoContext(CryptoContext &&)      = default;
     CryptoContext(const CryptoContext &) = default;
     CryptoContext & operator=(const CryptoContext &) = default;

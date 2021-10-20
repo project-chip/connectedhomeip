@@ -79,8 +79,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to decode the request");
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
             return;
         }
 
@@ -106,13 +105,11 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         }
         else if (responseDirective == kSendSuccessStatusCode)
         {
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
         }
         else if (responseDirective == kSendError)
         {
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
         }
     }
 }
@@ -123,7 +120,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -160,30 +157,32 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     request.arg1 = true;
 
-    auto onSuccessCb =
-        [apSuite, &onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                       const TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & dataResponse) {
-            uint8_t i;
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const auto & dataResponse) {
+        uint8_t i;
 
-            i         = 0;
-            auto iter = dataResponse.arg1.begin();
-            while (iter.Next())
-            {
-                auto & item = iter.GetValue();
+        i         = 0;
+        auto iter = dataResponse.arg1.begin();
+        while (iter.Next())
+        {
+            auto & item = iter.GetValue();
 
-                NL_TEST_ASSERT(apSuite, item.a == i);
-                NL_TEST_ASSERT(apSuite, item.b == false);
-                NL_TEST_ASSERT(apSuite, item.c.a == i);
-                NL_TEST_ASSERT(apSuite, item.c.b == true);
-                i++;
-            }
+            NL_TEST_ASSERT(apSuite, item.a == i);
+            NL_TEST_ASSERT(apSuite, item.b == false);
+            NL_TEST_ASSERT(apSuite, item.c.a == i);
+            NL_TEST_ASSERT(apSuite, item.c.b == true);
+            i++;
+        }
 
-            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(apSuite, dataResponse.arg6 == true);
+        NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, dataResponse.arg6 == true);
 
-            onSuccessWasCalled = true;
-        };
+        onSuccessWasCalled = true;
+    };
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
         onFailureWasCalled = true;
     };
@@ -208,11 +207,14 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
 
     request.arg1 = true;
 
-    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                             const chip::app::DataModel::NullObjectType & dataResponse) {
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const auto & dataResponse) {
         onSuccessWasCalled = true;
     };
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
         onFailureWasCalled = true;
     };
@@ -236,11 +238,14 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
 
     request.arg1 = true;
 
-    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                             const chip::app::DataModel::NullObjectType & dataResponse) {
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const auto & dataResponse) {
         onSuccessWasCalled = true;
     };
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
         onFailureWasCalled = true;
     };

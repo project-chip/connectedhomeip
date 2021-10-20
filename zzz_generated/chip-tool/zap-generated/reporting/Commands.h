@@ -57,81 +57,70 @@ public:
         delete onReportWindowCoveringSafetyStatusCallback;
     }
 
-    void AddReportCallbacks(uint8_t endpointId) override
+    void AddReportCallbacks(NodeId remoteId, uint8_t endpointId) override
     {
         chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x000F, 0x0055,
-                                       onReportBinaryInputBasicPresentValueCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x000F, 0x0055, onReportBinaryInputBasicPresentValueCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x000F, 0x006F,
-                                       onReportBinaryInputBasicStatusFlagsCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x000F, 0x006F, onReportBinaryInputBasicStatusFlagsCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0300, 0x0000,
-                                       onReportColorControlCurrentHueCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0000, onReportColorControlCurrentHueCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0300, 0x0001,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0001,
                                        onReportColorControlCurrentSaturationCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0300, 0x0003,
-                                       onReportColorControlCurrentXCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0003, onReportColorControlCurrentXCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0300, 0x0004,
-                                       onReportColorControlCurrentYCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0004, onReportColorControlCurrentYCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0300, 0x0007,
-                                       onReportColorControlColorTemperatureCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0007, onReportColorControlColorTemperatureCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0101, 0x0000,
-                                       onReportDoorLockLockStateCallback->Cancel(), BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0008, 0x0000,
-                                       onReportLevelControlCurrentLevelCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0000, onReportDoorLockLockStateCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0406, 0x0000,
-                                       onReportOccupancySensingOccupancyCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0000, onReportLevelControlCurrentLevelCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0006, 0x0000,
-                                       onReportOnOffOnOffCallback->Cancel(), BasicAttributeFilter<BooleanAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0403, 0x0000,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0406, 0x0000, onReportOccupancySensingOccupancyCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0403, 0x0000,
                                        onReportPressureMeasurementMeasuredValueCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0200, 0x0013,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0013,
                                        onReportPumpConfigurationAndControlCapacityCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0405, 0x0000,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0405, 0x0000,
                                        onReportRelativeHumidityMeasurementMeasuredValueCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x003B, 0x0001,
-                                       onReportSwitchCurrentPositionCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0x0001, onReportSwitchCurrentPositionCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0402, 0x0000,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0402, 0x0000,
                                        onReportTemperatureMeasurementMeasuredValueCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0201, 0x0000,
-                                       onReportThermostatLocalTemperatureCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0000, onReportThermostatLocalTemperatureCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0102, 0x0008,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0008,
                                        onReportWindowCoveringCurrentPositionLiftPercentageCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0102, 0x0009,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0009,
                                        onReportWindowCoveringCurrentPositionTiltPercentageCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0102, 0x000A,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x000A,
                                        onReportWindowCoveringOperationalStatusCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0102, 0x000B,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x000B,
                                        onReportWindowCoveringTargetPositionLiftPercent100thsCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0102, 0x000C,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x000C,
                                        onReportWindowCoveringTargetPositionTiltPercent100thsCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0102, 0x000E,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x000E,
                                        onReportWindowCoveringCurrentPositionLiftPercent100thsCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0102, 0x000F,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x000F,
                                        onReportWindowCoveringCurrentPositionTiltPercent100thsCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0102, 0x001A,
-                                       onReportWindowCoveringSafetyStatusCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x001A, onReportWindowCoveringSafetyStatusCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
     }
 

@@ -1208,6 +1208,18 @@ public:
     static void OnSuccessFn(void * context, uint8_t returnValue);
 };
 
+class CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge
+    : public CHIPCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallback>
+{
+public:
+    CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+};
+
 class CHIPTestClusterClusterTestSpecificResponseCallbackBridge
     : public CHIPCallbackBridge<TestClusterClusterTestSpecificResponseCallback>
 {

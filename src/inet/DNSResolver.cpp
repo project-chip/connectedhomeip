@@ -251,17 +251,6 @@ CHIP_ERROR DNSResolver::ResolveImpl(char * hostNameBuf)
 
 CHIP_ERROR DNSResolver::Cancel()
 {
-#if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    // NOTE: DNS lookups can be canceled only when using the asynchronous mode.
-
-    InetLayer & inet = Layer();
-
-    OnComplete = nullptr;
-    AppState   = nullptr;
-    inet.mAsyncDNSResolver.Cancel(*this);
-
-#endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
     return CHIP_NO_ERROR;
 }
 
@@ -439,19 +428,6 @@ uint8_t DNSResolver::CountAddresses(int family, const struct addrinfo * addrs)
 
     return count;
 }
-
-#if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-void DNSResolver::HandleAsyncResolveComplete()
-{
-    // Copy the resolved address to the application supplied buffer, but only if the request hasn't been canceled.
-    if (OnComplete && mState != kState_Canceled)
-    {
-        OnComplete(AppState, asyncDNSResolveResult, NumAddrs, AddrArray);
-    }
-
-    Release();
-}
-#endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 

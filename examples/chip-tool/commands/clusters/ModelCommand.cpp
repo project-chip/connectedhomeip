@@ -23,16 +23,14 @@
 
 using namespace ::chip;
 
-CHIP_ERROR ModelCommand::Run()
+CHIP_ERROR ModelCommand::RunCommand()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
 
-    auto * ctx = GetExecContext();
-
-    err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %" CHIP_ERROR_FORMAT,
-                              ctx->remoteId, err.Format()));
+                              mNodeId, err.Format()));
 
 exit:
     return err;

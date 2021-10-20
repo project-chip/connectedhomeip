@@ -69,14 +69,6 @@
 #include <inet/UDPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#include <inet/AsyncDNSResolverSockets.h>
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
 
@@ -130,9 +122,6 @@ class DLL_EXPORT InetLayer
 {
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
     friend class DNSResolver;
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    friend class AsyncDNSResolverSockets;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -252,13 +241,6 @@ private:
     void * mContext;
     void * mPlatformData;
     chip::System::Layer * mSystemLayer;
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    AsyncDNSResolverSockets mAsyncDNSResolver;
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     bool IsIdleTimerRunning();
 };

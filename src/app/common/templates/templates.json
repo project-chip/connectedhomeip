@@ -52,11 +52,6 @@
             "output": "cluster-id.h"
         },
         {
-            "path": "../../zap-templates/templates/app/client-command-macro.zapt",
-            "name": "ZCL client command",
-            "output": "client-command-macro.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/command-id.zapt",
             "name": "ZCL command-id header",
             "output": "command-id.h"
