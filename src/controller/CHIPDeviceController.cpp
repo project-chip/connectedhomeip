@@ -939,9 +939,11 @@ CHIP_ERROR DeviceCommissioner::OperationalDiscoveryComplete(NodeId remoteDeviceI
 
     Device * device = nullptr;
     ReturnErrorOnFailure(GetDevice(remoteDeviceId, &device));
-    device->OperationalCertProvisioned();
-    PersistDevice(device);
-    PersistNextKeyId();
+    if (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()) {
+      device->OperationalCertProvisioned();
+      PersistDevice(device);
+      PersistNextKeyId();
+    }
 
     return GetConnectedDevice(remoteDeviceId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
