@@ -345,9 +345,11 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
         uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
         if (size != 2)
         {
-            // We expect 2 bytes for the length, but the length value itself
-            // should be 0.  If it's not, we are not going to do the right
-            // thing.
+            // The value returned by emberAfAttributeValueSize for a list
+            // includes the space needed to store the list length (2 bytes) plus
+            // the space needed to store the actual list items.  We expect it to
+            // return 2 here, indicating a zero-length list.  If it doesn't,
+            // something has gone wrong.
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
