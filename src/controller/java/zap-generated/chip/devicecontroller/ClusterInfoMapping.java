@@ -7509,7 +7509,10 @@ import chip.clusterinfo.CommandParameterInfo;
 import chip.clusterinfo.DelegatedClusterCallback;
 import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ClusterInfoMapping {
 
