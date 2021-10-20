@@ -126,7 +126,7 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams,
     VerifyOrExit(mState == CommandState::Idle, err = CHIP_ERROR_INCORRECT_STATE);
 
     commandDataIB = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataIBBuilder();
-    err                = commandDataIB.GetError();
+    err           = commandDataIB.GetError();
     SuccessOrExit(err);
 
     err = ConstructCommandPath(aCommandPathParams, commandDataIB);
@@ -134,8 +134,8 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams,
 
     if (aStartDataStruct)
     {
-        err = commandDataIB.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::kCsTag_Data),
-                                                             TLV::kTLVType_Structure, mDataElementContainerType);
+        err = commandDataIB.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::kCsTag_Data), TLV::kTLVType_Structure,
+                                                        mDataElementContainerType);
     }
 
     MoveToState(CommandState::AddingCommand);
@@ -183,8 +183,7 @@ CHIP_ERROR Command::FinishCommand(bool aEndDataStruct)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams,
-                                         CommandDataIB::Builder aCommandDataIB)
+CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandDataIB::Builder aCommandDataIB)
 {
     CommandPath::Builder commandPath = aCommandDataIB.CreateCommandPathBuilder();
     if (aCommandPathParams.mFlags.Has(CommandPathFlags::kEndpointIdValid))
