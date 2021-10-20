@@ -121,7 +121,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     chip::EndpointId endpointId;
 
     {
-        CommandPath::Parser commandPath;
+        CommandPathIB::Parser commandPath;
 
         err = aCommandElement.GetCommandPath(&commandPath);
         SuccessOrExit(err);

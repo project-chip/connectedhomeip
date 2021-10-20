@@ -229,7 +229,7 @@ void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void
 
     CommandDataElement::Builder commandDataElementBuilder = commandList.CreateCommandDataElementBuilder();
     NL_TEST_ASSERT(apSuite, commandList.GetError() == CHIP_NO_ERROR);
-    CommandPath::Builder commandPathBuilder = commandDataElementBuilder.CreateCommandPathBuilder();
+    CommandPathIB::Builder commandPathBuilder = commandDataElementBuilder.CreateCommandPathBuilder();
     NL_TEST_ASSERT(apSuite, commandDataElementBuilder.GetError() == CHIP_NO_ERROR);
     commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPath();
     NL_TEST_ASSERT(apSuite, commandPathBuilder.GetError() == CHIP_NO_ERROR);
