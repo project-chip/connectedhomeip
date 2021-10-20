@@ -1,86 +1,91 @@
 steps:
-  - name: 'connectedhomeip/chip-build-vscode:0.5.18'
-    env:
-      - PW_ENVIRONMENT_ROOT=/pwenv
-    args:
-      - '-c'
-      - source ./scripts/bootstrap.sh
-    id: Bootstrap
-    entrypoint: /usr/bin/bash
-    volumes:
-      - name: pwenv
-        path: /pwenv
-    timeout: 900s
+    - name: "connectedhomeip/chip-build-vscode:0.5.18"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - "-c"
+          - source ./scripts/bootstrap.sh
+      id: Bootstrap
+      entrypoint: /usr/bin/bash
+      volumes:
+          - name: pwenv
+            path: /pwenv
+      timeout: 900s
 
-  - name: 'connectedhomeip/chip-build-vscode:0.5.18'
-    env:
-      - PW_ENVIRONMENT_ROOT=/pwenv
-    args:
-      - >-
-        ./scripts/build/build_examples.py --enable-flashbundle --target-glob '*-m5stack-*'
-        build --create-archives /workspace/artifacts/
-    waitFor:
-      - Bootstrap
-    entrypoint: ./scripts/run_in_build_env.sh
-    volumes:
-      - name: pwenv
-        path: /pwenv
+    - name: "connectedhomeip/chip-build-vscode:0.5.18"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target-glob '*-m5stack-*' build --create-archives
+              /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
 
-  - name: 'connectedhomeip/chip-build-vscode:0.5.18'
-    env:
-      - PW_ENVIRONMENT_ROOT=/pwenv
-    args:
-      - >-
-        ./scripts/build/build_examples.py --enable-flashbundle --target-glob '*-nrf52840-{lock,light}'
-        build --create-archives /workspace/artifacts/
-    waitFor:
-      - Bootstrap
-    entrypoint: ./scripts/run_in_build_env.sh
-    volumes:
-      - name: pwenv
-        path: /pwenv
+    - name: "connectedhomeip/chip-build-vscode:0.5.18"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target-glob '*-nrf52840-{lock,light}' build --create-archives
+              /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
 
-  - name: 'connectedhomeip/chip-build-vscode:0.5.18'
-    env:
-      - PW_ENVIRONMENT_ROOT=/pwenv
-    args:
-      - >-
-        ./scripts/build/build_examples.py --enable-flashbundle --target-glob '*-brd4161a-{lock,light}'
-        build --create-archives /workspace/artifacts/
-    waitFor:
-      - Bootstrap
-    entrypoint: ./scripts/run_in_build_env.sh
-    volumes:
-      - name: pwenv
-        path: /pwenv
+    - name: "connectedhomeip/chip-build-vscode:0.5.18"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target-glob '*-brd4161a-{lock,light}' build --create-archives
+              /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
 
-  - name: 'connectedhomeip/chip-build-vscode:0.5.18'
-    env:
-      - PW_ENVIRONMENT_ROOT=/pwenv
-    args:
-      - >-
-        ./scripts/build/build_examples.py --enable-flashbundle --target-glob 'linux-*'
-        build --create-archives /workspace/artifacts/
-    waitFor:
-      - Bootstrap
-    entrypoint: ./scripts/run_in_build_env.sh
-    volumes:
-      - name: pwenv
-        path: /pwenv
+    - name: "connectedhomeip/chip-build-vscode:0.5.18"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target-glob 'linux-*' build --create-archives
+              /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
 
-  - name: 'connectedhomeip/chip-build-vscode:0.5.18'
-    env:
-      - PW_ENVIRONMENT_ROOT=/pwenv
-    args:
-      - >-
-        ./scripts/build/build_examples.py --enable-flashbundle --target-glob 'android-{arm64,x64}-chip-tool'
-        build --create-archives /workspace/artifacts/
-    waitFor:
-      - Bootstrap
-    entrypoint: ./scripts/run_in_build_env.sh
-    volumes:
-      - name: pwenv
-        path: /pwenv
+    - name: "connectedhomeip/chip-build-vscode:0.5.18"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target-glob 'android-{arm64,x64}-chip-tool' build
+              --create-archives /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
 
 logsBucket: matter-build-automation-build-logs
 
