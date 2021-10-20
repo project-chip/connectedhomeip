@@ -126,6 +126,14 @@ public:
     chip::Controller::Device & GetDevice() { return mDevice; }
 
 private:
+    enum class State
+    {
+        Uninitialized,
+        Initialized,
+        Connecting,
+        SecureConnected,
+    };
+
     /* Node ID assigned to the device */
     NodeId mNodeId = kUndefinedNodeId;
 
@@ -137,6 +145,9 @@ private:
 
     /* Address used to communicate with the device */
     Transport::PeerAddress mAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+
+    /* Current state of the proxy */
+    State mState = State::Uninitialized;
 
     /* Tracker of callbacks for the device */
     Callback::CallbackDeque mConnectionSuccess;
