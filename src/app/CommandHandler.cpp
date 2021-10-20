@@ -88,7 +88,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
+CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
@@ -167,7 +167,7 @@ CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, c
     err = PrepareCommand(commandPathParams, false /* aStartDataStruct */);
     SuccessOrExit(err);
 
-    statusIBBuilder = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusIBBuilder();
+    statusIBBuilder = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataIBBuilder().CreateStatusIBBuilder();
 
     //
     // TODO: Most of the callers are incorrectly passing SecureChannel as the protocol ID, when in fact, the status code provided

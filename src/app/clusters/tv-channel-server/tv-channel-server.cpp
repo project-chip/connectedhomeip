@@ -60,7 +60,7 @@ void sendResponse(app::CommandHandler * command, ::TvChannelInfo channelInfo)
                                          ZCL_CHANGE_CHANNEL_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // TODO: Enable this once struct as param is supported
     // SuccessOrExit(err = writer->Put(TLV::ContextTag(0), channelInfo));
     // EmberAfTvChannelErrorType. errorType
