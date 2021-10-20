@@ -132,6 +132,8 @@ typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
                                                               uint8_t ErrorType);
 typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t status, uint8_t * data);
 typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * context, uint8_t returnValue);
+typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * context,
+                                                                       /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
 typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, uint8_t returnValue);
 
 // List specific responses

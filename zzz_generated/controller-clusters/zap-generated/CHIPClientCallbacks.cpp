@@ -2587,6 +2587,20 @@ bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(EndpointId endpoi
     return true;
 }
 
+bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                                   /* TYPE WARNING: array array defaults to */ uint8_t * arg1)
+{
+    ChipLogProgress(Zcl, "TestListInt8UReverseResponse:");
+    ChipLogProgress(Zcl, "  arg1: %p", arg1);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestListInt8UReverseResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestListInt8UReverseResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestListInt8UReverseResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, arg1);
+    return true;
+}
+
 bool emberAfTestClusterClusterTestSpecificResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                            uint8_t returnValue)
 {

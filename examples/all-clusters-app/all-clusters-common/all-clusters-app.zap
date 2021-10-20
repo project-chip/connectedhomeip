@@ -1,5 +1,5 @@
 {
-  "featureLevel": 62,
+  "featureLevel": 63,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -14254,7 +14254,7 @@
               "outgoing": 0
             },
             {
-              "name": "TestNestedStructListgumentRequest",
+              "name": "TestNestedStructListArgumentRequest",
               "code": 11,
               "mfgCode": null,
               "source": "client",
@@ -14262,8 +14262,16 @@
               "outgoing": 0
             },
             {
-              "name": "TestListNestedStructListInt8UArgumentRequest",
+              "name": "TestListNestedStructListArgumentRequest",
               "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "TestListInt8UReverseRequest",
+              "code": 13,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -14307,6 +14315,14 @@
             {
               "name": "TestAddArgumentsResponse",
               "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "TestListInt8UReverseResponse",
+              "code": 4,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,

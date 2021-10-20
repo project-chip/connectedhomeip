@@ -1059,6 +1059,16 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(v
     });
 };
 
+void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
+    void * context, /* TYPE WARNING: array array defaults to */ uint8_t * arg1)
+{
+    DispatchSuccess(context,
+        @ {
+            // arg1 : /* TYPE WARNING: array array defaults to */ uint8_t *
+            // Conversion from this type to Objc is not properly implemented yet
+        });
+};
+
 void CHIPTestClusterClusterTestSpecificResponseCallbackBridge::OnSuccessFn(void * context, uint8_t returnValue)
 {
     DispatchSuccess(context, @ {

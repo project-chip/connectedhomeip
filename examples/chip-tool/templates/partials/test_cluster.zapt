@@ -102,7 +102,7 @@ class {{filename}}: public TestCommand
     {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}
     {{#*inline "successResponse"}}OnSuccessResponse_{{index}}{{/inline}}
     {{#*inline "failureArguments"}}uint8_t status{{/inline}}
-    {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
+    {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{#if isList}}uint16_t count, {{/if}}{{#if isArray}}chip::app::DataModel::DecodableList<{{/if}}{{chipType}}{{#if isArray}}>{{/if}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
 
     CHIP_ERROR {{>testCommand}}()
     {
@@ -165,6 +165,7 @@ class {{filename}}: public TestCommand
             {{#if hasExpectedValue}}
               VerifyOrReturn(CheckValue
                 {{~#if isList}}AsList("{{>item}}", count, {{expectedValue.length}})
+                {{else if isArray}}AsList("{{>item}}", {{>item}}, {{expectedValue}})
                 {{else if (isString type)}}AsString("{{>item}}", {{>item}}, "{{expectedValue}}")
                 {{else}}<{{chipType}}>("{{>item}}", {{>item}}, {{expectedValue}}{{asTypeLiteralSuffix type}})
                 {{/if}}
