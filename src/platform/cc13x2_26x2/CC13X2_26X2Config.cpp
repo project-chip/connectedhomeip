@@ -53,7 +53,7 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceICACerts   =
                                                                                    .itemID   = 0x0004 } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDevicePrivateKey = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
                                                                                      .itemID   = 0x0005 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ProductRevision     = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_HardwareVersion     = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
                                                                                  .itemID   = 0x0006 } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ManufacturingDate   = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
                                                                                    .itemID   = 0x0007 } };

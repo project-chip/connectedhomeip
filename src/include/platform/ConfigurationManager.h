@@ -58,8 +58,19 @@ public:
 
     enum
     {
-        kMaxSerialNumberLength     = 32,
-        kMaxFirmwareRevisionLength = 32,
+        kMaxVendorNameLength            = 32,
+        kMaxProductNameLength           = 32,
+        kMaxNodeLabelLength             = 32,
+        kMaxLocationLength              = 2,
+        kMaxHardwareVersionStringLength = 64,
+        kMaxSoftwareVersionLength       = 64,
+        kMaxManufacturingDateLength     = 16,
+        kMaxPartNumberLength            = 32,
+        kMaxProductURLLength            = 256,
+        kMaxProductLabelLength          = 64,
+        kMaxSerialNumberLength          = 32,
+        kMaxUniqueIDLength              = 32,
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         kPrimaryMACAddressLength = 8,
 #else
@@ -72,15 +83,15 @@ public:
     virtual CHIP_ERROR GetVendorId(uint16_t & vendorId)                                             = 0;
     virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize)                                   = 0;
     virtual CHIP_ERROR GetProductId(uint16_t & productId)                                           = 0;
-    virtual CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize)                         = 0;
-    virtual CHIP_ERROR GetProductRevision(uint16_t & productRev)                                    = 0;
+    virtual CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize)                         = 0;
+    virtual CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVer)                                   = 0;
     virtual CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize)                                  = 0;
     virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                                    = 0;
     virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)                                      = 0;
     virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                                    = 0;
     virtual CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) = 0;
-    virtual CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize)                        = 0;
-    virtual CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev)                                  = 0;
+    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)                         = 0;
+    virtual CHIP_ERROR GetSoftwareVersion(uint16_t & softwareVer)                                   = 0;
     virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode)                                     = 0;
     virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
@@ -92,7 +103,7 @@ public:
     virtual CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf)                 = 0;
     virtual CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf)               = 0;
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
-    virtual CHIP_ERROR StoreProductRevision(uint16_t productRev)                       = 0;
+    virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
     virtual CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode)                        = 0;
     virtual CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator)            = 0;
     virtual CHIP_ERROR StoreRegulatoryLocation(uint32_t location)                      = 0;

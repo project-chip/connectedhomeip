@@ -430,6 +430,7 @@ Gv
 gz
 hardcoded
 hardknott
+hardwarever
 HardwareVersion
 HardwareVersionString
 hci
@@ -743,8 +744,6 @@ prj
 ProductID
 ProductLabel
 ProductName
-productrev
-ProductRevision
 ProductURL
 proto
 protobuf

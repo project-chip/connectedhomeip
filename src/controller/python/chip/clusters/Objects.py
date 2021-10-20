@@ -22789,7 +22789,7 @@ class ApplianceIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bytes])
 
-        class ProductRevision(ClusterAttributeDescriptor):
+        class HardwareVersion(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0B00
@@ -22964,7 +22964,7 @@ class MeterIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bytes])
 
-        class ProductRevision(ClusterAttributeDescriptor):
+        class HardwareVersion(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0B01
