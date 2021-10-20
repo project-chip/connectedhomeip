@@ -1782,6 +1782,33 @@ public class ClusterInfoMapping {
     }
   }
 
+  public class DelegatedTestListInt8UReverseResponseCallback
+      implements ChipClusters.TestClusterCluster.TestListInt8UReverseResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
+        // Conversion from this type to Java is not properly implemented yet
+        ) {
+      List<Object> responseValues = new ArrayList<>();
+      // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public class DelegatedTestSpecificResponseCallback
       implements ChipClusters.TestClusterCluster.TestSpecificResponseCallback,
           DelegatedClusterCallback {
@@ -6377,6 +6404,32 @@ public class ClusterInfoMapping {
             testClustertestListInt8UArgumentRequestCommandParams);
     testClusterClusterCommandInfoMap.put(
         "testListInt8UArgumentRequest", testClustertestListInt8UArgumentRequestCommandInfo);
+    Map<String, CommandParameterInfo> testClustertestListInt8UReverseRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    // TODO: fill out parameter types
+    CommandParameterInfo testClustertestListInt8UReverseRequestCommandParameterInfo =
+        new CommandParameterInfo(
+            "TestCluster",
+            ChipClusters.TestClusterCluster.TestListInt8UReverseResponseCallback.class);
+    CommandParameterInfo testClustertestListInt8UReverseRequestarg1CommandParameterInfo =
+        new CommandParameterInfo("arg1", int.class);
+    testClustertestListInt8UReverseRequestCommandParams.put(
+        "arg1", testClustertestListInt8UReverseRequestarg1CommandParameterInfo);
+
+    // Populate commands
+    CommandInfo testClustertestListInt8UReverseRequestCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .testListInt8UReverseRequest(
+                      (ChipClusters.TestClusterCluster.TestListInt8UReverseResponseCallback)
+                          callback,
+                      (Integer) commandArguments.get("arg1"));
+            },
+            () -> new DelegatedTestListInt8UReverseResponseCallback(),
+            testClustertestListInt8UReverseRequestCommandParams);
+    testClusterClusterCommandInfoMap.put(
+        "testListInt8UReverseRequest", testClustertestListInt8UReverseRequestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestListStructArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     // TODO: fill out parameter types
