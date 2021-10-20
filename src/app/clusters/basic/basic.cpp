@@ -90,4 +90,26 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         status = Attributes::HardwareVersion::Set(endpoint, firmwareRevision);
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Software Version: 0x%02x", status));
     }
+
+    char serialNumberString[33];
+    size_t serialNumberLen;
+    if (ConfigurationMgr().GetSerialNumber(serialNumberString, sizeof(serialNumberString), serialNumberLen) == CHIP_NO_ERROR)
+    {
+        status = Attributes::SerialNumber::Set(endpoint,
+                                               chip::CharSpan(serialNumberString, strlen(serialNumberString)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                       ChipLogError(Zcl, "Error setting Serial Number String: 0x%02x", status));
+    }
+
+    char manufacturingDateString[17];
+    uint16_t manufacturingYear;
+    uint8_t  manufacturingMonth;
+    uint8_t  manufacturingDayOfMonth;
+    if (ConfigurationMgr().GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth) == CHIP_NO_ERROR)
+    {
+        status = Attributes::ManufacturingDate::Set(endpoint,
+                                                    chip::CharSpan(manufacturingDateString, strlen(manufacturingDateString)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                       ChipLogError(Zcl, "Error setting Manufacturing Date String: 0x%02x", status));
+    }
 }
