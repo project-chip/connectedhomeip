@@ -58,6 +58,11 @@ android_library("java") {
   ]
 
   sources = [
+    "src/chip/clusterinfo/ClusterCommandCallback.java",
+    "src/chip/clusterinfo/ClusterInfo.java",
+    "src/chip/clusterinfo/CommandInfo.java",
+    "src/chip/clusterinfo/CommandParameterInfo.java",
+    "src/chip/clusterinfo/DelegatedClusterCallback.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
@@ -66,11 +71,6 @@ android_library("java") {
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
-    "src/chip/clusterinfo/ClusterInfo.java",
-    "src/chip/clusterinfo/ClusterCommandCallback.java",
-    "src/chip/clusterinfo/CommandInfo.java",
-    "src/chip/clusterinfo/CommandParameterInfo.java",
-    "src/chip/clusterinfo/DelegatedClusterCallback.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
@@ -78,7 +78,6 @@ android_library("java") {
   # TODO: add classpath support (we likely need to add something like
   #  ..../platforms/android-21/android.jar to access BLE items)
 }
-
 
 java_prebuilt("android") {
   jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
