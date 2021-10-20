@@ -216,13 +216,13 @@ static_assert(std::numeric_limits<Seconds64::rep>::is_integer, "Seconds64 must b
 static_assert(std::numeric_limits<Seconds32::rep>::is_integer, "Seconds32 must be an integer type");
 static_assert(std::numeric_limits<Seconds16::rep>::is_integer, "Seconds16 must be an integer type");
 
-static_assert(std::numeric_limits<Microseconds64::rep>::digits >= 64, "Microseconds64 must be an integer type");
-static_assert(std::numeric_limits<Microseconds32::rep>::digits >= 32, "Microseconds32 must be an integer type");
-static_assert(std::numeric_limits<Milliseconds64::rep>::digits >= 64, "Milliseconds64 must be an integer type");
-static_assert(std::numeric_limits<Milliseconds32::rep>::digits >= 32, "Milliseconds32 must be an integer type");
-static_assert(std::numeric_limits<Seconds64::rep>::digits >= 64, "Seconds64 must be an integer type");
-static_assert(std::numeric_limits<Seconds32::rep>::digits >= 32, "Seconds32 must be an integer type");
-static_assert(std::numeric_limits<Seconds16::rep>::digits >= 16, "Seconds16 must be an integer type");
+static_assert(std::numeric_limits<Microseconds64::rep>::digits >= 64, "Microseconds64 must be at least 64 bits");
+static_assert(std::numeric_limits<Microseconds32::rep>::digits >= 32, "Microseconds32 must be at least 32 bits");
+static_assert(std::numeric_limits<Milliseconds64::rep>::digits >= 64, "Milliseconds64 must be at least 64 bits");
+static_assert(std::numeric_limits<Milliseconds32::rep>::digits >= 32, "Milliseconds32 must be at least 32 bits");
+static_assert(std::numeric_limits<Seconds64::rep>::digits >= 64, "Seconds64 must be at least 64 bits");
+static_assert(std::numeric_limits<Seconds32::rep>::digits >= 32, "Seconds32 must be at least 32 bits");
+static_assert(std::numeric_limits<Seconds16::rep>::digits >= 16, "Seconds16 must be at least 16 bits");
 
 } // namespace Clock
 } // namespace System

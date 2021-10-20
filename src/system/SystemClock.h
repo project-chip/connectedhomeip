@@ -65,7 +65,7 @@ using Seconds16 = std::chrono::duration<uint16_t>;
 
 constexpr Seconds16 Zero{ 0 };
 
-inline namespace Literals {
+namespace Literals {
 
 constexpr Microseconds64 operator""_us(unsigned long long int us)
 {
