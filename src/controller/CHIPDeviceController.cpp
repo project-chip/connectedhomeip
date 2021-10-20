@@ -1669,7 +1669,8 @@ void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNo
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 void DeviceControllerInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender,
-                                                          const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData)
+                                                          const app::ConcreteCommandPath & aPath,
+                                                          const chip::app::StatusIB & aStatus, TLV::TLVReader * aData)
 {
     // Generally IM has more detailed errors than ember library, here we always use the, the actual handling of the
     // commands should implement full IMDelegate.
@@ -1687,7 +1688,7 @@ void DeviceControllerInteractionModelDelegate::OnResponse(app::CommandSender * a
 }
 
 void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender,
-                                                       Protocols::InteractionModel::Status aClusterStatus, CHIP_ERROR aError)
+                                                       const chip::app::StatusIB & aStatus, CHIP_ERROR aError)
 {
     // The IMDefaultResponseCallback started out life as an Ember function, so it only accepted
     // Ember status codes. Consequently, let's convert the IM code over to a meaningful Ember status before dispatching.
@@ -1696,7 +1697,7 @@ void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender 
     // well, this will be an even bigger problem.
     //
     // For now, #10331 tracks this issue.
-    IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aClusterStatus));
+    IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aStatus.mStatus));
 }
 
 void DeviceControllerInteractionModelDelegate::OnDone(app::CommandSender * apCommandSender)
