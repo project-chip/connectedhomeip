@@ -5425,6 +5425,11 @@ public class ChipClusters {
       testListInt8UArgumentRequest(chipClusterPtr, callback, arg1);
     }
 
+    public void testListInt8UReverseRequest(
+        TestListInt8UReverseResponseCallback callback, int arg1) {
+      testListInt8UReverseRequest(chipClusterPtr, callback, arg1);
+    }
+
     public void testListStructArgumentRequest(
         DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
       testListStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
@@ -5455,6 +5460,9 @@ public class ChipClusters {
     private native void testListInt8UArgumentRequest(
         long chipClusterPtr, DefaultClusterCallback callback, int arg1);
 
+    private native void testListInt8UReverseRequest(
+        long chipClusterPtr, TestListInt8UReverseResponseCallback callback, int arg1);
+
     private native void testListStructArgumentRequest(
         long chipClusterPtr,
         DefaultClusterCallback callback,
@@ -5483,6 +5491,15 @@ public class ChipClusters {
 
     public interface TestAddArgumentsResponseCallback {
       void onSuccess(int returnValue);
+
+      void onError(Exception error);
+    }
+
+    public interface TestListInt8UReverseResponseCallback {
+      void onSuccess(
+          // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
+          // Conversion from this type to Java is not properly implemented yet
+          );
 
       void onError(Exception error);
     }

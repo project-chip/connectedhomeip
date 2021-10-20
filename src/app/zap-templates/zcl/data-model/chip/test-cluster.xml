@@ -238,6 +238,14 @@ limitations under the License.
       <arg name="arg1" type="NestedStructList" array="true"/>
     </command>
 
+    <command source="client" code="0x0D" name="TestListInt8UReverseRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of INT8U and expects a
+        response that reverses the list.
+      </description>
+      <arg name="arg1" type="INT8U" array="true"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value
@@ -271,5 +279,21 @@ limitations under the License.
       <arg name="arg6" type="BOOLEAN"/>
     </command>
 
+    <command source="server" code="0x04" name="TestListInt8UReverseResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Response that delivers the reversed list of uint8.
+      </description>
+      <arg name="arg1" type="INT8U" array="true"/>
+    </command>
+
+    <event code="0x0001" name="TestEvent" priority="info" side="server">
+      <description>Example test event</description>
+      <field id="1" name="arg1" type="INT8U"/>
+      <field id="2" name="arg2" type="SimpleEnum"/>
+      <field id="3" name="arg3" type="BOOLEAN"/>
+      <field id="4" name="arg4" type="SimpleStruct"/>
+      <field id="5" name="arg5" type="SimpleStruct" array="true"/>
+      <field id="6" name="arg6" type="SimpleEnum" array="true"/>
+    </event>
   </cluster>
 </configurator>

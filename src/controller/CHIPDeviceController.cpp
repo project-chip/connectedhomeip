@@ -1709,7 +1709,7 @@ void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClien
     IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError)
+CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError)
 {
     app::ClusterInfo path;
     path.mNodeId = apReadClient->GetPeerNodeId();
@@ -1717,7 +1717,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(const app::ReadCl
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(const app::ReadClient * apReadClient)
+CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(app::ReadClient * apReadClient)
 {
     // Release the object for subscription
     if (apReadClient->IsSubscriptionType())

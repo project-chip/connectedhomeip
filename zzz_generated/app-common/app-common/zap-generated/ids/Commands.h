@@ -1572,6 +1572,10 @@ namespace TestAddArguments {
 static constexpr CommandId Id = 0x00000004;
 } // namespace TestAddArguments
 
+namespace TestListInt8UReverseResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace TestListInt8UReverseResponse
+
 namespace TestSimpleArgumentRequest {
 static constexpr CommandId Id = 0x00000005;
 } // namespace TestSimpleArgumentRequest
@@ -1603,6 +1607,10 @@ static constexpr CommandId Id = 0x0000000B;
 namespace TestListNestedStructListArgumentRequest {
 static constexpr CommandId Id = 0x0000000C;
 } // namespace TestListNestedStructListArgumentRequest
+
+namespace TestListInt8UReverseRequest {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace TestListInt8UReverseRequest
 
 } // namespace Commands
 } // namespace TestCluster
