@@ -103,7 +103,6 @@ def main(argv):
                     print(i, file=fp)
 
     except Exception as exception:
-        status = 1
         raise exception
 
     return status
