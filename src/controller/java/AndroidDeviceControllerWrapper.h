@@ -35,7 +35,7 @@
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
 class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
-                                       public chip::Controller::DeviceStatusDelegate,
+                                       public chip::DeviceStatusDelegate,
                                        public chip::Controller::OperationalCredentialsDelegate,
                                        public chip::PersistentStorageDelegate
 {

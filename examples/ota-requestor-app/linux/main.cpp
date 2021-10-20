@@ -19,8 +19,8 @@
 #include <app-common/zap-generated/enums.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
-#include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/CommissioneeDeviceProxy.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -49,6 +49,8 @@
 using chip::ByteSpan;
 using chip::CharSpan;
 using chip::EndpointId;
+using chip::OnDeviceConnected;
+using chip::OnDeviceConnectionFailure;
 using chip::VendorId;
 using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
@@ -59,8 +61,6 @@ using chip::Callback::Callback;
 using chip::Controller::Device;
 using chip::Controller::DeviceController;
 using chip::Controller::ExampleOperationalCredentialsIssuer;
-using chip::Controller::OnDeviceConnected;
-using chip::Controller::OnDeviceConnectionFailure;
 
 // TODO: would be nicer to encapsulate these globals and the callbacks in some sort of class
 chip::Messaging::ExchangeContext * exchangeCtx = nullptr;

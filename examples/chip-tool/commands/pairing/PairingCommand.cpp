@@ -92,7 +92,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     return err;
 }
 
-void PairingCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+void PairingCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device)
 {
     PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
     command->OpenCommissioningWindow();
@@ -153,8 +153,7 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress address)
 {
-    ChipSerializedDevice serializedTestDevice;
-    return mController.PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
@@ -166,7 +165,9 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::OpenCommissioningWindow()
 {
-    CHIP_ERROR err = mController.OpenCommissioningWindow(mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption);
+    SetupPayload payload;
+    CHIP_ERROR err =
+        mController.OpenCommissioningWindow(mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption, payload);
     SetCommandExitStatus(err);
     return err;
 }
@@ -246,7 +247,7 @@ CHIP_ERROR PairingCommand::SetupNetwork()
         break;
     case PairingNetworkType::WiFi:
     case PairingNetworkType::Thread:
-        err = mController.GetDevice(mNodeId, &mDevice);
+        err = mController.GetDeviceBeingCommissioned(mNodeId, &mDevice);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Setup failure! No pairing for device: %" PRIu64, mNodeId));
 
         mCluster.Associate(mDevice, mEndpointId);

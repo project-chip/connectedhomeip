@@ -299,7 +299,7 @@ JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlon
     deviceIPAddr.FromString(deviceAddrStr, deviceIPAddr);
     env->ReleaseStringUTFChars(deviceAddr, deviceAddrStr);
 
-    Controller::SerializedDevice mSerializedTestDevice;
+    SerializedDevice mSerializedTestDevice;
     err = wrapper->Controller()->PairTestDeviceWithoutSecurity(kRemoteDeviceId, chip::Transport::PeerAddress::UDP(deviceIPAddr),
                                                                mSerializedTestDevice);
 
@@ -316,14 +316,14 @@ JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlo
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "disconnectDevice() called with deviceId");
-    wrapper->Controller()->ReleaseDeviceById(deviceId);
+    wrapper->Controller()->ReleaseOperationalDevice(deviceId);
 }
 
 JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
 {
     chip::DeviceLayer::StackLock lock;
 
-    Device * chipDevice = reinterpret_cast<Device *>(handle);
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(handle);
     return chipDevice->IsActive();
 }
 
@@ -381,15 +381,15 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::SetupPayload setupPayload;
 
-    Device * chipDevice = reinterpret_cast<Device *>(devicePtr);
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (chipDevice == nullptr)
     {
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         return false;
     }
 
-    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kOriginalSetupCode,
-                                        setupPayload);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, 0, 0, 0, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -409,15 +409,15 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     setupPayload.discriminator = discriminator;
     setupPayload.setUpPINCode  = setupPinCode;
 
-    Device * chipDevice = reinterpret_cast<Device *>(devicePtr);
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (chipDevice == nullptr)
     {
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         return false;
     }
 
-    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kTokenWithRandomPIN,
-                                        setupPayload);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, 1000, discriminator, 1, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -446,7 +446,6 @@ JNI_METHOD(jobject, computePaseVerifier)
 {
     chip::DeviceLayer::StackLock lock;
 
-    Device * chipDevice = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     jobject params;
     jbyteArray verifierBytes;
@@ -456,10 +455,8 @@ JNI_METHOD(jobject, computePaseVerifier)
 
     ChipLogProgress(Controller, "computePaseVerifier() called");
 
-    chipDevice = reinterpret_cast<Device *>(devicePtr);
-    VerifyOrExit(chipDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = chipDevice->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier, passcodeId);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err = wrapper->Controller()->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier, passcodeId);
     SuccessOrExit(err);
 
     uint8_t serializedVerifier[sizeof(verifier.mW0) + sizeof(verifier.mL)];

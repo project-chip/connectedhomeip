@@ -15,10 +15,7 @@
  *    limitations under the License.
  */
 
-#if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
-#endif // CONFIG_NETWORK_LAYER_BLE
-#include <controller/CommissioneeDeviceProxy.h>
+#include <app/OperationalDeviceProxy.h>
 #include <inet/IPAddress.h>
 #include <inet/InetLayer.h>
 #include <lib/support/CHIPMem.h>
@@ -34,67 +31,51 @@
 
 using namespace chip;
 using namespace chip::Transport;
-using namespace chip::Controller;
 using namespace chip::Messaging;
 
+#if INET_CONFIG_ENABLE_IPV4
 namespace {
 
 using TestTransportMgr = TransportMgr<Transport::UDP>;
 
-void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext)
+void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext)
 {
     Platform::MemoryInit();
-    DeviceTransportMgr transportMgr;
+    TestTransportMgr transportMgr;
     SessionManager sessionManager;
     ExchangeManager exchangeMgr;
     Inet::InetLayer inetLayer;
     System::LayerImpl systemLayer;
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer blelayer;
-#endif // CONFIG_NETWORK_LAYER_BLE
     // Heap-allocate the fairly large FabricTable so we don't end up with a huge
     // stack.
     FabricTable * fabrics = Platform::New<FabricTable>();
+    FabricInfo * fabric   = fabrics->FindFabricWithIndex(1);
     secure_channel::MessageCounterManager messageCounterManager;
     SessionIDAllocator idAllocator;
 
     systemLayer.Init();
     inetLayer.Init(systemLayer, nullptr);
-    transportMgr.Init(UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv6).SetListenPort(CHIP_PORT)
-#if INET_CONFIG_ENABLE_IPV4
-                          ,
-                      UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT)
-#endif
-#if CONFIG_NETWORK_LAYER_BLE
-                          ,
-                      BleListenParameters(&blelayer)
-#endif
-    );
+    transportMgr.Init(UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT));
     sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);
     exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
 
-    ControllerDeviceInitParams params = {
-        .transportMgr    = &transportMgr,
-        .sessionManager  = &sessionManager,
-        .exchangeMgr     = &exchangeMgr,
-        .inetLayer       = &inetLayer,
-        .storageDelegate = nullptr,
-        .idAllocator     = &idAllocator,
-        .fabricsTable    = fabrics,
+    DeviceProxyInitParams params = {
+        .sessionManager = &sessionManager,
+        .exchangeMgr    = &exchangeMgr,
+        .idAllocator    = &idAllocator,
+        .fabricInfo     = fabric,
     };
-    CommissioneeDeviceProxy device;
-    NodeId mockNodeId           = 1;
-    FabricIndex mockFabricIndex = 1;
+    NodeId mockNodeId = 1;
+    OperationalDeviceProxy device(params, PeerId().SetNodeId(mockNodeId));
     Inet::IPAddress mockAddr;
-    Inet::IPAddress::FromString("::1", mockAddr);
+    Inet::IPAddress::FromString("127.0.0.1", mockAddr);
     PeerAddress addr = PeerAddress::UDP(mockAddr, CHIP_PORT);
-    device.Init(params, mockNodeId, addr, mockFabricIndex);
+    device.UpdateAddress(addr);
 
-    device.OperationalCertProvisioned();
-    NL_TEST_ASSERT(inSuite, device.EstablishConnectivity(nullptr, nullptr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, device.Connect(nullptr, nullptr) == CHIP_NO_ERROR);
 
-    device.Reset();
+    device.Clear();
     messageCounterManager.Shutdown();
     exchangeMgr.Shutdown();
     sessionManager.Shutdown();
@@ -108,18 +89,20 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("TestDevice_EstablishSessionDirectly", TestDevice_EstablishSessionDirectly),
+    NL_TEST_DEF("TestOperationalDeviceProxy_EstablishSessionDirectly", TestOperationalDeviceProxy_EstablishSessionDirectly),
     NL_TEST_SENTINEL()
 };
 // clang-format on
 
 } // namespace
 
-int TestDevice()
+int TestOperationalDeviceProxy()
 {
-    nlTestSuite theSuite = { "Device", &sTests[0], NULL, NULL };
+    nlTestSuite theSuite = { "OperationalDeviceProxy", &sTests[0], NULL, NULL };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestDevice)
+CHIP_REGISTER_TEST_SUITE(TestOperationalDeviceProxy)
+
+#endif // INET_CONFIG_ENABLE_IPV4

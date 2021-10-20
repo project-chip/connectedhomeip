@@ -27,8 +27,8 @@
 #pragma once
 
 #include "app/ConcreteCommandPath.h"
+#include <app/DeviceProxy.h>
 #include <app/util/error-mapping.h>
-#include <controller/CHIPDevice.h>
 #include <controller/InvokeInteraction.h>
 
 namespace chip {
@@ -43,7 +43,7 @@ class DLL_EXPORT ClusterBase
 public:
     virtual ~ClusterBase() {}
 
-    CHIP_ERROR Associate(Device * device, EndpointId endpoint);
+    CHIP_ERROR Associate(DeviceProxy * device, EndpointId endpoint);
 
     void Dissociate();
 
@@ -78,7 +78,7 @@ protected:
                                          app::TLVDataFilter tlvDataFilter);
 
     const ClusterId mClusterId;
-    Device * mDevice;
+    DeviceProxy * mDevice;
     EndpointId mEndpoint;
 };
 

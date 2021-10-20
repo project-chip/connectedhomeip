@@ -32,6 +32,7 @@ chip_test_suite("tests") {
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
+    "TestOperationalDeviceProxy.cpp",
     "TestStatusResponse.cpp",
   ]
 

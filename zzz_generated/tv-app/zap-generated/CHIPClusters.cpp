@@ -955,7 +955,6 @@ CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * c
                                       CommandResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
 
     auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
         successCb(context, responseData);
