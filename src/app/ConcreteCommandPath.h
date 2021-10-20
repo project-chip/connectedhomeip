@@ -33,6 +33,11 @@ struct ConcreteCommandPath
         mEndpointId(aEndpointId), mClusterId(aClusterId), mCommandId(aCommandId)
     {}
 
+    bool operator==(const ConcreteCommandPath & other) const
+    {
+        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mCommandId == other.mCommandId;
+    }
+
     const EndpointId mEndpointId = 0;
     const ClusterId mClusterId   = 0;
     const CommandId mCommandId   = 0;
