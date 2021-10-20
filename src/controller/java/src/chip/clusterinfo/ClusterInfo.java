@@ -8,8 +8,12 @@ import chip.devicecontroller.ChipClusters.BaseChipCluster;
 import java.util.Map;
 =======
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
+<<<<<<< HEAD
 import java.util.*;
 >>>>>>> 46c963914 (Restyled by google-java-format)
+=======
+import java.util.Map;
+>>>>>>> ef97f0702 (resolve type, nullable and format comments)
 
 /** ClusterInfo maps commands and provides a constructor function for a cluster. */
 public class ClusterInfo {

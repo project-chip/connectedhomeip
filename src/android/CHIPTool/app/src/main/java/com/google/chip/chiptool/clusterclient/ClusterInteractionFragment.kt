@@ -88,6 +88,7 @@ class ClusterInteractionFragment : Fragment() {
       }
 
       override fun onFailure(exception: Exception) {
+<<<<<<< HEAD
         showMessage("Command failed")
         Log.e(TAG, exception.toString())
       }
@@ -143,6 +144,8 @@ class ClusterInteractionFragment : Fragment() {
       }
 
       override fun onFailure(exception: Exception?) {
+=======
+>>>>>>> ef97f0702 (resolve type, nullable and format comments)
         showMessage("Command failed")
         Log.e(TAG, exception.toString())
       }
