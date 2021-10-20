@@ -1,7 +1,7 @@
 package chip.clusterinfo;
 
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
-import java.util.*;
+import java.util.Map;
 
 public class ClusterInfo {
   private final ClusterConstructor createClusterFunction;
