@@ -31,7 +31,7 @@ void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endp
 
 void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%lx]", attributePath.mEndpointId,
+    emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
                         attributePath.mAttributeId);
     // TODO
 }
