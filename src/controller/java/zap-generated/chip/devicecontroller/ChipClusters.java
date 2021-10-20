@@ -4795,6 +4795,59 @@ public class ChipClusters {
       readMaxFlowAttribute(chipClusterPtr, callback);
     }
 
+    public void readMinConstPressureAttribute(IntegerAttributeCallback callback) {
+      readMinConstPressureAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMaxConstPressureAttribute(IntegerAttributeCallback callback) {
+      readMaxConstPressureAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMinCompPressureAttribute(IntegerAttributeCallback callback) {
+      readMinCompPressureAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMaxCompPressureAttribute(IntegerAttributeCallback callback) {
+      readMaxCompPressureAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMinConstSpeedAttribute(IntegerAttributeCallback callback) {
+      readMinConstSpeedAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMaxConstSpeedAttribute(IntegerAttributeCallback callback) {
+      readMaxConstSpeedAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMinConstFlowAttribute(IntegerAttributeCallback callback) {
+      readMinConstFlowAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMaxConstFlowAttribute(IntegerAttributeCallback callback) {
+      readMaxConstFlowAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMinConstTempAttribute(IntegerAttributeCallback callback) {
+      readMinConstTempAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMaxConstTempAttribute(IntegerAttributeCallback callback) {
+      readMaxConstTempAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPumpStatusAttribute(IntegerAttributeCallback callback) {
+      readPumpStatusAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePumpStatusAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribePumpStatusAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportPumpStatusAttribute(IntegerAttributeCallback callback) {
+      reportPumpStatusAttribute(chipClusterPtr, callback);
+    }
+
     public void readEffectiveOperationModeAttribute(IntegerAttributeCallback callback) {
       readEffectiveOperationModeAttribute(chipClusterPtr, callback);
     }
@@ -4816,12 +4869,36 @@ public class ChipClusters {
       reportCapacityAttribute(chipClusterPtr, callback);
     }
 
+    public void readSpeedAttribute(IntegerAttributeCallback callback) {
+      readSpeedAttribute(chipClusterPtr, callback);
+    }
+
+    public void readLifetimeEnergyConsumedAttribute(LongAttributeCallback callback) {
+      readLifetimeEnergyConsumedAttribute(chipClusterPtr, callback);
+    }
+
     public void readOperationModeAttribute(IntegerAttributeCallback callback) {
       readOperationModeAttribute(chipClusterPtr, callback);
     }
 
     public void writeOperationModeAttribute(DefaultClusterCallback callback, int value) {
       writeOperationModeAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readControlModeAttribute(IntegerAttributeCallback callback) {
+      readControlModeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeControlModeAttribute(DefaultClusterCallback callback, int value) {
+      writeControlModeAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readAlarmMaskAttribute(IntegerAttributeCallback callback) {
+      readAlarmMaskAttribute(chipClusterPtr, callback);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
@@ -4835,6 +4912,45 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readMaxFlowAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinConstPressureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxConstPressureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinCompPressureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxCompPressureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinConstSpeedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxConstSpeedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinConstFlowAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxConstFlowAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinConstTempAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxConstTempAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readPumpStatusAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribePumpStatusAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportPumpStatusAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readEffectiveOperationModeAttribute(
@@ -4852,11 +4968,28 @@ public class ChipClusters {
     private native void reportCapacityAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
+    private native void readSpeedAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readLifetimeEnergyConsumedAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
     private native void readOperationModeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeOperationModeAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readControlModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeControlModeAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readAlarmMaskAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
