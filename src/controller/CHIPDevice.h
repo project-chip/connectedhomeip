@@ -710,10 +710,7 @@ class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEsta
 {
 public:
     ~Device();
-    Device() :
-        mOpenPairingSuccessCallback(OnOpenPairingWindowSuccessResponse, this),
-        mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this)
-    {}
+    Device() {}
     Device(const Device &) = delete;
 
     enum class CommissioningWindowOption
@@ -1102,9 +1099,6 @@ private:
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
-
-    Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
-    Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 };
 
 /**

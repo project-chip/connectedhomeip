@@ -1003,40 +1003,6 @@ void Device::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
 CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, CommissioningWindowOption option,
                                            const ByteSpan & salt, SetupPayload & setupPayload)
 {
-    constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
-
-    chip::Controller::AdministratorCommissioningCluster cluster;
-    cluster.Associate(this, kAdministratorCommissioningClusterEndpoint);
-
-    Callback::Cancelable * successCallback = mOpenPairingSuccessCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOpenPairingFailureCallback.Cancel();
-
-    if (option != CommissioningWindowOption::kOriginalSetupCode)
-    {
-        bool randomSetupPIN = (option == CommissioningWindowOption::kTokenWithRandomPIN);
-        PASEVerifier verifier;
-
-        ReturnErrorOnFailure(
-            PASESession::GeneratePASEVerifier(verifier, iteration, salt, randomSetupPIN, setupPayload.setUpPINCode));
-
-        uint8_t serializedVerifier[2 * kSpake2p_WS_Length];
-        VerifyOrReturnError(sizeof(serializedVerifier) == sizeof(verifier), CHIP_ERROR_INTERNAL);
-
-        memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
-        memcpy(&serializedVerifier[kSpake2p_WS_Length], verifier.mL, kSpake2p_WS_Length);
-
-        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(successCallback, failureCallback, timeout,
-                                                             ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
-                                                             setupPayload.discriminator, iteration, salt, mPAKEVerifierID++));
-    }
-    else
-    {
-        ReturnErrorOnFailure(cluster.OpenBasicCommissioningWindow(successCallback, failureCallback, timeout));
-    }
-
-    setupPayload.version               = 0;
-    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
-
     return CHIP_NO_ERROR;
 }
 
