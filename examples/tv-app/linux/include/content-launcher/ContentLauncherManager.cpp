@@ -51,27 +51,29 @@ exit:
     return err;
 }
 
-vector<chip::ByteSpan> ContentLauncherManager::proxyGetAcceptsHeader()
+CHIP_ERROR ContentLauncherManager::proxyGetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
-    vector<chip::ByteSpan> acceptedHeader;
-    char headerExample[]  = "exampleHeader";
-    int maximumVectorSize = 1;
+    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // TODO: Insert code here
+        char headerExample[]  = "exampleHeader";
+        int maximumVectorSize = 1;
 
-    for (uint16_t i = 0; i < maximumVectorSize; ++i)
-    {
-        acceptedHeader.push_back(chip::ByteSpan(chip::Uint8::from_char(headerExample), sizeof(headerExample)));
-    }
-    return acceptedHeader;
+        for (uint16_t i = 0; i < maximumVectorSize; ++i)
+        {
+            ReturnErrorOnFailure(encoder.Encode(chip::ByteSpan(chip::Uint8::from_char(headerExample), sizeof(headerExample) - 1)));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
-vector<EmberAfContentLaunchStreamingType> ContentLauncherManager::proxyGetSupportedStreamingTypes()
+CHIP_ERROR ContentLauncherManager::proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
-    vector<EmberAfContentLaunchStreamingType> supportedStreamingTypes;
-    supportedStreamingTypes.push_back(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH);
-    supportedStreamingTypes.push_back(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS);
-    return supportedStreamingTypes;
+    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // TODO: Insert code here
+        ReturnErrorOnFailure(encoder.Encode(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH));
+        ReturnErrorOnFailure(encoder.Encode(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS));
+        return CHIP_NO_ERROR;
+    });
 }
 
 ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<ContentLaunchParamater> parameterList, bool autoplay,

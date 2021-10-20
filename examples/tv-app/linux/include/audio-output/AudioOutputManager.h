@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
+#include <app/AttributeAccessInterface.h>
 
 #include <lib/core/CHIPError.h>
 #include <vector>
@@ -26,5 +26,5 @@ class AudioOutputManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<AudioOutputInfo> proxyGetListOfAudioOutputInfo();
+    CHIP_ERROR proxyGetListOfAudioOutputInfo(chip::app::AttributeValueEncoder & aEncoder);
 };
