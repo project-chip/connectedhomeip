@@ -70,8 +70,7 @@ void OnAttributeResponse<chip::ByteSpan>(void * /* context */, chip::ByteSpan va
 template <>
 void OnAttributeResponse<chip::CharSpan>(void * /* context */, chip::CharSpan value)
 {
-    std::string strValue(value.data(), value.size());
-    ChipLogProgress(Zcl, "  attributeValue: (span of length %zd) %s", value.size(), strValue.c_str());
+    ChipLogProgress(Zcl, "  attributeValue: '%.*s'", static_cast<int>(value.size()), value.data());
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
