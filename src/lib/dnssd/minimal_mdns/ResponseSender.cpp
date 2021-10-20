@@ -174,8 +174,8 @@ CHIP_ERROR ResponseSender::FlushReply()
         else
         {
             ChipLogDetail(Discovery, "Broadcasting mDns reply for query from %s", srcAddressString);
-            ReturnErrorOnFailure(
-                mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort, mSendState.GetSourceInterfaceId()));
+            ReturnErrorOnFailure(mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort,
+                                                        mSendState.GetSourceInterfaceId(), mSendState.GetSourceAddress().Type()));
         }
     }
 

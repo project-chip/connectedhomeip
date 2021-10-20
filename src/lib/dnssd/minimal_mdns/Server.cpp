@@ -222,7 +222,8 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
     return CHIP_ERROR_NOT_CONNECTED;
 }
 
-CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface)
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface,
+                                     chip::Inet::IPAddressType addressType)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
     {
@@ -233,7 +234,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
             continue;
         }
 
-        if ((info->udp->GetBoundInterface() != interface) && (info->udp->GetBoundInterface() != INET_NULL_INTERFACEID))
+        if ((info->interfaceId != interface) && (info->interfaceId != INET_NULL_INTERFACEID))
+        {
+            continue;
+        }
+
+        if ((addressType != chip::Inet::IPAddressType::kAny) && (info->addressType != addressType))
         {
             continue;
         }
@@ -242,17 +248,17 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
 
         /// The same packet needs to be sent over potentially multiple interfaces.
         /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+        /// for sending via `CloneData`
+        ///
         /// TODO: this wastes one copy of the data and that could be optimized away
-        chip::System::PacketBufferHandle copy = data.CloneData();
-
         if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #endif
         else
@@ -295,17 +301,17 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
 
         /// The same packet needs to be sent over potentially multiple interfaces.
         /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+        /// for sending via `CloneData`
+        ///
         /// TODO: this wastes one copy of the data and that could be optimized away
-        chip::System::PacketBufferHandle copy = data.CloneData();
-
         if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #endif
         else
@@ -318,7 +324,6 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         if (err == CHIP_NO_ERROR)
         {
             hadSuccesfulSend = true;
-            ChipLogProgress(Discovery, "mDNS broadcast success");
         }
         else
         {

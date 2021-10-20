@@ -142,7 +142,7 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
         //
         // We may want to consider having separate AnyV4 and AnyV6 constants
         // inside CHIP to resolve this ambiguity
-        if ((addr.Type() == kIPAddressType_Any) && (addrType == kIPAddressType_IPv6))
+        if ((addr.Type() == IPAddressType::kAny) && (addrType == IPAddressType::kIPv6))
         {
             ipAddr = *IP6_ADDR_ANY;
         }
