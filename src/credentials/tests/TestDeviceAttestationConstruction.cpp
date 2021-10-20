@@ -412,7 +412,7 @@ static void TestAttestationElements_DeconstructionUnordered(nlTestSuite * inSuit
  */
 // clang-format off
 static const nlTest sTests[] = {
-    NL_TEST_DEF("Test Device Attestation Elements Deconstruction", TestAttestationElements_Deconstruction), 
+    NL_TEST_DEF("Test Device Attestation Elements Deconstruction", TestAttestationElements_Deconstruction),
     NL_TEST_DEF("Test Vendor Reserved Data Ordering",   TestVendorReservedData),
     NL_TEST_DEF("Test Device Attestation Elements Roundtrip", TestAttestationElements_Roundtrip),
     NL_TEST_DEF("Test Device Attestation Elements Construction", TestAttestationElements_Construction),
