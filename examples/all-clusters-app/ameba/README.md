@@ -63,7 +63,7 @@ The commissioning is carried out via WiFi.
     [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
     to communicate with the device.
 
-          $ ./chip-tool pairing bypass node-id-to-assign 192.168.xx.xxx 5540
+          $ ./chip-tool pairing bypass ${NODE_ID_TO_ASSIGN} 192.168.xx.xxx 5540
 
 ### Cluster Control
 

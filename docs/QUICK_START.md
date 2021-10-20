@@ -32,9 +32,9 @@ controller.
 
 #### IP Pairing
 
-`chip-tool pairing onnetwork node-id-to-assign 20202021` will use PASE over IP
-to commission a device and assign `node-id-to-assign` (which must be a decimal
-number or a 0x-prefixed hex number) as its node id.
+`chip-tool pairing onnetwork ${NODE_ID_TO_ASSIGN} 20202021` will use PASE over
+IP to commission a device and assign `${NODE_ID_TO_ASSIGN}` (which must be a
+decimal number or a 0x-prefixed hex number) as its node id.
 
 NOTE: On Linux, if the device is actually running after unit tests ran you have
 to use `chip-tool pairing onnetwork desired-node-id 34567890`, because the unit
