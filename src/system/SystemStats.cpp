@@ -51,9 +51,6 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
 #if INET_CONFIG_NUM_UDP_ENDPOINTS
     "InetLayer_NumUDPEpsInUse",
 #endif
-#if INET_CONFIG_NUM_DNS_RESOLVERS
-    "InetLayer_NumDNSResolversInUse",
-#endif
     "ExchangeMgr_NumContextsInUse",   "ExchangeMgr_NumUMHandlersInUse",
     "ExchangeMgr_NumBindings",        "MessageLayer_NumConnectionsInUse",
 };

@@ -1426,16 +1426,6 @@
 #endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
 
 /**
- *  @def CHIP_CONFIG_ENABLE_DNS_RESOLVER
- *
- *  @brief
- *    Enable support for resolving hostnames with a DNS resolver.
- */
-#ifndef CHIP_CONFIG_ENABLE_DNS_RESOLVER
-#define CHIP_CONFIG_ENABLE_DNS_RESOLVER (INET_CONFIG_ENABLE_DNS_RESOLVER)
-#endif // CHIP_CONFIG_ENABLE_DNS_RESOLVER
-
-/**
  *  @def CHIP_CONFIG_RESOLVE_IPADDR_LITERAL
  *
  *  @brief

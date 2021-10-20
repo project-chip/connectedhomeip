@@ -87,10 +87,6 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     TCPEndPoint * testTCPEP = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR err = CHIP_NO_ERROR;
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    IPAddress testDestAddr = IPAddress::Any;
-    char testHostName[20]  = "www.nest.com";
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
     // Deinit system layer and network
     ShutdownNetwork();
@@ -112,74 +108,10 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    err = gInet.ResolveHostAddress(testHostName, 1, &testDestAddr, HandleDNSResolveComplete, nullptr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
     // then init network
     InitSystemLayer();
     InitNetwork();
 }
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-// Test Inet ResolveHostAddress functionality
-static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
-{
-    char testHostName1[20] = "www.google.com";
-    char testHostName2[20] = "127.0.0.1";
-    char testHostName3[20] = "";
-    char testHostName4[260];
-    IPAddress testDestAddr[1] = { IPAddress::Any };
-    CHIP_ERROR err;
-    constexpr uint32_t kSleepTimeMilliseconds = 10;
-
-    memset(testHostName4, 'w', sizeof(testHostName4));
-    testHostName4[259] = '\0';
-
-    callbackHandlerCalled = false;
-    err = gInet.ResolveHostAddress(testHostName1, 1, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        while (!callbackHandlerCalled)
-        {
-            ServiceNetwork(kSleepTimeMilliseconds);
-        }
-    }
-
-    callbackHandlerCalled = false;
-    err = gInet.ResolveHostAddress(testHostName2, 1, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        while (!callbackHandlerCalled)
-        {
-            ServiceNetwork(kSleepTimeMilliseconds);
-        }
-    }
-
-    callbackHandlerCalled = false;
-    err = gInet.ResolveHostAddress(testHostName3, 1, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        while (!callbackHandlerCalled)
-        {
-            ServiceNetwork(kSleepTimeMilliseconds);
-        }
-    }
-
-    err = gInet.ResolveHostAddress(testHostName2, 0, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
-
-    err = gInet.ResolveHostAddress(testHostName4, 1, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_HOST_NAME_TOO_LONG);
-}
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 static void TestInetError(nlTestSuite * inSuite, void * inContext)
 {
@@ -441,9 +373,6 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPre),
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-                                 NL_TEST_DEF("InetEndPoint::ResolveHostAddress", TestResolveHostAddress),
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
