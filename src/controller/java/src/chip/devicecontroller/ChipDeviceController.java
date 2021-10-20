@@ -217,18 +217,18 @@ public class ChipDeviceController {
   /**
    * Generates a new PASE verifier and passcode ID for the given setup PIN code.
    *
-   * @param deviceId the ID of the device for which to generate the PASE verifier
+   * @param devicePtr a pointer to the device object for which to generate the PASE verifier
    * @param setupPincode the PIN code to use
    * @param iterations the number of iterations for computing the verifier
    * @param salt the 16-byte salt
    */
   public PaseVerifierParams computePaseVerifier(
-      long deviceId, long setupPincode, int iterations, byte[] salt) {
-    return computePaseVerifier(deviceControllerPtr, deviceId, setupPincode, iterations, salt);
+      long devicePtr, long setupPincode, int iterations, byte[] salt) {
+    return computePaseVerifier(deviceControllerPtr, devicePtr, setupPincode, iterations, salt);
   }
 
   private native PaseVerifierParams computePaseVerifier(
-      long deviceControllerPtr, long deviceId, long setupPincode, int iterations, byte[] salt);
+      long deviceControllerPtr, long devicePtr, long setupPincode, int iterations, byte[] salt);
 
   private native long newDeviceController();
 
