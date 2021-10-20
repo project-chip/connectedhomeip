@@ -220,11 +220,10 @@ class BaseTestHelper:
             return False
 
     def TestResolve(self, nodeid):
-        fabricid = self.devCtrl.GetCompressedFabricId()
         self.logger.info(
-            "Resolve: node id = {:08x} (compressed) fabric id = {:08x}".format(nodeid, fabricid))
+            "Resolve: node id = {:08x}".format(nodeid))
         try:
-            self.devCtrl.ResolveNode(fabricid=fabricid, nodeid=nodeid)
+            self.devCtrl.ResolveNode(nodeid=nodeid)
             addr = self.devCtrl.GetAddressAndPort(nodeid)
             if not addr:
                 return False

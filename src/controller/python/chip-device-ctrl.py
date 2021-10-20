@@ -571,17 +571,17 @@ class DeviceMgrCmd(Cmd):
 
     def do_resolve(self, line):
         """
-        resolve <fabricid> <nodeid>
+        resolve <nodeid>
 
-        Resolve DNS-SD name corresponding with the given fabric and node IDs and
+        Resolve DNS-SD name corresponding with the given node ID and
         update address of the node in the device controller.
         """
         try:
             args = shlex.split(line)
-            if len(args) == 2:
-                err = self.devCtrl.ResolveNode(int(args[0]), int(args[1]))
+            if len(args) == 1:
+                err = self.devCtrl.ResolveNode(int(args[0]))
                 if err == 0:
-                    address = self.devCtrl.GetAddressAndPort(int(args[1]))
+                    address = self.devCtrl.GetAddressAndPort(int(args[0]))
                     address = "{}:{}".format(
                         *address) if address else "unknown"
                     print("Current address: " + address)

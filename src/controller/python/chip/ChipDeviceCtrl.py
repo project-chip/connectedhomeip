@@ -200,9 +200,10 @@ class ChipDeviceController(object):
                 self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
 
-    def ResolveNode(self, fabricid, nodeid):
+    def ResolveNode(self, nodeid):
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.pychip_Resolver_ResolveNode(fabricid, nodeid)
+            lambda: self._dmLib.pychip_DeviceController_UpdateDevice(
+                self.devCtrl, nodeid)
         )
 
     def GetAddressAndPort(self, nodeid):
@@ -497,9 +498,9 @@ class ChipDeviceController(object):
                 _DeviceAddressUpdateDelegate_OnUpdateComplete]
             self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
 
-            self._dmLib.pychip_Resolver_ResolveNode.argtypes = [
-                c_uint64, c_uint64]
-            self._dmLib.pychip_Resolver_ResolveNode.restype = c_uint32
+            self._dmLib.pychip_DeviceController_UpdateDevice.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_UpdateDevice.restype = c_uint32
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]

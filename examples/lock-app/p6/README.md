@@ -135,7 +135,7 @@ Once P6 is up and running, we need to set up a device controller on Raspberry Pi
 
 -   Resolve DNS-SD name and update address of the node in the device controller.
 
-         - chip-device-ctrl > resolve 0 1234
+         - chip-device-ctrl > resolve 1234
 
 <a name="Notes"></a>
 
