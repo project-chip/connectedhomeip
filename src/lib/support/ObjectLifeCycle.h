@@ -74,24 +74,7 @@ public:
     bool SetInitialized() { return Transition<State::Initializing, State::Initialized>(); }
     bool SetShuttingDown() { return Transition<State::Initialized, State::ShuttingDown>(); }
     bool SetShutdown() { return Transition<State::ShuttingDown, State::Shutdown>(); }
-
-    /**
-     * Transition from Shutdown back to Uninitialized, or remain Uninitialized.
-     *
-     * Typical use is `VerifyOrReturnError(state.Reset(), CHIP_ERROR_INCORRECT_STATE)`; this function returns `bool` rather than
-     * a `CHIP_ERROR` so that error source tracking will record the call point rather than this function itself.
-     *
-     * @return true     if the state was Uninitialized or Shutdown and is now Uninitialized.
-     * @return false    otherwise.
-     */
-    bool Reset()
-    {
-        if (mState == State::Shutdown)
-        {
-            mState = State::Uninitialized;
-        }
-        return mState == State::Uninitialized;
-    }
+    bool Reset() { return Transition<State::Shutdown, State::Uninitialized>(); }
 
     /**
      * Transition from Uninitialized or Shutdown to Destroyed.
