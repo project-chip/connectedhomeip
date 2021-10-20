@@ -72,9 +72,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
                   aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
 
     if (aCommandPath.mClusterId == TestCluster::Id &&
-        aCommandPath.mCommandId == TestCluster::Commands::TestStructArrayArgumentRequest::Type::GetCommandId())
+        aCommandPath.mCommandId == TestCluster::Commands::TestSimpleArgumentRequest::Type::GetCommandId())
     {
-        TestCluster::Commands::TestStructArrayArgumentRequest::DecodableType dataRequest;
+        TestCluster::Commands::TestSimpleArgumentRequest::DecodableType dataRequest;
 
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {

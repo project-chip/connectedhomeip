@@ -57,10 +57,6 @@
 #include <inet/InetLayerBasis.h>
 #include <inet/InetLayerEvents.h>
 
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-#include <inet/DNSResolver.h>
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -120,10 +116,6 @@ class InetLayer;
  */
 class DLL_EXPORT InetLayer
 {
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    friend class DNSResolver;
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     friend class TCPEndPoint;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -153,20 +145,6 @@ public:
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
     // DNS Resolution
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-
-    typedef DNSResolver::OnResolveCompleteFunct DNSResolveCompleteFunct;
-
-    CHIP_ERROR ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
-                                  IPAddress * addrArray, DNSResolveCompleteFunct onComplete, void * appState);
-    CHIP_ERROR ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t maxAddrs, IPAddress * addrArray,
-                                  DNSResolveCompleteFunct onComplete, void * appState);
-    CHIP_ERROR ResolveHostAddress(const char * hostName, uint8_t maxAddrs, IPAddress * addrArray,
-                                  DNSResolveCompleteFunct onComplete, void * appState);
-    void CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, void * appState);
-
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
     CHIP_ERROR GetInterfaceFromAddr(const IPAddress & addr, InterfaceId & intfId);
 

@@ -186,8 +186,8 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALT", 8), 0, &delegateAccessory) ==
-                       CHIP_NO_ERROR);
+                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALTsaltSALT", 16), 0,
+                                                   &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, contextCommissioner,
                                             &delegateCommissioner) == CHIP_NO_ERROR);
@@ -255,8 +255,8 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALT", 8), 0, &delegateAccessory) ==
-                       CHIP_NO_ERROR);
+                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALTsaltSALT", 16), 0,
+                                                   &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 4321, 0, contextCommissioner,
                                             &delegateCommissioner) == CHIP_NO_ERROR);

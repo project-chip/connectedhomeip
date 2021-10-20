@@ -34,10 +34,11 @@
 // #6308 should handle IM error code on the application side, either modify this function or remove this.
 
 // Cluster Specific Response Callbacks
-typedef void (*AccountLoginClusterGetSetupPINResponseCallback)(void * context, uint8_t * setupPIN);
-typedef void (*ApplicationLauncherClusterLaunchAppResponseCallback)(void * context, uint8_t status, uint8_t * data);
-typedef void (*ContentLauncherClusterLaunchContentResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
-typedef void (*ContentLauncherClusterLaunchURLResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
+typedef void (*AccountLoginClusterGetSetupPINResponseCallback)(void * context, chip::CharSpan setupPIN);
+typedef void (*ApplicationLauncherClusterLaunchAppResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
+typedef void (*ContentLauncherClusterLaunchContentResponseCallback)(void * context, chip::CharSpan data,
+                                                                    uint8_t contentLaunchStatus);
+typedef void (*ContentLauncherClusterLaunchURLResponseCallback)(void * context, chip::CharSpan data, uint8_t contentLaunchStatus);
 typedef void (*DoorLockClusterClearAllPinsResponseCallback)(void * context, uint8_t status);
 typedef void (*DoorLockClusterClearAllRfidsResponseCallback)(void * context, uint8_t status);
 typedef void (*DoorLockClusterClearHolidayScheduleResponseCallback)(void * context, uint8_t status);
@@ -70,16 +71,16 @@ typedef void (*DoorLockClusterSetWeekdayScheduleResponseCallback)(void * context
 typedef void (*DoorLockClusterSetYeardayScheduleResponseCallback)(void * context, uint8_t status);
 typedef void (*DoorLockClusterUnlockDoorResponseCallback)(void * context, uint8_t status);
 typedef void (*DoorLockClusterUnlockWithTimeoutResponseCallback)(void * context, uint8_t status);
-typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, chip::CharSpan debugText);
 typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
-                                                                                 uint8_t * debugText);
+                                                                                 chip::CharSpan debugText);
 typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
-                                                                               uint8_t * debugText);
+                                                                               chip::CharSpan debugText);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
 typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity, uint8_t groupCount,
                                                                 /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
-typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t * groupName);
+typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId, chip::CharSpan groupName);
 typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
 typedef void (*KeypadInputClusterSendKeyResponseCallback)(void * context, uint8_t status);
 typedef void (*MediaPlaybackClusterMediaFastForwardResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
@@ -93,23 +94,29 @@ typedef void (*MediaPlaybackClusterMediaSkipBackwardResponseCallback)(void * con
 typedef void (*MediaPlaybackClusterMediaSkipForwardResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaStartOverResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaStopResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
-typedef void (*NetworkCommissioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
-typedef void (*NetworkCommissioningClusterAddWiFiNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
-typedef void (*NetworkCommissioningClusterDisableNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
-typedef void (*NetworkCommissioningClusterEnableNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
-typedef void (*NetworkCommissioningClusterRemoveNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode,
+                                                                            chip::CharSpan debugText);
+typedef void (*NetworkCommissioningClusterAddWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
+                                                                          chip::CharSpan debugText);
+typedef void (*NetworkCommissioningClusterDisableNetworkResponseCallback)(void * context, uint8_t errorCode,
+                                                                          chip::CharSpan debugText);
+typedef void (*NetworkCommissioningClusterEnableNetworkResponseCallback)(void * context, uint8_t errorCode,
+                                                                         chip::CharSpan debugText);
+typedef void (*NetworkCommissioningClusterRemoveNetworkResponseCallback)(void * context, uint8_t errorCode,
+                                                                         chip::CharSpan debugText);
 typedef void (*NetworkCommissioningClusterScanNetworksResponseCallback)(
-    void * context, uint8_t errorCode, uint8_t * debugText, /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
+    void * context, uint8_t errorCode, chip::CharSpan debugText,
+    /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
     /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
 typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                               uint8_t * debugText);
+                                                                               chip::CharSpan debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                             uint8_t * debugText);
+                                                                             chip::CharSpan debugText);
 typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
                                                                                    uint32_t delayedActionTime);
 typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(
-    void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-    uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+    void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI, uint32_t softwareVersion,
+    chip::CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 typedef void (*OperationalCredentialsClusterAttestationResponseCallback)(void * context, chip::ByteSpan AttestationElements,
                                                                          chip::ByteSpan Signature);
 typedef void (*OperationalCredentialsClusterCertificateChainResponseCallback)(void * context, chip::ByteSpan Certificate);
@@ -125,12 +132,12 @@ typedef void (*ScenesClusterRemoveAllScenesResponseCallback)(void * context, uin
 typedef void (*ScenesClusterRemoveSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId,
-                                                       uint16_t transitionTime, uint8_t * sceneName,
+                                                       uint16_t transitionTime, chip::CharSpan sceneName,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
                                                               /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
                                                               uint8_t ErrorType);
-typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t status, uint8_t * data);
+typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
 typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * context, uint8_t returnValue);
 typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * context,
                                                                        /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
