@@ -1,7 +1,7 @@
 package chip.clusterinfo;
 
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
-import java.util.*;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class CommandInfo {

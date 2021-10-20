@@ -1,6 +1,6 @@
 package chip.clusterinfo;
 
-import java.util.*;
+import java.util.List;
 
 public interface ClusterCommandCallback {
   void onSuccess(List<Object> responseValues);

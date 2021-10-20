@@ -65,7 +65,7 @@ class ClusterInteractionFragment : Fragment() {
         responseValues.forEach { Log.d(TAG, it.toString()) }
       }
 
-      override fun onFailure(exception: Exception?) {
+      override fun onFailure(exception: Exception) {
         showMessage("Command failed")
         Log.e(TAG, exception.toString())
       }
