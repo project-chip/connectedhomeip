@@ -6031,7 +6031,7 @@ public:
             jobject applicationLauncherList = env->NewObject(entryTypeCls, entryTypeCtor, entry);
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, applicationLauncherList);
         }
-        VerifyOrReturn(iter.GetStatus() != CHIP_NO_ERROR,
+        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
                        ChipLogError(Zcl, "Error decoding ApplicationLauncherListAttribute value: %" CHIP_ERROR_FORMAT,
                                     iter.GetStatus().Format()));
 
@@ -6123,7 +6123,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding AudioOutputListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -6196,7 +6196,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, acceptsHeaderList);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding AcceptsHeaderListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -6272,7 +6272,7 @@ public:
             jobject supportedStreamingTypes = env->NewObject(entryTypeCls, entryTypeCtor, entry);
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, supportedStreamingTypes);
         }
-        VerifyOrReturn(iter.GetStatus() != CHIP_NO_ERROR,
+        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
                        ChipLogError(Zcl, "Error decoding SupportedStreamingTypesAttribute value: %" CHIP_ERROR_FORMAT,
                                     iter.GetStatus().Format()));
 
@@ -6361,7 +6361,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding DeviceListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -6435,7 +6435,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, serverList);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding ServerListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -6509,7 +6509,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, clientList);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding ClientListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -6583,7 +6583,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, partsList);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding PartsListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -6673,7 +6673,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding LabelListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -6766,7 +6766,7 @@ public:
 
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
-        VerifyOrReturn(iter.GetStatus() != CHIP_NO_ERROR,
+        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
                        ChipLogError(Zcl, "Error decoding BasicCommissioningInfoListAttribute value: %" CHIP_ERROR_FORMAT,
                                     iter.GetStatus().Format()));
 
@@ -6868,7 +6868,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding NetworkInterfacesAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -6956,7 +6956,7 @@ public:
 
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
-        VerifyOrReturn(iter.GetStatus() != CHIP_NO_ERROR,
+        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
                        ChipLogError(Zcl, "Error decoding GroupsAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7051,7 +7051,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding GroupKeysAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7144,7 +7144,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding MediaInputListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7243,7 +7243,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding FabricsListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7318,7 +7318,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, activeBatteryFaults);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding ActiveBatteryFaultsAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7414,7 +7414,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding TvChannelListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7506,7 +7506,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding TargetNavigatorListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7580,7 +7580,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, listInt8u);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding ListInt8uAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7652,7 +7652,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, listOctetString);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding ListOctetStringAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7743,7 +7743,7 @@ public:
 
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
-        VerifyOrReturn(iter.GetStatus() != CHIP_NO_ERROR,
+        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
                        ChipLogError(Zcl, "Error decoding ListStructOctetStringAttribute value: %" CHIP_ERROR_FORMAT,
                                     iter.GetStatus().Format()));
 
@@ -7850,7 +7850,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding NeighborTableListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -7951,7 +7951,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding RouteTableListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -8043,7 +8043,7 @@ public:
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
         VerifyOrReturn(
-            iter.GetStatus() != CHIP_NO_ERROR,
+            iter.GetStatus() == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Error decoding SecurityPolicyAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -8151,7 +8151,7 @@ public:
 
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         }
-        VerifyOrReturn(iter.GetStatus() != CHIP_NO_ERROR,
+        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
                        ChipLogError(Zcl, "Error decoding OperationalDatasetComponentsAttribute value: %" CHIP_ERROR_FORMAT,
                                     iter.GetStatus().Format()));
 
@@ -8227,7 +8227,7 @@ public:
             jobject activeNetworkFaultsList = env->NewObject(entryTypeCls, entryTypeCtor, entry);
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, activeNetworkFaultsList);
         }
-        VerifyOrReturn(iter.GetStatus() != CHIP_NO_ERROR,
+        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
                        ChipLogError(Zcl, "Error decoding ActiveNetworkFaultsListAttribute value: %" CHIP_ERROR_FORMAT,
                                     iter.GetStatus().Format()));
 

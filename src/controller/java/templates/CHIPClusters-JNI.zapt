@@ -491,7 +491,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
                 env->CallBooleanMethod(arrayListObj, arrayListAddMethod, {{asLowerCamelCase name}});
                 {{/if}}
             }
-            VerifyOrReturn(iter.GetStatus() != CHIP_NO_ERROR, ChipLogError(Zcl, "Error decoding {{asUpperCamelCase name}}Attribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+            VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR, ChipLogError(Zcl, "Error decoding {{asUpperCamelCase name}}Attribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
             env->ExceptionClear();
             env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
