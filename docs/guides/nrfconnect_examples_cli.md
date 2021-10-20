@@ -163,7 +163,7 @@ available configuration data or to add a specific subcommand.
 ```shell
 VendorId:        9050 (0x235A)
 ProductId:       20043 (0x4E4B)
-ProductRevision: 1 (0x1)
+HardwareVersion: 1 (0x1)
 FabricId:
 PinCode:         020202021
 Discriminator:   f00
@@ -208,12 +208,12 @@ uart:~$ matter config productid
 20043 (0x4E4B)
 ```
 
-#### productrev
+#### hardwarever
 
-Prints the product revision of the device. Takes no arguments.
+Prints the hardware version of the device. Takes no arguments.
 
 ```shell
-uart:~$ matter config productrev
+uart:~$ matter config hardwarever
 1 (0x1)
 ```
 

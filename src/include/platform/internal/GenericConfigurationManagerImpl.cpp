@@ -71,10 +71,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductName(char * b
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareRevisionString(char * buf, size_t bufSize)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     return CHIP_NO_ERROR;
 }
 
@@ -166,37 +166,37 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StorePrimary802154MACAd
 }
 
 template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductRevisionString(char * buf, size_t bufSize)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHardwareVersionString(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING);
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
     return CHIP_NO_ERROR;
 }
 
 template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductRevision(uint16_t & productRev)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHardwareVersion(uint16_t & hardwareVer)
 {
     CHIP_ERROR err;
     uint32_t val;
 
-    err = ReadConfigValue(ConfigClass::kConfigKey_ProductRevision, val);
+    err = ReadConfigValue(ConfigClass::kConfigKey_HardwareVersion, val);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        productRev = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION);
-        err        = CHIP_NO_ERROR;
+        hardwareVer = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION);
+        err         = CHIP_NO_ERROR;
     }
     else
     {
-        productRev = static_cast<uint16_t>(val);
+        hardwareVer = static_cast<uint16_t>(val);
     }
 
     return err;
 }
 
 template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreProductRevision(uint16_t productRev)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreHardwareVersion(uint16_t hardwareVer)
 {
-    return WriteConfigValue(ConfigClass::kConfigKey_ProductRevision, static_cast<uint32_t>(productRev));
+    return WriteConfigValue(ConfigClass::kConfigKey_HardwareVersion, static_cast<uint32_t>(hardwareVer));
 }
 
 template <class ConfigClass>
@@ -539,12 +539,12 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
     }
 
     {
-        uint16_t productRev;
-        if (GetProductRevision(productRev) != CHIP_NO_ERROR)
+        uint16_t hardwareVer;
+        if (GetHardwareVersion(hardwareVer) != CHIP_NO_ERROR)
         {
-            productRev = 0;
+            hardwareVer = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Product Revision: %" PRIu16, productRev);
+        ChipLogProgress(DeviceLayer, "  Hardware Version: %" PRIu16, hardwareVer);
     }
 
     {

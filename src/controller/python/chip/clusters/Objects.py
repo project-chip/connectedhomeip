@@ -26052,8 +26052,7 @@ class ApplianceIdentification(Cluster):
 
             value: 'typing.Optional[bytes]' = None
 
-        @dataclass
-        class ProductRevision(ClusterAttributeDescriptor):
+        class HardwareVersion(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0B00
@@ -26266,8 +26265,7 @@ class MeterIdentification(Cluster):
 
             value: 'typing.Optional[bytes]' = None
 
-        @dataclass
-        class ProductRevision(ClusterAttributeDescriptor):
+        class HardwareVersion(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0B01
