@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/DecodableList.h>
 #include <commands/clusters/ModelCommand.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
@@ -133,35 +134,53 @@ static void OnCharStringAttributeResponse(void * context, const chip::CharSpan v
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, uint16_t count, {{chipType}} * entries)
+static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, const chip::app::DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list)
 {
-    ChipLogProgress(chipTool, "On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse: %" PRIu16 " entries", count);
+    ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    for (uint16_t i = 0; i < count; i++)
+    size_t count = 0;
     {
+      auto iter = list.begin();
+      while (iter.Next()) {
+        ++count;
+      }
+      if (iter.GetStatus() != CHIP_NO_ERROR) {
+        command->SetCommandExitStatus(iter.GetStatus());
+        return;
+      }
+    }
+    ChipLogProgress(chipTool, "On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse: %zu entries", count);
+
+    auto iter = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ++i;
         {{#if isStruct}}
         ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]:", i);
         {{#chip_attribute_list_entryTypes}}
         {{#if (isOctetString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entries[i].{{name}}.size());
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entry.{{asLowerCamelCase name}}.size());
         {{else if (isCharString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>(entries[i].{{name}}.size()), entries[i].{{name}}.data());
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>(entry.{{asLowerCamelCase name}}.size()), entry.{{asLowerCamelCase name}}.data());
         {{else}}
-        ChipLogProgress(chipTool, "  {{name}}: {{asPrintFormat type}}", entries[i].{{name}});
+        ChipLogProgress(chipTool, "  {{asLowerCamelCase name}}: {{asPrintFormat type}}", entry.{{asLowerCamelCase name}});
         {{/if}}
         {{/chip_attribute_list_entryTypes}}
         {{else}}
         {{#if (isOctetString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entries[i].size());
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entry.size());
         {{else if (isCharString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>(entries[i].size()), entries[i].data());
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>(entry.size()), entry.data());
         {{else}}
-        ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]: {{asPrintFormat type}}", i, entries[i]);
+        ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]: {{asPrintFormat type}}", i, entry);
         {{/if}}
         {{/if}}
     }
 
-    ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 

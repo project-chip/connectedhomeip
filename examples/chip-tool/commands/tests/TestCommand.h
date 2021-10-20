@@ -157,7 +157,26 @@ protected:
         return CheckValueAsListHelper<T>(itemName, iter, std::forward<ValueTypes>(items)...);
     }
 
+    template <typename T>
+    bool CheckValueAsListLength(const char * itemName, chip::app::DataModel::DecodableList<T> list, uint64_t expectedLength)
+    {
+        auto iter      = list.begin();
+        uint64_t count = 0;
+        while (iter.Next())
+        {
+            ++count;
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            Exit(std::string(itemName) + " list length mismatch: expected " + std::to_string(expectedLength) + " but got an error");
+            return false;
+        }
+        return CheckValueAsList(itemName, count, expectedLength);
+    }
+
     bool CheckValueAsString(const char * itemName, chip::ByteSpan current, const char * expected);
+
+    bool CheckValueAsString(const char * itemName, chip::CharSpan current, const char * expected);
 
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

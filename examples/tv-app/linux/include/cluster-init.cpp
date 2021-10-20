@@ -28,8 +28,33 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/util/attribute-storage.h>
 
 using namespace chip;
+
+namespace {
+template <typename Manager, typename AttrTypeInfo, CHIP_ERROR (Manager::*Getter)(app::AttributeValueEncoder &)>
+class TvAttrAccess : public app::AttributeAccessInterface
+{
+public:
+    TvAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), AttrTypeInfo::GetClusterId()) {}
+
+    CHIP_ERROR Read(const app::ConcreteAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
+    {
+        if (aPath.mAttributeId == AttrTypeInfo::GetAttributeId())
+        {
+            return (Manager().*Getter)(aEncoder);
+        }
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+} // anonymous namespace
 
 /** @brief Application Basic Cluster Init
  *
@@ -82,6 +107,14 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
     }
 }
 
+namespace {
+
+TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo,
+             &TvChannelManager::proxyGetTvChannelList>
+    gTvChannelAttrAccess;
+
+} // anonymous namespace
+
 /** @brief Tv Channel  Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -93,9 +126,21 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
  */
 void emberAfTvChannelClusterInitCallback(EndpointId endpoint)
 {
-    ClusterManager().writeListAttribute(endpoint, ZCL_TV_CHANNEL_CLUSTER_ID, ZCL_TV_CHANNEL_LIST_ATTRIBUTE_ID,
-                                        TvChannelManager().proxyGetTvChannelList());
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gTvChannelAttrAccess);
+        attrAccessRegistered = true;
+    }
 }
+
+namespace {
+
+TvAttrAccess<ApplicationLauncherManager, app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::TypeInfo,
+             &ApplicationLauncherManager::proxyGetApplicationList>
+    gApplicationLauncherAttrAccess;
+
+} // anonymous namespace
 
 /** @brief Application Launcher  Cluster Init
  *
@@ -108,9 +153,21 @@ void emberAfTvChannelClusterInitCallback(EndpointId endpoint)
  */
 void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
 {
-    ClusterManager().writeListAttribute(endpoint, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_LIST_ATTRIBUTE_ID,
-                                        ApplicationLauncherManager().proxyGetApplicationList());
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gApplicationLauncherAttrAccess);
+        attrAccessRegistered = true;
+    }
 }
+
+namespace {
+
+TvAttrAccess<AudioOutputManager, app::Clusters::AudioOutput::Attributes::AudioOutputList::TypeInfo,
+             &AudioOutputManager::proxyGetListOfAudioOutputInfo>
+    gAudioOutputAttrAccess;
+
+} // anonymous namespace
 
 /** @brief Audio Output Cluster Init
  *
@@ -123,9 +180,41 @@ void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
  */
 void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 {
-    ClusterManager().writeListAttribute(endpoint, ZCL_AUDIO_OUTPUT_CLUSTER_ID, ZCL_AUDIO_OUTPUT_LIST_ATTRIBUTE_ID,
-                                        AudioOutputManager().proxyGetListOfAudioOutputInfo());
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gAudioOutputAttrAccess);
+        attrAccessRegistered = true;
+    }
 }
+
+namespace {
+
+class ContentLauncherAttrAccess : public app::AttributeAccessInterface
+{
+public:
+    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ContentLauncher::Id)
+    {}
+
+    CHIP_ERROR Read(const app::ConcreteAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
+    {
+        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id)
+        {
+            return ContentLauncherManager().proxyGetAcceptsHeader(aEncoder);
+        }
+
+        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
+        {
+            return ContentLauncherManager().proxyGetSupportedStreamingTypes(aEncoder);
+        }
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+ContentLauncherAttrAccess gContentLauncherAttrAccess;
+
+} // anonymous namespace
 
 /** @brief Content Launch Cluster Init
  *
@@ -138,13 +227,21 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
  */
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
-    ClusterManager().writeListAttribute(endpoint, ZCL_CONTENT_LAUNCH_CLUSTER_ID, ZCL_CONTENT_LAUNCHER_ACCEPTS_HEADER_ATTRIBUTE_ID,
-                                        ContentLauncherManager().proxyGetAcceptsHeader());
-
-    ClusterManager().writeListAttribute(endpoint, ZCL_CONTENT_LAUNCH_CLUSTER_ID,
-                                        ZCL_CONTENT_LAUNCHER_SUPPORTED_STREAMING_TYPES_ATTRIBUTE_ID,
-                                        ContentLauncherManager().proxyGetSupportedStreamingTypes());
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gContentLauncherAttrAccess);
+        attrAccessRegistered = true;
+    }
 }
+
+namespace {
+
+TvAttrAccess<MediaInputManager, app::Clusters::MediaInput::Attributes::MediaInputList::TypeInfo,
+             &MediaInputManager::proxyGetInputList>
+    gMediaInputAttrAccess;
+
+} // anonymous namespace
 
 /** @brief Media Input Cluster Init
  *
@@ -157,9 +254,21 @@ void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
  */
 void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 {
-    ClusterManager().writeListAttribute(endpoint, ZCL_MEDIA_INPUT_CLUSTER_ID, ZCL_MEDIA_INPUT_LIST_ATTRIBUTE_ID,
-                                        MediaInputManager().proxyGetInputList());
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gMediaInputAttrAccess);
+        attrAccessRegistered = true;
+    }
 }
+
+namespace {
+
+TvAttrAccess<TargetNavigatorManager, app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::TypeInfo,
+             &TargetNavigatorManager::proxyGetTargetInfoList>
+    gTargetNavigatorAttrAccess;
+
+} // anonymous namespace
 
 /** @brief Target Navigator Cluster Init
  *
@@ -172,6 +281,10 @@ void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
  */
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
-    ClusterManager().writeListAttribute(endpoint, ZCL_TARGET_NAVIGATOR_CLUSTER_ID, ZCL_TARGET_NAVIGATOR_LIST_ATTRIBUTE_ID,
-                                        TargetNavigatorManager().proxyGetTargetInfoList());
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gTargetNavigatorAttrAccess);
+        attrAccessRegistered = true;
+    }
 }
