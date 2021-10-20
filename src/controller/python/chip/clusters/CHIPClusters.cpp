@@ -4827,44 +4827,6 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_PumpConfigurationAndControl_
     return cluster.ReadAttributeSpeed(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeRunningHours(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::PumpConfigurationAndControlCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeLifetimeRunningHours(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
-        .AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_WriteAttribute_PumpConfigurationAndControl_LifetimeRunningHours(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint32_t value)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::PumpConfigurationAndControlCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.WriteAttributeLifetimeRunningHours(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
-        .AsInteger();
-}
-chip::ChipError::StorageType chip_ime_ReadAttribute_PumpConfigurationAndControl_Power(chip::Controller::Device * device,
-                                                                                      chip::EndpointId ZCLendpointId,
-                                                                                      chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::PumpConfigurationAndControlCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributePower(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_WriteAttribute_PumpConfigurationAndControl_Power(chip::Controller::Device * device,
-                                                                                       chip::EndpointId ZCLendpointId,
-                                                                                       chip::GroupId, uint32_t value)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::PumpConfigurationAndControlCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.WriteAttributePower(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value).AsInteger();
-}
 chip::ChipError::StorageType chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
