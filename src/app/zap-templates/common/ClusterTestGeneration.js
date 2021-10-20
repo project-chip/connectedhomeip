@@ -390,6 +390,9 @@ function chip_tests_item_parameters(options)
           value = value.map(v => attachGlobal(global, v));
         } else if (value instanceof Object) {
           for (key in value) {
+            if (key == "global") {
+              continue;
+            }
             value[key] = attachGlobal(global, value[key]);
           }
         } else {
