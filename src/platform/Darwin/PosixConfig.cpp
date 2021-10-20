@@ -75,8 +75,6 @@ uint16_t PosixConfig::mPosixSetupDiscriminator = 0xF00; // CHIP_DEVICE_CONFIG_US
 CHIP_ERROR PosixConfig::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    mPosixSetupDiscriminator = 0xF00; // CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
     return err;
 }
 
@@ -96,13 +94,8 @@ CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
     if (key == kConfigKey_SetupDiscriminator)
     {
         val = mPosixSetupDiscriminator;
-        err = CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
-    else
-    {
-        SuccessOrExit(err);
-    }
-
 exit:
     return err;
 }
@@ -150,11 +143,7 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
     if (key == kConfigKey_SetupDiscriminator)
     {
         mPosixSetupDiscriminator = val;
-        err                      = CHIP_NO_ERROR;
-    }
-    else
-    {
-        SuccessOrExit(err);
+        return CHIP_NO_ERROR;
     }
 exit:
     return err;
