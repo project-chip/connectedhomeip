@@ -43,7 +43,7 @@ k32w0_sdk("sdk") {
     "${k32w0_platform_dir}/util/include",
   ]
 
-  defines = []
+  defines = [ "CONFIG_OPERATIONAL_NETWORK=1" ]
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
   } else {
