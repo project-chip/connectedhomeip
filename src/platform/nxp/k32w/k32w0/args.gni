@@ -21,7 +21,6 @@ chip_device_platform = "k32w0"
 lwip_platform = "k32w0"
 
 chip_inet_config_enable_ipv4 = false
-chip_inet_config_enable_dns_resolver = false
 
 chip_inet_config_enable_tcp_endpoint = false
 
