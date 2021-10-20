@@ -531,6 +531,15 @@ void DeviceController::PersistNextKeyId()
     }
 }
 
+CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
+{
+    VerifyOrReturnError(GetCompressedFabricId() == peerId.GetCompressedFabricId(), CHIP_ERROR_INVALID_ARGUMENT);
+    uint16_t index = FindDeviceIndex(peerId.GetNodeId());
+    VerifyOrReturnError(index < kNumMaxActiveDevices, CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrReturnError(mActiveDevices[index].GetAddress(addr, port), CHIP_ERROR_NOT_CONNECTED);
+    return CHIP_NO_ERROR;
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
@@ -1700,7 +1709,7 @@ void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClien
     IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError)
+CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError)
 {
     app::ClusterInfo path;
     path.mNodeId = apReadClient->GetPeerNodeId();
@@ -1708,7 +1717,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(const app::ReadCl
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(const app::ReadClient * apReadClient)
+CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(app::ReadClient * apReadClient)
 {
     // Release the object for subscription
     if (apReadClient->IsSubscriptionType())

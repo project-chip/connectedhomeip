@@ -24,6 +24,7 @@ namespace chip {
 CHIP_ERROR SessionIDAllocator::Allocate(uint16_t & id)
 {
     VerifyOrReturnError(mNextAvailable < kMaxSessionID, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mNextAvailable > kUnsecuredSessionId, CHIP_ERROR_INTERNAL);
     id = mNextAvailable;
 
     // TODO - Update SessionID allocator to use freed session IDs
@@ -34,7 +35,8 @@ CHIP_ERROR SessionIDAllocator::Allocate(uint16_t & id)
 
 void SessionIDAllocator::Free(uint16_t id)
 {
-    if (mNextAvailable > 0 && (mNextAvailable - 1) == id)
+    // As per spec 4.4.1.3 Session ID of 0 is reserved for Unsecure communication
+    if (mNextAvailable > (kUnsecuredSessionId + 1) && (mNextAvailable - 1) == id)
     {
         mNextAvailable--;
     }

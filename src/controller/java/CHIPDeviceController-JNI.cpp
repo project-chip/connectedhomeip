@@ -59,10 +59,11 @@ using namespace chip::Controller;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
-static void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device ** device);
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
+static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jint passcodeId, jbyteArray pakeVerifier,
+                                         jobject & outParams);
 
 namespace {
 
@@ -275,19 +276,6 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
     }
 }
 
-JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
-{
-    chip::DeviceLayer::StackLock lock;
-    Device * chipDevice = nullptr;
-
-    ChipLogProgress(Controller, "getDevicePointer() called with device ID");
-
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
-
-    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
-    return reinterpret_cast<jlong>(chipDevice);
-}
-
 JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
 {
     chip::DeviceLayer::StackLock lock;
@@ -326,20 +314,9 @@ JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlo
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    Device * chipDevice                      = nullptr;
 
     ChipLogProgress(Controller, "disconnectDevice() called with deviceId");
-
-    err = wrapper->Controller()->GetDevice(deviceId, &chipDevice);
-
-    if (err != CHIP_NO_ERROR || !chipDevice)
-    {
-        ChipLogError(Controller, "Failed to get paired device.");
-        ThrowError(env, err);
-    }
-
-    wrapper->Controller()->ReleaseDevice(chipDevice);
+    wrapper->Controller()->ReleaseDeviceById(deviceId);
 }
 
 JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
@@ -350,33 +327,26 @@ JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
     return chipDevice->IsActive();
 }
 
-void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device ** chipDevice)
-{
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(wrapperHandle);
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-
-    err = wrapper->Controller()->GetDevice(deviceId, chipDevice);
-
-    if (err != CHIP_NO_ERROR || !chipDevice)
-    {
-        ChipLogError(Controller, "Failed to get paired device.");
-        ThrowError(env, err);
-    }
-}
-
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
-    Device * chipDevice = nullptr;
-
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::Inet::IPAddress addr;
     uint16_t port;
     char addrStr[50];
 
-    if (!chipDevice->GetAddress(addr, port))
-        return nullptr;
+    CHIP_ERROR err =
+        wrapper->Controller()->GetPeerAddressAndPort(PeerId()
+                                                         .SetCompressedFabricId(wrapper->Controller()->GetCompressedFabricId())
+                                                         .SetNodeId(static_cast<chip::NodeId>(deviceId)),
+                                                     addr, port);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to get device address.");
+        ThrowError(env, err);
+    }
 
     addr.ToString(addrStr);
     return env->NewStringUTF(addrStr);
@@ -471,6 +441,45 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
     }
 }
 
+JNI_METHOD(jobject, computePaseVerifier)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jlong setupPincode, jint iterations, jbyteArray salt)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    Device * chipDevice = nullptr;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    jobject params;
+    jbyteArray verifierBytes;
+    uint32_t passcodeId;
+    PASEVerifier verifier;
+    JniByteArray jniSalt(env, salt);
+
+    ChipLogProgress(Controller, "computePaseVerifier() called");
+
+    chipDevice = reinterpret_cast<Device *>(devicePtr);
+    VerifyOrExit(chipDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = chipDevice->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier, passcodeId);
+    SuccessOrExit(err);
+
+    uint8_t serializedVerifier[sizeof(verifier.mW0) + sizeof(verifier.mL)];
+    memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
+    memcpy(&serializedVerifier[sizeof(verifier.mW0)], verifier.mL, sizeof(verifier.mL));
+
+    err = JniReferences::GetInstance().N2J_ByteArray(env, serializedVerifier, sizeof(serializedVerifier), verifierBytes);
+    SuccessOrExit(err);
+
+    err = N2J_PaseVerifierParams(env, setupPincode, static_cast<jlong>(passcodeId), verifierBytes, params);
+    SuccessOrExit(err);
+    return params;
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ThrowError(env, err);
+    }
+    return nullptr;
+}
+
 void * IOThreadMain(void * arg)
 {
     JNIEnv * env;
@@ -507,6 +516,27 @@ void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)
     {
         env->Throw(ex);
     }
+}
+
+CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jint passcodeId, jbyteArray paseVerifier, jobject & outParams)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jmethodID constructor;
+    jclass paramsClass;
+
+    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/PaseVerifierParams", paramsClass);
+    JniClass paseVerifierParamsClass(paramsClass);
+    SuccessOrExit(err);
+
+    env->ExceptionClear();
+    constructor = env->GetMethodID(paramsClass, "<init>", "(JI[B)V");
+    VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+
+    outParams = (jobject) env->NewObject(paramsClass, constructor, setupPincode, passcodeId, paseVerifier);
+
+    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+exit:
+    return err;
 }
 
 CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)

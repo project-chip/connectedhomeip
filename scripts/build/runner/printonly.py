@@ -16,21 +16,21 @@ import shlex
 
 
 class PrintOnlyRunner:
-    def __init__(self, output_file):
+    def __init__(self, output_file, root: str):
         self.output_file = output_file
         self.dry_run = True
+        self.root = root
 
-    def Run(self, cmd, cwd=None, title=None):
+    def StartCommandExecution(self):
+        self.output_file.write(
+            "# Commands will be run in CHIP project root.\n")
+        self.output_file.write('cd "%s"\n\n' % self.root)
+
+    def Run(self, cmd, title=None):
         if title:
             self.output_file.write("# " + title + "\n")
 
-        if cwd:
-            self.output_file.write('cd "%s"\n' % cwd)
-
         self.output_file.write(
             " ".join([shlex.quote(part) for part in cmd]) + "\n")
-
-        if cwd:
-            self.output_file.write("cd -\n")
 
         self.output_file.write("\n")

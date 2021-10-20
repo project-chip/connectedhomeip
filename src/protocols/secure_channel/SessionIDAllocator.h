@@ -18,6 +18,15 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <stdint.h>
+
+// Spec 4.4.1.3
+// ===== Session ID (16 bits)
+// An unsigned integer value identifying the session associated with this message.
+// The session identifies the particular key used to encrypt a message out of the set of
+// available keys (either session or group), and the particular encryption/message
+// integrity algorithm to use for the message.The Session ID field is always present.
+// A Session ID of 0 SHALL indicate an unsecured session with no encryption or message integrity checking.
 
 namespace chip {
 
@@ -34,9 +43,10 @@ public:
     uint16_t Peek();
 
 private:
-    // Session ID is a 15 bit value (16th bit indicates unicast/group key)
-    static constexpr uint16_t kMaxSessionID = (1 << 15) - 1;
-    uint16_t mNextAvailable                 = 0;
+    static constexpr uint16_t kMaxSessionID       = UINT16_MAX;
+    static constexpr uint16_t kUnsecuredSessionId = 0;
+
+    uint16_t mNextAvailable = 1;
 };
 
 } // namespace chip
