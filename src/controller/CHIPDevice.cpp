@@ -1101,8 +1101,8 @@ CHIP_ERROR Device::LoadSecureSessionParameters()
     }
     else
     {
-        err = pairingSession.FromSerializable(mPairing);
-        SuccessOrExit(err);
+        // err = pairingSession.FromSerializable(mPairing);
+        // SuccessOrExit(err);
 
         err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
                                           CryptoContext::SessionRole::kInitiator, mFabricIndex);

@@ -957,8 +957,6 @@ public:
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
-    PASESessionSerializable & GetPairing() { return mPairing; }
-
     uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
     void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             app::TLVDataFilter tlvDataFilter = nullptr);
@@ -1036,8 +1034,6 @@ private:
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
-
-    PASESessionSerializable mPairing;
 
     DeviceStatusDelegate * mStatusDelegate = nullptr;
 

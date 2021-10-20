@@ -833,7 +833,9 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
+#ifndef CONFIG_OPERATIONAL_NETWORK
     testSecurePairingSecret->ToSerializable(device->GetPairing());
+#endif
 
     device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, mFabricIndex);
 
@@ -1550,7 +1552,9 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     else
 #endif
     {
+#ifndef CONFIG_OPERATIONAL_NETWORK
         mPairingSession.ToSerializable(device->GetPairing());
+#endif
         mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
         mPairedDevices.Insert(device->GetDeviceId());
@@ -2017,7 +2021,9 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
     break;
     case CommissioningStage::kCleanup:
         ChipLogProgress(Controller, "Rendezvous cleanup");
+#ifndef CONFIG_OPERATIONAL_NETWORK
         mPairingSession.ToSerializable(device->GetPairing());
+#endif
         mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
         mPairedDevices.Insert(device->GetDeviceId());
