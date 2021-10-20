@@ -50,7 +50,8 @@ constexpr size_t kSHA1_Hash_Length                = 20;
 constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
 
-constexpr size_t CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES = 16;
+constexpr size_t CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES      = 16;
+constexpr size_t CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES = 16;
 
 constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
 constexpr size_t kMax_ECDSA_Signature_Length = kP256_ECDSA_Signature_Length_Raw;
