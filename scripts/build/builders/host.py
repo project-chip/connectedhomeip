@@ -149,7 +149,8 @@ class HostBuilder(GnBuilder):
         else:
             outputs.update(
                 {
-                    self.app_name: os.path.join(self.output_dir, "chip_rpc_console_wheels")
+                    self.app_name: os.path.join(
+                        self.output_dir, "chip_rpc_console_wheels")
                 }
             )
 
