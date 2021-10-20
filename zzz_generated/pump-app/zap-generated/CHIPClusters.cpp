@@ -261,12 +261,11 @@ CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * c
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
 
-    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
-        successCb(context, responseData);
-    };
+    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
+                                            const ResponseDataT & responseData) { successCb(context, responseData); };
 
-    auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
-        failureCb(context, app::ToEmberAfStatus(aIMStatus));
+    auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
     };
 
     return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,

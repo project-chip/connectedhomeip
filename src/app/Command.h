@@ -83,12 +83,12 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    virtual CHIP_ERROR AddClusterSpecificSuccess(ConcreteCommandPath & aCommandPath, uint8_t aClusterStatus)
+    virtual CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    virtual CHIP_ERROR AddClusterSpecificFailure(ConcreteCommandPath & aCommandPath, uint8_t aClusterStatus)
+    virtual CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
