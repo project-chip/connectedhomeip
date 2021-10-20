@@ -20,29 +20,14 @@
 
 #include <zap-generated/CHIPClientCallbacks.h>
 
+#include <controller/java/CHIPCallbackWrapper.h>
 #include <jni.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <platform/PlatformManager.h>
 
-CHIPBooleanAttributeCallback::CHIPBooleanAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<BooleanAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPBooleanAttributeCallback::CallbackFn(void * context, bool value)
+void chip::CHIPBooleanAttributeCallback::CallbackFn(void * context, bool value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -54,7 +39,7 @@ void CHIPBooleanAttributeCallback::CallbackFn(void * context, bool value)
         reinterpret_cast<CHIPBooleanAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -64,23 +49,7 @@ void CHIPBooleanAttributeCallback::CallbackFn(void * context, bool value)
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jboolean>(value));
 }
 
-CHIPCharStringAttributeCallback::CHIPCharStringAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CharStringAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPCharStringAttributeCallback::CallbackFn(void * context, const chip::CharSpan value)
+void chip::CHIPCharStringAttributeCallback::CallbackFn(void * context, const chip::CharSpan value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -92,7 +61,7 @@ void CHIPCharStringAttributeCallback::CallbackFn(void * context, const chip::Cha
         reinterpret_cast<CHIPCharStringAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -105,23 +74,7 @@ void CHIPCharStringAttributeCallback::CallbackFn(void * context, const chip::Cha
     env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
 }
 
-CHIPInt8sAttributeCallback::CHIPInt8sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<Int8sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPInt8sAttributeCallback::CallbackFn(void * context, int8_t value)
+void chip::CHIPInt8sAttributeCallback::CallbackFn(void * context, int8_t value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -133,7 +86,7 @@ void CHIPInt8sAttributeCallback::CallbackFn(void * context, int8_t value)
         reinterpret_cast<CHIPInt8sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -143,23 +96,7 @@ void CHIPInt8sAttributeCallback::CallbackFn(void * context, int8_t value)
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
 }
 
-CHIPInt8uAttributeCallback::CHIPInt8uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<Int8uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPInt8uAttributeCallback::CallbackFn(void * context, uint8_t value)
+void chip::CHIPInt8uAttributeCallback::CallbackFn(void * context, uint8_t value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -171,7 +108,7 @@ void CHIPInt8uAttributeCallback::CallbackFn(void * context, uint8_t value)
         reinterpret_cast<CHIPInt8uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -181,23 +118,7 @@ void CHIPInt8uAttributeCallback::CallbackFn(void * context, uint8_t value)
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
 }
 
-CHIPInt16sAttributeCallback::CHIPInt16sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<Int16sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPInt16sAttributeCallback::CallbackFn(void * context, int16_t value)
+void chip::CHIPInt16sAttributeCallback::CallbackFn(void * context, int16_t value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -209,7 +130,7 @@ void CHIPInt16sAttributeCallback::CallbackFn(void * context, int16_t value)
         reinterpret_cast<CHIPInt16sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -219,23 +140,7 @@ void CHIPInt16sAttributeCallback::CallbackFn(void * context, int16_t value)
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
 }
 
-CHIPInt16uAttributeCallback::CHIPInt16uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<Int16uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPInt16uAttributeCallback::CallbackFn(void * context, uint16_t value)
+void chip::CHIPInt16uAttributeCallback::CallbackFn(void * context, uint16_t value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -247,7 +152,7 @@ void CHIPInt16uAttributeCallback::CallbackFn(void * context, uint16_t value)
         reinterpret_cast<CHIPInt16uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -257,23 +162,7 @@ void CHIPInt16uAttributeCallback::CallbackFn(void * context, uint16_t value)
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
 }
 
-CHIPInt32sAttributeCallback::CHIPInt32sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<Int32sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPInt32sAttributeCallback::CallbackFn(void * context, int32_t value)
+void chip::CHIPInt32sAttributeCallback::CallbackFn(void * context, int32_t value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -285,7 +174,7 @@ void CHIPInt32sAttributeCallback::CallbackFn(void * context, int32_t value)
         reinterpret_cast<CHIPInt32sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -295,23 +184,7 @@ void CHIPInt32sAttributeCallback::CallbackFn(void * context, int32_t value)
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
 }
 
-CHIPInt32uAttributeCallback::CHIPInt32uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<Int32uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPInt32uAttributeCallback::CallbackFn(void * context, uint32_t value)
+void chip::CHIPInt32uAttributeCallback::CallbackFn(void * context, uint32_t value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -323,7 +196,7 @@ void CHIPInt32uAttributeCallback::CallbackFn(void * context, uint32_t value)
         reinterpret_cast<CHIPInt32uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -333,23 +206,7 @@ void CHIPInt32uAttributeCallback::CallbackFn(void * context, uint32_t value)
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
 }
 
-CHIPInt64sAttributeCallback::CHIPInt64sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<Int64sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPInt64sAttributeCallback::CallbackFn(void * context, int64_t value)
+void chip::CHIPInt64sAttributeCallback::CallbackFn(void * context, int64_t value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -361,7 +218,7 @@ void CHIPInt64sAttributeCallback::CallbackFn(void * context, int64_t value)
         reinterpret_cast<CHIPInt64sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -371,23 +228,7 @@ void CHIPInt64sAttributeCallback::CallbackFn(void * context, int64_t value)
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
 }
 
-CHIPInt64uAttributeCallback::CHIPInt64uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<Int64uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPInt64uAttributeCallback::CallbackFn(void * context, uint64_t value)
+void chip::CHIPInt64uAttributeCallback::CallbackFn(void * context, uint64_t value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -399,7 +240,7 @@ void CHIPInt64uAttributeCallback::CallbackFn(void * context, uint64_t value)
         reinterpret_cast<CHIPInt64uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -409,23 +250,7 @@ void CHIPInt64uAttributeCallback::CallbackFn(void * context, uint64_t value)
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
 }
 
-CHIPOctetStringAttributeCallback::CHIPOctetStringAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<OctetStringAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPOctetStringAttributeCallback::CallbackFn(void * context, const chip::ByteSpan value)
+void chip::CHIPOctetStringAttributeCallback::CallbackFn(void * context, const chip::ByteSpan value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -437,7 +262,7 @@ void CHIPOctetStringAttributeCallback::CallbackFn(void * context, const chip::By
         reinterpret_cast<CHIPOctetStringAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    jobject javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -453,25 +278,7 @@ void CHIPOctetStringAttributeCallback::CallbackFn(void * context, const chip::By
     env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
 }
 
-CHIPApplicationLauncherApplicationLauncherListAttributeCallback::CHIPApplicationLauncherApplicationLauncherListAttributeCallback(
-    jobject javaCallback) :
-    chip::Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPApplicationLauncherApplicationLauncherListAttributeCallback::CallbackFn(
+void chip::CHIPApplicationLauncherApplicationLauncherListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<uint16_t> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -481,11 +288,11 @@ void CHIPApplicationLauncherApplicationLauncherListAttributeCallback::CallbackFn
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPApplicationLauncherApplicationLauncherListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPApplicationLauncherApplicationLauncherListAttributeCallback *>(context));
+    std::unique_ptr<CHIPApplicationLauncherApplicationLauncherListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPApplicationLauncherApplicationLauncherListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -522,24 +329,7 @@ void CHIPApplicationLauncherApplicationLauncherListAttributeCallback::CallbackFn
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPAudioOutputAudioOutputListAttributeCallback::CHIPAudioOutputAudioOutputListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
+void chip::CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & list)
 {
@@ -550,11 +340,11 @@ void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPAudioOutputAudioOutputListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPAudioOutputAudioOutputListAttributeCallback *>(context));
+    std::unique_ptr<CHIPAudioOutputAudioOutputListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPAudioOutputAudioOutputListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -606,24 +396,7 @@ void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBridgedActionsActionListAttributeCallback::CHIPBridgedActionsActionListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<BridgedActionsActionListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPBridgedActionsActionListAttributeCallback::CallbackFn(
+void chip::CHIPBridgedActionsActionListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
 {
@@ -634,11 +407,11 @@ void CHIPBridgedActionsActionListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPBridgedActionsActionListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPBridgedActionsActionListAttributeCallback *>(context));
+    std::unique_ptr<CHIPBridgedActionsActionListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPBridgedActionsActionListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -693,24 +466,7 @@ void CHIPBridgedActionsActionListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPBridgedActionsEndpointListAttributeCallback::CHIPBridgedActionsEndpointListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<BridgedActionsEndpointListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
+void chip::CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
         list)
@@ -722,11 +478,11 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPBridgedActionsEndpointListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPBridgedActionsEndpointListAttributeCallback *>(context));
+    std::unique_ptr<CHIPBridgedActionsEndpointListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPBridgedActionsEndpointListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -779,24 +535,7 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPContentLauncherAcceptsHeaderListAttributeCallback::CHIPContentLauncherAcceptsHeaderListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPContentLauncherAcceptsHeaderListAttributeCallback::CallbackFn(
+void chip::CHIPContentLauncherAcceptsHeaderListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -806,11 +545,11 @@ void CHIPContentLauncherAcceptsHeaderListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPContentLauncherAcceptsHeaderListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPContentLauncherAcceptsHeaderListAttributeCallback *>(context));
+    std::unique_ptr<CHIPContentLauncherAcceptsHeaderListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPContentLauncherAcceptsHeaderListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -845,25 +584,7 @@ void CHIPContentLauncherAcceptsHeaderListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPContentLauncherSupportedStreamingTypesAttributeCallback::CHIPContentLauncherSupportedStreamingTypesAttributeCallback(
-    jobject javaCallback) :
-    chip::Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPContentLauncherSupportedStreamingTypesAttributeCallback::CallbackFn(
+void chip::CHIPContentLauncherSupportedStreamingTypesAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list)
 {
@@ -874,11 +595,11 @@ void CHIPContentLauncherSupportedStreamingTypesAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPContentLauncherSupportedStreamingTypesAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPContentLauncherSupportedStreamingTypesAttributeCallback *>(context));
+    std::unique_ptr<CHIPContentLauncherSupportedStreamingTypesAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPContentLauncherSupportedStreamingTypesAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -915,24 +636,7 @@ void CHIPContentLauncherSupportedStreamingTypesAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPDescriptorDeviceListAttributeCallback::CHIPDescriptorDeviceListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<DescriptorDeviceListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(
+void chip::CHIPDescriptorDeviceListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list)
 {
@@ -943,11 +647,11 @@ void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPDescriptorDeviceListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPDescriptorDeviceListAttributeCallback *>(context));
+    std::unique_ptr<CHIPDescriptorDeviceListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDescriptorDeviceListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -996,25 +700,8 @@ void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPDescriptorServerListAttributeCallback::CHIPDescriptorServerListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<DescriptorServerListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPDescriptorServerListAttributeCallback::CallbackFn(void * context,
-                                                           const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
+void chip::CHIPDescriptorServerListAttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1023,11 +710,11 @@ void CHIPDescriptorServerListAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPDescriptorServerListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPDescriptorServerListAttributeCallback *>(context));
+    std::unique_ptr<CHIPDescriptorServerListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDescriptorServerListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1063,25 +750,8 @@ void CHIPDescriptorServerListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPDescriptorClientListAttributeCallback::CHIPDescriptorClientListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<DescriptorClientListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPDescriptorClientListAttributeCallback::CallbackFn(void * context,
-                                                           const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
+void chip::CHIPDescriptorClientListAttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1090,11 +760,11 @@ void CHIPDescriptorClientListAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPDescriptorClientListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPDescriptorClientListAttributeCallback *>(context));
+    std::unique_ptr<CHIPDescriptorClientListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDescriptorClientListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1130,25 +800,8 @@ void CHIPDescriptorClientListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPDescriptorPartsListAttributeCallback::CHIPDescriptorPartsListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<DescriptorPartsListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPDescriptorPartsListAttributeCallback::CallbackFn(void * context,
-                                                          const chip::app::DataModel::DecodableList<chip::EndpointId> & list)
+void chip::CHIPDescriptorPartsListAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::EndpointId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1157,11 +810,11 @@ void CHIPDescriptorPartsListAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPDescriptorPartsListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPDescriptorPartsListAttributeCallback *>(context));
+    std::unique_ptr<CHIPDescriptorPartsListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDescriptorPartsListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1197,24 +850,7 @@ void CHIPDescriptorPartsListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPFixedLabelLabelListAttributeCallback::CHIPFixedLabelLabelListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<FixedLabelLabelListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPFixedLabelLabelListAttributeCallback::CallbackFn(
+void chip::CHIPFixedLabelLabelListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list)
 {
@@ -1225,11 +861,11 @@ void CHIPFixedLabelLabelListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPFixedLabelLabelListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPFixedLabelLabelListAttributeCallback *>(context));
+    std::unique_ptr<CHIPFixedLabelLabelListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPFixedLabelLabelListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1280,25 +916,7 @@ void CHIPFixedLabelLabelListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback::
-    CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback::CallbackFn(
+void chip::CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & list)
@@ -1310,11 +928,11 @@ void CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback::Callba
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback *>(context));
+    std::unique_ptr<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1365,25 +983,7 @@ void CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback::Callba
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback(
-    jobject javaCallback) :
-    chip::Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
+void chip::CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list)
@@ -1395,11 +995,11 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback *>(context));
+    std::unique_ptr<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1458,24 +1058,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGroupKeyManagementGroupsAttributeCallback::CHIPGroupKeyManagementGroupsAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPGroupKeyManagementGroupsAttributeCallback::CallbackFn(
+void chip::CHIPGroupKeyManagementGroupsAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
 {
@@ -1486,11 +1069,11 @@ void CHIPGroupKeyManagementGroupsAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPGroupKeyManagementGroupsAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPGroupKeyManagementGroupsAttributeCallback *>(context));
+    std::unique_ptr<CHIPGroupKeyManagementGroupsAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPGroupKeyManagementGroupsAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1540,24 +1123,7 @@ void CHIPGroupKeyManagementGroupsAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGroupKeyManagementGroupKeysAttributeCallback::CHIPGroupKeyManagementGroupKeysAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPGroupKeyManagementGroupKeysAttributeCallback::CallbackFn(
+void chip::CHIPGroupKeyManagementGroupKeysAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
 {
@@ -1568,11 +1134,11 @@ void CHIPGroupKeyManagementGroupKeysAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPGroupKeyManagementGroupKeysAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPGroupKeyManagementGroupKeysAttributeCallback *>(context));
+    std::unique_ptr<CHIPGroupKeyManagementGroupKeysAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPGroupKeyManagementGroupKeysAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1627,24 +1193,7 @@ void CHIPGroupKeyManagementGroupKeysAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPMediaInputMediaInputListAttributeCallback::CHIPMediaInputMediaInputListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
+void chip::CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list)
 {
@@ -1655,11 +1204,11 @@ void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPMediaInputMediaInputListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPMediaInputMediaInputListAttributeCallback *>(context));
+    std::unique_ptr<CHIPMediaInputMediaInputListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPMediaInputMediaInputListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1713,24 +1262,7 @@ void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPModeSelectSupportedModesAttributeCallback::CHIPModeSelectSupportedModesAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<ModeSelectSupportedModesListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(
+void chip::CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & list)
 {
@@ -1741,11 +1273,11 @@ void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPModeSelectSupportedModesAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPModeSelectSupportedModesAttributeCallback *>(context));
+    std::unique_ptr<CHIPModeSelectSupportedModesAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPModeSelectSupportedModesAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1797,25 +1329,7 @@ void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOperationalCredentialsFabricsListAttributeCallback::CHIPOperationalCredentialsFabricsListAttributeCallback(
-    jobject javaCallback) :
-    chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPOperationalCredentialsFabricsListAttributeCallback::CallbackFn(
+void chip::CHIPOperationalCredentialsFabricsListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list)
@@ -1827,11 +1341,11 @@ void CHIPOperationalCredentialsFabricsListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPOperationalCredentialsFabricsListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPOperationalCredentialsFabricsListAttributeCallback *>(context));
+    std::unique_ptr<CHIPOperationalCredentialsFabricsListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOperationalCredentialsFabricsListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1889,25 +1403,7 @@ void CHIPOperationalCredentialsFabricsListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback::
-    CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback::CallbackFn(
+void chip::CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -1917,11 +1413,11 @@ void CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback::Callbac
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback *>(context));
+    std::unique_ptr<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -1956,25 +1452,8 @@ void CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback::Callbac
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPPowerSourceActiveBatteryFaultsAttributeCallback::CHIPPowerSourceActiveBatteryFaultsAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPPowerSourceActiveBatteryFaultsAttributeCallback::CallbackFn(void * context,
-                                                                     const chip::app::DataModel::DecodableList<uint8_t> & list)
+void chip::CHIPPowerSourceActiveBatteryFaultsAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1983,11 +1462,11 @@ void CHIPPowerSourceActiveBatteryFaultsAttributeCallback::CallbackFn(void * cont
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPPowerSourceActiveBatteryFaultsAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPPowerSourceActiveBatteryFaultsAttributeCallback *>(context));
+    std::unique_ptr<CHIPPowerSourceActiveBatteryFaultsAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPPowerSourceActiveBatteryFaultsAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2024,24 +1503,7 @@ void CHIPPowerSourceActiveBatteryFaultsAttributeCallback::CallbackFn(void * cont
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTvChannelTvChannelListAttributeCallback::CHIPTvChannelTvChannelListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<TvChannelTvChannelListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPTvChannelTvChannelListAttributeCallback::CallbackFn(
+void chip::CHIPTvChannelTvChannelListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
 {
@@ -2052,11 +1514,11 @@ void CHIPTvChannelTvChannelListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTvChannelTvChannelListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPTvChannelTvChannelListAttributeCallback *>(context));
+    std::unique_ptr<CHIPTvChannelTvChannelListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTvChannelTvChannelListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2114,25 +1576,7 @@ void CHIPTvChannelTvChannelListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTargetNavigatorTargetNavigatorListAttributeCallback::CHIPTargetNavigatorTargetNavigatorListAttributeCallback(
-    jobject javaCallback) :
-    chip::Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPTargetNavigatorTargetNavigatorListAttributeCallback::CallbackFn(
+void chip::CHIPTargetNavigatorTargetNavigatorListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list)
@@ -2144,11 +1588,11 @@ void CHIPTargetNavigatorTargetNavigatorListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTargetNavigatorTargetNavigatorListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPTargetNavigatorTargetNavigatorListAttributeCallback *>(context));
+    std::unique_ptr<CHIPTargetNavigatorTargetNavigatorListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTargetNavigatorTargetNavigatorListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2200,25 +1644,8 @@ void CHIPTargetNavigatorTargetNavigatorListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestClusterListInt8uAttributeCallback::CHIPTestClusterListInt8uAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<TestClusterListInt8uListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPTestClusterListInt8uAttributeCallback::CallbackFn(void * context,
-                                                           const chip::app::DataModel::DecodableList<uint8_t> & list)
+void chip::CHIPTestClusterListInt8uAttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2227,11 +1654,11 @@ void CHIPTestClusterListInt8uAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestClusterListInt8uAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPTestClusterListInt8uAttributeCallback *>(context));
+    std::unique_ptr<CHIPTestClusterListInt8uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTestClusterListInt8uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2267,25 +1694,8 @@ void CHIPTestClusterListInt8uAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestClusterListOctetStringAttributeCallback::CHIPTestClusterListOctetStringAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<TestClusterListOctetStringListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPTestClusterListOctetStringAttributeCallback::CallbackFn(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+void chip::CHIPTestClusterListOctetStringAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2294,11 +1704,11 @@ void CHIPTestClusterListOctetStringAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestClusterListOctetStringAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPTestClusterListOctetStringAttributeCallback *>(context));
+    std::unique_ptr<CHIPTestClusterListOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTestClusterListOctetStringAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2333,24 +1743,7 @@ void CHIPTestClusterListOctetStringAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestClusterListStructOctetStringAttributeCallback::CHIPTestClusterListStructOctetStringAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
+void chip::CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> & list)
 {
@@ -2361,11 +1754,11 @@ void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestClusterListStructOctetStringAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPTestClusterListStructOctetStringAttributeCallback *>(context));
+    std::unique_ptr<CHIPTestClusterListStructOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTestClusterListStructOctetStringAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2418,25 +1811,7 @@ void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback(
-    jobject javaCallback) :
-    chip::Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
+void chip::CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list)
@@ -2448,11 +1823,11 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback *>(context));
+    std::unique_ptr<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2504,25 +1879,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback(
-    jobject javaCallback) :
-    chip::Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
+void chip::CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list)
@@ -2534,11 +1891,11 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback *>(context));
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2604,25 +1961,7 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback(
-    jobject javaCallback) :
-    chip::Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(
+void chip::CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
         list)
@@ -2634,11 +1973,11 @@ void CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback *>(context));
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2699,25 +2038,7 @@ void CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback(
-    jobject javaCallback) :
-    chip::Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(
+void chip::CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & list)
@@ -2729,11 +2050,11 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback *>(context));
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2785,25 +2106,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::
-    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::CallbackFn(
+void chip::CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & list)
@@ -2815,11 +2118,11 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback *>(context));
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -2885,25 +2188,7 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::
-    CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>(CallbackFn, this)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::CallbackFn(
+void chip::CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -2913,11 +2198,11 @@ void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::Callb
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback> cppCallback(
-        reinterpret_cast<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback *>(context));
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback.get()->JavaCallback();
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
