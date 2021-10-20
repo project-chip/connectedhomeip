@@ -403,7 +403,11 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsCommissionableDeviceTypeEnabled()
 {
-    return CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE == 1;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE
+    return true;
+#else
+    return false;
+#endif
 }
 
 template <class ImplClass>

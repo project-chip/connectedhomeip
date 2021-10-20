@@ -330,7 +330,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const chip::ByteSpan value)
+    static void CallbackFn(void * context, const chip::CharSpan value)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -891,7 +891,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * setupPIN)
+    static void CallbackFn(void * context, chip::CharSpan setupPIN)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -899,8 +899,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPAccountLoginClusterGetSetupPINResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString setupPINStr(env, "");
+        UtfString setupPINStr(env, setupPIN);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -962,7 +961,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, chip::CharSpan data)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -970,8 +969,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPApplicationLauncherClusterLaunchAppResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString dataStr(env, "");
+        UtfString dataStr(env, data);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1033,7 +1031,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    static void CallbackFn(void * context, chip::CharSpan data, uint8_t contentLaunchStatus)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1041,8 +1039,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPContentLauncherClusterLaunchContentResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString dataStr(env, "");
+        UtfString dataStr(env, data);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1104,7 +1101,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    static void CallbackFn(void * context, chip::CharSpan data, uint8_t contentLaunchStatus)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1112,8 +1109,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPContentLauncherClusterLaunchURLResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString dataStr(env, "");
+        UtfString dataStr(env, data);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -2789,7 +2785,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2797,8 +2793,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGeneralCommissioningClusterArmFailSafeResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -2860,7 +2855,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2868,8 +2863,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -2931,7 +2925,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2939,8 +2933,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -3210,7 +3203,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t * groupName)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3218,8 +3211,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGroupsClusterViewGroupResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString groupNameStr(env, "");
+        UtfString groupNameStr(env, groupName);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4172,7 +4164,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4180,8 +4172,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4243,7 +4234,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4251,8 +4242,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4314,7 +4304,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4322,8 +4312,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterDisableNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4385,7 +4374,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4393,8 +4382,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterEnableNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4456,7 +4444,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4464,8 +4452,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4527,7 +4514,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText,
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText,
                            /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
                            /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
     {
@@ -4537,8 +4524,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterScanNetworksResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4605,7 +4591,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4613,8 +4599,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4676,7 +4661,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::CharSpan debugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4684,8 +4669,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        UtfString debugTextStr(env, debugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4816,9 +4800,9 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                           uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
-                           chip::ByteSpan metadataForRequestor)
+    static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI,
+                           uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
+                           bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4826,10 +4810,8 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString imageURIStr(env, "");
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString softwareVersionStringStr(env, "");
+        UtfString imageURIStr(env, imageURI);
+        UtfString softwareVersionStringStr(env, softwareVersionString);
         jbyteArray updateTokenArr;
         jbyteArray metadataForRequestorArr;
 
@@ -5589,7 +5571,7 @@ public:
     };
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                           uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
+                           chip::CharSpan sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5597,8 +5579,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPScenesClusterViewSceneResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString sceneNameStr(env, "");
+        UtfString sceneNameStr(env, sceneName);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -5737,7 +5718,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, chip::CharSpan data)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5745,8 +5726,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPTargetNavigatorClusterNavigateTargetResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString dataStr(env, "");
+        UtfString dataStr(env, data);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 

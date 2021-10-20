@@ -328,8 +328,7 @@ class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callba
             {{#if (isOctetString type)}}
             jbyteArray {{asSymbol label}}Arr;
             {{else if (isShortString type)}}
-            // ByteSpan is not properly returned yet, temporarily use empty string
-            UtfString {{asSymbol label}}Str(env, "");
+            UtfString {{asSymbol label}}Str(env, {{asSymbol label}});
             {{/if}}
             {{/chip_cluster_response_arguments}}
 

@@ -26,7 +26,7 @@ void CHIPOctetStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::B
     DispatchSuccess(context, @ { @"value" : [NSData dataWithBytes:value.data() length:value.size()] });
 };
 
-void CHIPCharStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::ByteSpan value)
+void CHIPCharStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::CharSpan value)
 {
     DispatchSuccess(
         context, @ { @"value" : [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding] });
@@ -448,35 +448,35 @@ void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBri
     DispatchSuccess(context, @ { @"value" : array });
 };
 
-void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(void * context, uint8_t * setupPIN)
+void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(void * context, chip::CharSpan setupPIN)
 {
     DispatchSuccess(context, @ {
-        @"setupPIN" : [NSString stringWithFormat:@"%s", setupPIN],
+        @"setupPIN" : [[NSString alloc] initWithBytes:setupPIN.data() length:setupPIN.size() encoding:NSUTF8StringEncoding],
     });
 };
 
-void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(void * context, uint8_t status, uint8_t * data)
+void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(void * context, uint8_t status, chip::CharSpan data)
 {
     DispatchSuccess(context, @ {
         @"status" : [NSNumber numberWithUnsignedChar:status],
-        @"data" : [NSString stringWithFormat:@"%s", data],
+        @"data" : [[NSString alloc] initWithBytes:data.data() length:data.size() encoding:NSUTF8StringEncoding],
     });
 };
 
 void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    void * context, chip::CharSpan data, uint8_t contentLaunchStatus)
 {
     DispatchSuccess(context, @ {
-        @"data" : [NSString stringWithFormat:@"%s", data],
+        @"data" : [[NSString alloc] initWithBytes:data.data() length:data.size() encoding:NSUTF8StringEncoding],
         @"contentLaunchStatus" : [NSNumber numberWithUnsignedChar:contentLaunchStatus],
     });
 };
 
 void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    void * context, chip::CharSpan data, uint8_t contentLaunchStatus)
 {
     DispatchSuccess(context, @ {
-        @"data" : [NSString stringWithFormat:@"%s", data],
+        @"data" : [[NSString alloc] initWithBytes:data.data() length:data.size() encoding:NSUTF8StringEncoding],
         @"contentLaunchStatus" : [NSNumber numberWithUnsignedChar:contentLaunchStatus],
     });
 };
@@ -677,29 +677,29 @@ void CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge::OnSuccessFn(voi
 };
 
 void CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
 void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
 void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
@@ -731,12 +731,12 @@ void CHIPGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(void * cont
 };
 
 void CHIPGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t status, uint16_t groupId, uint8_t * groupName)
+    void * context, uint8_t status, uint16_t groupId, chip::CharSpan groupName)
 {
     DispatchSuccess(context, @ {
         @"status" : [NSNumber numberWithUnsignedChar:status],
         @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-        @"groupName" : [NSString stringWithFormat:@"%s", groupName],
+        @"groupName" : [[NSString alloc] initWithBytes:groupName.data() length:groupName.size() encoding:NSUTF8StringEncoding],
     });
 };
 
@@ -832,57 +832,57 @@ void CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge::OnSuccessFn(void *
 };
 
 void CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
 void CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
 void CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
 void CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
 void CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
 void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccessFn(void * context, uint8_t errorCode,
-    uint8_t * debugText, /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
+    chip::CharSpan debugText, /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
     /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
         // wifiScanResults : /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Objc is not properly implemented yet
         // threadScanResults : /* TYPE WARNING: array array defaults to */ uint8_t *
@@ -891,20 +891,20 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
 };
 
 void CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
 void CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t errorCode, uint8_t * debugText)
+    void * context, uint8_t errorCode, chip::CharSpan debugText)
 {
     DispatchSuccess(context, @ {
         @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-        @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+        @"debugText" : [[NSString alloc] initWithBytes:debugText.data() length:debugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 
@@ -918,15 +918,17 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridg
 };
 
 void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuccessFn(void * context, uint8_t status,
-    uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion, uint8_t * softwareVersionString,
+    uint32_t delayedActionTime, chip::CharSpan imageURI, uint32_t softwareVersion, chip::CharSpan softwareVersionString,
     chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
 {
     DispatchSuccess(context, @ {
         @"status" : [NSNumber numberWithUnsignedChar:status],
         @"delayedActionTime" : [NSNumber numberWithUnsignedLong:delayedActionTime],
-        @"imageURI" : [NSString stringWithFormat:@"%s", imageURI],
+        @"imageURI" : [[NSString alloc] initWithBytes:imageURI.data() length:imageURI.size() encoding:NSUTF8StringEncoding],
         @"softwareVersion" : [NSNumber numberWithUnsignedLong:softwareVersion],
-        @"softwareVersionString" : [NSString stringWithFormat:@"%s", softwareVersionString],
+        @"softwareVersionString" : [[NSString alloc] initWithBytes:softwareVersionString.data()
+                                                            length:softwareVersionString.size()
+                                                          encoding:NSUTF8StringEncoding],
         @"updateToken" : [NSData dataWithBytes:updateToken.data() length:updateToken.size()],
         @"userConsentNeeded" : [NSNumber numberWithBool:userConsentNeeded],
         @"metadataForRequestor" : [NSData dataWithBytes:metadataForRequestor.data() length:metadataForRequestor.size()],
@@ -1020,7 +1022,7 @@ void CHIPScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(
 };
 
 void CHIPScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(void * context, uint8_t status, uint16_t groupId,
-    uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+    uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName,
     /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
 {
     DispatchSuccess(context, @ {
@@ -1028,7 +1030,7 @@ void CHIPScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(void * contex
         @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
         @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
         @"transitionTime" : [NSNumber numberWithUnsignedShort:transitionTime],
-        @"sceneName" : [NSString stringWithFormat:@"%s", sceneName],
+        @"sceneName" : [[NSString alloc] initWithBytes:sceneName.data() length:sceneName.size() encoding:NSUTF8StringEncoding],
         // extensionFieldSets : /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Objc is not properly implemented yet
     });
@@ -1044,11 +1046,12 @@ void CHIPTvChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
     });
 };
 
-void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn(void * context, uint8_t status, uint8_t * data)
+void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn(
+    void * context, uint8_t status, chip::CharSpan data)
 {
     DispatchSuccess(context, @ {
         @"status" : [NSNumber numberWithUnsignedChar:status],
-        @"data" : [NSString stringWithFormat:@"%s", data],
+        @"data" : [[NSString alloc] initWithBytes:data.data() length:data.size() encoding:NSUTF8StringEncoding],
     });
 };
 

@@ -281,8 +281,7 @@ bool emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Call
     {{#if (isOctetString type)}}
     ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", {{asSymbol label}}.size());
     {{else if (isCharString type)}}
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", {{asSymbol label}}.size(), {{asSymbol label}}.data());
+    ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>({{asSymbol label}}.size()), {{asSymbol label}}.data());
     {{else}}
     ChipLogProgress(Zcl, "  {{asSymbol label}}: {{asPrintFormat type}}", {{asSymbol label}});
     {{/if}}

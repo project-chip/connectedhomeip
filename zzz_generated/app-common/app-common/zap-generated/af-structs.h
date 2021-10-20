@@ -35,7 +35,7 @@ typedef struct _SimpleStruct
     bool b;
     uint8_t c;
     chip::ByteSpan d;
-    uint8_t * e;
+    chip::CharSpan e;
     uint8_t f;
 } SimpleStruct;
 
@@ -68,15 +68,15 @@ typedef struct _DoubleNestedStructList
 // Struct for ContentLaunchAdditionalInfo
 typedef struct _ContentLaunchAdditionalInfo
 {
-    uint8_t * name;
-    uint8_t * value;
+    chip::CharSpan name;
+    chip::CharSpan value;
 } ContentLaunchAdditionalInfo;
 
 // Struct for ContentLaunchParamater
 typedef struct _ContentLaunchParamater
 {
     uint8_t Type;
-    uint8_t * Value;
+    chip::CharSpan Value;
     /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
 } ContentLaunchParamater;
 
@@ -84,7 +84,7 @@ typedef struct _ContentLaunchParamater
 typedef struct _ApplicationLauncherApp
 {
     uint16_t catalogVendorId;
-    uint8_t * applicationId;
+    chip::CharSpan applicationId;
 } ApplicationLauncherApp;
 
 // Struct for AudioOutputInfo
@@ -118,7 +118,7 @@ typedef struct _BatFaultChangeType
 // Struct for ContentLaunchBrandingInformation
 typedef struct _ContentLaunchBrandingInformation
 {
-    uint8_t * providerName;
+    chip::CharSpan providerName;
     uint8_t background;
     uint8_t logo;
     uint8_t progressBar;
@@ -129,16 +129,16 @@ typedef struct _ContentLaunchBrandingInformation
 // Struct for ContentLaunchDimension
 typedef struct _ContentLaunchDimension
 {
-    uint8_t * width;
-    uint8_t * height;
+    chip::CharSpan width;
+    chip::CharSpan height;
     uint8_t metric;
 } ContentLaunchDimension;
 
 // Struct for ContentLaunchStyleInformation
 typedef struct _ContentLaunchStyleInformation
 {
-    uint8_t * imageUrl;
-    uint8_t * color;
+    chip::CharSpan imageUrl;
+    chip::CharSpan color;
     uint8_t size;
 } ContentLaunchStyleInformation;
 
@@ -408,9 +408,9 @@ typedef struct _TvChannelInfo
 // Struct for TvChannelLineupInfo
 typedef struct _TvChannelLineupInfo
 {
-    uint8_t * operatorName;
-    uint8_t * lineupName;
-    uint8_t * postalCode;
+    chip::CharSpan operatorName;
+    chip::CharSpan lineupName;
+    chip::CharSpan postalCode;
     uint8_t lineupInfoType;
 } TvChannelLineupInfo;
 

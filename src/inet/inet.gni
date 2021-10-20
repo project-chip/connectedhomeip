@@ -20,9 +20,6 @@ declare_args() {
   # Enable IPv4 support.
   chip_inet_config_enable_ipv4 = true
 
-  # Enable DNS resolver.
-  chip_inet_config_enable_dns_resolver = true
-
   # Enable UDP endpoint.
   chip_inet_config_enable_udp_endpoint = true
 

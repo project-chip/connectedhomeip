@@ -47,6 +47,7 @@
 #include <iostream>
 
 using chip::ByteSpan;
+using chip::CharSpan;
 using chip::EndpointId;
 using chip::VendorId;
 using chip::ArgParser::HelpOptions;
@@ -65,8 +66,8 @@ using chip::Controller::OnDeviceConnectionFailure;
 chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
 Device * providerDevice                        = nullptr;
 BdxDownloader bdxDownloader;
-void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                          uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
+void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI, uint32_t softwareVersion,
+                          CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
                           chip::ByteSpan metadataForRequestor)
 {
     ChipLogDetail(SoftwareUpdate, "%s", __FUNCTION__);
