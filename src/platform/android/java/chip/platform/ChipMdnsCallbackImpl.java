@@ -29,13 +29,7 @@ public class ChipMdnsCallbackImpl implements ChipMdnsCallback {
       long callbackHandle,
       long contextHandle,
       int errorCode) {
-        handleServiceResolve(
-            instanceName,
-            serviceType,
-            address,
-            port,
-            callbackHandle,
-            contextHandle);
+    handleServiceResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
   }
 
   public native void handleServiceResolve(
