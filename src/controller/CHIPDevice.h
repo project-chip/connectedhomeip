@@ -665,8 +665,6 @@ class DeviceStatusDelegate;
 struct SerializedDevice;
 
 constexpr size_t kMaxBlePendingPackets   = 1;
-constexpr size_t kOpCSRNonceLength       = 32;
-constexpr size_t kAttestationNonceLength = 32;
 
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
@@ -957,7 +955,6 @@ public:
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
-    uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
     void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             app::TLVDataFilter tlvDataFilter = nullptr);
     void CancelResponseHandler(uint8_t seqNum);
@@ -1045,8 +1042,6 @@ private:
 
     DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 
-    uint8_t mSequenceNumber = 0;
-
     uint32_t mLocalMessageCounter = 0;
     uint32_t mPeerMessageCounter  = 0;
 
@@ -1090,8 +1085,6 @@ private:
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
     SessionIDAllocator * mIDAllocator = nullptr;
-
-    uint16_t mPAKEVerifierID = 1;
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;

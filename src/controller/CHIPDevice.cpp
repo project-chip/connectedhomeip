@@ -1321,7 +1321,7 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
                                             Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter)
 {
     bool loadedSecureSession = false;
-    uint8_t seqNum           = GetNextSequenceNumber();
+    uint8_t seqNum           = 0;
     aPath.mNodeId            = GetDeviceId();
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
@@ -1349,7 +1349,7 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
                                                  Callback::Cancelable * onFailureCallback)
 {
     bool loadedSecureSession = false;
-    uint8_t seqNum           = GetNextSequenceNumber();
+    uint8_t seqNum           = 0;
     aPath.mNodeId            = GetDeviceId();
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
@@ -1389,7 +1389,7 @@ CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Cal
                                              Callback::Cancelable * onFailureCallback)
 {
     bool loadedSecureSession = false;
-    uint8_t seqNum           = GetNextSequenceNumber();
+    uint8_t seqNum           = 0;
     CHIP_ERROR err           = CHIP_NO_ERROR;
 
     aHandle->SetAppIdentifier(seqNum);
