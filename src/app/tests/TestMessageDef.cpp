@@ -23,7 +23,7 @@
  */
 
 #include <app/AppBuildConfig.h>
-#include <app/MessageDef/CommandDataElement.h>
+#include <app/MessageDef/CommandDataIB.h>
 #include <app/MessageDef/CommandList.h>
 #include <app/MessageDef/InvokeCommand.h>
 #include <app/MessageDef/ReadRequest.h>
@@ -537,19 +537,19 @@ void ParseAttributeDataVersionList(nlTestSuite * apSuite, chip::TLV::TLVReader &
     attributeDataVersionListParser.GetVersion(&version);
 }
 
-void BuildCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Builder & aCommandDataElementBuilder)
+void BuildCommandDataIB(nlTestSuite * apSuite, CommandDataIB::Builder & aCommandDataIBBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    CommandPath::Builder commandPathBuilder = aCommandDataElementBuilder.CreateCommandPathBuilder();
-    NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    CommandPath::Builder commandPathBuilder = aCommandDataIBBuilder.CreateCommandPathBuilder();
+    NL_TEST_ASSERT(apSuite, aCommandDataIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandPath(apSuite, commandPathBuilder);
 
     // Construct command data
     {
-        chip::TLV::TLVWriter * pWriter = aCommandDataElementBuilder.GetWriter();
+        chip::TLV::TLVWriter * pWriter = aCommandDataIBBuilder.GetWriter();
         chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
-        err = pWriter->StartContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
+        err = pWriter->StartContainer(chip::TLV::ContextTag(CommandDataIB::kCsTag_Data), chip::TLV::kTLVType_Structure,
                                       dummyType);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -560,26 +560,26 @@ void BuildCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Builder 
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
-    aCommandDataElementBuilder.EndOfCommandDataElement();
-    NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    aCommandDataIBBuilder.EndOfCommandDataIB();
+    NL_TEST_ASSERT(apSuite, aCommandDataIBBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Parser & aCommandDataElementParser)
+void ParseCommandDataIB(nlTestSuite * apSuite, CommandDataIB::Parser & aCommandDataIBParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPath::Parser commandPathParser;
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = aCommandDataElementParser.CheckSchemaValidity();
+    err = aCommandDataIBParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
-    err = aCommandDataElementParser.GetCommandPath(&commandPathParser);
+    err = aCommandDataIBParser.GetCommandPath(&commandPathParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     {
         chip::TLV::TLVReader reader;
         bool val = false;
         chip::TLV::TLVType container;
-        aCommandDataElementParser.GetData(&reader);
+        aCommandDataIBParser.GetData(&reader);
         err = reader.EnterContainer(container);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -594,41 +594,41 @@ void ParseCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Parser &
     }
 }
 
-void BuildCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataElement::Builder & aCommandDataElementBuilder)
+void BuildCommandDataIBWithStatusCode(nlTestSuite * apSuite, CommandDataIB::Builder & aCommandDataIBBuilder)
 {
-    CommandPath::Builder commandPathBuilder = aCommandDataElementBuilder.CreateCommandPathBuilder();
-    NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    CommandPath::Builder commandPathBuilder = aCommandDataIBBuilder.CreateCommandPathBuilder();
+    NL_TEST_ASSERT(apSuite, aCommandDataIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandPath(apSuite, commandPathBuilder);
 
-    StatusIB::Builder statusIBBuilder = aCommandDataElementBuilder.CreateStatusIBBuilder();
+    StatusIB::Builder statusIBBuilder = aCommandDataIBBuilder.CreateStatusIBBuilder();
     NL_TEST_ASSERT(apSuite, statusIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildStatusIB(apSuite, statusIBBuilder);
 
-    aCommandDataElementBuilder.EndOfCommandDataElement();
-    NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    aCommandDataIBBuilder.EndOfCommandDataIB();
+    NL_TEST_ASSERT(apSuite, aCommandDataIBBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataElement::Parser & aCommandDataElementParser)
+void ParseCommandDataIBWithStatusCode(nlTestSuite * apSuite, CommandDataIB::Parser & aCommandDataIBParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPath::Parser commandPathParser;
     StatusIB::Parser StatusIBParser;
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = aCommandDataElementParser.CheckSchemaValidity();
+    err = aCommandDataIBParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
-    err = aCommandDataElementParser.GetCommandPath(&commandPathParser);
+    err = aCommandDataIBParser.GetCommandPath(&commandPathParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = aCommandDataElementParser.GetStatusIB(&StatusIBParser);
+    err = aCommandDataIBParser.GetStatusIB(&StatusIBParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
 void BuildCommandList(nlTestSuite * apSuite, CommandList::Builder & aCommandListBuilder)
 {
-    CommandDataElement::Builder commandDataElementBuilder = aCommandListBuilder.CreateCommandDataElementBuilder();
+    CommandDataIB::Builder commandDataIBBuilder = aCommandListBuilder.CreateCommandDataIBBuilder();
     NL_TEST_ASSERT(apSuite, aCommandListBuilder.GetError() == CHIP_NO_ERROR);
-    BuildCommandDataElement(apSuite, commandDataElementBuilder);
+    BuildCommandDataIB(apSuite, commandDataIBBuilder);
 
     aCommandListBuilder.EndOfCommandList();
     NL_TEST_ASSERT(apSuite, aCommandListBuilder.GetError() == CHIP_NO_ERROR);
@@ -1342,16 +1342,16 @@ void AttributeDataVersionListTest(nlTestSuite * apSuite, void * apContext)
     ParseAttributeDataVersionList(apSuite, reader);
 }
 
-void CommandDataElementTest(nlTestSuite * apSuite, void * apContext)
+void CommandDataIBTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandDataElement::Builder commandDataElementBuilder;
-    CommandDataElement::Parser commandDataElementParser;
+    CommandDataIB::Builder commandDataIBBuilder;
+    CommandDataIB::Parser commandDataIBParser;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    commandDataElementBuilder.Init(&writer);
-    BuildCommandDataElement(apSuite, commandDataElementBuilder);
+    commandDataIBBuilder.Init(&writer);
+    BuildCommandDataIB(apSuite, commandDataIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1362,20 +1362,20 @@ void CommandDataElementTest(nlTestSuite * apSuite, void * apContext)
     err = reader.Next();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    commandDataElementParser.Init(reader);
-    ParseCommandDataElement(apSuite, commandDataElementParser);
+    commandDataIBParser.Init(reader);
+    ParseCommandDataIB(apSuite, commandDataIBParser);
 }
 
-void CommandDataElementWithStatusCodeTest(nlTestSuite * apSuite, void * apContext)
+void CommandDataIBWithStatusCodeTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandDataElement::Builder commandDataElementBuilder;
-    CommandDataElement::Parser commandDataElementParser;
+    CommandDataIB::Builder commandDataIBBuilder;
+    CommandDataIB::Parser commandDataIBParser;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    commandDataElementBuilder.Init(&writer);
-    BuildCommandDataElementWithStatusCode(apSuite, commandDataElementBuilder);
+    commandDataIBBuilder.Init(&writer);
+    BuildCommandDataIBWithStatusCode(apSuite, commandDataIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1386,8 +1386,8 @@ void CommandDataElementWithStatusCodeTest(nlTestSuite * apSuite, void * apContex
     err = reader.Next();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    commandDataElementParser.Init(reader);
-    ParseCommandDataElementWithStatusCode(apSuite, commandDataElementParser);
+    commandDataIBParser.Init(reader);
+    ParseCommandDataIBWithStatusCode(apSuite, commandDataIBParser);
 }
 
 void CommandListTest(nlTestSuite * apSuite, void * apContext)
@@ -1636,8 +1636,8 @@ const nlTest sTests[] =
                 NL_TEST_DEF("AttributeDataElementTest", AttributeDataElementTest),
                 NL_TEST_DEF("AttributeDataListTest", AttributeDataListTest),
                 NL_TEST_DEF("AttributeDataVersionListTest", AttributeDataVersionListTest),
-                NL_TEST_DEF("CommandDataElementTest", CommandDataElementTest),
-                NL_TEST_DEF("CommandDataElementWithStatusCodeTest", CommandDataElementWithStatusCodeTest),
+                NL_TEST_DEF("CommandDataIBTest", CommandDataIBTest),
+                NL_TEST_DEF("CommandDataIBWithStatusCodeTest", CommandDataIBWithStatusCodeTest),
                 NL_TEST_DEF("CommandListTest", CommandListTest),
                 NL_TEST_DEF("ReportDataTest", ReportDataTest),
                 NL_TEST_DEF("InvokeCommandTest", InvokeCommandTest),

@@ -113,7 +113,7 @@ void CommandSender::Close()
     }
 }
 
-CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
+CHIP_ERROR CommandSender::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::ClusterId clusterId;

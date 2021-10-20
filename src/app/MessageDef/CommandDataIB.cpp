@@ -17,11 +17,11 @@
  */
 /**
  *    @file
- *      This file defines CommandDataElement parser and builder in CHIP interaction model
+ *      This file defines CommandDataIB parser and builder in CHIP interaction model
  *
  */
 
-#include "CommandDataElement.h"
+#include "CommandDataIB.h"
 
 #include "MessageDefHelper.h"
 
@@ -36,7 +36,7 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR CommandDataElement::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR CommandDataIB::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -52,7 +52,7 @@ exit:
 }
 
 CHIP_ERROR
-CommandDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) const
+CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -223,14 +223,14 @@ exit:
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
+CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     uint32_t tagNum = 0;
 
-    PRETTY_PRINT("CommandDataElement =");
+    PRETTY_PRINT("CommandDataIB =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -321,7 +321,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR CommandDataElement::Parser::GetCommandPath(CommandPath::Parser * const apCommandPath) const
+CHIP_ERROR CommandDataIB::Parser::GetCommandPath(CommandPath::Parser * const apCommandPath) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -340,7 +340,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CommandDataElement::Parser::GetData(chip::TLV::TLVReader * const apReader) const
+CHIP_ERROR CommandDataIB::Parser::GetData(chip::TLV::TLVReader * const apReader) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -353,7 +353,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CommandDataElement::Parser::GetStatusIB(StatusIB::Parser * const apStatusIB) const
+CHIP_ERROR CommandDataIB::Parser::GetStatusIB(StatusIB::Parser * const apStatusIB) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -370,12 +370,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR CommandDataElement::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR CommandDataIB::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return InitAnonymousStructure(apWriter);
 }
 
-CommandPath::Builder & CommandDataElement::Builder::CreateCommandPathBuilder()
+CommandPath::Builder & CommandDataIB::Builder::CreateCommandPathBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mCommandPathBuilder.ResetError(mError));
@@ -387,7 +387,7 @@ exit:
     return mCommandPathBuilder;
 }
 
-StatusIB::Builder & CommandDataElement::Builder::CreateStatusIBBuilder()
+StatusIB::Builder & CommandDataIB::Builder::CreateStatusIBBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mStatusIBBuilder.ResetError(mError));
@@ -399,7 +399,7 @@ exit:
     return mStatusIBBuilder;
 }
 
-CommandDataElement::Builder & CommandDataElement::Builder::EndOfCommandDataElement()
+CommandDataIB::Builder & CommandDataIB::Builder::EndOfCommandDataIB()
 {
     EndOfContainer();
 

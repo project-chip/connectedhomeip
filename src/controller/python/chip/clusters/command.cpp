@@ -117,7 +117,7 @@ chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext,
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     {
-        auto writer = sender->GetCommandDataElementTLVWriter();
+        auto writer = sender->GetCommandDataIBTLVWriter();
         TLV::TLVReader reader;
         TLV::TLVType type;
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

@@ -93,12 +93,12 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
         VerifyOrExit(chip::TLV::AnonymousTag == commandListReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
         VerifyOrExit(chip::TLV::kTLVType_Structure == commandListReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-        CommandDataElement::Parser commandElement;
+        CommandDataIB::Parser commandElement;
 
         err = commandElement.Init(commandListReader);
         SuccessOrExit(err);
 
-        err = ProcessCommandDataElement(commandElement);
+        err = ProcessCommandDataIB(commandElement);
         SuccessOrExit(err);
     }
 
@@ -115,7 +115,7 @@ exit:
 CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandDataElement::Builder commandDataElement;
+    CommandDataIB::Builder commandDataIB;
 
     err = AllocateBuffer();
     SuccessOrExit(err);
@@ -125,16 +125,16 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams,
     //
     VerifyOrExit(mState == CommandState::Idle, err = CHIP_ERROR_INCORRECT_STATE);
 
-    commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
-    err                = commandDataElement.GetError();
+    commandDataIB = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataIBBuilder();
+    err                = commandDataIB.GetError();
     SuccessOrExit(err);
 
-    err = ConstructCommandPath(aCommandPathParams, commandDataElement);
+    err = ConstructCommandPath(aCommandPathParams, commandDataIB);
     SuccessOrExit(err);
 
     if (aStartDataStruct)
     {
-        err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data),
+        err = commandDataIB.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::kCsTag_Data),
                                                              TLV::kTLVType_Structure, mDataElementContainerType);
     }
 
@@ -144,7 +144,7 @@ exit:
     return err;
 }
 
-TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
+TLV::TLVWriter * Command::GetCommandDataIBTLVWriter()
 {
     if (mState != CommandState::AddingCommand)
     {
@@ -152,7 +152,7 @@ TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
     }
     else
     {
-        return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
+        return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataIBBuilder().GetWriter();
     }
 }
 
@@ -168,13 +168,13 @@ CHIP_ERROR Command::FinishCommand(bool aEndDataStruct)
 
     VerifyOrReturnError(mState == CommandState::AddingCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
-    CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
+    CommandDataIB::Builder commandDataIB = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataIBBuilder();
     if (aEndDataStruct)
     {
-        ReturnErrorOnFailure(commandDataElement.GetWriter()->EndContainer(mDataElementContainerType));
+        ReturnErrorOnFailure(commandDataIB.GetWriter()->EndContainer(mDataElementContainerType));
     }
 
-    ReturnErrorOnFailure(commandDataElement.EndOfCommandDataElement().GetError());
+    ReturnErrorOnFailure(commandDataIB.EndOfCommandDataIB().GetError());
     ReturnErrorOnFailure(mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList().GetError());
     ReturnErrorOnFailure(mInvokeCommandBuilder.EndOfInvokeCommand().GetError());
 
@@ -184,9 +184,9 @@ CHIP_ERROR Command::FinishCommand(bool aEndDataStruct)
 }
 
 CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams,
-                                         CommandDataElement::Builder aCommandDataElement)
+                                         CommandDataIB::Builder aCommandDataIB)
 {
-    CommandPath::Builder commandPath = aCommandDataElement.CreateCommandPathBuilder();
+    CommandPath::Builder commandPath = aCommandDataIB.CreateCommandPathBuilder();
     if (aCommandPathParams.mFlags.Has(CommandPathFlags::kEndpointIdValid))
     {
         commandPath.EndpointId(aCommandPathParams.mEndpointId);
