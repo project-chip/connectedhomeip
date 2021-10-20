@@ -352,7 +352,7 @@ void PairingCommand::OnDefaultFailureResponse(void * context, uint8_t status)
     command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
 
-void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
+void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, CharSpan debugText)
 {
     ChipLogProgress(chipTool, "AddNetworkResponse");
 
@@ -385,7 +385,7 @@ void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, uin
     }
 }
 
-void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
+void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, CharSpan debugText)
 {
     ChipLogProgress(chipTool, "EnableNetworkResponse");
 

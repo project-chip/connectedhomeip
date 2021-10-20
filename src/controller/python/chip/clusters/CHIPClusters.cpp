@@ -84,6 +84,14 @@ void OnAttributeResponse<chip::ByteSpan>(void * /* context */, chip::ByteSpan va
 }
 
 template <>
+void OnAttributeResponse<chip::CharSpan>(void * /* context */, chip::CharSpan value)
+{
+    ChipLogProgress(Zcl, "  attributeValue: '%.*s'", static_cast<int>(value.size()), value.data());
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <>
 void OnAttributeResponse<bool>(void * /* context */, bool value)
 {
     ChipLogProgress(Zcl, "  attributeValue: %s", value ? "true" : "false");
@@ -752,7 +760,7 @@ chip::Callback::Callback<Int32sAttributeCallback> gInt32sAttributeCallback{ OnAt
 chip::Callback::Callback<Int64uAttributeCallback> gInt64uAttributeCallback{ OnAttributeResponse<uint64_t>, nullptr };
 chip::Callback::Callback<Int64sAttributeCallback> gInt64sAttributeCallback{ OnAttributeResponse<int64_t>, nullptr };
 chip::Callback::Callback<OctetStringAttributeCallback> gOctetStringAttributeCallback{ OnAttributeResponse<ByteSpan>, nullptr };
-chip::Callback::Callback<CharStringAttributeCallback> gCharStringAttributeCallback{ OnAttributeResponse<ByteSpan>, nullptr };
+chip::Callback::Callback<CharStringAttributeCallback> gCharStringAttributeCallback{ OnAttributeResponse<CharSpan>, nullptr };
 
 } // namespace
 

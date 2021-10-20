@@ -143,7 +143,7 @@ static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnCharStringAttributeResponse(void * context, const chip::ByteSpan value)
+static void OnCharStringAttributeResponse(void * context, const chip::CharSpan value)
 {
     ChipLogProgress(chipTool, "CharString attribute Response: %.*s", static_cast<int>(value.size()), value.data());
 

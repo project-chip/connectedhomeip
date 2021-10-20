@@ -53,6 +53,9 @@ function atomicType(arg)
   case 'octet_string':
   case 'long_octet_string':
     return 'chip::ByteSpan';
+  case 'char_string':
+  case 'long_char_string':
+    return 'chip::CharSpan';
   case 'eui64':
     return 'chip::node_id';
   case 'percent':

@@ -47,7 +47,7 @@ public:
                                           bool keepAlive = false) :
         CHIPCallbackBridge<CharStringAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::ByteSpan value);
+    static void OnSuccessFn(void * context, chip::CharSpan value);
 };
 
 class CHIPBooleanAttributeCallbackBridge : public CHIPCallbackBridge<BooleanAttributeCallback>
@@ -440,7 +440,7 @@ public:
                                                              CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<AccountLoginClusterGetSetupPINResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t * setupPIN);
+    static void OnSuccessFn(void * context, chip::CharSpan setupPIN);
 };
 
 class CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge
@@ -451,7 +451,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ApplicationLauncherClusterLaunchAppResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint8_t * data);
+    static void OnSuccessFn(void * context, uint8_t status, chip::CharSpan data);
 };
 
 class CHIPContentLauncherClusterLaunchContentResponseCallbackBridge
@@ -462,7 +462,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ContentLauncherClusterLaunchContentResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t * data, uint8_t contentLaunchStatus);
+    static void OnSuccessFn(void * context, chip::CharSpan data, uint8_t contentLaunchStatus);
 };
 
 class CHIPContentLauncherClusterLaunchURLResponseCallbackBridge
@@ -473,7 +473,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ContentLauncherClusterLaunchURLResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t * data, uint8_t contentLaunchStatus);
+    static void OnSuccessFn(void * context, chip::CharSpan data, uint8_t contentLaunchStatus);
 };
 
 class CHIPDoorLockClusterClearAllPinsResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterClearAllPinsResponseCallback>
@@ -730,7 +730,7 @@ public:
         CHIPCallbackBridge<GeneralCommissioningClusterArmFailSafeResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge
@@ -742,7 +742,7 @@ public:
         CHIPCallbackBridge<GeneralCommissioningClusterCommissioningCompleteResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge
@@ -754,7 +754,7 @@ public:
         CHIPCallbackBridge<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPGroupsClusterAddGroupResponseCallbackBridge : public CHIPCallbackBridge<GroupsClusterAddGroupResponseCallback>
@@ -796,7 +796,7 @@ public:
                                                      bool keepAlive = false) :
         CHIPCallbackBridge<GroupsClusterViewGroupResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId, uint8_t * groupName);
+    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId, chip::CharSpan groupName);
 };
 
 class CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge
@@ -950,7 +950,7 @@ public:
         CHIPCallbackBridge<NetworkCommissioningClusterAddThreadNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge
@@ -962,7 +962,7 @@ public:
         CHIPCallbackBridge<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge
@@ -974,7 +974,7 @@ public:
         CHIPCallbackBridge<NetworkCommissioningClusterDisableNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge
@@ -986,7 +986,7 @@ public:
         CHIPCallbackBridge<NetworkCommissioningClusterEnableNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge
@@ -998,7 +998,7 @@ public:
         CHIPCallbackBridge<NetworkCommissioningClusterRemoveNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge
@@ -1010,7 +1010,7 @@ public:
         CHIPCallbackBridge<NetworkCommissioningClusterScanNetworksResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText,
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText,
                             /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
                             /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
 };
@@ -1024,7 +1024,7 @@ public:
         CHIPCallbackBridge<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge
@@ -1036,7 +1036,7 @@ public:
         CHIPCallbackBridge<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
 class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge
@@ -1060,8 +1060,8 @@ public:
         CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI,
-                            uint32_t softwareVersion, uint8_t * softwareVersionString, chip::ByteSpan updateToken,
+    static void OnSuccessFn(void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI,
+                            uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
                             bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 };
 
@@ -1172,7 +1172,7 @@ public:
         CHIPCallbackBridge<ScenesClusterViewSceneResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                            uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+                            chip::CharSpan sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 };
 
 class CHIPTvChannelClusterChangeChannelResponseCallbackBridge
@@ -1194,7 +1194,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<TargetNavigatorClusterNavigateTargetResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint8_t * data);
+    static void OnSuccessFn(void * context, uint8_t status, chip::CharSpan data);
 };
 
 class CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge
