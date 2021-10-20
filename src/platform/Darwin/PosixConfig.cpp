@@ -96,7 +96,6 @@ CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
         val = mPosixSetupDiscriminator;
         return CHIP_NO_ERROR;
     }
-exit:
     return err;
 }
 
@@ -145,7 +144,6 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
         mPosixSetupDiscriminator = val;
         return CHIP_NO_ERROR;
     }
-exit:
     return err;
 }
 
