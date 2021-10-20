@@ -114,7 +114,7 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
 
 CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    if (maxLength < (chip::Dnssd::kMaxInstanceNameSize + 1))
+    if (maxLength < (chip::Dnssd::Commissionable::kInstanceNameMaxLength + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -217,7 +217,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 1];
     char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 1];
     // size of subTypes array should be count of SubTypes above
-    const char * subTypes[kSubTypeMaxNumber];
+    const char * subTypes[Commissionable::kSubTypeMaxNumber];
     size_t subTypeSize = 0;
 
     if (!mDnssdInitialized)
@@ -394,7 +394,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     char compressedFabricIdSub[kSubTypeCompressedFabricIdMaxLength + 1];
-    const char * subTypes[1];
+    const char * subTypes[Operational::kSubTypeMaxNumber];
     size_t subTypeSize = 0;
 
     mOperationalAdvertisingParams = params;

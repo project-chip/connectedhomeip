@@ -41,6 +41,12 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
     return reader.Get(x);
 }
 
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, BitFlags<X> & x)
+{
+    return reader.Get(x);
+}
+
 //
 // @brief
 //
@@ -65,12 +71,7 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, ByteSpan & x)
 //
 inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
 {
-    ByteSpan bs;
-
-    VerifyOrReturnError(reader.GetType() == TLV::kTLVType_UTF8String, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-    ReturnErrorOnFailure(reader.Get(bs));
-    x = Span<const char>(Uint8::to_const_char(bs.data()), bs.size());
-    return CHIP_NO_ERROR;
+    return reader.Get(x);
 }
 
 /*

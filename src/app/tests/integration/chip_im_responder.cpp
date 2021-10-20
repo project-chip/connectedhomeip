@@ -25,6 +25,7 @@
  */
 
 #include "MockEvents.h"
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/EventManagement.h>
@@ -80,8 +81,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
                                                    kTestCommandId   // CommandId
         );
         printf("responder constructing status code in command");
-        apCommandObj->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
+        apCommandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     }
     else
     {
@@ -104,21 +104,20 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
                                           CommandSender * apCommandObj)
 {
-    ChipLogDetail(Controller,
-                  "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
     // Nothing todo.
+    (void) aCommandPath;
+    (void) aReader;
+    (void) apCommandObj;
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     uint64_t version = 0;
-    VerifyOrExit(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(apWriter != nullptr, /* no op */);
 
-    err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), kTestFieldValue1);
+    err = AttributeValueEncoder(apWriter).Encode(kTestFieldValue1);
     SuccessOrExit(err);
     err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 
@@ -137,8 +136,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mListIndex  = 5;
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
-    err = apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::Success);
+    err = apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
     return err;
 }
 } // namespace app

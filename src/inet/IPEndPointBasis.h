@@ -166,7 +166,7 @@ protected:
 
     CHIP_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId);
     CHIP_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
-    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags);
+    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer);
     CHIP_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
     void HandlePendingIO(uint16_t aPort);
 
@@ -195,7 +195,7 @@ protected:
 
     CHIP_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, const nw_parameters_t & aParameters);
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
-    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags);
+    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer);
     CHIP_ERROR StartListener();
     CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
     CHIP_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort);

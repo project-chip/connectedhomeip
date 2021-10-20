@@ -44,7 +44,7 @@ public:
     // Register for the Descriptor cluster on all endpoints.
     DescriptorAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Descriptor::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
@@ -115,23 +115,23 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, 
 
 DescriptorAttrAccess gAttrAccess;
 
-CHIP_ERROR DescriptorAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aClusterInfo.mClusterId == Descriptor::Id);
+    VerifyOrDie(aPath.mClusterId == Descriptor::Id);
 
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case DeviceList::Id: {
-        return ReadDeviceAttribute(aClusterInfo.mEndpointId, aEncoder);
+        return ReadDeviceAttribute(aPath.mEndpointId, aEncoder);
     }
     case ServerList::Id: {
-        return ReadClientServerAttribute(aClusterInfo.mEndpointId, aEncoder, true);
+        return ReadClientServerAttribute(aPath.mEndpointId, aEncoder, true);
     }
     case ClientList::Id: {
-        return ReadClientServerAttribute(aClusterInfo.mEndpointId, aEncoder, false);
+        return ReadClientServerAttribute(aPath.mEndpointId, aEncoder, false);
     }
     case PartsList::Id: {
-        return ReadPartsAttribute(aClusterInfo.mEndpointId, aEncoder);
+        return ReadPartsAttribute(aPath.mEndpointId, aEncoder);
     }
     default: {
         break;

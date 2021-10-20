@@ -247,12 +247,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
 
         if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
         }
 #endif
         else
@@ -300,12 +300,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
 
         if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, std::move(copy), info->udp->GetBoundInterface());
         }
 #endif
         else

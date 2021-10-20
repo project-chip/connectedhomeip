@@ -72,7 +72,7 @@ struct ResolveContext : public GenericContext
 {
     DnssdResolveCallback callback;
 
-    char name[kDnssdInstanceNameMaxSize + 1];
+    char name[Common::kInstanceNameMaxLength + 1];
     chip::Inet::IPAddressType addressType;
 
     ResolveContext(void * cbContext, DnssdResolveCallback cb, const char * cbContextName, chip::Inet::IPAddressType cbAddressType)
@@ -89,7 +89,7 @@ struct GetAddrInfoContext : public GenericContext
 {
     DnssdResolveCallback callback;
     std::vector<TextEntry> textEntries;
-    char name[kDnssdInstanceNameMaxSize + 1];
+    char name[Common::kInstanceNameMaxLength + 1];
     uint32_t interfaceId;
     uint16_t port;
 

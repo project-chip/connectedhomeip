@@ -274,7 +274,6 @@ CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
             // check if this tag has appeared before
             VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_StatusIB)), err = CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_StatusIB);
-            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
             {
                 StatusIB::Parser status;
@@ -361,8 +360,6 @@ CHIP_ERROR CommandDataElement::Parser::GetStatusIB(StatusIB::Parser * const apSt
 
     err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusIB), reader);
     SuccessOrExit(err);
-
-    VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     err = apStatusIB->Init(reader);
     SuccessOrExit(err);

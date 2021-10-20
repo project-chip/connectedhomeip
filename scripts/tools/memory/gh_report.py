@@ -239,7 +239,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         artifact_limit = self.config['github.limit-artifacts']
         artifact_pages = self.config['github.limit-artifact-pages']
 
-        # Size artifacts have names of the form
+        # Size artifacts have names of the form:
         #   Size,{group},{pr},{commit_hash},{parent_hash}
         # Record them keyed by group and commit_hash to match them up
         # after we have the entire list.
@@ -478,7 +478,8 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame,
                               tabulate={'floatfmt': '5.1f'})
 
     count = len(df.attrs['things'])
-    summary = f'{count} build{"" if count == 1 else "s"}'
+    platforms = ', '.join(sorted(list(set(df['platform']))))
+    summary = f'{count} build{"" if count == 1 else "s"} (for {platforms})'
     md.write(f'\n<details>\n<summary>{summary}</summary>\n\n')
     memdf.report.write_df(db.config,
                           df,
@@ -540,7 +541,7 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
             parent = df.attrs['parent']
             tdf.attrs['name'] = f'L,{commit},{parent}'
             tdf.attrs['title'] = (
-                f'Increases above {threshold:.1f}% from {commit} to {parent}')
+                f'Increases above {threshold:.1f}% from {parent} to {commit}')
             dfs[tdf.attrs['name']] = tdf
 
         if (pr and comment_enabled

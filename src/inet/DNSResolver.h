@@ -75,19 +75,6 @@ class DNSResolver : public InetLayerBasis
 private:
     friend class InetLayer;
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    friend class AsyncDNSResolverSockets;
-
-    /// States of the DNSResolver object with respect to hostname resolution.
-    enum class State : uint8_t
-    {
-        kUnused   = 0, ///< Used to indicate that the DNSResolver object is not used.
-        kActive   = 2, ///< Used to indicate that a DNS resolution is being performed on the DNSResolver object.
-        kComplete = 3, ///< Used to indicate that the DNS resolution on the DNSResolver object is complete.
-        kCanceled = 4, ///< Used to indicate that the DNS resolution on the DNSResolver has been canceled.
-    };
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
     /**
      * @brief   Type of event handling function called when a DNS request completes.
      *
@@ -175,21 +162,6 @@ private:
     CHIP_ERROR ProcessGetAddrInfoResult(int returnCode, struct addrinfo * results);
     void CopyAddresses(int family, uint8_t maxAddrs, const struct addrinfo * addrs);
     uint8_t CountAddresses(int family, const struct addrinfo * addrs);
-
-#if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-    /* Hostname that requires resolution */
-    char asyncHostNameBuf[NL_DNS_HOSTNAME_MAX_LEN + 1]; // DNS limits hostnames to 253 max characters.
-
-    CHIP_ERROR asyncDNSResolveResult;
-    /* The next DNSResolver object in the asynchronous DNS resolution queue. */
-    DNSResolver * pNextAsyncDNSResolver;
-
-    State mState;
-
-    void HandleAsyncResolveComplete();
-
-#endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 

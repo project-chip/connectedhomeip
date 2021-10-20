@@ -18,6 +18,7 @@ limitations under the License.
   <domain name="ZLL" spec="zll-1.0-11-0037-10" dependsOn="zcl-1.0-07-5123-03">
   </domain>
   <bitmap name="ScenesCopyMode" type="BITMAP8">
+    <cluster code="0x0005"/>
     <field name="CopyAllScenes" mask="0x01"/>
   </bitmap>
   <enum name="EnhancedColorMode" type="ENUM8">
@@ -27,6 +28,7 @@ limitations under the License.
     <item name="EnhancedCurrentHueAndCurrentSaturation" value="0x03"/>
   </enum>
   <bitmap name="ColorCapabilities" type="BITMAP16">
+    <cluster code="0x0300"/>
     <field name="HueSaturationSupported" mask="0x0001"/>
     <field name="EnhancedHueSupported" mask="0x0002"/>
     <field name="ColorLoopSupported" mask="0x0004"/>
@@ -34,6 +36,7 @@ limitations under the License.
     <field name="ColorTemperatureSupported" mask="0x0010"/>
   </bitmap>
   <bitmap name="ColorLoopUpdateFlags" type="BITMAP8">
+    <cluster code="0x0300"/>
     <field name="UpdateAction" mask="0x01"/>
     <field name="UpdateDirection" mask="0x02"/>
     <field name="UpdateTime" mask="0x04"/>

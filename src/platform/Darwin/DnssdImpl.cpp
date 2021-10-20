@@ -320,7 +320,7 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
     service.mProtocol    = context->protocol;
 
     strncpy(service.mName, name, sizeof(service.mName));
-    service.mName[kDnssdInstanceNameMaxSize] = 0;
+    service.mName[Common::kInstanceNameMaxLength] = 0;
 
     strncpy(service.mType, regtype, sizeof(service.mType));
     service.mType[kDnssdTypeMaxSize] = 0;

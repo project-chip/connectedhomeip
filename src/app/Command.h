@@ -77,12 +77,21 @@ public:
     TLV::TLVWriter * GetCommandDataElementTLVWriter();
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
-    virtual CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,
-                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                     const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
+
+    virtual CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
-    };
+    }
+
+    virtual CHIP_ERROR AddClusterSpecificSuccess(ConcreteCommandPath & aCommandPath, uint8_t aClusterStatus)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    virtual CHIP_ERROR AddClusterSpecificFailure(ConcreteCommandPath & aCommandPath, uint8_t aClusterStatus)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
      * Gets the inner exchange context object, without ownership.

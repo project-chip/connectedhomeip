@@ -160,8 +160,6 @@ const char * pychip_Stack_ErrorToString(ChipError::StorageType err);
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
 void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
-ChipError::StorageType pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                                chip::Controller::Device ** device);
 ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                          DeviceAvailableFunc callback);
 uint64_t pychip_GetCommandSenderHandle(chip::Controller::Device * device);
@@ -246,12 +244,12 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
                                                                  chip::NodeId nodeId, char * outAddress, uint64_t maxAddressLen,
                                                                  uint16_t * outPort)
 {
-    Device * device;
-    CHIP_ERROR err = devCtrl->GetDevice(nodeId, &device);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
     Inet::IPAddress address;
-    VerifyOrReturnError(device->GetAddress(address, *outPort), CHIP_ERROR_INCORRECT_STATE.AsInteger());
+    ReturnErrorOnFailure(
+        devCtrl
+            ->GetPeerAddressAndPort(PeerId().SetCompressedFabricId(devCtrl->GetCompressedFabricId()).SetNodeId(nodeId), address,
+                                    *outPort)
+            .AsInteger());
     VerifyOrReturnError(address.ToString(outAddress, maxAddressLen), CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
 
     return CHIP_NO_ERROR.AsInteger();
@@ -323,13 +321,21 @@ ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::Devic
     return devCtrl->PairDevice(nodeid, params).AsInteger();
 }
 
+void CloseSessionCallback(Device * device, ChipError::StorageType err)
+{
+    if (device != nullptr)
+    {
+        device->CloseSession();
+    }
+    if (!ChipError::IsSuccess(err))
+    {
+        ChipLogError(Controller, "Close session callback was called with an error:  %d", err);
+    }
+}
+
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    Device * device;
-    CHIP_ERROR err = devCtrl->GetDevice(nodeid, &device);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
-    return device->CloseSession().AsInteger();
+    return pychip_GetConnectedDeviceByNodeId(devCtrl, nodeid, CloseSessionCallback);
 }
 
 ChipError::StorageType pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
@@ -512,13 +518,6 @@ const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t stat
 {
     // return chip::StatusReportStr(profileId, statusCode);
     return NULL;
-}
-
-ChipError::StorageType pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                                chip::Controller::Device ** device)
-{
-    VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    return devCtrl->GetDevice(nodeId, device).AsInteger();
 }
 
 namespace {

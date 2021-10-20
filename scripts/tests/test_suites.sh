@@ -19,14 +19,17 @@
 set -e
 
 declare -i iterations=2
+declare -i delay=0
+declare -i node_id=0x12344321
 declare -i background_pid=0
 declare test_case_wrapper=()
 
 usage() {
-    echo "test_suites.sh [-a APPLICATION] [-i ITERATIONS] [-h] [-s CASE_NAME] [-w COMMAND]"
+    echo "test_suites.sh [-a APPLICATION] [-i ITERATIONS] [-h] [-s CASE_NAME] [-w COMMAND] [-d DELAY]"
     echo "  -a APPLICATION: runs chip-tool against 'chip-<APPLICATION>-app' (default: all-clusters)"
-    echo "  -i ITERATIONS: number of iterations to run (default: $iterations)"
+    echo "  -d DELAY: milliseconds to wait before running an individual test step (default: $delay)"
     echo "  -h: this help message"
+    echo "  -i ITERATIONS: number of iterations to run (default: $iterations)"
     echo "  -s CASE_NAME: runs single test case name (e.g. Test_TC_OO_2_2"
     echo "                for Test_TC_OO_2_2.yaml) (by default, all are run)"
     echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
@@ -35,11 +38,12 @@ usage() {
 }
 
 # read shell arguments
-while getopts a:i:hs:w: flag; do
+while getopts a:d:i:hs:w: flag; do
     case "$flag" in
         a) application=$OPTARG ;;
-        i) iterations=$OPTARG ;;
+        d) delay=$OPTARG ;;
         h) usage ;;
+        i) iterations=$OPTARG ;;
         s) single_case=$OPTARG ;;
         w) test_case_wrapper=("$OPTARG") ;;
     esac
@@ -61,7 +65,7 @@ if [[ $iterations == 0 ]]; then
     exit 1
 fi
 
-echo "Running tests for application: $application, with iterations set to: $iterations"
+echo "Running tests for application: $application, with iterations set to: $iterations and delay set to $delay"
 
 cleanup() {
     if [[ $background_pid != 0 ]]; then
@@ -121,9 +125,9 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode MT:D8XA0CQM00KA0648G00
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00
         echo "          * Starting test run: $i"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i"
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0

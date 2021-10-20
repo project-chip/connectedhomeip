@@ -27,7 +27,10 @@
 
 namespace chip {
 
-GlobalUnencryptedMessageCounter::GlobalUnencryptedMessageCounter() : value(Crypto::GetRandU32()) {}
+void GlobalUnencryptedMessageCounter::Init()
+{
+    value = Crypto::GetRandU32();
+}
 
 CHIP_ERROR GlobalEncryptedMessageCounter::Init()
 {
