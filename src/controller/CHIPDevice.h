@@ -664,7 +664,7 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-constexpr size_t kMaxBlePendingPackets   = 1;
+constexpr size_t kMaxBlePendingPackets = 1;
 
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
@@ -686,14 +686,14 @@ using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr           = nullptr;
-    SessionManager * sessionManager             = nullptr;
-    Messaging::ExchangeManager * exchangeMgr    = nullptr;
-    Inet::InetLayer * inetLayer                 = nullptr;
-    PersistentStorageDelegate * storageDelegate = nullptr;
-    SessionIDAllocator * idAllocator            = nullptr;
+    DeviceTransportMgr * transportMgr                     = nullptr;
+    SessionManager * sessionManager                       = nullptr;
+    Messaging::ExchangeManager * exchangeMgr              = nullptr;
+    Inet::InetLayer * inetLayer                           = nullptr;
+    PersistentStorageDelegate * storageDelegate           = nullptr;
+    SessionIDAllocator * idAllocator                      = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * bleLayer = nullptr;
+    Ble::BleLayer * bleLayer                              = nullptr;
 #endif
     FabricTable * fabricsTable                            = nullptr;
     DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
@@ -781,7 +781,7 @@ public:
         mFabricsTable    = params.fabricsTable;
         mpIMDelegate     = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
-        mBleLayer = params.bleLayer;
+        mBleLayer        = params.bleLayer;
 #endif
     }
 
@@ -1025,8 +1025,8 @@ private:
 
     Inet::InetLayer * mInetLayer = nullptr;
 
-    bool mActive           = false;
-    ConnectionState mState = ConnectionState::NotConnected;
+    bool mActive              = false;
+    ConnectionState mState    = ConnectionState::NotConnected;
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;

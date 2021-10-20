@@ -42,7 +42,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnOperationalDevic
         .storageDelegate = nullptr,
         .idAllocator     = mInitParams.idAllocator,
         .fabricsTable    = mInitParams.fabricsTable,
-        .imDelegate = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
+        .imDelegate      = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
     };
 
     CHIP_ERROR err = CHIP_NO_ERROR;

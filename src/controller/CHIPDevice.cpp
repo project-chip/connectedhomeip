@@ -1067,7 +1067,7 @@ void Device::Reset()
     mStatusDelegate = nullptr;
     mInetLayer      = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
-    mBleLayer = nullptr;
+    mBleLayer       = nullptr;
 #endif
     if (mExchangeMgr)
     {
