@@ -202,7 +202,8 @@ class ChipDeviceController(object):
 
     def ResolveNode(self, nodeid):
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.pychip_DeviceController_UpdateDevice(self.devCtrl, nodeid)
+            lambda: self._dmLib.pychip_DeviceController_UpdateDevice(
+                self.devCtrl, nodeid)
         )
 
     def GetAddressAndPort(self, nodeid):
