@@ -23,7 +23,6 @@ chip_device_project_config_include = ""
 chip_inet_config_enable_udp_endpoint = true
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_dns_resolver = true
-chip_inet_config_enable_async_dns_sockets = false
 
 chip_custom_build_cflags = []
 

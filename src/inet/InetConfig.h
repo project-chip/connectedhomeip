@@ -279,25 +279,6 @@
 #endif
 
 /**
- * @def INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
- *
- * @brief Enable asynchronous dns name resolution for Linux sockets.
- */
-#ifndef INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#define INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS               1
-#endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-/**
- * @def INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT
- *
- * @brief The maximum number of POSIX threads that would be performing
- * asynchronous DNS resolution.
- */
-#ifndef INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT
-#define INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT             2
-#endif // INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT
-
-/**
  *  @def INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
  *
  *  @brief

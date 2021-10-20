@@ -32,20 +32,19 @@
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
+#include <lib/dnssd/Constants.h>
 #include <lib/dnssd/ServiceNaming.h>
 
 namespace chip {
 namespace Dnssd {
 
 // None of these sizes include an null character at the end.
-static constexpr uint8_t kDnssdInstanceNameMaxSize = 33; // [Node]-[Fabric] ID in hex - 16+1+16
-static constexpr uint8_t kDnssdHostNameMaxSize     = 16; // 64-bits in hex.
-static constexpr size_t kDnssdProtocolTextMaxSize  = std::max(sizeof(kOperationalProtocol), sizeof(kCommissionProtocol)) - 1;
+static constexpr size_t kDnssdProtocolTextMaxSize = std::max(sizeof(kOperationalProtocol), sizeof(kCommissionProtocol)) - 1;
 static constexpr size_t kDnssdTypeMaxSize =
     std::max({ sizeof(kCommissionableServiceName), sizeof(kOperationalServiceName), sizeof(kCommissionerServiceName) }) - 1;
 static constexpr uint8_t kDnssdTypeAndProtocolMaxSize     = kDnssdTypeMaxSize + kDnssdProtocolTextMaxSize + 1; // <type>.<protocol>
 static constexpr uint16_t kDnssdTextMaxSize               = 64;
-static constexpr uint8_t kDnssdFullTypeAndProtocolMaxSize = kMaxSubtypeDescSize + /* '.' */ 1 + kDnssdTypeAndProtocolMaxSize;
+static constexpr uint8_t kDnssdFullTypeAndProtocolMaxSize = Common::kSubTypeMaxLength + /* '.' */ 1 + kDnssdTypeAndProtocolMaxSize;
 
 enum class DnssdServiceProtocol : uint8_t
 {
@@ -63,8 +62,8 @@ struct TextEntry
 
 struct DnssdService
 {
-    char mName[kDnssdInstanceNameMaxSize + 1];
-    char mHostName[kDnssdHostNameMaxSize + 1] = "";
+    char mName[Common::kInstanceNameMaxLength + 1];
+    char mHostName[kHostNameMaxLength + 1] = "";
     char mType[kDnssdTypeMaxSize + 1];
     DnssdServiceProtocol mProtocol;
     Inet::IPAddressType mAddressType;

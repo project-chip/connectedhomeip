@@ -262,10 +262,6 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     State = kState_Initialized;
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    ReturnErrorOnFailure(mAsyncDNSResolver.Init(this));
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
     return CHIP_NO_ERROR;
 }
 
@@ -292,12 +288,6 @@ CHIP_ERROR InetLayer::Shutdown()
             }
             return true;
         });
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-        err = mAsyncDNSResolver.Shutdown();
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -686,16 +676,15 @@ CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
 {
     assertChipStackLockedByCurrentThread();
 
-    CHIP_ERROR err         = CHIP_NO_ERROR;
     DNSResolver * resolver = nullptr;
 
-    VerifyOrExit(State == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     INET_FAULT_INJECT(FaultInjection::kFault_DNSResolverNew, return CHIP_ERROR_NO_MEMORY);
 
     // Store context information and set the resolver state.
-    VerifyOrExit(hostNameLen <= NL_DNS_HOSTNAME_MAX_LEN, err = INET_ERROR_HOST_NAME_TOO_LONG);
-    VerifyOrExit(maxAddrs > 0, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(hostNameLen <= NL_DNS_HOSTNAME_MAX_LEN, INET_ERROR_HOST_NAME_TOO_LONG);
+    VerifyOrReturnError(maxAddrs > 0, CHIP_ERROR_NO_MEMORY);
 
     resolver = DNSResolver::sPool.TryCreate();
     if (resolver != nullptr)
@@ -705,13 +694,14 @@ CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
     else
     {
         ChipLogError(Inet, "%s resolver pool FULL", "DNS");
-        ExitNow(err = CHIP_ERROR_NO_MEMORY);
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     // Short-circuit full address resolution if the supplied host name is a text-form
     // IP address...
     if (IPAddress::FromString(hostName, hostNameLen, *addrArray))
     {
+        CHIP_ERROR err         = CHIP_NO_ERROR;
         uint8_t addrTypeOption = (options & kDNSOption_AddrFamily_Mask);
         IPAddressType addrType = addrArray->Type();
 
@@ -732,30 +722,14 @@ CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
         resolver->Release();
         resolver = nullptr;
 
-        ExitNow(err = CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
     // After this point, the resolver will be released by:
-    // - mAsyncDNSResolver (in case of ASYNC_DNS_SOCKETS)
     // - resolver->Resolve() (in case of synchronous resolving)
     // - the event handlers (in case of LwIP)
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-    err =
-        mAsyncDNSResolver.PrepareDNSResolver(*resolver, hostName, hostNameLen, options, maxAddrs, addrArray, onComplete, appState);
-    SuccessOrExit(err);
-
-    mAsyncDNSResolver.EnqueueRequest(*resolver);
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-#if !INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    err = resolver->Resolve(hostName, hostNameLen, options, maxAddrs, addrArray, onComplete, appState);
-#endif // !INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-exit:
-
-    return err;
+    return resolver->Resolve(hostName, hostNameLen, options, maxAddrs, addrArray, onComplete, appState);
 }
 
 /**
@@ -796,13 +770,6 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
         {
             return true;
         }
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-        if (lResolver->mState == DNSResolver::kState_Canceled)
-        {
-            return true;
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
         lResolver->Cancel();
         return false;
