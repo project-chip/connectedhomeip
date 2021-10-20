@@ -5,6 +5,9 @@ package chip.devicecontroller;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
 import chip.clusterinfo.ClusterInfo;
 import chip.clusterinfo.CommandInfo;
 import chip.clusterinfo.CommandParameterInfo;
