@@ -41,6 +41,7 @@ FailureResponseDelegate gFailureResponseDelegate;
 
 // Define callbacks for ZCL commands and attribute requests.
 
+#if CHIP_PROGRESS_LOGGING
 std::string ByteSpanToString(chip::ByteSpan value)
 {
     std::string strValue = "";
@@ -51,6 +52,7 @@ std::string ByteSpanToString(chip::ByteSpan value)
     }
     return strValue;
 }
+#endif
 
 void OnDefaultSuccessResponse(void * /* context */)
 {
