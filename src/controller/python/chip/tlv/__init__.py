@@ -29,7 +29,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import struct
-from typing import NewType
 from collections import Mapping, Sequence, OrderedDict
 
 
@@ -112,7 +111,12 @@ TagControls = {
     0xE0: "Fully Qualified 8-byte",
 }
 
-uint = NewType('uint', int)
+
+class uint(int):
+    '''
+    NewType will not return a class until Python 3.10, as Python 3.10 is not widely used, we still need to construct a class so it can work as a type.
+    '''
+    pass
 
 
 class TLVWriter(object):
