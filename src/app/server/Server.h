@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <app/device/OperationalDeviceProxy.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <inet/InetConfig.h>
@@ -50,7 +49,7 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #endif
                                               >;
 
-class Server : public Messaging::ExchangeDelegate, public Messaging::ExchangeMgrDelegate
+class Server : public Messaging::ExchangeDelegate
 {
 public:
     CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
@@ -77,8 +76,6 @@ public:
 #endif
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
-
-    chip::app::device::OperationalDeviceProxy & GetOperationalDeviceProxy() { return mOperationalDeviceProxy; }
 
     void Shutdown();
 
@@ -113,18 +110,10 @@ private:
         }
     };
 
-    /**
-     * ----- ExchangeDelegate Implementation -----
-     */
+    // Messaging::ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-
-    /**
-     * ----- ExchangeMgrDelegate Implementation -----
-     */
-    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     AppDelegate * mAppDelegate = nullptr;
 
@@ -139,9 +128,6 @@ private:
     FabricTable mFabrics;
     SessionIDAllocator mSessionIDAllocator;
     secure_channel::MessageCounterManager mMessageCounterManager;
-    // TODO: There should be a list of OperationalDeviceProxy
-    // TODO: This may not belong in Server.h
-    chip::app::device::OperationalDeviceProxy mOperationalDeviceProxy;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

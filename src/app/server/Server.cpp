@@ -121,8 +121,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     err = mExchangeMgr.Init(&mSessions);
     SuccessOrExit(err);
-    mExchangeMgr.SetDelegate(this);
-
     err = mMessageCounterManager.Init(&mExchangeMgr);
     SuccessOrExit(err);
 
@@ -174,6 +172,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -280,16 +279,6 @@ void Server::OnResponseTimeout(Messaging::ExchangeContext * ec)
     {
         mAppDelegate->OnReceiveError();
     }
-}
-
-void Server::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr)
-{
-    mOperationalDeviceProxy.OnNewConnection(session);
-}
-
-void Server::OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr)
-{
-    mOperationalDeviceProxy.OnConnectionExpired(session);
 }
 
 } // namespace chip
