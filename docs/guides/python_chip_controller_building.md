@@ -283,12 +283,12 @@ previously commissioned. Depending on the network type:
 -   For Wi-Fi or Ethernet devices, the Matter accessory uses the mDNS (Multicast
     Domain Name System) protocol.
 
-Assuming your Fabric ID is _5544332211_ and Node ID is _1234_ (use the Node ID
-you noted down when you established the secure connection over Bluetooth LE)),
-run the following command:
+Assuming your Node ID is _1234_ (use the Node ID you noted down when you
+established the secure connection over Bluetooth LE)), run the following
+command:
 
 ```
-chip-device-ctrl > resolve 5544332211 1234
+chip-device-ctrl > resolve 1234
 ```
 
 A notification in the log indicates that the node address has been updated. The
@@ -407,13 +407,13 @@ Discover available Matter accessory devices:
 chip-device-ctrl > discover -all
 ```
 
-### `resolve <fabric_id> <node_id>`
+### `resolve <node_id>`
 
-Resolve DNS-SD name corresponding with the given fabric and Node IDs and update
-address of the node in the device controller:
+Resolve DNS-SD name corresponding with the given Node ID and update address of
+the node in the device controller:
 
 ```
-chip-device-ctrl > resolve 5544332211 1234
+chip-device-ctrl > resolve 1234
 ```
 
 ### `setup-payload generate [-v <Vendor ID>] [-p <Product ID>] [-cf <Custom Flow>] [-dc <Discovery Capabilities>] [-dv <Discriminator Value>] [-ps <Passcode>]`
