@@ -71,10 +71,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductName(char * buf
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFirmwareRevisionString(char * buf, size_t bufSize)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_REVISION_STRING);
     return CHIP_NO_ERROR;
 }
 
@@ -91,7 +91,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSerialNumber(char * bu
         ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
         serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
-        err          = CHIP_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
 
@@ -166,7 +166,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StorePrimary802154MACAddr
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductRevisionString(char * buf, size_t bufSize)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING);
@@ -174,7 +174,7 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductRevision
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductRevision(uint16_t & productRev)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetHardwareVersion(uint16_t & hardwareVer)
 {
     CHIP_ERROR err;
     uint32_t val;
@@ -182,21 +182,21 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductRevision
     err = Impl()->ReadConfigValue(ImplClass::kConfigKey_ProductRevision, val);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        productRev = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION);
-        err        = CHIP_NO_ERROR;
+        hardwareVer = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION);
+        err         = CHIP_NO_ERROR;
     }
     else
     {
-        productRev = static_cast<uint16_t>(val);
+        hardwareVer = static_cast<uint16_t>(val);
     }
 
     return err;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreProductRevision(uint16_t productRev)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreHardwareVersion(uint16_t hardwareVer)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, static_cast<uint32_t>(productRev));
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, static_cast<uint32_t>(hardwareVer));
 }
 
 template <class ImplClass>
@@ -497,12 +497,12 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
     }
 
     {
-        uint16_t productRev;
-        if (GetProductRevision(productRev) != CHIP_NO_ERROR)
+        uint16_t hardwareVer;
+        if (GetHardwareVersion(hardwareVer) != CHIP_NO_ERROR)
         {
-            productRev = 0;
+            hardwareVer = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Product Revision: %" PRIu16, productRev);
+        ChipLogProgress(DeviceLayer, "  Hardware Version: %" PRIu16, hardwareVer);
     }
 
     {

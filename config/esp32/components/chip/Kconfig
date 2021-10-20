@@ -419,7 +419,7 @@ menu "CHIP Device Layer"
             string "Device Firmware Revision"
             default ""
             help
-                A string identifying the firmware revision running on the device.
+                A string identifying the software version running on the device.
 
         config DEVICE_TYPE
             int "Default Device type"

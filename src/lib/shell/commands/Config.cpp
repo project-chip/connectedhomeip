@@ -58,15 +58,15 @@ static CHIP_ERROR ConfigGetProductId(bool printHeader)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR ConfigGetProductRevision(bool printHeader)
+static CHIP_ERROR ConfigGetHardwareVersion(bool printHeader)
 {
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductRevision(value16));
+    ReturnErrorOnFailure(ConfigurationMgr().GetHardwareVersion(value16));
     if (printHeader)
     {
-        streamer_printf(sout, "ProductRevision: ");
+        streamer_printf(sout, "HardwareVersion: ");
     }
     streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
     return CHIP_NO_ERROR;
@@ -126,7 +126,7 @@ static CHIP_ERROR PrintAllConfigs()
 {
     ReturnErrorOnFailure(ConfigGetVendorId(true));
     ReturnErrorOnFailure(ConfigGetProductId(true));
-    ReturnErrorOnFailure(ConfigGetProductRevision(true));
+    ReturnErrorOnFailure(ConfigGetHardwareVersion(true));
 
     ReturnErrorOnFailure(ConfigGetSetupPinCode(true));
     ReturnErrorOnFailure(ConfigGetSetupDiscriminator(true));
@@ -149,9 +149,9 @@ static CHIP_ERROR ConfigHandler(int argc, char ** argv)
         {
             return ConfigGetProductId(false);
         }
-        else if (strcmp(argv[0], "productrev") == 0)
+        else if (strcmp(argv[0], "hardwarever") == 0)
         {
-            return ConfigGetProductRevision(false);
+            return ConfigGetHardwareVersion(false);
         }
         else if (strcmp(argv[0], "pincode") == 0)
         {
