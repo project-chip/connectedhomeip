@@ -6,6 +6,7 @@ import java.util.List;
 <<<<<<< HEAD
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /**
  * Interface for making customized callback that implements both onSuccess and onFailure functions.
  */
@@ -21,6 +22,11 @@ import java.util.*;
 =======
 /** Interface for making customized callback that implements both onSuccess and onFailure function */
 >>>>>>> 2185ce827 (add descriptive documentation on each new class)
+=======
+/**
+ * Interface for making customized callback that implements both onSuccess and onFailure function
+ */
+>>>>>>> e3803522e (Restyled by google-java-format)
 public interface ClusterCommandCallback {
   void onSuccess(List<Object> responseValues);
 

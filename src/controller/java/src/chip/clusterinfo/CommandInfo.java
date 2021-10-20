@@ -17,12 +17,16 @@ import java.util.function.Supplier;
 public class CommandInfo {
 =======
  * CommandInfo includes a functional interface to invoke arbitrary commands based on cluster,
- * callback and a map of arguments, a Supplier that provides DelegatedClusterCallback, and a
- * Map that includes the name of the parameter and commandParametersInfo.
+ * callback and a map of arguments, a Supplier that provides DelegatedClusterCallback, and a Map
+ * that includes the name of the parameter and commandParametersInfo.
  */
+<<<<<<< HEAD
 
  public class CommandInfo {
 >>>>>>> 2185ce827 (add descriptive documentation on each new class)
+=======
+public class CommandInfo {
+>>>>>>> e3803522e (Restyled by google-java-format)
   public ClusterCommandFunction commandFunction;
   private Supplier<DelegatedClusterCallback> commandCallbackSupplier;
   private Map<String, CommandParameterInfo> commandParameters;
@@ -56,6 +60,7 @@ public class CommandInfo {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   /**
    * The functional interface provides a uniform way to invoke commands through invokeCommand
    * function. In ClusterInfoMapping, each ClusterCommandFunction was generated using the intended
@@ -70,6 +75,14 @@ public class CommandInfo {
   * callback, commandArguments to execute the correct function.
   */
 >>>>>>> 2185ce827 (add descriptive documentation on each new class)
+=======
+  /**
+   * The functional interface provides a uniform way to invoke commands through invokeCommand
+   * function. In ClusterInfoMapping, each ClusterCommandFunction was generated using the intended
+   * function. Using lambda function, the app component only needs to have cluster, callback,
+   * commandArguments to execute the correct function.
+   */
+>>>>>>> e3803522e (Restyled by google-java-format)
   @FunctionalInterface
   public interface ClusterCommandFunction {
     void invokeCommand(
