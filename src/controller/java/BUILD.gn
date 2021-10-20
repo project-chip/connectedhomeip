@@ -59,6 +59,7 @@ android_library("java") {
 
   sources = [
 <<<<<<< HEAD
+<<<<<<< HEAD
     "src/chip/clusterinfo/ClusterCommandCallback.java",
     "src/chip/clusterinfo/ClusterInfo.java",
     "src/chip/clusterinfo/CommandInfo.java",
@@ -72,6 +73,13 @@ android_library("java") {
 >>>>>>> 9199ce0a6 (Restyled by gn)
 =======
 >>>>>>> fde1d13c0 (fix comments)
+=======
+    "src/chip/clusterinfo/ClusterCommandCallback.java",
+    "src/chip/clusterinfo/ClusterInfo.java",
+    "src/chip/clusterinfo/CommandInfo.java",
+    "src/chip/clusterinfo/CommandParameterInfo.java",
+    "src/chip/clusterinfo/DelegatedClusterCallback.java",
+>>>>>>> 0411123b5 (Restyled by gn)
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
@@ -94,12 +102,15 @@ android_library("java") {
 >>>>>>> fde1d13c0 (fix comments)
 =======
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
+<<<<<<< HEAD
     "src/chip/clusterinfo/ClusterInfo.java",
     "src/chip/clusterinfo/ClusterCommandCallback.java",
     "src/chip/clusterinfo/CommandInfo.java",
     "src/chip/clusterinfo/CommandParameterInfo.java",
     "src/chip/clusterinfo/DelegatedClusterCallback.java",
 >>>>>>> 75ba092b5 (resolve build issues)
+=======
+>>>>>>> 0411123b5 (Restyled by gn)
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
@@ -107,7 +118,6 @@ android_library("java") {
   # TODO: add classpath support (we likely need to add something like
   #  ..../platforms/android-21/android.jar to access BLE items)
 }
-
 
 java_prebuilt("android") {
   jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
