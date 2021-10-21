@@ -225,6 +225,87 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
+static void OnBridgedActionsActionListListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
+{
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+
+    size_t count = 0;
+    {
+        auto iter = list.begin();
+        while (iter.Next())
+        {
+            ++count;
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            command->SetCommandExitStatus(iter.GetStatus());
+            return;
+        }
+    }
+    ChipLogProgress(chipTool, "OnBridgedActionsActionListListAttributeResponse: %zu entries", count);
+
+    auto iter  = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ++i;
+        ChipLogProgress(chipTool, "ActionStruct[%" PRIu16 "]:", i);
+        ChipLogProgress(chipTool, "  actionID: %" PRIu16 "", entry.actionID);
+        ChipLogProgress(Zcl, "  Name: %zu", entry.name.size());
+        ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
+        ChipLogProgress(chipTool, "  endpointListID: %" PRIu16 "", entry.endpointListID);
+        ChipLogProgress(chipTool, "  supportedCommands: %" PRIu16 "", entry.supportedCommands);
+        ChipLogProgress(chipTool, "  status: %" PRIu8 "", entry.status);
+    }
+
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnBridgedActionsEndpointListListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+        list)
+{
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+
+    size_t count = 0;
+    {
+        auto iter = list.begin();
+        while (iter.Next())
+        {
+            ++count;
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            command->SetCommandExitStatus(iter.GetStatus());
+            return;
+        }
+    }
+    ChipLogProgress(chipTool, "OnBridgedActionsEndpointListListAttributeResponse: %zu entries", count);
+
+    auto iter  = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ++i;
+        ChipLogProgress(chipTool, "EndpointListStruct[%" PRIu16 "]:", i);
+        ChipLogProgress(chipTool, "  endpointListID: %" PRIu16 "", entry.endpointListID);
+        ChipLogProgress(Zcl, "  Name: %zu", entry.name.size());
+        ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
+        ChipLogProgress(Zcl, "  Endpoints: %zu", entry.endpoints.size());
+    }
+
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
 static void
 OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context,
                                                         const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
@@ -1987,6 +2068,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
 | BooleanState                                                        | 0x0045 |
+| BridgedActions                                                      | 0x0025 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
 | ContentLauncher                                                     | 0x050A |
@@ -4455,6 +4537,485 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0045) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster BridgedActions                                              | 0x0025 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * DisableAction                                                     |   0x0A |
+| * DisableActionWithDuration                                         |   0x0B |
+| * EnableAction                                                      |   0x08 |
+| * EnableActionWithDuration                                          |   0x09 |
+| * InstantAction                                                     |   0x00 |
+| * InstantActionWithTransition                                       |   0x01 |
+| * PauseAction                                                       |   0x05 |
+| * PauseActionWithDuration                                           |   0x06 |
+| * ResumeAction                                                      |   0x07 |
+| * StartAction                                                       |   0x02 |
+| * StartActionWithDuration                                           |   0x03 |
+| * StopAction                                                        |   0x04 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ActionList                                                        | 0x0000 |
+| * EndpointList                                                      | 0x0001 |
+| * SetupUrl                                                          | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command DisableAction
+ */
+class BridgedActionsDisableAction : public ModelCommand
+{
+public:
+    BridgedActionsDisableAction() : ModelCommand("disable-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::DisableAction::Type mRequest;
+};
+
+/*
+ * Command DisableActionWithDuration
+ */
+class BridgedActionsDisableActionWithDuration : public ModelCommand
+{
+public:
+    BridgedActionsDisableActionWithDuration() : ModelCommand("disable-action-with-duration")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type mRequest;
+};
+
+/*
+ * Command EnableAction
+ */
+class BridgedActionsEnableAction : public ModelCommand
+{
+public:
+    BridgedActionsEnableAction() : ModelCommand("enable-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::EnableAction::Type mRequest;
+};
+
+/*
+ * Command EnableActionWithDuration
+ */
+class BridgedActionsEnableActionWithDuration : public ModelCommand
+{
+public:
+    BridgedActionsEnableActionWithDuration() : ModelCommand("enable-action-with-duration")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type mRequest;
+};
+
+/*
+ * Command InstantAction
+ */
+class BridgedActionsInstantAction : public ModelCommand
+{
+public:
+    BridgedActionsInstantAction() : ModelCommand("instant-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::InstantAction::Type mRequest;
+};
+
+/*
+ * Command InstantActionWithTransition
+ */
+class BridgedActionsInstantActionWithTransition : public ModelCommand
+{
+public:
+    BridgedActionsInstantActionWithTransition() : ModelCommand("instant-action-with-transition")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type mRequest;
+};
+
+/*
+ * Command PauseAction
+ */
+class BridgedActionsPauseAction : public ModelCommand
+{
+public:
+    BridgedActionsPauseAction() : ModelCommand("pause-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::PauseAction::Type mRequest;
+};
+
+/*
+ * Command PauseActionWithDuration
+ */
+class BridgedActionsPauseActionWithDuration : public ModelCommand
+{
+public:
+    BridgedActionsPauseActionWithDuration() : ModelCommand("pause-action-with-duration")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type mRequest;
+};
+
+/*
+ * Command ResumeAction
+ */
+class BridgedActionsResumeAction : public ModelCommand
+{
+public:
+    BridgedActionsResumeAction() : ModelCommand("resume-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type mRequest;
+};
+
+/*
+ * Command StartAction
+ */
+class BridgedActionsStartAction : public ModelCommand
+{
+public:
+    BridgedActionsStartAction() : ModelCommand("start-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::StartAction::Type mRequest;
+};
+
+/*
+ * Command StartActionWithDuration
+ */
+class BridgedActionsStartActionWithDuration : public ModelCommand
+{
+public:
+    BridgedActionsStartActionWithDuration() : ModelCommand("start-action-with-duration")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type mRequest;
+};
+
+/*
+ * Command StopAction
+ */
+class BridgedActionsStopAction : public ModelCommand
+{
+public:
+    BridgedActionsStopAction() : ModelCommand("stop-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::StopAction::Type mRequest;
+};
+
+/*
+ * Attribute ActionList
+ */
+class ReadBridgedActionsActionList : public ModelCommand
+{
+public:
+    ReadBridgedActionsActionList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "action-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedActionsActionList()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeActionList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BridgedActionsActionListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BridgedActionsActionListListAttributeCallback>(OnBridgedActionsActionListListAttributeResponse,
+                                                                                    this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute EndpointList
+ */
+class ReadBridgedActionsEndpointList : public ModelCommand
+{
+public:
+    ReadBridgedActionsEndpointList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "endpoint-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedActionsEndpointList()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeEndpointList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BridgedActionsEndpointListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BridgedActionsEndpointListListAttributeCallback>(
+            OnBridgedActionsEndpointListListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute SetupUrl
+ */
+class ReadBridgedActionsSetupUrl : public ModelCommand
+{
+public:
+    ReadBridgedActionsSetupUrl() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "setup-url");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedActionsSetupUrl()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSetupUrl(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadBridgedActionsClusterRevision : public ModelCommand
+{
+public:
+    ReadBridgedActionsClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedActionsClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -25790,6 +26351,31 @@ void registerClusterBooleanState(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterBridgedActions(Commands & commands)
+{
+    const char * clusterName = "BridgedActions";
+
+    commands_list clusterCommands = {
+        make_unique<BridgedActionsDisableAction>(),               //
+        make_unique<BridgedActionsDisableActionWithDuration>(),   //
+        make_unique<BridgedActionsEnableAction>(),                //
+        make_unique<BridgedActionsEnableActionWithDuration>(),    //
+        make_unique<BridgedActionsInstantAction>(),               //
+        make_unique<BridgedActionsInstantActionWithTransition>(), //
+        make_unique<BridgedActionsPauseAction>(),                 //
+        make_unique<BridgedActionsPauseActionWithDuration>(),     //
+        make_unique<BridgedActionsResumeAction>(),                //
+        make_unique<BridgedActionsStartAction>(),                 //
+        make_unique<BridgedActionsStartActionWithDuration>(),     //
+        make_unique<BridgedActionsStopAction>(),                  //
+        make_unique<ReadBridgedActionsActionList>(),              //
+        make_unique<ReadBridgedActionsEndpointList>(),            //
+        make_unique<ReadBridgedActionsSetupUrl>(),                //
+        make_unique<ReadBridgedActionsClusterRevision>(),         //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterBridgedDeviceBasic(Commands & commands)
 {
     const char * clusterName = "BridgedDeviceBasic";
@@ -26824,6 +27410,7 @@ void registerClusters(Commands & commands)
     registerClusterBinaryInputBasic(commands);
     registerClusterBinding(commands);
     registerClusterBooleanState(commands);
+    registerClusterBridgedActions(commands);
     registerClusterBridgedDeviceBasic(commands);
     registerClusterColorControl(commands);
     registerClusterContentLauncher(commands);

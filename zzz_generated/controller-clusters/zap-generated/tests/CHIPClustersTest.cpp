@@ -752,6 +752,41 @@ CHIP_ERROR BooleanStateClusterTest::WriteAttributeClusterRevision(Callback::Canc
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR BridgedActionsClusterTest::WriteAttributeSetupUrl(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback, chip::CharSpan setupUrl)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = BridgedActions::Attributes::SetupUrl::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, setupUrl));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedActionsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback,
+                                                                    uint16_t clusterRevision)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, clusterRevision));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback,
                                                                    chip::CharSpan vendorName)

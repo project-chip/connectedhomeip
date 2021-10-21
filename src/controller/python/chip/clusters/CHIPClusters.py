@@ -468,6 +468,135 @@ class ChipClusters:
             },
         },
     }
+    _BRIDGED_ACTIONS_CLUSTER_INFO = {
+        "clusterName": "BridgedActions",
+        "clusterId": 0x00000025,
+        "commands": {
+            0x0000000A: {
+                "commandId": 0x0000000A,
+                "commandName": "DisableAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x0000000B: {
+                "commandId": 0x0000000B,
+                "commandName": "DisableActionWithDuration",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "duration": "int",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "EnableAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "EnableActionWithDuration",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "duration": "int",
+                },
+            },
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "InstantAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "InstantActionWithTransition",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "transitionTime": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "PauseAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "PauseActionWithDuration",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "duration": "int",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "ResumeAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "StartAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "StartActionWithDuration",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "duration": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "StopAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "ActionList",
+                "attributeId": 0x00000000,
+                "type": "",
+            },
+            0x00000001: {
+                "attributeName": "EndpointList",
+                "attributeId": 0x00000001,
+                "type": "",
+            },
+            0x00000002: {
+                "attributeName": "SetupUrl",
+                "attributeId": 0x00000002,
+                "type": "str",
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+            },
+        },
+    }
     _BRIDGED_DEVICE_BASIC_CLUSTER_INFO = {
         "clusterName": "BridgedDeviceBasic",
         "clusterId": 0x00000039,
@@ -4057,6 +4186,7 @@ class ChipClusters:
         0x0000000F: _BINARY_INPUT_BASIC_CLUSTER_INFO,
         0x0000F000: _BINDING_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
+        0x00000025: _BRIDGED_ACTIONS_CLUSTER_INFO,
         0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
         0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
         0x0000050A: _CONTENT_LAUNCHER_CLUSTER_INFO,
@@ -4114,6 +4244,7 @@ class ChipClusters:
         "BinaryInputBasic": _BINARY_INPUT_BASIC_CLUSTER_INFO,
         "Binding": _BINDING_CLUSTER_INFO,
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
+        "BridgedActions": _BRIDGED_ACTIONS_CLUSTER_INFO,
         "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "ContentLauncher": _CONTENT_LAUNCHER_CLUSTER_INFO,
@@ -4298,6 +4429,66 @@ class ChipClusters:
     def ClusterBinding_CommandUnbind(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
         return self._chipLib.chip_ime_AppendCommand_Binding_Unbind(
             device, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
+        )
+
+    def ClusterBridgedActions_CommandDisableAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandDisableActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandEnableAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandEnableActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandInstantAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandInstantActionWithTransition(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, transitionTime: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantActionWithTransition(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, transitionTime
+        )
+
+    def ClusterBridgedActions_CommandPauseAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandPauseActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandResumeAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_ResumeAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandStartAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_StartAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandStartActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_StartActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandStopAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_StopAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
         )
 
     def ClusterColorControl_CommandColorLoopSet(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateFlags: int, action: int, direction: int, time: int, startHue: int, optionsMask: int, optionsOverride: int):
@@ -5238,6 +5429,18 @@ class ChipClusters:
 
     def ClusterBooleanState_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeActionList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_ActionList(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeEndpointList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_EndpointList(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeSetupUrl(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_SetupUrl(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterBridgedDeviceBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
@@ -6980,6 +7183,71 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster BridgedActions
+        # Cluster BridgedActions Command DisableAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command DisableActionWithDuration
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableActionWithDuration.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableActionWithDuration.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command EnableAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command EnableActionWithDuration
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableActionWithDuration.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableActionWithDuration.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command InstantAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command InstantActionWithTransition
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantActionWithTransition.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantActionWithTransition.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command PauseAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command PauseActionWithDuration
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseActionWithDuration.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseActionWithDuration.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command ResumeAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_ResumeAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_ResumeAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command StartAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StartAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StartAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command StartActionWithDuration
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StartActionWithDuration.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StartActionWithDuration.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command StopAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StopAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StopAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions ReadAttribute ActionList
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_ActionList.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_ActionList.restype = ctypes.c_uint32
+        # Cluster BridgedActions ReadAttribute EndpointList
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_EndpointList.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_EndpointList.restype = ctypes.c_uint32
+        # Cluster BridgedActions ReadAttribute SetupUrl
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_SetupUrl.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_SetupUrl.restype = ctypes.c_uint32
+        # Cluster BridgedActions ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision.restype = ctypes.c_uint32
         # Cluster BridgedDeviceBasic
         # Cluster BridgedDeviceBasic ReadAttribute VendorName
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName.argtypes = [
