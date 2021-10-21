@@ -24,14 +24,14 @@ chip_ble_project_config_include = ""
 mbedtls_target = "//mbedtls:mbedtls"
 lwip_platform = "external"
 
-chip_build_tests = true
+chip_build_tests = false
 
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_udp_endpoint = true
 
 chip_bypass_rendezvous = false
-chip_ip_commissioning = true
 chip_config_network_layer_ble = true
+chip_ip_commissioning = true
 chip_use_clusters_for_ip_commissioning = true
 
 custom_toolchain = "//third_party/connectedhomeip/config/ameba/toolchain:ameba"

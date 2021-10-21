@@ -40,6 +40,7 @@
 #include <lwip_netconf.h>
 
 using namespace ::chip;
+using namespace ::chip::Inet;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -534,7 +535,8 @@ void ConnectivityManagerImpl::DriveStationState()
 
                 ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms", timeToNextConnect);
 
-                ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, NULL));
+                ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(timeToNextConnect),
+                                                                   DriveStationState, NULL));
             }
         }
     }

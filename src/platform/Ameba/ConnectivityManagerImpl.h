@@ -177,7 +177,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * Chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the platform.
+ * that are specific to the Ameba platform.
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {
