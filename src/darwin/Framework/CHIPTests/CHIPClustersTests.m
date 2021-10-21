@@ -4269,7 +4269,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 3U);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 4U);
 
         [expectation fulfill];
     }];
@@ -4312,7 +4312,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 3U);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 4U);
 
         [expectation fulfill];
     }];
