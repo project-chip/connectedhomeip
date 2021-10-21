@@ -313,16 +313,16 @@ void MatterOperationalCredentialsPluginServerInitCallback(void)
 }
 
 namespace {
-class FabricCleanupExchangeDelegate : public Messaging::ExchangeDelegate
+class FabricCleanupExchangeDelegate : public chip::Messaging::ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override
     {
         return CHIP_NO_ERROR;
     }
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
-    void OnExchangeClosing(Messaging::ExchangeContext * ec) override
+    void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
+    void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
         FabricIndex currentFabricIndex = ec->GetSecureSession().GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
@@ -352,8 +352,8 @@ exit:
     emberAfSendImmediateDefaultResponse(status);
     if (err == CHIP_NO_ERROR)
     {
-        Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
-        FabricIndex currentFabricIndex  = ec->GetSecureSession().GetFabricIndex();
+        chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
+        FabricIndex currentFabricIndex        = ec->GetSecureSession().GetFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
             // If the current fabric is being removed, expiring all the secure sessions causes crashes as
