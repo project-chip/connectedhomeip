@@ -6,6 +6,7 @@ package chip.clusterinfo;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 /** CommandParameterInfo captures the name and type of a parameter */
 =======
 >>>>>>> fde1d13c0 (fix comments)
@@ -32,6 +33,9 @@ package chip.clusterinfo;
  * CommandParameterInfo captures the name and type of a parameter
  */
 >>>>>>> 74fe2b5bd (add . at the end of class description)
+=======
+/** CommandParameterInfo captures the name and type of a parameter */
+>>>>>>> 85f45fb7a (Restyled by google-java-format)
 public class CommandParameterInfo {
   public CommandParameterInfo() {}
 
