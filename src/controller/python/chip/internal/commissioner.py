@@ -102,7 +102,8 @@ def _SetNativeCallSignatues(handle: ctypes.CDLL):
     """Sets up the FFI types for the cdll handle."""
     setter = NativeLibraryHandleMethodArguments(handle)
 
-    setter.Set('pychip_internal_Commissioner_New', Commissioner_p, [ctypes.c_uint64])
+    setter.Set('pychip_internal_Commissioner_New',
+               Commissioner_p, [ctypes.c_uint64])
     setter.Set('pychip_internal_Commissioner_Unpair',
                ctypes.c_uint32, [Commissioner_p, ctypes.c_uint64])
     setter.Set('pychip_internal_Commissioner_BleConnectForPairing',
