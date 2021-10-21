@@ -5,3 +5,16 @@
 #include <commands/tests/TestCommand.h>
 
 {{>test_cluster tests=(getTests)}}
+
+void registerCommandsTests(Commands & commands)
+{
+    const char * clusterName = "Tests";
+
+    commands_list clusterCommands = {
+      {{#chip_tests (getTests)}}
+        make_unique<{{filename}}>(),
+      {{/chip_tests}}
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
