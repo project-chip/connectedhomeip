@@ -68,7 +68,6 @@ class AsyncCommandTransaction:
             except:
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure))
-        pass
 
     def handleError(self, imError: int, chipError: int):
         self._event_loop.call_soon_threadsafe(
