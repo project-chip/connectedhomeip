@@ -380,7 +380,7 @@ class ChipDeviceController(object):
         device = self.GetConnectedDeviceSync(nodeid)
 
         # We are not using IM for Attributes.
-        res = self._Cluster.WriteAttribute(
+        self._Cluster.WriteAttribute(
             device, cluster, attribute, endpoint, groupid, value, False)
         if blocking:
             return im.GetAttributeWriteResponse(im.DEFAULT_ATTRIBUTEWRITE_APPID)

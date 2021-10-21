@@ -601,7 +601,6 @@ def main(argv):
                                tabulate={'floatfmt': '5.1f'})
 
     except Exception as exception:
-        status = 1
         raise exception
 
     return status
