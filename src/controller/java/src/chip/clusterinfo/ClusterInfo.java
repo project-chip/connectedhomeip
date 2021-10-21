@@ -17,6 +17,7 @@ import java.util.Map;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 /** ClusterInfo maps commands and provides a constructor function for a cluster. */
 =======
 /**
@@ -26,6 +27,9 @@ import java.util.Map;
 =======
 /** ClusterInfo maps commands and provides a constructor function for a cluster */
 >>>>>>> 68e157c68 (Restyled by google-java-format)
+=======
+/** ClusterInfo maps commands and provides a constructor function for a cluster. */
+>>>>>>> 74fe2b5bd (add . at the end of class description)
 public class ClusterInfo {
   private final ClusterConstructor createClusterFunction;
   private final Map<String, CommandInfo> commands;
