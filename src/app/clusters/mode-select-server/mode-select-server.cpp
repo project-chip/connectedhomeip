@@ -61,7 +61,7 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-class ModeSelectAttrAccess : public chip::app::AttributeAccessInterface
+class ModeSelectAttrAccess : public AttributeAccessInterface
 {
 public:
     ModeSelectAttrAccess() : chip::app::AttributeAccessInterface(Optional<EndpointId>::Missing(), ModeSelectCluster::Id) {}
