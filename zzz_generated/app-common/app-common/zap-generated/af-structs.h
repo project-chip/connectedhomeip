@@ -149,21 +149,6 @@ typedef struct _DeviceType
     uint16_t revision;
 } DeviceType;
 
-// Struct for DiscoverAttributesInfoRecord
-typedef struct _DiscoverAttributesInfoRecord
-{
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-} DiscoverAttributesInfoRecord;
-
-// Struct for ExtendedDiscoverAttributesInfoRecord
-typedef struct _ExtendedDiscoverAttributesInfoRecord
-{
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint8_t attributeAccessControl;
-} ExtendedDiscoverAttributesInfoRecord;
-
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
 {

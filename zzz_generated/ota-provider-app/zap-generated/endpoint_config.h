@@ -299,69 +299,6 @@
         0                                                                                                                          \
     }
 
-// Array of EmberAfCommandMetadata structs.
-#define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (39)
-#define GENERATED_COMMANDS                                                                                                         \
-    {                                                                                                                              \
-                                                                                                                                   \
-        /* Endpoint: 0, Cluster: OTA Software Update Provider (server) */                                                          \
-        { 0x0029, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* QueryImage */                                                  \
-            { 0x0029, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ApplyUpdateRequest */                                          \
-            { 0x0029, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* NotifyUpdateApplied */                                         \
-            { 0x0029, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* QueryImageResponse */                                          \
-            { 0x0029, 0x04, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* ApplyUpdateRequestResponse */                                  \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
-            { 0x0030, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ArmFailSafe */                                                 \
-            { 0x0030, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* ArmFailSafeResponse */                                         \
-            { 0x0030, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SetRegulatoryConfig */                                         \
-            { 0x0030, 0x03, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* SetRegulatoryConfigResponse */                                 \
-            { 0x0030, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* CommissioningComplete */                                       \
-            { 0x0030, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* CommissioningCompleteResponse */                               \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                             \
-            { 0x0031, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ScanNetworks */                                                \
-            { 0x0031, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* ScanNetworksResponse */                                        \
-            { 0x0031, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddWiFiNetwork */                                              \
-            { 0x0031, 0x03, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* AddWiFiNetworkResponse */                                      \
-            { 0x0031, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateWiFiNetwork */                                           \
-            { 0x0031, 0x05, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* UpdateWiFiNetworkResponse */                                   \
-            { 0x0031, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddThreadNetwork */                                            \
-            { 0x0031, 0x07, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* AddThreadNetworkResponse */                                    \
-            { 0x0031, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateThreadNetwork */                                         \
-            { 0x0031, 0x09, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* UpdateThreadNetworkResponse */                                 \
-            { 0x0031, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveNetwork */                                               \
-            { 0x0031, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* RemoveNetworkResponse */                                       \
-            { 0x0031, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* EnableNetwork */                                               \
-            { 0x0031, 0x0D, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* EnableNetworkResponse */                                       \
-            { 0x0031, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* DisableNetwork */                                              \
-            { 0x0031, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* DisableNetworkResponse */                                      \
-            { 0x0031, 0x10, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* GetLastNetworkCommissioningResult */                           \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
-            { 0x003E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AttestationRequest */                                          \
-            { 0x003E, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* AttestationResponse */                                         \
-            { 0x003E, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* CertificateChainRequest */                                     \
-            { 0x003E, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* CertificateChainResponse */                                    \
-            { 0x003E, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* OpCSRRequest */                                                \
-            { 0x003E, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* OpCSRResponse */                                               \
-            { 0x003E, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddNOC */                                                      \
-            { 0x003E, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* NOCResponse */                                                 \
-            { 0x003E, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateFabricLabel */                                           \
-            { 0x003E, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveFabric */                                                \
-            { 0x003E, 0x0B, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddTrustedRootCertificate */                                   \
-    }
-
-// Array of EmberAfManufacturerCodeEntry structures for commands.
-#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
-    {                                                                                                                              \
-        {                                                                                                                          \
-            0x00, 0x00                                                                                                             \
-        }                                                                                                                          \
-    }
-
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.
 #define GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT (0)
 #define GENERATED_CLUSTER_MANUFACTURER_CODES                                                                                       \
