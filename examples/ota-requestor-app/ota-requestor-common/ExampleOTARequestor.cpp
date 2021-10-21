@@ -49,7 +49,7 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
 ExampleOTARequestor::ExampleOTARequestor()
 {
     mOtaStartDelayMs     = 0;
-    mProviderId          = chip::kUndefinedNodeId;
+    mProviderNodeId      = chip::kUndefinedNodeId;
     mProviderFabricIndex = chip::kUndefinedFabricIndex;
 }
 
@@ -68,10 +68,10 @@ void ExampleOTARequestor::ConnectToProvider()
     ChipLogProgress(SoftwareUpdate,
                     "Once #7976 is fixed, this would attempt to connect to 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8
                     " (" ChipLogFormatX64 ")",
-                    ChipLogValueX64(mProviderId), mProviderFabricIndex, ChipLogValueX64(providerFabric->GetFabricId()));
+                    ChipLogValueX64(mProviderNodeId), mProviderFabricIndex, ChipLogValueX64(providerFabric->GetFabricId()));
 
     // TODO: uncomment and fill in after #7976 is fixed
-    // mProviderDevice.Init(mConnectParams, mProviderId, address, mProviderFabricIndex);
+    // mProviderDevice.Init(mConnectParams, mProviderNodeId, address, mProviderFabricIndex);
     // mProviderDevice.EstablishConnectivity();
 }
 
@@ -88,7 +88,7 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
         return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
     }
 
-    mProviderId          = providerLocation;
+    mProviderNodeId      = providerLocation;
     mProviderFabricIndex = commandObj->GetExchangeContext()->GetSecureSession().GetFabricIndex();
 
     FabricInfo * providerFabric = GetProviderFabricInfo();
@@ -100,7 +100,7 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
 
     ChipLogProgress(SoftwareUpdate,
                     "Notified of Provider at NodeID: 0x" ChipLogFormatX64 "on FabricIndex 0x%" PRIu8 " (" ChipLogFormatX64 ")",
-                    ChipLogValueX64(mProviderId), mProviderFabricIndex, ChipLogValueX64(providerFabric->GetFabricId()));
+                    ChipLogValueX64(mProviderNodeId), mProviderFabricIndex, ChipLogValueX64(providerFabric->GetFabricId()));
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
