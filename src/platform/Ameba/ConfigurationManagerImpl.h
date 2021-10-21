@@ -37,13 +37,17 @@ namespace DeviceLayer {
 class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
                                        private Internal::AmebaConfig
 {
+    // Allow the ConfigurationManager interface class to delegate method calls to
+    // the implementation methods provided by this class.
+    friend class ConfigurationManager;
+
+private:
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 #endif
 
-private:
     // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR Init(void) override;

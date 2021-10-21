@@ -94,7 +94,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     AmebaConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
 
@@ -106,7 +106,7 @@ CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     AmebaConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
