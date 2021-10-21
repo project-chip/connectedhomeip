@@ -50,6 +50,8 @@ function getTests()
 
   const FlowMeasurement = [
     'Test_TC_FLW_1_1',
+    'Test_TC_FLW_2_1',
+    'Test_TC_FLW_2_2',
   ];
 
   const OccupancySensing = [
