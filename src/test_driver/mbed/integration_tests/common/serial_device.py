@@ -99,11 +99,7 @@ class SerialDevice(Device):
                     plain_line = plain_line.split(b'\r')[-2]
                 # Debug traces use tabulator characters, change those to spaces for readability
                 plain_line = plain_line.replace(b'\t', b'  ')
-                try:
-                    plain_line = plain_line.decode()
-                except UnicodeDecodeError:
-                    log.warning('{}: Invalid bytes read: {}'.format(self.name, line))
-                    continue
+                plain_line = plain_line.decode('utf-8', 'ignore')
                 plain_line.rstrip()
                 log.info('<--|{}| {}'.format(self.name, plain_line.strip()))
                 self.iq.put(plain_line)
