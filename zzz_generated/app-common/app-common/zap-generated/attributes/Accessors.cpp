@@ -7328,57 +7328,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lightSensorType)
 } // namespace Attributes
 } // namespace IlluminanceMeasurement
 
-namespace IlluminanceLevelSensing {
-namespace Attributes {
-
-namespace LevelStatus {
-
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * levelStatus)
-{
-    return emberAfReadServerAttribute(endpoint, IlluminanceLevelSensing::Id, LevelStatus::Id, (uint8_t *) levelStatus,
-                                      sizeof(*levelStatus));
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t levelStatus)
-{
-    return emberAfWriteServerAttribute(endpoint, IlluminanceLevelSensing::Id, LevelStatus::Id, (uint8_t *) &levelStatus,
-                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
-}
-
-} // namespace LevelStatus
-
-namespace LightSensorType {
-
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * lightSensorType)
-{
-    return emberAfReadServerAttribute(endpoint, IlluminanceLevelSensing::Id, LightSensorType::Id, (uint8_t *) lightSensorType,
-                                      sizeof(*lightSensorType));
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lightSensorType)
-{
-    return emberAfWriteServerAttribute(endpoint, IlluminanceLevelSensing::Id, LightSensorType::Id, (uint8_t *) &lightSensorType,
-                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
-}
-
-} // namespace LightSensorType
-
-namespace IlluminanceLevelTarget {
-
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * illuminanceLevelTarget)
-{
-    return emberAfReadServerAttribute(endpoint, IlluminanceLevelSensing::Id, IlluminanceLevelTarget::Id,
-                                      (uint8_t *) illuminanceLevelTarget, sizeof(*illuminanceLevelTarget));
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t illuminanceLevelTarget)
-{
-    return emberAfWriteServerAttribute(endpoint, IlluminanceLevelSensing::Id, IlluminanceLevelTarget::Id,
-                                       (uint8_t *) &illuminanceLevelTarget, ZCL_INT16U_ATTRIBUTE_TYPE);
-}
-
-} // namespace IlluminanceLevelTarget
-
-} // namespace Attributes
-} // namespace IlluminanceLevelSensing
-
 namespace TemperatureMeasurement {
 namespace Attributes {
 

@@ -38,6 +38,7 @@ public:
         delete onReportColorControlCurrentYCallback;
         delete onReportColorControlColorTemperatureCallback;
         delete onReportDoorLockLockStateCallback;
+        delete onReportIlluminanceMeasurementMeasuredValueCallback;
         delete onReportLevelControlCurrentLevelCallback;
         delete onReportOccupancySensingOccupancyCallback;
         delete onReportOnOffOnOffCallback;
@@ -78,6 +79,9 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0000, onReportDoorLockLockStateCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0400, 0x0000,
+                                       onReportIlluminanceMeasurementMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0000, onReportLevelControlCurrentLevelCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0406, 0x0000, onReportOccupancySensingOccupancyCallback->Cancel(),
@@ -177,6 +181,8 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockStateCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportIlluminanceMeasurementMeasuredValueCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancyCallback =
