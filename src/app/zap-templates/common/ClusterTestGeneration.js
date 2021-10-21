@@ -426,7 +426,7 @@ function chip_tests_item_parameters(options)
             value = new Boolean(value);
             break;
           default:
-            throw new Error('Unsupported value: ', value);
+            throw new Error('Unsupported value: ' + JSON.stringify(value));
           }
         }
 
