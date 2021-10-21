@@ -87,12 +87,6 @@ const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
 GENERATED_FUNCTION_ARRAYS
 #endif
 
-#ifdef EMBER_AF_SUPPORT_COMMAND_DISCOVERY
-const EmberAfCommandMetadata generatedCommands[]              = GENERATED_COMMANDS;
-const EmberAfManufacturerCodeEntry commandManufacturerCodes[] = GENERATED_COMMAND_MANUFACTURER_CODES;
-const uint16_t commandManufacturerCodeCount                   = GENERATED_COMMAND_MANUFACTURER_CODE_COUNT;
-#endif
-
 const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
 const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
 const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
@@ -1328,115 +1322,6 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(EmberAfCluster * cluste
     }
     return cluster->functions[functionIndex];
 }
-
-#ifdef EMBER_AF_SUPPORT_COMMAND_DISCOVERY
-
-uint16_t emAfGetManufacturerCodeForCommand(EmberAfCommandMetadata * command)
-{
-    return getManufacturerCode((EmberAfManufacturerCodeEntry *) commandManufacturerCodes, commandManufacturerCodeCount,
-                               static_cast<uint16_t>(command - generatedCommands));
-}
-
-/**
- * This function populates command IDs into a given buffer.
- *
- * It returns true if commands are complete, meaning there are NO MORE
- * commands that would be returned after the last command.
- * It returns false, if there were more commands, but were not populated
- * because of maxIdCount limitation.
- */
-bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, ClusterId clusterId, uint8_t * buffer,
-                              uint16_t bufferLength, uint16_t * bufferIndex, uint8_t startId, uint8_t maxIdCount)
-{
-    uint16_t i, count = 0;
-    bool returnValue   = true;
-    uint8_t cmdDirMask = 0;
-
-    // determine the appropriate mask to match the request
-    // discover commands generated, client is asking server what commands do you generate?
-    if (outgoing && (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER))
-    {
-        cmdDirMask = COMMAND_MASK_OUTGOING_SERVER;
-        // discover commands generated server is asking client what commands do you generate?
-    }
-    else if (outgoing && (cmd->direction == ZCL_DIRECTION_SERVER_TO_CLIENT))
-    {
-        cmdDirMask = COMMAND_MASK_OUTGOING_CLIENT;
-        // discover commands received client is asking server what commands do you receive?
-    }
-    else if (!outgoing && (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER))
-    {
-        cmdDirMask = COMMAND_MASK_INCOMING_SERVER;
-        // discover commands received server is asking client what commands do you receive?
-    }
-    else
-    {
-        cmdDirMask = COMMAND_MASK_INCOMING_CLIENT;
-    }
-
-    for (i = 0; i < EMBER_AF_GENERATED_COMMAND_COUNT; i++)
-    {
-        if (generatedCommands[i].clusterId != clusterId)
-        {
-            continue;
-        }
-
-        if ((generatedCommands[i].mask & cmdDirMask) == 0)
-        {
-            continue;
-        }
-
-        // Only start from the passed command id
-        if (generatedCommands[i].commandId < startId)
-        {
-            continue;
-        }
-
-        // According to spec: if cmd->mfgSpecific is set, then we ONLY return the
-        // mfg specific commands. If it's not, then we ONLY return non-mfg specific.
-        if (generatedCommands[i].mask & COMMAND_MASK_MANUFACTURER_SPECIFIC)
-        {
-            // Command is Mfg specific
-            if (!cmd->mfgSpecific)
-            {
-                continue; // ignore if asking for not mfg specific
-            }
-            if (cmd->mfgCode != emAfGetManufacturerCodeForCommand((EmberAfCommandMetadata *) &(generatedCommands[i])))
-            {
-                continue; // Ignore if mfg code doesn't match the commands
-            }
-        }
-        else
-        {
-            // Command is not mfg specific.
-            if (cmd->mfgSpecific)
-            {
-                continue; // Ignore if asking for mfg specific
-            }
-        }
-
-        // The one we are about to put in, is beyond the maxIdCount,
-        // so instead of populating it in, we set the return flag to
-        // false and get out of here.
-        if (maxIdCount == count || count >= bufferLength)
-        {
-            returnValue = false;
-            break;
-        }
-        buffer[count] = generatedCommands[i].commandId;
-        (*bufferIndex)++;
-        count++;
-    }
-    return returnValue;
-}
-#else
-// We just need an empty stub if we don't support it
-bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, ClusterId clusterId, uint8_t * buffer,
-                              uint16_t bufferLength, uint16_t * bufferIndex, uint8_t startId, uint8_t maxIdCount)
-{
-    return true;
-}
-#endif
 
 bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverride)
 {
