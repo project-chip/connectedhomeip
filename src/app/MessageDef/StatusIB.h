@@ -42,7 +42,9 @@ struct StatusIB
 {
     StatusIB() = default;
     StatusIB(Protocols::InteractionModel::Status imStatus) : mStatus(imStatus) {}
-    StatusIB(Protocols::InteractionModel::Status imStatus, ClusterStatus clusterStatus) : mStatus(imStatus), mClusterStatus(clusterStatus) {}
+    StatusIB(Protocols::InteractionModel::Status imStatus, ClusterStatus clusterStatus) :
+        mStatus(imStatus), mClusterStatus(clusterStatus)
+    {}
 
     enum class Tag : uint8_t
     {

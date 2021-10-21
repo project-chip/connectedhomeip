@@ -68,9 +68,7 @@ public:
          * @param[in] attributeStatus: Attribute-specific status, containing an InteractionModel::Status code as well as
          *                             an optional cluster-specific status code.
          */
-        virtual void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath,
-                                StatusIB attributeStatus)
-        {}
+        virtual void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath, StatusIB attributeStatus) {}
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendWriteRequest(). The following

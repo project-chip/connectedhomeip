@@ -71,16 +71,20 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
-    if (aClusterInfo.mClusterId == TestCluster::Id && aClusterInfo.mFieldId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId()) {
-        if (responseDirective == kSendAttributeSuccess) {
+    if (aClusterInfo.mClusterId == TestCluster::Id &&
+        aClusterInfo.mFieldId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+    {
+        if (responseDirective == kSendAttributeSuccess)
+        {
             TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
 
             ReturnErrorOnFailure(DataModel::Decode(aReader, value));
 
             auto iter = value.begin();
             uint8_t i = 0;
-            while (iter.Next()) {
-                auto &item = iter.GetValue();
+            while (iter.Next())
+            {
+                auto & item = iter.GetValue();
 
                 VerifyOrReturnError(item.fabricIndex == i, CHIP_ERROR_INVALID_ARGUMENT);
                 i++;
@@ -91,7 +95,8 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
             AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mFieldId);
             aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
         }
-        else {
+        else
+        {
             AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mFieldId);
             aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Failure);
         }
@@ -140,17 +145,12 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath) {
-        onSuccessCbInvoked = true;
-    };
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath,
-                                             app::StatusIB status,
-                                             CHIP_ERROR aError) {
-        onFailureCbInvoked = true;
-    };
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB status,
+                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
 
     chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         gExchangeManager, sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
@@ -181,15 +181,12 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath) {
-        onSuccessCbInvoked = true;
-    };
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [apSuite, &onFailureCbInvoked](const app::ConcreteAttributePath * attributePath,
-                                             app::StatusIB status,
-                                             CHIP_ERROR aError) {
+    auto onFailureCb = [apSuite, &onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB status,
+                                                      CHIP_ERROR aError) {
         NL_TEST_ASSERT(apSuite, attributePath != nullptr);
         onFailureCbInvoked = true;
     };

@@ -210,7 +210,6 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     return numActive;
 }
 
-
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
     CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;

@@ -46,15 +46,14 @@ public:
     // In the latter case, path will be non-null. Otherwise, it shall be null.
     //
     using OnErrorCallbackType =
-        std::function<void(const app::ConcreteAttributePath *path, app::StatusIB status, CHIP_ERROR aError)>;
+        std::function<void(const app::ConcreteAttributePath * path, app::StatusIB status, CHIP_ERROR aError)>;
     using OnDoneCallbackType = std::function<void(app::WriteClient *, WriteCallback *)>;
 
     WriteCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
         mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
     {}
 
-    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath,
-                    app::StatusIB status) override
+    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath, app::StatusIB status) override
     {
         if (status.mStatus == Protocols::InteractionModel::Status::Success)
         {
@@ -80,15 +79,13 @@ private:
 };
 
 template <typename AttributeInfo>
-CHIP_ERROR WriteAttribute(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle,
-                                 chip::EndpointId endpointId, const typename AttributeInfo::Type & requestCommandData,
-                                 WriteCallback::OnSuccessCallbackType onSuccessCb, WriteCallback::OnErrorCallbackType onErrorCb)
+CHIP_ERROR WriteAttribute(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+                          const typename AttributeInfo::Type & requestCommandData, WriteCallback::OnSuccessCallbackType onSuccessCb,
+                          WriteCallback::OnErrorCallbackType onErrorCb)
 {
     app::WriteClientHandle handle;
 
-    auto onDone = [](app::WriteClient * apWriteClient, WriteCallback * callback) {
-        chip::Platform::Delete(callback);
-    };
+    auto onDone = [](app::WriteClient * apWriteClient, WriteCallback * callback) { chip::Platform::Delete(callback); };
 
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDone);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
