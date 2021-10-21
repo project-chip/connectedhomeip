@@ -33,8 +33,8 @@ chip_data_model("ota-requestor-common") {
   sources = [
     "BDXDownloader.cpp",
     "BDXDownloader.h",
-    "ExampleRequestorDelegate.cpp",
-    "ExampleRequestorDelegate.h",
+    "ExampleOTARequestor.cpp",
+    "ExampleOTARequestor.h",
   ]
 
   is_server = true

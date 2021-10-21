@@ -16,10 +16,11 @@
  *    limitations under the License.
  */
 
-#include <ExampleRequestorDelegate.h>
+#include <ExampleOTARequestor.h>
 
 #include <app-common/zap-generated/enums.h>
 #include <app/util/af-enums.h>
+#include <app/util/util.h>
 #include <controller/CHIPDevice.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/BufferReader.h>
@@ -30,22 +31,34 @@
 
 using chip::FabricInfo;
 
-constexpr uint32_t kImmediateStartDelayMs = 1;
+ExampleOTARequestor ExampleOTARequestor::sInstance;
 
-ExampleRequestorDelegate::ExampleRequestorDelegate()
+constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this value when starting OTA "immediately"
+
+// OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
+bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
+{
+    EmberAfStatus status = ExampleOTARequestor::GetInstance().HandleAnnounceOTAProvider(commandObj, commandPath, commandData);
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+ExampleOTARequestor::ExampleOTARequestor()
 {
     mOtaStartDelayMs     = 0;
     mProviderId          = chip::kUndefinedNodeId;
     mProviderFabricIndex = chip::kUndefinedFabricIndex;
 }
 
-void ExampleRequestorDelegate::Init(chip::Controller::ControllerDeviceInitParams connectParams, uint32_t startDelayMs)
+void ExampleOTARequestor::Init(chip::Controller::ControllerDeviceInitParams connectParams, uint32_t startDelayMs)
 {
     mConnectParams   = connectParams;
     mOtaStartDelayMs = startDelayMs;
 }
 
-void ExampleRequestorDelegate::ConnectToProvider()
+void ExampleOTARequestor::ConnectToProvider()
 {
     FabricInfo * providerFabric = GetProviderFabricInfo();
     VerifyOrReturn(providerFabric != nullptr,
@@ -61,7 +74,7 @@ void ExampleRequestorDelegate::ConnectToProvider()
     // mProviderDevice.EstablishConnectivity();
 }
 
-EmberAfStatus ExampleRequestorDelegate::HandleAnnounceOTAProvider(
+EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
 {
@@ -110,13 +123,13 @@ EmberAfStatus ExampleRequestorDelegate::HandleAnnounceOTAProvider(
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-void ExampleRequestorDelegate::StartDelayTimerHandler(chip::System::Layer * systemLayer, void * appState)
+void ExampleOTARequestor::StartDelayTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     VerifyOrReturn(appState != nullptr);
-    static_cast<ExampleRequestorDelegate *>(appState)->ConnectToProvider();
+    static_cast<ExampleOTARequestor *>(appState)->ConnectToProvider();
 }
 
-chip::FabricInfo * ExampleRequestorDelegate::GetProviderFabricInfo()
+chip::FabricInfo * ExampleOTARequestor::GetProviderFabricInfo()
 {
     if (mConnectParams.fabricsTable == nullptr)
     {

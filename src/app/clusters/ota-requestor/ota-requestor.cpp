@@ -28,13 +28,6 @@
 #include <app/util/af.h>
 #include <lib/support/BufferReader.h>
 
-#include "ota-requestor-delegate.h"
-#include "ota-requestor.h"
-
-using chip::app::clusters::OTARequestorDelegate;
-
-OTARequestorDelegate * gDelegate = nullptr;
-
 /**
  * @brief OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
  */

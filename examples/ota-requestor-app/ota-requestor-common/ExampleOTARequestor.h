@@ -18,34 +18,35 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/Command.h>
-#include <app/clusters/ota-requestor/ota-requestor-delegate.h>
 #include <app/util/basic-types.h>
 #include <controller/CHIPDevice.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
 
-using chip::app::clusters::OTARequestorDelegate;
-
 // An example implementation for how an application might handle receiving an AnnounceOTAProvider command. In this case, the
 // AnnounceOTAProvider command will be used as a trigger to send a QueryImage command and begin the OTA process. This class also
 // contains other application-specific logic related to OTA Software Update.
-class ExampleRequestorDelegate : public OTARequestorDelegate
+class ExampleOTARequestor
 {
 public:
-    ExampleRequestorDelegate();
+    static ExampleOTARequestor & GetInstance() { return sInstance; }
 
     void Init(chip::Controller::ControllerDeviceInitParams connectParams, uint32_t startDelayMs);
 
-    // Inherited from OTARequestorDelegate
     EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
 
 private:
+    ExampleOTARequestor();
+
     static void StartDelayTimerHandler(chip::System::Layer * systemLayer, void * appState);
     void ConnectToProvider();
     chip::FabricInfo * GetProviderFabricInfo();
+
+    static ExampleOTARequestor sInstance;
 
     chip::Controller::Device mProviderDevice;
     chip::Controller::ControllerDeviceInitParams mConnectParams;
