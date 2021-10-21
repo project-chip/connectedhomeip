@@ -30,9 +30,9 @@ tests:
       attribute: "current hue"
       response:
           constraints:
-                type: uint8
-                minValue: 0
-                maxValue: 254
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Write the default value to mandatory attribute: CurrentHue"
       command: "writeAttribute"
@@ -59,9 +59,9 @@ tests:
       attribute: "current saturation"
       response:
           constraints:
-                type: uint8
-                minValue: 0
-                maxValue: 254
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Write the default value to mandatory attribute: CurrentSaturation"
       command: "writeAttribute"
@@ -88,9 +88,9 @@ tests:
       attribute: "current x"
       response:
           constraints:
-                type: uint16
-                minValue: 0
-                maxValue: 65279
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Write the default value to mandatory attribute: CurrentX"
       command: "writeAttribute"
@@ -117,9 +117,9 @@ tests:
       attribute: "current y"
       response:
           constraints:
-                type: uint16
-                minValue: 0
-                maxValue: 65279
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Write the default values to mandatory attribute: CurrentY"
       command: "writeAttribute"
@@ -147,11 +147,13 @@ tests:
       attribute: "color temperature"
       response:
           constraints:
-                type: uint16
-                minValue: 0
-                maxValue: 65279
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
-    - label: "Write the default values to mandatory attribute: ColorTemperatureMireds"
+    - label:
+          "Write the default values to mandatory attribute:
+          ColorTemperatureMireds"
       disabled: true
       command: "writeAttribute"
       attribute: "color temperature"
@@ -179,9 +181,9 @@ tests:
       attribute: "color mode"
       response:
           constraints:
-                type: enum8
-                minValue: 0
-                maxValue: 2
+              type: enum8
+              minValue: 0
+              maxValue: 2
 
     - label: "Write the default values to mandatory attribute: ColorMode"
       disabled: true
@@ -210,7 +212,7 @@ tests:
       attribute: "color control options"
       response:
           constraints:
-                type: map8
+              type: map8
 
     - label: "Write the default values to mandatory attribute: Options"
       command: "writeAttribute"
@@ -235,9 +237,10 @@ tests:
       attribute: "enhanced current hue"
       response:
           constraints:
-                type: uint16
+              type: uint16
 
-    - label: "Write the default values to mandatory attribute: EnhancedCurrentHue"
+    - label:
+          "Write the default values to mandatory attribute: EnhancedCurrentHue"
       command: "writeAttribute"
       attribute: "enhanced current hue"
       arguments:
@@ -263,9 +266,10 @@ tests:
       attribute: "enhanced color mode"
       response:
           constraints:
-                type: enum8
+              type: enum8
 
-    - label: "Write the default values to mandatory attribute: EnhancedColorMode"
+    - label:
+          "Write the default values to mandatory attribute: EnhancedColorMode"
       disabled: true
       command: "writeAttribute"
       attribute: "enhanced color mode"
@@ -292,7 +296,7 @@ tests:
       attribute: "color loop active"
       response:
           constraints:
-                type: uint8
+              type: uint8
 
     - label: "Write the default values to mandatory attribute: ColorLoopActive"
       command: "writeAttribute"
@@ -319,9 +323,10 @@ tests:
       attribute: "color loop direction"
       response:
           constraints:
-                type: uint8
+              type: uint8
 
-    - label: "Write the default values to mandatory attribute: ColorLoopDirection"
+    - label:
+          "Write the default values to mandatory attribute: ColorLoopDirection"
       command: "writeAttribute"
       attribute: "color loop direction"
       arguments:
@@ -346,7 +351,7 @@ tests:
       attribute: "color loop time"
       response:
           constraints:
-                type: uint16
+              type: uint16
 
     - label: "Write the default values to mandatory attribute: ColorLoopTime"
       command: "writeAttribute"
@@ -373,9 +378,11 @@ tests:
       attribute: "color loop start enhanced hue"
       response:
           constraints:
-                type: uint16
+              type: uint16
 
-    - label: "Write the default values to mandatory attribute: ColorLoopStartEnhancedHue"
+    - label:
+          "Write the default values to mandatory attribute:
+          ColorLoopStartEnhancedHue"
       command: "writeAttribute"
       attribute: "color loop start enhanced hue"
       arguments:
@@ -400,9 +407,11 @@ tests:
       attribute: "color loop stored enhanced hue"
       response:
           constraints:
-                type: uint16
+              type: uint16
 
-    - label: "Write the default values to mandatory attribute: ColorLoopStoredEnhancedHue"
+    - label:
+          "Write the default values to mandatory attribute:
+          ColorLoopStoredEnhancedHue"
       command: "writeAttribute"
       attribute: "color loop stored enhanced hue"
       arguments:
@@ -427,11 +436,12 @@ tests:
       attribute: "color capabilities"
       response:
           constraints:
-                type: map16
-                minValue: 0
-                maxValue: 65279
+              type: map16
+              minValue: 0
+              maxValue: 65279
 
-    - label: "Write the default values to mandatory attribute: ColorCapabilities"
+    - label:
+          "Write the default values to mandatory attribute: ColorCapabilities"
       command: "writeAttribute"
       attribute: "color capabilities"
       arguments:
@@ -456,11 +466,13 @@ tests:
       attribute: "color temp physical min"
       response:
           constraints:
-                type: uint16
-                minValue: 0
-                maxValue: 65279
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
-    - label: "Write the default values to mandatory  attribute: ColorTempPhysicalMinMireds"
+    - label:
+          "Write the default values to mandatory  attribute:
+          ColorTempPhysicalMinMireds"
       command: "writeAttribute"
       attribute: "color temp physical min"
       arguments:
@@ -485,11 +497,13 @@ tests:
       attribute: "color temp physical max"
       response:
           constraints:
-                type: uint16
-                minValue: 0
-                maxValue: 65279
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
-    - label: "Write the default values to mandatory attribute: ColorTempPhysicalMaxMireds"
+    - label:
+          "Write the default values to mandatory attribute:
+          ColorTempPhysicalMaxMireds"
       command: "writeAttribute"
       attribute: "color temp physical max"
       arguments:
@@ -510,7 +524,9 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Write the default values to optional attribute: CoupleColorTempToLevelMinMireds"
+    - label:
+          "Write the default values to optional attribute:
+          CoupleColorTempToLevelMinMireds"
       command: "writeAttribute"
       attribute: "couple color temp to level min-mireds"
       arguments:
@@ -533,7 +549,9 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default values to optional attribute: StartUpColorTemperatureMireds"
+    - label:
+          "Write the default values to optional attribute:
+          StartUpColorTemperatureMireds"
       command: "writeAttribute"
       attribute: "start up color temperature mireds"
       arguments:
@@ -556,9 +574,9 @@ tests:
       attribute: "remaining time"
       response:
           constraints:
-                type: uint16
-                minValue: 0
-                maxValue: 254
+              type: uint16
+              minValue: 0
+              maxValue: 254
 
     - label: "Write the default values to optional attribute: RemainingTime"
       command: "writeAttribute"
