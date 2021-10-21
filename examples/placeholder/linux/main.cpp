@@ -17,13 +17,34 @@
  */
 
 #include "AppMain.h"
+#include "Options.h"
 
-#include <cassert>
 #include <lib/support/CodeUtils.h>
+
+#include "MatterCallbacks.h"
+
+void RunTestCommand()
+{
+    const char * command = LinuxDeviceOptions::GetInstance().command;
+    if (command == nullptr)
+    {
+        return;
+    }
+
+    auto test = GetTestCommand(command);
+    if (test.get() == nullptr)
+    {
+        ChipLogError(chipTool, "Specified test command does not exists: %s", command);
+        return;
+    }
+
+    chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(test.get()));
+}
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    RunTestCommand();
     ChipLinuxAppMainLoop();
     return 0;
 }
