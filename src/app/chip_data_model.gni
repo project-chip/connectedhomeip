@@ -111,7 +111,6 @@ template("chip_data_model") {
       "${_app_root}/util/ember-print.cpp",
       "${_app_root}/util/error-mapping.cpp",
       "${_app_root}/util/message.cpp",
-      "${_app_root}/util/prepare-list.cpp",
       "${_app_root}/util/process-cluster-message.cpp",
       "${_app_root}/util/process-global-message.cpp",
       "${_app_root}/util/util.cpp",

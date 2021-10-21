@@ -81,10 +81,6 @@ namespace Inet {
 
 void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
 {
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    DNSResolver::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumDNSResolvers],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumDNSResolvers]);
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumTCPEps],
                                      aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumTCPEps]);
@@ -105,8 +101,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  */
 InetLayer::InetLayer()
 {
-    State = kState_NotInitialized;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sInetEventHandlerDelegate.IsInitialized())
         sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
@@ -241,9 +235,7 @@ void InetLayer::DroppableEventDequeued(void)
 CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 {
     Inet::RegisterLayerErrorFormatter();
-
-    if (State != kState_NotInitialized)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     // Platform-specific initialization may elect to set this data
     // member. Ensure it is set to a sane default value before
@@ -260,11 +252,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    State = kState_Initialized;
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    ReturnErrorOnFailure(mAsyncDNSResolver.Init(this));
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+    mLayerState.SetInitialized();
 
     return CHIP_NO_ERROR;
 }
@@ -279,52 +267,34 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
  */
 CHIP_ERROR InetLayer::Shutdown()
 {
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (State == kState_Initialized)
-    {
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-        // Cancel all DNS resolution requests owned by this instance.
-        DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
-            if ((lResolver != nullptr) && lResolver->IsCreatedByInetLayer(*this))
-            {
-                lResolver->Cancel();
-            }
-            return true;
-        });
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-        err = mAsyncDNSResolver.Shutdown();
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        // Abort all TCP endpoints owned by this instance.
-        TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Abort();
-            }
-            return true;
-        });
+    // Abort all TCP endpoints owned by this instance.
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        {
+            lEndPoint->Abort();
+        }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        // Close all UDP endpoints owned by this instance.
-        UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Close();
-            }
-            return true;
-        });
+    // Close all UDP endpoints owned by this instance.
+    UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        {
+            lEndPoint->Close();
+        }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-    }
 
-    State = kState_NotInitialized;
-
+    mLayerState.SetShutdown();
+    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return err;
 }
 
@@ -480,7 +450,7 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     *retEndPoint = TCPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
@@ -520,7 +490,7 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     *retEndPoint = UDPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
@@ -535,281 +505,6 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
     return CHIP_NO_ERROR;
 }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-/**
- *  Perform an IP address resolution of a specified hostname.
- *
- *  @note
- *    This is an asynchronous operation and the result will be communicated back
- *    via the OnComplete() callback.
- *
- *  @param[in]  hostName    A pointer to a NULL-terminated C string representing
- *                          the host name to be queried.
- *
- *  @param[in]  maxAddrs    The maximum number of addresses to store in the DNS
- *                          table.
- *
- *  @param[in]  addrArray   A pointer to the DNS table.
- *
- *  @param[in]  onComplete  A pointer to the callback function when a DNS
- *                          request is complete.
- *
- *  @param[in]  appState    A pointer to the application state to be passed to
- *                          onComplete when a DNS request is complete.
- *
- *  @retval #CHIP_NO_ERROR                   if a DNS request is handled
- *                                           successfully.
- *  @retval #CHIP_ERROR_NO_MEMORY            if the Inet layer resolver pool
- *                                           is full.
- *  @retval #INET_ERROR_HOST_NAME_TOO_LONG   if a requested host name is too
- *                                           long.
- *  @retval #INET_ERROR_HOST_NOT_FOUND       if a request host name could not be
- *                                           resolved to an address.
- *  @retval #INET_ERROR_DNS_TRY_AGAIN        if a name server returned a
- *                                           temporary failure indication;
- *                                           try again later.
- *  @retval #INET_ERROR_DNS_NO_RECOVERY      if a name server returned an
- *                                           unrecoverable error.
- *  @retval #CHIP_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
- *                                           the underlying platform.
- *  @retval other POSIX network or OS error returned by the underlying DNS
- *          resolver implementation.
- *
- */
-CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint8_t maxAddrs, IPAddress * addrArray,
-                                         DNSResolveCompleteFunct onComplete, void * appState)
-{
-    size_t hostNameLength = strlen(hostName);
-    if (hostNameLength > UINT16_MAX)
-    {
-        return INET_ERROR_HOST_NAME_TOO_LONG;
-    }
-    return ResolveHostAddress(hostName, static_cast<uint16_t>(hostNameLength), maxAddrs, addrArray, onComplete, appState);
-}
-
-/**
- *  Perform an IP address resolution of a specified hostname.
- *
- *  @param[in]  hostName    A pointer to a non NULL-terminated C string representing the host name
- *                          to be queried.
- *
- *  @param[in]  hostNameLen The string length of host name.
- *
- *  @param[in]  maxAddrs    The maximum number of addresses to store in the DNS
- *                          table.
- *
- *  @param[in]  addrArray   A pointer to the DNS table.
- *
- *  @param[in]  onComplete  A pointer to the callback function when a DNS
- *                          request is complete.
- *
- *  @param[in]  appState    A pointer to the application state to be passed to
- *                          onComplete when a DNS request is complete.
- *
- *  @retval #CHIP_NO_ERROR                   if a DNS request is handled
- *                                           successfully.
- *  @retval #CHIP_ERROR_NO_MEMORY            if the Inet layer resolver pool
- *                                           is full.
- *  @retval #INET_ERROR_HOST_NAME_TOO_LONG   if a requested host name is too
- *                                           long.
- *  @retval #INET_ERROR_HOST_NOT_FOUND       if a request host name could not be
- *                                           resolved to an address.
- *  @retval #INET_ERROR_DNS_TRY_AGAIN        if a name server returned a
- *                                           temporary failure indication;
- *                                           try again later.
- *  @retval #INET_ERROR_DNS_NO_RECOVERY      if a name server returned an
- *                                           unrecoverable error.
- *  @retval #CHIP_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
- *                                           the underlying platform.
- *  @retval other POSIX network or OS error returned by the underlying DNS
- *          resolver implementation.
- *
- */
-CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t maxAddrs, IPAddress * addrArray,
-                                         DNSResolveCompleteFunct onComplete, void * appState)
-{
-    return ResolveHostAddress(hostName, hostNameLen, kDNSOption_Default, maxAddrs, addrArray, onComplete, appState);
-}
-
-/**
- *  Perform an IP address resolution of a specified hostname.
- *
- *  @param[in]  hostName    A pointer to a non NULL-terminated C string representing the host name
- *                          to be queried.
- *
- *  @param[in]  hostNameLen The string length of host name.
- *
- *  @param[in]  options     An integer value controlling how host name resolution is performed.
- *
- *                          Value should be one of the address family values from the
- *                          #DNSOptions enumeration:
- *
- *                          #kDNSOption_AddrFamily_Any
- *                          #kDNSOption_AddrFamily_IPv4Only
- *                          #kDNSOption_AddrFamily_IPv6Only
- *                          #kDNSOption_AddrFamily_IPv4Preferred
- *                          #kDNSOption_AddrFamily_IPv6Preferred
- *
- *  @param[in]  maxAddrs    The maximum number of addresses to store in the DNS
- *                          table.
- *
- *  @param[in]  addrArray   A pointer to the DNS table.
- *
- *  @param[in]  onComplete  A pointer to the callback function when a DNS
- *                          request is complete.
- *
- *  @param[in]  appState    A pointer to the application state to be passed to
- *                          onComplete when a DNS request is complete.
- *
- *  @retval #CHIP_NO_ERROR                   if a DNS request is handled
- *                                           successfully.
- *  @retval #CHIP_ERROR_NO_MEMORY            if the Inet layer resolver pool
- *                                           is full.
- *  @retval #INET_ERROR_HOST_NAME_TOO_LONG   if a requested host name is too
- *                                           long.
- *  @retval #INET_ERROR_HOST_NOT_FOUND       if a request host name could not be
- *                                           resolved to an address.
- *  @retval #INET_ERROR_DNS_TRY_AGAIN        if a name server returned a
- *                                           temporary failure indication;
- *                                           try again later.
- *  @retval #INET_ERROR_DNS_NO_RECOVERY      if a name server returned an
- *                                           unrecoverable error.
- *  @retval #CHIP_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
- *                                           the underlying platform.
- *  @retval other POSIX network or OS error returned by the underlying DNS
- *          resolver implementation.
- *
- */
-CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
-                                         IPAddress * addrArray, DNSResolveCompleteFunct onComplete, void * appState)
-{
-    assertChipStackLockedByCurrentThread();
-
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    DNSResolver * resolver = nullptr;
-
-    VerifyOrExit(State == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-
-    INET_FAULT_INJECT(FaultInjection::kFault_DNSResolverNew, return CHIP_ERROR_NO_MEMORY);
-
-    // Store context information and set the resolver state.
-    VerifyOrExit(hostNameLen <= NL_DNS_HOSTNAME_MAX_LEN, err = INET_ERROR_HOST_NAME_TOO_LONG);
-    VerifyOrExit(maxAddrs > 0, err = CHIP_ERROR_NO_MEMORY);
-
-    resolver = DNSResolver::sPool.TryCreate();
-    if (resolver != nullptr)
-    {
-        resolver->InitInetLayerBasis(*this);
-    }
-    else
-    {
-        ChipLogError(Inet, "%s resolver pool FULL", "DNS");
-        ExitNow(err = CHIP_ERROR_NO_MEMORY);
-    }
-
-    // Short-circuit full address resolution if the supplied host name is a text-form
-    // IP address...
-    if (IPAddress::FromString(hostName, hostNameLen, *addrArray))
-    {
-        uint8_t addrTypeOption = (options & kDNSOption_AddrFamily_Mask);
-        IPAddressType addrType = addrArray->Type();
-
-        if ((addrTypeOption == kDNSOption_AddrFamily_IPv6Only && addrType != kIPAddressType_IPv6)
-#if INET_CONFIG_ENABLE_IPV4
-            || (addrTypeOption == kDNSOption_AddrFamily_IPv4Only && addrType != kIPAddressType_IPv4)
-#endif
-        )
-        {
-            err = INET_ERROR_INCOMPATIBLE_IP_ADDRESS_TYPE;
-        }
-
-        if (onComplete)
-        {
-            onComplete(appState, err, (err == CHIP_NO_ERROR) ? 1 : 0, addrArray);
-        }
-
-        resolver->Release();
-        resolver = nullptr;
-
-        ExitNow(err = CHIP_NO_ERROR);
-    }
-
-    // After this point, the resolver will be released by:
-    // - mAsyncDNSResolver (in case of ASYNC_DNS_SOCKETS)
-    // - resolver->Resolve() (in case of synchronous resolving)
-    // - the event handlers (in case of LwIP)
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-    err =
-        mAsyncDNSResolver.PrepareDNSResolver(*resolver, hostName, hostNameLen, options, maxAddrs, addrArray, onComplete, appState);
-    SuccessOrExit(err);
-
-    mAsyncDNSResolver.EnqueueRequest(*resolver);
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-#if !INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    err = resolver->Resolve(hostName, hostNameLen, options, maxAddrs, addrArray, onComplete, appState);
-#endif // !INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-exit:
-
-    return err;
-}
-
-/**
- *  Cancel any outstanding DNS query (for a matching completion callback and
- *  application state) that may still be active.
- *
- *  @note
- *    This situation can arise if the application initiates a connection
- *    to a peer using a hostname and then aborts/closes the connection
- *    before the hostname resolution completes.
- *
- *  @param[in]    onComplete   A pointer to the callback function when a DNS
- *                             request is complete.
- *
- *  @param[in]    appState     A pointer to an application state object to be passed
- *                             to the callback function as argument.
- *
- */
-void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, void * appState)
-{
-    assertChipStackLockedByCurrentThread();
-
-    if (State != kState_Initialized)
-        return;
-
-    DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
-        if (!lResolver->IsCreatedByInetLayer(*this))
-        {
-            return true;
-        }
-
-        if (lResolver->OnComplete != onComplete)
-        {
-            return true;
-        }
-
-        if (lResolver->AppState != appState)
-        {
-            return true;
-        }
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-        if (lResolver->mState == DNSResolver::kState_Canceled)
-        {
-            return true;
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-        lResolver->Cancel();
-        return false;
-    });
-}
-
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 /**
  *  Get the interface identifier for the specified IP address. If the
@@ -907,7 +602,8 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
 
     if (lTimerRequired)
     {
-        aSystemLayer->StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, HandleTCPInactivityTimer, &lInetLayer);
+        aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleTCPInactivityTimer,
+                                 &lInetLayer);
     }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -951,12 +647,6 @@ CHIP_ERROR InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip:
             System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
         break;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    case kInetEvent_DNSResolveComplete:
-        static_cast<DNSResolver &>(aTarget).HandleResolveComplete();
-        break;
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
     default:
         return CHIP_ERROR_UNEXPECTED_EVENT;

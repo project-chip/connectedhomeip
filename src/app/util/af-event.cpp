@@ -155,7 +155,7 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
     {
         control->status = EMBER_EVENT_MS_TIME;
 #if !CHIP_DEVICE_LAYER_NONE
-        chip::DeviceLayer::SystemLayer().StartTimer(delayMs, EventControlHandler, control);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), EventControlHandler, control);
 #endif
     }
     else

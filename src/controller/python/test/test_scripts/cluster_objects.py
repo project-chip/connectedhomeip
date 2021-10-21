@@ -16,7 +16,7 @@
 #
 
 
-from chip.clusters import TestObjects
+import chip.clusters as Clusters
 import logging
 import chip.interaction_model
 
@@ -30,20 +30,20 @@ LIGHTING_ENDPOINT_ID = 1
 class ClusterObjectTests:
     @classmethod
     def TestAPI(cls):
-        if TestObjects.OnOff.id != 6:
+        if Clusters.OnOff.id != 6:
             raise ValueError()
-        if TestObjects.OnOff.Commands.Off.command_id != 0:
+        if Clusters.OnOff.Commands.Off.command_id != 0:
             raise ValueError()
-        if TestObjects.OnOff.Commands.Off.cluster_id != 6:
+        if Clusters.OnOff.Commands.Off.cluster_id != 6:
             raise ValueError()
-        if TestObjects.OnOff.Commands.On.command_id != 1:
+        if Clusters.OnOff.Commands.On.command_id != 1:
             raise ValueError()
-        if TestObjects.OnOff.Commands.On.cluster_id != 6:
+        if Clusters.OnOff.Commands.On.cluster_id != 6:
             raise ValueError()
 
     @classmethod
     async def RoundTripTest(cls, devCtrl):
-        req = TestObjects.OnOff.Commands.On()
+        req = Clusters.OnOff.Commands.On()
         res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
         if res is not None:
             logger.error(
@@ -52,7 +52,7 @@ class ClusterObjectTests:
 
     @classmethod
     async def RoundTripTestWithBadEndpoint(cls, devCtrl):
-        req = TestObjects.OnOff.Commands.On()
+        req = Clusters.OnOff.Commands.On()
         try:
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=233, payload=req)
             raise ValueError(f"Failure expected")
@@ -61,11 +61,23 @@ class ClusterObjectTests:
             return
 
     @classmethod
+    async def SendCommandWithResponse(cls, devCtrl):
+        req = Clusters.TestCluster.Commands.TestAddArguments(Arg1=2, Arg2=3)
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req, responseType=Clusters.TestCluster.Commands.TestAddArgumentsResponse)
+        if not isinstance(res, Clusters.TestCluster.Commands.TestAddArgumentsResponse):
+            logger.error(f"Unexpected response of type {type(res)} received.")
+            raise ValueError()
+        logger.info(f"Received response: {res}")
+        if res.ReturnValue != 5:
+            raise ValueError()
+
+    @classmethod
     async def RunTest(cls, devCtrl):
         try:
             cls.TestAPI()
             await cls.RoundTripTest(devCtrl)
             await cls.RoundTripTestWithBadEndpoint(devCtrl)
+            await cls.SendCommandWithResponse(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")

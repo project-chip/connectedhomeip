@@ -21,5 +21,5 @@
 #
 
 """Provides Python APIs for CHIP."""
-
-from . import TestObjects
+from . import Command
+from .Objects import *

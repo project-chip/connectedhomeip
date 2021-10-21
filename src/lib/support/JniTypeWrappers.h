@@ -65,14 +65,10 @@ class UtfString
 {
 public:
     UtfString(JNIEnv * env, const char * data) : mEnv(env) { mData = data != nullptr ? mEnv->NewStringUTF(data) : nullptr; }
-    UtfString(JNIEnv * env, chip::ByteSpan data) : mEnv(env)
+    UtfString(JNIEnv * env, chip::CharSpan data) : mEnv(env)
     {
-        std::ostringstream os;
-        for (size_t i = 0; i < data.size(); i++)
-        {
-            os << data.data()[i];
-        }
-        mData = env->NewStringUTF(os.str().c_str());
+        std::string str(data.data(), data.size());
+        mData = env->NewStringUTF(str.c_str());
     }
     ~UtfString() { mEnv->DeleteLocalRef(mData); }
 

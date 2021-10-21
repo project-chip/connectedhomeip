@@ -49,11 +49,11 @@ AvahiProtocol ToAvahiProtocol(chip::Inet::IPAddressType addressType)
     switch (addressType)
     {
 #if INET_CONFIG_ENABLE_IPV4
-    case chip::Inet::IPAddressType::kIPAddressType_IPv4:
+    case chip::Inet::IPAddressType::kIPv4:
         protocol = AVAHI_PROTO_INET;
         break;
 #endif
-    case chip::Inet::IPAddressType::kIPAddressType_IPv6:
+    case chip::Inet::IPAddressType::kIPv6:
         protocol = AVAHI_PROTO_INET6;
         break;
     default:
@@ -72,14 +72,14 @@ chip::Inet::IPAddressType ToAddressType(AvahiProtocol protocol)
     {
 #if INET_CONFIG_ENABLE_IPV4
     case AVAHI_PROTO_INET:
-        type = chip::Inet::IPAddressType::kIPAddressType_IPv4;
+        type = chip::Inet::IPAddressType::kIPv4;
         break;
 #endif
     case AVAHI_PROTO_INET6:
-        type = chip::Inet::IPAddressType::kIPAddressType_IPv6;
+        type = chip::Inet::IPAddressType::kIPv6;
         break;
     default:
-        type = chip::Inet::IPAddressType::kIPAddressType_Unknown;
+        type = chip::Inet::IPAddressType::kUnknown;
         break;
     }
 
@@ -315,7 +315,7 @@ void Poller::SystemTimerUpdate(AvahiTimeout * timer)
     {
         mEarliestTimeout = timer->mAbsTimeout;
         auto msDelay     = std::chrono::duration_cast<std::chrono::milliseconds>(steady_clock::now() - mEarliestTimeout).count();
-        DeviceLayer::SystemLayer().StartTimer(msDelay, SystemTimerCallback, this);
+        DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(msDelay), SystemTimerCallback, this);
     }
 }
 

@@ -182,7 +182,8 @@ void ChannelContext::EnterAddressResolve()
     if (mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kAddressResolving)
     {
         System::Layer * layer = mExchangeManager->GetSessionManager()->SystemLayer();
-        layer->StartTimer(CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS, AddressResolveTimeout, this);
+        layer->StartTimer(System::Clock::Milliseconds32(CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS), AddressResolveTimeout,
+                          this);
         Retain(); // Keep the pointer in the timer
     }
 }

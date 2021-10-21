@@ -54,6 +54,21 @@ static const char * TAG = "lock-app";
 
 static DeviceCallbacks EchoCallbacks;
 
+static void InitServer(intptr_t context)
+{
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
+    CHIP_ERROR error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed: %s", ErrorStr(error));
+    }
+}
+
 extern "C" void app_main()
 {
     // Initialize the ESP NVS layer.
@@ -85,15 +100,5 @@ extern "C" void app_main()
         return;
     }
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
-    error = GetAppTask().StartAppTask();
-    if (error != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "GetAppTask().Init() failed: %s", ErrorStr(error));
-    }
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

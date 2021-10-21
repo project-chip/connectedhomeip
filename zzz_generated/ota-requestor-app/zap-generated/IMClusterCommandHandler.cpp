@@ -303,9 +303,9 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             expectArgumentCount = 8;
             uint8_t status;
             uint32_t delayedActionTime;
-            const uint8_t * imageURI;
+            chip::CharSpan imageURI;
             uint32_t softwareVersion;
-            const uint8_t * softwareVersionString;
+            chip::CharSpan softwareVersionString;
             chip::ByteSpan updateToken;
             bool userConsentNeeded;
             chip::ByteSpan metadataForRequestor;
@@ -345,15 +345,13 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                     TLVUnpackError = aDataTlv.Get(delayedActionTime);
                     break;
                 case 2:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(imageURI);
+                    TLVUnpackError = aDataTlv.Get(imageURI);
                     break;
                 case 3:
                     TLVUnpackError = aDataTlv.Get(softwareVersion);
                     break;
                 case 4:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(softwareVersionString);
+                    TLVUnpackError = aDataTlv.Get(softwareVersionString);
                     break;
                 case 5:
                     TLVUnpackError = aDataTlv.Get(updateToken);
@@ -384,9 +382,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 8 == validArgumentCount)
             {
                 wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
-                    aCommandPath.mEndpointId, apCommandObj, status, delayedActionTime, const_cast<uint8_t *>(imageURI),
-                    softwareVersion, const_cast<uint8_t *>(softwareVersionString), updateToken, userConsentNeeded,
-                    metadataForRequestor);
+                    aCommandPath.mEndpointId, apCommandObj, status, delayedActionTime, imageURI, softwareVersion,
+                    softwareVersionString, updateToken, userConsentNeeded, metadataForRequestor);
             }
             break;
         }

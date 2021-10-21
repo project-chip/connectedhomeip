@@ -23,24 +23,25 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t mask, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
-    if (clusterId != OnOff::Id)
+    if (path.mClusterId != OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mClusterId));
         return;
     }
 
-    if (attributeId != OnOff::Attributes::OnOff::Id)
+    if (path.mAttributeId != OnOff::Attributes::OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+        ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mAttributeId));
         return;
     }
 

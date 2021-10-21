@@ -584,7 +584,7 @@ CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
         OnRefreshSubscribeTimerSyncCallback, this);
     mHoldReport = true;
     return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        mMinIntervalFloorSeconds * kMillisecondsPerSecond, OnRefreshSubscribeTimerSyncCallback, this);
+        System::Clock::Seconds16(mMinIntervalFloorSeconds), OnRefreshSubscribeTimerSyncCallback, this);
 }
 } // namespace app
 } // namespace chip

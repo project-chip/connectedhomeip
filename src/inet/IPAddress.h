@@ -31,6 +31,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
 
 #include <inet/InetConfig.h>
@@ -80,67 +81,53 @@ namespace chip {
 namespace Inet {
 
 /**
- * @brief   Internet protocol address family
- *
- * @details
- *  Values of the \c IPAddressType type are returned by the
- *  <tt>IPAddress::Type()</tt> method. They indicate the address family
- *  entailed by the use of the address.
+ * Internet protocol address family
  */
-typedef enum
+enum class IPAddressType : uint8_t
 {
-    /** Not used. */
-    kIPAddressType_Unknown = 0,
-
+    kUnknown = 0, ///< Not used.
 #if INET_CONFIG_ENABLE_IPV4
-    /** Internet protocol version 4. */
-    kIPAddressType_IPv4 = 1,
-#endif // INET_CONFIG_ENABLE_IPV4
-
-    /** Internet protocol version 6. */
-    kIPAddressType_IPv6 = 2,
-
-    /** The unspecified internet address (independent of protocol version) */
-    kIPAddressType_Any = 3
-} IPAddressType;
+    kIPv4 = 1, ///< Internet protocol version 4.
+#endif         // INET_CONFIG_ENABLE_IPV4
+    kIPv6 = 2, ///< Internet protocol version 6.
+    kAny  = 3  ///< The unspecified internet address (independent of protocol version).
+};
 
 /**
- * @brief   Internet protocol v6 multicast flags
+ * Internet protocol v6 multicast flags
  *
- * @details
- *  Values of the \c IPv6MulticastFlag type are used to call the
- *  <tt>IPAddress::MakeIPv6Multicast()</tt> methods. They indicate the
- *  type of IPv6 multicast address to create. These numbers are
- *  registered by IETF with IANA.
+ *  Values of the \c IPv6MulticastFlag type are used to call the <tt>IPAddress::MakeIPv6Multicast()</tt> methods.
+ *  They indicate the type of IPv6 multicast address to create. These numbers are registered by IETF with IANA.
  */
-typedef enum
+enum class IPv6MulticastFlag : uint8_t
 {
     /** The multicast address is (1) transient (i.e., dynamically-assigned) rather than (0) well-known (i.e, IANA-assigned). */
-    kIPv6MulticastFlag_Transient = 0x01,
+    kTransient = 0x01,
 
     /** The multicast address is (1) based on a network prefix. */
-    kIPv6MulticastFlag_Prefix = 0x02
-} IPv6MulticastFlag;
+    kPrefix = 0x02
+};
+using IPv6MulticastFlags = BitFlags<IPv6MulticastFlag>;
 
 /**
- * @brief   Maximum length of the string representation of an IP address.
- */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-constexpr uint16_t kMaxIPAddressStringLength = IP6ADDR_STRLEN_MAX;
-#else
-constexpr uint16_t kMaxIPAddressStringLength = INET6_ADDRSTRLEN;
-#endif
-
-/**
- * @brief   Internet protocol address
+ * Internet protocol address
  *
- * @details
  *  The CHIP Inet Layer uses objects of this class to represent Internet
  *  protocol addresses (independent of protocol version).
  */
 class DLL_EXPORT IPAddress
 {
 public:
+    /**
+     * Maximum length of the string representation of an IP address, including a terminating NUL.
+     */
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    static constexpr uint16_t kMaxStringLength = IP6ADDR_STRLEN_MAX;
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    static constexpr uint16_t kMaxStringLength = INET6_ADDRSTRLEN;
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
     IPAddress() = default;
 
     /**
@@ -283,9 +270,9 @@ public:
      *  Use this method to return an value of the enumerated type \c
      *  IPAddressType to indicate the type of the IP address.
      *
-     * @retval  kIPAddressType_IPv4 The address is IPv4.
-     * @retval  kIPAddressType_IPv6 The address is IPv6.
-     * @retval  kIPAddressType_Any  The address is the unspecified address.
+     * @retval  IPAddressType::kIPv4 The address is IPv4.
+     * @retval  IPAddressType::kIPv6 The address is IPv6.
+     * @retval  IPAddressType::kAny  The address is the unspecified address.
      */
     IPAddressType Type() const;
 
@@ -620,21 +607,21 @@ public:
      *
      * @return  The constructed IP address.
      */
-    static IPAddress MakeIPv6Multicast(uint8_t aFlags, uint8_t aScope,
+    static IPAddress MakeIPv6Multicast(IPv6MulticastFlags aFlags, uint8_t aScope,
                                        const uint8_t aGroupId[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES]);
 
     /**
      * @brief   Construct an IPv6 multicast address from its parts.
      *
      * @details
-     *  Use <tt>MakeIPv6Multicast(uint8_t flags, uint8_t scope,
+     *  Use <tt>MakeIPv6Multicast(IPv6MulticastFlag flags, uint8_t scope,
      *  uint32_t groupId)</tt> to construct an IPv6 multicast
      *  address with \c flags for routing scope \c scope and group
      *  identifier \c groupId.
      *
      * @return  The constructed IP address.
      */
-    static IPAddress MakeIPv6Multicast(uint8_t aFlags, uint8_t aScope, uint32_t aGroupId);
+    static IPAddress MakeIPv6Multicast(IPv6MulticastFlags aFlags, uint8_t aScope, uint32_t aGroupId);
 
     /**
      * @brief   Construct a well-known IPv6 multicast address from its parts.
@@ -652,14 +639,14 @@ public:
      * @brief   Construct a transient IPv6 multicast address from its parts.
      *
      * @details
-     *  Use <tt>MakeIPv6TransientMulticast(uint8_t flags, uint8_t scope,
+     *  Use <tt>MakeIPv6TransientMulticast(IPv6MulticastFlag flags, uint8_t scope,
      *  uint8_t groupId[14])</tt> to construct a transient IPv6
      *  multicast address with \c flags for routing scope \c scope and
      *  group identifier octets \c groupId.
      *
      * @return  The constructed IP address.
      */
-    static IPAddress MakeIPv6TransientMulticast(uint8_t aFlags, uint8_t aScope,
+    static IPAddress MakeIPv6TransientMulticast(IPv6MulticastFlags aFlags, uint8_t aScope,
                                                 const uint8_t aGroupId[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES]);
 
     /**

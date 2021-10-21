@@ -33,47 +33,6 @@ const kGlobalAttributes = [
   0xfffd, // FeatureMap
 ];
 
-// TODO Expose the readTypeLength as an additional member field of {{asUnderlyingZclType}} instead
-//      of having to call this method separately.
-function asReadTypeLength(type)
-{
-  const db = this.global.db;
-
-  if (StringHelper.isShortString(type)) {
-    return '1u';
-  }
-
-  if (StringHelper.isLongString(type)) {
-    return '2u';
-  }
-
-  function fn(pkgId)
-  {
-    const defaultResolver = zclQuery.selectAtomicType(db, pkgId, type);
-
-    const enumResolver = zclHelper.isEnum(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectEnumByName(db, type, pkgId).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
-    });
-
-    const bitmapResolver = zclHelper.isBitmap(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectBitmapByName(db, pkgId, type).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
-    });
-
-    const typeResolver = Promise.all([ defaultResolver, enumResolver, bitmapResolver ]);
-    return typeResolver.then(types => (types.find(type => type)).size);
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
-    console.log(err);
-    throw err;
-  });
-  return templateUtil.templatePromise(this.global, promise)
-}
-
 // TODO Expose the readType as an additional member field of {{asUnderlyingZclType}} instead
 //      of having to call this method separately.
 function asReadType(type)
@@ -391,14 +350,6 @@ function asMEI(prefix, suffix)
  */
 async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
-  if (StringHelper.isCharString(type)) {
-    return 'chip::Span<const char>';
-  }
-
-  if (type == 'single') {
-    return 'float';
-  }
-
   async function fn(pkgId)
   {
     const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
@@ -433,12 +384,73 @@ function zapTypeToDecodableClusterObjectType(type, options)
   return zapTypeToClusterObjectType.call(this, type, true, options)
 }
 
+function zapTypeToPythonClusterObjectType(type, options)
+{
+  if (StringHelper.isCharString(type)) {
+    return 'str';
+  }
+
+  if (StringHelper.isOctetString(type)) {
+    return 'bytes';
+  }
+
+  if ([ 'single', 'double' ].includes(type.toLowerCase())) {
+    return 'float';
+  }
+
+  if (type.toLowerCase() == 'boolean') {
+    return 'bool'
+  }
+
+  // #10748: asUnderlyingZclType will emit wrong types for int{48|56|64}(u), so we process all int values here.
+  if (type.toLowerCase().match(/^int\d+$/)) {
+    return 'int'
+  }
+
+  if (type.toLowerCase().match(/^int\d+u$/)) {
+    return 'uint'
+  }
+
+  async function fn(pkgId)
+  {
+    const ns          = asUpperCamelCase(options.hash.ns);
+    const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+    if (await typeChecker('isEnum')) {
+      return ns + '.Enums.' + type;
+    }
+
+    if (await typeChecker('isBitmap')) {
+      return 'int';
+    }
+
+    if (await typeChecker('isStruct')) {
+      return ns + '.Structs.' + type;
+    }
+
+    resolvedType = await zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
+    {
+      basicType = ChipTypesHelper.asBasicType(resolvedType);
+      if (basicType.match(/^int\d+_t$/)) {
+        return 'int'
+      }
+      if (basicType.match(/^uint\d+_t$/)) {
+        return 'uint'
+      }
+    }
+
+    throw "Unhandled type " + resolvedType + " (from " + type + ")"
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  return templateUtil.templatePromise(this.global, promise)
+}
+
 //
 // Module exports
 //
 exports.asPrintFormat                       = asPrintFormat;
 exports.asReadType                          = asReadType;
-exports.asReadTypeLength                    = asReadTypeLength;
 exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
 exports.asTypeLiteralSuffix                 = asTypeLiteralSuffix;
@@ -448,3 +460,4 @@ exports.hasSpecificAttributes               = hasSpecificAttributes;
 exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
+exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;

@@ -218,6 +218,10 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+char ConnectivityManagerImpl::sWiFiIfName[];
+#endif
+
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -246,14 +250,14 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (ConnectivityUtils::GetWiFiInterfaceName(mWiFiIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, IFNAMSIZ) == CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", mWiFiIfName);
+        ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", sWiFiIfName);
     }
     else
     {
         ChipLogError(DeviceLayer, "Failed to get WiFi interface");
-        mWiFiIfName[0] = '\0';
+        sWiFiIfName[0] = '\0';
     }
 
     if (ResetWiFiStatsCount() != CHIP_NO_ERROR)
@@ -494,7 +498,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant1 interface proxy %s: %s",
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant interface proxy %s: %s",
                         mWpaSupplicant.interfacePath, err ? err->message : "unknown error");
 
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
@@ -527,7 +531,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
         GVariant * args = nullptr;
         GVariantBuilder builder;
 
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: can't find interface %s: %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME,
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: can't find interface %s: %s", sWiFiIfName,
                         err ? err->message : "unknown error");
 
         ChipLogProgress(DeviceLayer, "wpa_supplicant: try to create interface %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
@@ -543,6 +547,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
         {
             mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
             ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath);
+
+            strncpy(sWiFiIfName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, IFNAMSIZ);
+            sWiFiIfName[IFNAMSIZ - 1] = '\0';
 
             wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
                                                                   kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
@@ -640,8 +647,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 
         g_signal_connect(mWpaSupplicant.proxy, "interface-removed", G_CALLBACK(_OnWpaInterfaceRemoved), NULL);
 
-        wpa_fi_w1_wpa_supplicant1_call_get_interface(mWpaSupplicant.proxy, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, nullptr,
-                                                     _OnWpaInterfaceReady, nullptr);
+        wpa_fi_w1_wpa_supplicant1_call_get_interface(mWpaSupplicant.proxy, sWiFiIfName, nullptr, _OnWpaInterfaceReady, nullptr);
     }
     else
     {
@@ -663,6 +669,8 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     mWpaSupplicant.iface         = nullptr;
     mWpaSupplicant.interfacePath = nullptr;
     mWpaSupplicant.networkPath   = nullptr;
+
+    ChipLogProgress(DeviceLayer, "wpa_supplicant: Start WiFi management");
 
     wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
                                                 kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
@@ -723,7 +731,7 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
+                err       = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(apTimeout), DriveAPState, NULL);
                 SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
             }
@@ -960,7 +968,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             {
                 char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
                 if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
-                    strncmp(ifName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, sizeof(ifName)) == 0)
+                    strncmp(ifName, sWiFiIfName, sizeof(ifName)) == 0)
                 {
                     chip::Inet::IPAddress addr = it.GetAddress();
                     if (addr.IsIPv4())
@@ -982,7 +990,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             // Run dhclient for IP on WiFi.
             // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
             char cmdBuffer[128];
-            sprintf(cmdBuffer, CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+            sprintf(cmdBuffer, CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD, sWiFiIfName);
             int dhclientSystemRet = system(cmdBuffer);
             if (dhclientSystemRet != 0)
             {
@@ -990,7 +998,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             }
             else
             {
-                ChipLogProgress(DeviceLayer, "dhclient is running on the %s interface.", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+                ChipLogProgress(DeviceLayer, "dhclient is running on the %s interface.", sWiFiIfName);
             }
 
             // Return success as long as the device is connected to the network
@@ -1166,34 +1174,34 @@ CHIP_ERROR ConnectivityManagerImpl::ResetEthernetStatsCount()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    if (mWiFiIfName[0] == '\0')
+    if (sWiFiIfName[0] == '\0')
     {
         return CHIP_ERROR_READ_FAILED;
     }
 
-    return ConnectivityUtils::GetWiFiChannelNumber(mWiFiIfName, channelNumber);
+    return ConnectivityUtils::GetWiFiChannelNumber(sWiFiIfName, channelNumber);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiRssi(int8_t & rssi)
 {
-    if (mWiFiIfName[0] == '\0')
+    if (sWiFiIfName[0] == '\0')
     {
         return CHIP_ERROR_READ_FAILED;
     }
 
-    return ConnectivityUtils::GetWiFiRssi(mWiFiIfName, rssi);
+    return ConnectivityUtils::GetWiFiRssi(sWiFiIfName, rssi);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
     uint32_t count;
 
-    if (mWiFiIfName[0] == '\0')
+    if (sWiFiIfName[0] == '\0')
     {
         return CHIP_ERROR_READ_FAILED;
     }
 
-    ReturnErrorOnFailure(ConnectivityUtils::GetWiFiBeaconLostCount(mWiFiIfName, count));
+    ReturnErrorOnFailure(ConnectivityUtils::GetWiFiBeaconLostCount(sWiFiIfName, count));
     VerifyOrReturnError(count >= mBeaconLostCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
     beaconLostCount = count - mBeaconLostCount;
 
@@ -1202,12 +1210,12 @@ CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBeaconLostCount(uint32_t & beaconLos
 
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
 {
-    if (mWiFiIfName[0] == '\0')
+    if (sWiFiIfName[0] == '\0')
     {
         return CHIP_ERROR_READ_FAILED;
     }
 
-    return ConnectivityUtils::GetWiFiCurrentMaxRate(mWiFiIfName, currentMaxRate);
+    return ConnectivityUtils::GetWiFiCurrentMaxRate(sWiFiIfName, currentMaxRate);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)

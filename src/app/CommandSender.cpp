@@ -113,7 +113,7 @@ void CommandSender::Close()
     }
 }
 
-CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
+CHIP_ERROR CommandSender::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::ClusterId clusterId;
@@ -121,7 +121,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     chip::EndpointId endpointId;
 
     {
-        CommandPath::Parser commandPath;
+        CommandPathIB::Parser commandPath;
 
         err = aCommandElement.GetCommandPath(&commandPath);
         SuccessOrExit(err);

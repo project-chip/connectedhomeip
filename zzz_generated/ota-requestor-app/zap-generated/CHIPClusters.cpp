@@ -75,7 +75,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancel
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // updateToken: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
     // newVersion: int32u
@@ -120,7 +120,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cance
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // updateToken: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
     // softwareVersion: int32u
@@ -167,7 +167,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // vendorId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
     // productId: int16u

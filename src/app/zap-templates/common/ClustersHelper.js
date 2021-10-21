@@ -189,15 +189,11 @@ function asChipCallback(item)
   }
 
   if (StringHelper.isCharString(item.type)) {
-    return { name : 'CharString', type : 'const chip::ByteSpan' };
+    return { name : 'CharString', type : 'const chip::CharSpan' };
   }
 
   if (ListHelper.isList(item.type)) {
     return { name : 'List', type : null };
-  }
-
-  if (item.type == 'boolean') {
-    return { name : 'Boolean', type : 'bool' };
   }
 
   const basicType = ChipTypesHelper.asBasicType(item.chipType);
@@ -212,6 +208,8 @@ function asChipCallback(item)
   case 'uint32_t':
   case 'uint64_t':
     return { name : 'Int' + basicType.replace(/[^0-9]/g, '') + 'u', type : basicType };
+  case 'bool':
+    return { name : 'Boolean', type : 'bool' };
   default:
     return { name : 'Unsupported', type : null };
   }
@@ -300,12 +298,14 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
 
   const enumItem = getEnum(enums, itemType);
   if (enumItem) {
-    itemType = enumItem.type;
+    item.isEnum = true;
+    itemType    = enumItem.type;
   }
 
   const bitmap = getBitmap(bitmaps, itemType);
   if (bitmap) {
-    itemType = bitmap.type;
+    item.isBitmap = true;
+    itemType      = bitmap.type;
   }
 
   const atomic = getAtomic(atomics, itemType);
