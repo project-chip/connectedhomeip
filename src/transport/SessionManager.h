@@ -265,11 +265,9 @@ public:
 
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress)
     {
-        Transport::UnauthenticatedSession * session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
-        if (session == nullptr)
-            return Optional<SessionHandle>::Missing();
-
-        return Optional<SessionHandle>::Value(SessionHandle(Transport::UnauthenticatedSessionHandle(*session)));
+        Optional<Transport::UnauthenticatedSessionHandle> session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
+        return session.HasValue() ? Optional<SessionHandle>::Value(SessionHandle(session.Value()))
+                                  : Optional<SessionHandle>::Missing();
     }
 
 private:
