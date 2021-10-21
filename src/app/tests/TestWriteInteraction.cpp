@@ -83,8 +83,7 @@ class TestWriteClientCallback : public chip::app::WriteClient::Callback
 {
 public:
     void ResetCounter() { mOnSuccessCalled = mOnErrorCalled = mOnDoneCalled = 0; }
-    void OnResponse(const WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path,
-                    Protocols::InteractionModel::Status imStatus) override
+    void OnResponse(const WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path, StatusIB status) override
     {
         mOnSuccessCalled++;
     }

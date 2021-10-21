@@ -884,6 +884,11 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callba
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
+template CHIP_ERROR
+ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
+    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo::Type & requestData, void * context,
+    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
+
 CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1000,6 +1005,32 @@ CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * c
     return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
                                                requestData, onSuccessCb, onFailureCb);
 };
+
+template <typename AttributeInfo>
+CHIP_ERROR ClusterBase::WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
+                                       WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
+
+    auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
+        if (successCb != nullptr)
+        {
+            successCb(context);
+        }
+    };
+
+    auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
+                                            CHIP_ERROR aError) {
+        if (failureCb != nullptr)
+        {
+            failureCb(context, app::ToEmberAfStatus(status.mStatus));
+        }
+    };
+
+    return chip::Controller::WriteAttribute<AttributeInfo>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
+                                                           mEndpoint, requestData, onSuccessCb, onFailureCb);
+}
 
 } // namespace Controller
 } // namespace chip

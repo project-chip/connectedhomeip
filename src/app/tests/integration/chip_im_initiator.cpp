@@ -187,7 +187,7 @@ public:
     void OnDone(chip::app::CommandSender * apCommandSender) override {}
 
     void OnResponse(const chip::app::WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path,
-                    chip::Protocols::InteractionModel::Status aStatus) override
+                    chip::app::StatusIB status) override
     {
         auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
         auto transitTime = respTime - gLastMessageTime;

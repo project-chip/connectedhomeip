@@ -25,6 +25,7 @@ chip_test_suite("interaction-tests") {
   if (chip_device_platform != "mbed" && chip_device_platform != "efr32") {
     test_sources = [ "TestCommands.cpp" ]
     test_sources += [ "TestRead.cpp" ]
+    test_sources += [ "TestWrite.cpp" ]
   }
 
   public_deps = [

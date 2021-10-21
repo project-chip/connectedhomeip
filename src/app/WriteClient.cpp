@@ -22,6 +22,7 @@
  *
  */
 
+#include "lib/core/CHIPError.h"
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/WriteClient.h>
@@ -286,12 +287,10 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     VerifyOrDie(apExchangeContext == mpExchangeCtx);
 
-    // Verify that the message is an Write Response.
-    // If not, close the exchange and free the payload.
-    if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse))
-    {
-        ExitNow();
-    }
+    // Verify that the message is an Write Response. If not, this is an unexpected message.
+    // Signal the error through the error callback and shutdown the client.
+    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse),
+                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     err = ProcessWriteResponseMessage(std::move(aPayload));
 
@@ -363,9 +362,9 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
         SuccessOrExit(err);
         if (mpCallback != nullptr)
         {
-            auto path = ConcreteAttributePath(attributePathParams.mEndpointId, attributePathParams.mClusterId,
-                                              attributePathParams.mFieldId);
-            mpCallback->OnResponse(this, path, statusIB.mStatus);
+            ConcreteAttributePath path(attributePathParams.mEndpointId, attributePathParams.mClusterId,
+                                       attributePathParams.mFieldId);
+            mpCallback->OnResponse(this, path, statusIB);
         }
     }
 

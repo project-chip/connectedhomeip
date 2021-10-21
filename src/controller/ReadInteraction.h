@@ -57,8 +57,7 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const Sessio
     auto callback = chip::Platform::MakeUnique<TypedReadCallback<AttributeTypeInfo>>(onSuccessCb, onErrorCb, onDone);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    err = engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, 0, callback.get());
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, 0, callback.get()));
 
     err = readClient->SendReadRequest(readParams);
     if (err != CHIP_NO_ERROR)

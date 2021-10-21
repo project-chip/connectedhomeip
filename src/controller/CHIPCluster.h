@@ -64,29 +64,7 @@ public:
 
     template <typename AttributeInfo>
     CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
-    {
-        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
-            if (successCb != nullptr)
-            {
-                successCb(context);
-            }
-        };
-
-        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath,
-                                                Protocols::InteractionModel::Status aInteractionModelStatus, CHIP_ERROR aError) {
-            if (failureCb != nullptr)
-            {
-                failureCb(context, app::ToEmberAfStatus(aInteractionModelStatus));
-            }
-        };
-
-        return WriteAttributeRequest<AttributeInfo>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                                    requestData, onSuccessCb, onFailureCb);
-    }
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}

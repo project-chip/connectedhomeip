@@ -180,6 +180,36 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
     return numActive;
 }
 
+uint32_t InteractionModelEngine::GetNumActiveWriteClients() const
+{
+    uint32_t numActive = 0;
+
+    for (auto & writeClient : mWriteClients)
+    {
+        if (!writeClient.IsFree())
+        {
+            numActive++;
+        }
+    }
+
+    return numActive;
+}
+
+uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
+{
+    uint32_t numActive = 0;
+
+    for (auto & writeHandler : mWriteHandlers)
+    {
+        if (!writeHandler.IsFree())
+        {
+            numActive++;
+        }
+    }
+
+    return numActive;
+}
+
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
     CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
