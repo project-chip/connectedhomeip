@@ -115,10 +115,12 @@ TestTarget Target(ClusterId cluster)
 struct TestEntryDelegate
 {
     FabricIndex fabricIndex = 0;
-    AuthMode authMode       = AuthMode::kNone; // kNone used as sentinel
+    AuthMode authMode       = AuthMode::kNone;
     Privilege privilege     = Privilege::kView;
     TestSubject subjects[kSubjectsPerEntry + 1];
     TestTarget targets[kTargetsPerEntry + 1];
+    const char* tag = "";
+    bool touched = false;
 };
 
 TestEntryDelegate entries[] = {
@@ -127,12 +129,14 @@ TestEntryDelegate entries[] = {
         .authMode    = AuthMode::kCase,
         .privilege   = Privilege::kAdminister,
         .subjects    = { Node(0x1122334455667788) },
+        .tag         = "1-admin",
     },
     {
         .fabricIndex = 2,
         .authMode    = AuthMode::kCase,
         .privilege   = Privilege::kAdminister,
         .subjects    = { Node(0x8877665544332211) },
+        .tag         = "2-admin",
     },
     {
         .fabricIndex = 2,
@@ -145,6 +149,7 @@ TestEntryDelegate entries[] = {
         .privilege   = Privilege::kView,
         .subjects    = { Passcode(0) },
         .targets     = { Target(kEndpoint2, kOnOffCluster) },
+        .tag         = "1-pase-view-onoff-2",
     },
     {
         .fabricIndex = 1,
@@ -177,8 +182,48 @@ TestEntryDelegate entries[] = {
         .privilege   = Privilege::kView,
         .subjects    = { Group(7) },
     },
-    {} // sentinel entry
+    {
+        .fabricIndex = 3,
+        .authMode    = AuthMode::kCase,
+        .privilege   = Privilege::kAdminister,
+    },
 };
+constexpr int kNumEntries = sizeof(entries) / sizeof(entries[0]);
+
+void ResetTouchedEntries()
+{
+    for (int i = 0; i < kNumEntries; ++i)
+    {
+        entries[i].touched = false;
+    }
+}
+
+bool EntriesTouchedToTag(const char * tag, FabricIndex fabricIndex)
+{
+    bool expectedTouched = true;
+
+    for (int i = 0; i < kNumEntries; ++i)
+    {
+        auto & entry = entries[i];
+        if (entry.fabricIndex == fabricIndex)
+        {
+            if (entry.touched != expectedTouched)
+            {
+                return false;
+            }
+            if (strcmp(entry.tag, tag) == 0)
+            {
+                expectedTouched = false;
+            }
+        }
+        else if (entry.touched)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 class TestEntry : public Entry
 {
@@ -272,13 +317,19 @@ public:
             {
                 entry.delegate = entries;
             }
-            else if (entry.delegate->authMode != AuthMode::kNone)
+            else if ((entry.delegate - entries) < kNumEntries)
             {
                 entry.delegate++;
             }
-        } while (entry.delegate->authMode != AuthMode::kNone && fabricFiltered && entry.delegate->fabricIndex != fabricIndex);
+        } while ((entry.delegate - entries) < kNumEntries && fabricFiltered && entry.delegate->fabricIndex != fabricIndex);
 
-        return (entry.delegate->authMode != AuthMode::kNone) ? &entry : nullptr;
+        if ((entry.delegate - entries) < kNumEntries)
+        {
+            entry.delegate->touched = true;
+            return &entry;
+        }
+
+        return nullptr;
     }
 
     void Release() override {}
@@ -330,11 +381,13 @@ void MetaTestIterator(nlTestSuite * inSuite, void * inContext)
         ++p;
     }
 
-    NL_TEST_ASSERT(inSuite, p == entries + sizeof(entries) / sizeof(entries[0]) - 1);
+    NL_TEST_ASSERT(inSuite, p == entries + kNumEntries);
 
     iterator->Release();
 }
 
+// Given the entries, test many cases to ensure AccessControl::Check both
+// returns the correct answer and has used the expected entries to do so
 void TestCheck(nlTestSuite * inSuite, void * inContext)
 {
     AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
@@ -345,28 +398,68 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
         RequestPath requestPath;
         Privilege privilege;
         CHIP_ERROR expectedResult;
+        const char * expectedTag;
     } checks[] = {
         // clang-format off
         {
             { .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
             { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
             Privilege::kAdminister,
-            CHIP_NO_ERROR
+            CHIP_NO_ERROR,
+            "1-admin",
         },
         {
-            { .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+            { .subject = 0x1111222233334444, .authMode = AuthMode::kCase, .fabricIndex = 1 },
             { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
             Privilege::kAdminister,
-            CHIP_ERROR_ACCESS_DENIED
+            CHIP_ERROR_ACCESS_DENIED,
+            "(end)",
+        },
+        {
+            { .subject = 0x0000000000000000, .authMode = AuthMode::kPase, .fabricIndex = 1 },
+            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+            Privilege::kAdminister,
+            CHIP_ERROR_ACCESS_DENIED,
+            "(end)",
+        },
+        {
+            { .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 2 },
+            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+            Privilege::kAdminister,
+            CHIP_NO_ERROR,
+            "2-admin",
+        },
+        {
+            { .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 2 },
+            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+            Privilege::kAdminister,
+            CHIP_ERROR_ACCESS_DENIED,
+            "(end)",
+        },
+        {
+            { .subject = 0x0000000000000000, .authMode = AuthMode::kPase, .fabricIndex = 2 },
+            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+            Privilege::kAdminister,
+            CHIP_ERROR_ACCESS_DENIED,
+            "(end)",
+        },
+        {
+            { .subject = 0x0000000000000000, .authMode = AuthMode::kPase, .fabricIndex = 1 },
+            { .endpoint = kEndpoint2, .cluster = kOnOffCluster },
+            Privilege::kView,
+            CHIP_NO_ERROR,
+            "1-pase-view-onoff-2",
         },
         // clang-format on
     };
 
     for (int i = 0; i < int(sizeof(checks) / sizeof(checks[0])); ++i)
     {
-        auto & check   = checks[i];
+        auto & check = checks[i];
+        ResetTouchedEntries();
         CHIP_ERROR err = context.Check(check.subjectDescriptor, check.requestPath, check.privilege);
         NL_TEST_ASSERT_LOOP(inSuite, i, err == check.expectedResult);
+        NL_TEST_ASSERT_LOOP(inSuite, i, EntriesTouchedToTag(check.expectedTag, check.subjectDescriptor.fabricIndex));
     }
 }
 
