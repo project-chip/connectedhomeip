@@ -139,16 +139,12 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
     size_t count = 0;
-    {
-      auto iter = list.begin();
-      while (iter.Next()) {
-        ++count;
-      }
-      if (iter.GetStatus() != CHIP_NO_ERROR) {
-        command->SetCommandExitStatus(iter.GetStatus());
-        return;
-      }
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR) {
+      command->SetCommandExitStatus(err);
+      return;
     }
+
     ChipLogProgress(chipTool, "On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse: %zu entries", count);
 
     auto iter = list.begin();
@@ -180,8 +176,7 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
         {{/if}}
         {{/if}}
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 {{/if}}

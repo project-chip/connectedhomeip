@@ -394,15 +394,9 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
     CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
     Commands::TestListInt8UReverseRequest::DecodableType const & commandData)
 {
-    size_t count = 0;
-    {
-        auto iter = commandData.arg1.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR, );
-    }
+    size_t count   = 0;
+    CHIP_ERROR err = commandData.arg1.ComputeSize(&count);
+    VerifyOrExit(err == CHIP_NO_ERROR, );
 
     {
         auto iter = commandData.arg1.begin();
