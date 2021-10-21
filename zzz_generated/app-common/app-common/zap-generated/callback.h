@@ -398,14 +398,6 @@ void emberAfBallastConfigurationClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Illuminance Level Sensing Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfIlluminanceLevelSensingClusterInitCallback(chip::EndpointId endpoint);
-
 /** @brief Temperature Measurement Cluster Init
  *
  * Cluster Init
@@ -5485,110 +5477,6 @@ void emberAfIlluminanceMeasurementClusterServerTickCallback(chip::EndpointId end
  * @param endpoint  Endpoint that is being served
  */
 void emberAfIlluminanceMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
-// Illuminance Level Sensing Cluster
-//
-
-/** @brief Illuminance Level Sensing Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfIlluminanceLevelSensingClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Illuminance Level Sensing Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfIlluminanceLevelSensingClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Illuminance Level Sensing Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterIlluminanceLevelSensingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Illuminance Level Sensing Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterIlluminanceLevelSensingClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Illuminance Level Sensing Cluster Server Message Sent
- *
- * Server Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfIlluminanceLevelSensingClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                    EmberStatus status);
-
-/** @brief Illuminance Level Sensing Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfIlluminanceLevelSensingClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                    EmberStatus status);
-
-/** @brief Illuminance Level Sensing Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterIlluminanceLevelSensingClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Illuminance Level Sensing Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterIlluminanceLevelSensingClusterClientPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Illuminance Level Sensing Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfIlluminanceLevelSensingClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Illuminance Level Sensing Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfIlluminanceLevelSensingClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Temperature Measurement Cluster

@@ -117,6 +117,10 @@
 @property (readonly) chip::Controller::IdentifyCluster cppCluster;
 @end
 
+@interface CHIPIlluminanceMeasurement ()
+@property (readonly) chip::Controller::IlluminanceMeasurementCluster cppCluster;
+@end
+
 @interface CHIPKeypadInput ()
 @property (readonly) chip::Controller::KeypadInputCluster cppCluster;
 @end
