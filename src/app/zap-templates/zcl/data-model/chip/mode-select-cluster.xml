@@ -47,8 +47,6 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="START_UP_MODE"   type="INT8U"                                            writable="false" optional="false">StartUpMode</attribute>
     <attribute side="server" code="0x0004" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false">Description</attribute>
 
-    <!-- This attribute should not be enabled on the server side -->
-
     <!-- Test Commands -->
     <command source="client" code="0x00" name="ChangeToMode" optional="false">
       <description>
