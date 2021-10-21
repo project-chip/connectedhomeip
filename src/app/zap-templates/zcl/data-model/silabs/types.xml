@@ -243,18 +243,10 @@ limitations under the License.
   <enum name="ColorControlOptions" type="BITMAP8">
     <item name="ExecuteIfOff" value="0x1"/>
   </enum>
-  <enum name="MeasurementLightSensorType" type="ENUM8">
-    <item name="photodiode" value="0x0"/>
-    <item name="CMOS" value="0x1"/>
-  </enum>
   <enum name="LevelStatus" type="ENUM8">
     <item name="OnTarget" value="0x0"/>
     <item name="BelowTarget" value="0x1"/>
     <item name="AboveTarget" value="0x2"/>
-  </enum>
-  <enum name="SensingLightSensorType" type="ENUM8">
-    <item name="photodiode" value="0x0"/>
-    <item name="CMOS" value="0x1"/>
   </enum>
   <enum name="OccupancySensorType" type="ENUM8">
     <item name="PIR" value="0x0"/>
