@@ -1142,7 +1142,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<OperationalCredentialsClusterNOCResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText);
+    static void OnSuccessFn(void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::CharSpan DebugText);
 };
 
 class CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge

@@ -423,15 +423,6 @@ limitations under the License.
     <item name="status" type="Status"/>
     <item name="attributeId" type="ATTRIB_ID"/>
   </struct>
-  <struct name="DiscoverAttributesInfoRecord">
-    <item name="attributeId" type="ATTRIB_ID"/>
-    <item name="attributeType" type="INT8U"/>
-  </struct>
-  <struct name="ExtendedDiscoverAttributesInfoRecord">
-    <item name="attributeId" type="ATTRIB_ID"/>
-    <item name="attributeType" type="INT8U"/>
-    <item name="attributeAccessControl" type="INT8U"/>
-  </struct>
   <struct name="ReadStructuredAttributeRecord">
     <item name="attributeId" type="ATTRIB_ID"/>
     <item name="indicator" type="INT8U"/>
