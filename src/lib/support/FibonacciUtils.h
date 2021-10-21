@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace chip {
 
 /**
