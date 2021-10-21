@@ -130,44 +130,6 @@ static CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddr
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if INET_CONFIG_ENABLE_IPV4
-#if LWIP_IPV4 && LWIP_IGMP
-static CHIP_ERROR LwIPIPv4JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
-                                                  err_t (*aMethod)(struct netif *, const ip4_addr_t *))
-{
-    struct netif * const lNetif = IPEndPointBasis::FindNetifFromInterfaceId(aInterfaceId);
-    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-
-    const ip4_addr_t lIPv4Address = aAddress.ToIPv4();
-    const err_t lStatus           = aMethod(lNetif, &lIPv4Address);
-
-    if (lStatus == ERR_MEM)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    return chip::System::MapErrorLwIP(lStatus);
-}
-#endif // LWIP_IPV4 && LWIP_IGMP
-#endif // INET_CONFIG_ENABLE_IPV4
-
-#ifdef HAVE_IPV6_MULTICAST
-static CHIP_ERROR LwIPIPv6JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
-                                                  err_t (*aMethod)(struct netif *, const ip6_addr_t *))
-{
-    struct netif * const lNetif = IPEndPointBasis::FindNetifFromInterfaceId(aInterfaceId);
-    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-
-    const ip6_addr_t lIPv6Address = aAddress.ToIPv6();
-    const err_t lStatus           = aMethod(lNetif, &lIPv6Address);
-
-    if (lStatus == ERR_MEM)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    return chip::System::MapErrorLwIP(lStatus);
-}
-#endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
-
 CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
 {
     CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
@@ -216,6 +178,44 @@ CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
 void IPEndPointBasis::InitImpl() {}
 
 #if INET_CONFIG_ENABLE_IPV4
+#if LWIP_IPV4 && LWIP_IGMP
+static CHIP_ERROR LwIPIPv4JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
+                                                  err_t (*aMethod)(struct netif *, const ip4_addr_t *))
+{
+    struct netif * const lNetif = IPEndPointBasis::FindNetifFromInterfaceId(aInterfaceId);
+    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+    const ip4_addr_t lIPv4Address = aAddress.ToIPv4();
+    const err_t lStatus           = aMethod(lNetif, &lIPv4Address);
+
+    if (lStatus == ERR_MEM)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return chip::System::MapErrorLwIP(lStatus);
+}
+#endif // LWIP_IPV4 && LWIP_IGMP
+#endif // INET_CONFIG_ENABLE_IPV4
+
+#ifdef HAVE_IPV6_MULTICAST
+static CHIP_ERROR LwIPIPv6JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
+                                                  err_t (*aMethod)(struct netif *, const ip6_addr_t *))
+{
+    struct netif * const lNetif = IPEndPointBasis::FindNetifFromInterfaceId(aInterfaceId);
+    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+    const ip6_addr_t lIPv6Address = aAddress.ToIPv6();
+    const err_t lStatus           = aMethod(lNetif, &lIPv6Address);
+
+    if (lStatus == ERR_MEM)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return chip::System::MapErrorLwIP(lStatus);
+}
+#endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+
+#if INET_CONFIG_ENABLE_IPV4
 CHIP_ERROR IPEndPointBasis::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #if LWIP_IPV4 && LWIP_IGMP
@@ -235,6 +235,24 @@ CHIP_ERROR IPEndPointBasis::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfa
 #else  // HAVE_IPV6_MULTICAST
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // HAVE_IPV6_MULTICAST
+}
+
+struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
+{
+    struct netif * lRetval = NULL;
+
+#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+    NETIF_FOREACH(lRetval)
+    {
+        if (lRetval == aInterfaceId)
+            break;
+    }
+#else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
+    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId; lRetval = lRetval->next)
+        ;
+#endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+
+    return (lRetval);
 }
 
 void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle && aBuffer)
@@ -257,32 +275,6 @@ void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle && aBuffer)
     }
 }
 
-/**
- *  @brief Get LwIP IP layer source and destination addressing information.
- *
- *  @param[in]   aBuffer       the packet buffer containing the IP message
- *
- *  @returns  a pointer to the address information on success; otherwise,
- *            NULL if there is insufficient space in the packet for
- *            the address information.
- *
- *  @details
- *     When using LwIP information about the packet is 'hidden' in the
- *     reserved space before the start of the data in the packet
- *     buffer. This is necessary because the system layer events only
- *     have two arguments, which in this case are used to convey the
- *     pointer to the end point and the pointer to the buffer.
- *
- *     In most cases this trick of storing information before the data
- *     works because the first buffer in an LwIP IP message contains
- *     the space that was used for the Ethernet/IP/UDP headers. However,
- *     given the current size of the IPPacketInfo structure (40 bytes),
- *     it is possible for there to not be enough room to store the
- *     structure along with the payload in a single packet buffer. In
- *     practice, this should only happen for extremely large IPv4
- *     packets that arrive without an Ethernet header.
- *
- */
 IPPacketInfo * IPEndPointBasis::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
 {
     uintptr_t lStart;
@@ -316,24 +308,6 @@ CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::LayerLwIP * aLay
         static_cast<void>(std::move(aBuffer).UnsafeRelease());
     }
     return error;
-}
-
-struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
-{
-    struct netif * lRetval = NULL;
-
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
-    NETIF_FOREACH(lRetval)
-    {
-        if (lRetval == aInterfaceId)
-            break;
-    }
-#else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
-    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId; lRetval = lRetval->next)
-        ;
-#endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
-
-    return (lRetval);
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -387,7 +361,24 @@ static CHIP_ERROR SocketsSetMulticastLoopback(int aSocket, IPVersion aIPVersion,
 #endif // IPV6_MULTICAST_LOOP
 }
 
+CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
+{
+    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
+
+    lRetval = SocketsSetMulticastLoopback(mSocket, aIPVersion, aLoopback);
+    SuccessOrExit(lRetval);
+
+exit:
+    return (lRetval);
+}
+
+void IPEndPointBasis::InitImpl()
+{
+    mBoundIntfId = INET_NULL_INTERFACEID;
+}
+
 #if INET_CONFIG_ENABLE_IPV4
+
 static CHIP_ERROR SocketsIPv4JoinLeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                      int aCommand)
 {
@@ -422,6 +413,12 @@ static CHIP_ERROR SocketsIPv4JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
     }
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR IPEndPointBasis::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+{
+    return SocketsIPv4JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP);
+}
+
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #if INET_IPV6_ADD_MEMBERSHIP || INET_IPV6_DROP_MEMBERSHIP
@@ -445,29 +442,6 @@ static CHIP_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
     return CHIP_NO_ERROR;
 }
 #endif // INET_IPV6_ADD_MEMBERSHIP || INET_IPV6_DROP_MEMBERSHIP
-
-CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
-{
-    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
-
-    lRetval = SocketsSetMulticastLoopback(mSocket, aIPVersion, aLoopback);
-    SuccessOrExit(lRetval);
-
-exit:
-    return (lRetval);
-}
-
-void IPEndPointBasis::InitImpl()
-{
-    mBoundIntfId = INET_NULL_INTERFACEID;
-}
-
-#if INET_CONFIG_ENABLE_IPV4
-CHIP_ERROR IPEndPointBasis::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
-{
-    return SocketsIPv4JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP);
-}
-#endif // INET_CONFIG_ENABLE_IPV4
 
 CHIP_ERROR IPEndPointBasis::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
@@ -987,36 +961,6 @@ CHIP_ERROR IPEndPointBasis::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfa
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters)
-{
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-    nw_protocol_stack_t protocolStack = nw_parameters_copy_default_protocol_stack(aParameters);
-    nw_protocol_options_t ipOptions   = nw_protocol_stack_copy_internet_protocol(protocolStack);
-
-    switch (aAddressType)
-    {
-
-    case IPAddressType::kIPv6:
-        nw_ip_options_set_version(ipOptions, nw_ip_version_6);
-        break;
-
-#if INET_CONFIG_ENABLE_IPV4
-    case IPAddressType::kIPv4:
-        nw_ip_options_set_version(ipOptions, nw_ip_version_4);
-        break;
-#endif // INET_CONFIG_ENABLE_IPV4
-
-    default:
-        res = INET_ERROR_WRONG_ADDRESS_TYPE;
-        break;
-    }
-    nw_release(ipOptions);
-    nw_release(protocolStack);
-
-    return res;
-}
-
 CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
                                  const nw_parameters_t & aParameters)
 {
@@ -1085,6 +1029,36 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     dispatch_release(content);
 
     dispatch_semaphore_wait(mSendSemaphore, DISPATCH_TIME_FOREVER);
+
+    return res;
+}
+
+CHIP_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters)
+{
+    CHIP_ERROR res = CHIP_NO_ERROR;
+
+    nw_protocol_stack_t protocolStack = nw_parameters_copy_default_protocol_stack(aParameters);
+    nw_protocol_options_t ipOptions   = nw_protocol_stack_copy_internet_protocol(protocolStack);
+
+    switch (aAddressType)
+    {
+
+    case IPAddressType::kIPv6:
+        nw_ip_options_set_version(ipOptions, nw_ip_version_6);
+        break;
+
+#if INET_CONFIG_ENABLE_IPV4
+    case IPAddressType::kIPv4:
+        nw_ip_options_set_version(ipOptions, nw_ip_version_4);
+        break;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    default:
+        res = INET_ERROR_WRONG_ADDRESS_TYPE;
+        break;
+    }
+    nw_release(ipOptions);
+    nw_release(protocolStack);
 
     return res;
 }
