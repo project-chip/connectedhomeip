@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 /**
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
  * CommandInfo has a functional interface to invoke arbitrary commands based on cluster, callback
  * and a map of arguments, a Supplier that provides {@link DelegatedClusterCallback}, and maps the
  * parameter and commandParametersInfo.
@@ -25,6 +26,11 @@ public class CommandInfo {
  * callback and a map of arguments, a Supplier that provides {@link DelegatedClusterCallback}, and
  * maps the parameter and commandParametersInfo.
 >>>>>>> 4054a1371 (modify description of each new added class)
+=======
+ * CommandInfo has a functional interface to invoke arbitrary commands based on cluster, callback
+ * and a map of arguments, a Supplier that provides {@link DelegatedClusterCallback}, and maps the
+ * parameter and commandParametersInfo.
+>>>>>>> 68e157c68 (Restyled by google-java-format)
  */
 <<<<<<< HEAD
 
