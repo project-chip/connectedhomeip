@@ -27,6 +27,7 @@ const path              = require('path');
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
 const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
+const { LogCommands }                   = require('./simulated-clusters/TestLogCommands.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
 const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templates/templates/app/helper.js');
 
@@ -263,18 +264,31 @@ function getClusters()
 {
   // Create a new array to merge the configured clusters list and test
   // simulated clusters.
-  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands));
+  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands, LogCommands));
 }
 
 function getCommands(clusterName)
 {
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.commands) : Clusters.getClientCommands(clusterName);
+  switch (clusterName) {
+  case DelayCommands.name:
+    return Promise.resolve(DelayCommands.commands);
+  case LogCommands.name:
+    return Promise.resolve(LogCommands.commands);
+  default:
+    return Clusters.getClientCommands(clusterName);
+  }
 }
 
 function getAttributes(clusterName)
 {
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.attributes)
-                                             : Clusters.getServerAttributes(clusterName);
+  switch (clusterName) {
+  case DelayCommands.name:
+    return Promise.resolve(DelayCommands.attributes);
+  case LogCommands.name:
+    return Promise.resolve(LogCommands.attributes);
+  default:
+    return Clusters.getServerAttributes(clusterName);
+  }
 }
 
 function assertCommandOrAttribute(context)
@@ -341,7 +355,11 @@ function chip_tests_items(options)
 
 function isTestOnlyCluster(name)
 {
-  return name == DelayCommands.name;
+  const testOnlyClusters = [
+    DelayCommands.name,
+    LogCommands.name,
+  ];
+  return testOnlyClusters.includes(name);
 }
 
 function chip_tests_item_response_type(options)

@@ -44,6 +44,7 @@ public:
 
     /////////// GlobalCommands Interface /////////
     CHIP_ERROR WaitForMs(uint32_t ms);
+    CHIP_ERROR Log(const char * message);
 
 protected:
     ChipDevice * mDevice;
