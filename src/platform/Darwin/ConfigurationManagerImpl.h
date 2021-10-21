@@ -53,36 +53,7 @@ private:
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
-
-    // ===== Members for internal use by the following friends.
-
-    friend ConfigurationManager & ConfigurationMgr(void);
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
-
-    static ConfigurationManagerImpl sInstance;
 };
-
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the ESP32 platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

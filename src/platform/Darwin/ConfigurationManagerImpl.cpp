@@ -128,9 +128,19 @@ exit:
 }
 #endif // TARGET_OS_OSX
 
-/** Singleton instance of the ConfigurationManager implementation object.
+/** Singleton pointer to the ConfigurationManager implementation.
  */
-ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
+ConfigurationManager * gInstance;
+
+ConfigurationManager & ConfigurationMgr()
+{
+    return *gInstance;
+}
+
+void SetConfigurationMgr(ConfigurationManager & configurationManager)
+{
+    gInstance = &configurationManager;
+}
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {

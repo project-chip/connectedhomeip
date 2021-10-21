@@ -36,9 +36,19 @@ namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
-/** Singleton instance of the ConfigurationManager implementation object.
+/** Singleton pointer to the ConfigurationManager implementation.
  */
-ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
+ConfigurationManager * gInstance;
+
+ConfigurationManager & ConfigurationMgr()
+{
+    return *gInstance;
+}
+
+void SetConfigurationMgr(ConfigurationManager & configurationManager)
+{
+    gInstance = &configurationManager;
+}
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
