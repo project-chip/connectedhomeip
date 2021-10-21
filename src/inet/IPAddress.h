@@ -117,6 +117,7 @@ union SockAddr
     sockaddr any;
     sockaddr_in in;
     sockaddr_in6 in6;
+    sockaddr_storage storage;
 };
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 

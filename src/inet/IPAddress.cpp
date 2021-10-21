@@ -72,7 +72,7 @@ IPAddress & IPAddress::operator=(const IPAddress & other)
 
 IPAddress::IPAddress(const ip6_addr_t & ipv6Addr)
 {
-    static_assert(sizeof(*this) == sizeof(Addr), "ip6_addr_t size mismatch");
+    static_assert(sizeof(ip6_addr_t) == sizeof(Addr), "ip6_addr_t size mismatch");
     memcpy(Addr, &ipv6Addr, sizeof(ipv6Addr));
 }
 
