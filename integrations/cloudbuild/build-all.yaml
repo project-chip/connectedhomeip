@@ -37,7 +37,7 @@ artifacts:
         location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"
         paths: ["/workspace/artifacts/*.tar.gz"]
 
-# Using higher CPU machines generally speeds up builds by > 4x (faster as we spend more time
-# building instead of docker download/checkout/bootstrap)
+# Using higher CPU machines generally speeds up builds, except bootstrap is always
+# slow.
 options:
-    machineType: "E2_HIGHCPU_8"
+    machineType: "E2_HIGHCPU_32"
