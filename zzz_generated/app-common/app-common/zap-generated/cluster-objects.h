@@ -21966,8 +21966,8 @@ namespace Attributes {
 namespace BasicIdentification {
 struct TypeInfo
 {
-    using Type          = uint8_t *;
-    using DecodableType = uint8_t *;
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BasicIdentification::Id; }
