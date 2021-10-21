@@ -2072,7 +2072,7 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void retrieveLogsRequest(
-        DefaultClusterCallback callback,
+        RetrieveLogsResponseCallback callback,
         int intent,
         int requestedProtocol,
         byte[] transferFileDesignator) {
@@ -2082,10 +2082,16 @@ public class ChipClusters {
 
     private native void retrieveLogsRequest(
         long chipClusterPtr,
-        DefaultClusterCallback callback,
+        RetrieveLogsResponseCallback callback,
         int intent,
         int requestedProtocol,
         byte[] transferFileDesignator);
+
+    public interface RetrieveLogsResponseCallback {
+      void onSuccess(int status, byte[] content, long timeStamp, long timeSinceBoot);
+
+      void onError(Exception error);
+    }
   }
 
   public static class DoorLockCluster extends BaseChipCluster {

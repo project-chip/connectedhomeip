@@ -1690,10 +1690,11 @@ using chip::Callback::Cancelable;
      transferFileDesignator:(NSData *)transferFileDesignator
             responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.RetrieveLogsRequest(
-            success, failure, intent, requestedProtocol, [self asByteSpan:transferFileDesignator]);
-    });
+    new CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.RetrieveLogsRequest(
+                success, failure, intent, requestedProtocol, [self asByteSpan:transferFileDesignator]);
+        });
 }
 
 @end

@@ -830,6 +830,23 @@ bool emberAfContentLauncherClusterLaunchURLResponseCallback(EndpointId endpoint,
     return true;
 }
 
+bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
+                                                              chip::ByteSpan content, uint32_t timeStamp, uint32_t timeSinceBoot)
+{
+    ChipLogProgress(Zcl, "RetrieveLogsResponse:");
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
+    ChipLogProgress(Zcl, "  content: %zu", content.size());
+    ChipLogProgress(Zcl, "  timeStamp: %" PRIu32 "", timeStamp);
+    ChipLogProgress(Zcl, "  timeSinceBoot: %" PRIu32 "", timeSinceBoot);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("DiagnosticLogsClusterRetrieveLogsResponseCallback");
+
+    Callback::Callback<DiagnosticLogsClusterRetrieveLogsResponseCallback> * cb =
+        Callback::Callback<DiagnosticLogsClusterRetrieveLogsResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, status, content, timeStamp, timeSinceBoot);
+    return true;
+}
+
 bool emberAfDoorLockClusterClearAllPinsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
 {
     ChipLogProgress(Zcl, "ClearAllPinsResponse:");
