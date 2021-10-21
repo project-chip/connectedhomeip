@@ -215,10 +215,6 @@ static void PrintNetworkState()
             }
         }
     }
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    char dnsServerAddrStr[DNS_MAX_NAME_LENGTH];
-    printf("  DNS Server: %s\n", gNetworkOptions.DNSServerAddr.ToString(dnsServerAddrStr, sizeof(dnsServerAddrStr)));
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -417,23 +413,6 @@ void InitNetwork()
             netif_ip6_addr_set_state(&(sNetIFs[j]), 1, 0x30);
         }
     }
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    if (gNetworkOptions.DNSServerAddr != IPAddress::Any)
-    {
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        ip_addr_t dnsServerAddr = gNetworkOptions.DNSServerAddr.ToLwIPAddr();
-#else // LWIP_VERSION_MAJOR <= 1
-#if INET_CONFIG_ENABLE_IPV4
-        ip_addr_t dnsServerAddr = gNetworkOptions.DNSServerAddr.ToIPv4();
-#else // !INET_CONFIG_ENABLE_IPV4
-#error "No support for DNS Resolver without IPv4!"
-#endif // !INET_CONFIG_ENABLE_IPV4
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-
-        dns_setserver(0, &dnsServerAddr);
-    }
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
     PrintNetworkState();
 

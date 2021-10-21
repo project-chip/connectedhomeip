@@ -62,6 +62,8 @@ public:
         mFilterType(filterType), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID },
         mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -146,7 +148,7 @@ public:
     }
 
     /////////// CHIPCommand Interface /////////
-    CHIP_ERROR Run(NodeId remoteId) override;
+    CHIP_ERROR RunCommand() override;
     uint16_t GetWaitDurationInSeconds() const override { return 120; }
     void Shutdown() override;
 
@@ -164,8 +166,8 @@ public:
 
     /////////// Network Commissioning Callbacks /////////
     static void OnDefaultFailureResponse(void * context, uint8_t status);
-    static void OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
-    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnAddNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -192,7 +194,7 @@ private:
     const PairingNetworkType mNetworkType;
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
-    NodeId mRemoteId;
+    NodeId mNodeId;
     uint16_t mRemotePort;
     uint64_t mFabricId;
     uint16_t mTimeout;

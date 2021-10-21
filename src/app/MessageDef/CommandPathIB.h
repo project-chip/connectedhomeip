@@ -17,7 +17,7 @@
  */
 /**
  *    @file
- *      This file defines CommandPath parser and builder in CHIP interaction model
+ *      This file defines CommandPathIB parser and builder in CHIP interaction model
  *
  */
 
@@ -35,13 +35,12 @@
 
 namespace chip {
 namespace app {
-namespace CommandPath {
+namespace CommandPathIB {
 enum
 {
     kCsTag_EndpointId = 0,
-    kCsTag_GroupId    = 1,
-    kCsTag_ClusterId  = 2,
-    kCsTag_CommandId  = 3,
+    kCsTag_ClusterId  = 1,
+    kCsTag_CommandId  = 2,
 };
 
 class Parser : public chip::app::Parser
@@ -50,7 +49,7 @@ public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandPath
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandPathIB
      *
      *  @return #CHIP_NO_ERROR on success
      */
@@ -85,17 +84,6 @@ public:
     CHIP_ERROR GetEndpointId(chip::EndpointId * const apEndpointId) const;
 
     /**
-     *  @brief Get a TLVReader for the GroupId. Next() must be called before accessing them.
-     *
-     *  @param [in] apGroupId    A pointer to apGroupId
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetGroupId(chip::GroupId * const apGroupId) const;
-
-    /**
      *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them.
      *
      *  @param [in] apClusterId    A pointer to ClusterId
@@ -122,7 +110,7 @@ class Builder : public chip::app::Builder
 {
 public:
     /**
-     *  @brief Initialize a CommandPath::Builder for writing into a TLV stream
+     *  @brief Initialize a CommandPathIB::Builder for writing into a TLV stream
      *
      *  @param [in] apWriter    A pointer to TLVWriter
      *
@@ -131,7 +119,7 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     * Init the CommandPath container with an particular context tag.
+     * Init the CommandPathIB container with an particular context tag.
      * Required to implement arrays of arrays, and to test ListBuilder.
      *
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
@@ -148,16 +136,7 @@ public:
      *
      *  @return A reference to *this
      */
-    CommandPath::Builder & EndpointId(const chip::EndpointId aEndpointId);
-
-    /**
-     *  @brief Inject GroupId into the TLV stream to indicate the GroupId referenced by the path.
-     *
-     *  @param [in] aGroupId  Group Id for this Command path
-     *
-     *  @return A reference to *this
-     */
-    CommandPath::Builder & GroupId(const chip::GroupId aGroupId);
+    CommandPathIB::Builder & EndpointId(const chip::EndpointId aEndpointId);
 
     /**
      *  @brief Inject ClusterId into the TLV stream.
@@ -166,7 +145,7 @@ public:
      *
      *  @return A reference to *this
      */
-    CommandPath::Builder & ClusterId(const chip::ClusterId aClusterId);
+    CommandPathIB::Builder & ClusterId(const chip::ClusterId aClusterId);
 
     /**
      *  @brief Inject CommandId into the TLV stream
@@ -175,19 +154,19 @@ public:
      *
      *  @return A reference to *this
      */
-    CommandPath::Builder & CommandId(const chip::CommandId aCommandId);
+    CommandPathIB::Builder & CommandId(const chip::CommandId aCommandId);
 
     /**
-     *  @brief Mark the end of this CommandPath
+     *  @brief Mark the end of this CommandPathIB
      *
      *  @return A reference to *this
      */
-    CommandPath::Builder & EndOfCommandPath();
+    CommandPathIB::Builder & EndOfCommandPath();
 
 private:
     CHIP_ERROR _Init(TLV::TLVWriter * const apWriter, const TLV::Tag aTag);
 };
-}; // namespace CommandPath
+}; // namespace CommandPathIB
 
 }; // namespace app
 }; // namespace chip

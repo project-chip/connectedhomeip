@@ -1,6 +1,8 @@
 {{> header}}
 {{#if (chip_has_client_clusters)}}
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/DecodableList.h>
 #include <zap-generated/CHIPClusters.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
@@ -328,8 +330,7 @@ class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callba
             {{#if (isOctetString type)}}
             jbyteArray {{asSymbol label}}Arr;
             {{else if (isShortString type)}}
-            // ByteSpan is not properly returned yet, temporarily use empty string
-            UtfString {{asSymbol label}}Str(env, "");
+            UtfString {{asSymbol label}}Str(env, {{asSymbol label}});
             {{/if}}
             {{/chip_cluster_response_arguments}}
 
@@ -412,7 +413,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
             }
         }
 
-        static void CallbackFn(void * context, uint16_t count, {{chipType}} * entries)
+        static void CallbackFn(void * context, const app::DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list)
         {
             chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
@@ -451,17 +452,19 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
             VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find {{asUpperCamelCase name}}Attribute constructor"));
             {{/if}}
 
-            for (uint16_t i = 0; i < count; i++)
+            auto iter = list.begin();
+            while (iter.Next())
             {
+                auto & entry = iter.GetValue();
                 {{#if isStruct}}
                 {{#chip_attribute_list_entryTypes}}
                 {{#if (isOctetString type)}}
-                jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entries[i].{{name}}.size());
-                env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entries[i].{{name}}.size(), reinterpret_cast<const jbyte *>(entries[i].{{name}}.data()));
+                jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entry.{{asLowerCamelCase name}}.size());
+                env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entry.{{asLowerCamelCase name}}.size(), reinterpret_cast<const jbyte *>(entry.{{asLowerCamelCase name}}.data()));
                 {{else if (isCharString type)}}
                 // Implement after ByteSpan is emitted instead of uint8_t *.
                 {{else}}
-                {{asJniBasicType type}} {{asLowerCamelCase name}} = entries[i].{{name}};
+                {{asJniBasicType type}} {{asLowerCamelCase name}} = entry.{{asLowerCamelCase name}};
                 {{/if}}
                 {{/chip_attribute_list_entryTypes}}
 
@@ -475,19 +478,20 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
                 env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
                 {{else}}
                 {{#if (isOctetString type)}}
-                jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entries[i].size());
-                env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entries[i].size(), reinterpret_cast<const jbyte *>(entries[i].data()));
+                jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entry.size());
+                env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entry.size(), reinterpret_cast<const jbyte *>(entry.data()));
                 {{else if (isCharString type)}}
                 // Implement after ByteSpan is emitted instead of uint8_t *
                 {{else}}
                 jclass entryTypeCls;
                 JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", entryTypeCls);
                 jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "({{asJniSignature type}})V");
-                jobject {{asLowerCamelCase name}} = env->NewObject(entryTypeCls, entryTypeCtor, entries[i]);
+                jobject {{asLowerCamelCase name}} = env->NewObject(entryTypeCls, entryTypeCtor, entry);
                 {{/if}}
                 env->CallBooleanMethod(arrayListObj, arrayListAddMethod, {{asLowerCamelCase name}});
                 {{/if}}
             }
+            VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR, ChipLogError(Zcl, "Error decoding {{asUpperCamelCase name}}Attribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
             env->ExceptionClear();
             env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -521,19 +525,19 @@ JNI_METHOD(jlong, {{asUpperCamelCase name}}Cluster, initWithDevice)(JNIEnv * env
 }
 
 {{#chip_cluster_commands}}
-JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback{{#chip_cluster_command_arguments}}, {{asJniBasicType type}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}})
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asJniBasicType type}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}})
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     {{asUpperCamelCase ../name}}Cluster * cppCluster;
     
-    {{#chip_cluster_command_arguments}}
+    {{#chip_cluster_command_arguments_with_structs_expanded}}
     {{#if (isOctetString type)}}
     JniByteArray {{asLowerCamelCase label}}Arr(env, {{asLowerCamelCase label}});
     {{else if (isCharString type)}}
     JniUtfString {{asLowerCamelCase label}}Str(env, {{asLowerCamelCase label}});
     {{/if}}
-    {{/chip_cluster_command_arguments}}
+    {{/chip_cluster_command_arguments_with_structs_expanded}}
 
     {{#if hasSpecificResponse}}
     std::unique_ptr<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback, void (*)(CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback *)> onSuccess(
@@ -548,7 +552,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
     cppCluster = reinterpret_cast<{{asUpperCamelCase ../name}}Cluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asLowerCamelCase label}}Arr.data(), {{asLowerCamelCase label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asLowerCamelCase label}}, strlen({{asLowerCamelCase label}}Str.c_str())){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments}});
+    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asLowerCamelCase label}}Arr.data(), {{asLowerCamelCase label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asLowerCamelCase label}}, strlen({{asLowerCamelCase label}}Str.c_str())){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}});
     SuccessOrExit(err);
 
 exit: 

@@ -18,9 +18,9 @@
 
 #include "TestCommand.h"
 
-CHIP_ERROR TestCommand::Run(NodeId remoteId)
+CHIP_ERROR TestCommand::RunCommand()
 {
-    return mController.GetConnectedDevice(remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
@@ -116,6 +116,19 @@ bool TestCommand::CheckValueAsList(const char * itemName, uint64_t current, uint
 bool TestCommand::CheckValueAsString(const char * itemName, const chip::ByteSpan current, const char * expected)
 {
     const chip::ByteSpan expectedArgument = chip::ByteSpan(chip::Uint8::from_const_char(expected), strlen(expected));
+
+    if (!current.data_equal(expectedArgument))
+    {
+        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
+        return false;
+    }
+
+    return true;
+}
+
+bool TestCommand::CheckValueAsString(const char * itemName, const chip::CharSpan current, const char * expected)
+{
+    const chip::CharSpan expectedArgument(expected, strlen(expected));
     if (!current.data_equal(expectedArgument))
     {
         Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));

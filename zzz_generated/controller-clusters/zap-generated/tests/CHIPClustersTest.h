@@ -507,6 +507,18 @@ public:
 
     CHIP_ERROR WriteAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint8_t value);
+    CHIP_ERROR WriteAttributeRemainingTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t value);
+    CHIP_ERROR WriteAttributeMinLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint8_t value);
+    CHIP_ERROR WriteAttributeMaxLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint8_t value);
+    CHIP_ERROR WriteAttributeCurrentFrequency(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t value);
+    CHIP_ERROR WriteAttributeMinFrequency(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
+    CHIP_ERROR WriteAttributeMaxFrequency(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -706,12 +718,42 @@ public:
                                       uint16_t value);
     CHIP_ERROR WriteAttributeMaxFlow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                      uint16_t value);
+    CHIP_ERROR WriteAttributeMinConstPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              int16_t value);
+    CHIP_ERROR WriteAttributeMaxConstPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              int16_t value);
+    CHIP_ERROR WriteAttributeMinCompPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             int16_t value);
+    CHIP_ERROR WriteAttributeMaxCompPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             int16_t value);
+    CHIP_ERROR WriteAttributeMinConstSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t value);
+    CHIP_ERROR WriteAttributeMaxConstSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t value);
+    CHIP_ERROR WriteAttributeMinConstFlow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
+    CHIP_ERROR WriteAttributeMaxConstFlow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
+    CHIP_ERROR WriteAttributeMinConstTemp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          int16_t value);
+    CHIP_ERROR WriteAttributeMaxConstTemp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          int16_t value);
+    CHIP_ERROR WriteAttributePumpStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint16_t value);
     CHIP_ERROR WriteAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint8_t value);
     CHIP_ERROR WriteAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, uint8_t value);
     CHIP_ERROR WriteAttributeCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                       int16_t value);
+    CHIP_ERROR WriteAttributeSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint16_t value);
+    CHIP_ERROR WriteAttributeLifetimeEnergyConsumed(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint32_t value);
+    CHIP_ERROR WriteAttributeAlarmMask(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

@@ -21,6 +21,7 @@
 
 #include <cstdint>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
@@ -211,6 +212,46 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callba
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type,
+                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::DecodableType>(
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type &, void *,
+    CommandResponseSuccessCallback<
+        chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type,
+                                               chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type,
+                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>(
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template <typename RequestDataT, typename ResponseDataT>
+CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
+                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
+                                      CommandResponseFailureCallback failureCb)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
+
+    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
+        successCb(context, responseData);
+    };
+
+    auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+        failureCb(context, app::ToEmberAfStatus(aIMStatus));
+    };
+
+    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                               requestData, onSuccessCb, onFailureCb);
+};
 
 } // namespace Controller
 } // namespace chip

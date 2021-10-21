@@ -186,15 +186,10 @@ CHIP_ERROR Command::FinishCommand(bool aEndDataStruct)
 CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams,
                                          CommandDataElement::Builder aCommandDataElement)
 {
-    CommandPath::Builder commandPath = aCommandDataElement.CreateCommandPathBuilder();
+    CommandPathIB::Builder commandPath = aCommandDataElement.CreateCommandPathBuilder();
     if (aCommandPathParams.mFlags.Has(CommandPathFlags::kEndpointIdValid))
     {
         commandPath.EndpointId(aCommandPathParams.mEndpointId);
-    }
-
-    if (aCommandPathParams.mFlags.Has(CommandPathFlags::kGroupIdValid))
-    {
-        commandPath.GroupId(aCommandPathParams.mGroupId);
     }
 
     commandPath.ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPath();

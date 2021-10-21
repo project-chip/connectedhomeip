@@ -239,7 +239,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         artifact_limit = self.config['github.limit-artifacts']
         artifact_pages = self.config['github.limit-artifact-pages']
 
-        # Size artifacts have names of the form
+        # Size artifacts have names of the form:
         #   Size,{group},{pr},{commit_hash},{parent_hash}
         # Record them keyed by group and commit_hash to match them up
         # after we have the entire list.
@@ -367,6 +367,11 @@ def gh_get_comments_for_pr(gh: ghapi.core.GhApi, pr: int):
         ghapi.all.paged(gh.issues.list_comments, pr))
 
 
+def gh_get_commits_for_pr(gh: ghapi.core.GhApi, pr: int):
+    return itertools.chain.from_iterable(
+        ghapi.all.paged(gh.pulls.list_commits, pr))
+
+
 def percent_change(a: int, b: int) -> float:
     if a == 0:
         return 0.0 if b == 0 else float('inf')
@@ -455,6 +460,20 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame,
     if not db.gh:
         return False
     pr = df.attrs['pr']
+
+    # Check the most recent commit on the PR, so that we don't comment on
+    # builds that are already outdated.
+    commit = df.attrs['commit']
+    commits = sorted(gh_get_commits_for_pr(db.gh, pr),
+                     key=lambda c: c.commit.committer.date,
+                     reverse=True)
+    if commits and commit != commits[0].sha:
+        logging.debug('SCS: PR #%s: not commenting for stale %s; newest is %s',
+                      pr, commit, commits[0].sha)
+        return False
+
+    # Check for an existing size report comment. If one exists, we'll add
+    # the new report to it.
     title = df.attrs['title']
     existing_comment_id = 0
     for comment in gh_get_comments_for_pr(db.gh, pr):
@@ -478,7 +497,8 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame,
                               tabulate={'floatfmt': '5.1f'})
 
     count = len(df.attrs['things'])
-    summary = f'{count} build{"" if count == 1 else "s"}'
+    platforms = ', '.join(sorted(list(set(df['platform']))))
+    summary = f'{count} build{"" if count == 1 else "s"} (for {platforms})'
     md.write(f'\n<details>\n<summary>{summary}</summary>\n\n')
     memdf.report.write_df(db.config,
                           df,
@@ -545,7 +565,6 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
 
         if (pr and comment_enabled
                 and (comment_limit == 0 or comment_limit > comment_count)):
-            comment_count += 1
             if gh_send_change_report(db, df, tdf):
                 # Mark the originating builds, and remove the originating
                 # artifacts, so that they don't generate duplicate report
@@ -555,6 +574,7 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
                     for artifact_id in df.attrs['artifacts']:
                         logging.info('RMC: deleting artifact %d', artifact_id)
                         db.delete_artifact(artifact_id)
+                comment_count += 1
     return dfs
 
 
@@ -600,7 +620,6 @@ def main(argv):
                                tabulate={'floatfmt': '5.1f'})
 
     except Exception as exception:
-        status = 1
         raise exception
 
     return status

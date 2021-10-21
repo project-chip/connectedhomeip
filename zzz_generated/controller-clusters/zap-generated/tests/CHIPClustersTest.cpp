@@ -2477,6 +2477,109 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeCurrentLevel(Callback::Cancela
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR LevelControlClusterTest::WriteAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback, uint16_t remainingTime)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = LevelControl::Attributes::RemainingTime::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, remainingTime));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR LevelControlClusterTest::WriteAttributeMinLevel(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback, uint8_t minLevel)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = LevelControl::Attributes::MinLevel::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, minLevel));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR LevelControlClusterTest::WriteAttributeMaxLevel(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback, uint8_t maxLevel)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = LevelControl::Attributes::MaxLevel::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, maxLevel));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR LevelControlClusterTest::WriteAttributeCurrentFrequency(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback,
+                                                                   uint16_t currentFrequency)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = LevelControl::Attributes::CurrentFrequency::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, currentFrequency));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR LevelControlClusterTest::WriteAttributeMinFrequency(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint16_t minFrequency)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = LevelControl::Attributes::MinFrequency::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, minFrequency));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR LevelControlClusterTest::WriteAttributeMaxFrequency(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint16_t maxFrequency)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = LevelControl::Attributes::MaxFrequency::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, maxFrequency));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR LevelControlClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback,
                                                                   uint16_t clusterRevision)
@@ -3319,6 +3422,204 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxFlow(Callbac
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstPressure(Callback::Cancelable * onSuccessCallback,
+                                                                                  Callback::Cancelable * onFailureCallback,
+                                                                                  int16_t minConstPressure)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MinConstPressure::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, minConstPressure));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstPressure(Callback::Cancelable * onSuccessCallback,
+                                                                                  Callback::Cancelable * onFailureCallback,
+                                                                                  int16_t maxConstPressure)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MaxConstPressure::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, maxConstPressure));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinCompPressure(Callback::Cancelable * onSuccessCallback,
+                                                                                 Callback::Cancelable * onFailureCallback,
+                                                                                 int16_t minCompPressure)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MinCompPressure::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, minCompPressure));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxCompPressure(Callback::Cancelable * onSuccessCallback,
+                                                                                 Callback::Cancelable * onFailureCallback,
+                                                                                 int16_t maxCompPressure)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MaxCompPressure::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, maxCompPressure));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstSpeed(Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback,
+                                                                               uint16_t minConstSpeed)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MinConstSpeed::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, minConstSpeed));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstSpeed(Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback,
+                                                                               uint16_t maxConstSpeed)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, maxConstSpeed));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstFlow(Callback::Cancelable * onSuccessCallback,
+                                                                              Callback::Cancelable * onFailureCallback,
+                                                                              uint16_t minConstFlow)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MinConstFlow::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, minConstFlow));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstFlow(Callback::Cancelable * onSuccessCallback,
+                                                                              Callback::Cancelable * onFailureCallback,
+                                                                              uint16_t maxConstFlow)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MaxConstFlow::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, maxConstFlow));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstTemp(Callback::Cancelable * onSuccessCallback,
+                                                                              Callback::Cancelable * onFailureCallback,
+                                                                              int16_t minConstTemp)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MinConstTemp::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, minConstTemp));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstTemp(Callback::Cancelable * onSuccessCallback,
+                                                                              Callback::Cancelable * onFailureCallback,
+                                                                              int16_t maxConstTemp)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MaxConstTemp::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, maxConstTemp));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributePumpStatus(Callback::Cancelable * onSuccessCallback,
+                                                                            Callback::Cancelable * onFailureCallback,
+                                                                            uint16_t pumpStatus)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::PumpStatus::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, pumpStatus));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
                                                                                         Callback::Cancelable * onFailureCallback,
                                                                                         uint8_t effectiveOperationMode)
@@ -3369,6 +3670,77 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeCapacity(Callba
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
     ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, capacity));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeSpeed(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback, uint16_t speed)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::Speed::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, speed));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeLifetimeEnergyConsumed(Callback::Cancelable * onSuccessCallback,
+                                                                                        Callback::Cancelable * onFailureCallback,
+                                                                                        uint32_t lifetimeEnergyConsumed)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, lifetimeEnergyConsumed));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeAlarmMask(Callback::Cancelable * onSuccessCallback,
+                                                                           Callback::Cancelable * onFailureCallback,
+                                                                           uint16_t alarmMask)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::AlarmMask::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, alarmMask));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                                            Callback::Cancelable * onFailureCallback,
+                                                                            uint32_t featureMap)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = Globals::Attributes::FeatureMap::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, featureMap));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }

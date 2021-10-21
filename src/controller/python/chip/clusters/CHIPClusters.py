@@ -1827,6 +1827,78 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000001: {
+                "attributeName": "RemainingTime",
+                "attributeId": 0x00000001,
+                "type": "int",
+            },
+            0x00000002: {
+                "attributeName": "MinLevel",
+                "attributeId": 0x00000002,
+                "type": "int",
+            },
+            0x00000003: {
+                "attributeName": "MaxLevel",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
+            0x00000004: {
+                "attributeName": "CurrentFrequency",
+                "attributeId": 0x00000004,
+                "type": "int",
+            },
+            0x00000005: {
+                "attributeName": "MinFrequency",
+                "attributeId": 0x00000005,
+                "type": "int",
+            },
+            0x00000006: {
+                "attributeName": "MaxFrequency",
+                "attributeId": 0x00000006,
+                "type": "int",
+            },
+            0x0000000F: {
+                "attributeName": "Options",
+                "attributeId": 0x0000000F,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000010: {
+                "attributeName": "OnOffTransitionTime",
+                "attributeId": 0x00000010,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000011: {
+                "attributeName": "OnLevel",
+                "attributeId": 0x00000011,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000012: {
+                "attributeName": "OnTransitionTime",
+                "attributeId": 0x00000012,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000013: {
+                "attributeName": "OffTransitionTime",
+                "attributeId": 0x00000013,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000014: {
+                "attributeName": "DefaultMoveRate",
+                "attributeId": 0x00000014,
+                "type": "int",
+                "writable": True,
+            },
+            0x00004000: {
+                "attributeName": "StartUpCurrentLevel",
+                "attributeId": 0x00004000,
+                "type": "int",
+                "writable": True,
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -2551,6 +2623,62 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "MinConstPressure",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
+            0x00000004: {
+                "attributeName": "MaxConstPressure",
+                "attributeId": 0x00000004,
+                "type": "int",
+            },
+            0x00000005: {
+                "attributeName": "MinCompPressure",
+                "attributeId": 0x00000005,
+                "type": "int",
+            },
+            0x00000006: {
+                "attributeName": "MaxCompPressure",
+                "attributeId": 0x00000006,
+                "type": "int",
+            },
+            0x00000007: {
+                "attributeName": "MinConstSpeed",
+                "attributeId": 0x00000007,
+                "type": "int",
+            },
+            0x00000008: {
+                "attributeName": "MaxConstSpeed",
+                "attributeId": 0x00000008,
+                "type": "int",
+            },
+            0x00000009: {
+                "attributeName": "MinConstFlow",
+                "attributeId": 0x00000009,
+                "type": "int",
+            },
+            0x0000000A: {
+                "attributeName": "MaxConstFlow",
+                "attributeId": 0x0000000A,
+                "type": "int",
+            },
+            0x0000000B: {
+                "attributeName": "MinConstTemp",
+                "attributeId": 0x0000000B,
+                "type": "int",
+            },
+            0x0000000C: {
+                "attributeName": "MaxConstTemp",
+                "attributeId": 0x0000000C,
+                "type": "int",
+            },
+            0x00000010: {
+                "attributeName": "PumpStatus",
+                "attributeId": 0x00000010,
+                "type": "int",
+                "reportable": True,
+            },
             0x00000011: {
                 "attributeName": "EffectiveOperationMode",
                 "attributeId": 0x00000011,
@@ -2567,11 +2695,37 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000014: {
+                "attributeName": "Speed",
+                "attributeId": 0x00000014,
+                "type": "int",
+            },
+            0x00000017: {
+                "attributeName": "LifetimeEnergyConsumed",
+                "attributeId": 0x00000017,
+                "type": "int",
+            },
             0x00000020: {
                 "attributeName": "OperationMode",
                 "attributeId": 0x00000020,
                 "type": "int",
                 "writable": True,
+            },
+            0x00000021: {
+                "attributeName": "ControlMode",
+                "attributeId": 0x00000021,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000022: {
+                "attributeName": "AlarmMask",
+                "attributeId": 0x00000022,
+                "type": "int",
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -2888,6 +3042,32 @@ class ChipClusters:
                     "arg2": "int",
                 },
             },
+            0x0000000A: {
+                "commandId": 0x0000000A,
+                "commandName": "TestListInt8UArgumentRequest",
+                "args": {
+                    "arg1": "int",
+                },
+            },
+            0x0000000D: {
+                "commandId": 0x0000000D,
+                "commandName": "TestListInt8UReverseRequest",
+                "args": {
+                    "arg1": "int",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "TestListStructArgumentRequest",
+                "args": {
+                    "a": "int",
+                    "b": "bool",
+                    "c": "int",
+                    "d": "bytes",
+                    "e": "str",
+                    "f": "int",
+                },
+            },
             0x00000001: {
                 "commandId": 0x00000001,
                 "commandName": "TestNotHandled",
@@ -2898,6 +3078,18 @@ class ChipClusters:
                 "commandId": 0x00000002,
                 "commandName": "TestSpecific",
                 "args": {
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "TestStructArgumentRequest",
+                "args": {
+                    "a": "int",
+                    "b": "bool",
+                    "c": "int",
+                    "d": "bytes",
+                    "e": "str",
+                    "f": "int",
                 },
             },
             0x00000003: {
@@ -4747,6 +4939,22 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid, arg1, arg2
         )
 
+    def ClusterTestCluster_CommandTestListInt8UArgumentRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int):
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest(
+            device, ZCLendpoint, ZCLgroupid, arg1
+        )
+
+    def ClusterTestCluster_CommandTestListInt8UReverseRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int):
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UReverseRequest(
+            device, ZCLendpoint, ZCLgroupid, arg1
+        )
+
+    def ClusterTestCluster_CommandTestListStructArgumentRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, a: int, b: bool, c: int, d: bytes, e: bytes, f: int):
+        e = e.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestListStructArgumentRequest(
+            device, ZCLendpoint, ZCLgroupid, a, b, c, d, len(d), e, len(e), f
+        )
+
     def ClusterTestCluster_CommandTestNotHandled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled(
             device, ZCLendpoint, ZCLgroupid
@@ -4755,6 +4963,12 @@ class ChipClusters:
     def ClusterTestCluster_CommandTestSpecific(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific(
             device, ZCLendpoint, ZCLgroupid
+        )
+
+    def ClusterTestCluster_CommandTestStructArgumentRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, a: int, b: bool, c: int, d: bytes, e: bytes, f: int):
+        e = e.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestStructArgumentRequest(
+            device, ZCLendpoint, ZCLgroupid, a, b, c, d, len(d), e, len(e), f
         )
 
     def ClusterTestCluster_CommandTestUnknownCommand(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5446,6 +5660,66 @@ class ChipClusters:
     def ClusterLevelControl_SubscribeAttributeCurrentLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_LevelControl_CurrentLevel(device, ZCLendpoint, minInterval, maxInterval)
 
+    def ClusterLevelControl_ReadAttributeRemainingTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_RemainingTime(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_ReadAttributeMinLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_MinLevel(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_ReadAttributeMaxLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_MaxLevel(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_ReadAttributeCurrentFrequency(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentFrequency(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_ReadAttributeMinFrequency(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_MinFrequency(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_ReadAttributeMaxFrequency(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_MaxFrequency(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_ReadAttributeOptions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_Options(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_WriteAttributeOptions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_LevelControl_Options(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterLevelControl_ReadAttributeOnOffTransitionTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_OnOffTransitionTime(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_WriteAttributeOnOffTransitionTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_LevelControl_OnOffTransitionTime(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterLevelControl_ReadAttributeOnLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_OnLevel(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_WriteAttributeOnLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_LevelControl_OnLevel(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterLevelControl_ReadAttributeOnTransitionTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_OnTransitionTime(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_WriteAttributeOnTransitionTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_LevelControl_OnTransitionTime(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterLevelControl_ReadAttributeOffTransitionTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_OffTransitionTime(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_WriteAttributeOffTransitionTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_LevelControl_OffTransitionTime(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterLevelControl_ReadAttributeDefaultMoveRate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_DefaultMoveRate(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_WriteAttributeDefaultMoveRate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_LevelControl_DefaultMoveRate(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterLevelControl_ReadAttributeStartUpCurrentLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_StartUpCurrentLevel(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterLevelControl_WriteAttributeStartUpCurrentLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_LevelControl_StartUpCurrentLevel(device, ZCLendpoint, ZCLgroupid, value)
+
     def ClusterLevelControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -5638,6 +5912,42 @@ class ChipClusters:
     def ClusterPumpConfigurationAndControl_ReadAttributeMaxFlow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinConstPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstPressure(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxConstPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstPressure(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinCompPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinCompPressure(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxCompPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxCompPressure(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinConstSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstSpeed(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxConstSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstSpeed(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinConstFlow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstFlow(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxConstFlow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstFlow(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinConstTemp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstTemp(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxConstTemp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstTemp(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributePumpStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_PumpStatus(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_SubscribeAttributePumpStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_PumpStatus(device, ZCLendpoint, minInterval, maxInterval)
+
     def ClusterPumpConfigurationAndControl_ReadAttributeEffectiveOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveOperationMode(device, ZCLendpoint, ZCLgroupid)
 
@@ -5650,11 +5960,29 @@ class ChipClusters:
     def ClusterPumpConfigurationAndControl_SubscribeAttributeCapacity(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Capacity(device, ZCLendpoint, minInterval, maxInterval)
 
+    def ClusterPumpConfigurationAndControl_ReadAttributeSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Speed(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeLifetimeEnergyConsumed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterPumpConfigurationAndControl_ReadAttributeOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterPumpConfigurationAndControl_WriteAttributeOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_OperationMode(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeControlMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ControlMode(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_WriteAttributeControlMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_ControlMode(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeAlarmMask(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_AlarmMask(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_FeatureMap(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterPumpConfigurationAndControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -7494,6 +7822,86 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_LevelControl_CurrentLevel.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_LevelControl_CurrentLevel.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute RemainingTime
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_RemainingTime.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_RemainingTime.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute MinLevel
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_MinLevel.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_MinLevel.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute MaxLevel
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_MaxLevel.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_MaxLevel.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute CurrentFrequency
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentFrequency.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentFrequency.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute MinFrequency
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_MinFrequency.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_MinFrequency.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute MaxFrequency
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_MaxFrequency.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_MaxFrequency.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute Options
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_Options.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_Options.restype = ctypes.c_uint32
+        # Cluster LevelControl WriteAttribute Options
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_Options.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_Options.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute OnOffTransitionTime
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_OnOffTransitionTime.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_OnOffTransitionTime.restype = ctypes.c_uint32
+        # Cluster LevelControl WriteAttribute OnOffTransitionTime
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_OnOffTransitionTime.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_OnOffTransitionTime.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute OnLevel
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_OnLevel.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_OnLevel.restype = ctypes.c_uint32
+        # Cluster LevelControl WriteAttribute OnLevel
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_OnLevel.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_OnLevel.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute OnTransitionTime
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_OnTransitionTime.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_OnTransitionTime.restype = ctypes.c_uint32
+        # Cluster LevelControl WriteAttribute OnTransitionTime
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_OnTransitionTime.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_OnTransitionTime.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute OffTransitionTime
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_OffTransitionTime.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_OffTransitionTime.restype = ctypes.c_uint32
+        # Cluster LevelControl WriteAttribute OffTransitionTime
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_OffTransitionTime.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_OffTransitionTime.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute DefaultMoveRate
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_DefaultMoveRate.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_DefaultMoveRate.restype = ctypes.c_uint32
+        # Cluster LevelControl WriteAttribute DefaultMoveRate
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_DefaultMoveRate.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_DefaultMoveRate.restype = ctypes.c_uint32
+        # Cluster LevelControl ReadAttribute StartUpCurrentLevel
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_StartUpCurrentLevel.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_LevelControl_StartUpCurrentLevel.restype = ctypes.c_uint32
+        # Cluster LevelControl WriteAttribute StartUpCurrentLevel
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_StartUpCurrentLevel.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_LevelControl_StartUpCurrentLevel.restype = ctypes.c_uint32
         # Cluster LevelControl ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -7939,6 +8347,54 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinConstPressure
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstPressure.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstPressure.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxConstPressure
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstPressure.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstPressure.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinCompPressure
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinCompPressure.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinCompPressure.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxCompPressure
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxCompPressure.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxCompPressure.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinConstSpeed
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstSpeed.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstSpeed.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxConstSpeed
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstSpeed.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstSpeed.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinConstFlow
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstFlow.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstFlow.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxConstFlow
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstFlow.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstFlow.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinConstTemp
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstTemp.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstTemp.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxConstTemp
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstTemp.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstTemp.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute PumpStatus
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_PumpStatus.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_PumpStatus.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl SubscribeAttribute PumpStatus
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_PumpStatus.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_PumpStatus.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl ReadAttribute EffectiveOperationMode
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveOperationMode.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -7955,6 +8411,14 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Capacity.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Capacity.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute Speed
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Speed.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Speed.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute LifetimeEnergyConsumed
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl ReadAttribute OperationMode
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -7963,6 +8427,22 @@ class ChipClusters:
         self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_OperationMode.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_OperationMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute ControlMode
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ControlMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ControlMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl WriteAttribute ControlMode
+        self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_ControlMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_ControlMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute AlarmMask
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_AlarmMask.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_AlarmMask.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_FeatureMap.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8151,6 +8631,18 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestListInt8UArgumentRequest
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestListInt8UReverseRequest
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UReverseRequest.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UReverseRequest.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestListStructArgumentRequest
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestListStructArgumentRequest.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_bool, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestListStructArgumentRequest.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestNotHandled
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8159,6 +8651,10 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestStructArgumentRequest
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestStructArgumentRequest.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_bool, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestStructArgumentRequest.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestUnknownCommand
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestUnknownCommand.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

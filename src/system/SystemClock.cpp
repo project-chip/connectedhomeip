@@ -28,6 +28,7 @@
 #include <lib/support/TimeUtils.h>
 #include <system/SystemError.h>
 
+#include <limits>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -46,6 +47,7 @@
 
 namespace chip {
 namespace System {
+namespace Clock {
 
 namespace Internal {
 
@@ -80,35 +82,35 @@ ClockBase * gClockBase = &gClockImpl;
 #define MONOTONIC_CLOCK_ID CLOCK_MONOTONIC
 #endif
 
-Clock::MonotonicMicroseconds ClockImpl::GetMonotonicMicroseconds()
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
     struct timespec ts;
     int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
     VerifyOrDie(res == 0);
-    return (static_cast<uint64_t>(ts.tv_sec) * kMicrosecondsPerSecond) +
-        (static_cast<uint64_t>(ts.tv_nsec) / kNanosecondsPerMicrosecond);
+    return Seconds64(ts.tv_sec) +
+        std::chrono::duration_cast<Microseconds64>(std::chrono::duration<uint64_t, std::nano>(ts.tv_nsec));
 }
 
-Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds()
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
-    return GetMonotonicMicroseconds() / kMicrosecondsPerMillisecond;
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
 #endif // HAVE_CLOCK_GETTIME
 
 #if HAVE_GETTIMEOFDAY
 
-Clock::MonotonicMicroseconds ClockImpl::GetMonotonicMicroseconds()
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
     VerifyOrDie(res == 0);
-    return (tv.tv_sec * kMicrosecondsPerSecond) + tv.tv_usec;
+    return TimevalToMicroseconds(tv);
 }
 
-Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds()
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
-    return GetMonotonicMicroseconds() / kMicrosecondsPerMillisecond;
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
 #endif // HAVE_GETTIMEOFDAY
@@ -119,12 +121,12 @@ Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds()
 
 // -------------------- Default Get/SetClock Functions for LwIP Systems --------------------
 
-Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMicroseconds(void)
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return GetMonotonicMilliseconds() * kMicrosecondsPerMillisecond;
+    return GetMonotonicMilliseconds64();
 }
 
-Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds(void)
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
     static volatile uint64_t overflow        = 0;
     static volatile u32_t lastSample         = 0;
@@ -161,14 +163,12 @@ Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds(void)
         sample         = sys_now();
     }
 
-    return static_cast<uint64_t>(overflowSample | static_cast<uint64_t>(sample));
+    return Milliseconds64(overflowSample | static_cast<uint64_t>(sample));
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
-
-namespace Clock {
 
 static_assert(std::is_unsigned<ClockBase::Tick>::value, "ClockBase::Tick must be unsigned");
 constexpr ClockBase::Tick kMaxTick     = static_cast<ClockBase::Tick>(0) - static_cast<ClockBase::Tick>(1);
@@ -190,19 +190,39 @@ ClockBase::Tick AddOffset(const ClockBase::Tick & base, const ClockBase::Tick & 
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-Clock::MonotonicMilliseconds TimevalToMilliseconds(const timeval & in)
+Microseconds64 TimevalToMicroseconds(const timeval & tv)
 {
-    return static_cast<Clock::MonotonicMilliseconds>(in.tv_sec) * 1000 +
-        static_cast<Clock::MonotonicMilliseconds>(in.tv_usec / 1000);
+    return Seconds64(tv.tv_sec) + Microseconds64(tv.tv_usec);
 }
 
-void MillisecondsToTimeval(Clock::MonotonicMilliseconds in, timeval & out)
+MonotonicMilliseconds TimevalToMilliseconds(const timeval & in)
+{
+    return static_cast<MonotonicMilliseconds>(in.tv_sec) * 1000 + static_cast<MonotonicMilliseconds>(in.tv_usec / 1000);
+}
+
+void MillisecondsToTimeval(MonotonicMilliseconds in, timeval & out)
 {
     out.tv_sec  = static_cast<time_t>(in / 1000);
     out.tv_usec = static_cast<suseconds_t>((in % 1000) * 1000);
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+static_assert(std::numeric_limits<Microseconds64::rep>::is_integer, "Microseconds64 must be an integer type");
+static_assert(std::numeric_limits<Microseconds32::rep>::is_integer, "Microseconds32 must be an integer type");
+static_assert(std::numeric_limits<Milliseconds64::rep>::is_integer, "Milliseconds64 must be an integer type");
+static_assert(std::numeric_limits<Milliseconds32::rep>::is_integer, "Milliseconds32 must be an integer type");
+static_assert(std::numeric_limits<Seconds64::rep>::is_integer, "Seconds64 must be an integer type");
+static_assert(std::numeric_limits<Seconds32::rep>::is_integer, "Seconds32 must be an integer type");
+static_assert(std::numeric_limits<Seconds16::rep>::is_integer, "Seconds16 must be an integer type");
+
+static_assert(std::numeric_limits<Microseconds64::rep>::digits >= 64, "Microseconds64 must be at least 64 bits");
+static_assert(std::numeric_limits<Microseconds32::rep>::digits >= 32, "Microseconds32 must be at least 32 bits");
+static_assert(std::numeric_limits<Milliseconds64::rep>::digits >= 64, "Milliseconds64 must be at least 64 bits");
+static_assert(std::numeric_limits<Milliseconds32::rep>::digits >= 32, "Milliseconds32 must be at least 32 bits");
+static_assert(std::numeric_limits<Seconds64::rep>::digits >= 64, "Seconds64 must be at least 64 bits");
+static_assert(std::numeric_limits<Seconds32::rep>::digits >= 32, "Seconds32 must be at least 32 bits");
+static_assert(std::numeric_limits<Seconds16::rep>::digits >= 16, "Seconds16 must be at least 16 bits");
 
 } // namespace Clock
 } // namespace System

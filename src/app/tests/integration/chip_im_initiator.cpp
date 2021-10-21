@@ -161,12 +161,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadError(chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient) override
+    CHIP_ERROR ReadDone(chip::app::ReadClient * apReadClient) override
     {
         if (!apReadClient->IsSubscriptionType())
         {
@@ -308,12 +308,11 @@ CHIP_ERROR SendReadRequest()
     eventPathParams[1].mClusterId  = kTestClusterId;
     eventPathParams[1].mEventId    = kTestChangeEvent2;
 
-    chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, 1, 0,
-                                                       chip::app::AttributePathParams::Flags::kFieldIdValid);
+    chip::app::AttributePathParams attributePathParams(kTestEndpointId, kTestClusterId, 1);
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex));
+    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 1, 1, gFabricIndex));
     readPrepareParams.mTimeout                     = gMessageTimeoutMsec;
     readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
@@ -374,7 +373,7 @@ CHIP_ERROR SendSubscribeRequest()
     CHIP_ERROR err   = CHIP_NO_ERROR;
     gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
 
-    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex));
+    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 1, 1, gFabricIndex));
     chip::app::EventPathParams eventPathParams[2];
     chip::app::AttributePathParams attributePathParams[1];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
@@ -684,7 +683,7 @@ int main(int argc, char * argv[])
     InitializeChip();
 
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-                                     .SetAddressType(chip::Inet::kIPAddressType_IPv6)
+                                     .SetAddressType(chip::Inet::IPAddressType::kIPv6)
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 

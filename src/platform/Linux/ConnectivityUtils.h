@@ -51,13 +51,13 @@ public:
     static uint8_t MapFrequencyToChannel(const uint16_t frequency);
     static ConnectionType GetInterfaceConnectionType(const char * ifname);
     static CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
-    static CHIP_ERROR GetWiFiChannelNumber(int skfd, const char * ifname, uint16_t & channelNumber);
-    static CHIP_ERROR GetWiFiRssi(int skfd, const char * ifname, int8_t & rssi);
-    static CHIP_ERROR GetWiFiBeaconLostCount(int skfd, const char * ifname, uint32_t & beaconLostCount);
-    static CHIP_ERROR GetWiFiCurrentMaxRate(int skfd, const char * ifname, uint64_t & currentMaxRate);
+    static CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
+    static CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi);
+    static CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount);
+    static CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate);
     static CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
-    static CHIP_ERROR GetEthPHYRate(int skfd, const char * ifname, uint8_t & pHYRate);
-    static CHIP_ERROR GetEthFullDuplex(int skfd, const char * ifname, bool & fullDuplex);
+    static CHIP_ERROR GetEthPHYRate(const char * ifname, uint8_t & pHYRate);
+    static CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex);
 
 private:
     static uint16_t Map2400MHz(const uint8_t inChannel);

@@ -1,3 +1,4 @@
+ameba-amebad-all-clusters
 android-arm-chip-tool
 android-arm64-chip-test
 android-arm64-chip-tool
@@ -16,7 +17,6 @@ esp32-devkitc-shell
 esp32-devkitc-temperature-measurement
 esp32-m5stack-all-clusters
 esp32-m5stack-all-clusters-ipv6only
-esp32-m5stack-all-clusters-rpc
 infineon-p6-lock
 nrf-nrf52840-light
 nrf-nrf52840-lock

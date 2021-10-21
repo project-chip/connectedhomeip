@@ -193,7 +193,7 @@ void ParseEventPathList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 #endif
 }
 
-void BuildCommandPath(nlTestSuite * apSuite, CommandPath::Builder & aCommandPathBuilder)
+void BuildCommandPath(nlTestSuite * apSuite, CommandPathIB::Builder & aCommandPathBuilder)
 {
     aCommandPathBuilder.EndpointId(1).ClusterId(3).CommandId(4).EndOfCommandPath();
     NL_TEST_ASSERT(apSuite, aCommandPathBuilder.GetError() == CHIP_NO_ERROR);
@@ -202,7 +202,7 @@ void BuildCommandPath(nlTestSuite * apSuite, CommandPath::Builder & aCommandPath
 void ParseCommandPath(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandPath::Parser commandPathParser;
+    CommandPathIB::Parser commandPathParser;
     chip::EndpointId endpointId = 0;
     chip::ClusterId clusterId   = 0;
     chip::CommandId commandId   = 0;
@@ -541,7 +541,7 @@ void BuildCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Builder 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    CommandPath::Builder commandPathBuilder = aCommandDataElementBuilder.CreateCommandPathBuilder();
+    CommandPathIB::Builder commandPathBuilder = aCommandDataElementBuilder.CreateCommandPathBuilder();
     NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandPath(apSuite, commandPathBuilder);
 
@@ -567,7 +567,7 @@ void BuildCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Builder 
 void ParseCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Parser & aCommandDataElementParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandPath::Parser commandPathParser;
+    CommandPathIB::Parser commandPathParser;
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aCommandDataElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -596,7 +596,7 @@ void ParseCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Parser &
 
 void BuildCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataElement::Builder & aCommandDataElementBuilder)
 {
-    CommandPath::Builder commandPathBuilder = aCommandDataElementBuilder.CreateCommandPathBuilder();
+    CommandPathIB::Builder commandPathBuilder = aCommandDataElementBuilder.CreateCommandPathBuilder();
     NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandPath(apSuite, commandPathBuilder);
 
@@ -611,7 +611,7 @@ void BuildCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataEle
 void ParseCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataElement::Parser & aCommandDataElementParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandPath::Parser commandPathParser;
+    CommandPathIB::Parser commandPathParser;
     StatusIB::Parser StatusIBParser;
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aCommandDataElementParser.CheckSchemaValidity();
@@ -1141,7 +1141,7 @@ void CommandPathTest(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    CommandPath::Builder commandPathBuilder;
+    CommandPathIB::Builder commandPathBuilder;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     err = commandPathBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

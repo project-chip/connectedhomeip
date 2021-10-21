@@ -470,7 +470,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
         }
         else
         {
-            char subtypeStr[kMaxSubtypeDescSize];
+            char subtypeStr[Common::kSubTypeMaxLength + 1];
             ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
             qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
                                           kLocalDomain);
@@ -483,7 +483,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
         }
         else
         {
-            char subtypeStr[kMaxSubtypeDescSize];
+            char subtypeStr[Common::kSubTypeMaxLength + 1];
             ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
             qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
                                           kLocalDomain);

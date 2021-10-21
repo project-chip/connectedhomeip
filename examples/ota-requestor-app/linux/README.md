@@ -22,9 +22,12 @@ In one terminal:
 In a second terminal:
 
 ```
-./chip-tool pairing onnetwork-long 20202021 3840
+./chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840
 ./chip-ota-requestor-app [-p <provider node id>]
 ```
+
+where `${NODE_ID_TO_ASSIGN}` is the node id to assign to the provider app, which
+should match the `-p` argument passed to `chip-ota-requestor-app`.
 
 ## Current Features / Limitations
 

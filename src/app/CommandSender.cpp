@@ -48,7 +48,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabric
     SuccessOrExit(err);
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 1, 1, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(timeout);
@@ -121,7 +121,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     chip::EndpointId endpointId;
 
     {
-        CommandPath::Parser commandPath;
+        CommandPathIB::Parser commandPath;
 
         err = aCommandElement.GetCommandPath(&commandPath);
         SuccessOrExit(err);
@@ -152,6 +152,29 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         {
             hasDataResponse = true;
             err             = aCommandElement.GetData(&commandDataReader);
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "Received malformed Command Response, err=%" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            if (hasDataResponse)
+            {
+                ChipLogProgress(DataManagement,
+                                "Received Command Response Data, Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                                " Command=" ChipLogFormatMEI,
+                                endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+            }
+            else
+            {
+                ChipLogProgress(DataManagement,
+                                "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                                " Command=" ChipLogFormatMEI " Status=0x%" PRIx16,
+                                endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId),
+                                to_underlying(statusIB.mStatus));
+            }
         }
         SuccessOrExit(err);
 

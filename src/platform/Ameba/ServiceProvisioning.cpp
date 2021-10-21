@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +16,17 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <platform/CHIPDeviceLayer.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
-#include <app/util/af-enums.h>
+#include "ServiceProvisioning.h"
 
-#include <lib/core/CHIPTLV.h>
-#include <lib/support/SafeInt.h>
+using namespace ::chip::DeviceLayer;
 
-EmberAfStatus PrepareListFromTLV(chip::TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen);
+CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
+{
+    // TODO
+    printf("TODO : SetWiFiStationProvisioning\n");
+    return CHIP_NO_ERROR;
+}

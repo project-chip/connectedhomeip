@@ -1,6 +1,9 @@
 # Commands will be run in CHIP project root.
 cd "{root}"
 
+# Generating ameba-amebad-all-clusters
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters'
+
 # Generating JARs for Java build rules test
 python3 build/chip/java/tests/generate_jars_for_test.py
 
@@ -176,17 +179,6 @@ bash -c 'source $IDF_PATH/export.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only reconfigure'
 
-# Generating esp32-m5stack-all-clusters-rpc
-mkdir -p {out}/esp32-m5stack-all-clusters-rpc
-
-cp examples/all-clusters-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m5stack-all-clusters-rpc/sdkconfig.defaults
-
-rm -f examples/all-clusters-app/esp32/sdkconfig
-
-bash -c 'source $IDF_PATH/export.sh; 
-export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc/sdkconfig.defaults
-idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc reconfigure'
-
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
 
@@ -252,6 +244,9 @@ west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {
 
 # Generating tizen-arm-light
 gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
+
+# Building ameba-amebad-all-clusters
+ninja -C {out}/ameba-amebad-all-clusters
 
 # Building JNI android-arm-chip-tool
 ninja -C {out}/android-arm-chip-tool
@@ -432,13 +427,6 @@ rm -f examples/all-clusters-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only build'
-
-rm -f examples/all-clusters-app/esp32/sdkconfig
-
-# Building esp32-m5stack-all-clusters-rpc
-bash -c 'source $IDF_PATH/export.sh; 
-export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc/sdkconfig.defaults
-idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc build'
 
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock

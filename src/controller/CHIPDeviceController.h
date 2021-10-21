@@ -247,6 +247,8 @@ public:
 
     virtual void ReleaseDevice(Device * device);
 
+    void ReleaseDeviceById(NodeId remoteDeviceId);
+
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
@@ -305,7 +307,6 @@ protected:
     uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
-    void ReleaseDeviceById(NodeId remoteDeviceId);
     CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();

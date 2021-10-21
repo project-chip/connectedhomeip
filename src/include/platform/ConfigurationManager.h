@@ -415,7 +415,7 @@ inline void ConfigurationManager::LogDeviceConfig()
  */
 inline bool ConfigurationManager::IsCommissionableDeviceTypeEnabled()
 {
-    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceNameEnabled();
+    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceTypeEnabled();
 }
 
 /**

@@ -1572,6 +1572,10 @@ namespace TestAddArguments {
 static constexpr CommandId Id = 0x00000004;
 } // namespace TestAddArguments
 
+namespace TestListInt8UReverseResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace TestListInt8UReverseResponse
+
 namespace TestSimpleArgumentRequest {
 static constexpr CommandId Id = 0x00000005;
 } // namespace TestSimpleArgumentRequest
@@ -1579,6 +1583,34 @@ static constexpr CommandId Id = 0x00000005;
 namespace TestStructArrayArgumentRequest {
 static constexpr CommandId Id = 0x00000006;
 } // namespace TestStructArrayArgumentRequest
+
+namespace TestStructArgumentRequest {
+static constexpr CommandId Id = 0x00000007;
+} // namespace TestStructArgumentRequest
+
+namespace TestNestedStructArgumentRequest {
+static constexpr CommandId Id = 0x00000008;
+} // namespace TestNestedStructArgumentRequest
+
+namespace TestListStructArgumentRequest {
+static constexpr CommandId Id = 0x00000009;
+} // namespace TestListStructArgumentRequest
+
+namespace TestListInt8UArgumentRequest {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace TestListInt8UArgumentRequest
+
+namespace TestNestedStructListArgumentRequest {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace TestNestedStructListArgumentRequest
+
+namespace TestListNestedStructListArgumentRequest {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace TestListNestedStructListArgumentRequest
+
+namespace TestListInt8UReverseRequest {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace TestListInt8UReverseRequest
 
 } // namespace Commands
 } // namespace TestCluster
