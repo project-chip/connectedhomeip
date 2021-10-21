@@ -58,21 +58,22 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * OnResponse will be called when a successful response from server has been received and processed for the given path.
+         * OnResponse will be called when a from server has been received and processed for the given path.
          *
          * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
-         * receives an OnDone call to destroy the object.
+         * receives an OnDone call before it shuts down the object.
          *
          * @param[in] apWriteClient: The write client object that initiated the write transaction.
          * @param[in] aPath: The attribute path field in write response.
-         * @param[in] aInteractionModelStatus: Interaction model status code for the write request to the given path.
+         * @param[in] attributeStatus: Attribute-specific status, containing an InteractionModel::Status code as well as
+         *                             an optional cluster-specific status code.
          */
         virtual void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath,
-                                Protocols::InteractionModel::Status aInteractionModelStatus)
+                                StatusIB attributeStatus)
         {}
 
         /**
-         * OnError will be called when an error occurr *after* a successful call to SendWriteRequest(). The following
+         * OnError will be called when an error occurs *after* a successful call to SendWriteRequest(). The following
          * errors will be delivered through this call in the aError field:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
@@ -80,7 +81,7 @@ public:
          * - CHIP_ERROR*: All other cases.
          *
          * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
-         * receives an OnDone call to destroy and free the object.
+         * receives an OnDone call before it shuts down the object.
          *
          * @param[in] apWriteClient: The write client object that initiated the attribute write transaction.
          * @param[in] aError: A system error code that conveys the overall error code.

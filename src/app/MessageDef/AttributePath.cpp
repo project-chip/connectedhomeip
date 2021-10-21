@@ -120,7 +120,7 @@ CHIP_ERROR AttributePath::Parser::CheckSchemaValidity() const
             {
                 chip::AttributeId fieldTag;
                 reader.Get(fieldTag);
-                PRETTY_PRINT("\tFieldTag = 0x%" PRIx32 ",", fieldTag);
+                PRETTY_PRINT("\tFieldTag = " ChipLogFormatMEI ",", ChipLogValueMEI(fieldTag));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

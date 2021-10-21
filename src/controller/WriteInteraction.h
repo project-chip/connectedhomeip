@@ -27,27 +27,26 @@ namespace chip {
 namespace Controller {
 
 /*
- * A typed command invocation function that takes as input a cluster-object representation of a command request and
- * callbacks for success and failure and either returns a decoded cluster-object representation of the response through
- * the provided success callback or calls the provided failure callback.
+ * An adapter callback that permits applications to provide std::function callbacks for success, error and on done.
+ * This permits a slightly more flexible programming model that allows applications to pass in lambdas and bound member functions
+ * as they see fit instead.
  *
- * The RequestObjectT is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object
- * that can be encoded using the DataModel::Encode machinery and exposes the GetClusterId() and GetCommandId() functions
- * is expected to work.
- *
- * The ResponseObjectT is expected to be one of two things:
- *
- *    - If a data response is expected on success, a struct type decodable via DataModel::Decode which has GetClusterId() and
- * GetCommandId() methods.  A ClusterName::Commands::ResponseCommandName::DecodableType is typically used.
- *    - If a status response is expected on success, a DataModel::NullObjectType.
  */
 
 class WriteCallback final : public app::WriteClient::Callback
 {
 public:
     using OnSuccessCallbackType = std::function<void(const app::ConcreteAttributePath &)>;
+
+    //
+    // Callback to deliver any error that occurs during the write. This includes
+    // errors global to the write as a whole (e.g timeout) as well as per-attribute
+    // errors.
+    //
+    // In the latter case, path will be non-null. Otherwise, it shall be null.
+    //
     using OnErrorCallbackType =
-        std::function<void(const app::ConcreteAttributePath *, Protocols::InteractionModel::Status, CHIP_ERROR aError)>;
+        std::function<void(const app::ConcreteAttributePath *path, app::StatusIB status, CHIP_ERROR aError)>;
     using OnDoneCallbackType = std::function<void(app::WriteClient *, WriteCallback *)>;
 
     WriteCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
@@ -55,21 +54,21 @@ public:
     {}
 
     void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath,
-                    Protocols::InteractionModel::Status aIMStatus) override
+                    app::StatusIB status) override
     {
-        if (aIMStatus == Protocols::InteractionModel::Status::Success)
+        if (status.mStatus == Protocols::InteractionModel::Status::Success)
         {
             mOnSuccess(aPath);
         }
         else
         {
-            mOnError(&aPath, aIMStatus, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+            mOnError(&aPath, status, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
         }
     }
 
     void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override
     {
-        mOnError(nullptr, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+        mOnError(nullptr, app::StatusIB(Protocols::InteractionModel::Status::Failure), CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
     }
 
     void OnDone(app::WriteClient * apWriteClient) override { mOnDone(apWriteClient, this); }
@@ -81,14 +80,18 @@ private:
 };
 
 template <typename AttributeInfo>
-CHIP_ERROR WriteAttributeRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle,
+CHIP_ERROR WriteAttribute(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle,
                                  chip::EndpointId endpointId, const typename AttributeInfo::Type & requestCommandData,
                                  WriteCallback::OnSuccessCallbackType onSuccessCb, WriteCallback::OnErrorCallbackType onErrorCb)
 {
     app::WriteClientHandle handle;
 
-    auto callback = Platform::MakeUnique<WriteCallback>(
-        onSuccessCb, onErrorCb, [](app::WriteClient * apWriteClient, WriteCallback * this_) { Platform::Delete(this_); });
+    auto onDone = [](app::WriteClient * apWriteClient, WriteCallback * callback) {
+        chip::Platform::Delete(callback);
+    };
+    
+    auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDone);
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, callback.get()));
     ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(

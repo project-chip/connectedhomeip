@@ -156,6 +156,9 @@ public:
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadClients() const;
 
+    uint32_t GetNumActiveWriteHandlers() const;
+    uint32_t GetNumActiveWriteClients() const;
+
     /**
      *  Get read client index in mReadClients
      *
