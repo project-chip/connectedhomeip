@@ -24,7 +24,7 @@ import java.util.*;
 >>>>>>> 2185ce827 (add descriptive documentation on each new class)
 =======
 /**
- * Interface for making customized callback that implements both onSuccess and onFailure function
+ * Interface for making customized callback that implements both onSuccess and onFailure functions.
  */
 >>>>>>> e3803522e (Restyled by google-java-format)
 public interface ClusterCommandCallback {
