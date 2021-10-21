@@ -1,6 +1,8 @@
 package chip.clusterinfo;
 
-/** CommandParameterInfo captures the name and type of a parameter */
+/**
+ * CommandParameterInfo captures the name and type of a parameter
+ */
 public class CommandParameterInfo {
   public CommandParameterInfo() {}
 

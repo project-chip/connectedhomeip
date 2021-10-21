@@ -3,7 +3,7 @@ package chip.clusterinfo;
 import chip.devicecontroller.ChipClusters.BaseChipCluster;
 import java.util.Map;
 
-/** ClusterInfo maps commands and provides a constructor function for a cluster */
+/** ClusterInfo maps commands and provides a constructor function for a cluster. */
 public class ClusterInfo {
   private final ClusterConstructor createClusterFunction;
   private final Map<String, CommandInfo> commands;
