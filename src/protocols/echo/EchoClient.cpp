@@ -30,7 +30,7 @@ namespace Protocols {
 namespace Echo {
 
 // The Echo message timeout value in milliseconds.
-constexpr uint32_t kEchoMessageTimeoutMsec = 800;
+constexpr System::Clock::Timeout kEchoMessageTimeout = System::Clock::Milliseconds32(800);
 
 CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SessionHandle session)
 {
@@ -77,7 +77,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, Me
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    mExchangeCtx->SetResponseTimeout(kEchoMessageTimeoutMsec);
+    mExchangeCtx->SetResponseTimeout(kEchoMessageTimeout);
 
     // Send an Echo Request message.  Discard the exchange context if the send fails.
     err = mExchangeCtx->SendMessage(MsgType::EchoRequest, std::move(payload),
