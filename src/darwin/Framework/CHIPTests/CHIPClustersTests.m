@@ -272,6 +272,3033 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_CC_2_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads mandatory attribute: CurrentHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads mandatory attribute: CurrentHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: current hue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: current hue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 254);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000002_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default value to mandatory attribute: CurrentHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t currentHueArgument = 0;
+    [cluster writeAttributeCurrentHueWithValue:currentHueArgument
+                               responseHandler:^(NSError * err, NSDictionary * values) {
+                                   NSLog(@"Write the default value to mandatory attribute: CurrentHue Error: %@", err);
+
+                                   XCTAssertEqual(err.code, 1);
+                                   [expectation fulfill];
+                               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: CurrentHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: CurrentHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000004_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads mandatory attribute: CurrentSaturation"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads mandatory attribute: CurrentSaturation Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: CurrentSaturation"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: CurrentSaturation Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 254);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000006_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default value to mandatory attribute: CurrentSaturation"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t currentSaturationArgument = 0;
+    [cluster
+        writeAttributeCurrentSaturationWithValue:currentSaturationArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Write the default value to mandatory attribute: CurrentSaturation Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 1);
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000007_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: CurrentSaturation"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: CurrentSaturation Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000008_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: CurrentX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: CurrentX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 24939U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000009_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: CurrentX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: CurrentX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000010_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default value to mandatory attribute: CurrentX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t currentXArgument = 24939U;
+    [cluster writeAttributeCurrentXWithValue:currentXArgument
+                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                 NSLog(@"Write the default value to mandatory attribute: CurrentX Error: %@", err);
+
+                                 XCTAssertEqual(err.code, 1);
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000011_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: CurrentX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: CurrentX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 24939U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000012_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: CurrentY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: CurrentY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 24701U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000013_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: CurrentY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: CurrentY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000014_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory attribute: CurrentY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t currentYArgument = 24701U;
+    [cluster writeAttributeCurrentYWithValue:currentYArgument
+                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                 NSLog(@"Write the default values to mandatory attribute: CurrentY Error: %@", err);
+
+                                 XCTAssertEqual(err.code, 1);
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000015_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: CurrentY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: CurrentY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 24701U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000016_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Validate constraints of attribute: ColorTemperatureMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorTemperatureWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorTemperatureMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000017_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: ColorMode"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorMode Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 2);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000018_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Options"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorControlOptionsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Options Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000019_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: Options"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorControlOptionsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: Options Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000020_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default values to mandatory attribute: Options"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t colorControlOptionsArgument = 0;
+    [cluster writeAttributeColorControlOptionsWithValue:colorControlOptionsArgument
+                                        responseHandler:^(NSError * err, NSDictionary * values) {
+                                            NSLog(@"Write the default values to mandatory attribute: Options Error: %@", err);
+
+                                            XCTAssertEqual(err.code, 0);
+
+                                            [expectation fulfill];
+                                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000021_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: Options"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorControlOptionsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: Options Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000022_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: EnhancedCurrentHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: EnhancedCurrentHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000023_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: EnhancedCurrentHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: EnhancedCurrentHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000024_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory attribute: EnhancedCurrentHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t enhancedCurrentHueArgument = 0U;
+    [cluster
+        writeAttributeEnhancedCurrentHueWithValue:enhancedCurrentHueArgument
+                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                      NSLog(@"Write the default values to mandatory attribute: EnhancedCurrentHue Error: %@", err);
+
+                                      XCTAssertEqual(err.code, 1);
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000025_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: EnhancedCurrentHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: EnhancedCurrentHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000026_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: EnhancedColorMode"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedColorModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: EnhancedColorMode Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000027_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: ColorLoopActive"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopActiveWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: ColorLoopActive Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000028_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: ColorLoopActive"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopActiveWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorLoopActive Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000029_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory attribute: ColorLoopActive"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t colorLoopActiveArgument = 0;
+    [cluster writeAttributeColorLoopActiveWithValue:colorLoopActiveArgument
+                                    responseHandler:^(NSError * err, NSDictionary * values) {
+                                        NSLog(@"Write the default values to mandatory attribute: ColorLoopActive Error: %@", err);
+
+                                        XCTAssertEqual(err.code, 1);
+                                        [expectation fulfill];
+                                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000030_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: ColorLoopActive"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopActiveWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: ColorLoopActive Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000031_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: ColorLoopDirection"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopDirectionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: ColorLoopDirection Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000032_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: ColorLoopDirection"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopDirectionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorLoopDirection Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000033_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory attribute: ColorLoopDirection"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t colorLoopDirectionArgument = 0;
+    [cluster
+        writeAttributeColorLoopDirectionWithValue:colorLoopDirectionArgument
+                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                      NSLog(@"Write the default values to mandatory attribute: ColorLoopDirection Error: %@", err);
+
+                                      XCTAssertEqual(err.code, 1);
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000034_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: ColorLoopDirection"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopDirectionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: ColorLoopDirection Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000035_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: ColorLoopTime"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: ColorLoopTime Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 25U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000036_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: ColorLoopTime"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorLoopTime Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000037_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory attribute: ColorLoopTime"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorLoopTimeArgument = 25U;
+    [cluster writeAttributeColorLoopTimeWithValue:colorLoopTimeArgument
+                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                      NSLog(@"Write the default values to mandatory attribute: ColorLoopTime Error: %@", err);
+
+                                      XCTAssertEqual(err.code, 1);
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000038_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: ColorLoopTime"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: ColorLoopTime Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 25U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000039_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: ColorLoopStartEnhancedHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStartEnhancedHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: ColorLoopStartEnhancedHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 8960U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000040_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Validate constraints of attribute: ColorLoopStartEnhancedHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStartEnhancedHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorLoopStartEnhancedHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000041_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory attribute: ColorLoopStartEnhancedHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorLoopStartEnhancedHueArgument = 8960U;
+    [cluster writeAttributeColorLoopStartEnhancedHueWithValue:colorLoopStartEnhancedHueArgument
+                                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                                  NSLog(@"Write the default values to mandatory attribute: "
+                                                        @"ColorLoopStartEnhancedHue Error: %@",
+                                                      err);
+
+                                                  XCTAssertEqual(err.code, 1);
+                                                  [expectation fulfill];
+                                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000042_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads back mandatory attribute: ColorLoopStartEnhancedHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStartEnhancedHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: ColorLoopStartEnhancedHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 8960U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000043_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: ColorLoopStoredEnhancedHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: ColorLoopStoredEnhancedHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000044_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Validate constraints of attribute: ColorLoopStoredEnhancedHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorLoopStoredEnhancedHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000045_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory attribute: ColorLoopStoredEnhancedHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorLoopStoredEnhancedHueArgument = 0U;
+    [cluster writeAttributeColorLoopStoredEnhancedHueWithValue:colorLoopStoredEnhancedHueArgument
+                                               responseHandler:^(NSError * err, NSDictionary * values) {
+                                                   NSLog(@"Write the default values to mandatory attribute: "
+                                                         @"ColorLoopStoredEnhancedHue Error: %@",
+                                                       err);
+
+                                                   XCTAssertEqual(err.code, 1);
+                                                   [expectation fulfill];
+                                               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000046_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads back mandatory attribute: ColorLoopStoredEnhancedHue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: ColorLoopStoredEnhancedHue Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000047_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: ColorCapabilities"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorCapabilitiesWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: ColorCapabilities Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000048_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: ColorCapabilities"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorCapabilitiesWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorCapabilities Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000049_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory attribute: ColorCapabilities"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorCapabilitiesArgument = 0U;
+    [cluster
+        writeAttributeColorCapabilitiesWithValue:colorCapabilitiesArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Write the default values to mandatory attribute: ColorCapabilities Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 1);
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000050_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back mandatory attribute: ColorCapabilities"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorCapabilitiesWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: ColorCapabilities Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000051_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: ColorTempPhysicalMinMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorTempPhysicalMinWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: ColorTempPhysicalMinMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000052_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Validate constraints of attribute: ColorTempPhysicalMinMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorTempPhysicalMinWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorTempPhysicalMinMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000053_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory  attribute: ColorTempPhysicalMinMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorTempPhysicalMinArgument = 0U;
+    [cluster writeAttributeColorTempPhysicalMinWithValue:colorTempPhysicalMinArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Write the default values to mandatory  attribute: ColorTempPhysicalMinMireds "
+                                                   @"Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 1);
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000054_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads back mandatory attribute: ColorTempPhysicalMinMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorTempPhysicalMinWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: ColorTempPhysicalMinMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000055_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: ColorTempPhysicalMaxMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorTempPhysicalMaxWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: ColorTempPhysicalMaxMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 65279U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000056_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Validate constraints of attribute: ColorTempPhysicalMaxMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorTempPhysicalMaxWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: ColorTempPhysicalMaxMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000057_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to mandatory attribute: ColorTempPhysicalMaxMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorTempPhysicalMaxArgument = 65279U;
+    [cluster writeAttributeColorTempPhysicalMaxWithValue:colorTempPhysicalMaxArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Write the default values to mandatory attribute: ColorTempPhysicalMaxMireds "
+                                                   @"Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 1);
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000058_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads back mandatory attribute: ColorTempPhysicalMaxMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorTempPhysicalMaxWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back mandatory attribute: ColorTempPhysicalMaxMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 65279U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000059_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Read the optional attribute: CoupleColorTempToLevelMinMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCoupleColorTempToLevelMinMiredsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: CoupleColorTempToLevelMinMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000060_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to optional attribute: CoupleColorTempToLevelMinMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t coupleColorTempToLevelMinMiredsArgument = 0U;
+    [cluster writeAttributeCoupleColorTempToLevelMinMiredsWithValue:coupleColorTempToLevelMinMiredsArgument
+                                                    responseHandler:^(NSError * err, NSDictionary * values) {
+                                                        NSLog(@"Write the default values to optional attribute: "
+                                                              @"CoupleColorTempToLevelMinMireds Error: %@",
+                                                            err);
+
+                                                        XCTAssertEqual(err.code, 1);
+                                                        [expectation fulfill];
+                                                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000061_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads back optional attribute: CoupleColorTempToLevelMinMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCoupleColorTempToLevelMinMiredsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back optional attribute: CoupleColorTempToLevelMinMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000062_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Read the optional attribute: StartUpColorTemperatureMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpColorTemperatureMiredsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: StartUpColorTemperatureMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000063_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to optional attribute: StartUpColorTemperatureMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t startUpColorTemperatureMiredsArgument = 0U;
+    [cluster writeAttributeStartUpColorTemperatureMiredsWithValue:startUpColorTemperatureMiredsArgument
+                                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                                      NSLog(@"Write the default values to optional attribute: "
+                                                            @"StartUpColorTemperatureMireds Error: %@",
+                                                          err);
+
+                                                      XCTAssertEqual(err.code, 0);
+
+                                                      [expectation fulfill];
+                                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000064_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads back optional attribute: StartUpColorTemperatureMireds"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpColorTemperatureMiredsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back optional attribute: StartUpColorTemperatureMireds Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000065_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the Optional attribute: RemainingTime"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeRemainingTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the Optional attribute: RemainingTime Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000066_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: RemainingTime"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeRemainingTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: RemainingTime Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 254);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000067_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to optional attribute: RemainingTime"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t remainingTimeArgument = 0U;
+    [cluster writeAttributeRemainingTimeWithValue:remainingTimeArgument
+                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                      NSLog(@"Write the default values to optional attribute: RemainingTime Error: %@", err);
+
+                                      XCTAssertEqual(err.code, 1);
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000068_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back optional attribute: RemainingTime"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeRemainingTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back optional attribute: RemainingTime Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000069_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: DriftCompensation"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeDriftCompensationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: DriftCompensation Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 4);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000070_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to optional attribute: DriftCompensation"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t driftCompensationArgument = 0;
+    [cluster
+        writeAttributeDriftCompensationWithValue:driftCompensationArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Write the default values to optional attribute: DriftCompensation Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 1);
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000071_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back optional attribute: DriftCompensation"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeDriftCompensationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads back optional attribute: DriftCompensation Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000072_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: CompensationText"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCompensationTextWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: CompensationText Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] length], 254);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000073_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: NumberOfPrimaries"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNumberOfPrimariesWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: NumberOfPrimaries Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 6);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000074_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: NumberOfPrimaries"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t numberOfPrimariesArgument = 0;
+    [cluster writeAttributeNumberOfPrimariesWithValue:numberOfPrimariesArgument
+                                      responseHandler:^(NSError * err, NSDictionary * values) {
+                                          NSLog(@"Write the default mandatory attribute: NumberOfPrimaries Error: %@", err);
+
+                                          XCTAssertEqual(err.code, 1);
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000075_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: NumberOfPrimaries"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNumberOfPrimariesWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: NumberOfPrimaries Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000076_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary1X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary1XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary1X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000077_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary1X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary1XArgument = 0U;
+    [cluster writeAttributePrimary1XWithValue:primary1XArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary1X Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000078_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary1X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary1XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary1X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000079_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary1Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary1YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary1Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000080_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary1Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary1YArgument = 0U;
+    [cluster writeAttributePrimary1YWithValue:primary1YArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary1Y Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000081_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary1Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary1YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary1Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000082_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary1Intensity"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary1IntensityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary1Intensity Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000083_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary2X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary2XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary2X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000084_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary2X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary2XArgument = 0U;
+    [cluster writeAttributePrimary2XWithValue:primary2XArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary2X Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000085_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary2X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary2XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary2X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000086_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary2Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary2YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary2Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000087_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary2Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary2YArgument = 0U;
+    [cluster writeAttributePrimary2YWithValue:primary2YArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary2Y Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000088_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary2Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary2YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary2Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000089_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Validate constraints of attribute: Primary2Intensity"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary2IntensityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Validate constraints of attribute: Primary2Intensity Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000090_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary3X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary3XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary3X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000091_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary3X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary3XArgument = 0U;
+    [cluster writeAttributePrimary3XWithValue:primary3XArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary3X Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000092_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary3X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary3XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary3X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000093_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary3Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary3YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary3Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000094_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary3Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary3YArgument = 0U;
+    [cluster writeAttributePrimary3YWithValue:primary3YArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary3Y Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000095_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary3Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary3YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary3Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000096_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary3Intensity"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary3IntensityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary3Intensity Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000097_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary4X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary4XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary4X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000098_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary4X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary4XArgument = 0U;
+    [cluster writeAttributePrimary4XWithValue:primary4XArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary4X Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000099_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary4X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary4XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary4X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000100_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary4Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary4YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary4Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000101_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary4Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary4YArgument = 0U;
+    [cluster writeAttributePrimary4YWithValue:primary4YArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary4Y Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000102_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary4Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary4YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary4Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000103_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary4Intensity"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary4IntensityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary4Intensity Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000104_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary5X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary5XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary5X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000105_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary5X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary5XArgument = 0U;
+    [cluster writeAttributePrimary5XWithValue:primary5XArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary5X Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000106_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary5X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary5XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary5X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000107_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary5Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary5YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary5Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000108_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary5Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary5YArgument = 0U;
+    [cluster writeAttributePrimary5YWithValue:primary5YArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary5Y Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000109_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary5Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary5YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary5Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000110_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary5Intensity"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary5IntensityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary5Intensity Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000111_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary6X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary6XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary6X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000112_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary6X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary6XArgument = 0U;
+    [cluster writeAttributePrimary6XWithValue:primary6XArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary6X Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000113_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary6X"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary6XWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary6X Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000114_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary6Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary6YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary6Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000115_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default mandatory attribute: Primary6Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t primary6YArgument = 0U;
+    [cluster writeAttributePrimary6YWithValue:primary6YArgument
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Write the default mandatory attribute: Primary6Y Error: %@", err);
+
+                                  XCTAssertEqual(err.code, 1);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000116_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the mandatory attribute: Primary6Y"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary6YWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the mandatory attribute: Primary6Y Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000117_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the mandatory attribute: Primary6Intensity"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePrimary6IntensityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the mandatory attribute: Primary6Intensity Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000118_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: WhitePointX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeWhitePointXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: WhitePointX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000119_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default optional attribute: WhitePointX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t whitePointXArgument = 0U;
+    [cluster writeAttributeWhitePointXWithValue:whitePointXArgument
+                                responseHandler:^(NSError * err, NSDictionary * values) {
+                                    NSLog(@"Write the default optional attribute: WhitePointX Error: %@", err);
+
+                                    XCTAssertEqual(err.code, 0);
+
+                                    [expectation fulfill];
+                                }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000120_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the optional attribute: WhitePointX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeWhitePointXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the optional attribute: WhitePointX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000121_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: WhitePointY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeWhitePointYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: WhitePointY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000122_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default optional attribute: WhitePointY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t whitePointYArgument = 0U;
+    [cluster writeAttributeWhitePointYWithValue:whitePointYArgument
+                                responseHandler:^(NSError * err, NSDictionary * values) {
+                                    NSLog(@"Write the default optional attribute: WhitePointY Error: %@", err);
+
+                                    XCTAssertEqual(err.code, 0);
+
+                                    [expectation fulfill];
+                                }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000123_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the optional attribute: WhitePointY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeWhitePointYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the optional attribute: WhitePointY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000124_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: ColorPointRX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointRXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: ColorPointRX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000125_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default optional attribute: ColorPointRX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorPointRXArgument = 0U;
+    [cluster writeAttributeColorPointRXWithValue:colorPointRXArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Write the default optional attribute: ColorPointRX Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 0);
+
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000126_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the optional attribute: ColorPointRX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointRXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the optional attribute: ColorPointRX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000127_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: ColorPointRY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointRYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: ColorPointRY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000128_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default optional attribute: ColorPointRY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorPointRYArgument = 0U;
+    [cluster writeAttributeColorPointRYWithValue:colorPointRYArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Write the default optional attribute: ColorPointRY Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 0);
+
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000129_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the optional attribute: ColorPointRY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointRYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the optional attribute: ColorPointRY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000130_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: ColorPointRIntensity"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointRIntensityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: ColorPointRIntensity Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000131_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: ColorPointGX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointGXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: ColorPointGX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000132_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default optional attribute: ColorPointGX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorPointGXArgument = 0U;
+    [cluster writeAttributeColorPointGXWithValue:colorPointGXArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Write the default optional attribute: ColorPointGX Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 0);
+
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000133_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the optional attribute: ColorPointGX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointGXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the optional attribute: ColorPointGX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000134_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: ColorPointGY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointGYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: ColorPointGY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000135_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default optional attribute: ColorPointGY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorPointGYArgument = 0U;
+    [cluster writeAttributeColorPointGYWithValue:colorPointGYArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Write the default optional attribute: ColorPointGY Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 0);
+
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000136_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the optional attribute: ColorPointGY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointGYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the optional attribute: ColorPointGY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000137_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: ColorPointGIntensity"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointGIntensityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: ColorPointGIntensity Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000138_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: ColorPointBX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointBXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: ColorPointBX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000139_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default optional attribute: ColorPointBX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorPointBXArgument = 0U;
+    [cluster writeAttributeColorPointBXWithValue:colorPointBXArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Write the default optional attribute: ColorPointBX Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 0);
+
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000140_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the optional attribute: ColorPointBX"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointBXWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the optional attribute: ColorPointBX Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000141_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: ColorPointBY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointBYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: ColorPointBY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65279);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000142_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write the default optional attribute: ColorPointBY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t colorPointBYArgument = 0U;
+    [cluster writeAttributeColorPointBYWithValue:colorPointBYArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Write the default optional attribute: ColorPointBY Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 0);
+
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000143_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back the optional attribute: ColorPointBY"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointBYWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back the optional attribute: ColorPointBY Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_2_1_000144_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional attribute: ColorPointBIntensity"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorPointBIntensityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read the optional attribute: ColorPointBIntensity Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_CC_3_1_000000_On
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn on light for color control tests"];
