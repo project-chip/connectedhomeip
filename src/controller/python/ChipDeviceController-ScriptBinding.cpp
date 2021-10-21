@@ -211,11 +211,11 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     FactoryInitParams factoryParams;
-    factoryParams.storageDelegate = &sStorageDelegate;
-    factoryParams.fabricStorage   = &sFabricStorage;
-    factoryParams.imDelegate      = &PythonInteractionModelDelegate::Instance();
+    factoryParams.fabricStorage = &sFabricStorage;
+    factoryParams.imDelegate    = &PythonInteractionModelDelegate::Instance();
 
     SetupParams initParams;
+    initParams.storageDelegate                = &sStorageDelegate;
     initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;

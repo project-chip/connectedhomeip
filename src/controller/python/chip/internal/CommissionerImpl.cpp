@@ -111,9 +111,10 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         err = gFabricStorage.Initialize(&gServerStorage);
         SuccessOrExit(err);
 
+        factoryParams.fabricStorage = &gFabricStorage;
+
         commissionerParams.pairingDelegate = &gPairingDelegate;
-        factoryParams.storageDelegate      = &gServerStorage;
-        factoryParams.fabricStorage        = &gFabricStorage;
+        commissionerParams.storageDelegate = &gServerStorage;
 
         // Initialize device attestation verifier
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());

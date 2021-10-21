@@ -43,6 +43,8 @@ struct SetupParams
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
+    PersistentStorageDelegate * storageDelegate = nullptr;
+
     /* The following keypair must correspond to the public key used for generating
     controllerNOC. It's used by controller to establish CASE sessions with devices */
     Crypto::P256Keypair * ephemeralKeypair = nullptr;
@@ -60,11 +62,10 @@ struct SetupParams
     DevicePairingDelegate * pairingDelegate = nullptr;
 };
 
-// TODO everything other than the storage delegate here should be removed.
+// TODO everything other than the fabric storage here should be removed.
 // We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
-    PersistentStorageDelegate * storageDelegate           = nullptr;
     FabricStorage * fabricStorage                         = nullptr;
     System::Layer * systemLayer                           = nullptr;
     Inet::InetLayer * inetLayer                           = nullptr;
@@ -110,9 +111,8 @@ private:
     CHIP_ERROR InitSystemState();
 
     uint16_t mListenPort;
-    PersistentStorageDelegate * mStorageDelegate = nullptr;
-    FabricStorage * mFabricStorage               = nullptr;
-    DeviceControllerSystemState * mSystemState   = nullptr;
+    FabricStorage * mFabricStorage             = nullptr;
+    DeviceControllerSystemState * mSystemState = nullptr;
 };
 
 } // namespace Controller

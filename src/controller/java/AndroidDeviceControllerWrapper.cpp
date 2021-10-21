@@ -209,12 +209,13 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;
 
-    initParams.storageDelegate = wrapper.get();
-    initParams.systemLayer     = systemLayer;
-    initParams.inetLayer       = inetLayer;
+    initParams.systemLayer   = systemLayer;
+    initParams.inetLayer     = inetLayer;
+    initParams.fabricStorage = wrapper.get();
     // move bleLayer into platform/android to share with app server
     initParams.bleLayer                        = DeviceLayer::ConnectivityMgr().GetBleLayer();
     initParams.listenPort                      = CHIP_PORT + 1;
+    setupParams.storageDelegate                = wrapper.get();
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = wrapper.get();
 
