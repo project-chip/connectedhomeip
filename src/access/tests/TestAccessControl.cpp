@@ -119,8 +119,8 @@ struct TestEntryDelegate
     Privilege privilege     = Privilege::kView;
     TestSubject subjects[kSubjectsPerEntry + 1];
     TestTarget targets[kTargetsPerEntry + 1];
-    const char* tag = "";
-    bool touched = false;
+    const char * tag = "";
+    bool touched     = false;
 };
 
 TestEntryDelegate entries[] = {
