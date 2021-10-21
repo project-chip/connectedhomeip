@@ -39,6 +39,7 @@ steps:
               /workspace/artifacts/
       waitFor:
           - Bootstrap
+          - ESP32
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
@@ -55,6 +56,7 @@ steps:
               /workspace/artifacts/
       waitFor:
           - Bootstrap
+          - NRFConnect
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
@@ -71,12 +73,14 @@ steps:
               /workspace/artifacts/
       waitFor:
           - Bootstrap
+          - EFR32
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
             path: /pwenv
 
     - name: "connectedhomeip/chip-build-vscode:0.5.18"
+      id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -86,6 +90,7 @@ steps:
               --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
+          - Linux
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
