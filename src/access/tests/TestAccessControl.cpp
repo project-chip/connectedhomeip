@@ -339,17 +339,33 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
 {
     AccessControl & context = *reinterpret_cast<AccessControl *>(inContext);
 
-    CHIP_ERROR err;
+    constexpr struct
+    {
+        SubjectDescriptor subjectDescriptor;
+        RequestPath requestPath;
+        Privilege privilege;
+        CHIP_ERROR expectedResult;
+    } checks[] = {
+        {
+            { .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+            Privilege::kAdminister,
+            CHIP_NO_ERROR
+        },
+        {
+            { .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+            Privilege::kAdminister,
+            CHIP_ERROR_ACCESS_DENIED
+        },
+    };
 
-    // TODO: make this table driven, add a bunch more test cases
-
-    err = context.Check({ .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
-                        { .endpoint = kEndpoint1, .cluster = kOnOffCluster }, Privilege::kAdminister);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = context.Check({ .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1 },
-                        { .endpoint = kEndpoint1, .cluster = kOnOffCluster }, Privilege::kAdminister);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ACCESS_DENIED);
+    for (int i = 0; i < int(sizeof(checks) / sizeof(checks[0])); ++i)
+    {
+        auto & check = checks[i];
+        CHIP_ERROR err = context.Check(check.subjectDescriptor, check.requestPath, check.privilege);
+        NL_TEST_ASSERT_LOOP(inSuite, i, err == check.expectedResult);
+    }
 }
 
 void TestGlobalInstance(nlTestSuite * inSuite, void * inContext)
