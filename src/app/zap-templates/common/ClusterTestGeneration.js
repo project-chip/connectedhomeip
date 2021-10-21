@@ -34,6 +34,7 @@ const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templa
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
 const kCommandName       = 'command';
+const kWaitCommandName   = 'wait';
 const kIndexName         = 'index';
 const kValuesName        = 'values';
 const kConstraintsName   = 'constraints';
@@ -70,6 +71,39 @@ function setDefault(test, name, defaultValue)
 
 function setDefaultType(test)
 {
+  if (kWaitCommandName in test) {
+    setDefaultTypeForWaitCommand(test);
+  } else {
+    setDefaultTypeForCommand(test);
+  }
+}
+
+function setDefaultTypeForWaitCommand(test)
+{
+  const type = test[kWaitCommandName];
+  switch (type) {
+  case 'readAttribute':
+    test.isAttribute     = true;
+    test.isReadAttribute = true;
+    break;
+  case 'writeAttribute':
+    test.isAttribute      = true;
+    test.isWriteAttribute = true;
+    break;
+  case 'subscribeAttribute':
+    test.isAttribute          = true;
+    test.isSubscribeAttribute = true;
+    break;
+  default:
+    test.isCommand = true;
+    break;
+  }
+
+  test.isWait = true;
+}
+
+function setDefaultTypeForCommand(test)
+{
   const type = test[kCommandName];
   switch (type) {
   case 'readAttribute':
@@ -101,6 +135,8 @@ function setDefaultType(test)
     test.isCommand   = true;
     break;
   }
+
+  test.isWait = false;
 }
 
 function setDefaultArguments(test)
@@ -153,6 +189,11 @@ function setDefaultResponse(test)
         '      - name: "returnValue"\n' +
         '      - value: 7\n';
     throwError(test, errorStr);
+  }
+
+  // Step that waits for a particular event does not requires constraints nor expected values.
+  if (test.isWait) {
+    return;
   }
 
   if (!test.isAttribute) {

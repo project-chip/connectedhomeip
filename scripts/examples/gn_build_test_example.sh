@@ -42,7 +42,11 @@ function runZAP() {
         touch "$ZAP_OUTPUT_DIR"/af-gen-event.h
     fi
 
+    # Generates the generic files for the given zap configuration
     "$CHIP_ROOT"/scripts/tools/zap/generate.py "$ZAP_INPUT_FILE" -o "$ZAP_OUTPUT_DIR"
+
+    # Generates the specific files for the given zap configuration
+    TARGET_APP=$APP_DIR "$CHIP_ROOT"/scripts/tools/zap/generate.py "$ZAP_INPUT_FILE" -t $INPUT_DIR/../templates/templates.json -o "$ZAP_OUTPUT_DIR"
 }
 
 function runGN() {
