@@ -27,6 +27,7 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
 #include <transport/FabricTable.h>
 
 using chip::FabricInfo;
@@ -118,7 +119,7 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
         return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
     }
 
-    chip::DeviceLayer::SystemLayer().StartTimer(msToStart, StartDelayTimerHandler, this);
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(msToStart), StartDelayTimerHandler, this);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
