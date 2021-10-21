@@ -27,7 +27,7 @@ tests:
               type: uint16
 
     - label: "operate on DUT to change the flow significantly"
-      disabled: true    
+      disabled: true
 
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
