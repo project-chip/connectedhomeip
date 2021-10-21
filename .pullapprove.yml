@@ -4,45 +4,43 @@ version: 3
 github_api_version: "shadow-cat-preview"
 
 ############################################################
-#  Conditions
+#  Overrides
 ############################################################
 
-pullapprove_conditions:
-    ############################################################
-    #  License Checks
-    ############################################################
-    - condition: "'*license/cla*' in statuses.successful"
-      unmet_status: "pending"
-      explanation: "CLA must be agreed to by all contributors"
+overrides:
+    - if: "'hotfix' in labels"
+      status: success
+      explanation: "Hotfix label added, bypassing reviews"
 
     ############################################################
     #  Draft PRs
     ############################################################
-    - condition: "'WIP' not in title"
-      unmet_status: "pending"
-      explanation: "Work in progress"
-
-    - condition: "not draft"
-      unmet_status: "pending"
-      explanation: "Work in progress"
+    - if: "draft or 'WIP' in title"
+      status: pending
+      explanation: "PR is draft, pending review"
+    - if: "not draft"
+      status: pending
+      explanation: "PR is draft, pending review"
+  
+    ############################################################
+    #  License Checks
+    ############################################################
+    - if: "'*license/cla*' not in statuses.successful"
+      status: pending
+      explanation: "CLA must be agreed to by all contributors"
 
     ############################################################
     #  Conditions to Skip Review
     ############################################################
-    - condition: "base.ref == 'master'"
-      unmet_status: "success"
+    - if: "base.ref != 'master'"
+      status: success
       explanation: "Review not required unless merging to master"
-
-    ############################################################
-    #  Bypass reviews
-    ############################################################
-    - "'hotfix' not in labels"
 
     ############################################################
     #  Required status checks
     ############################################################
-    - condition: "'*restyle*' in statuses.successful"
-      unmet_status: "failure"
+    - if: "'*restyle*' not in statuses.successful"
+      status: failure
       explanation: "Style must be inline before reviewing can be complete"
 
 ############################################################
