@@ -328,7 +328,7 @@ CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     return Dnssd::Resolver::Instance().ResolveNodeId(PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(deviceId),
-                                                     chip::Inet::kIPAddressType_Any);
+                                                     chip::Inet::IPAddressType::kAny);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -631,12 +631,12 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->InetLayer())
-                                                    .SetAddressType(Inet::kIPAddressType_IPv6)
+                                                    .SetAddressType(Inet::IPAddressType::kIPv6)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mSystemState->InetLayer())
-                                                    .SetAddressType(Inet::kIPAddressType_IPv4)
+                                                    .SetAddressType(Inet::IPAddressType::kIPv4)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
                                                     ));
@@ -1999,8 +1999,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
         ChipLogProgress(Controller, "Finding node on operational network");
         Dnssd::Resolver::Instance().ResolveNodeId(
-            PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(device->GetDeviceId()),
-            Inet::IPAddressType::kIPAddressType_Any);
+            PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(device->GetDeviceId()), Inet::IPAddressType::kAny);
 #endif
     }
     break;

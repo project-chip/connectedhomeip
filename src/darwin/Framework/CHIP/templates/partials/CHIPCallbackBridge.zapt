@@ -10,7 +10,7 @@ public:
       {{#if (isStrEqual partial-type "Command")}}
       {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
       {{else if (isStrEqual partial-type "List")}}
-      , uint16_t count, {{chipType}} * entries
+      , const chip::app::DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list
       {{else if partial-type}}
       , {{asUnderlyingZclType partial-type}} value
       {{else}}
@@ -22,7 +22,8 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
   {{#if (isStrEqual partial-type "Command")}}
   {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
   {{else if (isStrEqual partial-type "List")}}
-  , uint16_t count, {{chipType}} * entries
+  , const chip::app::DataModel::DecodableList
+  <{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list
   {{else if partial-type}}
   , {{asUnderlyingZclType partial-type}} value
   {{else}}
@@ -45,28 +46,35 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
       {{/chip_cluster_response_arguments}}
     });
     {{else if (isStrEqual partial-type "List")}}
-    id array = [NSMutableArray arrayWithCapacity:count];
-    for (uint16_t i = 0; i < count; i++)
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next())
     {
+        auto & entry = iter.GetValue();
         {{#if isStruct}}
-        array[i] = @{
+        [array addObject:@{
           {{#chip_attribute_list_entryTypes}}
           {{#if (isOctetString type)}}
-          @"{{name}}" : [NSData dataWithBytes:entries[i].{{name}}.data() length:entries[i].{{name}}.size()],
+          @"{{name}}" : [NSData dataWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size()],
           {{else if (isCharString type)}}
-          @"{{name}}" : [[NSString alloc] initWithBytes:entries[i].{{name}}.data() length:entries[i].{{name}}.size() encoding:NSUTF8StringEncoding],
+          @"{{name}}" : [[NSString alloc] initWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size() encoding:NSUTF8StringEncoding],
           {{else}}
-          @"{{name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i].{{name}}],
+          @"{{name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entry.{{asLowerCamelCase name}}],
           {{/if}}
           {{/chip_attribute_list_entryTypes}}
-        };
+        }];
         {{else if (isOctetString type)}}
-        array[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
+        [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
         {{else if (isCharString type)}}
-        array[i] = [[NSString alloc] initWithBytes:entries[i].data() length:entries[i].size() encoding:NSUTF8StringEncoding];
+        [array addObject:[[NSString alloc] initWithBytes:entry.data() length:entry.size() encoding:NSUTF8StringEncoding]];
         {{else}}
-        array[i] = [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i]];
+        [array addObject:[NSNumber numberWith{{asObjectiveCNumberType label type false}}:entry]];
         {{/if}}
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
     }
 
     DispatchSuccess(context, @{ @"value": array });

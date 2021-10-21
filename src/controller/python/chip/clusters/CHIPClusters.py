@@ -2623,6 +2623,62 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "MinConstPressure",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
+            0x00000004: {
+                "attributeName": "MaxConstPressure",
+                "attributeId": 0x00000004,
+                "type": "int",
+            },
+            0x00000005: {
+                "attributeName": "MinCompPressure",
+                "attributeId": 0x00000005,
+                "type": "int",
+            },
+            0x00000006: {
+                "attributeName": "MaxCompPressure",
+                "attributeId": 0x00000006,
+                "type": "int",
+            },
+            0x00000007: {
+                "attributeName": "MinConstSpeed",
+                "attributeId": 0x00000007,
+                "type": "int",
+            },
+            0x00000008: {
+                "attributeName": "MaxConstSpeed",
+                "attributeId": 0x00000008,
+                "type": "int",
+            },
+            0x00000009: {
+                "attributeName": "MinConstFlow",
+                "attributeId": 0x00000009,
+                "type": "int",
+            },
+            0x0000000A: {
+                "attributeName": "MaxConstFlow",
+                "attributeId": 0x0000000A,
+                "type": "int",
+            },
+            0x0000000B: {
+                "attributeName": "MinConstTemp",
+                "attributeId": 0x0000000B,
+                "type": "int",
+            },
+            0x0000000C: {
+                "attributeName": "MaxConstTemp",
+                "attributeId": 0x0000000C,
+                "type": "int",
+            },
+            0x00000010: {
+                "attributeName": "PumpStatus",
+                "attributeId": 0x00000010,
+                "type": "int",
+                "reportable": True,
+            },
             0x00000011: {
                 "attributeName": "EffectiveOperationMode",
                 "attributeId": 0x00000011,
@@ -2639,11 +2695,37 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000014: {
+                "attributeName": "Speed",
+                "attributeId": 0x00000014,
+                "type": "int",
+            },
+            0x00000017: {
+                "attributeName": "LifetimeEnergyConsumed",
+                "attributeId": 0x00000017,
+                "type": "int",
+            },
             0x00000020: {
                 "attributeName": "OperationMode",
                 "attributeId": 0x00000020,
                 "type": "int",
                 "writable": True,
+            },
+            0x00000021: {
+                "attributeName": "ControlMode",
+                "attributeId": 0x00000021,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000022: {
+                "attributeName": "AlarmMask",
+                "attributeId": 0x00000022,
+                "type": "int",
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -5830,6 +5912,42 @@ class ChipClusters:
     def ClusterPumpConfigurationAndControl_ReadAttributeMaxFlow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinConstPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstPressure(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxConstPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstPressure(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinCompPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinCompPressure(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxCompPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxCompPressure(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinConstSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstSpeed(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxConstSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstSpeed(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinConstFlow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstFlow(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxConstFlow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstFlow(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMinConstTemp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstTemp(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxConstTemp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstTemp(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributePumpStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_PumpStatus(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_SubscribeAttributePumpStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_PumpStatus(device, ZCLendpoint, minInterval, maxInterval)
+
     def ClusterPumpConfigurationAndControl_ReadAttributeEffectiveOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveOperationMode(device, ZCLendpoint, ZCLgroupid)
 
@@ -5842,11 +5960,29 @@ class ChipClusters:
     def ClusterPumpConfigurationAndControl_SubscribeAttributeCapacity(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Capacity(device, ZCLendpoint, minInterval, maxInterval)
 
+    def ClusterPumpConfigurationAndControl_ReadAttributeSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Speed(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeLifetimeEnergyConsumed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterPumpConfigurationAndControl_ReadAttributeOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterPumpConfigurationAndControl_WriteAttributeOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_OperationMode(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeControlMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ControlMode(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_WriteAttributeControlMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_ControlMode(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeAlarmMask(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_AlarmMask(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_FeatureMap(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterPumpConfigurationAndControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -8211,6 +8347,54 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinConstPressure
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstPressure.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstPressure.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxConstPressure
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstPressure.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstPressure.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinCompPressure
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinCompPressure.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinCompPressure.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxCompPressure
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxCompPressure.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxCompPressure.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinConstSpeed
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstSpeed.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstSpeed.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxConstSpeed
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstSpeed.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstSpeed.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinConstFlow
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstFlow.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstFlow.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxConstFlow
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstFlow.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstFlow.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MinConstTemp
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstTemp.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MinConstTemp.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxConstTemp
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstTemp.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxConstTemp.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute PumpStatus
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_PumpStatus.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_PumpStatus.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl SubscribeAttribute PumpStatus
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_PumpStatus.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_PumpStatus.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl ReadAttribute EffectiveOperationMode
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveOperationMode.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8227,6 +8411,14 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Capacity.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Capacity.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute Speed
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Speed.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Speed.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute LifetimeEnergyConsumed
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl ReadAttribute OperationMode
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8235,6 +8427,22 @@ class ChipClusters:
         self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_OperationMode.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_OperationMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute ControlMode
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ControlMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ControlMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl WriteAttribute ControlMode
+        self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_ControlMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_ControlMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute AlarmMask
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_AlarmMask.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_AlarmMask.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_FeatureMap.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

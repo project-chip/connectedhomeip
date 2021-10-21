@@ -91,8 +91,9 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SPL"   // SetupPayload
                                   "SVR"   // AppServer
                                   "DIS"   // Discovery
-                                  "IM"    // InteractionModel
+                                  "IM\0"  // InteractionModel
                                   "TST"   // Test
+                                  "ODP"   // OperationalDeviceProxy
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)

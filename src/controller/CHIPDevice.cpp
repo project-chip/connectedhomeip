@@ -255,6 +255,12 @@ CHIP_ERROR Device::Persist()
 
 void Device::OnNewConnection(SessionHandle session)
 {
+    // Only allow update if the session has been initialized and matches
+    if (mSecureSession.HasValue() && !MatchesSession(session))
+    {
+        return;
+    }
+
     mState = ConnectionState::SecureConnected;
     mSecureSession.SetValue(session);
 

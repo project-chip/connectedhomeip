@@ -388,6 +388,68 @@ function zapTypeToDecodableClusterObjectType(type, options)
   return zapTypeToClusterObjectType.call(this, type, true, options)
 }
 
+function zapTypeToPythonClusterObjectType(type, options)
+{
+  if (StringHelper.isCharString(type)) {
+    return 'str';
+  }
+
+  if (StringHelper.isOctetString(type)) {
+    return 'bytes';
+  }
+
+  if ([ 'single', 'double' ].includes(type.toLowerCase())) {
+    return 'float';
+  }
+
+  if (type.toLowerCase() == 'boolean') {
+    return 'bool'
+  }
+
+  // #10748: asUnderlyingZclType will emit wrong types for int{48|56|64}(u), so we process all int values here.
+  if (type.toLowerCase().match(/^int\d+$/)) {
+    return 'int'
+  }
+
+  if (type.toLowerCase().match(/^int\d+u$/)) {
+    return 'uint'
+  }
+
+  async function fn(pkgId)
+  {
+    const ns          = asUpperCamelCase(options.hash.ns);
+    const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+    if (await typeChecker('isEnum')) {
+      return ns + '.Enums.' + type;
+    }
+
+    if (await typeChecker('isBitmap')) {
+      return 'int';
+    }
+
+    if (await typeChecker('isStruct')) {
+      return ns + '.Structs.' + type;
+    }
+
+    resolvedType = await zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
+    {
+      basicType = ChipTypesHelper.asBasicType(resolvedType);
+      if (basicType.match(/^int\d+_t$/)) {
+        return 'int'
+      }
+      if (basicType.match(/^uint\d+_t$/)) {
+        return 'uint'
+      }
+    }
+
+    throw "Unhandled type " + resolvedType + " (from " + type + ")"
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  return templateUtil.templatePromise(this.global, promise)
+}
+
 //
 // Module exports
 //
@@ -402,3 +464,4 @@ exports.hasSpecificAttributes               = hasSpecificAttributes;
 exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
+exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;

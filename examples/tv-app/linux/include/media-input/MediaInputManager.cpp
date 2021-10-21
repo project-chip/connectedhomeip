@@ -17,6 +17,7 @@
 
 #include "MediaInputManager.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
@@ -35,25 +36,26 @@ exit:
     return err;
 }
 
-std::vector<MediaInputInfo> MediaInputManager::proxyGetInputList()
+CHIP_ERROR MediaInputManager::proxyGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
-    std::vector<MediaInputInfo> mediaInputList;
-    int maximumVectorSize = 2;
-    char description[]    = "exampleDescription";
-    char name[]           = "exampleName";
+    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // TODO: Insert code here
+        int maximumVectorSize = 2;
+        char description[]    = "exampleDescription";
+        char name[]           = "exampleName";
 
-    for (int i = 0; i < maximumVectorSize; ++i)
-    {
-        MediaInputInfo mediaInput;
-        mediaInput.description = chip::ByteSpan(chip::Uint8::from_char(description), sizeof(description));
-        mediaInput.name        = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
-        mediaInput.inputType   = EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI;
-        mediaInput.index       = static_cast<uint8_t>(1 + i);
-        mediaInputList.push_back(mediaInput);
-    }
+        for (int i = 0; i < maximumVectorSize; ++i)
+        {
+            chip::app::Clusters::MediaInput::Structs::MediaInputInfo::Type mediaInput;
+            mediaInput.description = chip::ByteSpan(chip::Uint8::from_char(description), sizeof(description) - 1);
+            mediaInput.name        = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name) - 1);
+            mediaInput.inputType   = EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI;
+            mediaInput.index       = static_cast<uint8_t>(1 + i);
+            ReturnErrorOnFailure(encoder.Encode(mediaInput));
+        }
 
-    return mediaInputList;
+        return CHIP_NO_ERROR;
+    });
 }
 
 bool mediaInputClusterSelectInput(uint8_t input)

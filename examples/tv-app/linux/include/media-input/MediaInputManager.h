@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
+#include <app/AttributeAccessInterface.h>
 
 #include <lib/core/CHIPError.h>
 #include <string>
@@ -28,5 +28,5 @@ class MediaInputManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<MediaInputInfo> proxyGetInputList();
+    CHIP_ERROR proxyGetInputList(chip::app::AttributeValueEncoder & aEncoder);
 };

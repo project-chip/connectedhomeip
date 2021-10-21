@@ -185,7 +185,6 @@ def main(argv):
         memdf.report.write_dfs(config, summaries, sys.stdout, 'simple')
 
     except Exception as exception:
-        status = 1
         raise exception
 
     return status
