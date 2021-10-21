@@ -115,6 +115,53 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
     DispatchSuccess(context, @ { @"value" : array });
 };
 
+void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        [array addObject:@ {
+            @"ActionID" : [NSNumber numberWithUnsignedShort:entry.actionID],
+            @"Name" : [NSData dataWithBytes:entry.name.data() length:entry.name.size()],
+            @"Type" : [NSNumber numberWithUnsignedChar:entry.type],
+            @"EndpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
+            @"SupportedCommands" : [NSNumber numberWithUnsignedShort:entry.supportedCommands],
+            @"Status" : [NSNumber numberWithUnsignedChar:entry.status],
+        }];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
+void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+        list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        [array addObject:@ {
+            @"EndpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
+            @"Name" : [NSData dataWithBytes:entry.name.data() length:entry.name.size()],
+            @"Type" : [NSNumber numberWithUnsignedChar:entry.type],
+            @"Endpoints" : [NSData dataWithBytes:entry.endpoints.data() length:entry.endpoints.size()],
+        }];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
 void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
 {

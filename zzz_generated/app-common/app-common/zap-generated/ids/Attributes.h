@@ -805,6 +805,32 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace PollControl
 
+namespace BridgedActions {
+namespace Attributes {
+
+namespace ActionList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ActionList
+
+namespace EndpointList {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace EndpointList
+
+namespace SetupUrl {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SetupUrl
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace BridgedActions
+
 namespace Basic {
 namespace Attributes {
 
