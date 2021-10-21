@@ -15228,6 +15228,18 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace BallastConfiguration
 namespace IlluminanceMeasurement {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for LightSensorType
+enum class LightSensorType : uint8_t
+{
+    kPhotodiode = 0x00,
+    kCmos       = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using LightSensorType                      = EmberAfLightSensorType;
+#endif
 
 namespace Attributes {
 namespace MeasuredValue {
@@ -15282,41 +15294,6 @@ struct TypeInfo
 } // namespace LightSensorType
 } // namespace Attributes
 } // namespace IlluminanceMeasurement
-namespace IlluminanceLevelSensing {
-
-namespace Attributes {
-namespace LevelStatus {
-struct TypeInfo
-{
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return IlluminanceLevelSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LevelStatus::Id; }
-};
-} // namespace LevelStatus
-namespace LightSensorType {
-struct TypeInfo
-{
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return IlluminanceLevelSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
-};
-} // namespace LightSensorType
-namespace IlluminanceLevelTarget {
-struct TypeInfo
-{
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return IlluminanceLevelSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::IlluminanceLevelTarget::Id; }
-};
-} // namespace IlluminanceLevelTarget
-} // namespace Attributes
-} // namespace IlluminanceLevelSensing
 namespace TemperatureMeasurement {
 
 namespace Attributes {
