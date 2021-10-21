@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import pytest
-import subprocess
 
 import logging
 log = logging.getLogger(__name__)
@@ -22,5 +21,7 @@ log = logging.getLogger(__name__)
 @pytest.mark.smoketest
 def test_smoke_test(device):
     device.reset(duration=1)
-    ret = device.wait_for_output("Starting CHIP task")
+    ret = device.wait_for_output("Mbed lock-app example application start")
+    assert ret != None and len(ret) > 0
+    ret = device.wait_for_output("Mbed lock-app example application run")
     assert ret != None and len(ret) > 0
