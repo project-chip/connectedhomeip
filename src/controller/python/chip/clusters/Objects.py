@@ -5952,7 +5952,7 @@ class GeneralDiagnostics:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=0, Type=bytes),
+                            Label="Name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(
                             Label="FabricConnected", Tag=1, Type=bool),
                         ClusterObjectFieldDescriptor(
@@ -5965,7 +5965,7 @@ class GeneralDiagnostics:
                             Label="Type", Tag=5, Type=GeneralDiagnostics.Enums.InterfaceType),
                     ])
 
-            Name: 'bytes' = None
+            Name: 'str' = None
             FabricConnected: 'bool' = None
             OffPremiseServicesReachableIPv4: 'bool' = None
             OffPremiseServicesReachableIPv6: 'bool' = None
@@ -6118,7 +6118,7 @@ class SoftwareDiagnostics:
                         ClusterObjectFieldDescriptor(
                             Label="Id", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=1, Type=bytes),
+                            Label="Name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(
                             Label="StackFreeCurrent", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -6128,7 +6128,7 @@ class SoftwareDiagnostics:
                     ])
 
             Id: 'uint' = None
-            Name: 'bytes' = None
+            Name: 'str' = None
             StackFreeCurrent: 'uint' = None
             StackFreeMinimum: 'uint' = None
             StackSize: 'uint' = None
@@ -8119,7 +8119,7 @@ class OperationalCredentials:
                         ClusterObjectFieldDescriptor(
                             Label="NodeId", Tag=4, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Label", Tag=5, Type=bytes),
+                            Label="Label", Tag=5, Type=str),
                     ])
 
             FabricIndex: 'uint' = None
@@ -8127,7 +8127,7 @@ class OperationalCredentials:
             VendorId: 'uint' = None
             FabricId: 'uint' = None
             NodeId: 'uint' = None
-            Label: 'bytes' = None
+            Label: 'str' = None
 
         @dataclass
         class NOCStruct(ClusterObject):
@@ -8300,12 +8300,12 @@ class OperationalCredentials:
                         ClusterObjectFieldDescriptor(
                             Label="FabricIndex", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="DebugText", Tag=2, Type=bytes),
+                            Label="DebugText", Tag=2, Type=str),
                     ])
 
             StatusCode: 'uint' = None
             FabricIndex: 'uint' = None
-            DebugText: 'bytes' = None
+            DebugText: 'str' = None
 
         @dataclass
         class UpdateFabricLabel(ClusterCommand):
@@ -8459,13 +8459,13 @@ class FixedLabel:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="Label", Tag=0, Type=bytes),
+                            Label="Label", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="Value", Tag=1, Type=bytes),
+                            Label="Value", Tag=1, Type=str),
                     ])
 
-            Label: 'bytes' = None
-            Value: 'bytes' = None
+            Label: 'str' = None
+            Value: 'str' = None
 
     class Attributes:
         class LabelList(ClusterAttributeDescriptor):
@@ -17987,18 +17987,18 @@ class TvChannel:
                         ClusterObjectFieldDescriptor(
                             Label="MinorNumber", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=2, Type=bytes),
+                            Label="Name", Tag=2, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="CallSign", Tag=3, Type=bytes),
+                            Label="CallSign", Tag=3, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="AffiliateCallSign", Tag=4, Type=bytes),
+                            Label="AffiliateCallSign", Tag=4, Type=str),
                     ])
 
             MajorNumber: 'uint' = None
             MinorNumber: 'uint' = None
-            Name: 'bytes' = None
-            CallSign: 'bytes' = None
-            AffiliateCallSign: 'bytes' = None
+            Name: 'str' = None
+            CallSign: 'str' = None
+            AffiliateCallSign: 'str' = None
 
         @dataclass
         class TvChannelLineupInfo(ClusterObject):
@@ -18175,11 +18175,11 @@ class TargetNavigator:
                         ClusterObjectFieldDescriptor(
                             Label="Identifier", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=1, Type=bytes),
+                            Label="Name", Tag=1, Type=str),
                     ])
 
             Identifier: 'uint' = None
-            Name: 'bytes' = None
+            Name: 'str' = None
 
     class Commands:
         @dataclass
@@ -18769,15 +18769,15 @@ class MediaInput:
                         ClusterObjectFieldDescriptor(
                             Label="InputType", Tag=1, Type=MediaInput.Enums.MediaInputType),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=2, Type=bytes),
+                            Label="Name", Tag=2, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="Description", Tag=3, Type=bytes),
+                            Label="Description", Tag=3, Type=str),
                     ])
 
             Index: 'uint' = None
             InputType: 'MediaInput.Enums.MediaInputType' = None
-            Name: 'bytes' = None
-            Description: 'bytes' = None
+            Name: 'str' = None
+            Description: 'str' = None
 
     class Commands:
         @dataclass
@@ -19370,12 +19370,12 @@ class AudioOutput:
                         ClusterObjectFieldDescriptor(
                             Label="OutputType", Tag=1, Type=AudioOutput.Enums.AudioOutputType),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=2, Type=bytes),
+                            Label="Name", Tag=2, Type=str),
                     ])
 
             Index: 'uint' = None
             OutputType: 'AudioOutput.Enums.AudioOutputType' = None
-            Name: 'bytes' = None
+            Name: 'str' = None
 
     class Commands:
         @dataclass

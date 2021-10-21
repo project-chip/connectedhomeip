@@ -37,9 +37,9 @@ struct ConcreteAttributePath
         return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId;
     }
 
-    const EndpointId mEndpointId   = 0;
-    const ClusterId mClusterId     = 0;
-    const AttributeId mAttributeId = 0;
+    EndpointId mEndpointId   = 0;
+    ClusterId mClusterId     = 0;
+    AttributeId mAttributeId = 0;
 };
 } // namespace app
 } // namespace chip

@@ -39,8 +39,8 @@ namespace System {
 class LayerImplSelect : public LayerSocketsLoop
 {
 public:
-    LayerImplSelect() = default;
-    ~LayerImplSelect() { mLayerState.Destroy(); }
+    LayerImplSelect()  = default;
+    ~LayerImplSelect() = default;
 
     // Layer overrides.
     CHIP_ERROR Init() override;

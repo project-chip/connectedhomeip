@@ -16,26 +16,26 @@
  */
 
 /*
- * This file declare test suites utilities methods for delayed commands.
+ * This file declares test suite utility methods for logging.
  *
  * Each method declared in this file needs to be implemented on a per-language
- * basis and permits to exposes methods to the test suites that are not part
+ * basis and allows exposing  methods to the test suites that are not part
  * of the regular cluster set of APIs.
  *
  */
 
-const WaitForMs = {
-  name : 'WaitForMs',
-  arguments : [ { type : 'INT32U', name : 'ms' } ],
+const Log = {
+  name : 'Log',
+  arguments : [ { type : 'CHAR_STRING', name : 'message' } ],
   response : { arguments : [] }
 };
 
-const DelayCommands = {
-  name : 'DelayCommands',
-  commands : [ WaitForMs ],
+const LogCommands = {
+  name : 'LogCommands',
+  commands : [ Log ],
 };
 
 //
 // Module exports
 //
-exports.DelayCommands = DelayCommands;
+exports.LogCommands = LogCommands;

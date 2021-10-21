@@ -200,10 +200,14 @@ void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, 
     uint16_t listCount = 1;
     _LabelStruct labelStruct;
 
-    labelStruct.label = chip::ByteSpan(reinterpret_cast<const uint8_t *>(label), kFixedLabelElementsOctetStringSize);
+    // TODO: This size is obviously wrong.  See
+    // https://github.com/project-chip/connectedhomeip/issues/10743
+    labelStruct.label = CharSpan(label, kFixedLabelElementsOctetStringSize);
 
     strncpy(zclOctetStrBuf, value, sizeof(zclOctetStrBuf));
-    labelStruct.value = chip::ByteSpan(reinterpret_cast<uint8_t *>(&zclOctetStrBuf[0]), sizeof(zclOctetStrBuf));
+    // TODO: This size is obviously wrong.  See
+    // https://github.com/project-chip/connectedhomeip/issues/10743
+    labelStruct.value = CharSpan(&zclOctetStrBuf[0], sizeof(zclOctetStrBuf));
 
     emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&labelStruct), 1);
     emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&listCount), 0);

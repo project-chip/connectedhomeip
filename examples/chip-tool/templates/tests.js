@@ -126,6 +126,7 @@ function getTests()
     'TestClusterComplexTypes',
     'TestConstraints',
     'TestDelayCommands',
+    'TestLogCommands',
     'TestDescriptorCluster',
     'TestOperationalCredentialsCluster',
   ];

@@ -55,7 +55,7 @@ System::SocketEvents SocketEventsFromLibeventFlags(short eventFlags)
 
 CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
 {
-    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterPOSIXErrorFormatter();
 
@@ -83,7 +83,7 @@ CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
 
     Mutex::Init(mTimerListMutex);
 
-    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
@@ -111,7 +111,7 @@ void LayerImplLibevent::MdnsTimeoutCallbackHandler()
 
 CHIP_ERROR LayerImplLibevent::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
 
     event_base_loopbreak(mEventBase);
 
@@ -133,6 +133,7 @@ CHIP_ERROR LayerImplLibevent::Shutdown()
     mEventBase   = nullptr;
     mSystemLayer = nullptr;
 
+    mLayerState.SetShutdown();
     mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }

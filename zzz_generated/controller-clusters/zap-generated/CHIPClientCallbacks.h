@@ -123,7 +123,7 @@ typedef void (*OperationalCredentialsClusterAttestationResponseCallback)(void * 
                                                                          chip::ByteSpan Signature);
 typedef void (*OperationalCredentialsClusterCertificateChainResponseCallback)(void * context, chip::ByteSpan Certificate);
 typedef void (*OperationalCredentialsClusterNOCResponseCallback)(void * context, uint8_t StatusCode, uint8_t FabricIndex,
-                                                                 chip::ByteSpan DebugText);
+                                                                 chip::CharSpan DebugText);
 typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan NOCSRElements,
                                                                    chip::ByteSpan AttestationSignature);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);

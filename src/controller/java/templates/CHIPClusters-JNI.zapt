@@ -462,7 +462,8 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
                 jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entry.{{asLowerCamelCase name}}.size());
                 env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entry.{{asLowerCamelCase name}}.size(), reinterpret_cast<const jbyte *>(entry.{{asLowerCamelCase name}}.data()));
                 {{else if (isCharString type)}}
-                // Implement after ByteSpan is emitted instead of uint8_t *.
+                UtfString {{asLowerCamelCase name}}Str(env, entry.{{asLowerCamelCase name}});
+                jstring {{asLowerCamelCase name}}({{asLowerCamelCase name}}Str.jniValue());
                 {{else}}
                 {{asJniBasicType type}} {{asLowerCamelCase name}} = entry.{{asLowerCamelCase name}};
                 {{/if}}
@@ -481,7 +482,8 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
                 jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entry.size());
                 env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entry.size(), reinterpret_cast<const jbyte *>(entry.data()));
                 {{else if (isCharString type)}}
-                // Implement after ByteSpan is emitted instead of uint8_t *
+                UtfString {{asLowerCamelCase name}}Str(env, entry);
+                jstring {{asLowerCamelCase name}}({{asLowerCamelCase name}}Str.jniValue());
                 {{else}}
                 jclass entryTypeCls;
                 JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", entryTypeCls);
