@@ -31,6 +31,7 @@
         "low-power-cluster.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
+        "mode-select-cluster.xml",
         "onoff-cluster.xml",
         "operational-credentials-cluster.xml",
         "pressure-measurement-cluster.xml",
@@ -50,7 +51,6 @@
         "wake-on-lan-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
-
         "ami.xml",
         "general.xml",
         "ha-devices.xml",
