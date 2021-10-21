@@ -190,16 +190,3 @@ class {{filename}}: public TestCommand
 };
 
 {{/chip_tests}}
-
-void registerCommandsTests(Commands & commands)
-{
-    const char * clusterName = "Tests";
-
-    commands_list clusterCommands = {
-      {{#chip_tests tests}}
-        make_unique<{{filename}}>(),
-      {{/chip_tests}}
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}
