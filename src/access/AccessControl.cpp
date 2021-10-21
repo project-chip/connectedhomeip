@@ -25,24 +25,13 @@ using namespace chip::Access;
 // Avoid GetAccessControl returning nullptr before SetAccessControl is called.
 class UnimplementedDataProvider : public AccessControlDataProvider
 {
-    CHIP_ERROR Init() override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
 
-    void Finish() override
-    {
-    }
+    void Finish() override {}
 
-    EntryIterator * Entries() const override
-    {
-        return nullptr;
-    }
+    EntryIterator * Entries() const override { return nullptr; }
 
-    EntryIterator * Entries(FabricIndex fabricIndex) const override
-    {
-        return nullptr;
-    }
+    EntryIterator * Entries(FabricIndex fabricIndex) const override { return nullptr; }
 };
 
 // Avoid GetAccessControl returning nullptr before SetAccessControl is called.
