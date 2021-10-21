@@ -1447,7 +1447,7 @@ void DeviceCommissioner::OnAddNOCFailureResponse(void * context, uint8_t status)
 }
 
 void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex,
-                                                             ByteSpan DebugText)
+                                                             CharSpan DebugText)
 {
     ChipLogProgress(Controller, "Device returned status %d on receiving the NOC", StatusCode);
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);

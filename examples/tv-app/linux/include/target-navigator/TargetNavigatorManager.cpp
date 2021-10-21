@@ -47,7 +47,7 @@ CHIP_ERROR TargetNavigatorManager::proxyGetTargetInfoList(chip::app::AttributeVa
         for (int i = 0; i < maximumVectorSize; ++i)
         {
             chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::Type targetInfo;
-            targetInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name) - 1);
+            targetInfo.name       = chip::CharSpan(name, sizeof(name) - 1);
             targetInfo.identifier = static_cast<uint8_t>(1 + i);
             ReturnErrorOnFailure(encoder.Encode(targetInfo));
         }

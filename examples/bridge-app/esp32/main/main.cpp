@@ -179,8 +179,8 @@ void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, 
     uint16_t listCount = 1;
     _LabelStruct labelStruct;
 
-    labelStruct.label = chip::ByteSpan(Uint8::from_const_char(label), strlen(label));
-    labelStruct.value = chip::ByteSpan(Uint8::from_const_char(value), strlen(value));
+    labelStruct.label = chip::CharSpan(label, strlen(label));
+    labelStruct.value = chip::CharSpan(value, strlen(value));
 
     emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&labelStruct), 1);
     emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&listCount), 0);

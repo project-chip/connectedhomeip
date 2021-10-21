@@ -59,9 +59,9 @@ limitations under the License.
     <cluster code="0x0504"/>
     <item name="majorNumber" type="INT16U"/>
     <item name="minorNumber" type="INT16U"/>
-    <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
-    <item name="callSign" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
-    <item name="affiliateCallSign" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
+    <item name="name" type="CHAR_STRING" length="32"/>
+    <item name="callSign" type="CHAR_STRING" length="32"/>
+    <item name="affiliateCallSign" type="CHAR_STRING" length="32"/>
   </struct>
 
   <struct name="TvChannelLineupInfo">

@@ -4,6 +4,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -85,7 +86,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 {{chipType}} * entry = reinterpret_cast<{{chipType}} *>(write ? src : dest);
                 {{#chip_attribute_list_entryTypes}}
                 {{#if (isString type)}}
+                {{#if (isOctetString type)}}
                 ByteSpan * {{name}}Span = &entry->{{name}}; // {{type}}
+                {{else}}
+                ByteSpan {{name}}SpanStorage(Uint8::from_const_char(entry->{{name}}.data()), entry->{{name}}.size()); // {{type}}
+                ByteSpan * {{name}}Span = &{{name}}SpanStorage;
+                {{/if}}
                 if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, {{size}}, {{name}}Span) : ReadByteSpan(src + entryOffset, {{size}}, {{name}}Span)))
                 {
                     ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
