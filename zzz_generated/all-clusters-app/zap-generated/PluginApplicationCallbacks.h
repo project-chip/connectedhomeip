@@ -47,6 +47,7 @@
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIasZonePluginServerInitCallback();                                                                                       \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
+    MatterIlluminanceMeasurementPluginServerInitCallback();                                                                        \
     MatterKeypadInputPluginServerInitCallback();                                                                                   \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
     MatterLowPowerPluginServerInitCallback();                                                                                      \
