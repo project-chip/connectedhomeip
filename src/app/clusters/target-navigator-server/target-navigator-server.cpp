@@ -33,6 +33,7 @@
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TargetNavigator;
 
 TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data);
@@ -40,8 +41,9 @@ TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std
 void sendResponse(app::CommandHandler * command, TargetNavigatorResponse response)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TARGET_NAVIGATOR_CLUSTER_ID,
-                                         ZCL_NAVIGATE_TARGET_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, TargetNavigator::Id,
+                                         TargetNavigator::Commands::NavigateTargetResponse::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
     VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
