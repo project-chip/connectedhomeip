@@ -198,9 +198,11 @@ private:
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
 
-    static constexpr uint32_t kAdvertiseTimeout     = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
-    static constexpr uint32_t kFastAdvertiseTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
-    uint64_t mAdvertiseStartTime;
+    static constexpr System::Clock::Timeout kAdvertiseTimeout =
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);
+    static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+    System::Clock::Timestamp mAdvertiseStartTime;
 
     static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleFastAdvertisementTimer();

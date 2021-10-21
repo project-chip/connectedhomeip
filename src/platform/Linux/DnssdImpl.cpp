@@ -314,8 +314,8 @@ void Poller::SystemTimerUpdate(AvahiTimeout * timer)
     if ((mEarliestTimeout == std::chrono::steady_clock::time_point()) || (timer->mAbsTimeout < mEarliestTimeout))
     {
         mEarliestTimeout = timer->mAbsTimeout;
-        auto msDelay     = std::chrono::duration_cast<std::chrono::milliseconds>(steady_clock::now() - mEarliestTimeout).count();
-        DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(msDelay), SystemTimerCallback, this);
+        auto delay       = std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(steady_clock::now() - mEarliestTimeout);
+        DeviceLayer::SystemLayer().StartTimer(delay, SystemTimerCallback, this);
     }
 }
 
