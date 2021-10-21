@@ -113,10 +113,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.transportMgr = chip::Platform::New<DeviceTransportMgr>();
 
     ReturnErrorOnFailure(stateParams.transportMgr->Init(
-        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
+        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::IPAddressType::kIPv6).SetListenPort(mListenPort)
 #if INET_CONFIG_ENABLE_IPV4
             ,
-        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(mListenPort)
+        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(mListenPort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
             ,

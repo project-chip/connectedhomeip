@@ -570,7 +570,7 @@ static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
     VerifyOrExit(aEndPoint != nullptr, lStatus = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!aBuffer.IsNull(), lStatus = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (aEndPoint->State != TCPEndPoint::kState_Connected)
+    if (aEndPoint->mState != TCPEndPoint::State::kConnected)
     {
         lStatus = aEndPoint->SetReceivedDataForTesting(std::move(aBuffer));
         INET_FAIL_ERROR(lStatus, "TCPEndPoint::PutBackReceivedData failed");
@@ -666,10 +666,10 @@ static bool IsTransportReadyForSend()
         {
             if (sTCPIPEndPoint->PendingSendLength() == 0)
             {
-                switch (sTCPIPEndPoint->State)
+                switch (sTCPIPEndPoint->mState)
                 {
-                case TCPEndPoint::kState_Connected:
-                case TCPEndPoint::kState_ReceiveShutdown:
+                case TCPEndPoint::State::kConnected:
+                case TCPEndPoint::State::kReceiveShutdown:
                     lStatus = true;
                     break;
 
@@ -789,7 +789,7 @@ exit:
 
 static void StartTest()
 {
-    IPAddressType lIPAddressType = kIPAddressType_IPv6;
+    IPAddressType lIPAddressType = IPAddressType::kIPv6;
     IPAddress lAddress           = chip::Inet::IPAddress::Any;
     CHIP_ERROR lStatus;
 
@@ -799,7 +799,7 @@ static void StartTest()
 #if INET_CONFIG_ENABLE_IPV4
     if (gOptFlags & kOptFlagUseIPv4)
     {
-        lIPAddressType = kIPAddressType_IPv4;
+        lIPAddressType = IPAddressType::kIPv4;
         if (!gNetworkOptions.LocalIPv6Addr.empty())
             lAddress = gNetworkOptions.LocalIPv4Addr[0];
         else

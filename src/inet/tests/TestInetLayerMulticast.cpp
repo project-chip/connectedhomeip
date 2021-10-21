@@ -489,9 +489,7 @@ static IPAddress MakeIPv4Multicast(uint32_t aGroupIdentifier)
 
 static IPAddress MakeIPv6Multicast(uint32_t aGroupIdentifier)
 {
-    const uint8_t lFlags = kIPv6MulticastFlag_Transient;
-
-    return (IPAddress::MakeIPv6Multicast(lFlags, kIPv6MulticastScope_Site, aGroupIdentifier));
+    return (IPAddress::MakeIPv6Multicast(IPv6MulticastFlag::kTransient, kIPv6MulticastScope_Site, aGroupIdentifier));
 }
 
 static void SetGroup(GroupAddress & aGroupAddress, uint32_t aGroupIdentifier, uint32_t aExpectedRx, uint32_t aExpectedTx)
@@ -718,7 +716,7 @@ exit:
 
 static void StartTest()
 {
-    IPAddressType lIPAddressType = kIPAddressType_IPv6;
+    IPAddressType lIPAddressType = IPAddressType::kIPv6;
     IPVersion lIPVersion         = kIPVersion_6;
     IPAddress lAddress           = IPAddress::Any;
     IPEndPointBasis * lEndPoint  = nullptr;
@@ -728,7 +726,7 @@ static void StartTest()
 #if INET_CONFIG_ENABLE_IPV4
     if (gOptFlags & kOptFlagUseIPv4)
     {
-        lIPAddressType = kIPAddressType_IPv4;
+        lIPAddressType = IPAddressType::kIPv4;
         lIPVersion     = kIPVersion_4;
     }
 #endif // INET_CONFIG_ENABLE_IPV4

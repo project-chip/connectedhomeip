@@ -133,12 +133,12 @@ CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
         {
             ipAddr = addr.ToLwIPAddr();
         }
-        else if (addrType == kIPAddressType_IPv6)
+        else if (addrType == IPAddressType::kIPv6)
         {
             ipAddr = ip6_addr_any;
         }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == kIPAddressType_IPv4)
+        else if (addrType == IPAddressType::kIPv4)
         {
             ipAddr = ip_addr_any;
         }
@@ -149,13 +149,13 @@ CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
 
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 
-        if (addrType == kIPAddressType_IPv6)
+        if (addrType == IPAddressType::kIPv6)
         {
             ip6_addr_t ipv6Addr = addr.ToIPv6();
             res                 = chip::System::MapErrorLwIP(tcp_bind_ip6(mTCP, &ipv6Addr, port));
         }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == kIPAddressType_IPv4)
+        else if (addrType == IPAddressType::kIPv4)
         {
             ip_addr_t ipv4Addr = addr.ToIPv4();
             res                = chip::System::MapErrorLwIP(tcp_bind(mTCP, &ipv4Addr, port));
@@ -199,14 +199,14 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
         IPAddress intfLLAddr;
         InetLayer & lInetLayer = Layer();
 
-        if (!addr.IsIPv6LinkLocal() || State == kState_Bound)
+        if (!addr.IsIPv6LinkLocal() || mState == State::kBound)
             return CHIP_ERROR_NOT_IMPLEMENTED;
 
         res = lInetLayer.GetLinkLocalAddr(intfId, &intfLLAddr);
         if (res != CHIP_NO_ERROR)
             return res;
 
-        res = Bind(kIPAddressType_IPv6, intfLLAddr, 0, true);
+        res = Bind(IPAddressType::kIPv6, intfLLAddr, 0, true);
         if (res != CHIP_NO_ERROR)
             return res;
     }
@@ -225,13 +225,13 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
         ip_addr_t lwipAddr = addr.ToLwIPAddr();
         res                = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
-        if (addrType == kIPAddressType_IPv6)
+        if (addrType == IPAddressType::kIPv6)
         {
             ip6_addr_t lwipAddr = addr.ToIPv6();
             res                 = chip::System::MapErrorLwIP(tcp_connect_ip6(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
         }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == kIPAddressType_IPv4)
+        else if (addrType == IPAddressType::kIPv4)
         {
             ip_addr_t lwipAddr = addr.ToIPv4();
             res                = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
@@ -253,7 +253,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
 
         if (res == CHIP_NO_ERROR)
         {
-            State = kState_Connecting;
+            mState = State::kConnecting;
             Retain();
         }
     }
@@ -564,7 +564,7 @@ CHIP_ERROR TCPEndPoint::DriveSendingImpl()
         if (err == CHIP_NO_ERROR)
         {
             // If in the SendShutdown state and the unsent queue is now empty, shutdown the PCB for sending.
-            if (State == kState_SendShutdown && (RemainingToSend() == 0))
+            if (mState == State::kSendShutdown && (RemainingToSend() == 0))
             {
                 lwipErr = tcp_shutdown(mTCP, 0, 1);
                 if (lwipErr != ERR_OK)
@@ -584,7 +584,7 @@ CHIP_ERROR TCPEndPoint::DriveSendingImpl()
 
 void TCPEndPoint::HandleConnectCompleteImpl() {}
 
-void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, int oldState)
+void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, State oldState)
 {
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -593,14 +593,14 @@ void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, int oldState)
     if (mTCP != NULL)
     {
         // If the endpoint was a connection endpoint (vs. a listening endpoint)...
-        if (oldState != kState_Listening)
+        if (oldState != State::kListening)
         {
             // Prevent further callbacks for incoming data.  This has the effect of instructing
             // LwIP to discard any further data received from the peer.
             tcp_recv(mTCP, NULL);
 
             // If entering the Closed state...
-            if (State == kState_Closed)
+            if (mState == State::kClosed)
             {
                 // Prevent further callbacks to the error handler.
                 //
@@ -651,7 +651,7 @@ void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, int oldState)
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-    if (State == kState_Closed)
+    if (mState == State::kClosed)
     {
         mUnackedLength = 0;
     }
@@ -739,12 +739,12 @@ CHIP_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
     {
         switch (addrType)
         {
-        case kIPAddressType_IPv6:
+        case IPAddressType::kIPv6:
             mTCP = tcp_new_ip_type(IPADDR_TYPE_V6);
             break;
 
 #if INET_CONFIG_ENABLE_IPV4
-        case kIPAddressType_IPv4:
+        case IPAddressType::kIPv4:
             mTCP = tcp_new_ip_type(IPADDR_TYPE_V4);
             break;
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -767,13 +767,13 @@ CHIP_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
         switch (IP_GET_TYPE(&mTCP->local_ip))
         {
         case IPADDR_TYPE_V6:
-            if (addrType != kIPAddressType_IPv6)
+            if (addrType != IPAddressType::kIPv6)
                 return INET_ERROR_WRONG_ADDRESS_TYPE;
             break;
 
 #if INET_CONFIG_ENABLE_IPV4
         case IPADDR_TYPE_V4:
-            if (addrType != kIPAddressType_IPv4)
+            if (addrType != IPAddressType::kIPv4)
                 return INET_ERROR_WRONG_ADDRESS_TYPE;
             break;
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -785,10 +785,10 @@ CHIP_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
     if (mTCP == NULL)
     {
-        if (addrType == kIPAddressType_IPv6)
+        if (addrType == IPAddressType::kIPv6)
             mTCP = tcp_new_ip6();
 #if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == kIPAddressType_IPv4)
+        else if (addrType == IPAddressType::kIPv4)
             mTCP = tcp_new();
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -805,9 +805,9 @@ CHIP_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
     else
     {
 #if INET_CONFIG_ENABLE_IPV4
-        const IPAddressType pcbType = PCB_ISIPV6(mTCP) ? kIPAddressType_IPv6 : kIPAddressType_IPv4;
+        const IPAddressType pcbType = PCB_ISIPV6(mTCP) ? IPAddressType::kIPv6 : IPAddressType::kIPv4;
 #else  // !INET_CONFIG_ENABLE_IPV4
-        const IPAddressType pcbType = kIPAddressType_IPv6;
+        const IPAddressType pcbType = IPAddressType::kIPv6;
 #endif // !INET_CONFIG_ENABLE_IPV4
         if (addrType != pcbType)
             return INET_ERROR_WRONG_ADDRESS_TYPE;
@@ -879,7 +879,7 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
             DriveSending();
 
         // If in the closing state and the send queue is now empty, attempt to transition to closed.
-        if ((State == kState_Closing) && (RemainingToSend() == 0))
+        if ((mState == State::kClosing) && (RemainingToSend() == 0))
             DoClose(CHIP_NO_ERROR, false);
     }
 }
@@ -887,7 +887,7 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
 void TCPEndPoint::HandleDataReceived(System::PacketBufferHandle && buf)
 {
     // Only receive new data while in the Connected or SendShutdown states.
-    if (State == kState_Connected || State == kState_SendShutdown)
+    if (mState == State::kConnected || mState == State::kSendShutdown)
     {
         // Mark the connection as being active.
         MarkActive();
@@ -916,10 +916,10 @@ void TCPEndPoint::HandleDataReceived(System::PacketBufferHandle && buf)
             // the app to decide whether to keep the send side of the connection open after
             // the peer has closed. If no OnPeerClose is provided, we assume that the app
             // wants to close both directions and automatically enter the Closing state.
-            if (State == kState_Connected && OnPeerClose != NULL)
-                State = kState_ReceiveShutdown;
+            if (mState == State::kConnected && OnPeerClose != NULL)
+                mState = State::kReceiveShutdown;
             else
-                State = kState_Closing;
+                mState = State::kClosing;
 
             // Call the app's OnPeerClose.
             if (OnPeerClose != NULL)
@@ -937,7 +937,7 @@ void TCPEndPoint::HandleIncomingConnection(TCPEndPoint * conEP)
     IPAddress peerAddr;
     uint16_t peerPort;
 
-    if (State == kState_Listening)
+    if (mState == State::kListening)
     {
         // If there's no callback available, fail with an error.
         if (OnConnectionReceived == NULL)
@@ -965,7 +965,7 @@ void TCPEndPoint::HandleIncomingConnection(TCPEndPoint * conEP)
 
 void TCPEndPoint::HandleError(CHIP_ERROR err)
 {
-    if (State == kState_Listening)
+    if (mState == State::kListening)
     {
         if (OnAcceptError != NULL)
             OnAcceptError(this, err);
@@ -1047,7 +1047,7 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
         if (err == CHIP_NO_ERROR)
         {
             // Put the new end point into the Connected state.
-            conEP->State             = kState_Connected;
+            conEP->mState            = State::kConnected;
             conEP->mTCP              = tpcb;
             conEP->mLwIPEndPointType = LwIPEndPointType::TCP;
             conEP->Retain();
@@ -1183,7 +1183,7 @@ CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
 
     if (res == CHIP_NO_ERROR)
     {
-        if (addrType == kIPAddressType_IPv6)
+        if (addrType == IPAddressType::kIPv6)
         {
             struct sockaddr_in6 sa;
             memset(&sa, 0, sizeof(sa));
@@ -1197,7 +1197,7 @@ CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
                 res = CHIP_ERROR_POSIX(errno);
         }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == kIPAddressType_IPv4)
+        else if (addrType == IPAddressType::kIPv4)
         {
             struct sockaddr_in sa;
             memset(&sa, 0, sizeof(sa));
@@ -1342,7 +1342,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     } sa;
     memset(&sa, 0, sizeof(sa));
 
-    if (addrType == kIPAddressType_IPv6)
+    if (addrType == IPAddressType::kIPv6)
     {
         sa.in6.sin6_family   = AF_INET6;
         sa.in6.sin6_port     = htons(port);
@@ -1353,7 +1353,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
         sockaddrptr          = reinterpret_cast<const sockaddr *>(&sa.in6);
     }
 #if INET_CONFIG_ENABLE_IPV4
-    else if (addrType == kIPAddressType_IPv4)
+    else if (addrType == IPAddressType::kIPv4)
     {
         sa.in.sin_family = AF_INET;
         sa.in.sin_port   = htons(port);
@@ -1383,7 +1383,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
 
     if (conRes == 0)
     {
-        State = kState_Connected;
+        mState = State::kConnected;
         // Wait for ability to read on this endpoint.
         ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingRead(mWatch));
         if (OnConnectComplete != nullptr)
@@ -1391,7 +1391,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     }
     else
     {
-        State = kState_Connecting;
+        mState = State::kConnecting;
         // Wait for ability to write on this endpoint.
         ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingWrite(mWatch));
     }
@@ -1742,7 +1742,7 @@ CHIP_ERROR TCPEndPoint::DriveSendingImpl()
     if (err == CHIP_NO_ERROR)
     {
         // If we're in the SendShutdown state and the send queue is now empty, shutdown writing on the socket.
-        if (State == kState_SendShutdown && mSendQueue.IsNull())
+        if (mState == State::kSendShutdown && mSendQueue.IsNull())
         {
             if (shutdown(mSocket, SHUT_WR) != 0)
                 err = CHIP_ERROR_POSIX(errno);
@@ -1767,7 +1767,7 @@ void TCPEndPoint::HandleConnectCompleteImpl()
     }
 }
 
-void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, int oldState)
+void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, State oldState)
 {
     struct linger lingerStruct;
 
@@ -1777,7 +1777,7 @@ void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, int oldState)
         // If entering the Closed state
         // OR if entering the Closing state, and there's no unsent data in the send queue
         // THEN close the socket.
-        if (State == kState_Closed || (State == kState_Closing && mSendQueue.IsNull()))
+        if (mState == State::kClosed || (mState == State::kClosing && mSendQueue.IsNull()))
         {
             // If aborting the connection, ensure we send a TCP RST.
             if (IsConnected(oldState) && err != CHIP_NO_ERROR)
@@ -1887,7 +1887,7 @@ CHIP_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
     // and use that address as the source address for that connection. This is
     // done in the event that directly binding the connection to the target
     // interface is not allowed due to insufficient privileges.
-    VerifyOrReturnError(State != kState_Bound, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mState != State::kBound, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     bool ipAddrFound = false;
     for (InterfaceAddressIterator addrIter; addrIter.HasCurrent(); addrIter.Next())
@@ -1900,19 +1900,19 @@ CHIP_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
             // Search for an IPv4 address on the TargetInterface
 
 #if INET_CONFIG_ENABLE_IPV4
-            if (addrType == kIPAddressType_IPv4)
+            if (addrType == IPAddressType::kIPv4)
             {
                 if (curAddr.IsIPv4())
                 {
                     // Bind to the IPv4 address of the TargetInterface
                     ipAddrFound = true;
-                    ReturnErrorOnFailure(Bind(kIPAddressType_IPv4, curAddr, 0, true));
+                    ReturnErrorOnFailure(Bind(IPAddressType::kIPv4, curAddr, 0, true));
 
                     break;
                 }
             }
 #endif // INET_CONFIG_ENABLE_IPV4
-            if (addrType == kIPAddressType_IPv6)
+            if (addrType == IPAddressType::kIPv6)
             {
                 // Select an IPv6 address on the interface that is not
                 // a link local or a multicast address.
@@ -1921,7 +1921,7 @@ CHIP_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
                 {
                     // Bind to the IPv6 address of the TargetInterface
                     ipAddrFound = true;
-                    ReturnErrorOnFailure(Bind(kIPAddressType_IPv6, curAddr, 0, true));
+                    ReturnErrorOnFailure(Bind(IPAddressType::kIPv6, curAddr, 0, true));
 
                     break;
                 }
@@ -1939,10 +1939,10 @@ CHIP_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
     if (mSocket == kInvalidSocketFd)
     {
         int family;
-        if (addrType == kIPAddressType_IPv6)
+        if (addrType == IPAddressType::kIPv6)
             family = PF_INET6;
 #if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == kIPAddressType_IPv4)
+        else if (addrType == IPAddressType::kIPv4)
             family = PF_INET;
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -1997,7 +1997,7 @@ void TCPEndPoint::HandlePendingIO(System::SocketEvents events)
 
     // If in the Listening state, and the app is ready to receive a connection, and there is a connection
     // ready to be received on the socket, process the incoming connection.
-    if (State == kState_Listening)
+    if (mState == State::kListening)
     {
         if (OnConnectionReceived != nullptr && events.Has(System::SocketEventFlags::kRead))
         {
@@ -2006,7 +2006,7 @@ void TCPEndPoint::HandlePendingIO(System::SocketEvents events)
     }
 
     // If in the processes of initiating a connection...
-    else if (State == kState_Connecting)
+    else if (mState == State::kConnecting)
     {
         // The socket being writable indicates the connection has completed (successfully or otherwise).
         if (events.Has(System::SocketEventFlags::kWrite))
@@ -2038,7 +2038,7 @@ void TCPEndPoint::HandlePendingIO(System::SocketEvents events)
 
         // If in a state were receiving is allowed, and the app is ready to receive data, and data is ready
         // on the socket, receive inbound data from the connection.
-        if ((State == kState_Connected || State == kState_SendShutdown) && ReceiveEnabled && OnDataReceived != nullptr &&
+        if ((mState == State::kConnected || mState == State::kSendShutdown) && ReceiveEnabled && OnDataReceived != nullptr &&
             events.Has(System::SocketEventFlags::kRead))
             ReceiveData();
     }
@@ -2141,10 +2141,10 @@ void TCPEndPoint::ReceiveData()
             // the app to decide whether to keep the send side of the connection open after
             // the peer has closed. If no OnPeerClose is provided, we assume that the app
             // wants to close both directions and automatically enter the Closing state.
-            if (State == kState_Connected && OnPeerClose != nullptr)
-                State = kState_ReceiveShutdown;
+            if (mState == State::kConnected && OnPeerClose != nullptr)
+                mState = State::kReceiveShutdown;
             else
-                State = kState_Closing;
+                mState = State::kClosing;
             // Do not wait for ability to read on this endpoint.
             (void) static_cast<System::LayerSockets *>(Layer().SystemLayer())->ClearCallbackOnPendingRead(mWatch);
             // Call the app's OnPeerClose.
@@ -2247,11 +2247,11 @@ void TCPEndPoint::HandleIncomingConnection()
         err            = static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(conSocket, &conEP->mWatch);
         if (err == CHIP_NO_ERROR)
         {
-            conEP->State = kState_Connected;
+            conEP->mState = State::kConnected;
 #if INET_CONFIG_ENABLE_IPV4
-            conEP->mAddrType = (sa.any.sa_family == AF_INET6) ? kIPAddressType_IPv6 : kIPAddressType_IPv4;
+            conEP->mAddrType = (sa.any.sa_family == AF_INET6) ? IPAddressType::kIPv6 : IPAddressType::kIPv4;
 #else  // !INET_CONFIG_ENABLE_IPV4
-            conEP->mAddrType = kIPAddressType_IPv6;
+            conEP->mAddrType = IPAddressType::kIPv6;
 #endif // !INET_CONFIG_ENABLE_IPV4
             conEP->Retain();
 
@@ -2276,7 +2276,7 @@ void TCPEndPoint::HandleIncomingConnection()
         close(conSocket);
     if (conEP != nullptr)
     {
-        if (conEP->State == kState_Connected)
+        if (conEP->mState == State::kConnected)
         {
             conEP->Release();
         }
@@ -2340,17 +2340,17 @@ CHIP_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
 {
     CHIP_ERROR res = CHIP_NO_ERROR;
 
-    if (State != kState_Ready)
+    if (mState != State::kReady)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    if (addr != IPAddress::Any && addr.Type() != kIPAddressType_Any && addr.Type() != addrType)
+    if (addr != IPAddress::Any && addr.Type() != IPAddressType::kAny && addr.Type() != addrType)
         return INET_ERROR_WRONG_ADDRESS_TYPE;
 
     res = BindImpl(addrType, addr, port, reuseAddr);
 
     if (res == CHIP_NO_ERROR)
     {
-        State = kState_Bound;
+        mState = State::kBound;
     }
 
     return res;
@@ -2360,7 +2360,7 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
 {
     CHIP_ERROR res = CHIP_NO_ERROR;
 
-    if (State != kState_Bound)
+    if (mState != State::kBound)
         return CHIP_ERROR_INCORRECT_STATE;
 
     res = ListenImpl(backlog);
@@ -2370,7 +2370,7 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
         // Once Listening, bump the reference count.  The corresponding call to Release()
         // [or on LwIP, DeferredRelease()] will happen in DoClose().
         Retain();
-        State = kState_Listening;
+        mState = State::kListening;
     }
 
     return res;
@@ -2380,7 +2380,7 @@ CHIP_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
 {
     CHIP_ERROR res = CHIP_NO_ERROR;
 
-    if (State != kState_Ready && State != kState_Bound)
+    if (mState != State::kReady && mState != State::kBound)
         return CHIP_ERROR_INCORRECT_STATE;
 
     ReturnErrorOnFailure(ConnectImpl(addr, port, intfId));
@@ -2394,7 +2394,7 @@ CHIP_ERROR TCPEndPoint::Send(System::PacketBufferHandle && data, bool push)
 {
     CHIP_ERROR res = CHIP_NO_ERROR;
 
-    if (State != kState_Connected && State != kState_ReceiveShutdown)
+    if (mState != State::kConnected && mState != State::kReceiveShutdown)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -2448,14 +2448,14 @@ CHIP_ERROR TCPEndPoint::Shutdown()
         return CHIP_ERROR_INCORRECT_STATE;
 
     // If fully connected, enter the SendShutdown state.
-    if (State == kState_Connected)
+    if (mState == State::kConnected)
     {
-        State = kState_SendShutdown;
+        mState = State::kSendShutdown;
         DriveSending();
     }
 
     // Otherwise, if the peer has already closed their end of the connection,
-    else if (State == kState_ReceiveShutdown)
+    else if (mState == State::kReceiveShutdown)
         err = DoClose(err, false);
 
     return err;
@@ -2574,9 +2574,10 @@ void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, v
     tcpEndPoint->DoClose(INET_ERROR_TCP_CONNECT_TIMEOUT, false);
 }
 
-bool TCPEndPoint::IsConnected(int state)
+bool TCPEndPoint::IsConnected(State state)
 {
-    return state == kState_Connected || state == kState_SendShutdown || state == kState_ReceiveShutdown || state == kState_Closing;
+    return state == State::kConnected || state == State::kSendShutdown || state == State::kReceiveShutdown ||
+        state == State::kClosing;
 }
 
 void TCPEndPoint::Init(InetLayer * inetLayer)
@@ -2640,7 +2641,7 @@ void TCPEndPoint::DriveReceiving()
 
     // If the connection is closing, and the receive queue is now empty, call DoClose() to complete
     // the process of closing the connection.
-    if (State == kState_Closing && mRcvQueue.IsNull())
+    if (mState == State::kClosing && mRcvQueue.IsNull())
         DoClose(CHIP_NO_ERROR, false);
 }
 
@@ -2655,7 +2656,7 @@ void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
         // Mark the connection as being active.
         MarkActive();
 
-        State = kState_Connected;
+        mState = State::kConnected;
 
         HandleConnectCompleteImpl();
 
@@ -2672,7 +2673,7 @@ void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
 
 CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 {
-    int oldState = State;
+    State oldState = mState;
 
     // If in one of the connected states (Connected, LocalShutdown, PeerShutdown or Closing)
     // AND this is a graceful close (i.e. not prompted by an error)
@@ -2680,18 +2681,18 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
     // ... THEN enter the Closing state, allowing the queued data to drain,
     // ... OTHERWISE go straight to the Closed state.
     if (IsConnected() && err == CHIP_NO_ERROR && (!mSendQueue.IsNull() || !mRcvQueue.IsNull()))
-        State = kState_Closing;
+        mState = State::kClosing;
     else
-        State = kState_Closed;
+        mState = State::kClosed;
 
-    if (oldState != kState_Closed)
+    if (oldState != State::kClosed)
     {
         // Stop the Connect timer in case it is still running.
         StopConnectTimer();
     }
 
     // If not making a state transition, return immediately.
-    if (State == oldState)
+    if (mState == oldState)
     {
         return CHIP_NO_ERROR;
     }
@@ -2704,7 +2705,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
     // If entering the Closed state...
-    if (State == kState_Closed)
+    if (mState == State::kClosed)
     {
         // Clear clear the send and receive queues.
         mSendQueue = nullptr;
@@ -2713,13 +2714,13 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
         // Call the appropriate app callback if allowed.
         if (!suppressCallback)
         {
-            if (oldState == kState_Connecting)
+            if (oldState == State::kConnecting)
             {
                 if (OnConnectComplete != nullptr)
                     OnConnectComplete(this, err);
             }
-            else if ((oldState == kState_Connected || oldState == kState_SendShutdown || oldState == kState_ReceiveShutdown ||
-                      oldState == kState_Closing) &&
+            else if ((oldState == State::kConnected || oldState == State::kSendShutdown || oldState == State::kReceiveShutdown ||
+                      oldState == State::kClosing) &&
                      OnConnectionClosed != nullptr)
                 OnConnectionClosed(this, err);
         }
@@ -2732,7 +2733,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
         // We achieve this by first preventing further up-calls from LwIP (via the call to tcp_abort() above)
         // and then queuing the Release() call to happen after all existing events have been processed.
         //
-        if (oldState != kState_Ready && oldState != kState_Bound)
+        if (oldState != State::kReady && oldState != State::kBound)
         {
             DeferredFree(kReleaseDeferralErrorTactic_Ignore);
         }

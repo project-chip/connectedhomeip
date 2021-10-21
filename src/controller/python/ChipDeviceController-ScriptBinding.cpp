@@ -431,7 +431,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
         for (int j = 0; j < dnsSdInfo->numIPs; ++j)
         {
-            char buf[chip::Inet::kMaxIPAddressStringLength];
+            char buf[chip::Inet::IPAddress::kMaxStringLength];
             dnsSdInfo->ipAddress[j].ToString(buf);
             ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
         }
