@@ -37,7 +37,7 @@ constexpr ClusterId kColorControlCluster  = 0x00000300;
 constexpr ClusterId kAccessControlCluster = 0x0000001F;
 
 constexpr size_t kSubjectsPerEntry = 4;
-constexpr size_t kTargetsPerEntry = 3;
+constexpr size_t kTargetsPerEntry  = 3;
 
 // Used to detect empty subjects, targets, etc.
 constexpr int kEmptyFlags = 0;
@@ -346,23 +346,19 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
         Privilege privilege;
         CHIP_ERROR expectedResult;
     } checks[] = {
-        {
-            { .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
-            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
-            Privilege::kAdminister,
-            CHIP_NO_ERROR
-        },
-        {
-            { .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1 },
-            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
-            Privilege::kAdminister,
-            CHIP_ERROR_ACCESS_DENIED
-        },
+        { { .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+          { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+          Privilege::kAdminister,
+          CHIP_NO_ERROR },
+        { { .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+          { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+          Privilege::kAdminister,
+          CHIP_ERROR_ACCESS_DENIED },
     };
 
     for (int i = 0; i < int(sizeof(checks) / sizeof(checks[0])); ++i)
     {
-        auto & check = checks[i];
+        auto & check   = checks[i];
         CHIP_ERROR err = context.Check(check.subjectDescriptor, check.requestPath, check.privilege);
         NL_TEST_ASSERT_LOOP(inSuite, i, err == check.expectedResult);
     }
@@ -419,14 +415,14 @@ int Terminate(void * inContext)
 
 int TestAccessControl()
 {
-// clang-format off
+    // clang-format off
     constexpr nlTest tests[] = {
         NL_TEST_DEF("MetaTestIterator", MetaTestIterator),
         NL_TEST_DEF("TestGlobalInstance", TestGlobalInstance),
         NL_TEST_DEF("TestCheck", TestCheck),
         NL_TEST_SENTINEL()
     };
-// clang-format on
+    // clang-format on
 
     nlTestSuite suite = {
         .name       = "AccessControl",
