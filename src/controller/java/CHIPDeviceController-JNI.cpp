@@ -446,7 +446,7 @@ JNI_METHOD(jobject, computePaseVerifier)
 {
     chip::DeviceLayer::StackLock lock;
 
-    CHIP_ERROR err      = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     jobject params;
     jbyteArray verifierBytes;
     uint32_t passcodeId;
