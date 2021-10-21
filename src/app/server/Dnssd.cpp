@@ -214,7 +214,7 @@ CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
 
     mDiscoveryExpirationMs = mTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(mDiscoveryTimeoutSecs) * 1000;
 
-    return DeviceLayer::SystemLayer().StartTimer(static_cast<uint32_t>(mDiscoveryTimeoutSecs) * 1000, HandleDiscoveryExpiration,
+    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(mDiscoveryTimeoutSecs), HandleDiscoveryExpiration,
                                                  nullptr);
 }
 
@@ -231,7 +231,7 @@ CHIP_ERROR DnssdServer::ScheduleExtendedDiscoveryExpiration()
     mExtendedDiscoveryExpirationMs =
         mTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(extendedDiscoveryTimeoutSecs) * 1000;
 
-    return DeviceLayer::SystemLayer().StartTimer(static_cast<uint32_t>(extendedDiscoveryTimeoutSecs) * 1000,
+    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(extendedDiscoveryTimeoutSecs),
                                                  HandleExtendedDiscoveryExpiration, nullptr);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY

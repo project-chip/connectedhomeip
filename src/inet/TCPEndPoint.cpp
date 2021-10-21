@@ -2522,7 +2522,8 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
-        Layer().SystemLayer()->StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, InetLayer::HandleTCPInactivityTimer, &lInetLayer);
+        Layer().SystemLayer()->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL),
+                                          InetLayer::HandleTCPInactivityTimer, &lInetLayer);
     }
 }
 #endif // INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -2554,7 +2555,7 @@ void TCPEndPoint::StartConnectTimerIfSet()
 {
     if (mConnectTimeoutMsecs > 0)
     {
-        Layer().SystemLayer()->StartTimer(mConnectTimeoutMsecs, TCPConnectTimeoutHandler, this);
+        Layer().SystemLayer()->StartTimer(System::Clock::Milliseconds32(mConnectTimeoutMsecs), TCPConnectTimeoutHandler, this);
     }
 }
 
@@ -2746,7 +2747,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 
 void TCPEndPoint::ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut)
 {
-    Layer().SystemLayer()->StartTimer(aTimeOut, TCPUserTimeoutHandler, this);
+    Layer().SystemLayer()->StartTimer(System::Clock::Milliseconds32(aTimeOut), TCPUserTimeoutHandler, this);
 }
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS

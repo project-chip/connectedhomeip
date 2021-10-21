@@ -32,6 +32,8 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/ObjectLifeCycle.h>
+#include <system/SystemClock.h>
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
 #include <system/SystemObject.h>
@@ -100,7 +102,7 @@ public:
      *       arguments. If called with @a aComplete and @a aAppState identical to an existing timer,
      *       the currently-running timer will first be cancelled.
      *
-     *   @param[in]  aDelayMilliseconds Time in milliseconds before this timer fires.
+     *   @param[in]  aDelay             Time before this timer fires.
      *   @param[in]  aComplete          A pointer to the function called when timer expires.
      *   @param[in]  aAppState          A pointer to the application state object used when timer expires.
      *
@@ -108,7 +110,7 @@ public:
      *   @return CHIP_ERROR_NO_MEMORY If a timer cannot be allocated.
      *   @return Other Value indicating timer failed to start.
      */
-    virtual CHIP_ERROR StartTimer(uint32_t aDelayMilliseconds, TimerCompleteCallback aComplete, void * aAppState) = 0;
+    virtual CHIP_ERROR StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
 
     /**
      * @brief

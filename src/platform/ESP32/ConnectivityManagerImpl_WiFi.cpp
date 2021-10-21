@@ -624,7 +624,8 @@ void ConnectivityManagerImpl::DriveStationState()
 
                 ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms", timeToNextConnect);
 
-                ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, NULL));
+                ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeToNextConnect),
+                                                                      DriveStationState, NULL));
             }
         }
     }
@@ -747,7 +748,7 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
+                err       = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(apTimeout), DriveAPState, NULL);
                 SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " ms", apTimeout);
             }

@@ -211,7 +211,8 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
 
     gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicMilliseconds());
-    SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(gPingArguments.GetEchoInterval(), EchoTimerHandler, NULL));
+    SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(gPingArguments.GetEchoInterval()),
+                                                              EchoTimerHandler, NULL));
 
     streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
