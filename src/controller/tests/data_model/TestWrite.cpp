@@ -148,8 +148,8 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
     // not safe to do so.
     auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath,
                                              app::StatusIB status,
-                                             CHIP_ERROR aError) { 
-        onFailureCbInvoked = true; 
+                                             CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
     };
 
     chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(

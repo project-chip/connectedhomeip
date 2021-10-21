@@ -89,7 +89,7 @@ CHIP_ERROR WriteAttribute(Messaging::ExchangeManager * aExchangeMgr, SessionHand
     auto onDone = [](app::WriteClient * apWriteClient, WriteCallback * callback) {
         chip::Platform::Delete(callback);
     };
-    
+
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDone);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
