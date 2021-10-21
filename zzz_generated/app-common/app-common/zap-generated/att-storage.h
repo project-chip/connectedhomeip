@@ -55,16 +55,3 @@
 #define CLUSTER_MASK_SERVER (0x40)
 // Cluster is a client
 #define CLUSTER_MASK_CLIENT (0x80)
-
-// Command masks modify meanings of commands
-//
-// Is sending of this client command supported
-#define COMMAND_MASK_OUTGOING_CLIENT (0x01)
-// Is sending of this server command supported
-#define COMMAND_MASK_OUTGOING_SERVER (0x02)
-// Is receiving of this client command supported
-#define COMMAND_MASK_INCOMING_CLIENT (0x04)
-// Is receiving of this server command supported
-#define COMMAND_MASK_INCOMING_SERVER (0x08)
-// Is this command manufacturer specific?
-#define COMMAND_MASK_MANUFACTURER_SPECIFIC (0x10)
