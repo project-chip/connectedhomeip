@@ -79,6 +79,7 @@ private:
 };
 
 ServerStorageDelegate gServerStorage;
+chip::SimpleFabricStorage gFabricStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
@@ -102,18 +103,21 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         // already assumed initialized
         chip::Controller::SetupParams commissionerParams;
         chip::Controller::FactoryInitParams factoryParams;
-
-        commissionerParams.pairingDelegate = &gPairingDelegate;
-        factoryParams.storageDelegate      = &gServerStorage;
-
         chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
         chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
         chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
+        chip::Crypto::P256Keypair ephemeralKey;
+
+        err = gFabricStorage.Initialize(&gServerStorage);
+        SuccessOrExit(err);
+
+        commissionerParams.pairingDelegate = &gPairingDelegate;
+        factoryParams.storageDelegate      = &gServerStorage;
+        factoryParams.fabricStorage        = &gFabricStorage;
 
         // Initialize device attestation verifier
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
 
-        chip::Crypto::P256Keypair ephemeralKey;
         err = ephemeralKey.Initialize();
         SuccessOrExit(err);
 

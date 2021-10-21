@@ -352,3 +352,20 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
     ChipLogProgress(chipTool, "KVS: Deleting key %s", key);
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
 }
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer,
+                                                     uint16_t size) override
+{
+    return SyncSetKeyValue(key, buffer, size);
+};
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer,
+                                                    uint16_t & size) override
+{
+    return SyncGetKeyValue(key, buffer, size);
+};
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncDelete(FabricIndex fabricIndex, const char * key) override
+{
+    return SyncDeleteKeyValue(key);
+};

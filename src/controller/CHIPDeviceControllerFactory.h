@@ -65,6 +65,7 @@ struct SetupParams
 struct FactoryInitParams
 {
     PersistentStorageDelegate * storageDelegate           = nullptr;
+    FabricStorage * fabricStorage                         = nullptr;
     System::Layer * systemLayer                           = nullptr;
     Inet::InetLayer * inetLayer                           = nullptr;
     DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
@@ -110,6 +111,7 @@ private:
 
     uint16_t mListenPort;
     PersistentStorageDelegate * mStorageDelegate = nullptr;
+    FabricStorage * mFabricStorage               = nullptr;
     DeviceControllerSystemState * mSystemState   = nullptr;
 };
 

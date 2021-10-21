@@ -60,6 +60,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
+@property (readonly) chip::FabricStorage * fabricStorage;
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) chip::NodeId localDeviceId;
@@ -124,6 +125,10 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             delete self->_cppCommissioner;
             self->_cppCommissioner = nullptr;
         }
+        if (self->_fabricStorage) {
+            delete self->_fabricStorage;
+            self->_fabricStorage = nullptr;
+        }
     });
 
     // StopEventLoopTask will block until blocks are executed
@@ -153,6 +158,8 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
         _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
+        // TODO Expose FabricStorage to CHIPFramework consumers.
+        _fabricStorage = new chip::SimpleFabricStorage(_persistentStorageDelegateBridge);
 
         // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
         std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge;
@@ -184,6 +191,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
 
         params.storageDelegate = _persistentStorageDelegateBridge;
+        params.fabricStorage = _fabricStorage;
         commissionerParams.deviceAddressUpdateDelegate = _pairingDelegateBridge;
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
@@ -472,6 +480,11 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     if (_persistentStorageDelegateBridge) {
         delete _persistentStorageDelegateBridge;
         _persistentStorageDelegateBridge = NULL;
+    }
+
+    if (_fabricStorage) {
+        delete _fabricStorage;
+        _fabricStorage = nullptr;
     }
 
     return YES;
