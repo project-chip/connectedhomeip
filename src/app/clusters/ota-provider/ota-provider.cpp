@@ -193,7 +193,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
 
     if (location.size() != kLocationLen)
     {
-        ChipLogError(Zcl, "location param length %zu exceeds max %zu", location.size(), kLocationLen);
+        ChipLogError(Zcl, "location param length %zu != expected length %zu", location.size(), kLocationLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
         return true;
     }
