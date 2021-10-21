@@ -27,6 +27,7 @@ namespace DeviceLayer {
  */
 class ConfigurationManagerImpl final : public ConfigurationManager
 {
+public:
     virtual ~ConfigurationManagerImpl() = default;
 
 private:
@@ -96,35 +97,15 @@ private:
     }
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
-    // ===== Members for internal use by the following friends.
-
-    friend ConfigurationManager & ConfigurationMgr(void);
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
-
-    static ConfigurationManagerImpl sInstance;
 };
 
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * Chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr(void)
+ConfigurationManager & ConfigurationMgr()
 {
-    return ConfigurationManagerImpl::sInstance;
+    static ConfigurationManagerImpl sInstance;
+    return sInstance;
 }
 
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * Chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the ESP32 platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
+void SetConfigurationMgr(ConfigurationManagerImpl & configurationManager) {}
 
 } // namespace DeviceLayer
 } // namespace chip

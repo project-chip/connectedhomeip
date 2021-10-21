@@ -151,20 +151,18 @@ protected:
 };
 
 /**
- * Returns a reference to the public interface of the ConfigurationManager singleton object.
+ * Returns a reference to a ConfigurationManager object.
  *
- * chip application should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
+ * Applications should use this to access the features of the ConfigurationManager.
  */
 extern ConfigurationManager & ConfigurationMgr();
 
 /**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
+ * Sets a reference to a ConfigurationManager object.
  *
- * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the selected platform.
+ * This must be called before any calls to ConfigurationMgr.
  */
-extern ConfigurationManagerImpl & ConfigurationMgrImpl();
+extern void SetConfigurationMgr(ConfigurationManager & configurationManager);
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -50,9 +50,19 @@ enum
 
 // TODO: Define a Singleton instance of CHIP Group Key Store here (#1266)
 
-/** Singleton instance of the ConfigurationManager implementation object for the ESP32.
+/** Singleton pointer to the ConfigurationManager implementation.
  */
-ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
+ConfigurationManager * gInstance;
+
+ConfigurationManager & ConfigurationMgr()
+{
+    return *gInstance;
+}
+
+void SetConfigurationMgr(ConfigurationManager & configurationManager)
+{
+    gInstance = &configurationManager;
+}
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
