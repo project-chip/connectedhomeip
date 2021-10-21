@@ -77,7 +77,7 @@ void LEDWidget::Animate()
         Clock::MonotonicMicroseconds stateDurUS       = ((sl_led_get_state(mLed)) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
         Clock::MonotonicMicroseconds nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
 
-        if (Clock::IsEarlier(nextChangeTimeUS, nowUS))
+        if (nextChangeTimeUS < nowUS)
         {
             Invert();
             mLastChangeTimeUS = nowUS;

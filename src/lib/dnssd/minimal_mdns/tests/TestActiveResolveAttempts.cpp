@@ -27,14 +27,17 @@ using namespace chip;
 class MockClock : public System::Clock::ClockBase
 {
 public:
-    System::Clock::Microseconds64 GetMonotonicMicroseconds64() override { return System::Clock::Microseconds64(mUsec); }
-    System::Clock::Milliseconds64 GetMonotonicMilliseconds64() override { return System::Clock::Milliseconds64(mUsec / 1000); }
+    System::Clock::Microseconds64 GetMonotonicMicroseconds64() override { return mUsec; }
+    System::Clock::Milliseconds64 GetMonotonicMilliseconds64() override
+    {
+        return std::chrono::duration_cast<System::Clock::Milliseconds64>(mUsec);
+    }
 
-    void AdvanceMs(MonotonicMilliseconds ms) { mUsec += ms * 1000L; }
-    void AdvanceSec(uint32_t s) { AdvanceMs(s * 1000); }
+    void AdvanceMs(uint32_t ms) { mUsec += System::Clock::Milliseconds32(ms); }
+    void AdvanceSec(uint32_t s) { mUsec += System::Clock::Seconds32(s); }
 
 private:
-    MonotonicMicroseconds mUsec = 0;
+    System::Clock::Microseconds64 mUsec;
 };
 
 PeerId MakePeerId(NodeId nodeId)

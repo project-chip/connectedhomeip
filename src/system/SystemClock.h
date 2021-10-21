@@ -221,29 +221,9 @@ inline void SetSystemClockForTesting(Clock::ClockBase * clock)
 using MonotonicMicroseconds = ClockBase::MonotonicMicroseconds;
 using MonotonicMilliseconds = ClockBase::MonotonicMilliseconds;
 
-/**
- *  Compares two time values and returns true if the first value is earlier than the second value.
- *
- *  A static API that gets called to compare 2 time values. This API attempts to account for timer wrap by assuming that
- *  the difference between the 2 input values will only be more than half the timestamp scalar range if a timer wrap has
- *  occurred between the 2 samples.
- *
- *  @note
- *      This implementation assumes that ClockBase::Tick is an unsigned scalar type.
- *
- *  @return true if the first param is earlier than the second, false otherwise.
- */
-bool IsEarlier(const ClockBase::Tick & first, const ClockBase::Tick & second);
-
-/**
- *  Returns a time value plus an offset, with the offset clamped below half the time range.
- */
-ClockBase::Tick AddOffset(const ClockBase::Tick & base, const ClockBase::Tick & offset);
-
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 Microseconds64 TimevalToMicroseconds(const timeval & in);
-MonotonicMilliseconds TimevalToMilliseconds(const timeval & in);
-void MillisecondsToTimeval(MonotonicMilliseconds in, timeval & out);
+void ToTimeval(Microseconds64 in, timeval & out);
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Clock

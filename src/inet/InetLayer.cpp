@@ -607,7 +607,8 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
 
     if (lTimerRequired)
     {
-        aSystemLayer->StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, HandleTCPInactivityTimer, &lInetLayer);
+        aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleTCPInactivityTimer,
+                                 &lInetLayer);
     }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0

@@ -170,24 +170,6 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
-static_assert(std::is_unsigned<ClockBase::Tick>::value, "ClockBase::Tick must be unsigned");
-constexpr ClockBase::Tick kMaxTick     = static_cast<ClockBase::Tick>(0) - static_cast<ClockBase::Tick>(1);
-constexpr ClockBase::Tick kHalfMaxTick = static_cast<ClockBase::Tick>(kMaxTick / 2);
-
-bool IsEarlier(const ClockBase::Tick & inFirst, const ClockBase::Tick & inSecond)
-{
-    // account for timer wrap with the assumption that no two input times will "naturally"
-    // be more than half the timer range apart.
-    return (((inFirst < inSecond) && (inSecond - inFirst < kHalfMaxTick)) ||
-            ((inFirst > inSecond) && (inFirst - inSecond > kHalfMaxTick)));
-}
-
-ClockBase::Tick AddOffset(const ClockBase::Tick & base, const ClockBase::Tick & offset)
-{
-    const ClockBase::Tick increment = (offset < kHalfMaxTick) ? offset : (kHalfMaxTick - 1);
-    return base + increment;
-}
-
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 Microseconds64 TimevalToMicroseconds(const timeval & tv)
@@ -195,15 +177,12 @@ Microseconds64 TimevalToMicroseconds(const timeval & tv)
     return Seconds64(tv.tv_sec) + Microseconds64(tv.tv_usec);
 }
 
-MonotonicMilliseconds TimevalToMilliseconds(const timeval & in)
+void ToTimeval(Microseconds64 in, timeval & out)
 {
-    return static_cast<MonotonicMilliseconds>(in.tv_sec) * 1000 + static_cast<MonotonicMilliseconds>(in.tv_usec / 1000);
-}
-
-void MillisecondsToTimeval(MonotonicMilliseconds in, timeval & out)
-{
-    out.tv_sec  = static_cast<time_t>(in / 1000);
-    out.tv_usec = static_cast<suseconds_t>((in % 1000) * 1000);
+    Seconds32 seconds = std::chrono::duration_cast<Seconds32>(in);
+    in -= seconds;
+    out.tv_sec  = static_cast<time_t>(seconds.count());
+    out.tv_usec = static_cast<suseconds_t>(in.count());
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS

@@ -178,7 +178,7 @@ void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
         dirtyPath.mFieldId = 1;
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-        chip::DeviceLayer::SystemLayer().StartTimer(1000, MutateClusterHandler, NULL);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), MutateClusterHandler, NULL);
         testSyncReport = true;
     }
     else
@@ -195,7 +195,7 @@ class MockInteractionModelApp : public chip::app::InteractionModelDelegate
 public:
     virtual CHIP_ERROR SubscriptionEstablished(const chip::app::ReadHandler * apReadHandler)
     {
-        chip::DeviceLayer::SystemLayer().StartTimer(1000, MutateClusterHandler, NULL);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), MutateClusterHandler, NULL);
         return CHIP_NO_ERROR;
     }
 };

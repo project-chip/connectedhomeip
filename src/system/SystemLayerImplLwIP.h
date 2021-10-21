@@ -38,7 +38,7 @@ public:
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
@@ -55,7 +55,7 @@ public:
 private:
     friend class PlatformEventing;
 
-    CHIP_ERROR StartPlatformTimer(uint32_t aDelayMilliseconds);
+    CHIP_ERROR StartPlatformTimer(System::Clock::Timeout aDelay);
 
     Timer::MutexedList mTimerList;
     bool mHandlingTimerComplete; // true while handling any timer completion

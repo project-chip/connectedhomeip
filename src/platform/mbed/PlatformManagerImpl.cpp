@@ -257,7 +257,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
     return TranslateOsStatus(err);
 }
 
-CHIP_ERROR PlatformManagerImpl::_StartChipTimer(int64_t durationMS)
+CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout duration)
 {
     // Let LayerSocketsLoop::PrepareSelect() handle timers.
     return CHIP_NO_ERROR;

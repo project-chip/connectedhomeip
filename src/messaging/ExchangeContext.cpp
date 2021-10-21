@@ -338,7 +338,7 @@ CHIP_ERROR ExchangeContext::StartResponseTimer()
         return CHIP_ERROR_INTERNAL;
     }
 
-    return lSystemLayer->StartTimer(mResponseTimeout, HandleResponseTimeout, this);
+    return lSystemLayer->StartTimer(chip::System::Clock::Milliseconds32(mResponseTimeout), HandleResponseTimeout, this);
 }
 
 void ExchangeContext::CancelResponseTimer()
