@@ -92,7 +92,7 @@ typedef struct _AudioOutputInfo
 {
     uint8_t index;
     uint8_t outputType;
-    chip::ByteSpan name;
+    chip::CharSpan name;
 } AudioOutputInfo;
 
 // Struct for BasicCommissioningInfoType
@@ -172,7 +172,7 @@ typedef struct _FabricDescriptor
     uint16_t VendorId;
     chip::FabricId FabricId;
     chip::NodeId NodeId;
-    chip::ByteSpan Label;
+    chip::CharSpan Label;
 } FabricDescriptor;
 
 // Struct for GroupKey
@@ -203,8 +203,8 @@ typedef struct _IasAceZoneStatusResult
 // Struct for LabelStruct
 typedef struct _LabelStruct
 {
-    chip::ByteSpan label;
-    chip::ByteSpan value;
+    chip::CharSpan label;
+    chip::CharSpan value;
 } LabelStruct;
 
 // Struct for MediaInputInfo
@@ -212,8 +212,8 @@ typedef struct _MediaInputInfo
 {
     uint8_t index;
     uint8_t inputType;
-    chip::ByteSpan name;
-    chip::ByteSpan description;
+    chip::CharSpan name;
+    chip::CharSpan description;
 } MediaInputInfo;
 
 // Struct for MediaPlaybackPosition
@@ -234,7 +234,7 @@ typedef struct _NOCStruct
 typedef struct _NavigateTargetTargetInfo
 {
     uint8_t identifier;
-    chip::ByteSpan name;
+    chip::CharSpan name;
 } NavigateTargetTargetInfo;
 
 // Struct for NeighborTable
@@ -259,7 +259,7 @@ typedef struct _NeighborTable
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
 {
-    chip::ByteSpan Name;
+    chip::CharSpan Name;
     bool FabricConnected;
     bool OffPremiseServicesReachableIPv4;
     bool OffPremiseServicesReachableIPv6;
@@ -378,7 +378,7 @@ typedef struct _ThreadInterfaceScanResult
 typedef struct _ThreadMetrics
 {
     uint64_t Id;
-    chip::ByteSpan Name;
+    chip::CharSpan Name;
     uint32_t StackFreeCurrent;
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
@@ -400,9 +400,9 @@ typedef struct _TvChannelInfo
 {
     uint16_t majorNumber;
     uint16_t minorNumber;
-    chip::ByteSpan name;
-    chip::ByteSpan callSign;
-    chip::ByteSpan affiliateCallSign;
+    chip::CharSpan name;
+    chip::CharSpan callSign;
+    chip::CharSpan affiliateCallSign;
 } TvChannelInfo;
 
 // Struct for TvChannelLineupInfo

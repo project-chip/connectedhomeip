@@ -219,7 +219,7 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
         ChipLogProgress(chipTool, "AudioOutputInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  index: %" PRIu8 "", entry.index);
         ChipLogProgress(chipTool, "  outputType: %" PRIu8 "", entry.outputType);
-        ChipLogProgress(Zcl, "  name: %zu", entry.name.size());
+        ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -464,8 +464,8 @@ static void OnFixedLabelLabelListListAttributeResponse(
 #endif // CHIP_PROGRESS_LOGGING
         ++i;
         ChipLogProgress(chipTool, "LabelStruct[%" PRIu16 "]:", i);
-        ChipLogProgress(Zcl, "  label: %zu", entry.label.size());
-        ChipLogProgress(Zcl, "  value: %zu", entry.value.size());
+        ChipLogProgress(Zcl, "  label: %.*s", static_cast<int>(entry.label.size()), entry.label.data());
+        ChipLogProgress(Zcl, "  value: %.*s", static_cast<int>(entry.value.size()), entry.value.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -539,7 +539,7 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
 #endif // CHIP_PROGRESS_LOGGING
         ++i;
         ChipLogProgress(chipTool, "NetworkInterfaceType[%" PRIu16 "]:", i);
-        ChipLogProgress(Zcl, "  Name: %zu", entry.name.size());
+        ChipLogProgress(Zcl, "  Name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(chipTool, "  fabricConnected: %d", entry.fabricConnected);
         ChipLogProgress(chipTool, "  offPremiseServicesReachableIPv4: %d", entry.offPremiseServicesReachableIPv4);
         ChipLogProgress(chipTool, "  offPremiseServicesReachableIPv6: %d", entry.offPremiseServicesReachableIPv6);
@@ -660,8 +660,8 @@ static void OnMediaInputMediaInputListListAttributeResponse(
         ChipLogProgress(chipTool, "MediaInputInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  index: %" PRIu8 "", entry.index);
         ChipLogProgress(chipTool, "  inputType: %" PRIu8 "", entry.inputType);
-        ChipLogProgress(Zcl, "  name: %zu", entry.name.size());
-        ChipLogProgress(Zcl, "  description: %zu", entry.description.size());
+        ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(Zcl, "  description: %.*s", static_cast<int>(entry.description.size()), entry.description.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -703,7 +703,7 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
         ChipLogProgress(chipTool, "  vendorId: %" PRIu16 "", entry.vendorId);
         ChipLogProgress(chipTool, "  fabricId: %" PRIu64 "", entry.fabricId);
         ChipLogProgress(chipTool, "  nodeId: %" PRIu64 "", entry.nodeId);
-        ChipLogProgress(Zcl, "  Label: %zu", entry.label.size());
+        ChipLogProgress(Zcl, "  Label: %.*s", static_cast<int>(entry.label.size()), entry.label.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -775,9 +775,10 @@ static void OnTvChannelTvChannelListListAttributeResponse(
         ChipLogProgress(chipTool, "TvChannelInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  majorNumber: %" PRIu16 "", entry.majorNumber);
         ChipLogProgress(chipTool, "  minorNumber: %" PRIu16 "", entry.minorNumber);
-        ChipLogProgress(Zcl, "  name: %zu", entry.name.size());
-        ChipLogProgress(Zcl, "  callSign: %zu", entry.callSign.size());
-        ChipLogProgress(Zcl, "  affiliateCallSign: %zu", entry.affiliateCallSign.size());
+        ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(Zcl, "  callSign: %.*s", static_cast<int>(entry.callSign.size()), entry.callSign.data());
+        ChipLogProgress(Zcl, "  affiliateCallSign: %.*s", static_cast<int>(entry.affiliateCallSign.size()),
+                        entry.affiliateCallSign.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -815,7 +816,7 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
         ++i;
         ChipLogProgress(chipTool, "NavigateTargetTargetInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  identifier: %" PRIu8 "", entry.identifier);
-        ChipLogProgress(Zcl, "  name: %zu", entry.name.size());
+        ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -1812,7 +1813,7 @@ static void OnOperationalCredentialsNOCResponseSuccess(
     ChipLogProgress(Zcl, "Received NOCResponse:");
     ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", data.statusCode);
     ChipLogProgress(Zcl, "  FabricIndex: %" PRIu8 "", data.fabricIndex);
-    ChipLogProgress(Zcl, "  DebugText: %zu", data.debugText.size());
+    ChipLogProgress(Zcl, "  DebugText: %.*s", static_cast<int>(data.debugText.size()), data.debugText.data());
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);

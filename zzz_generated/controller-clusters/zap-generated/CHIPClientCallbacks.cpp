@@ -1734,12 +1734,12 @@ bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(Endpoi
 }
 
 bool emberAfOperationalCredentialsClusterNOCResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                             uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
+                                                             uint8_t StatusCode, uint8_t FabricIndex, chip::CharSpan DebugText)
 {
     ChipLogProgress(Zcl, "NOCResponse:");
     ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", StatusCode);
     ChipLogProgress(Zcl, "  FabricIndex: %" PRIu8 "", FabricIndex);
-    ChipLogProgress(Zcl, "  DebugText: %zu", DebugText.size());
+    ChipLogProgress(Zcl, "  DebugText: %.*s", static_cast<int>(DebugText.size()), DebugText.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterNOCResponseCallback");
 

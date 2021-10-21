@@ -2016,7 +2016,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             expectArgumentCount = 3;
             uint8_t StatusCode;
             uint8_t FabricIndex;
-            chip::ByteSpan DebugText;
+            chip::CharSpan DebugText;
             bool argExists[3];
 
             memset(argExists, 0, sizeof argExists);

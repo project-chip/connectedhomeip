@@ -6719,7 +6719,7 @@ enum class Fields
 struct Type
 {
 public:
-    chip::ByteSpan name;
+    chip::CharSpan name;
     bool fabricConnected;
     bool offPremiseServicesReachableIPv4;
     bool offPremiseServicesReachableIPv6;
@@ -6835,7 +6835,7 @@ struct Type
 {
 public:
     uint64_t id;
-    chip::ByteSpan name;
+    chip::CharSpan name;
     uint32_t stackFreeCurrent;
     uint32_t stackFreeMinimum;
     uint32_t stackSize;
@@ -8526,7 +8526,7 @@ public:
     uint16_t vendorId;
     chip::FabricId fabricId;
     chip::NodeId nodeId;
-    chip::ByteSpan label;
+    chip::CharSpan label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -8820,7 +8820,7 @@ public:
 
     uint8_t statusCode;
     uint8_t fabricIndex;
-    chip::ByteSpan debugText;
+    chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8833,7 +8833,7 @@ public:
 
     uint8_t statusCode;
     uint8_t fabricIndex;
-    chip::ByteSpan debugText;
+    chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NOCResponse
@@ -9007,8 +9007,8 @@ enum class Fields
 struct Type
 {
 public:
-    chip::ByteSpan label;
-    chip::ByteSpan value;
+    chip::CharSpan label;
+    chip::CharSpan value;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -18301,9 +18301,9 @@ struct Type
 public:
     uint16_t majorNumber;
     uint16_t minorNumber;
-    chip::ByteSpan name;
-    chip::ByteSpan callSign;
-    chip::ByteSpan affiliateCallSign;
+    chip::CharSpan name;
+    chip::CharSpan callSign;
+    chip::CharSpan affiliateCallSign;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -18519,7 +18519,7 @@ struct Type
 {
 public:
     uint8_t identifier;
-    chip::ByteSpan name;
+    chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -19382,8 +19382,8 @@ struct Type
 public:
     uint8_t index;
     MediaInputType inputType;
-    chip::ByteSpan name;
-    chip::ByteSpan description;
+    chip::CharSpan name;
+    chip::CharSpan description;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20093,7 +20093,7 @@ struct Type
 public:
     uint8_t index;
     AudioOutputType outputType;
-    chip::ByteSpan name;
+    chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);

@@ -5059,7 +5059,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
+    static void CallbackFn(void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::CharSpan DebugText)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5067,7 +5067,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPOperationalCredentialsClusterNOCResponseCallback * cppCallback = nullptr;
-        jbyteArray DebugTextArr;
+        UtfString DebugTextStr(env, DebugText);
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -5077,19 +5077,11 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II[B)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        DebugTextArr = env->NewByteArray(DebugText.size());
-        VerifyOrExit(DebugTextArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        env->ExceptionClear();
-        env->SetByteArrayRegion(DebugTextArr, 0, DebugText.size(), reinterpret_cast<const jbyte *>(DebugText.data()));
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(StatusCode), static_cast<jint>(FabricIndex),
-                            DebugTextArr);
-
-        env->DeleteLocalRef(DebugTextArr);
+                            DebugTextStr.jniValue());
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -6105,7 +6097,7 @@ public:
             ChipLogError(Zcl,
                          "Could not find class chip/devicecontroller/ChipClusters$AudioOutputCluster$AudioOutputListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(II[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(IILjava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find AudioOutputListAttribute constructor"));
 
         auto iter = list.begin();
@@ -6114,8 +6106,8 @@ public:
             auto & entry    = iter.GetValue();
             jint index      = entry.index;
             jint outputType = entry.outputType;
-            jbyteArray name = env->NewByteArray(entry.name.size());
-            env->SetByteArrayRegion(name, 0, entry.name.size(), reinterpret_cast<const jbyte *>(entry.name.data()));
+            UtfString nameStr(env, entry.name);
+            jstring name(nameStr.jniValue());
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, outputType, name);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create AudioOutputListAttribute object"));
@@ -6655,17 +6647,17 @@ public:
             err == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$FixedLabelCluster$LabelListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "([B[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find LabelListAttribute constructor"));
 
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry     = iter.GetValue();
-            jbyteArray label = env->NewByteArray(entry.label.size());
-            env->SetByteArrayRegion(label, 0, entry.label.size(), reinterpret_cast<const jbyte *>(entry.label.data()));
-            jbyteArray value = env->NewByteArray(entry.value.size());
-            env->SetByteArrayRegion(value, 0, entry.value.size(), reinterpret_cast<const jbyte *>(entry.value.data()));
+            auto & entry = iter.GetValue();
+            UtfString labelStr(env, entry.label);
+            jstring label(labelStr.jniValue());
+            UtfString valueStr(env, entry.value);
+            jstring value(valueStr.jniValue());
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, label, value);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create LabelListAttribute object"));
@@ -6843,15 +6835,15 @@ public:
                 Zcl,
                 "Could not find class chip/devicecontroller/ChipClusters$GeneralDiagnosticsCluster$NetworkInterfacesAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "([BZZZ[BI)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/String;ZZZ[BI)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find NetworkInterfacesAttribute constructor"));
 
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry    = iter.GetValue();
-            jbyteArray name = env->NewByteArray(entry.name.size());
-            env->SetByteArrayRegion(name, 0, entry.name.size(), reinterpret_cast<const jbyte *>(entry.name.data()));
+            auto & entry = iter.GetValue();
+            UtfString nameStr(env, entry.name);
+            jstring name(nameStr.jniValue());
             jboolean fabricConnected                 = entry.fabricConnected;
             jboolean offPremiseServicesReachableIPv4 = entry.offPremiseServicesReachableIPv4;
             jboolean offPremiseServicesReachableIPv6 = entry.offPremiseServicesReachableIPv6;
@@ -7123,20 +7115,19 @@ public:
             err == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$MediaInputCluster$MediaInputListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(II[B[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(IILjava/lang/String;Ljava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find MediaInputListAttribute constructor"));
 
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry    = iter.GetValue();
-            jint index      = entry.index;
-            jint inputType  = entry.inputType;
-            jbyteArray name = env->NewByteArray(entry.name.size());
-            env->SetByteArrayRegion(name, 0, entry.name.size(), reinterpret_cast<const jbyte *>(entry.name.data()));
-            jbyteArray description = env->NewByteArray(entry.description.size());
-            env->SetByteArrayRegion(description, 0, entry.description.size(),
-                                    reinterpret_cast<const jbyte *>(entry.description.data()));
+            auto & entry   = iter.GetValue();
+            jint index     = entry.index;
+            jint inputType = entry.inputType;
+            UtfString nameStr(env, entry.name);
+            jstring name(nameStr.jniValue());
+            UtfString descriptionStr(env, entry.description);
+            jstring description(descriptionStr.jniValue());
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, inputType, name, description);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create MediaInputListAttribute object"));
@@ -7219,7 +7210,7 @@ public:
             ChipLogError(
                 Zcl, "Could not find class chip/devicecontroller/ChipClusters$OperationalCredentialsCluster$FabricsListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(I[BIJJ[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(I[BIJJLjava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find FabricsListAttribute constructor"));
 
         auto iter = list.begin();
@@ -7230,11 +7221,11 @@ public:
             jbyteArray rootPublicKey = env->NewByteArray(entry.rootPublicKey.size());
             env->SetByteArrayRegion(rootPublicKey, 0, entry.rootPublicKey.size(),
                                     reinterpret_cast<const jbyte *>(entry.rootPublicKey.data()));
-            jint vendorId    = entry.vendorId;
-            jlong fabricId   = entry.fabricId;
-            jlong nodeId     = entry.nodeId;
-            jbyteArray label = env->NewByteArray(entry.label.size());
-            env->SetByteArrayRegion(label, 0, entry.label.size(), reinterpret_cast<const jbyte *>(entry.label.data()));
+            jint vendorId  = entry.vendorId;
+            jlong fabricId = entry.fabricId;
+            jlong nodeId   = entry.nodeId;
+            UtfString labelStr(env, entry.label);
+            jstring label(labelStr.jniValue());
 
             jobject attributeObj =
                 env->NewObject(attributeClass, attributeCtor, fabricIndex, rootPublicKey, vendorId, fabricId, nodeId, label);
@@ -7390,7 +7381,8 @@ public:
             err == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$TvChannelCluster$TvChannelListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(II[B[B[B)V");
+        jmethodID attributeCtor =
+            env->GetMethodID(attributeClass, "<init>", "(IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find TvChannelListAttribute constructor"));
 
         auto iter = list.begin();
@@ -7399,13 +7391,12 @@ public:
             auto & entry     = iter.GetValue();
             jint majorNumber = entry.majorNumber;
             jint minorNumber = entry.minorNumber;
-            jbyteArray name  = env->NewByteArray(entry.name.size());
-            env->SetByteArrayRegion(name, 0, entry.name.size(), reinterpret_cast<const jbyte *>(entry.name.data()));
-            jbyteArray callSign = env->NewByteArray(entry.callSign.size());
-            env->SetByteArrayRegion(callSign, 0, entry.callSign.size(), reinterpret_cast<const jbyte *>(entry.callSign.data()));
-            jbyteArray affiliateCallSign = env->NewByteArray(entry.affiliateCallSign.size());
-            env->SetByteArrayRegion(affiliateCallSign, 0, entry.affiliateCallSign.size(),
-                                    reinterpret_cast<const jbyte *>(entry.affiliateCallSign.data()));
+            UtfString nameStr(env, entry.name);
+            jstring name(nameStr.jniValue());
+            UtfString callSignStr(env, entry.callSign);
+            jstring callSign(callSignStr.jniValue());
+            UtfString affiliateCallSignStr(env, entry.affiliateCallSign);
+            jstring affiliateCallSign(affiliateCallSignStr.jniValue());
 
             jobject attributeObj =
                 env->NewObject(attributeClass, attributeCtor, majorNumber, minorNumber, name, callSign, affiliateCallSign);
@@ -7489,7 +7480,7 @@ public:
                 Zcl,
                 "Could not find class chip/devicecontroller/ChipClusters$TargetNavigatorCluster$TargetNavigatorListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(I[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(ILjava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find TargetNavigatorListAttribute constructor"));
 
         auto iter = list.begin();
@@ -7497,8 +7488,8 @@ public:
         {
             auto & entry    = iter.GetValue();
             jint identifier = entry.identifier;
-            jbyteArray name = env->NewByteArray(entry.name.size());
-            env->SetByteArrayRegion(name, 0, entry.name.size(), reinterpret_cast<const jbyte *>(entry.name.data()));
+            UtfString nameStr(env, entry.name);
+            jstring name(nameStr.jniValue());
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, identifier, name);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create TargetNavigatorListAttribute object"));
