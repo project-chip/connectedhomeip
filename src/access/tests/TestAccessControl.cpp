@@ -346,14 +346,20 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
         Privilege privilege;
         CHIP_ERROR expectedResult;
     } checks[] = {
-        { { .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
-          { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
-          Privilege::kAdminister,
-          CHIP_NO_ERROR },
-        { { .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1 },
-          { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
-          Privilege::kAdminister,
-          CHIP_ERROR_ACCESS_DENIED },
+        // clang-format off
+        {
+            { .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+            Privilege::kAdminister,
+            CHIP_NO_ERROR
+        },
+        {
+            { .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+            { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
+            Privilege::kAdminister,
+            CHIP_ERROR_ACCESS_DENIED
+        },
+        // clang-format on
     };
 
     for (int i = 0; i < int(sizeof(checks) / sizeof(checks[0])); ++i)
