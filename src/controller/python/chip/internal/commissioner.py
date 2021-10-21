@@ -15,7 +15,6 @@
 #
 from chip.configuration import GetLocalNodeId
 from chip.native import NativeLibraryHandleMethodArguments, GetLibraryHandle
-from ctypes import c_uint64, c_uint32, c_uint16
 from enum import Enum
 from typing import Optional
 from chip.internal.types import NetworkCredentialsRequested, OperationalCredentialsRequested, PairingComplete
@@ -103,11 +102,11 @@ def _SetNativeCallSignatues(handle: ctypes.CDLL):
     """Sets up the FFI types for the cdll handle."""
     setter = NativeLibraryHandleMethodArguments(handle)
 
-    setter.Set('pychip_internal_Commissioner_New', Commissioner_p, [c_uint64])
+    setter.Set('pychip_internal_Commissioner_New', Commissioner_p, [ctypes.c_uint64])
     setter.Set('pychip_internal_Commissioner_Unpair',
-               c_uint32, [Commissioner_p, c_uint64])
+               ctypes.c_uint32, [Commissioner_p, ctypes.c_uint64])
     setter.Set('pychip_internal_Commissioner_BleConnectForPairing',
-               c_uint32, [Commissioner_p, c_uint64, c_uint32, c_uint16])
+               ctypes.c_uint32, [Commissioner_p, ctypes.c_uint64, ctypes.c_uint32, cctypes._uint16])
 
     setter.Set('pychip_internal_PairingDelegate_SetPairingCompleteCallback', None, [
                PairingComplete])

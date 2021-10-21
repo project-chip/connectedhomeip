@@ -28,7 +28,7 @@ Use `--output-format=help` to see available output formats.
 
 import sys
 
-import numpy as np  # type: ignore
+import numpy # type: ignore
 
 import memdf.collect
 import memdf.report
