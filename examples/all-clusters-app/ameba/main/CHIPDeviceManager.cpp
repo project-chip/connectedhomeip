@@ -82,6 +82,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
     if (cb != nullptr)
     {
-        cb->PostAttributeChangeCallback(pathe.mEndpointId, path.mClusterId, path.mAttributeId, mask, type, size, value);
+        cb->PostAttributeChangeCallback(path.mEndpointId, path.mClusterId, path.mAttributeId, mask, type, size, value);
     }
 }
