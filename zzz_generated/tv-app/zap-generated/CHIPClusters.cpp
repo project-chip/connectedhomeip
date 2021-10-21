@@ -138,7 +138,7 @@ exit:
 
 CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint8_t location,
-                                                            chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
+                                                            chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -165,8 +165,7 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
     // location: regulatoryLocationType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
     // countryCode: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(countryCode.data()), countryCode.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), countryCode.data()));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
@@ -802,7 +801,7 @@ exit:
 }
 
 CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, chip::ByteSpan label)
+                                                            Callback::Cancelable * onFailureCallback, chip::CharSpan label)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -827,8 +826,7 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // label: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(label.data()), label.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), label.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
