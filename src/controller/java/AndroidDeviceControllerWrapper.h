@@ -80,9 +80,9 @@ public:
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
     // FabricStorage implementation
-    CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override;
-    CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override;
-    CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override;
+    CHIP_ERROR SyncStore(chip::FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override;
+    CHIP_ERROR SyncLoad(chip::FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override;
+    CHIP_ERROR SyncDelete(chip::FabricIndex fabricIndex, const char * key) override;
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {

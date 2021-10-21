@@ -353,19 +353,19 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer,
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncStore(chip::FabricIndex fabricIndex, const char * key, const void * buffer,
                                                      uint16_t size) override
 {
     return SyncSetKeyValue(key, buffer, size);
 };
 
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer,
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncLoad(chip::FabricIndex fabricIndex, const char * key, void * buffer,
                                                     uint16_t & size) override
 {
     return SyncGetKeyValue(key, buffer, size);
 };
 
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncDelete(FabricIndex fabricIndex, const char * key) override
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncDelete(chip::FabricIndex fabricIndex, const char * key) override
 {
     return SyncDeleteKeyValue(key);
 };
