@@ -1053,7 +1053,7 @@ void CheckFromIPv6(nlTestSuite * inSuite, void * inContext)
         struct in6_addr ip_addr;
         ip_addr = *reinterpret_cast<struct in6_addr *>(addr);
 #endif
-        test_addr_2 = IPAddress::FromIPv6(ip_addr);
+        test_addr_2 = IPAddress(ip_addr);
 
         CheckAddressQuartets(inSuite, test_addr_1, test_addr_2);
 
@@ -1186,7 +1186,7 @@ void CheckFromIPv4(nlTestSuite * inSuite, void * inContext)
         ip_addr.s_addr      = htonl(lCurrent->mAddr.mAddrQuartets[3]);
         test_addr_1.Addr[2] = htonl(0xffff);
 #endif
-        test_addr_2 = IPAddress::FromIPv4(ip_addr);
+        test_addr_2 = IPAddress(ip_addr);
 
         CheckAddressQuartets(inSuite, test_addr_1, test_addr_2);
 
@@ -1232,7 +1232,7 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
             memset(&sock_v4, 0, sizeof(struct sockaddr_in));
             sock_v4.sin_family = AF_INET;
             memcpy(&sock_v4.sin_addr.s_addr, &addr[3], sizeof(struct in_addr));
-            test_addr_2 = IPAddress::FromSockAddr(reinterpret_cast<struct sockaddr &>(sock_v4));
+            test_addr_2 = IPAddress::FromSockAddr(sock_v4);
             break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -1240,14 +1240,14 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
             memset(&sock_v6, 0, sizeof(struct sockaddr_in6));
             sock_v6.sin6_family = AF_INET6;
             memcpy(&sock_v6.sin6_addr.s6_addr, addr, sizeof(struct in6_addr));
-            test_addr_2 = IPAddress::FromSockAddr(reinterpret_cast<struct sockaddr &>(sock_v6));
+            test_addr_2 = IPAddress::FromSockAddr(sock_v6);
             break;
 
         case IPAddressType::kAny:
             memset(&sock_v6, 0, sizeof(struct sockaddr_in6));
             sock_v6.sin6_family = 0;
             memcpy(&sock_v6.sin6_addr.s6_addr, addr, sizeof(struct in6_addr));
-            test_addr_2 = IPAddress::FromSockAddr(reinterpret_cast<struct sockaddr &>(sock_v6));
+            test_addr_2 = IPAddress::FromSockAddr(sock_v6);
             break;
 
         default:

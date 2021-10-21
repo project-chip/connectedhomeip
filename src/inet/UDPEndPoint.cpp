@@ -485,19 +485,19 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     if (pktInfo != NULL)
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        pktInfo->SrcAddress  = IPAddress::FromLwIPAddr(*addr);
-        pktInfo->DestAddress = IPAddress::FromLwIPAddr(*ip_current_dest_addr());
+        pktInfo->SrcAddress  = IPAddress(*addr);
+        pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
 #else // LWIP_VERSION_MAJOR <= 1
         if (PCB_ISIPV6(pcb))
         {
-            pktInfo->SrcAddress = IPAddress::FromIPv6(*(ip6_addr_t *) addr);
-            pktInfo->DestAddress = IPAddress::FromIPv6(*ip6_current_dest_addr());
+            pktInfo->SrcAddress = IPAddress(*(ip6_addr_t *) addr);
+            pktInfo->DestAddress = IPAddress(*ip6_current_dest_addr());
         }
 #if INET_CONFIG_ENABLE_IPV4
         else
         {
-            pktInfo->SrcAddress = IPAddress::FromIPv4(*addr);
-            pktInfo->DestAddress = IPAddress::FromIPv4(*ip_current_dest_addr());
+            pktInfo->SrcAddress = IPAddress(*addr);
+            pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1
@@ -526,12 +526,7 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
     // If an ephemeral port was requested, retrieve the actual bound port.
     if (port == 0)
     {
-        union
-        {
-            struct sockaddr any;
-            struct sockaddr_in in;
-            struct sockaddr_in6 in6;
-        } boundAddr;
+        SockAddr boundAddr;
         socklen_t boundAddrLen = sizeof(boundAddr);
 
         if (getsockname(mSocket, &boundAddr.any, &boundAddrLen) == 0)
