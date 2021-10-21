@@ -11869,15 +11869,6 @@ namespace Events {
 } // namespace Events
 
 } // namespace IlluminanceMeasurement
-namespace IlluminanceLevelSensing {
-
-namespace Commands {
-} // namespace Commands
-
-namespace Events {
-} // namespace Events
-
-} // namespace IlluminanceLevelSensing
 namespace TemperatureMeasurement {
 
 namespace Commands {

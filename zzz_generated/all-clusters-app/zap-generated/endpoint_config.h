@@ -2547,6 +2547,14 @@
               ZAP_EMPTY_DEFAULT() },                                   /* start up color temperature mireds */                     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                       \
                                                                                                                                    \
+            /* Endpoint: 1, Cluster: Illuminance Measurement (server) */                                                           \
+            { 0x0000, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* MeasuredValue */                                    \
+            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* MinMeasuredValue */                                 \
+            { 0x0002, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* MaxMeasuredValue */                                 \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Tolerance */                                        \
+            { 0x0004, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0xFF) },    /* LightSensorType */                                  \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },      /* ClusterRevision */                                  \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                           \
             { 0x0000, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x8000) }, /* measured value */                                   \
             { 0x0001, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x8000) }, /* min measured value */                               \
@@ -2940,6 +2948,9 @@
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayColorControlServer }, /* Endpoint: 1, Cluster: Color Control (server) */                                \
             {                                                                                                                      \
+                0x0400, ZAP_ATTRIBUTE_INDEX(351), 6, 11, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 1, Cluster: Illuminance Measurement (server) */                                                        \
+            {                                                                                                                      \
                 0x0402, ZAP_ATTRIBUTE_INDEX(357), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
             {                                                                                                                      \
@@ -3028,7 +3039,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 18, 3376 }, { ZAP_CLUSTER_INDEX(18), 42, 7534 }, { ZAP_CLUSTER_INDEX(60), 2, 18 },                 \
+        { ZAP_CLUSTER_INDEX(0), 18, 4391 }, { ZAP_CLUSTER_INDEX(18), 41, 7531 }, { ZAP_CLUSTER_INDEX(59), 2, 18 },                 \
     }
 
 // Largest attribute size is needed for various buffers
@@ -3038,7 +3049,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (1518)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (10928)
+#define ATTRIBUTE_MAX_SIZE (11940)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)

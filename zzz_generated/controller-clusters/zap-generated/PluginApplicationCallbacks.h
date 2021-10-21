@@ -48,6 +48,7 @@
     MatterGroupKeyManagementPluginClientInitCallback();                                                                            \
     MatterGroupsPluginClientInitCallback();                                                                                        \
     MatterIdentifyPluginClientInitCallback();                                                                                      \
+    MatterIlluminanceMeasurementPluginClientInitCallback();                                                                        \
     MatterKeypadInputPluginClientInitCallback();                                                                                   \
     MatterLevelControlPluginClientInitCallback();                                                                                  \
     MatterLowPowerPluginClientInitCallback();                                                                                      \
