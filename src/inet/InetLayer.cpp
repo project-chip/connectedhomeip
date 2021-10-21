@@ -101,8 +101,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  */
 InetLayer::InetLayer()
 {
-    State = kState_NotInitialized;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sInetEventHandlerDelegate.IsInitialized())
         sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
@@ -237,9 +235,7 @@ void InetLayer::DroppableEventDequeued(void)
 CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 {
     Inet::RegisterLayerErrorFormatter();
-
-    if (State != kState_NotInitialized)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     // Platform-specific initialization may elect to set this data
     // member. Ensure it is set to a sane default value before
@@ -256,7 +252,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    State = kState_Initialized;
+    mLayerState.SetInitialized();
 
     return CHIP_NO_ERROR;
 }
@@ -271,35 +267,34 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
  */
 CHIP_ERROR InetLayer::Shutdown()
 {
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (State == kState_Initialized)
-    {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        // Abort all TCP endpoints owned by this instance.
-        TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Abort();
-            }
-            return true;
-        });
+    // Abort all TCP endpoints owned by this instance.
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        {
+            lEndPoint->Abort();
+        }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        // Close all UDP endpoints owned by this instance.
-        UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Close();
-            }
-            return true;
-        });
+    // Close all UDP endpoints owned by this instance.
+    UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        {
+            lEndPoint->Close();
+        }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-    }
 
-    State = kState_NotInitialized;
-
+    mLayerState.SetShutdown();
+    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return err;
 }
 
@@ -455,7 +450,7 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     *retEndPoint = TCPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
@@ -495,7 +490,7 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     *retEndPoint = UDPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)

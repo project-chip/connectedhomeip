@@ -32,7 +32,7 @@ class LayerImplLwIP : public LayerLwIP
 {
 public:
     LayerImplLwIP();
-    ~LayerImplLwIP() { mLayerState.Destroy(); }
+    ~LayerImplLwIP() = default;
 
     // Layer overrides.
     CHIP_ERROR Init() override;

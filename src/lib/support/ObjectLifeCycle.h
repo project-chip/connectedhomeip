@@ -26,75 +26,55 @@ namespace chip {
  * Track the life cycle of an object.
  *
  * <pre>
- *                  ┌───────────────┐  Init  ┌─────────────┐  Shutdown  ┌──────────┐  Destroy  ┌───────────┐
- * Construction ───>│ Uninitialized ├───────>│ Initialized ├───────────>│ Shutdown ├──────────>│ Destroyed │
- *                  └──────────┬────┘        └─────────────┘            └─────┬────┘           └───────────┘
- *                      ^      │                               Reset          │
- *                      └──────┴<─────────────────────────────────────────────┘
+ *
+ *      Construction
+ *          ↓
+ *      Uninitialized ‹─┐
+ *          ↓           │
+ *      Initializing    │
+ *          ↓           │
+ *      Initialized     │
+ *          ↓           │
+ *      ShuttingDown    │
+ *          ↓           │
+ *      Shutdown ───────┘
+ *          ↓
+ *      Destroyed
+ *
  * </pre>
  */
-struct ObjectLifeCycle
+class ObjectLifeCycle
 {
+public:
+    enum class State : uint8_t
+    {
+        Uninitialized = 0, ///< Pre-initialized state.
+        Initializing  = 1, ///< State during intialization.
+        Initialized   = 2, ///< Initialized (active) state.
+        ShuttingDown  = 3, ///< State during shutdown.
+        Shutdown      = 4, ///< Post-shutdown state.
+        Destroyed     = 5, ///< Post-destructor state.
+    };
+
+    ObjectLifeCycle() : mState(State::Uninitialized) {}
+    ~ObjectLifeCycle() { mState = State::Destroyed; }
+
     /**
      * @returns true if and only if the object is in the Initialized state.
      */
     bool IsInitialized() const { return mState == State::Initialized; }
 
-    /**
-     * Transition from Uninitialized to Initialized.
+    /*
+     * State transitions.
      *
-     * Typical use is `VerifyOrReturnError(state.Init(), CHIP_ERROR_INCORRECT_STATE)`; this function returns `bool` rather than
-     * a `CHIP_ERROR` so that error source tracking will record the call point rather than this function itself.
-     *
-     * @return true     if the state was Uninitialized and is now Initialized.
-     * @return false    otherwise.
+     * Typical use is `VerifyOrReturnError(state.SetInitializing(), CHIP_ERROR_INCORRECT_STATE)`; these functions return `bool`
+     * rather than a `CHIP_ERROR` so that error source tracking will record the call point rather than this function itself.
      */
-    bool Init()
-    {
-        if (mState == State::Uninitialized)
-        {
-            mState = State::Initialized;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Transition from Initialized to Shutdown.
-     *
-     * Typical use is `VerifyOrReturnError(state.Shutdown(), CHIP_ERROR_INCORRECT_STATE)`; this function returns `bool` rather than
-     * a `CHIP_ERROR` so that error source tracking will record the call point rather than this function itself.
-     *
-     * @return true     if the state was Initialized and is now Shutdown.
-     * @return false    otherwise.
-     */
-    bool Shutdown()
-    {
-        if (mState == State::Initialized)
-        {
-            mState = State::Shutdown;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Transition from Shutdown back to Uninitialized, or remain Uninitialized.
-     *
-     * Typical use is `VerifyOrReturnError(state.Reset(), CHIP_ERROR_INCORRECT_STATE)`; this function returns `bool` rather than
-     * a `CHIP_ERROR` so that error source tracking will record the call point rather than this function itself.
-     *
-     * @return true     if the state was Uninitialized or Shutdown and is now Uninitialized.
-     * @return false    otherwise.
-     */
-    bool Reset()
-    {
-        if (mState == State::Shutdown)
-        {
-            mState = State::Uninitialized;
-        }
-        return mState == State::Uninitialized;
-    }
+    bool SetInitializing() { return Transition<State::Uninitialized, State::Initializing>(); }
+    bool SetInitialized() { return Transition<State::Initializing, State::Initialized>(); }
+    bool SetShuttingDown() { return Transition<State::Initialized, State::ShuttingDown>(); }
+    bool SetShutdown() { return Transition<State::ShuttingDown, State::Shutdown>(); }
+    bool Reset() { return Transition<State::Shutdown, State::Uninitialized>(); }
 
     /**
      * Transition from Uninitialized or Shutdown to Destroyed.
@@ -115,21 +95,21 @@ struct ObjectLifeCycle
         return false;
     }
 
-    /**
-     * Return the current state as an integer. This is intended for troubleshooting or logging, since there is no code access to
-     * the meaning of the integer value.
-     */
-    explicit operator int() const { return static_cast<int>(mState); }
+    State GetState() const { return mState; }
 
 private:
-    enum class State : uint8_t
+    template <State FROM, State TO>
+    bool Transition()
     {
-        Uninitialized = 0, /**< Pre-initialized state; */
-        Initialized   = 1, /**< Initialized state. */
-        Shutdown      = 2, /**< Post-Shutdown state. */
-        Destroyed     = 3, /**< Post-destructor state. */
-    };
-    State mState = State::Uninitialized;
+        if (mState == FROM)
+        {
+            mState = TO;
+            return true;
+        }
+        return false;
+    }
+
+    State mState;
 };
 
 } // namespace chip
