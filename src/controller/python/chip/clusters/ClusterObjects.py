@@ -50,12 +50,10 @@ class ClusterObjectFieldDescriptor:
         if not isinstance(val, List):
             raise ValueError(
                 f"Field {debugPath}.{self.Label} expected List[{self.Type}], but got {type(val)}")
-        index = 0
         writer.startArray(tag)
-        for v in val:
+        for i, v in enumerate(val):
             self._PutSingleElementToTLV(
-                None, v, writer, debugPath + f'[{index}]')
-            index += 1
+                None, v, writer, debugPath + f'[{i}]')
         writer.endContainer()
 
 
@@ -95,13 +93,9 @@ class ClusterObjectDescriptor:
                 ret[tag] = value
                 continue
             if descriptor.IsArray:
-                res = []
-                index = 0
-                for v in value:
-                    res += [self._ConvertNonArray(
-                        f'{debugPath}[{index}]', descriptor, v)]
-                    index += 1
-                ret[descriptor.Label] = res
+                ret[descriptor.Label] = [
+                    self._ConvertNonArray(f'{debugPath}[{i}]', descriptor, v)
+                    for i, v in enumerate(value)]
                 continue
             ret[descriptor.Label] = self._ConvertNonArray(
                 f'{debugPath}.{descriptor.Label}', descriptor, value)

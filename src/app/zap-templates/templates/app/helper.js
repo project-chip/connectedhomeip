@@ -443,7 +443,7 @@ function zapTypeToPythonClusterObjectType(type, options)
     return 'bytes';
   }
 
-  if (type == 'single' || type == 'double') {
+  if ([ 'single', 'double' ].includes(type.toLowerCase())) {
     return 'float';
   }
 
@@ -451,23 +451,13 @@ function zapTypeToPythonClusterObjectType(type, options)
     return 'bool'
   }
 
+  // #10748: asUnderlyingZclType will emit wrong types for int{48|56|64}(u), so we process all int values here.
   if (type.toLowerCase().match(/^int\d+$/)) {
     return 'int'
   }
 
   if (type.toLowerCase().match(/^int\d+u$/)) {
     return 'uint'
-  }
-
-  // Hack for chip::Xxxx types
-  {
-    basicType = ChipTypesHelper.asBasicType(type);
-    if (basicType.match(/^int\d+_t$/)) {
-      return 'int'
-    }
-    if (basicType.match(/^uint\d+_t$/)) {
-      return 'uint'
-    }
   }
 
   async function fn(pkgId)
