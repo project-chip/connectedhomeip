@@ -69,12 +69,12 @@ public:
     CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-
-ModeSelectCluster::Structs::ModeOptionStruct::Type buildModeOptionStruct(const char *label, size_t labelLength, uint8_t mode, uint32_t semanticTag)
+ModeSelectCluster::Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, size_t labelLength, uint8_t mode,
+                                                                         uint32_t semanticTag)
 {
     ModeSelectCluster::Structs::ModeOptionStruct::Type option;
-    option.label = ByteSpan((const unsigned char *) label, labelLength);
-    option.mode = mode;
+    option.label       = ByteSpan((const unsigned char *) label, labelLength);
+    option.mode        = mode;
     option.semanticTag = semanticTag;
     return option;
 }
@@ -86,13 +86,12 @@ ModeSelectCluster::Structs::ModeOptionStruct::Type option1 = buildModeOptionStru
 ModeSelectCluster::Structs::ModeOptionStruct::Type option2 = buildModeOptionStruct("White", 5, 4, 0);
 ModeSelectCluster::Structs::ModeOptionStruct::Type option3 = buildModeOptionStruct("Half-and-half", 13, 7, 0);
 
-const ModeSelectCluster::SupportedModesManager & gSupportedModeManager =
-    ModeSelectCluster::SupportedModesManager::Builder()
-        // TODO: Add as many ModeOptions as necessary.
-        .addSupportedMode((unsigned short)0u, option1)
-        .addSupportedMode((unsigned short)0u, option2)
-        .addSupportedMode((unsigned short)0u, option3)
-        .build();
+const ModeSelectCluster::SupportedModesManager & gSupportedModeManager = ModeSelectCluster::SupportedModesManager::Builder()
+                                                                             // TODO: Add as many ModeOptions as necessary.
+                                                                             .addSupportedMode((unsigned short) 0u, option1)
+                                                                             .addSupportedMode((unsigned short) 0u, option2)
+                                                                             .addSupportedMode((unsigned short) 0u, option3)
+                                                                             .build();
 
 CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -143,8 +142,8 @@ bool emberAfModeSelectClusterClusterChangeToModeCallback(
     }
     // TODO: Implement application logic
 
-    emberAfWriteAttribute(endpointId, ModeSelectCluster::Id, ModeSelectCluster::Attributes::CurrentMode::Id,CLUSTER_MASK_SERVER, &newMode,
-                                ZCL_INT8U_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(endpointId, ModeSelectCluster::Id, ModeSelectCluster::Attributes::CurrentMode::Id, CLUSTER_MASK_SERVER,
+                          &newMode, ZCL_INT8U_ATTRIBUTE_TYPE);
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: ChangeToMode successful");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

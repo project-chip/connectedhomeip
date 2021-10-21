@@ -53,7 +53,7 @@ public:
         SupportedModesManager build();
 
     private:
-        map<EndpointId, vector<ModeOptionStructType>* > mSupportedModesByEndpoints;
+        map<EndpointId, vector<ModeOptionStructType> *> mSupportedModesByEndpoints;
     };
 
     const vector<ModeOptionStructType> getSupportedModesForEndpoint(EndpointId endpointId) const;
@@ -100,13 +100,13 @@ chip::app::Clusters::ModeSelectCluster::SupportedModesManager::Builder::addSuppo
 
 SupportedModesManager chip::app::Clusters::ModeSelectCluster::SupportedModesManager::Builder::build()
 {
-    map<EndpointId, const vector<ModeOptionStructType > > supportedOptions;
+    map<EndpointId, const vector<ModeOptionStructType>> supportedOptions;
     for (map<EndpointId, vector<ModeOptionStructType> *>::iterator it = mSupportedModesByEndpoints.begin();
          it != mSupportedModesByEndpoints.end(); ++it)
     {
-        EndpointId endpointId            = it->first;
+        EndpointId endpointId = it->first;
 
-        const vector<ModeOptionStructType > modeOptionsForEndpoint(*(it->second));
+        const vector<ModeOptionStructType> modeOptionsForEndpoint(*(it->second));
         supportedOptions.insert(pair<EndpointId, const vector<ModeOptionStructType>>(endpointId, modeOptionsForEndpoint));
     }
 
