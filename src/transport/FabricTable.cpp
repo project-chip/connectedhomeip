@@ -403,7 +403,6 @@ FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId fabricId
     return nullptr;
 }
 
-
 void FabricTable::Reset()
 {
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
