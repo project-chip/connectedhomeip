@@ -113,7 +113,7 @@ public class ChipClusters {
       {{#if (isOctetString type)}}
       public byte[] {{asLowerCamelCase name}};
       {{else if (isCharString type)}}
-      // Add String member here after ByteSpan is properly emitted in C++ layer
+      public String {{asLowerCamelCase name}};
       {{else}}
       public {{asJavaBasicType label type}} {{asLowerCamelCase name}};
       {{/if}}
@@ -124,7 +124,7 @@ public class ChipClusters {
         {{#if (isOctetString type)}}
         byte[] {{asLowerCamelCase name}}{{#not_last}},{{/not_last}}
         {{else if (isCharString type)}}
-        // Add String field here after ByteSpan is properly emitted in C++ layer
+        String {{asLowerCamelCase name}}{{#not_last}},{{/not_last}}
         {{else}}
         {{asJavaBasicType label type}} {{asLowerCamelCase name}}{{#not_last}},{{/not_last}}
         {{/if}}

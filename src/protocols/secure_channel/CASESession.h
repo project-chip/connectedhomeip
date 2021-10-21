@@ -46,9 +46,6 @@
 
 namespace chip {
 
-// TODO: move this constant over to src/crypto/CHIPCryptoPAL.h - name it CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES
-constexpr uint16_t kAEADKeySize = 16;
-
 constexpr uint16_t kSigmaParamRandomNumberSize = 32;
 constexpr uint16_t kTrustedRootIdSize          = Credentials::kKeyIdentifierLength;
 constexpr uint16_t kMaxTrustedRootIds          = 5;

@@ -26,7 +26,6 @@ chip_enable_nfc = false
 chip_build_tests = false
 chip_monolithic_tests = false
 chip_inet_config_enable_tcp_endpoint = false
-chip_inet_config_enable_dns_resolver = false
 chip_build_libshell = false
 qpg_ar = "arm-none-eabi-ar"
 qpg_cc = "arm-none-eabi-gcc"

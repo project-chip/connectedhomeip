@@ -17,6 +17,8 @@
  */
 
 #include "ApplicationLauncherManager.h"
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
@@ -32,12 +34,13 @@ exit:
     return err;
 }
 
-vector<uint16_t> ApplicationLauncherManager::proxyGetApplicationList()
+CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::app::AttributeValueEncoder & aEncoder)
 {
-    vector<uint16_t> applications;
-    applications.push_back(123);
-    applications.push_back(456);
-    return applications;
+    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        ReturnErrorOnFailure(encoder.Encode(123u));
+        ReturnErrorOnFailure(encoder.Encode(456u));
+        return CHIP_NO_ERROR;
+    });
 }
 
 ApplicationLauncherResponse applicationLauncherClusterLaunchApp(ApplicationLauncherApp application, std::string data)

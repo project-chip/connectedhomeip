@@ -135,6 +135,28 @@ public:
     CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier = 0);
 
     /**
+     *  Allocate a ReadClient that can be used to do a read interaction.  If the call succeeds, the consumer
+     *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
+     *
+     *  @param[inout] 	apReadClient	    A double pointer to a ReadClient that is updated to point to a valid ReadClient
+     *                                      on successful completion of this function. On failure, it will be updated to point to
+     *                                      nullptr.
+     *  @param[in]      aInteractionType    Type of interaction (read or subscription) that the requested ReadClient should execute.
+     *  @param[in]      aAppIdentifier      A unique token that can be attached to the returned ReadClient object that will be
+     *                                      passed through some of the methods in the registered InteractionModelDelegate.
+     *  @param[in]      apDelegateOverride  If not-null, permits overriding the default delegate registered with the
+     *                                      InteractionModelEngine that will be used by the ReadClient.
+     *
+     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
+     *  @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
+                             uint64_t aAppIdentifier, InteractionModelDelegate * apDelegateOverride = nullptr);
+
+    uint32_t GetNumActiveReadHandlers() const;
+    uint32_t GetNumActiveReadClients() const;
+
+    /**
      *  Get read client index in mReadClients
      *
      *  @param[in]    apReadClient    A pointer to a read client object.
@@ -188,15 +210,6 @@ private:
      */
     CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                        System::PacketBufferHandle && aPayload);
-    /**
-     *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer
-     *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                             uint64_t aAppIdentifier);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;

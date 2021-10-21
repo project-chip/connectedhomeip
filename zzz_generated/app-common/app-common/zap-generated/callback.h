@@ -12062,7 +12062,7 @@ bool emberAfGroupsClusterViewGroupCallback(chip::app::CommandHandler * commandOb
  * @brief Groups Cluster ViewGroupResponse Command callback (from server)
  */
 bool emberAfGroupsClusterViewGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                   uint16_t groupId, uint8_t * groupName);
+                                                   uint16_t groupId, chip::CharSpan groupName);
 /**
  * @brief Groups Cluster GetGroupMembership Command callback (from client)
  */
@@ -12119,7 +12119,8 @@ bool emberAfScenesClusterViewSceneCallback(chip::app::CommandHandler * commandOb
  * @brief Scenes Cluster ViewSceneResponse Command callback (from server)
  */
 bool emberAfScenesClusterViewSceneResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+                                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
+                                                   chip::CharSpan sceneName,
                                                    /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 /**
  * @brief Scenes Cluster RemoveScene Command callback (from client)
@@ -12194,7 +12195,7 @@ bool emberAfScenesClusterEnhancedViewSceneCallback(
  */
 bool emberAfScenesClusterEnhancedViewSceneResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId, uint8_t sceneId,
-    uint16_t transitionTime, uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+    uint16_t transitionTime, chip::CharSpan sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 /**
  * @brief Scenes Cluster CopyScene Command callback (from client)
  */
@@ -12591,12 +12592,10 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
 /**
  * @brief OTA Software Update Provider Cluster QueryImageResponse Command callback (from server)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::EndpointId endpoint,
-                                                                       chip::app::CommandSender * commandObj, uint8_t status,
-                                                                       uint32_t delayedActionTime, uint8_t * imageURI,
-                                                                       uint32_t softwareVersion, uint8_t * softwareVersionString,
-                                                                       chip::ByteSpan updateToken, bool userConsentNeeded,
-                                                                       chip::ByteSpan metadataForRequestor);
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status, uint32_t delayedActionTime,
+    chip::CharSpan imageURI, uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
+    bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 /**
  * @brief OTA Software Update Provider Cluster ApplyUpdateRequestResponse Command callback (from server)
  */
@@ -12619,7 +12618,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(
  * @brief General Commissioning Cluster ArmFailSafeResponse Command callback (from server)
  */
 bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   uint8_t errorCode, uint8_t * debugText);
+                                                                   uint8_t errorCode, chip::CharSpan debugText);
 /**
  * @brief General Commissioning Cluster SetRegulatoryConfig Command callback (from client)
  */
@@ -12631,7 +12630,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
  */
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::EndpointId endpoint,
                                                                            chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                           uint8_t * debugText);
+                                                                           chip::CharSpan debugText);
 /**
  * @brief General Commissioning Cluster CommissioningComplete Command callback (from client)
  */
@@ -12643,7 +12642,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
  */
 bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::EndpointId endpoint,
                                                                              chip::app::CommandSender * commandObj,
-                                                                             uint8_t errorCode, uint8_t * debugText);
+                                                                             uint8_t errorCode, chip::CharSpan debugText);
 /**
  * @brief Network Commissioning Cluster ScanNetworks Command callback (from client)
  */
@@ -12654,7 +12653,7 @@ bool emberAfNetworkCommissioningClusterScanNetworksCallback(
  * @brief Network Commissioning Cluster ScanNetworksResponse Command callback (from server)
  */
 bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t errorCode, uint8_t * debugText,
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t errorCode, chip::CharSpan debugText,
     /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
     /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
 /**
@@ -12668,7 +12667,7 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(
  */
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::EndpointId endpoint,
                                                                       chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                      uint8_t * debugText);
+                                                                      chip::CharSpan debugText);
 /**
  * @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback (from client)
  */
@@ -12680,7 +12679,7 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(
  */
 bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::EndpointId endpoint,
                                                                          chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                         uint8_t * debugText);
+                                                                         chip::CharSpan debugText);
 /**
  * @brief Network Commissioning Cluster AddThreadNetwork Command callback (from client)
  */
@@ -12692,7 +12691,7 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(
  */
 bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::EndpointId endpoint,
                                                                         chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                        uint8_t * debugText);
+                                                                        chip::CharSpan debugText);
 /**
  * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback (from client)
  */
@@ -12704,7 +12703,7 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(
  */
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip::EndpointId endpoint,
                                                                            chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                           uint8_t * debugText);
+                                                                           chip::CharSpan debugText);
 /**
  * @brief Network Commissioning Cluster RemoveNetwork Command callback (from client)
  */
@@ -12716,7 +12715,7 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(
  */
 bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::EndpointId endpoint,
                                                                      chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                     uint8_t * debugText);
+                                                                     chip::CharSpan debugText);
 /**
  * @brief Network Commissioning Cluster EnableNetwork Command callback (from client)
  */
@@ -12728,7 +12727,7 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(
  */
 bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::EndpointId endpoint,
                                                                      chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                     uint8_t * debugText);
+                                                                     chip::CharSpan debugText);
 /**
  * @brief Network Commissioning Cluster DisableNetwork Command callback (from client)
  */
@@ -12740,7 +12739,7 @@ bool emberAfNetworkCommissioningClusterDisableNetworkCallback(
  */
 bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::EndpointId endpoint,
                                                                       chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                      uint8_t * debugText);
+                                                                      chip::CharSpan debugText);
 /**
  * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback (from client)
  */
@@ -13187,14 +13186,14 @@ bool emberAfDoorLockClusterClearAllRfidsResponseCallback(chip::EndpointId endpoi
  */
 bool emberAfDoorLockClusterOperationEventNotificationCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                               uint8_t source, uint8_t eventCode, uint16_t userId,
-                                                              chip::ByteSpan pin, uint32_t timeStamp, uint8_t * data);
+                                                              chip::ByteSpan pin, uint32_t timeStamp, chip::CharSpan data);
 /**
  * @brief Door Lock Cluster ProgrammingEventNotification Command callback (from server)
  */
 bool emberAfDoorLockClusterProgrammingEventNotificationCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                 uint8_t source, uint8_t eventCode, uint16_t userId,
                                                                 chip::ByteSpan pin, uint8_t userType, uint8_t userStatus,
-                                                                uint32_t timeStamp, uint8_t * data);
+                                                                uint32_t timeStamp, chip::CharSpan data);
 /**
  * @brief Window Covering Cluster UpOrOpen Command callback (from client)
  */
@@ -13479,7 +13478,7 @@ bool emberAfIasAceClusterEmergencyCallback(chip::app::CommandHandler * commandOb
  */
 bool emberAfIasAceClusterGetZoneInformationResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                             uint8_t zoneId, uint16_t zoneType, chip::NodeId ieeeAddress,
-                                                            uint8_t * zoneLabel);
+                                                            chip::CharSpan zoneLabel);
 /**
  * @brief IAS ACE Cluster Fire Command callback (from client)
  */
@@ -13489,7 +13488,7 @@ bool emberAfIasAceClusterFireCallback(chip::app::CommandHandler * commandObj, co
  * @brief IAS ACE Cluster ZoneStatusChanged Command callback (from server)
  */
 bool emberAfIasAceClusterZoneStatusChangedCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t zoneId,
-                                                   uint16_t zoneStatus, uint8_t audibleNotification, uint8_t * zoneLabel);
+                                                   uint16_t zoneStatus, uint8_t audibleNotification, chip::CharSpan zoneLabel);
 /**
  * @brief IAS ACE Cluster Panic Command callback (from client)
  */
@@ -13600,7 +13599,7 @@ bool emberAfTargetNavigatorClusterNavigateTargetCallback(
  * @brief Target Navigator Cluster NavigateTargetResponse Command callback (from server)
  */
 bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                 uint8_t status, uint8_t * data);
+                                                                 uint8_t status, chip::CharSpan data);
 /**
  * @brief Media Playback Cluster MediaPlay Command callback (from client)
  */
@@ -13772,7 +13771,7 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
  * @brief Content Launcher Cluster LaunchContentResponse Command callback (from server)
  */
 bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                uint8_t * data, uint8_t contentLaunchStatus);
+                                                                chip::CharSpan data, uint8_t contentLaunchStatus);
 /**
  * @brief Content Launcher Cluster LaunchURL Command callback (from client)
  */
@@ -13783,7 +13782,7 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
  * @brief Content Launcher Cluster LaunchURLResponse Command callback (from server)
  */
 bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint8_t * data, uint8_t contentLaunchStatus);
+                                                            chip::CharSpan data, uint8_t contentLaunchStatus);
 /**
  * @brief Audio Output Cluster SelectOutput Command callback (from client)
  */
@@ -13806,7 +13805,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(
  * @brief Application Launcher Cluster LaunchAppResponse Command callback (from server)
  */
 bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                uint8_t status, uint8_t * data);
+                                                                uint8_t status, chip::CharSpan data);
 /**
  * @brief Application Basic Cluster ChangeStatus Command callback (from client)
  */
@@ -13823,7 +13822,7 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(
  * @brief Account Login Cluster GetSetupPINResponse Command callback (from server)
  */
 bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                           uint8_t * setupPIN);
+                                                           chip::CharSpan setupPIN);
 /**
  * @brief Account Login Cluster Login Command callback (from client)
  */
@@ -13883,6 +13882,11 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestAddArguments::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestListInt8UReverseResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                                   /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+/**
  * @brief Test Cluster Cluster TestSimpleArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestSimpleArgumentRequestCallback(
@@ -13931,11 +13935,17 @@ bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestListInt8UReverseRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::DecodableType & commandData);
+/**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */
 bool emberAfMessagingClusterDisplayMessageCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                    uint32_t messageId, uint8_t messageControl, uint32_t startTime,
-                                                   uint16_t durationInMinutes, uint8_t * message,
+                                                   uint16_t durationInMinutes, chip::CharSpan message,
                                                    uint8_t optionalExtendedMessageControl);
 /**
  * @brief Messaging Cluster GetLastMessage Command callback (from client)
@@ -13959,7 +13969,7 @@ bool emberAfMessagingClusterMessageConfirmationCallback(
  */
 bool emberAfMessagingClusterDisplayProtectedMessageCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                             uint32_t messageId, uint8_t messageControl, uint32_t startTime,
-                                                            uint16_t durationInMinutes, uint8_t * message,
+                                                            uint16_t durationInMinutes, chip::CharSpan message,
                                                             uint8_t optionalExtendedMessageControl);
 /**
  * @brief Messaging Cluster GetMessageCancellation Command callback (from client)

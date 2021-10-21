@@ -2,6 +2,8 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model/DecodableList.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Span.h>
 
@@ -23,6 +25,19 @@ SuccessResponseDelegate gSuccessResponseDelegate;
 FailureResponseDelegate gFailureResponseDelegate;
 
 // Define callbacks for ZCL commands and attribute requests.
+
+#if CHIP_PROGRESS_LOGGING
+std::string ByteSpanToString(chip::ByteSpan value)
+{
+    std::string strValue = "";
+    for (size_t i = 0; i < value.size(); i++)
+    {
+        strValue += ' ';
+        strValue += std::to_string(value.data()[i]);
+    }
+    return strValue;
+}
+#endif
 
 void OnDefaultSuccessResponse(void * /* context */)
 {
@@ -49,13 +64,15 @@ void OnAttributeResponse(void * /* context */, AttributeType value)
 template <>
 void OnAttributeResponse<chip::ByteSpan>(void * /* context */, chip::ByteSpan value)
 {
-    std::string strValue = "";
-    for (size_t i = 0; i < value.size(); i++)
-    {
-        strValue += ' ';
-        strValue += std::to_string(value.data()[i]);
-    }
-    ChipLogProgress(Zcl, "  attributeValue: (span of length %zd) %s", value.size(), strValue.c_str());
+    ChipLogProgress(Zcl, "  attributeValue: (span of length %zd) %s", value.size(), ByteSpanToString(value).c_str());
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <>
+void OnAttributeResponse<chip::CharSpan>(void * /* context */, chip::CharSpan value)
+{
+    ChipLogProgress(Zcl, "  attributeValue: '%.*s'", static_cast<int>(value.size()), value.data());
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -71,9 +88,58 @@ void OnAttributeResponse<bool>(void * /* context */, bool value)
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, uint16_t count, {{chipType}} * entries)
+static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, const DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list)
 {
-    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
+    uint16_t count = 0;
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        ++count;
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        {{#if isStruct}}
+        ChipLogProgress(Zcl, "    {");
+        {{#chip_attribute_list_entryTypes}}
+        {{#if (isOctetString type)}}
+        ChipLogProgress(Zcl, "      {{asSymbol label}}: %s,", ByteSpanToString(entry.{{asLowerCamelCase name}}).c_str());
+        {{else if (isCharString type)}}
+        // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
+        {{else}}
+        ChipLogProgress(Zcl, "      {{asSymbol label}}: {{asPrintFormat type}},", entry.{{asLowerCamelCase name}});
+        {{/if}}
+        {{/chip_attribute_list_entryTypes}}
+        ChipLogProgress(Zcl, "    },");
+        {{else if (isOctetString type)}}
+        ChipLogProgress(Zcl, "    %s,", ByteSpanToString(entry).c_str());
+        {{else if (isCharString type)}}
+        ChipLogProgress(Zcl, "    %.*s,", static_cast<int>(entry.size()), entry.data());
+        {{else}}
+        ChipLogProgress(Zcl, "    {{asPrintFormat type}},", entry);
+        {{/if}}
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -94,7 +160,7 @@ chip::Callback::Callback<Int32sAttributeCallback> gInt32sAttributeCallback{OnAtt
 chip::Callback::Callback<Int64uAttributeCallback> gInt64uAttributeCallback{OnAttributeResponse<uint64_t>, nullptr};
 chip::Callback::Callback<Int64sAttributeCallback> gInt64sAttributeCallback{OnAttributeResponse<int64_t>, nullptr};
 chip::Callback::Callback<OctetStringAttributeCallback> gOctetStringAttributeCallback{OnAttributeResponse<ByteSpan>, nullptr};
-chip::Callback::Callback<CharStringAttributeCallback> gCharStringAttributeCallback{OnAttributeResponse<ByteSpan>, nullptr};
+chip::Callback::Callback<CharStringAttributeCallback> gCharStringAttributeCallback{OnAttributeResponse<CharSpan>, nullptr};
 
 } // namespace
 

@@ -91,7 +91,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandPath::Parser commandPath;
+    CommandPathIB::Parser commandPath;
     chip::TLV::TLVReader commandDataReader;
     chip::ClusterId clusterId;
     chip::CommandId commandId;

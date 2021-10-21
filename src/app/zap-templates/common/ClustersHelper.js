@@ -189,7 +189,7 @@ function asChipCallback(item)
   }
 
   if (StringHelper.isCharString(item.type)) {
-    return { name : 'CharString', type : 'const chip::ByteSpan' };
+    return { name : 'CharString', type : 'const chip::CharSpan' };
   }
 
   if (ListHelper.isList(item.type)) {
@@ -300,12 +300,14 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
 
   const enumItem = getEnum(enums, itemType);
   if (enumItem) {
-    itemType = enumItem.type;
+    item.isEnum = true;
+    itemType    = enumItem.type;
   }
 
   const bitmap = getBitmap(bitmaps, itemType);
   if (bitmap) {
-    itemType = bitmap.type;
+    item.isBitmap = true;
+    itemType      = bitmap.type;
   }
 
   const atomic = getAtomic(atomics, itemType);

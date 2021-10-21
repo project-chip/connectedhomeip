@@ -251,7 +251,7 @@ CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
             VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
             {
-                CommandPath::Parser path;
+                CommandPathIB::Parser path;
                 err = path.Init(reader);
                 SuccessOrExit(err);
 
@@ -321,7 +321,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR CommandDataElement::Parser::GetCommandPath(CommandPath::Parser * const apCommandPath) const
+CHIP_ERROR CommandDataElement::Parser::GetCommandPath(CommandPathIB::Parser * const apCommandPath) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -375,7 +375,7 @@ CHIP_ERROR CommandDataElement::Builder::Init(chip::TLV::TLVWriter * const apWrit
     return InitAnonymousStructure(apWriter);
 }
 
-CommandPath::Builder & CommandDataElement::Builder::CreateCommandPathBuilder()
+CommandPathIB::Builder & CommandDataElement::Builder::CreateCommandPathBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mCommandPathBuilder.ResetError(mError));

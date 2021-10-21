@@ -62,6 +62,8 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         {{#if hasExpectedValue}}
         {{#if isList}}
         XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
+        {{else if isArray}}
+        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
         {{else}}
         {{#if (isString type)}}
         {{#if (isOctetString type)}}

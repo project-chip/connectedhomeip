@@ -1616,6 +1616,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::TestListInt8UReverseRequest::Id: {
+            Commands::TestListInt8UReverseRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfTestClusterClusterTestListInt8UReverseRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::TestListNestedStructListArgumentRequest::Id: {
             Commands::TestListNestedStructListArgumentRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);

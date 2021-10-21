@@ -54,7 +54,6 @@ def main(argv):
         memdf.report.write_dfs(config, {SymbolDF.name: summary})
 
     except Exception as exception:
-        status = 1
         raise exception
 
     return status
