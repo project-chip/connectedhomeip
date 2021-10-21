@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,26 +15,27 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements utility functions for deriving a fibonacci
- *      number from an index.
+/*
+ * This file declares test suite utility methods for logging.
+ *
+ * Each method declared in this file needs to be implemented on a per-language
+ * basis and allows exposing  methods to the test suites that are not part
+ * of the regular cluster set of APIs.
  *
  */
 
-#pragma once
+const Log = {
+  name : 'Log',
+  arguments : [ { type : 'CHAR_STRING', name : 'message' } ],
+  response : { arguments : [] }
+};
 
-#include <cstdint>
+const LogCommands = {
+  name : 'LogCommands',
+  commands : [ Log ],
+};
 
-namespace chip {
-
-/**
- *  This function generates 32-bit Fibonacci number
- *  for a given 32 bit index.
- *
- * @return  32-bit unsigned fibonacci number.
- *
- */
-extern uint32_t GetFibonacciForIndex(uint32_t index);
-
-} // namespace chip
+//
+// Module exports
+//
+exports.LogCommands = LogCommands;

@@ -233,7 +233,7 @@ CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && comma
     err = commandSender->PrepareCommand(commandPathParams);
     SuccessOrExit(err);
 
-    writer = commandSender->GetCommandDataElementTLVWriter();
+    writer = commandSender->GetCommandDataIBTLVWriter();
     err    = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
     SuccessOrExit(err);
 

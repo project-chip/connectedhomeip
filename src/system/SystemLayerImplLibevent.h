@@ -44,7 +44,7 @@ class LayerImplLibevent : public LayerSocketsLoop
 {
 public:
     LayerImplLibevent() : mEventBase(nullptr), mMdnsTimeoutEvent(nullptr) {}
-    ~LayerImplLibevent() { mLayerState.Destroy(); }
+    ~LayerImplLibevent() = default;
 
     // Layer overrides.
     CHIP_ERROR Init() override;

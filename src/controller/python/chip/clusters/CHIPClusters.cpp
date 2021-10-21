@@ -176,7 +176,7 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      index: %" PRIu8 ",", entry.index);
         ChipLogProgress(Zcl, "      outputType: %" PRIu8 ",", entry.outputType);
-        ChipLogProgress(Zcl, "      name: %s,", ByteSpanToString(entry.name).c_str());
+        ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "    },");
     }
 
@@ -464,8 +464,8 @@ static void OnFixedLabelLabelListListAttributeResponse(
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
-        ChipLogProgress(Zcl, "      label: %s,", ByteSpanToString(entry.label).c_str());
-        ChipLogProgress(Zcl, "      value: %s,", ByteSpanToString(entry.value).c_str());
+        ChipLogProgress(Zcl, "      label: %.*s,", static_cast<int>(entry.label.size()), entry.label.data());
+        ChipLogProgress(Zcl, "      value: %.*s,", static_cast<int>(entry.value.size()), entry.value.data());
         ChipLogProgress(Zcl, "    },");
     }
 
@@ -555,7 +555,7 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
-        ChipLogProgress(Zcl, "      Name: %s,", ByteSpanToString(entry.name).c_str());
+        ChipLogProgress(Zcl, "      Name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "      FabricConnected: %d,", entry.fabricConnected);
         ChipLogProgress(Zcl, "      OffPremiseServicesReachableIPv4: %d,", entry.offPremiseServicesReachableIPv4);
         ChipLogProgress(Zcl, "      OffPremiseServicesReachableIPv6: %d,", entry.offPremiseServicesReachableIPv6);
@@ -699,8 +699,8 @@ static void OnMediaInputMediaInputListListAttributeResponse(
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      index: %" PRIu8 ",", entry.index);
         ChipLogProgress(Zcl, "      inputType: %" PRIu8 ",", entry.inputType);
-        ChipLogProgress(Zcl, "      name: %s,", ByteSpanToString(entry.name).c_str());
-        ChipLogProgress(Zcl, "      description: %s,", ByteSpanToString(entry.description).c_str());
+        ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(Zcl, "      description: %.*s,", static_cast<int>(entry.description.size()), entry.description.data());
         ChipLogProgress(Zcl, "    },");
     }
 
@@ -749,7 +749,7 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
         ChipLogProgress(Zcl, "      VendorId: %" PRIu16 ",", entry.vendorId);
         ChipLogProgress(Zcl, "      FabricId: %" PRIu64 ",", entry.fabricId);
         ChipLogProgress(Zcl, "      NodeId: %" PRIu64 ",", entry.nodeId);
-        ChipLogProgress(Zcl, "      Label: %s,", ByteSpanToString(entry.label).c_str());
+        ChipLogProgress(Zcl, "      Label: %.*s,", static_cast<int>(entry.label.size()), entry.label.data());
         ChipLogProgress(Zcl, "    },");
     }
 
@@ -833,9 +833,10 @@ static void OnTvChannelTvChannelListListAttributeResponse(
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      majorNumber: %" PRIu16 ",", entry.majorNumber);
         ChipLogProgress(Zcl, "      minorNumber: %" PRIu16 ",", entry.minorNumber);
-        ChipLogProgress(Zcl, "      name: %s,", ByteSpanToString(entry.name).c_str());
-        ChipLogProgress(Zcl, "      callSign: %s,", ByteSpanToString(entry.callSign).c_str());
-        ChipLogProgress(Zcl, "      affiliateCallSign: %s,", ByteSpanToString(entry.affiliateCallSign).c_str());
+        ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(Zcl, "      callSign: %.*s,", static_cast<int>(entry.callSign.size()), entry.callSign.data());
+        ChipLogProgress(Zcl, "      affiliateCallSign: %.*s,", static_cast<int>(entry.affiliateCallSign.size()),
+                        entry.affiliateCallSign.data());
         ChipLogProgress(Zcl, "    },");
     }
 
@@ -880,7 +881,7 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      identifier: %" PRIu8 ",", entry.identifier);
-        ChipLogProgress(Zcl, "      name: %s,", ByteSpanToString(entry.name).c_str());
+        ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "    },");
     }
 

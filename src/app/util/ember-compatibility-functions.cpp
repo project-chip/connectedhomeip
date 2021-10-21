@@ -26,6 +26,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -491,6 +492,11 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     IgnoreUnusedVariable(data);
     IgnoreUnusedVariable(mask);
 
+    MatterReportingAttributeChangeCallback(endpoint, clusterId, attributeId);
+}
+
+void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+{
     ClusterInfo info;
     info.mClusterId  = clusterId;
     info.mFieldId    = attributeId;

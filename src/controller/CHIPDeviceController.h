@@ -645,7 +645,7 @@ private:
     /* Callback when adding operational certs to device results in failure */
     static void OnAddNOCFailureResponse(void * context, uint8_t status);
     /* Callback when the device confirms that it has added the operational certificates */
-    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex, ByteSpan DebugText);
+    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex, CharSpan DebugText);
 
     /* Callback when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);

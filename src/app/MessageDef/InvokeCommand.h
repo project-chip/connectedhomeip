@@ -31,7 +31,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "Builder.h"
-#include "CommandDataElement.h"
+#include "CommandDataIB.h"
 #include "CommandList.h"
 #include "Parser.h"
 

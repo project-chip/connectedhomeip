@@ -45,7 +45,7 @@ static void sendResponse(app::CommandHandler * command, EmberAfKeypadInputStatus
 
     VerifyOrExit(command != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), keypadInputStatus));
     SuccessOrExit(err = command->FinishCommand());
 

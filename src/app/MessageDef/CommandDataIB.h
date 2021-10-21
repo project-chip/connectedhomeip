@@ -17,7 +17,7 @@
  */
 /**
  *    @file
- *      This file defines CommandDataElement parser and builder in CHIP interaction model
+ *      This file defines CommandDataIB parser and builder in CHIP interaction model
  *
  */
 
@@ -38,7 +38,7 @@
 
 namespace chip {
 namespace app {
-namespace CommandDataElement {
+namespace CommandDataIB {
 enum
 {
     kCsTag_CommandPath = 0,
@@ -52,7 +52,7 @@ public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandDataElement
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandDataIB
      *
      *  @return #CHIP_NO_ERROR on success
      */
@@ -139,16 +139,16 @@ public:
     StatusIB::Builder & CreateStatusIBBuilder();
 
     /**
-     *  @brief Mark the end of this CommandDataElement
+     *  @brief Mark the end of this CommandDataIB
      *
      *  @return A reference to *this
      */
-    CommandDataElement::Builder & EndOfCommandDataElement();
+    CommandDataIB::Builder & EndOfCommandDataIB();
 
 private:
     CommandPathIB::Builder mCommandPathBuilder;
     StatusIB::Builder mStatusIBBuilder;
 };
-}; // namespace CommandDataElement
+}; // namespace CommandDataIB
 }; // namespace app
 }; // namespace chip

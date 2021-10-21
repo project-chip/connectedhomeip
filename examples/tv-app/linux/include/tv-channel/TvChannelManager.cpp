@@ -55,9 +55,9 @@ CHIP_ERROR TvChannelManager::proxyGetTvChannelList(chip::app::AttributeValueEnco
         for (int i = 0; i < maximumVectorSize; ++i)
         {
             chip::app::Clusters::TvChannel::Structs::TvChannelInfo::Type channelInfo;
-            channelInfo.affiliateCallSign = ByteSpan(Uint8::from_char(affiliateCallSign), sizeof(affiliateCallSign) - 1);
-            channelInfo.callSign          = ByteSpan(Uint8::from_char(callSign), sizeof(callSign) - 1);
-            channelInfo.name              = ByteSpan(Uint8::from_char(name), sizeof(name) - 1);
+            channelInfo.affiliateCallSign = CharSpan(affiliateCallSign, sizeof(affiliateCallSign) - 1);
+            channelInfo.callSign          = CharSpan(callSign, sizeof(callSign) - 1);
+            channelInfo.name              = CharSpan(name, sizeof(name) - 1);
             channelInfo.majorNumber       = static_cast<uint8_t>(1 + i);
             channelInfo.minorNumber       = static_cast<uint16_t>(2 + i);
             ReturnErrorOnFailure(encoder.Encode(channelInfo));

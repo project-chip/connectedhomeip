@@ -141,7 +141,7 @@ CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, C
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // moveMode: moveMode
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
@@ -188,7 +188,7 @@ CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCall
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // level: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), level));
     // transitionTime: int16u
@@ -236,7 +236,7 @@ CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSu
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // level: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), level));
     // transitionTime: int16u
@@ -279,7 +279,7 @@ CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCa
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // moveMode: moveMode
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
@@ -323,7 +323,7 @@ CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, C
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // stepMode: stepMode
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
@@ -372,7 +372,7 @@ CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCa
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // stepMode: stepMode
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
@@ -417,7 +417,7 @@ CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, C
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // optionMask: bitmap8
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionMask));
     // optionOverride: bitmap8

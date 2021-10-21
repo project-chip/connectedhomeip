@@ -318,7 +318,7 @@ class ChipDeviceController(object):
             nonlocal returnDevice
             nonlocal deviceAvailableCV
             with deviceAvailableCV:
-                returnDevice = device
+                returnDevice = c_void_p(device)
                 deviceAvailableCV.notify_all()
             if err != 0:
                 print("Failed in getting the connected device: {}".format(err))
@@ -331,11 +331,11 @@ class ChipDeviceController(object):
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
-        if returnDevice == c_void_p(None):
+        if returnDevice.value == None:
             with deviceAvailableCV:
                 deviceAvailableCV.wait()
 
-        if returnDevice == c_void_p(None):
+        if returnDevice.value == None:
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
 

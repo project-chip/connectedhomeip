@@ -91,14 +91,14 @@ groups:
             teams: [reviewers-comcast]
         reviews:
             request: 10
-    shared-reviewers-espressif:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams: [reviewers-espressif]
-        reviews:
-            request: 10
+#     shared-reviewers-espressif:
+#         type: optional
+#         conditions:
+#             - files.include('*')
+#         reviewers:
+#             teams: [reviewers-espressif]
+#         reviews:
+#             request: 10
     shared-reviewers-google:
         type: optional
         conditions:
@@ -107,14 +107,14 @@ groups:
             teams: [reviewers-google]
         reviews:
             request: 10
-    shared-reviewers-lg:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams: [reviewers-lg]
-        reviews:
-            request: 10
+#     shared-reviewers-lg:
+#         type: optional
+#         conditions:
+#             - files.include('*')
+#         reviewers:
+#             teams: [reviewers-lg]
+#         reviews:
+#             request: 10
     shared-reviewers-nordic:
         type: optional
         conditions:
