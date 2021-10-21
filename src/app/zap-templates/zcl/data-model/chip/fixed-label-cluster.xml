@@ -19,8 +19,8 @@ limitations under the License.
 
   <struct name="LabelStruct">
     <cluster code="0x0040"/>
-    <item name="label" type="OCTET_STRING" length="16"/> <!-- TODO: Change this to CHAR_STRING once it is supported #6112 -->
-    <item name="value" type="OCTET_STRING" length="16"/> <!-- TODO: Change this to CHAR_STRING once it is supported #6112 -->
+    <item name="label" type="CHAR_STRING" length="16"/>
+    <item name="value" type="CHAR_STRING" length="16"/>
   </struct>
 
   <cluster>

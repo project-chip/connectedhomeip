@@ -47,8 +47,8 @@ CHIP_ERROR MediaInputManager::proxyGetInputList(chip::app::AttributeValueEncoder
         for (int i = 0; i < maximumVectorSize; ++i)
         {
             chip::app::Clusters::MediaInput::Structs::MediaInputInfo::Type mediaInput;
-            mediaInput.description = chip::ByteSpan(chip::Uint8::from_char(description), sizeof(description) - 1);
-            mediaInput.name        = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name) - 1);
+            mediaInput.description = chip::CharSpan(description, sizeof(description) - 1);
+            mediaInput.name        = chip::CharSpan(name, sizeof(name) - 1);
             mediaInput.inputType   = EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI;
             mediaInput.index       = static_cast<uint8_t>(1 + i);
             ReturnErrorOnFailure(encoder.Encode(mediaInput));

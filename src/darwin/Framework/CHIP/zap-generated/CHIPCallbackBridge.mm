@@ -104,7 +104,7 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
         [array addObject:@ {
             @"index" : [NSNumber numberWithUnsignedChar:entry.index],
             @"outputType" : [NSNumber numberWithUnsignedChar:entry.outputType],
-            @"name" : [NSData dataWithBytes:entry.name.data() length:entry.name.size()],
+            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -228,8 +228,8 @@ void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * cont
     while (iter.Next()) {
         auto & entry = iter.GetValue();
         [array addObject:@ {
-            @"label" : [NSData dataWithBytes:entry.label.data() length:entry.label.size()],
-            @"value" : [NSData dataWithBytes:entry.value.data() length:entry.value.size()],
+            @"label" : [[NSString alloc] initWithBytes:entry.label.data() length:entry.label.size() encoding:NSUTF8StringEncoding],
+            @"value" : [[NSString alloc] initWithBytes:entry.value.data() length:entry.value.size() encoding:NSUTF8StringEncoding],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -269,7 +269,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
     while (iter.Next()) {
         auto & entry = iter.GetValue();
         [array addObject:@ {
-            @"Name" : [NSData dataWithBytes:entry.name.data() length:entry.name.size()],
+            @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
             @"FabricConnected" : [NSNumber numberWithBool:entry.fabricConnected],
             @"OffPremiseServicesReachableIPv4" : [NSNumber numberWithBool:entry.offPremiseServicesReachableIPv4],
             @"OffPremiseServicesReachableIPv6" : [NSNumber numberWithBool:entry.offPremiseServicesReachableIPv6],
@@ -339,8 +339,10 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
         [array addObject:@ {
             @"index" : [NSNumber numberWithUnsignedChar:entry.index],
             @"inputType" : [NSNumber numberWithUnsignedChar:entry.inputType],
-            @"name" : [NSData dataWithBytes:entry.name.data() length:entry.name.size()],
-            @"description" : [NSData dataWithBytes:entry.description.data() length:entry.description.size()],
+            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
+            @"description" : [[NSString alloc] initWithBytes:entry.description.data()
+                                                      length:entry.description.size()
+                                                    encoding:NSUTF8StringEncoding],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -365,7 +367,7 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
             @"VendorId" : [NSNumber numberWithUnsignedShort:entry.vendorId],
             @"FabricId" : [NSNumber numberWithUnsignedLongLong:entry.fabricId],
             @"NodeId" : [NSNumber numberWithUnsignedLongLong:entry.nodeId],
-            @"Label" : [NSData dataWithBytes:entry.label.data() length:entry.label.size()],
+            @"Label" : [[NSString alloc] initWithBytes:entry.label.data() length:entry.label.size() encoding:NSUTF8StringEncoding],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -403,9 +405,13 @@ void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * c
         [array addObject:@ {
             @"majorNumber" : [NSNumber numberWithUnsignedShort:entry.majorNumber],
             @"minorNumber" : [NSNumber numberWithUnsignedShort:entry.minorNumber],
-            @"name" : [NSData dataWithBytes:entry.name.data() length:entry.name.size()],
-            @"callSign" : [NSData dataWithBytes:entry.callSign.data() length:entry.callSign.size()],
-            @"affiliateCallSign" : [NSData dataWithBytes:entry.affiliateCallSign.data() length:entry.affiliateCallSign.size()],
+            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
+            @"callSign" : [[NSString alloc] initWithBytes:entry.callSign.data()
+                                                   length:entry.callSign.size()
+                                                 encoding:NSUTF8StringEncoding],
+            @"affiliateCallSign" : [[NSString alloc] initWithBytes:entry.affiliateCallSign.data()
+                                                            length:entry.affiliateCallSign.size()
+                                                          encoding:NSUTF8StringEncoding],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -426,7 +432,7 @@ void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSucces
         auto & entry = iter.GetValue();
         [array addObject:@ {
             @"identifier" : [NSNumber numberWithUnsignedChar:entry.identifier],
-            @"name" : [NSData dataWithBytes:entry.name.data() length:entry.name.size()],
+            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -1127,12 +1133,12 @@ void CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge::On
 };
 
 void CHIPOperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
+    void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::CharSpan DebugText)
 {
     DispatchSuccess(context, @ {
         @"StatusCode" : [NSNumber numberWithUnsignedChar:StatusCode],
         @"FabricIndex" : [NSNumber numberWithUnsignedChar:FabricIndex],
-        @"DebugText" : [NSData dataWithBytes:DebugText.data() length:DebugText.size()],
+        @"DebugText" : [[NSString alloc] initWithBytes:DebugText.data() length:DebugText.size() encoding:NSUTF8StringEncoding],
     });
 };
 

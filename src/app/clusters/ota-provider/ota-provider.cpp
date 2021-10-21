@@ -189,11 +189,6 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
 
     ChipLogDetail(Zcl, "OTA Provider received QueryImage");
 
-    // TODO: (#7112) support location param and verify length once CHAR_STRING is supported
-    // Using location parameter is blocked by #5542 (use Span for string arguments). For now, there is no way to safely get the
-    // length of the location string because it is not guaranteed to be null-terminated.
-    Span<const char> locationSpan;
-
     if (metadataForProvider.size() > kMaxMetadataLen)
     {
         ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.size(), kMaxMetadataLen);
@@ -201,7 +196,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     }
 
     status = delegate->HandleQueryImage(commandObj, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
-                                        locationSpan, requestorCanConsent, metadataForProvider);
+                                        commandData.location, requestorCanConsent, metadataForProvider);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

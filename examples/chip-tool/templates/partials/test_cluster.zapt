@@ -119,7 +119,6 @@ class {{filename}}: public TestCommand
         {{/chip_tests_item_parameters}}
 
         auto success = [](void * context, const responseType & data) {
-            {{! TODO Update CHAR_STRING to be of type chip::CharSpan instead of chip::ByteSpan }}
             (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
         };
 
