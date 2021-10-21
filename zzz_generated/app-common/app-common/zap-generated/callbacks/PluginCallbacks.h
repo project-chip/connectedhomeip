@@ -115,6 +115,9 @@ void __attribute__((weak)) MatterOperationalCredentialsPluginServerInitCallback(
 void __attribute__((weak)) MatterFixedLabelPluginClientInitCallback(){};
 void __attribute__((weak)) MatterFixedLabelPluginServerInitCallback(){};
 
+void __attribute__((weak)) MatterModeSelectClusterPluginClientInitCallback(){};
+void __attribute__((weak)) MatterModeSelectClusterPluginServerInitCallback(){};
+
 void __attribute__((weak)) MatterShadeConfigurationPluginClientInitCallback(){};
 void __attribute__((weak)) MatterShadeConfigurationPluginServerInitCallback(){};
 

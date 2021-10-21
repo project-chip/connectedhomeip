@@ -9032,6 +9032,137 @@ struct TypeInfo
 } // namespace LabelList
 } // namespace Attributes
 } // namespace FixedLabel
+namespace ModeSelectCluster {
+
+namespace Structs {
+namespace ModeOptionStruct {
+enum class Fields
+{
+    kLabel       = 0,
+    kMode        = 1,
+    kSemanticTag = 2,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan label;
+    uint8_t mode;
+    uint32_t semanticTag;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ModeOptionStruct
+namespace SemanticTag {
+enum class Fields
+{
+    kMfgCode = 0,
+    kValue   = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t mfgCode;
+    uint16_t value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace SemanticTag
+} // namespace Structs
+
+namespace Commands {
+namespace ChangeToMode {
+enum class Fields
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return ModeSelectCluster::Id; }
+
+    uint8_t newMode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return ModeSelectCluster::Id; }
+
+    uint8_t newMode;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToMode
+} // namespace Commands
+
+namespace Attributes {
+namespace CurrentMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return ModeSelectCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+};
+} // namespace CurrentMode
+namespace SupportedModes {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::ModeOptionStruct::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::ModeOptionStruct::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return ModeSelectCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+};
+} // namespace SupportedModes
+namespace OnMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return ModeSelectCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
+};
+} // namespace OnMode
+namespace StartUpMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return ModeSelectCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
+};
+} // namespace StartUpMode
+namespace Description {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return ModeSelectCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+};
+} // namespace Description
+} // namespace Attributes
+} // namespace ModeSelectCluster
 namespace ShadeConfiguration {
 
 namespace Attributes {

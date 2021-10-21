@@ -442,6 +442,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Mode Select Cluster
+ *
+ */
+@interface CHIPTestModeSelectCluster : CHIPModeSelectCluster
+
+- (void)writeAttributeCurrentModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeStartUpModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeDescriptionWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Network Commissioning
  *
  */

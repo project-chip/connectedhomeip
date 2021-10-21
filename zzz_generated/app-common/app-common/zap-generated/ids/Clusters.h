@@ -121,6 +121,9 @@ static constexpr ClusterId Id = 0x0000003E;
 namespace FixedLabel {
 static constexpr ClusterId Id = 0x00000040;
 } // namespace FixedLabel
+namespace ModeSelectCluster {
+static constexpr ClusterId Id = 0x00000050;
+} // namespace ModeSelectCluster
 namespace ShadeConfiguration {
 static constexpr ClusterId Id = 0x00000100;
 } // namespace ShadeConfiguration
