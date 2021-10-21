@@ -1071,11 +1071,11 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** ne
             {
                 NetworkInterface * ifp = new NetworkInterface();
 
-                ifp->Name            = CharSpan(ifa->ifa_name, strlen(ifa->ifa_name));
-                ifp->FabricConnected = ifa->ifa_flags & IFF_RUNNING;
-                ifp->Type            = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
+                ifp->name            = CharSpan(ifa->ifa_name, strlen(ifa->ifa_name));
+                ifp->fabricConnected = ifa->ifa_flags & IFF_RUNNING;
+                ifp->type            = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
 
-                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->HardwareAddress) != CHIP_NO_ERROR)
+                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->hardwareAddress) != CHIP_NO_ERROR)
                 {
                     ChipLogError(DeviceLayer, "Failed to get network hardware address");
                 }

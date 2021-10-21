@@ -29,6 +29,7 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/util/basic-types.h>
 
@@ -50,14 +51,8 @@ template <class>
 class GenericPlatformManagerImpl_POSIX;
 } // namespace Internal
 
-struct NetworkInterface
+struct NetworkInterface : public chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type
 {
-    CharSpan Name;
-    ByteSpan HardwareAddress;
-    EmberAfInterfaceType Type;
-    bool FabricConnected;
-    bool OffPremiseServicesReachableIPv4;
-    bool OffPremiseServicesReachableIPv6;
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
