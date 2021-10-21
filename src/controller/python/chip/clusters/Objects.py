@@ -9005,6 +9005,9 @@ class FixedLabel:
 
 
 
+
+
+
     class Attributes:
         class LabelList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -19120,6 +19123,8 @@ class TargetNavigator:
 
 
 
+
+
     class Commands:
         @dataclass
         class NavigateTarget(ClusterCommand):
@@ -19726,6 +19731,8 @@ class MediaInput:
 
 
 
+
+
     class Commands:
         @dataclass
         class SelectInput(ClusterCommand):
@@ -20321,6 +20328,8 @@ class AudioOutput:
             Index: 'uint' = None
             OutputType: 'AudioOutput.Enums.AudioOutputType' = None
             Name: 'str' = None
+
+
 
 
 
