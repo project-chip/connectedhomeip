@@ -50,6 +50,13 @@ class ConfigurationManagerImpl final : public ConfigurationManager,
 #endif
                                        private Internal::ESP32Config
 {
+public:
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
+
+private:
     // Allow the ConfigurationManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConfigurationManager;
@@ -60,7 +67,6 @@ class ConfigurationManagerImpl final : public ConfigurationManager,
     friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 #endif
 
-private:
     // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR _Init(void);
