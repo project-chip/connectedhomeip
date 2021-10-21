@@ -257,6 +257,21 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
     DispatchSuccess(context, @ { @"value" : array });
 };
 
+void CHIPModeSelectClusterSupportedModesListAttributeCallbackBridge::OnSuccessFn(
+    void * context, uint16_t count, _ModeOptionStruct * entries)
+{
+    id array = [NSMutableArray arrayWithCapacity:count];
+    for (uint16_t i = 0; i < count; i++) {
+        array[i] = @ {
+            @"Label" : [NSData dataWithBytes:entries[i].Label.data() length:entries[i].Label.size()],
+            @"Mode" : [NSNumber numberWithUnsignedChar:entries[i].Mode],
+            @"SemanticTag" : [NSNumber numberWithUnsignedLong:entries[i].SemanticTag],
+        };
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
 void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _FabricDescriptor * entries)
 {

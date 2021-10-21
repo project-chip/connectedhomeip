@@ -39,6 +39,7 @@ public:
         delete onReportColorControlColorTemperatureCallback;
         delete onReportDoorLockLockStateCallback;
         delete onReportLevelControlCurrentLevelCallback;
+        delete onReportModeSelectClusterCurrentModeCallback;
         delete onReportOccupancySensingOccupancyCallback;
         delete onReportOnOffOnOffCallback;
         delete onReportPressureMeasurementMeasuredValueCallback;
@@ -78,6 +79,8 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0000, onReportDoorLockLockStateCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0000, onReportLevelControlCurrentLevelCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0050, 0x0000, onReportModeSelectClusterCurrentModeCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0406, 0x0000, onReportOccupancySensingOccupancyCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
@@ -174,6 +177,8 @@ private:
     chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockStateCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportModeSelectClusterCurrentModeCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancyCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);

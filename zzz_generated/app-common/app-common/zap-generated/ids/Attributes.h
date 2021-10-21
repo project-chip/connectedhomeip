@@ -1571,6 +1571,36 @@ namespace ClusterRevision = Globals::Attributes::ClusterRevision;
 } // namespace Attributes
 } // namespace FixedLabel
 
+namespace ModeSelectCluster {
+namespace Attributes {
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CurrentMode
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedModes
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace OnMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace StartUpMode
+
+namespace Description {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace Description
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
+} // namespace Attributes
+} // namespace ModeSelectCluster
+
 namespace ShadeConfiguration {
 namespace Attributes {
 

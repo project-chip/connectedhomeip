@@ -293,6 +293,17 @@ public:
     static void OnSuccessFn(void * context, uint16_t count, _MediaInputInfo * entries);
 };
 
+class CHIPModeSelectClusterSupportedModesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ModeSelectClusterSupportedModesListAttributeCallback>
+{
+public:
+    CHIPModeSelectClusterSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ModeSelectClusterSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, uint16_t count, _ModeOptionStruct * entries);
+};
+
 class CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OperationalCredentialsFabricsListListAttributeCallback>
 {

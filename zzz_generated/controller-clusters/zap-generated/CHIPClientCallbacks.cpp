@@ -865,6 +865,54 @@ void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstack-usage="
 #endif // __clang__
+void ModeSelectClusterClusterSupportedModesListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
+    _ModeOptionStruct data[count];
+#pragma GCC diagnostic pop
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_STATUS_VOID(ReadByteSpan(message, 2, &data[i].Label));
+        messageLen = static_cast<uint16_t>(messageLen - 2);
+        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].Mode = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i].SemanticTag = emberAfGetInt32u(message, 0, 4);
+        message += 4;
+    }
+    Callback::Callback<ModeSelectClusterSupportedModesListAttributeCallback> * cb =
+        Callback::Callback<ModeSelectClusterSupportedModesListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
+
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {

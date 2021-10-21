@@ -235,6 +235,9 @@
 #define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x0B)
 #define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x0C)
 
+// Commands for cluster: Mode Select Cluster
+#define ZCL_CHANGE_TO_MODE_COMMAND_ID (0x00)
+
 // Commands for cluster: Door Lock
 #define ZCL_LOCK_DOOR_COMMAND_ID (0x00)
 #define ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID (0x00)
