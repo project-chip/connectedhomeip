@@ -16,12 +16,16 @@ import java.util.Map;
 >>>>>>> ef97f0702 (resolve type, nullable and format comments)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /** ClusterInfo maps commands and provides a constructor function for a cluster. */
 =======
 /**
   ClusterInfo maps commands and provides a constructor function for a cluster
  */
 >>>>>>> 2185ce827 (add descriptive documentation on each new class)
+=======
+/** ClusterInfo maps commands and provides a constructor function for a cluster */
+>>>>>>> 68e157c68 (Restyled by google-java-format)
 public class ClusterInfo {
   private final ClusterConstructor createClusterFunction;
   private final Map<String, CommandInfo> commands;
@@ -54,9 +58,13 @@ public class ClusterInfo {
 =======
    * The functional interface provides a uniform way to create cluster through create function. In
    * ClusterInfoMapping, each ClusterConstructor was generated using the intended function. Using
+<<<<<<< HEAD
    * lambda function, it only needs to have ptr and endpointId to create the intended
    * cluster.
 >>>>>>> e3803522e (Restyled by google-java-format)
+=======
+   * lambda function, it only needs to have ptr and endpointId to create the intended cluster.
+>>>>>>> 68e157c68 (Restyled by google-java-format)
    */
   @FunctionalInterface
   public interface ClusterConstructor {
