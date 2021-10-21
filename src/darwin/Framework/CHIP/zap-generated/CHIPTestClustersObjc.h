@@ -144,6 +144,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Bridged Actions
+ *
+ */
+@interface CHIPTestBridgedActions : CHIPBridgedActions
+
+- (void)writeAttributeSetupUrlWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Bridged Device Basic
  *
  */

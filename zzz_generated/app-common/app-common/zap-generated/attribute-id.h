@@ -255,6 +255,15 @@
 #define ZCL_LONG_POLL_INTERVAL_MIN_ATTRIBUTE_ID (0x0005)
 #define ZCL_FAST_POLL_TIMEOUT_MAX_ATTRIBUTE_ID (0x0006)
 
+// Attribute ids for cluster: Bridged Actions
+
+// Client attributes
+
+// Server attributes
+#define ZCL_ACTION_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_ENDPOINT_LIST_ATTRIBUTE_ID (0x0001)
+#define ZCL_SETUP_URL_ATTRIBUTE_ID (0x0002)
+
 // Attribute ids for cluster: Basic
 
 // Client attributes

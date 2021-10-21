@@ -9,6 +9,7 @@
         "audio-output-cluster.xml",
         "basic-information-cluster.xml",
         "binding-cluster.xml",
+        "bridged-actions-cluster.xml",
         "bridged-device-basic.xml",
         "chip-devices.xml",
         "chip-ota.xml",

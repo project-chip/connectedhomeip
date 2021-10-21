@@ -4661,6 +4661,559 @@ struct TypeInfo
 } // namespace FastPollTimeoutMax
 } // namespace Attributes
 } // namespace PollControl
+namespace BridgedActions {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ActionErrorEnum
+enum class ActionErrorEnum : uint8_t
+{
+    kUnknown     = 0x00,
+    kInterrupted = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ActionErrorEnum                      = EmberAfActionErrorEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ActionStatusEnum
+enum class ActionStatusEnum : uint8_t
+{
+    kInactive = 0x00,
+    kActive   = 0x01,
+    kPaused   = 0x02,
+    kDisabled = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ActionStatusEnum                     = EmberAfActionStatusEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ActionTypeEnum
+enum class ActionTypeEnum : uint8_t
+{
+    kOther        = 0x00,
+    kScene        = 0x01,
+    kSequence     = 0x02,
+    kAutomation   = 0x03,
+    kException    = 0x04,
+    kNotification = 0x05,
+    kAlarm        = 0x06,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ActionTypeEnum                       = EmberAfActionTypeEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for EndpointListTypeEnum
+enum class EndpointListTypeEnum : uint8_t
+{
+    kOther = 0x00,
+    kRoom  = 0x01,
+    kZone  = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using EndpointListTypeEnum                 = EmberAfEndpointListTypeEnum;
+#endif
+
+// Bitmap for CommandBits
+enum class CommandBits : uint16_t
+{
+    kInstantAction               = 0,
+    kInstantActionWithTransition = 1,
+    kStartAction                 = 2,
+    kStartActionWithDuration     = 3,
+    kStopAction                  = 4,
+    kPauseAction                 = 5,
+    kPauseActionWithDuration     = 6,
+    kResumeAction                = 7,
+    kEnableAction                = 8,
+    kEnableActionWithDuration    = 9,
+    kDisableAction               = 10,
+    kDisableActionWithDuration   = 11,
+};
+
+namespace Structs {
+namespace ActionStruct {
+enum class Fields
+{
+    kActionID          = 0,
+    kName              = 1,
+    kType              = 2,
+    kEndpointListID    = 3,
+    kSupportedCommands = 4,
+    kStatus            = 5,
+};
+
+struct Type
+{
+public:
+    uint16_t actionID;
+    chip::ByteSpan name;
+    ActionTypeEnum type;
+    uint16_t endpointListID;
+    uint16_t supportedCommands;
+    ActionStatusEnum status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ActionStruct
+namespace EndpointListStruct {
+enum class Fields
+{
+    kEndpointListID = 0,
+    kName           = 1,
+    kType           = 2,
+    kEndpoints      = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t endpointListID;
+    chip::ByteSpan name;
+    EndpointListTypeEnum type;
+    chip::ByteSpan endpoints;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace EndpointListStruct
+} // namespace Structs
+
+namespace Commands {
+namespace InstantAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return InstantAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return InstantAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace InstantAction
+namespace InstantActionWithTransition {
+enum class Fields
+{
+    kActionID       = 0,
+    kInvokeID       = 1,
+    kTransitionTime = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return InstantActionWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint16_t transitionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return InstantActionWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint16_t transitionTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace InstantActionWithTransition
+namespace StartAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StartAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StartAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StartAction
+namespace StartActionWithDuration {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kDuration = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StartActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint32_t duration;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StartActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint32_t duration;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StartActionWithDuration
+namespace StopAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StopAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StopAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StopAction
+namespace PauseAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PauseAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PauseAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PauseAction
+namespace PauseActionWithDuration {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kDuration = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PauseActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint32_t duration;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PauseActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint32_t duration;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PauseActionWithDuration
+namespace ResumeAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ResumeAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ResumeAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResumeAction
+namespace EnableAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnableAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnableAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnableAction
+namespace EnableActionWithDuration {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kDuration = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnableActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint32_t duration;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnableActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint32_t duration;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnableActionWithDuration
+namespace DisableAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return DisableAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return DisableAction::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DisableAction
+namespace DisableActionWithDuration {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kDuration = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return DisableActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint32_t duration;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return DisableActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    uint32_t duration;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DisableActionWithDuration
+} // namespace Commands
+
+namespace Attributes {
+namespace ActionList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::ActionStruct::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::ActionStruct::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActionList::Id; }
+};
+} // namespace ActionList
+namespace EndpointList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::EndpointListStruct::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::EndpointListStruct::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EndpointList::Id; }
+};
+} // namespace EndpointList
+namespace SetupUrl {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SetupUrl::Id; }
+};
+} // namespace SetupUrl
+} // namespace Attributes
+} // namespace BridgedActions
 namespace Basic {
 
 namespace Commands {

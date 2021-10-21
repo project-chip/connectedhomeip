@@ -80,6 +80,17 @@ typedef struct _ContentLaunchParamater
     /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
 } ContentLaunchParamater;
 
+// Struct for ActionStruct
+typedef struct _ActionStruct
+{
+    uint16_t ActionID;
+    chip::ByteSpan Name;
+    uint8_t Type;
+    uint16_t EndpointListID;
+    uint16_t SupportedCommands;
+    uint8_t Status;
+} ActionStruct;
+
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
 {
@@ -155,6 +166,15 @@ typedef struct _DiscoverAttributesInfoRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
 } DiscoverAttributesInfoRecord;
+
+// Struct for EndpointListStruct
+typedef struct _EndpointListStruct
+{
+    uint16_t EndpointListID;
+    chip::ByteSpan Name;
+    uint8_t Type;
+    chip::ByteSpan Endpoints;
+} EndpointListStruct;
 
 // Struct for ExtendedDiscoverAttributesInfoRecord
 typedef struct _ExtendedDiscoverAttributesInfoRecord

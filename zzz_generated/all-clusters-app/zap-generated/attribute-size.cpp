@@ -131,6 +131,80 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
+    case 0x0025: // Bridged Actions Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // action list
+        {
+            entryLength = 42;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _ActionStruct
+            _ActionStruct * entry = reinterpret_cast<_ActionStruct *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->ActionID, write ? (uint8_t *) &entry->ActionID : src, write,
+                           &entryOffset, sizeof(entry->ActionID)); // INT16U
+            ByteSpan * NameSpan = &entry->Name;                    // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
+                           sizeof(entry->Type)); // ActionTypeEnum
+            copyListMember(write ? dest : (uint8_t *) &entry->EndpointListID, write ? (uint8_t *) &entry->EndpointListID : src,
+                           write, &entryOffset, sizeof(entry->EndpointListID)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->SupportedCommands,
+                           write ? (uint8_t *) &entry->SupportedCommands : src, write, &entryOffset,
+                           sizeof(entry->SupportedCommands)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->Status, write ? (uint8_t *) &entry->Status : src, write, &entryOffset,
+                           sizeof(entry->Status)); // ActionStatusEnum
+            break;
+        }
+        case 0x0001: // endpoint list
+        {
+            entryLength = 295;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _EndpointListStruct
+            _EndpointListStruct * entry = reinterpret_cast<_EndpointListStruct *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->EndpointListID, write ? (uint8_t *) &entry->EndpointListID : src,
+                           write, &entryOffset, sizeof(entry->EndpointListID)); // INT16U
+            ByteSpan * NameSpan = &entry->Name;                                 // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
+                           sizeof(entry->Type));          // EndpointListTypeEnum
+            ByteSpan * EndpointsSpan = &entry->Endpoints; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 258, EndpointsSpan)
+                       : ReadByteSpan(src + entryOffset, 258, EndpointsSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 258);
+            break;
+        }
+        }
+        break;
+    }
     case 0x050A: // Content Launcher Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -883,6 +957,19 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0000: // audio output list
             // Struct _AudioOutputInfo
             entryLength = 36;
+            break;
+        }
+        break;
+    case 0x0025: // Bridged Actions Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // action list
+            // Struct _ActionStruct
+            entryLength = 42;
+            break;
+        case 0x0001: // endpoint list
+            // Struct _EndpointListStruct
+            entryLength = 295;
             break;
         }
         break;

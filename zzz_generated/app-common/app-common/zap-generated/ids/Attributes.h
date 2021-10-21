@@ -745,6 +745,28 @@ namespace ClusterRevision = Globals::Attributes::ClusterRevision;
 } // namespace Attributes
 } // namespace PollControl
 
+namespace BridgedActions {
+namespace Attributes {
+
+namespace ActionList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ActionList
+
+namespace EndpointList {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace EndpointList
+
+namespace SetupUrl {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SetupUrl
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
+} // namespace Attributes
+} // namespace BridgedActions
+
 namespace Basic {
 namespace Attributes {
 
