@@ -21,10 +21,10 @@
 #include "support/CodeUtils.h"
 #include "support/logging/CHIPLogging.h"
 
-#include <platform/platform_stdlib.h>
-#include <mDNS/mDNS.h>
-#include <lwip_netconf.h>
 #include <lwip/netif.h>
+#include <lwip_netconf.h>
+#include <mDNS/mDNS.h>
+#include <platform/platform_stdlib.h>
 
 extern struct netif xnetif[];
 
@@ -41,7 +41,7 @@ namespace Mdns {
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int ameba_error = 0;
+    int ameba_error  = 0;
 
     ameba_error = mDNSResponderInit();
     VerifyOrExit(ameba_error == 0, error = CHIP_ERROR_INTERNAL);
@@ -63,7 +63,7 @@ const char * GetProtocolString(MdnsServiceProtocol protocol)
 
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
-    CHIP_ERROR error        = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     DNSServiceRef dnsServiceRef = NULL;
     TXTRecordRef txtRecord;
@@ -71,17 +71,18 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 
     TXTRecordCreate(&txtRecord, sizeof(txt_buf), txt_buf);
 
-    for (size_t i = 0; i < (service -> mTextEntrySize); i++) {
-    const char *value = reinterpret_cast <const char *> (service -> mTextEntries[i].mData);
+    for (size_t i = 0; i < (service->mTextEntrySize); i++)
+    {
+        const char * value = reinterpret_cast<const char *>(service->mTextEntries[i].mData);
         TXTRecordSetValue(&txtRecord, service->mTextEntries[i].mKey, strlen(value), value);
     }
 
-    char *name = const_cast<char*>(service->mName);
-    char *service_type = strcat(strcat(const_cast<char*>(service->mType), "."), GetProtocolString(service->mProtocol));
-    char *domain = "local";
+    char * name         = const_cast<char *>(service->mName);
+    char * service_type = strcat(strcat(const_cast<char *>(service->mType), "."), GetProtocolString(service->mProtocol));
+    char * domain       = "local";
     unsigned short port = service->mPort;
 
-    dnsServiceRef = mDNSRegisterService(name, service_type, domain, port,&txtRecord);
+    dnsServiceRef = mDNSRegisterService(name, service_type, domain, port, &txtRecord);
     VerifyOrExit(dnsServiceRef != NULL, error = CHIP_ERROR_INTERNAL);
 
 exit:

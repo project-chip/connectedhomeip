@@ -33,12 +33,12 @@ void LEDWidget::Init(PinName gpioNum)
     mGPIONum = gpioNum;
     mState   = false;
 
-    if (gpioNum != (PinName)NC)
+    if (gpioNum != (PinName) NC)
     {
         // Init LED control pin
         gpio_init(&gpio_led, gpioNum);
-        gpio_dir(&gpio_led, PIN_OUTPUT);    // Direction: Output
-        gpio_mode(&gpio_led, PullNone);     // No pull
+        gpio_dir(&gpio_led, PIN_OUTPUT); // Direction: Output
+        gpio_mode(&gpio_led, PullNone);  // No pull
         gpio_write(&gpio_led, mState);
     }
 }
@@ -55,6 +55,6 @@ void LEDWidget::DoSet(bool state)
 
     if (stateChange)
     {
-       gpio_write(&gpio_led, state);
+        gpio_write(&gpio_led, state);
     }
 }
