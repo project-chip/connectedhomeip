@@ -73,7 +73,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpoint)
     // Group names are not supported by this plugin.
     EmberAfStatus status;
     uint8_t nameSupport = (uint8_t) emberAfPluginGroupsServerGroupNamesSupportedCallback(endpoint);
-    status = Attributes::NameSupport::Set(endpoint, nameSupport);
+    status              = Attributes::NameSupport::Set(endpoint, nameSupport);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfGroupsClusterPrintln("ERR: writing name support %x", status);
@@ -170,8 +170,8 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, Groups::Id,
-                                             Commands::AddGroupResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, Groups::Id, Commands::AddGroupResponse::Id,
+                                             (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

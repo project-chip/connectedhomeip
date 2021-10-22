@@ -274,8 +274,8 @@ static bool areStartUpOnOffServerAttributesTokenized(EndpointId endpoint)
         return false;
     }
 
-    metadata = emberAfLocateAttributeMetadata(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id,
-                                              CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE);
+    metadata = emberAfLocateAttributeMetadata(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id, CLUSTER_MASK_SERVER,
+                                              EMBER_AF_NULL_MANUFACTURER_CODE);
     if (!emberAfAttributeIsTokenized(metadata))
     {
         return false;
