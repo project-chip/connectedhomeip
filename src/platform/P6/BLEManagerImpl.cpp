@@ -351,7 +351,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 exit:
     if (gatt_err != WICED_BT_GATT_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %ld", gatt_err);
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendNotification() failed: %ld", gatt_err);
         return false;
     }
     else
