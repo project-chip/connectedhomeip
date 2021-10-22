@@ -202,7 +202,7 @@ Merges require at least 3 approvals from unique require-reviewers lists, and all
 
 Development Lead & Vice Leads can merge a change with fewer then the required approvals have been submitted.
 
-A separate "fast track" label will be created that will only require a single checkbox to be set, this label shall only be set by the SW Development Lead, and/or Vice Lead (unless they’re both unavailable, in which case a replacement can be temporarily appointed)
+A separate "fast track" label will be created that will only require a single checkbox to be set, this label shall only be set by the Development Lead, and/or Vice Lead (unless they’re both unavailable, in which case a replacement can be temporarily appointed)
 
 "Day" here means "business day" (i.e. PRs on friday do not get fast-tracked faster).
 
