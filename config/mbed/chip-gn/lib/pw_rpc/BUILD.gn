@@ -13,32 +13,33 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
-import("//${chip_root}/build/chip/tests.gni")
-
-assert(current_os == "mbed")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/target_types.gni")
 
 declare_args() {
-  chip_build_pw_rpc_lib = false
-  chip_custom_build_cflags = []
+  chip_build_pw_rpc_echo_proto = false
 }
 
-config("chip_custom_cflags_config") {
-  cflags = chip_custom_build_cflags
-}
+static_library("pw_rpc") {
+  output_name = "libPwRpc"
 
-group("mbed") {
-  deps = [ "${chip_root}/src/lib" ]
+  public_configs = [ "${dir_pigweed}/pw_hdlc:default_config" ]
+  deps = [
+    "$dir_pw_rpc:server",
+    "${chip_root}/examples/platform/mbed/pw_sys_io:pw_sys_io_mbed",
+    "${dir_pigweed}/pw_hdlc:pw_rpc",
+    dir_pw_assert,
+    dir_pw_hdlc,
+    dir_pw_log,
+  ]
 
-  if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
+  if (chip_build_pw_rpc_echo_proto) {
+    deps += [ "$dir_pw_rpc/nanopb:echo_service" ]
   }
 
-  if (chip_build_pw_rpc_lib) {
-    deps += [ "//lib/pw_rpc" ]
-  }
-}
+  deps += pw_build_LINK_DEPS
 
-group("default") {
-  deps = [ ":mbed" ]
+  output_dir = "${root_out_dir}/lib"
+
+  complete_static_lib = true
 }

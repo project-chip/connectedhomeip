@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,32 +13,20 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-import("//${chip_root}/build/chip/tests.gni")
+pw_log_BACKEND = "$dir_pw_log_basic"
+pw_assert_BACKEND = "$dir_pw_assert_log"
+pw_sys_io_BACKEND =
+    "${chip_root}/examples/platform/mbed/pw_sys_io:pw_sys_io_mbed"
+pw_rpc_system_server_BACKEND =
+    "${chip_root}/examples/common/pigweed:system_rpc_server"
 
-assert(current_os == "mbed")
+pw_build_LINK_DEPS = [
+  "$dir_pw_assert:impl",
+  "$dir_pw_log:impl",
+]
 
-declare_args() {
-  chip_build_pw_rpc_lib = false
-  chip_custom_build_cflags = []
-}
+dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
 
-config("chip_custom_cflags_config") {
-  cflags = chip_custom_build_cflags
-}
-
-group("mbed") {
-  deps = [ "${chip_root}/src/lib" ]
-
-  if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
-  }
-
-  if (chip_build_pw_rpc_lib) {
-    deps += [ "//lib/pw_rpc" ]
-  }
-}
-
-group("default") {
-  deps = [ ":mbed" ]
-}
+chip_enable_pw_rpc = true
