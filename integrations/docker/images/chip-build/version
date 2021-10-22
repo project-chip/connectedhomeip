@@ -1,1 +1,1 @@
-0.5.43 Version bump reason: [Ameba] Update toolchain to asdk-10.3.0
+0.5.44 Version bump reason: Remove ESP32 workaround for invalid certificates
