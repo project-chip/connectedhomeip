@@ -192,6 +192,8 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Success(v
     {{~#*inline "field"}}data.{{asLowerCamelCase label}}{{/inline~}}
     {{#if isArray}}
     ChipLogProgress(Zcl, "  {{label}}: Array printing is not implemented yet.");
+    {{else if isOptional}}
+    ChipLogProgress(Zcl, "  {{label}}: Optional printing is not implemented yet.");
     {{else if (isOctetString type)}}
     ChipLogProgress(Zcl, "  {{label}}: %zu", {{>field}}.size());
     {{else if (isCharString type)}}

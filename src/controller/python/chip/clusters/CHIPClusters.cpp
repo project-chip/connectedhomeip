@@ -6684,6 +6684,15 @@ chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestNotHandled(c
     cluster.Associate(device, ZCLendpointId);
     return cluster.TestNotHandled(nullptr, nullptr).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestNullableOptionalRequest(chip::Controller::Device * device,
+                                                                                            chip::EndpointId ZCLendpointId,
+                                                                                            chip::GroupId, uint8_t arg1)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TestNullableOptionalRequest(nullptr, nullptr, arg1).AsInteger();
+}
 chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestSpecific(chip::Controller::Device * device,
                                                                              chip::EndpointId ZCLendpointId, chip::GroupId)
 {

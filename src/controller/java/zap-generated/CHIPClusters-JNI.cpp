@@ -6039,6 +6039,76 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPTestClusterClusterTestNullableOptionalResponseCallback
+    : public Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback>
+{
+public:
+    CHIPTestClusterClusterTestNullableOptionalResponseCallback(jobject javaCallback) :
+        Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+    ~CHIPTestClusterClusterTestNullableOptionalResponseCallback()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+        env->DeleteGlobalRef(javaCallbackRef);
+    };
+
+    static void CallbackFn(void * context, bool wasPresent, bool wasNull, uint8_t value)
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+        jmethodID javaMethod;
+        CHIPTestClusterClusterTestNullableOptionalResponseCallback * cppCallback = nullptr;
+
+        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+        cppCallback = reinterpret_cast<CHIPTestClusterClusterTestNullableOptionalResponseCallback *>(context);
+        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+
+        javaCallbackRef = cppCallback->javaCallbackRef;
+        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
+
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ZZI)V", &javaMethod);
+        SuccessOrExit(err);
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jboolean>(wasPresent), static_cast<jboolean>(wasNull),
+                            static_cast<jint>(value));
+
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        if (cppCallback != nullptr)
+        {
+            cppCallback->Cancel();
+            delete cppCallback;
+        }
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPTestClusterClusterTestSpecificResponseCallback : public Callback::Callback<TestClusterClusterTestSpecificResponseCallback>
 {
 public:
@@ -25395,6 +25465,55 @@ JNI_METHOD(void, TestClusterCluster, testNotHandled)(JNIEnv * env, jobject self,
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->TestNotHandled(onSuccess->Cancel(), onFailure->Cancel());
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, TestClusterCluster, testNullableOptionalRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint arg1)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster;
+
+    std::unique_ptr<CHIPTestClusterClusterTestNullableOptionalResponseCallback,
+                    void (*)(CHIPTestClusterClusterTestNullableOptionalResponseCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterClusterTestNullableOptionalResponseCallback>(callback),
+                  Platform::Delete<CHIPTestClusterClusterTestNullableOptionalResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->TestNullableOptionalRequest(onSuccess->Cancel(), onFailure->Cancel(), arg1);
     SuccessOrExit(err);
 
 exit:
