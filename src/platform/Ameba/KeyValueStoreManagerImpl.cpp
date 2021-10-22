@@ -21,9 +21,9 @@
  *          Platform-specific key value storage implementation for Ameba
  */
 /* this file behaves like a config.h, comes first */
+#include "chip_porting.h"
 #include <platform/KeyValueStoreManager.h>
 #include <support/CodeUtils.h>
-#include "chip_porting.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -35,16 +35,16 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
                                           size_t offset_bytes)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    int32_t ret = -1;
-    char* _key = (char*) malloc(strlen(key) + 1);
+    int32_t ret    = -1;
+    char * _key    = (char *) malloc(strlen(key) + 1);
 
     if (!value)
     {
-        return(err = CHIP_ERROR_INVALID_ARGUMENT);
+        return (err = CHIP_ERROR_INVALID_ARGUMENT);
     }
     if (_key == NULL)
     {
-        return(err = CHIP_ERROR_NO_MEMORY);
+        return (err = CHIP_ERROR_NO_MEMORY);
     }
     if (offset_bytes > 0)
     {
@@ -54,8 +54,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
 
     strcpy(_key, key);
-    ret = getPref_bin_new(_key, _key, (uint8_t *)value, value_size, read_bytes_size);
-    if(TRUE == ret)
+    ret = getPref_bin_new(_key, _key, (uint8_t *) value, value_size, read_bytes_size);
+    if (TRUE == ret)
     {
         err = CHIP_NO_ERROR;
         if (read_bytes_size)
@@ -75,21 +75,21 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    int32_t ret = -1;
-    char* _key = (char*) malloc(strlen(key) + 1);
+    int32_t ret    = -1;
+    char * _key    = (char *) malloc(strlen(key) + 1);
 
     if (!value)
     {
-        return(err = CHIP_ERROR_INVALID_ARGUMENT);
+        return (err = CHIP_ERROR_INVALID_ARGUMENT);
     }
     if (_key == NULL)
     {
-        return(err = CHIP_ERROR_NO_MEMORY);
+        return (err = CHIP_ERROR_NO_MEMORY);
     }
 
-    strcpy(_key,key);
-    ret = setPref_new(_key, _key, (uint8_t *)value, value_size);
-    if(TRUE == ret)
+    strcpy(_key, key);
+    ret = setPref_new(_key, _key, (uint8_t *) value, value_size);
+    if (TRUE == ret)
         err = CHIP_NO_ERROR;
     else
         err = CHIP_ERROR_INTERNAL;
@@ -99,19 +99,18 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     return err;
 }
 
-
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    char* _key = (char*) malloc(strlen(key) + 1);
+    char * _key    = (char *) malloc(strlen(key) + 1);
     if (_key == NULL)
     {
-        return(err = CHIP_ERROR_NO_MEMORY);
+        return (err = CHIP_ERROR_NO_MEMORY);
     }
 
-    strcpy(_key,key);
-    //registerPref(_key);
-    if(TRUE == deleteKey(_key,_key))
+    strcpy(_key, key);
+    // registerPref(_key);
+    if (TRUE == deleteKey(_key, _key))
         err = CHIP_NO_ERROR;
     else
         err = CHIP_ERROR_INTERNAL;

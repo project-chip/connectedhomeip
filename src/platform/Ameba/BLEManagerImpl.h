@@ -20,12 +20,12 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include "FreeRTOS.h"
-#include "event_groups.h"
-#include "timers.h"
-#include "bt_matter_adapter_service.h"
 #include "app_msg.h"
 #include "bt_matter_adapter_peripheral_app.h"
+#include "bt_matter_adapter_service.h"
+#include "event_groups.h"
 #include "gap_msg.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -88,22 +88,23 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    typedef enum {
-	BC_DEV_DISABLED            = 0x0,
-	BC_DEV_INIT                = 0x1,
-	BC_DEV_IDLE                = 0x2,
-	BC_DEV_BT_CONNECTED        = 0x3,
-	BC_DEV_DEINIT              = 0x4,
+    typedef enum
+    {
+        BC_DEV_DISABLED     = 0x0,
+        BC_DEV_INIT         = 0x1,
+        BC_DEV_IDLE         = 0x2,
+        BC_DEV_BT_CONNECTED = 0x3,
+        BC_DEV_DEINIT       = 0x4,
     } BC_device_state_t;
 
     enum class Flags : uint8_t
     {
-        kAdvertisingEnabled      = 0x0001,
-        kFastAdvertisingEnabled  = 0x0002,
-        kAdvertising             = 0x0004,
-        kRestartAdvertising      = 0x0008,
+        kAdvertisingEnabled       = 0x0001,
+        kFastAdvertisingEnabled   = 0x0002,
+        kAdvertising              = 0x0004,
+        kRestartAdvertising       = 0x0008,
         kAMEBABLEStackInitialized = 0x0010,
-        kDeviceNameSet           = 0x0020,
+        kDeviceNameSet            = 0x0020,
         kAdvertisingRefreshNeeded = 0x030,
         kAdvertisingConfigured    = 0x040,
     };
@@ -128,7 +129,7 @@ private:
     CHIPoBLEConState mBleConnections[kMaxConnections];
 
     CHIPoBLEServiceMode mServiceMode;
-    
+
     uint16_t mNumGAPCons;
     uint16_t mTXCharCCCDAttrHandle;
     uint16_t mSubscribedConIds[kMaxConnections];
@@ -150,15 +151,15 @@ private:
     CHIP_ERROR SetSubscribed(uint16_t conId);
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
-    
+
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle);
-    
+
     BLEManagerImpl::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
-    static CHIP_ERROR ble_svr_gap_msg_event(void *param, T_IO_MSG *p_gap_msg);
-    static CHIP_ERROR ble_svr_gap_event(void *param, int cb_type, void *p_cb_data);
-    static CHIP_ERROR gatt_svr_chr_access(void *param, T_SERVER_ID service_id, TBTCONFIG_CALLBACK_DATA *p_data);
-    static int ble_callback_dispatcher(void *param, void *p_cb_data, int type, T_CHIP_BLEMGR_CALLBACK_TYPE callback_type);
+    static CHIP_ERROR ble_svr_gap_msg_event(void * param, T_IO_MSG * p_gap_msg);
+    static CHIP_ERROR ble_svr_gap_event(void * param, int cb_type, void * p_cb_data);
+    static CHIP_ERROR gatt_svr_chr_access(void * param, T_SERVER_ID service_id, TBTCONFIG_CALLBACK_DATA * p_data);
+    static int ble_callback_dispatcher(void * param, void * p_cb_data, int type, T_CHIP_BLEMGR_CALLBACK_TYPE callback_type);
     static void DriveBLEState(intptr_t arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     static void CancelBleAdvTimeoutTimer(void);

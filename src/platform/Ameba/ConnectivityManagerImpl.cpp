@@ -53,10 +53,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        mWiFiStationMode =
-            (wifi_mode == RTW_MODE_STA)
-            ? kWiFiStationMode_Enabled
-            : kWiFiStationMode_Disabled;
+        mWiFiStationMode = (wifi_mode == RTW_MODE_STA) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
     }
     return mWiFiStationMode;
 }
@@ -79,8 +76,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     if (mWiFiStationMode != val)
     {
-        ChipLogProgress(DeviceLayer, "WiFi station mode change: %d -> %d", (mWiFiStationMode),
-                        (val));
+        ChipLogProgress(DeviceLayer, "WiFi station mode change: %d -> %d", (mWiFiStationMode), (val));
     }
 
     mWiFiStationMode = val;
@@ -91,14 +87,14 @@ exit:
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
-	rtw_wifi_setting_t mWiFiSetting;
-	CHIP_GetWiFiConfig(&mWiFiSetting);
+    rtw_wifi_setting_t mWiFiSetting;
+    CHIP_GetWiFiConfig(&mWiFiSetting);
     return mWiFiSetting.ssid[0] != 0;
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
-    //TBD
+    // TBD
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -338,23 +334,24 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
-    mLastStationConnectFailTime 	= 0;
-    mLastAPDemandTime				= 0;
-    mWiFiStationMode				= kWiFiStationMode_Disabled;
-    mWiFiStationState				= kWiFiStationState_NotConnected;
-    mWiFiAPMode 					= kWiFiAPMode_Disabled;
-    mWiFiAPState					= kWiFiAPState_NotActive;
+    mLastStationConnectFailTime     = 0;
+    mLastAPDemandTime               = 0;
+    mWiFiStationMode                = kWiFiStationMode_Disabled;
+    mWiFiStationState               = kWiFiStationState_NotConnected;
+    mWiFiAPMode                     = kWiFiAPMode_Disabled;
+    mWiFiAPState                    = kWiFiAPState_NotActive;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
-    mWiFiAPIdleTimeoutMS			= CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
+    mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
     mFlags.SetRaw(0);
 
     // TODO Initialize the Chip Addressing and Routing Module.
 
     // Ensure that station mode is enabled.
     wifi_on(RTW_MODE_STA);
-    
+
     // Ensure that station mode is enabled in the WiFi layer.
-    wifi_set_mode(RTW_MODE_STA);;
+    wifi_set_mode(RTW_MODE_STA);
+    ;
 
     // If there is no persistent station provision...
     if (!IsWiFiStationProvisioned())
@@ -418,7 +415,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
         DriveStationState();
-        DHCPProcess();   
+        DHCPProcess();
     }
 #endif
 }
@@ -451,11 +448,12 @@ void ConnectivityManagerImpl::DriveStationState()
         wifi_on(RTW_MODE_STA);
 
         // Ensure that station mode is enabled in the WiFi layer.
-        wifi_set_mode(RTW_MODE_STA);;
+        wifi_set_mode(RTW_MODE_STA);
+        ;
     }
 
     // Determine if the WiFi layer thinks the station interface is currently connected.
-    stationConnected = (wifi_is_connected_to_ap() == RTW_SUCCESS)?1:0;
+    stationConnected = (wifi_is_connected_to_ap() == RTW_SUCCESS) ? 1 : 0;
 
     // If the station interface is currently connected ...
     if (stationConnected)
@@ -521,10 +519,11 @@ void ConnectivityManagerImpl::DriveStationState()
             if (mLastStationConnectFailTime == 0 || now >= mLastStationConnectFailTime + mWiFiStationReconnectIntervalMS)
             {
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
-				rtw_wifi_setting_t wifi_info;
-				CHIP_GetWiFiConfig(&wifi_info);
-				wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
-				wifi_connect((char *)wifi_info.ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *)wifi_info.password, strlen((const char*)wifi_info.ssid), strlen((const char *)wifi_info.password), 0, NULL);
+                rtw_wifi_setting_t wifi_info;
+                CHIP_GetWiFiConfig(&wifi_info);
+                wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
+                wifi_connect((char *) wifi_info.ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) wifi_info.password,
+                             strlen((const char *) wifi_info.ssid), strlen((const char *) wifi_info.password), 0, NULL);
                 ChangeWiFiStationState(kWiFiStationState_Connecting);
             }
 
@@ -536,7 +535,7 @@ void ConnectivityManagerImpl::DriveStationState()
                 ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms", timeToNextConnect);
 
                 ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(timeToNextConnect),
-                                                                   DriveStationState, NULL));
+                                                                      DriveStationState, NULL));
             }
         }
     }
@@ -576,8 +575,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
 {
     if (mWiFiStationState != newState)
     {
-        ChipLogProgress(DeviceLayer, "WiFi station state change: %d -> %d", (mWiFiStationState),
-                        (newState));
+        ChipLogProgress(DeviceLayer, "WiFi station state change: %d -> %d", (mWiFiStationState), (newState));
         mWiFiStationState = newState;
     }
 }
@@ -640,7 +638,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                     haveIPv4Conn = true;
                     char addrStr[INET_ADDRSTRLEN];
                     // ToDo: change the code to using IPv6 address
-                    ip4addr_ntoa_r((const ip4_addr_t *)LwIP_GetIP(&xnetif[0]), addrStr, sizeof(addrStr));
+                    ip4addr_ntoa_r((const ip4_addr_t *) LwIP_GetIP(&xnetif[0]), addrStr, sizeof(addrStr));
                     IPAddress::FromString(addrStr, addr);
                 }
 
@@ -668,7 +666,8 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     if (haveIPv4Conn != hadIPv4Conn || haveIPv6Conn != hadIPv6Conn)
     {
         // Update the current state.
-        mFlags.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity, haveIPv4Conn).Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
+        mFlags.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity, haveIPv4Conn)
+            .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
 
         // Alert other components of the state change.
         ChipDeviceEvent event;
@@ -692,9 +691,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 
 void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(void)
 {
-    uint8_t *ip = LwIP_GetIP(&xnetif[0]);
-    uint8_t *gw = LwIP_GetGW(&xnetif[0]);
-    uint8_t *msk = LwIP_GetMASK(&xnetif[0]);
+    uint8_t * ip  = LwIP_GetIP(&xnetif[0]);
+    uint8_t * gw  = LwIP_GetGW(&xnetif[0]);
+    uint8_t * msk = LwIP_GetMASK(&xnetif[0]);
 #if CHIP_PROGRESS_LOGGING
     {
         ChipLogProgress(DeviceLayer, "\n\r\tIP              => %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
@@ -731,20 +730,22 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(void)
 {
 #if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1
 #if LWIP_IPV6
-	uint8_t *ipv6_0 = LwIP_GetIPv6_linklocal(&xnetif[0]);
-	uint8_t *ipv6_1 = LwIP_GetIPv6_global(&xnetif[0]);
+    uint8_t * ipv6_0 = LwIP_GetIPv6_linklocal(&xnetif[0]);
+    uint8_t * ipv6_1 = LwIP_GetIPv6_global(&xnetif[0]);
 #endif
 #endif
 #if CHIP_PROGRESS_LOGGING
     {
 #if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1
 #if LWIP_IPV6
-    ChipLogProgress(DeviceLayer, "\n\r\tLink-local IPV6 => %02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
-				    ipv6_0[0], ipv6_0[1],  ipv6_0[2],  ipv6_0[3],  ipv6_0[4],  ipv6_0[5],  ipv6_0[6], ipv6_0[7],
-				    ipv6_0[8], ipv6_0[9], ipv6_0[10], ipv6_0[11], ipv6_0[12], ipv6_0[13], ipv6_0[14], ipv6_0[15]);
-    ChipLogProgress(DeviceLayer, "\n\r\tIPV6            => %02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
-				    ipv6_1[0], ipv6_1[1],  ipv6_1[2],  ipv6_1[3],  ipv6_1[4],  ipv6_1[5],  ipv6_1[6], ipv6_1[7],
-				    ipv6_1[8], ipv6_1[9], ipv6_1[10], ipv6_1[11], ipv6_1[12], ipv6_1[13], ipv6_1[14], ipv6_1[15]);
+        ChipLogProgress(DeviceLayer,
+                        "\n\r\tLink-local IPV6 => %02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
+                        ipv6_0[0], ipv6_0[1], ipv6_0[2], ipv6_0[3], ipv6_0[4], ipv6_0[5], ipv6_0[6], ipv6_0[7], ipv6_0[8],
+                        ipv6_0[9], ipv6_0[10], ipv6_0[11], ipv6_0[12], ipv6_0[13], ipv6_0[14], ipv6_0[15]);
+        ChipLogProgress(DeviceLayer,
+                        "\n\r\tIPV6            => %02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
+                        ipv6_1[0], ipv6_1[1], ipv6_1[2], ipv6_1[3], ipv6_1[4], ipv6_1[5], ipv6_1[6], ipv6_1[7], ipv6_1[8],
+                        ipv6_1[9], ipv6_1[10], ipv6_1[11], ipv6_1[12], ipv6_1[13], ipv6_1[14], ipv6_1[15]);
 #endif
 #endif
     }
@@ -762,15 +763,15 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(void)
 
 void ConnectivityManagerImpl::RefreshMessageLayer(void) {}
 
-void ConnectivityManagerImpl::RtkWiFiStationConnectedHandler( char* buf, int buf_len, int flags, void* userdata)
+void ConnectivityManagerImpl::RtkWiFiStationConnectedHandler(char * buf, int buf_len, int flags, void * userdata)
 {
     ChipDeviceEvent event;
     memset(&event, 0, sizeof(event));
-    event.Type                         = DeviceEventType::kRtkWiFiStationConnectedEvent;
+    event.Type = DeviceEventType::kRtkWiFiStationConnectedEvent;
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void ConnectivityManagerImpl::DHCPProcessThread(void *param)
+void ConnectivityManagerImpl::DHCPProcessThread(void * param)
 {
     LwIP_DHCP(0, DHCP_START);
     PlatformMgr().LockChipStack();
