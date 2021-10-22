@@ -19,8 +19,11 @@ config:
     endpoint: 1
 
 tests:
+    # TDOD: Enable when SDK supports command
     - label: "Hide Input Status Command"
+      disabled: true
       command: "HideInputStatus"
-
+    # TDOD: Enable when SDK supports command
     - label: "Show Input Status Command"
+      disabled: true
       command: "ShowInputStatus"

@@ -39,9 +39,8 @@ tests:
       attribute: "catalog vendor id"
       response:
           value: 1234
-          constraints: 
-            constraints:
-              type: uint16
+      constraints:
+        type: uint16
 
     # TODO: Update response value to correspond with application ID
     - label: "Read Current App ID attribute."
@@ -51,7 +50,7 @@ tests:
       response:
           value: "HelloWorldApp"
           constraints:
-          type: string
+            type: string
 
    # TODO: Update the corresponding values when feature is supported
     - label: "Stop an app with the provided application ID"

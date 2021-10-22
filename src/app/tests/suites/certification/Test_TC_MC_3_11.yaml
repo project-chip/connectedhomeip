@@ -19,11 +19,31 @@ config:
     endpoint: 1
 
 tests:
+    # Remove disable flag when SDK supports command.
     - label: "Rename Input Command"
+      disabled: true
       command: "RenameInput"
       arguments:
           values:
               - name: "index"
                 value: 1
               - name: "name"
-                value: "newName"
+                value: "A1"
+    # Remove disable flag when SDK supports command.
+    - label: "Rename Input Command"
+      disabled: true
+      command: "RenameInput"
+      arguments:
+          values:
+              - name: "index"
+                value: 1
+              - name: "name"
+                value: "A2"
+    # Remove disable flag when SDK supports command.
+    - label: "Read attribute media input list"
+      disabled: true
+      command: "readAttribute"
+      attribute: "media input list"
+      response:
+          value:
+              []
