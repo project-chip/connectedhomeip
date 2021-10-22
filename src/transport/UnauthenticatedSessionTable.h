@@ -83,9 +83,9 @@ class UnauthenticatedSessionTable
 {
 public:
     /**
-     * Get a peer given the peer id. If the peer doesn't exist in the cache, allocate a new entry for it.
+     * Get a session given the peer address. If the session doesn't exist in the cache, allocate a new entry for it.
      *
-     * @return the peer found or allocated, nullptr if not found and allocate failed.
+     * @return the session found or allocated, nullptr if not found and allocation failed.
      */
     CHECK_RETURN_VALUE
     Optional<UnauthenticatedSessionHandle> FindOrAllocateEntry(const PeerAddress & address)

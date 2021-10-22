@@ -29,6 +29,14 @@
 
 namespace chip {
 
+
+/// An empty class type used to indicate optional type with uninitialized state.
+struct NullOptionalType
+{
+    explicit NullOptionalType() = default;
+};
+constexpr NullOptionalType NullOptional{};
+
 /**
  * Pairs an object with a boolean value to determine if the object value
  * is actually valid or not.
@@ -38,6 +46,8 @@ class Optional
 {
 public:
     constexpr Optional() : mHasValue(false) {}
+    constexpr Optional(NullOptionalType) : mHasValue(false) {};
+
     ~Optional()
     {
         if (mHasValue)
