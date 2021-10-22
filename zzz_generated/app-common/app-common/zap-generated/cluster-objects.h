@@ -9689,10 +9689,30 @@ struct TypeInfo
     using Type          = bool;
     using DecodableType = bool;
 
-    static constexpr ClusterId GetClusterId() { return BooleanState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StateValue::Id; }
 };
 } // namespace StateValue
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
 } // namespace Attributes
 namespace Events {
 namespace StateChange {
