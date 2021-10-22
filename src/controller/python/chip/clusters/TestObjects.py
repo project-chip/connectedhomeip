@@ -18,7 +18,7 @@
 
 from dataclasses import dataclass
 import typing
-from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand
+from .ClusterObjects import ClusterObjectDescriptor, ClusterCommand
 from chip import ChipUtility
 from enum import IntEnum
 

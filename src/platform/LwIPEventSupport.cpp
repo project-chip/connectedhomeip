@@ -55,9 +55,9 @@ CHIP_ERROR PlatformEventing::PostEvent(System::Layer & aLayer, System::Object & 
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, uint32_t aMilliseconds)
+CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::Timeout delay)
 {
-    return PlatformMgr().StartChipTimer(aMilliseconds);
+    return PlatformMgr().StartChipTimer(delay);
 }
 
 } // namespace System

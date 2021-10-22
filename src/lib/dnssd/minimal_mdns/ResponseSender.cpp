@@ -161,7 +161,7 @@ CHIP_ERROR ResponseSender::FlushReply()
 
     if (mResponseBuilder.HasResponseRecords())
     {
-        char srcAddressString[chip::Inet::kMaxIPAddressStringLength];
+        char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
         VerifyOrDie(mSendState.GetSourceAddress().ToString(srcAddressString) != nullptr);
 
         if (mSendState.SendUnicast())

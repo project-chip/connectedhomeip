@@ -80,12 +80,12 @@ CHIP_ERROR JoinMulticastGroup(chip::Inet::InterfaceId interfaceId, chip::Inet::U
 
     chip::Inet::IPAddress address;
 
-    if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv6)
+    if (addressType == chip::Inet::IPAddressType::kIPv6)
     {
         BroadcastIpAddresses::GetIpv6Into(address);
 #if INET_CONFIG_ENABLE_IPV4
     }
-    else if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv4)
+    else if (addressType == chip::Inet::IPAddressType::kIPv4)
     {
         BroadcastIpAddresses::GetIpv4Into(address);
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -102,10 +102,10 @@ const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
 {
     switch (addressType)
     {
-    case chip::Inet::IPAddressType::kIPAddressType_IPv6:
+    case chip::Inet::IPAddressType::kIPv6:
         return "IPv6";
 #if INET_CONFIG_ENABLE_IPV4
-    case chip::Inet::IPAddressType::kIPAddressType_IPv4:
+    case chip::Inet::IPAddressType::kIPv4:
         return "IPv4";
 #endif // INET_CONFIG_ENABLE_IPV4
     default:
@@ -239,7 +239,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
             continue;
         }
 
-        if ((addressType != chip::Inet::kIPAddressType_Any) && (info->addressType != addressType))
+        if ((addressType != chip::Inet::IPAddressType::kAny) && (info->addressType != addressType))
         {
             continue;
         }
@@ -251,12 +251,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         /// for sending via `CloneData`
         ///
         /// TODO: this wastes one copy of the data and that could be optimized away
-        if (info->addressType == chip::Inet::kIPAddressType_IPv6)
+        if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
             err = info->udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
+        else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
             err = info->udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
@@ -304,12 +304,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         /// for sending via `CloneData`
         ///
         /// TODO: this wastes one copy of the data and that could be optimized away
-        if (info->addressType == chip::Inet::kIPAddressType_IPv6)
+        if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
             err = info->udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
+        else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
             err = info->udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }

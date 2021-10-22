@@ -57,14 +57,22 @@ public:
 
     void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, TLV::TLVReader * aData) override
     {
-        const uint8_t * buffer = nullptr;
-        uint32_t size          = 0;
+        uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+        uint32_t size = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (aData != nullptr)
         {
-            buffer = aData->GetReadPoint();
-            size   = aData->GetRemainingLength();
+            // Python need to read from full TLV data the TLVReader may contain some unclean states.
+            TLV::TLVWriter writer;
+            writer.Init(buffer);
+            CHIP_ERROR err = writer.CopyContainer(TLV::AnonymousTag, *aData);
+            if (err != CHIP_NO_ERROR)
+            {
+                this->OnError(apCommandSender, Protocols::InteractionModel::Status::Failure, err);
+                return;
+            }
+            size = writer.GetLengthWritten();
         }
 
         gOnCommandSenderResponseCallback(mAppContext, aPath.mEndpointId, aPath.mClusterId, aPath.mCommandId, buffer, size);
@@ -117,7 +125,7 @@ chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext,
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     {
-        auto writer = sender->GetCommandDataElementTLVWriter();
+        auto writer = sender->GetCommandDataIBTLVWriter();
         TLV::TLVReader reader;
         TLV::TLVType type;
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

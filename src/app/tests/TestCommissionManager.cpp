@@ -88,7 +88,8 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
-    chip::DeviceLayer::SystemLayer().StartTimer(kTimeoutMs + kSleepPadding, CheckCommissioningWindowManagerWindowClosedTask, suite);
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
+                                                CheckCommissioningWindowManagerWindowClosedTask, suite);
 }
 
 void CheckCommissioningWindowManagerWindowTimeout(nlTestSuite * suite, void *)

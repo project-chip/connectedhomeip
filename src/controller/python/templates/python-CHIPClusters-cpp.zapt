@@ -122,7 +122,7 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
         {{#if (isOctetString type)}}
         ChipLogProgress(Zcl, "      {{asSymbol label}}: %s,", ByteSpanToString(entry.{{asLowerCamelCase name}}).c_str());
         {{else if (isCharString type)}}
-        // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
+        ChipLogProgress(Zcl, "      {{asSymbol label}}: %.*s,", static_cast<int>(entry.{{asLowerCamelCase name}}.size()), entry.{{asLowerCamelCase name}}.data());
         {{else}}
         ChipLogProgress(Zcl, "      {{asSymbol label}}: {{asPrintFormat type}},", entry.{{asLowerCamelCase name}});
         {{/if}}
@@ -185,7 +185,7 @@ chip::ChipError::StorageType chip_ime_AppendCommand_{{asUpperCamelCase clusterNa
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asUpperCamelCase clusterName}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.{{asUpperCamelCase name}}(nullptr, nullptr{{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isString type)}}chip::ByteSpan({{asLowerCamelCase label}}, {{asLowerCamelCase label}}_Len){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}}).AsInteger();
+    return cluster.{{asUpperCamelCase name}}(nullptr, nullptr{{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isOctetString type)}}chip::ByteSpan({{asLowerCamelCase label}}, {{asLowerCamelCase label}}_Len){{else if (isCharString type)}}chip::CharSpan(reinterpret_cast<const char*>({{asLowerCamelCase label}}), {{asLowerCamelCase label}}_Len){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}}).AsInteger();
 }
 {{/chip_cluster_commands}}
 
@@ -223,7 +223,7 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_{{asUpperCamelCase parent.n
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WriteAttribute{{asUpperCamelCase name}}(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isString type)}} chip::ByteSpan(value, len){{else}}value{{/if}}).AsInteger();
+    return cluster.WriteAttribute{{asUpperCamelCase name}}(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isOctetString type)}} chip::ByteSpan(value, len){{else if (isCharString type)}} chip::CharSpan(reinterpret_cast<const char*>(value), len){{else}}value{{/if}}).AsInteger();
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}

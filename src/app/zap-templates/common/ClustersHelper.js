@@ -196,10 +196,6 @@ function asChipCallback(item)
     return { name : 'List', type : null };
   }
 
-  if (item.type == 'boolean') {
-    return { name : 'Boolean', type : 'bool' };
-  }
-
   const basicType = ChipTypesHelper.asBasicType(item.chipType);
   switch (basicType) {
   case 'int8_t':
@@ -212,6 +208,8 @@ function asChipCallback(item)
   case 'uint32_t':
   case 'uint64_t':
     return { name : 'Int' + basicType.replace(/[^0-9]/g, '') + 'u', type : basicType };
+  case 'bool':
+    return { name : 'Boolean', type : 'bool' };
   default:
     return { name : 'Unsupported', type : null };
   }
@@ -251,9 +249,13 @@ function handleString(item, [ atomics, enums, bitmaps, structs ])
   const kLengthSizeInBytes = 2;
 
   item.atomicTypeId = atomic.atomicId;
-  item.chipType     = 'chip::ByteSpan';
-  item.size         = kLengthSizeInBytes + item.maxLength;
-  item.name         = item.name || item.label;
+  if (StringHelper.isOctetString(item.type)) {
+    item.chipType = 'chip::ByteSpan';
+  } else {
+    item.chipType = 'chip::CharSpan';
+  }
+  item.size = kLengthSizeInBytes + item.maxLength;
+  item.name = item.name || item.label;
   return true;
 }
 

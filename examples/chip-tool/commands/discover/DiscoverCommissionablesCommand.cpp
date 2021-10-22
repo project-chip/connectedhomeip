@@ -47,7 +47,7 @@ void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::Disco
     ChipLogProgress(Discovery, "\tPairing Hint\t\t0x%x", nodeData.pairingHint);
     for (int i = 0; i < nodeData.numIPs; i++)
     {
-        char buf[chip::Inet::kMaxIPAddressStringLength];
+        char buf[chip::Inet::IPAddress::kMaxStringLength];
         nodeData.ipAddress[i].ToString(buf);
 
         ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", i, buf);

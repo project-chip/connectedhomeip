@@ -42,7 +42,7 @@ void sendResponse(app::CommandHandler * command, const char * responseSetupPin)
                                          ZCL_GET_SETUP_PIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(0), responseSetupPin));
     SuccessOrExit(err = command->FinishCommand());
 exit:

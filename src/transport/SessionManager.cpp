@@ -189,7 +189,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
     else
     {
         auto unauthenticated = session.GetUnauthenticatedSession();
-        mUnauthenticatedSessions.MarkSessionActive(unauthenticated.Get());
+        mUnauthenticatedSessions.MarkSessionActive(unauthenticated);
         destination = &unauthenticated->GetPeerAddress();
 
         ChipLogProgress(Inet,
@@ -306,8 +306,8 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
 
 void SessionManager::ScheduleExpiryTimer()
 {
-    CHIP_ERROR err =
-        mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SessionManager::ExpiryTimerCallback, this);
+    CHIP_ERROR err = mSystemLayer->StartTimer(System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS),
+                                              SessionManager::ExpiryTimerCallback, this);
 
     VerifyOrDie(err == CHIP_NO_ERROR);
 }
@@ -339,13 +339,14 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
 void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                      System::PacketBufferHandle && msg)
 {
-    Transport::UnauthenticatedSession * session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
-    if (session == nullptr)
+    Optional<Transport::UnauthenticatedSessionHandle> optionalSession = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
+    if (!optionalSession.HasValue())
     {
         ChipLogError(Inet, "UnauthenticatedSession exhausted");
         return;
     }
 
+    Transport::UnauthenticatedSessionHandle session      = optionalSession.Value();
     SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
 
     // Verify message counter
@@ -357,7 +358,7 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
     }
     VerifyOrDie(err == CHIP_NO_ERROR);
 
-    mUnauthenticatedSessions.MarkSessionActive(*session);
+    mUnauthenticatedSessions.MarkSessionActive(session);
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
@@ -374,8 +375,7 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
 
     if (mCB != nullptr)
     {
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(Transport::UnauthenticatedSessionHandle(*session)),
-                               peerAddress, isDuplicate, std::move(msg));
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(session), peerAddress, isDuplicate, std::move(msg));
     }
 }
 

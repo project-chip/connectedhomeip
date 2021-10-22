@@ -219,7 +219,7 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
         ChipLogProgress(chipTool, "AudioOutputInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  index: %" PRIu8 "", entry.index);
         ChipLogProgress(chipTool, "  outputType: %" PRIu8 "", entry.outputType);
-        ChipLogProgress(Zcl, "  name: %zu", entry.name.size());
+        ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -464,8 +464,8 @@ static void OnFixedLabelLabelListListAttributeResponse(
 #endif // CHIP_PROGRESS_LOGGING
         ++i;
         ChipLogProgress(chipTool, "LabelStruct[%" PRIu16 "]:", i);
-        ChipLogProgress(Zcl, "  label: %zu", entry.label.size());
-        ChipLogProgress(Zcl, "  value: %zu", entry.value.size());
+        ChipLogProgress(Zcl, "  label: %.*s", static_cast<int>(entry.label.size()), entry.label.data());
+        ChipLogProgress(Zcl, "  value: %.*s", static_cast<int>(entry.value.size()), entry.value.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -539,7 +539,7 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
 #endif // CHIP_PROGRESS_LOGGING
         ++i;
         ChipLogProgress(chipTool, "NetworkInterfaceType[%" PRIu16 "]:", i);
-        ChipLogProgress(Zcl, "  Name: %zu", entry.name.size());
+        ChipLogProgress(Zcl, "  Name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(chipTool, "  fabricConnected: %d", entry.fabricConnected);
         ChipLogProgress(chipTool, "  offPremiseServicesReachableIPv4: %d", entry.offPremiseServicesReachableIPv4);
         ChipLogProgress(chipTool, "  offPremiseServicesReachableIPv6: %d", entry.offPremiseServicesReachableIPv6);
@@ -660,8 +660,8 @@ static void OnMediaInputMediaInputListListAttributeResponse(
         ChipLogProgress(chipTool, "MediaInputInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  index: %" PRIu8 "", entry.index);
         ChipLogProgress(chipTool, "  inputType: %" PRIu8 "", entry.inputType);
-        ChipLogProgress(Zcl, "  name: %zu", entry.name.size());
-        ChipLogProgress(Zcl, "  description: %zu", entry.description.size());
+        ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(Zcl, "  description: %.*s", static_cast<int>(entry.description.size()), entry.description.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -703,7 +703,7 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
         ChipLogProgress(chipTool, "  vendorId: %" PRIu16 "", entry.vendorId);
         ChipLogProgress(chipTool, "  fabricId: %" PRIu64 "", entry.fabricId);
         ChipLogProgress(chipTool, "  nodeId: %" PRIu64 "", entry.nodeId);
-        ChipLogProgress(Zcl, "  Label: %zu", entry.label.size());
+        ChipLogProgress(Zcl, "  Label: %.*s", static_cast<int>(entry.label.size()), entry.label.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -775,9 +775,10 @@ static void OnTvChannelTvChannelListListAttributeResponse(
         ChipLogProgress(chipTool, "TvChannelInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  majorNumber: %" PRIu16 "", entry.majorNumber);
         ChipLogProgress(chipTool, "  minorNumber: %" PRIu16 "", entry.minorNumber);
-        ChipLogProgress(Zcl, "  name: %zu", entry.name.size());
-        ChipLogProgress(Zcl, "  callSign: %zu", entry.callSign.size());
-        ChipLogProgress(Zcl, "  affiliateCallSign: %zu", entry.affiliateCallSign.size());
+        ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(Zcl, "  callSign: %.*s", static_cast<int>(entry.callSign.size()), entry.callSign.data());
+        ChipLogProgress(Zcl, "  affiliateCallSign: %.*s", static_cast<int>(entry.affiliateCallSign.size()),
+                        entry.affiliateCallSign.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -815,7 +816,7 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
         ++i;
         ChipLogProgress(chipTool, "NavigateTargetTargetInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  identifier: %" PRIu8 "", entry.identifier);
-        ChipLogProgress(Zcl, "  name: %zu", entry.name.size());
+        ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
     }
 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -1812,7 +1813,7 @@ static void OnOperationalCredentialsNOCResponseSuccess(
     ChipLogProgress(Zcl, "Received NOCResponse:");
     ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", data.statusCode);
     ChipLogProgress(Zcl, "  FabricIndex: %" PRIu8 "", data.fabricIndex);
-    ChipLogProgress(Zcl, "  DebugText: %zu", data.debugText.size());
+    ChipLogProgress(Zcl, "  DebugText: %.*s", static_cast<int>(data.debugText.size()), data.debugText.data());
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -1972,6 +1973,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | Basic                                                               | 0x0028 |
 | BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
+| BooleanState                                                        | 0x0045 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
 | ContentLauncher                                                     | 0x050A |
@@ -3409,7 +3411,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 /*
@@ -3476,7 +3478,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 /*
@@ -4328,6 +4330,130 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster BooleanState                                                | 0x0045 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * StateValue                                                        | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute StateValue
+ */
+class ReadBooleanStateStateValue : public ModelCommand
+{
+public:
+    ReadBooleanStateStateValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "state-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBooleanStateStateValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0045) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BooleanStateCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeStateValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportBooleanStateStateValue : public ModelCommand
+{
+public:
+    ReportBooleanStateStateValue() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "state-value");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBooleanStateStateValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0045) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BooleanStateCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeStateValue(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.SubscribeAttributeStateValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                    mMaxInterval);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadBooleanStateClusterRevision : public ModelCommand
+{
+public:
+    ReadBooleanStateClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBooleanStateClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0045) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BooleanStateCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster BridgedDeviceBasic                                          | 0x0039 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -4516,7 +4642,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 /*
@@ -19734,7 +19860,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 /*
@@ -19801,7 +19927,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 /*
@@ -25639,6 +25765,18 @@ void registerClusterBinding(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterBooleanState(Commands & commands)
+{
+    const char * clusterName = "BooleanState";
+
+    commands_list clusterCommands = {
+        make_unique<ReadBooleanStateStateValue>(),      //
+        make_unique<ReportBooleanStateStateValue>(),    //
+        make_unique<ReadBooleanStateClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterBridgedDeviceBasic(Commands & commands)
 {
     const char * clusterName = "BridgedDeviceBasic";
@@ -26672,6 +26810,7 @@ void registerClusters(Commands & commands)
     registerClusterBasic(commands);
     registerClusterBinaryInputBasic(commands);
     registerClusterBinding(commands);
+    registerClusterBooleanState(commands);
     registerClusterBridgedDeviceBasic(commands);
     registerClusterColorControl(commands);
     registerClusterContentLauncher(commands);

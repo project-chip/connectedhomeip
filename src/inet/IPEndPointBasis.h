@@ -52,26 +52,7 @@ class IPPacketInfo;
  */
 class DLL_EXPORT IPEndPointBasis : public EndPointBasis
 {
-    friend class InetLayer;
-
 public:
-    /**
-     * @brief   Basic dynamic state of the underlying endpoint.
-     *
-     * @details
-     *  Objects are initialized in the "ready" state, proceed to the "bound"
-     *  state after binding to a local interface address, then proceed to the
-     *  "listening" state when they have continuations registered for handling
-     *  events for reception of ICMP messages.
-     */
-    enum
-    {
-        kState_Ready     = 0, /**< Endpoint initialized, but not open. */
-        kState_Bound     = 1, /**< Endpoint bound, but not listening. */
-        kState_Listening = 2, /**< Endpoint receiving datagrams. */
-        kState_Closed    = 3  /**< Endpoint closed, ready for release. */
-    } mState;
-
     /**
      * @brief   Type of message text reception event handling function.
      *
@@ -134,6 +115,24 @@ public:
     CHIP_ERROR LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
 
 protected:
+    friend class InetLayer;
+
+    /**
+     * Basic dynamic state of the underlying endpoint.
+     *
+     *  Objects are initialized in the "ready" state, proceed to the "bound"
+     *  state after binding to a local interface address, then proceed to the
+     *  "listening" state when they have continuations registered for handling
+     *  events for reception of ICMP messages.
+     */
+    enum class State : uint8_t
+    {
+        kReady     = 0, /**< Endpoint initialized, but not open. */
+        kBound     = 1, /**< Endpoint bound, but not listening. */
+        kListening = 2, /**< Endpoint receiving datagrams. */
+        kClosed    = 3  /**< Endpoint closed, ready for release. */
+    } mState;
+
     void Init(InetLayer * aInetLayer);
 
     /** The endpoint's message reception event handling function delegate. */
@@ -152,8 +151,6 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 public:
     static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
-    static CHIP_ERROR PostPacketBufferEvent(chip::System::LayerLwIP * aLayer, System::Object & aTarget,
-                                            System::EventType aEventType, System::PacketBufferHandle && aBuffer);
 
 protected:
     void HandleDataReceived(chip::System::PacketBufferHandle && aBuffer);

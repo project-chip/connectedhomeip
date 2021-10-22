@@ -96,7 +96,7 @@ class {{filename}}: public TestCommand
     {{#if (isTestOnlyCluster cluster)}}
     CHIP_ERROR {{>testCommand}}()
     {
-        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{definedValue}}{{/chip_tests_item_parameters}});
+        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{#if (isString type)}}"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
     }
     {{else}}
     {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}
@@ -119,7 +119,6 @@ class {{filename}}: public TestCommand
         {{/chip_tests_item_parameters}}
 
         auto success = [](void * context, const responseType & data) {
-            {{! TODO Update CHAR_STRING to be of type chip::CharSpan instead of chip::ByteSpan }}
             (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
         };
 
@@ -129,7 +128,14 @@ class {{filename}}: public TestCommand
         {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.InvokeCommand<requestType, responseType>(request, this, success, failure){{#if async}}){{/if}};
         {{else}}
         {{#chip_tests_item_parameters}}
-        {{chipType}} {{asLowerCamelCase name}}Argument = {{#if (isString type)}}chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}")){{else}}{{definedValue}}{{asTypeLiteralSuffix type}}{{/if}};
+        {{chipType}} {{asLowerCamelCase name}}Argument =
+          {{#if (isOctetString type)}}
+            chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"))
+          {{else if (isCharString type)}}
+            chip::CharSpan("{{definedValue}}", strlen("{{definedValue}}"))
+          {{else}}
+            {{definedValue}}{{asTypeLiteralSuffix type}}
+          {{/if}};
         {{/chip_tests_item_parameters}}
 
         {{~#*inline "commandName"}}{{asUpperCamelCase commandName}}{{#if isAttribute}}Attribute{{asUpperCamelCase attribute}}{{/if}}{{/inline}}
@@ -190,16 +196,3 @@ class {{filename}}: public TestCommand
 };
 
 {{/chip_tests}}
-
-void registerCommandsTests(Commands & commands)
-{
-    const char * clusterName = "Tests";
-
-    commands_list clusterCommands = {
-      {{#chip_tests tests}}
-        make_unique<{{filename}}>(),
-      {{/chip_tests}}
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}

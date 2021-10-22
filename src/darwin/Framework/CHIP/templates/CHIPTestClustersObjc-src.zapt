@@ -31,7 +31,15 @@ using chip::Callback::Cancelable;
 {{#unless isStruct}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
-{{#*inline "callbackParams"}}, {{#if (isString type)}}[self asSpan:{{/if}}value{{#if (isString type)}}]{{/if}}{{/inline}}
+{{#*inline "callbackParams"}},
+  {{#if (isOctetString type)}}
+    [self asByteSpan:value]
+  {{else if (isCharString type)}}
+    [self asCharSpan:value]
+  {{else}}
+    value
+  {{/if}}
+{{/inline}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

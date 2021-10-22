@@ -520,7 +520,7 @@ CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(delayMs.Value(), &ResolveRetryCallback, this);
+    return mSystemLayer->StartTimer(System::Clock::Milliseconds32(delayMs.Value()), &ResolveRetryCallback, this);
 }
 
 void MinMdnsResolver::ResolveRetryCallback(System::Layer *, void * self)

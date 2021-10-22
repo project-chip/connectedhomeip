@@ -462,7 +462,8 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
                 jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entry.{{asLowerCamelCase name}}.size());
                 env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entry.{{asLowerCamelCase name}}.size(), reinterpret_cast<const jbyte *>(entry.{{asLowerCamelCase name}}.data()));
                 {{else if (isCharString type)}}
-                // Implement after ByteSpan is emitted instead of uint8_t *.
+                UtfString {{asLowerCamelCase name}}Str(env, entry.{{asLowerCamelCase name}});
+                jstring {{asLowerCamelCase name}}({{asLowerCamelCase name}}Str.jniValue());
                 {{else}}
                 {{asJniBasicType type}} {{asLowerCamelCase name}} = entry.{{asLowerCamelCase name}};
                 {{/if}}
@@ -481,7 +482,8 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
                 jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entry.size());
                 env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entry.size(), reinterpret_cast<const jbyte *>(entry.data()));
                 {{else if (isCharString type)}}
-                // Implement after ByteSpan is emitted instead of uint8_t *
+                UtfString {{asLowerCamelCase name}}Str(env, entry);
+                jstring {{asLowerCamelCase name}}({{asLowerCamelCase name}}Str.jniValue());
                 {{else}}
                 jclass entryTypeCls;
                 JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", entryTypeCls);
@@ -552,7 +554,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
     cppCluster = reinterpret_cast<{{asUpperCamelCase ../name}}Cluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asLowerCamelCase label}}Arr.data(), {{asLowerCamelCase label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asLowerCamelCase label}}, strlen({{asLowerCamelCase label}}Str.c_str())){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asLowerCamelCase label}}Arr.data(), {{asLowerCamelCase label}}Arr.size()){{else if (isCharString type)}}chip::CharSpan({{asLowerCamelCase label}}Str.c_str(), strlen({{asLowerCamelCase label}}Str.c_str())){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}});
     SuccessOrExit(err);
 
 exit: 
@@ -625,7 +627,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     err = cppCluster->WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) jniArr.data(), jniArr.size()));
     {{else if (isCharString type)}}
     JniUtfString valueStr(env, value);
-    err = cppCluster->WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) valueStr.c_str(), strlen(valueStr.c_str())));
+    err = cppCluster->WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
     {{else}}
     err = cppCluster->WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), static_cast<{{chipCallback.type}}>(value));
     {{/if}}

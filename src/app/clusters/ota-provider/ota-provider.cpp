@@ -38,6 +38,7 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using chip::app::Clusters::OTAProviderDelegate;
 
 namespace {
+constexpr size_t kLocationLen          = 2;   // The expected length of the location parameter in QueryImage
 constexpr size_t kMaxMetadataLen       = 512; // The maximum length of Metadata in any OTA Provider command
 constexpr size_t kUpdateTokenMaxLength = 32;  // The expected length of the Update Token parameter used in multiple commands
 constexpr size_t kUpdateTokenMinLength = 8;   // The expected length of the Update Token parameter used in multiple commands
@@ -174,6 +175,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     auto & hardwareVersion     = commandData.hardwareVersion;
     auto & softwareVersion     = commandData.softwareVersion;
     auto & protocolsSupported  = commandData.protocolsSupported;
+    auto & location            = commandData.location;
     auto & requestorCanConsent = commandData.requestorCanConsent;
     auto & metadataForProvider = commandData.metadataForProvider;
 
@@ -189,19 +191,22 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
 
     ChipLogDetail(Zcl, "OTA Provider received QueryImage");
 
-    // TODO: (#7112) support location param and verify length once CHAR_STRING is supported
-    // Using location parameter is blocked by #5542 (use Span for string arguments). For now, there is no way to safely get the
-    // length of the location string because it is not guaranteed to be null-terminated.
-    Span<const char> locationSpan;
+    if (location.size() != kLocationLen)
+    {
+        ChipLogError(Zcl, "location param length %zu != expected length %zu", location.size(), kLocationLen);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+        return true;
+    }
 
     if (metadataForProvider.size() > kMaxMetadataLen)
     {
         ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.size(), kMaxMetadataLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+        return true;
     }
 
     status = delegate->HandleQueryImage(commandObj, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
-                                        locationSpan, requestorCanConsent, metadataForProvider);
+                                        location, requestorCanConsent, metadataForProvider);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

@@ -430,7 +430,7 @@ void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
 void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     const uint16_t port = nodeData.port;
-    char buf[chip::Inet::kMaxIPAddressStringLength];
+    char buf[chip::Inet::IPAddress::kMaxStringLength];
     nodeData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 

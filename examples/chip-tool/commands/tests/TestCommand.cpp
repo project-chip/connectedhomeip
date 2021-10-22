@@ -49,7 +49,14 @@ void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * contex
 
 CHIP_ERROR TestCommand::WaitForMs(uint32_t ms)
 {
-    return chip::DeviceLayer::SystemLayer().StartTimer(ms, OnWaitForMsFn, this);
+    return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(ms), OnWaitForMsFn, this);
+}
+
+CHIP_ERROR TestCommand::Log(const char * message)
+{
+    ChipLogDetail(chipTool, "%s", message);
+    WaitForMs(0);
+    return CHIP_NO_ERROR;
 }
 
 void TestCommand::Exit(std::string message)

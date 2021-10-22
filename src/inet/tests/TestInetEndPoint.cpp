@@ -53,6 +53,7 @@
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::System;
+using namespace chip::System::Clock::Literals;
 
 #define TOOL_NAME "TestInetEndPoint"
 
@@ -105,7 +106,7 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-    err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
+    err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // then init network
@@ -240,32 +241,32 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     // UdpEndPoint special cases to cover the error branch
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-    err = testUDPEP->Bind(kIPAddressType_Unknown, addr_any, 3000);
+    err = testUDPEP->Bind(IPAddressType::kUnknown, addr_any, 3000);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
-    err = testUDPEP->Bind(kIPAddressType_Unknown, addr, 3000);
+    err = testUDPEP->Bind(IPAddressType::kUnknown, addr, 3000);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #if INET_CONFIG_ENABLE_IPV4
-    err = testUDPEP->Bind(kIPAddressType_IPv4, addr, 3000);
+    err = testUDPEP->Bind(IPAddressType::kIPv4, addr, 3000);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    err            = testUDPEP->Bind(kIPAddressType_IPv6, addr, 3000, intId);
-    err            = testUDPEP->BindInterface(kIPAddressType_IPv6, intId);
+    err            = testUDPEP->Bind(IPAddressType::kIPv6, addr, 3000, intId);
+    err            = testUDPEP->BindInterface(IPAddressType::kIPv6, intId);
     InterfaceId id = testUDPEP->GetBoundInterface();
     NL_TEST_ASSERT(inSuite, id == intId);
 
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
-    err = testUDPEP->Bind(kIPAddressType_IPv6, addr, 3000, intId);
+    err = testUDPEP->Bind(IPAddressType::kIPv6, addr, 3000, intId);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-    err = testUDPEP->BindInterface(kIPAddressType_IPv6, intId);
+    err = testUDPEP->BindInterface(IPAddressType::kIPv6, intId);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     testUDPEP->Free();
 
     err = gInet.NewUDPEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 #if INET_CONFIG_ENABLE_IPV4
-    err = testUDPEP->Bind(kIPAddressType_IPv4, addr_v4, 3000, intId);
+    err = testUDPEP->Bind(IPAddressType::kIPv4, addr_v4, 3000, intId);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
     buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     err = testUDPEP->SendTo(addr_v4, 3000, std::move(buf));
@@ -290,17 +291,17 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = testTCPEP1->GetLocalInfo(nullptr, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
-    err = testTCPEP1->Bind(kIPAddressType_Unknown, addr_any, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kUnknown, addr_any, 3000, true);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #if INET_CONFIG_ENABLE_IPV4
-    err = testTCPEP1->Bind(kIPAddressType_IPv4, addr, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kIPv4, addr, 3000, true);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #endif // INET_CONFIG_ENABLE_IPV4
-    err = testTCPEP1->Bind(kIPAddressType_Unknown, addr, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kUnknown, addr, 3000, true);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 
-    err = testTCPEP1->Bind(kIPAddressType_IPv6, addr_any, 3000, true);
-    err = testTCPEP1->Bind(kIPAddressType_IPv6, addr_any, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kIPv6, addr_any, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kIPv6, addr_any, 3000, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     err = testTCPEP1->Listen(4);
 #if INET_CONFIG_ENABLE_IPV4
@@ -333,14 +334,14 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     // Verify same aComplete and aAppState args do not exhaust timer pool
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
     {
-        err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
+        err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
-        err = gSystemLayer.StartTimer(10, HandleTimer, &numTimersTest[i]);
+        err = gSystemLayer.StartTimer(10_ms32, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
 #endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 

@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "CommandDataElement.h"
+#include "CommandDataIB.h"
 #include "ListBuilder.h"
 #include "ListParser.h"
 
@@ -62,16 +62,16 @@ class Builder : public ListBuilder
 {
 public:
     /**
-     *  @brief Initialize a CommandDataElement::Builder for writing into the TLV stream
+     *  @brief Initialize a CommandDataIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to CommandDataElement::Builder
+     *  @return A reference to CommandDataIB::Builder
      */
-    CommandDataElement::Builder & CreateCommandDataElementBuilder();
+    CommandDataIB::Builder & CreateCommandDataIBBuilder();
 
     /**
-     *  @return A reference to CommandDataElement::Builder
+     *  @return A reference to CommandDataIB::Builder
      */
-    CommandDataElement::Builder & GetCommandDataElementBuilder() { return mCommandDataElementBuilder; };
+    CommandDataIB::Builder & GetCommandDataIBBuilder() { return mCommandDataIBBuilder; };
 
     /**
      *  @brief Mark the end of this CommandList
@@ -81,7 +81,7 @@ public:
     CommandList::Builder & EndOfCommandList();
 
 private:
-    CommandDataElement::Builder mCommandDataElementBuilder;
+    CommandDataIB::Builder mCommandDataIBBuilder;
 };
 }; // namespace CommandList
 }; // namespace app

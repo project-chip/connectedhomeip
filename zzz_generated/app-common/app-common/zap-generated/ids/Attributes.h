@@ -1571,6 +1571,20 @@ namespace ClusterRevision = Globals::Attributes::ClusterRevision;
 } // namespace Attributes
 } // namespace FixedLabel
 
+namespace BooleanState {
+namespace Attributes {
+
+namespace StateValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace StateValue
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
+} // namespace Attributes
+} // namespace BooleanState
+
 namespace ShadeConfiguration {
 namespace Attributes {
 

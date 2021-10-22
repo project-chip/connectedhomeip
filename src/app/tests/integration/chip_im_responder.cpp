@@ -91,7 +91,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 
         ReturnOnFailure(apCommandObj->PrepareCommand(commandPathParams));
 
-        writer = apCommandObj->GetCommandDataElementTLVWriter();
+        writer = apCommandObj->GetCommandDataIBTLVWriter();
         ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));
 
         ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId2), kTestFieldValue2));
@@ -178,7 +178,7 @@ void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
         dirtyPath.mFieldId = 1;
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-        chip::DeviceLayer::SystemLayer().StartTimer(1000, MutateClusterHandler, NULL);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), MutateClusterHandler, NULL);
         testSyncReport = true;
     }
     else
@@ -195,7 +195,7 @@ class MockInteractionModelApp : public chip::app::InteractionModelDelegate
 public:
     virtual CHIP_ERROR SubscriptionEstablished(const chip::app::ReadHandler * apReadHandler)
     {
-        chip::DeviceLayer::SystemLayer().StartTimer(1000, MutateClusterHandler, NULL);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), MutateClusterHandler, NULL);
         return CHIP_NO_ERROR;
     }
 };
@@ -211,7 +211,7 @@ int main(int argc, char * argv[])
     InitializeChip();
 
     err = gTransportManager.Init(
-        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv6));
+        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::IPAddressType::kIPv6));
     SuccessOrExit(err);
 
     err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager);

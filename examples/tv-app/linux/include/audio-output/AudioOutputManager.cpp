@@ -51,7 +51,7 @@ CHIP_ERROR AudioOutputManager::proxyGetListOfAudioOutputInfo(chip::app::Attribut
         {
             chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::Type audioOutputInfo;
             audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
-            audioOutputInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name) - 1);
+            audioOutputInfo.name       = chip::CharSpan(name, sizeof(name) - 1);
             audioOutputInfo.index      = static_cast<uint8_t>(1 + i);
             ReturnErrorOnFailure(encoder.Encode(audioOutputInfo));
         }

@@ -318,7 +318,7 @@ class ChipDeviceController(object):
             nonlocal returnDevice
             nonlocal deviceAvailableCV
             with deviceAvailableCV:
-                returnDevice = device
+                returnDevice = c_void_p(device)
                 deviceAvailableCV.notify_all()
             if err != 0:
                 print("Failed in getting the connected device: {}".format(err))
@@ -331,11 +331,11 @@ class ChipDeviceController(object):
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
-        if returnDevice == c_void_p(None):
+        if returnDevice.value == None:
             with deviceAvailableCV:
                 deviceAvailableCV.wait()
 
-        if returnDevice == c_void_p(None):
+        if returnDevice.value == None:
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
 
@@ -371,7 +371,7 @@ class ChipDeviceController(object):
         device = self.GetConnectedDeviceSync(nodeid)
 
         # We are not using IM for Attributes.
-        res = self._Cluster.ReadAttribute(
+        self._Cluster.ReadAttribute(
             device, cluster, attribute, endpoint, groupid, False)
         if blocking:
             return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
@@ -390,7 +390,7 @@ class ChipDeviceController(object):
 
         commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
         im.ClearCommandStatus(commandSenderHandle)
-        res = self._Cluster.SubscribeAttribute(
+        self._Cluster.SubscribeAttribute(
             device, cluster, attribute, endpoint, minInterval, maxInterval, commandSenderHandle != 0)
         if blocking:
             # We only send 1 command by this function, so index is always 0

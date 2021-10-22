@@ -101,8 +101,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  */
 InetLayer::InetLayer()
 {
-    State = kState_NotInitialized;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sInetEventHandlerDelegate.IsInitialized())
         sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
@@ -237,9 +235,7 @@ void InetLayer::DroppableEventDequeued(void)
 CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 {
     Inet::RegisterLayerErrorFormatter();
-
-    if (State != kState_NotInitialized)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     // Platform-specific initialization may elect to set this data
     // member. Ensure it is set to a sane default value before
@@ -256,7 +252,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    State = kState_Initialized;
+    mLayerState.SetInitialized();
 
     return CHIP_NO_ERROR;
 }
@@ -271,35 +267,34 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
  */
 CHIP_ERROR InetLayer::Shutdown()
 {
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (State == kState_Initialized)
-    {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        // Abort all TCP endpoints owned by this instance.
-        TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Abort();
-            }
-            return true;
-        });
+    // Abort all TCP endpoints owned by this instance.
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        {
+            lEndPoint->Abort();
+        }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        // Close all UDP endpoints owned by this instance.
-        UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Close();
-            }
-            return true;
-        });
+    // Close all UDP endpoints owned by this instance.
+    UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        {
+            lEndPoint->Close();
+        }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-    }
 
-    State = kState_NotInitialized;
-
+    mLayerState.SetShutdown();
+    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return err;
 }
 
@@ -380,7 +375,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
         {
             if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
             {
-                (*llAddr) = IPAddress::FromIPv6(*netif_ip6_addr(intf, j));
+                (*llAddr) = IPAddress(*netif_ip6_addr(intf, j));
                 return CHIP_NO_ERROR;
             }
         }
@@ -409,7 +404,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
                 struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
                 if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
                 {
-                    (*llAddr) = IPAddress::FromIPv6((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
+                    (*llAddr) = IPAddress((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
                     break;
                 }
             }
@@ -425,7 +420,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
     in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
     VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
 
-    *llAddr = IPAddress::FromIPv6(*ip6_addr);
+    *llAddr = IPAddress(*ip6_addr);
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
     return CHIP_NO_ERROR;
@@ -455,7 +450,7 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     *retEndPoint = TCPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
@@ -495,7 +490,7 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     *retEndPoint = UDPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
@@ -607,7 +602,8 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
 
     if (lTimerRequired)
     {
-        aSystemLayer->StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, HandleTCPInactivityTimer, &lInetLayer);
+        aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleTCPInactivityTimer,
+                                 &lInetLayer);
     }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0

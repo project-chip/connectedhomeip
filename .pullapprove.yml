@@ -89,6 +89,14 @@ groups:
             teams: [reviewers-comcast]
         reviews:
             request: 10
+#     shared-reviewers-espressif:
+#         type: optional
+#         conditions:
+#             - files.include('*')
+#         reviewers:
+#             teams: [reviewers-espressif]
+#         reviews:
+#             request: 10
     shared-reviewers-google:
         type: optional
         conditions:
