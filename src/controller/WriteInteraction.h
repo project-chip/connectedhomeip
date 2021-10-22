@@ -67,7 +67,7 @@ public:
 
     void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override
     {
-        mOnError(nullptr, app::StatusIB(Protocols::InteractionModel::Status::Failure), CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+        mOnError(nullptr, app::StatusIB(Protocols::InteractionModel::Status::Failure), aError);
     }
 
     void OnDone(app::WriteClient * apWriteClient) override { mOnDone(apWriteClient, this); }
