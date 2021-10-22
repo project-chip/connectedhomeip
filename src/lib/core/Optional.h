@@ -29,7 +29,6 @@
 
 namespace chip {
 
-
 /// An empty class type used to indicate optional type with uninitialized state.
 struct NullOptionalType
 {
@@ -46,7 +45,7 @@ class Optional
 {
 public:
     constexpr Optional() : mHasValue(false) {}
-    constexpr Optional(NullOptionalType) : mHasValue(false) {};
+    constexpr Optional(NullOptionalType) : mHasValue(false){};
 
     ~Optional()
     {
