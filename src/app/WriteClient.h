@@ -58,7 +58,8 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * OnResponse will be called when a from server has been received and processed for the given path.
+         * OnResponse will be called when a write response has been received
+         * and processed for the given path.
          *
          * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
