@@ -977,14 +977,12 @@ CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSucces
     {
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Basic::Attributes::UserLabel::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::Basic::Attributes::UserLabel::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
+                                                                                     onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::UserLabel::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::UserLabel::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -1010,14 +1008,12 @@ CHIP_ERROR BasicCluster::WriteAttributeLocation(Callback::Cancelable * onSuccess
     {
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::Basic::Attributes::Location::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
+                                                                                    onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::Location::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -1540,13 +1536,11 @@ CHIP_ERROR BridgedDeviceBasicCluster::WriteAttributeUserLabel(Callback::Cancelab
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::UserLabel::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::UserLabel::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::UserLabel::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -12475,14 +12469,12 @@ CHIP_ERROR TestClusterCluster::WriteAttributeCharString(Callback::Cancelable * o
     {
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(value, onSuccess->mContext,
+                                                                                            onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -12509,14 +12501,12 @@ CHIP_ERROR TestClusterCluster::WriteAttributeLongCharString(Callback::Cancelable
     {
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(value, onSuccess->mContext,
+                                                                                                onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 

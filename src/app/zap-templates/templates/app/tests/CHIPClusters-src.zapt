@@ -30,17 +30,9 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}ClusterTest::WriteAttribute{{asUpperC
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: {{ type }}
-{{#if (isCharString type)}}
-        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-{{else}}
         return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-{{/if}}
     } else {
-{{#if (isCharString type)}}
-        return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
-{{else}}
         return WriteAttribute<app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(value, nullptr, nullptr, nullptr);
-{{/if}}
     }
 }
 

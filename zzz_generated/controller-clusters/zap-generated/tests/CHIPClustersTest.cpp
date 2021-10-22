@@ -87,13 +87,11 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeVendorName(Callback::Cance
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -132,13 +130,12 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationName(Callback::
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(value, nullptr, nullptr,
+                                                                                                      nullptr);
     }
 }
 
@@ -176,13 +173,12 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationId(Callback::Ca
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo>(value, nullptr, nullptr,
+                                                                                                    nullptr);
     }
 }
 
@@ -505,14 +501,12 @@ CHIP_ERROR BasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onS
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
-        return WriteAttribute<app::Clusters::Basic::Attributes::VendorName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::Basic::Attributes::VendorName::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
+                                                                                      onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::VendorName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::VendorName::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -549,14 +543,12 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductName(Callback::Cancelable * on
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
-        return WriteAttribute<app::Clusters::Basic::Attributes::ProductName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::Basic::Attributes::ProductName::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
+                                                                                       onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::ProductName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::ProductName::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -615,13 +607,11 @@ CHIP_ERROR BasicClusterTest::WriteAttributeHardwareVersionString(Callback::Cance
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::Basic::Attributes::HardwareVersionString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::HardwareVersionString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::HardwareVersionString::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -659,13 +649,11 @@ CHIP_ERROR BasicClusterTest::WriteAttributeSoftwareVersionString(Callback::Cance
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::Basic::Attributes::SoftwareVersionString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::SoftwareVersionString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::SoftwareVersionString::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -681,14 +669,12 @@ CHIP_ERROR BasicClusterTest::WriteAttributeManufacturingDate(Callback::Cancelabl
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
-        return WriteAttribute<app::Clusters::Basic::Attributes::ManufacturingDate::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::Basic::Attributes::ManufacturingDate::TypeInfo>(value, onSuccess->mContext,
+                                                                                             onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::ManufacturingDate::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::ManufacturingDate::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -704,14 +690,12 @@ CHIP_ERROR BasicClusterTest::WriteAttributePartNumber(Callback::Cancelable * onS
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
-        return WriteAttribute<app::Clusters::Basic::Attributes::PartNumber::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::Basic::Attributes::PartNumber::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
+                                                                                      onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::PartNumber::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::PartNumber::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -727,14 +711,12 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductURL(Callback::Cancelable * onS
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
-        return WriteAttribute<app::Clusters::Basic::Attributes::ProductURL::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::Basic::Attributes::ProductURL::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
+                                                                                      onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::ProductURL::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::ProductURL::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -750,14 +732,12 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductLabel(Callback::Cancelable * o
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
-        return WriteAttribute<app::Clusters::Basic::Attributes::ProductLabel::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::Basic::Attributes::ProductLabel::TypeInfo>(value, onSuccess->mContext,
+                                                                                        onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::ProductLabel::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::ProductLabel::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -773,14 +753,12 @@ CHIP_ERROR BasicClusterTest::WriteAttributeSerialNumber(Callback::Cancelable * o
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
-        return WriteAttribute<app::Clusters::Basic::Attributes::SerialNumber::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::Basic::Attributes::SerialNumber::TypeInfo>(value, onSuccess->mContext,
+                                                                                        onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::Basic::Attributes::SerialNumber::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::Basic::Attributes::SerialNumber::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -945,13 +923,12 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeVendorName(Callback::Can
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::VendorName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::VendorName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::VendorName::TypeInfo>(value, nullptr, nullptr,
+                                                                                                   nullptr);
     }
 }
 
@@ -989,13 +966,12 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductName(Callback::Ca
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ProductName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ProductName::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ProductName::TypeInfo>(value, nullptr, nullptr,
+                                                                                                    nullptr);
     }
 }
 
@@ -1035,13 +1011,12 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeHardwareVersionString(Ca
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo>(value, nullptr,
+                                                                                                              nullptr, nullptr);
     }
 }
 
@@ -1082,13 +1057,12 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSoftwareVersionString(Ca
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo>(value, nullptr,
+                                                                                                              nullptr, nullptr);
     }
 }
 
@@ -1107,13 +1081,12 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeManufacturingDate(Callba
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo>(value, nullptr, nullptr,
+                                                                                                          nullptr);
     }
 }
 
@@ -1130,13 +1103,12 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributePartNumber(Callback::Can
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::PartNumber::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::PartNumber::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::PartNumber::TypeInfo>(value, nullptr, nullptr,
+                                                                                                   nullptr);
     }
 }
 
@@ -1153,13 +1125,12 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductURL(Callback::Can
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ProductURL::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ProductURL::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ProductURL::TypeInfo>(value, nullptr, nullptr,
+                                                                                                   nullptr);
     }
 }
 
@@ -1176,13 +1147,12 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductLabel(Callback::C
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo>(value, nullptr, nullptr,
+                                                                                                     nullptr);
     }
 }
 
@@ -1199,13 +1169,12 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSerialNumber(Callback::C
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo>(value, nullptr, nullptr,
+                                                                                                     nullptr);
     }
 }
 
@@ -1393,13 +1362,12 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCompensationText(Callback::Can
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(value, nullptr, nullptr,
+                                                                                                   nullptr);
     }
 }
 
@@ -3993,14 +3961,12 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeDescription(Callback::Cancelabl
         auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
-        return WriteAttribute<app::Clusters::PowerSource::Attributes::Description::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+        return WriteAttribute<app::Clusters::PowerSource::Attributes::Description::TypeInfo>(value, onSuccess->mContext,
+                                                                                             onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::PowerSource::Attributes::Description::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::PowerSource::Attributes::Description::TypeInfo>(value, nullptr, nullptr, nullptr);
     }
 }
 
@@ -6961,13 +6927,12 @@ CHIP_ERROR WakeOnLanClusterTest::WriteAttributeWakeOnLanMacAddress(Callback::Can
         auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
         // TYPE: char_string
         return WriteAttribute<app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), onSuccess->mContext,
-            onSuccess->mCall, onFailure->mCall);
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
     }
     else
     {
-        return WriteAttribute<app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo>(
-            chip::Span<const char>(reinterpret_cast<const char *>(value.data()), value.size()), nullptr, nullptr, nullptr);
+        return WriteAttribute<app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo>(value, nullptr, nullptr,
+                                                                                                   nullptr);
     }
 }
 
