@@ -25,19 +25,15 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/util/error-mapping.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
-using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
+using namespace chip::app::Clusters;
 
 constexpr int16_t kDefaultAbsMinHeatSetpointLimit    = 700;  // 7C (44.5 F) is the default
 constexpr int16_t kDefaultAbsMaxHeatSetpointLimit    = 3000; // 30C (86 F) is the default
@@ -51,6 +47,64 @@ constexpr int16_t kDefaultHeatingSetpoint            = 2000;
 constexpr int16_t kDefaultCoolingSetpoint            = 2600;
 constexpr uint8_t kInvalidControlSequenceOfOperation = 0xff;
 constexpr uint8_t kInvalidRequestedSystemMode        = 0xff;
+constexpr int8_t kDefaultDeadBand                    = 25; // 2.5C is the default
+// // translateZclTemp() and
+// // translateDegFTemp() are from the Matter Application Clusters Specification
+// // 4.5.4.1. Sample Conversion Code
+
+// /*
+//  * Function : translateZclTemp()
+//  * Description : Converts the temperature setpoints in ZCL
+//  * to the half degF format
+//  * The half degF format is 8-bit unsigned,
+//  * and represents 2x temperature value in
+//  * Fahrenheit (to get 0.5 resolution).
+//  * The format used in ZCL is 16-bit signed
+//  * in Celsius and multiplied by 100
+//  * to get 0.01 resolution.
+//  * e.g. 2500 (25.00 deg C) ---> 0x9A (77 deg F)
+//  * Input Para : Temperature in ZCL (degC) format
+//  * Output Para: Temperature in half DegF format
+//  */
+// int8u translateZclTemp(int16s temperature)
+// {
+//     int32s x = temperature;
+//     // rearrangement of
+//     // = (x * (9/5) / 100 + 32) * 2;
+//     // the added 250 is for proper rounding.
+//     // a rounding technique that only works
+//     // with positive numbers
+//     return (int8u)((x * 9 * 2 + 250) / (5 * 100) + 64);
+// }
+// /*
+//  * Function : translateDegFTemp
+//  * Description : Converts the temperature in DegF
+//  * protocol to the format
+//  * expected by the cluster attribute
+//  * Measured Value in the
+//  * Temperature Measurement
+//  * Information Attribute Set.
+//  * The half deg F format is 8-bit
+//  * unsigned, and represents
+//  * 2x temperature value in
+//  * Fahrenheit (to get 0.5 resolution).
+//  * The format expected by cluster
+//  * is 16-bit signed in Celsius and
+//  * multiplied by 100 to get
+//  * 0.01 resolution.
+//  * e.g. 0x9A (77 deg F) ---> 2500 (25.00 deg C)
+//  * Input Para : temperature in DegF format
+//  * Output Para: temperature in ZCL format
+//  */
+// int16s translateDegFTemp(int8u temperature)
+// {
+//     int32s x = temperature;
+//     // rearrangement of
+//     // = 100 * (x/2 - 32) * 5/9
+//     // *1000 (should be 100), +90, then /10,
+//     // is for rounding.
+//     return (int16s)(((x - 64) * 5 * 1000 + 90) / (10 * 2 * 9));
+// }
 
 void emberAfThermostatClusterServerInitCallback()
 {
@@ -68,166 +122,262 @@ void emberAfThermostatClusterServerInitCallback()
     // or should this just be the responsibility of the thermostat application?
 }
 
-Protocols::InteractionModel::Status
-MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
-                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+// IMPORTANT NOTE:
+// No Side effects are permitted in emberAfThermostatClusterServerPreAttributeChangedCallback
+// If a setpoint changes is required as a result of setpoint limit change
+// it does not happen here.  It is the responsibility of the device to adjust the setpoint(s)
+// as required in emberAfThermostatClusterServerPostAttributeChangedCallback
+// limit change validation assures that there is at least 1 setpoint that will be valid
+
+#define FEATURE_MAP_HEAT 0x01
+#define FEATURE_MAP_COOL 0x02
+#define FEATURE_MAP_OCC 0x04
+#define FEATURE_MAP_SCH 0x08
+#define FEATURE_MAP_SB 0x10
+#define FEATURE_MAP_AUTO 0x20
+
+#define FEATURE_MAP_OVERIDE FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
+
+EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+                                                                        EmberAfAttributeType attributeType, uint16_t size,
+                                                                        uint8_t * value)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    EndpointId endpoint  = attributePath.mEndpointId;
     int16_t requested;
 
-    switch (attributePath.mAttributeId)
+    // Limits will be needed for all checks
+    // so we just get them all now
+    int16_t AbsMinHeatSetpointLimit;
+    int16_t AbsMaxHeatSetpointLimit;
+    int16_t MinHeatSetpointLimit;
+    int16_t MaxHeatSetpointLimit;
+    int16_t AbsMinCoolSetpointLimit;
+    int16_t AbsMaxCoolSetpointLimit;
+    int16_t MinCoolSetpointLimit;
+    int16_t MaxCoolSetpointLimit;
+    int8_t DeadBand         = 0;
+    int16_t DeadBandTemp    = 0;
+    uint32_t FeatureMap     = 0;
+    bool AutoSupported      = false;
+    bool HeatSupported      = false;
+    bool CoolSupported      = false;
+    bool OccupancySupported = false;
+    int16_t OccupiedCoolingSetpoint;
+    int16_t OccupiedHeatingSetpoint;
+    int16_t UnoccupiedCoolingSetpoint;
+    int16_t UnoccupiedHeatingSetpoint;
+
+// TODO re-enable reading reaturemap once https://github.com/project-chip/connectedhomeip/pull/9725 is merged
+#ifndef FEATURE_MAP_OVERIDE
+    emberAfReadServerAttribute(endpoint, Thermostat::Id, chip::app::Clusters::Globals::Attributes::Ids::FeatureMap,
+                               (uint8_t *) &FeatureMap, sizeof(FeatureMap));
+#else
+    FeatureMap = FEATURE_MAP_OVERIDE;
+#endif
+
+    if (FeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
     {
-    case OccupiedHeatingSetpoint::Id: {
-        int16_t AbsMinHeatSetpointLimit;
-        int16_t AbsMaxHeatSetpointLimit;
-        int16_t MinHeatSetpointLimit;
-        int16_t MaxHeatSetpointLimit;
-
-        status = AbsMinHeatSetpointLimit::Get(endpoint, &AbsMinHeatSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        AutoSupported = true;
+        if (GetMinSetpointDeadBand(endpoint, &DeadBand) != EMBER_ZCL_STATUS_SUCCESS)
         {
-            AbsMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
+            DeadBand = kDefaultDeadBand;
         }
-
-        status = AbsMaxHeatSetpointLimit::Get(endpoint, &AbsMaxHeatSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            AbsMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
-        }
-
-        status = MinHeatSetpointLimit::Get(endpoint, &MinHeatSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            MinHeatSetpointLimit = AbsMinHeatSetpointLimit;
-        }
-
-        status = MaxHeatSetpointLimit::Get(endpoint, &MaxHeatSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            MaxHeatSetpointLimit = AbsMaxHeatSetpointLimit;
-        }
-
-        requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
-        if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
-            requested > MaxHeatSetpointLimit)
-            status = EMBER_ZCL_STATUS_INVALID_VALUE;
-        else
-            status = EMBER_ZCL_STATUS_SUCCESS;
-
-        break;
+        DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
     }
+    if (FeatureMap & 1 << 0)
+        HeatSupported = true;
 
-    case OccupiedCoolingSetpoint::Id: {
-        int16_t AbsMinCoolSetpointLimit;
-        int16_t AbsMaxCoolSetpointLimit;
-        int16_t MinCoolSetpointLimit;
-        int16_t MaxCoolSetpointLimit;
+    if (FeatureMap & 1 << 1)
+        CoolSupported = true;
 
-        status = AbsMinCoolSetpointLimit::Get(endpoint, &AbsMinCoolSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (FeatureMap & 1 << 2)
+        OccupancySupported = true;
+
+    if (GetAbsMinCoolSetpointLimit(endpoint, &AbsMinCoolSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
+        AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
+
+    if (GetAbsMaxCoolSetpointLimit(endpoint, &AbsMaxCoolSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
+        AbsMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
+
+    if (GetMinCoolSetpointLimit(endpoint, &MinCoolSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
+        MinCoolSetpointLimit = AbsMinCoolSetpointLimit;
+
+    if (GetMaxCoolSetpointLimit(endpoint, &MaxCoolSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
+        MaxCoolSetpointLimit = AbsMaxCoolSetpointLimit;
+
+    if (GetAbsMinHeatSetpointLimit(endpoint, &AbsMinHeatSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
+        AbsMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
+
+    if (GetAbsMaxHeatSetpointLimit(endpoint, &AbsMaxHeatSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
+        AbsMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
+
+    if (GetMinHeatSetpointLimit(endpoint, &MinHeatSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
+        MinHeatSetpointLimit = AbsMinHeatSetpointLimit;
+
+    if (GetMaxHeatSetpointLimit(endpoint, &MaxHeatSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
+        MaxHeatSetpointLimit = AbsMaxHeatSetpointLimit;
+
+    if (CoolSupported)
+        if (GetOccupiedCoolingSetpoint(endpoint, &OccupiedCoolingSetpoint) != EMBER_ZCL_STATUS_SUCCESS)
         {
-            AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
+            ChipLogError(Zcl, "Error: Can not read Occupied Cooling Setpoint");
+            return EMBER_ZCL_STATUS_FAILURE;
         }
 
-        status = AbsMaxCoolSetpointLimit::Get(endpoint, &AbsMaxCoolSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (HeatSupported)
+        if (GetOccupiedHeatingSetpoint(endpoint, &OccupiedHeatingSetpoint) != EMBER_ZCL_STATUS_SUCCESS)
         {
-            AbsMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
+            ChipLogError(Zcl, "Error: Can not read Occupied Heating Setpoint");
+            return EMBER_ZCL_STATUS_FAILURE;
         }
 
-        status = MinCoolSetpointLimit::Get(endpoint, &MinCoolSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (CoolSupported && OccupancySupported)
+        if (GetUnoccupiedCoolingSetpoint(endpoint, &UnoccupiedCoolingSetpoint) != EMBER_ZCL_STATUS_SUCCESS)
         {
-            MinCoolSetpointLimit = AbsMinCoolSetpointLimit;
+            ChipLogError(Zcl, "Error: Can not read Unoccupied Cooling Setpoint");
+            return EMBER_ZCL_STATUS_FAILURE;
         }
 
-        status = MaxCoolSetpointLimit::Get(endpoint, &MaxCoolSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (HeatSupported && OccupancySupported)
+        if (GetUnoccupiedHeatingSetpoint(endpoint, &UnoccupiedHeatingSetpoint) != EMBER_ZCL_STATUS_SUCCESS)
         {
-            MaxCoolSetpointLimit = AbsMaxCoolSetpointLimit;
+            ChipLogError(Zcl, "Error: Can not read Unoccupied Heating Setpoint");
+            return EMBER_ZCL_STATUS_FAILURE;
         }
+
+    switch (attributeId)
+    {
+    case Ids::OccupiedHeatingSetpoint:
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
-        if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
-            requested > MaxCoolSetpointLimit)
-            status = EMBER_ZCL_STATUS_INVALID_VALUE;
-        else
-            status = EMBER_ZCL_STATUS_SUCCESS;
-
-        break;
-    }
-
-    case MinHeatSetpointLimit::Id:
-    case MaxHeatSetpointLimit::Id: {
-        int16_t AbsMinHeatSetpointLimit;
-        int16_t AbsMaxHeatSetpointLimit;
-
-        status = AbsMinHeatSetpointLimit::Get(endpoint, &AbsMinHeatSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (!HeatSupported)
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        else if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
+                 requested > MaxHeatSetpointLimit)
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        else if (AutoSupported)
         {
-            AbsMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
+            if (requested > OccupiedCoolingSetpoint - DeadBandTemp)
+                return EMBER_ZCL_STATUS_INVALID_VALUE;
         }
+        return EMBER_ZCL_STATUS_SUCCESS;
 
-        status = AbsMaxHeatSetpointLimit::Get(endpoint, &AbsMaxHeatSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            AbsMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
-        }
-
+    case Ids::OccupiedCoolingSetpoint:
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
-        if (requested < AbsMinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit)
-            status = EMBER_ZCL_STATUS_INVALID_VALUE;
-        else
-            status = EMBER_ZCL_STATUS_SUCCESS;
-
-        break;
-    }
-    case MinCoolSetpointLimit::Id:
-    case MaxCoolSetpointLimit::Id: {
-        int16_t AbsMinCoolSetpointLimit;
-        int16_t AbsMaxCoolSetpointLimit;
-
-        status = AbsMinCoolSetpointLimit::Get(endpoint, &AbsMinCoolSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (!CoolSupported)
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        else if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
+                 requested > MaxCoolSetpointLimit)
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        else if (AutoSupported)
         {
-            AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
+            if (requested < OccupiedHeatingSetpoint + DeadBandTemp)
+                return EMBER_ZCL_STATUS_INVALID_VALUE;
         }
+        return EMBER_ZCL_STATUS_SUCCESS;
 
-        status = AbsMaxCoolSetpointLimit::Get(endpoint, &AbsMaxCoolSetpointLimit);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            AbsMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
-        }
-
+    case Ids::UnoccupiedHeatingSetpoint:
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
-        if (requested < AbsMinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit)
-            status = EMBER_ZCL_STATUS_INVALID_VALUE;
-        else
-            status = EMBER_ZCL_STATUS_SUCCESS;
+        if (!(HeatSupported && OccupancySupported))
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        else if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
+                 requested > MaxHeatSetpointLimit)
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        else if (AutoSupported)
+        {
+            if (requested > UnoccupiedCoolingSetpoint - DeadBandTemp)
+                return EMBER_ZCL_STATUS_INVALID_VALUE;
+        }
+        return EMBER_ZCL_STATUS_SUCCESS;
 
-        break;
-    }
+    case Ids::UnoccupiedCoolingSetpoint:
+        requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
+        if (!(CoolSupported && OccupancySupported))
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        else if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
+                 requested > MaxCoolSetpointLimit)
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        else if (AutoSupported)
+        {
+            if (requested < UnoccupiedHeatingSetpoint + DeadBandTemp)
+                return EMBER_ZCL_STATUS_INVALID_VALUE;
+        }
+        return EMBER_ZCL_STATUS_SUCCESS;
 
-    case ControlSequenceOfOperation::Id: {
+    case Ids::MinHeatSetpointLimit:
+        requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
+        if (!HeatSupported)
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        else if (requested < AbsMinHeatSetpointLimit || requested > MaxHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit)
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        else if (AutoSupported)
+        {
+            if (requested > MinCoolSetpointLimit - DeadBandTemp)
+                return EMBER_ZCL_STATUS_INVALID_VALUE;
+        }
+        return EMBER_ZCL_STATUS_SUCCESS;
+
+    case Ids::MaxHeatSetpointLimit:
+        requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
+        if (!HeatSupported)
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        else if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit)
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        else if (AutoSupported)
+        {
+            if (requested > MaxCoolSetpointLimit - DeadBandTemp)
+                return EMBER_ZCL_STATUS_INVALID_VALUE;
+        }
+        return EMBER_ZCL_STATUS_SUCCESS;
+
+    case Ids::MinCoolSetpointLimit:
+        requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
+        if (!CoolSupported)
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        else if (requested < AbsMinCoolSetpointLimit || requested > MaxCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit)
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        else if (AutoSupported)
+        {
+            if (requested < MinHeatSetpointLimit + DeadBandTemp)
+                return EMBER_ZCL_STATUS_INVALID_VALUE;
+        }
+        return EMBER_ZCL_STATUS_SUCCESS;
+
+    case Ids::MaxCoolSetpointLimit:
+        requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
+        if (!CoolSupported)
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        else if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit)
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        else if (AutoSupported)
+        {
+            if (requested < MaxHeatSetpointLimit + DeadBandTemp)
+                return EMBER_ZCL_STATUS_INVALID_VALUE;
+        }
+        return EMBER_ZCL_STATUS_SUCCESS;
+
+    case Ids::MinSetpointDeadBand:
+        requested = *value;
+        if (!AutoSupported)
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        else if (requested < 0 || requested > 25)
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        return EMBER_ZCL_STATUS_SUCCESS;
+
+    case Ids::ControlSequenceOfOperation:
         uint8_t requestedCSO;
         requestedCSO = *value;
         if (requestedCSO > EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_AND_HEATING_WITH_REHEAT)
-            status = EMBER_ZCL_STATUS_INVALID_VALUE;
-        else
-            status = EMBER_ZCL_STATUS_SUCCESS;
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
+        return EMBER_ZCL_STATUS_SUCCESS;
 
-        break;
-    }
-
-    case SystemMode::Id: {
+    case Ids::SystemMode: {
         uint8_t ControlSequenceOfOperation = kInvalidControlSequenceOfOperation;
         uint8_t RequestedSystemMode        = kInvalidRequestedSystemMode;
-        ControlSequenceOfOperation::Get(endpoint, &ControlSequenceOfOperation);
+        GetControlSequenceOfOperation(endpoint, &ControlSequenceOfOperation);
         RequestedSystemMode = *value;
         if (ControlSequenceOfOperation > EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_AND_HEATING_WITH_REHEAT ||
             RequestedSystemMode > EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_FAN_ONLY)
         {
-            status = EMBER_ZCL_STATUS_INVALID_VALUE;
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
         }
         else
         {
@@ -237,60 +387,52 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             case EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_WITH_REHEAT:
                 if (RequestedSystemMode == EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_HEAT ||
                     RequestedSystemMode == EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_EMERGENCY_HEATING)
-                    status = EMBER_ZCL_STATUS_INVALID_VALUE;
-                break;
+                    return EMBER_ZCL_STATUS_INVALID_VALUE;
+                else
+                    return EMBER_ZCL_STATUS_SUCCESS;
 
             case EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_HEATING_ONLY:
             case EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_HEATING_WITH_REHEAT:
                 if (RequestedSystemMode == EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_COOL ||
                     RequestedSystemMode == EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_PRECOOLING)
-                    status = EMBER_ZCL_STATUS_INVALID_VALUE;
-                break;
+                    return EMBER_ZCL_STATUS_INVALID_VALUE;
+                else
+                    return EMBER_ZCL_STATUS_SUCCESS;
             default:
-                break;
+                return EMBER_ZCL_STATUS_SUCCESS;
             }
         }
-        break;
     }
     default:
-        break;
+        return EMBER_ZCL_STATUS_SUCCESS;
     }
-
-    return app::ToInteractionModelStatus(status);
 }
 
-bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                         const app::ConcreteCommandPath & commandPath,
-                                                         const Commands::ClearWeeklySchedule::DecodableType & commandData)
+bool emberAfThermostatClusterClearWeeklyScheduleCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj)
 {
     // TODO
     return false;
 }
-bool emberAfThermostatClusterGetRelayStatusLogCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GetRelayStatusLog::DecodableType & commandData)
+bool emberAfThermostatClusterGetRelayStatusLogCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GetWeeklySchedule::DecodableType & commandData)
+bool emberAfThermostatClusterGetWeeklyScheduleCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj,
+                                                       uint8_t daysToReturn, uint8_t modeToReturn)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::SetWeeklySchedule::DecodableType & commandData)
+bool emberAfThermostatClusterSetWeeklyScheduleCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj,
+                                                       uint8_t numberOfTransitionsForSequence, uint8_t daysOfWeekForSequence,
+                                                       uint8_t modeForSequence, uint8_t * payload)
 {
     // TODO
     return false;
 }
-
-using namespace chip::app::Clusters::Thermostat::Attributes;
 
 int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint)
 {
@@ -317,36 +459,30 @@ int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoin
     // Per global matter data model policy
     // if a attribute is not present then it's default shall be used.
 
-    status = AbsMinHeatSetpointLimit::Get(endpoint, &AbsMinHeatSetpointLimit);
+    status = GetAbsMinHeatSetpointLimit(endpoint, &AbsMinHeatSetpointLimit);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Warning: AbsMinHeatSetpointLimit missing using default");
     }
 
-    status = AbsMaxHeatSetpointLimit::Get(endpoint, &AbsMaxHeatSetpointLimit);
+    status = GetAbsMaxHeatSetpointLimit(endpoint, &AbsMaxHeatSetpointLimit);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Warning: AbsMaxHeatSetpointLimit missing using default");
     }
-    status = MinHeatSetpointLimit::Get(endpoint, &MinHeatSetpointLimit);
+    status = GetMinHeatSetpointLimit(endpoint, &MinHeatSetpointLimit);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
+        ChipLogError(Zcl, "Warning: MinHeatSetpointLimit missing using default");
         MinHeatSetpointLimit = AbsMinHeatSetpointLimit;
     }
 
-    status = MaxHeatSetpointLimit::Get(endpoint, &MaxHeatSetpointLimit);
+    status = GetMaxHeatSetpointLimit(endpoint, &MaxHeatSetpointLimit);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
+        ChipLogError(Zcl, "Warning: MaxHeatSetpointLimit missing using AbsMaxHeatSetpointLimit");
         MaxHeatSetpointLimit = AbsMaxHeatSetpointLimit;
     }
-
-    // Make sure the user imposed limits are within the manufacturer imposed limits
-
-    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3725
-    // Spec does not specify the behavior is the requested setpoint exceeds the limit allowed
-    // This implementation clamps at the limit.
-
-    // resolution of 3725 is to clamp.
 
     if (MinHeatSetpointLimit < AbsMinHeatSetpointLimit)
         MinHeatSetpointLimit = AbsMinHeatSetpointLimit;
@@ -388,36 +524,31 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
     // Per global matter data model policy
     // if a attribute is not present then it's default shall be used.
 
-    status = AbsMinCoolSetpointLimit::Get(endpoint, &AbsMinCoolSetpointLimit);
+    status = GetAbsMinCoolSetpointLimit(endpoint, &AbsMinCoolSetpointLimit);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Warning: AbsMinCoolSetpointLimit missing using default");
     }
 
-    status = AbsMaxCoolSetpointLimit::Get(endpoint, &AbsMaxCoolSetpointLimit);
+    status = GetAbsMaxCoolSetpointLimit(endpoint, &AbsMaxCoolSetpointLimit);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Warning: AbsMaxCoolSetpointLimit missing using default");
     }
 
-    status = MinCoolSetpointLimit::Get(endpoint, &MinCoolSetpointLimit);
+    status = GetMinCoolSetpointLimit(endpoint, &MinCoolSetpointLimit);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
+        ChipLogError(Zcl, "Warning: MinCoolSetpointLimit missing using AbsMinCoolSetpointLimit");
         MinCoolSetpointLimit = AbsMinCoolSetpointLimit;
     }
 
-    status = MaxCoolSetpointLimit::Get(endpoint, &MaxCoolSetpointLimit);
+    status = GetMaxCoolSetpointLimit(endpoint, &MaxCoolSetpointLimit);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
+        ChipLogError(Zcl, "Warning: MaxCoolSetpointLimit missing using AbsMaxCoolSetpointLimit");
         MaxCoolSetpointLimit = AbsMaxCoolSetpointLimit;
     }
-
-    // Make sure the user imposed limits are within the manufacture imposed limits
-    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3725
-    // Spec does not specify the behavior is the requested setpoint exceeds the limit allowed
-    // This implementation clamps at the limit.
-
-    // resolution of 3725 is to clamp.
 
     if (MinCoolSetpointLimit < AbsMinCoolSetpointLimit)
         MinCoolSetpointLimit = AbsMinCoolSetpointLimit;
@@ -433,91 +564,230 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
 
     return CoolingSetpoint;
 }
-bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::SetpointRaiseLower::DecodableType & commandData)
+bool emberAfThermostatClusterSetpointRaiseLowerCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj,
+                                                        uint8_t mode, int8_t amount)
 {
-    auto & mode   = commandData.mode;
-    auto & amount = commandData.amount;
-
-    EndpointId aEndpointId = commandPath.mEndpointId;
-
     int16_t HeatingSetpoint = kDefaultHeatingSetpoint, CoolingSetpoint = kDefaultCoolingSetpoint; // Set to defaults to be safe
     EmberAfStatus status                     = EMBER_ZCL_STATUS_FAILURE;
-    EmberAfStatus ReadStatus                 = EMBER_ZCL_STATUS_FAILURE;
-    EmberAfStatus WriteCoolingSetpointStatus = EMBER_ZCL_STATUS_SUCCESS, WriteHeatingSetpointStatus = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus WriteCoolingSetpointStatus = EMBER_ZCL_STATUS_FAILURE;
+    EmberAfStatus WriteHeatingSetpointStatus = EMBER_ZCL_STATUS_FAILURE;
+    bool AutoSupported                       = false;
+    bool HeatSupported                       = false;
+    bool CoolSupported                       = false;
+    int16_t DeadBandTemp                     = 0;
+    int8_t DeadBand                          = 0;
+    uint32_t FeatureMap                      = 0;
 
+    // TODO re-enable reading reaturemap once https://github.com/project-chip/connectedhomeip/pull/9725 is merged
+#ifndef FEATURE_MAP_OVERIDE
+    emberAfReadServerAttribute(endpoint, Thermostat::Id, chip::app::Clusters::Globals::Attributes::Ids::FeatureMap,
+                               (uint8_t *) &FeatureMap, sizeof(FeatureMap));
+#else
+    FeatureMap = FEATURE_MAP_OVERIDE;
+#endif
+
+    if (FeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
+    {
+        AutoSupported = true;
+        if (GetMinSetpointDeadBand(aEndpointId, &DeadBand) != EMBER_ZCL_STATUS_SUCCESS)
+            DeadBand = kDefaultDeadBand;
+        DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
+    }
+    if (FeatureMap & 1 << 0)
+        HeatSupported = true;
+
+    if (FeatureMap & 1 << 1)
+        CoolSupported = true;
     switch (mode)
     {
     case EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS:
-
-        // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3726
-        // Behavior is not specified if the device only contains one mode
-        // and the both mode command is sent.
-        // Implemented behavior is not perfect, but spec needs to be clear before changing the implementaion
-
-        // 4.3.7.2.1. Both
-        // [4.172] The client MAY indicate Both regardless of the server feature support. The server SHALL
-        // only adjust the setpoint that it supports and not respond with an error.
-
-        // Implementation assumes that the attribute will NOT be present if the device does not support that mode.
-
-        // In auto mode we will need to change both the heating and cooling setpoints
-        ReadStatus = OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint);
-        if (ReadStatus == EMBER_ZCL_STATUS_SUCCESS)
+        if (HeatSupported && CoolSupported)
         {
-            CoolingSetpoint            = static_cast<int16_t>(CoolingSetpoint + amount * 10);
-            CoolingSetpoint            = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
-            WriteCoolingSetpointStatus = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
-            if (WriteCoolingSetpointStatus != EMBER_ZCL_STATUS_SUCCESS)
+            int16_t DesiredCoolingSetpoint, CoolLimit, DesiredHeatingSetpoint, HeatLimit;
+            if (GetOccupiedCoolingSetpoint(aEndpointId, &CoolingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
             {
-                ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
+                DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
+                CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
+                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                {
+                    if (GetOccupiedHeatingSetpoint(aEndpointId, &HeatingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+                    {
+                        DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
+                        HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
+                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                        {
+                            if (CoolLimit != 0 || HeatLimit != 0)
+                            {
+                                if (abs(CoolLimit) <= abs(HeatLimit))
+                                {
+                                    // We are limited by the Heating Limit
+                                    DesiredHeatingSetpoint = static_cast<int16_t>(DesiredHeatingSetpoint - HeatLimit);
+                                    DesiredCoolingSetpoint = static_cast<int16_t>(DesiredCoolingSetpoint - HeatLimit);
+                                }
+                                else
+                                {
+                                    // We are limited by Cooling Limit
+                                    DesiredHeatingSetpoint = static_cast<int16_t>(DesiredHeatingSetpoint - CoolLimit);
+                                    DesiredCoolingSetpoint = static_cast<int16_t>(DesiredCoolingSetpoint - CoolLimit);
+                                }
+                            }
+                            WriteCoolingSetpointStatus = SetOccupiedCoolingSetpoint(aEndpointId, DesiredCoolingSetpoint);
+                            if (WriteCoolingSetpointStatus != EMBER_ZCL_STATUS_SUCCESS)
+                            {
+                                ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
+                            }
+                            WriteHeatingSetpointStatus = SetOccupiedHeatingSetpoint(aEndpointId, DesiredHeatingSetpoint);
+                            if (WriteHeatingSetpointStatus != EMBER_ZCL_STATUS_SUCCESS)
+                            {
+                                ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        ReadStatus = OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint);
-        if (ReadStatus == EMBER_ZCL_STATUS_SUCCESS)
+        if (CoolSupported && !HeatSupported)
         {
-            HeatingSetpoint            = static_cast<int16_t>(HeatingSetpoint + amount * 10);
-            HeatingSetpoint            = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
-            WriteHeatingSetpointStatus = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
-            if (WriteHeatingSetpointStatus != EMBER_ZCL_STATUS_SUCCESS)
+            if (GetOccupiedCoolingSetpoint(aEndpointId, &CoolingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
             {
-                ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
+                CoolingSetpoint            = static_cast<int16_t>(CoolingSetpoint + amount * 10);
+                CoolingSetpoint            = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
+                WriteCoolingSetpointStatus = SetOccupiedCoolingSetpoint(aEndpointId, CoolingSetpoint);
+                if (WriteCoolingSetpointStatus != EMBER_ZCL_STATUS_SUCCESS)
+                {
+                    ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
+                }
             }
         }
-        // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3801
-        // Spec behavior is not defined if one was successfull and the other not what should happen.
-        // this implementation leaves the successfull one changed but will return an error.
-        if ((WriteCoolingSetpointStatus == EMBER_ZCL_STATUS_SUCCESS) && (WriteHeatingSetpointStatus == EMBER_ZCL_STATUS_SUCCESS))
+
+        if (HeatSupported && !CoolSupported)
+        {
+            if (GetOccupiedHeatingSetpoint(aEndpointId, &HeatingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+            {
+                HeatingSetpoint            = static_cast<int16_t>(HeatingSetpoint + amount * 10);
+                HeatingSetpoint            = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
+                WriteHeatingSetpointStatus = SetOccupiedHeatingSetpoint(aEndpointId, HeatingSetpoint);
+                if (WriteHeatingSetpointStatus != EMBER_ZCL_STATUS_SUCCESS)
+                {
+                    ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
+                }
+            }
+        }
+
+        if ((!HeatSupported || WriteHeatingSetpointStatus == EMBER_ZCL_STATUS_SUCCESS) &&
+            (!CoolSupported || WriteCoolingSetpointStatus == EMBER_ZCL_STATUS_SUCCESS))
             status = EMBER_ZCL_STATUS_SUCCESS;
         break;
 
     case EMBER_ZCL_SETPOINT_ADJUST_MODE_COOL_SETPOINT:
-        // In cooling mode we will need to change only the cooling setpoint
-        ReadStatus = OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint);
-
-        if (ReadStatus == EMBER_ZCL_STATUS_SUCCESS)
+        if (CoolSupported)
         {
-            CoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
-            CoolingSetpoint = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
-            status          = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
+            if (GetOccupiedCoolingSetpoint(aEndpointId, &CoolingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+            {
+                CoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
+                CoolingSetpoint = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
+                if (AutoSupported)
+                {
+                    // Need to check if we can move the cooling setpoint while maintaining the dead band
+                    if (GetOccupiedHeatingSetpoint(aEndpointId, &HeatingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+                    {
+                        if (CoolingSetpoint - HeatingSetpoint < DeadBandTemp)
+                        {
+                            // Dead Band Violation
+                            // Try to adjust it
+                            HeatingSetpoint = static_cast<int16_t>(CoolingSetpoint - DeadBandTemp);
+                            if (HeatingSetpoint == EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId))
+                            {
+                                // Desired cooling setpoint is enforcable
+                                // Set the new cooling and heating setpoints
+                                if (SetOccupiedHeatingSetpoint(aEndpointId, HeatingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+                                {
+                                    if (SetOccupiedCoolingSetpoint(aEndpointId, CoolingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+                                        status = EMBER_ZCL_STATUS_SUCCESS;
+                                }
+                                else
+                                    ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
+                            }
+                            else
+                            {
+                                ChipLogError(Zcl, "Error: Could Not adjust heating setpoint to maintain dead band!");
+                                status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+                            }
+                        }
+                        else
+                            status = SetOccupiedCoolingSetpoint(aEndpointId, CoolingSetpoint);
+                    }
+                    else
+                        ChipLogError(Zcl, "Error: GetOccupiedHeatingSetpoint failed!");
+                }
+                else
+                {
+                    status = SetOccupiedCoolingSetpoint(aEndpointId, CoolingSetpoint);
+                }
+            }
+            else
+                ChipLogError(Zcl, "Error: GetOccupiedCoolingSetpoint failed!");
         }
+        else
+            status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
         break;
 
     case EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_SETPOINT:
-        // In cooling mode we will need to change only the cooling setpoint
-        ReadStatus = OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint);
-        if (ReadStatus == EMBER_ZCL_STATUS_SUCCESS)
+        if (HeatSupported)
         {
-            HeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
-            HeatingSetpoint = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
-            status          = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
+            if (GetOccupiedHeatingSetpoint(aEndpointId, &HeatingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+            {
+                HeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
+                HeatingSetpoint = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
+                if (AutoSupported)
+                {
+                    // Need to check if we can move the cooling setpoint while maintaining the dead band
+                    if (GetOccupiedCoolingSetpoint(aEndpointId, &CoolingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+                    {
+                        if (CoolingSetpoint - HeatingSetpoint < DeadBandTemp)
+                        {
+                            // Dead Band Violation
+                            // Try to adjust it
+                            CoolingSetpoint = static_cast<int16_t>(HeatingSetpoint + DeadBandTemp);
+                            if (CoolingSetpoint == EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId))
+                            {
+                                // Desired cooling setpoint is enforcable
+                                // Set the new cooling and heating setpoints
+                                if (SetOccupiedCoolingSetpoint(aEndpointId, CoolingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+                                {
+                                    if (SetOccupiedHeatingSetpoint(aEndpointId, HeatingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
+                                        status = EMBER_ZCL_STATUS_SUCCESS;
+                                }
+                                else
+                                    ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
+                            }
+                            else
+                            {
+                                ChipLogError(Zcl, "Error: Could Not adjust cooling setpoint to maintain dead band!");
+                                status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+                            }
+                        }
+                        else
+                            status = SetOccupiedHeatingSetpoint(aEndpointId, HeatingSetpoint);
+                    }
+                    else
+                        ChipLogError(Zcl, "Error: GetOccupiedCoolingSetpoint failed!");
+                }
+                else
+                {
+                    status = SetOccupiedHeatingSetpoint(aEndpointId, HeatingSetpoint);
+                }
+            }
+            else
+                ChipLogError(Zcl, "Error: GetOccupiedHeatingSetpoint failed!");
         }
+        else
+            status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
         break;
 
     default:
-        // Nothing to do here
+        status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
         break;
     }
     emberAfSendImmediateDefaultResponse(status);
