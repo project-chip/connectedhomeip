@@ -233,6 +233,20 @@ public:
 private:
 };
 
+class DLL_EXPORT BooleanStateCluster : public ClusterBase
+{
+public:
+    BooleanStateCluster() : ClusterBase(app::Clusters::BooleanState::Id) {}
+    ~BooleanStateCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeStateValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR SubscribeAttributeStateValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeStateValue(Callback::Cancelable * onReportCallback);
+};
+
 class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
 {
 public:

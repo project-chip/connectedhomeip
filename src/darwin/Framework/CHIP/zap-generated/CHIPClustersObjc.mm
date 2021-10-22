@@ -624,6 +624,48 @@ using chip::Callback::Cancelable;
 
 @end
 
+@implementation CHIPBooleanState
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)readAttributeStateValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeStateValue(success, failure);
+    });
+}
+
+- (void)subscribeAttributeStateValueWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeStateValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeStateValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeStateValue(success);
+        },
+        true);
+}
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+    });
+}
+
+@end
+
 @implementation CHIPBridgedDeviceBasic
 
 - (chip::Controller::ClusterBase *)getCluster

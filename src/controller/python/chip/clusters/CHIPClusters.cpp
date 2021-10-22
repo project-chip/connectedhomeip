@@ -2020,6 +2020,42 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Binding_ClusterRevision(chip
 }
 
 // End of Cluster Binding
+// Cluster BooleanState
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_BooleanState_StateValue(chip::Controller::Device * device,
+                                                                            chip::EndpointId ZCLendpointId,
+                                                                            chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BooleanStateCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeStateValue(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_BooleanState_StateValue(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId,
+                                                                                 uint16_t minInterval, uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BooleanStateCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .SubscribeAttributeStateValue(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                      maxInterval)
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_BooleanState_ClusterRevision(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId,
+                                                                                 chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BooleanStateCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster BooleanState
 // Cluster BridgedDeviceBasic
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(chip::Controller::Device * device,
