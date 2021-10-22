@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-infineon:0.5.18
+            image: connectedhomeip/chip-build-infineon:0.5.20
 
         steps:
             - name: Checkout
