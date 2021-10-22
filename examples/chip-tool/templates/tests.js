@@ -130,6 +130,7 @@ function getTests()
     'TestDelayCommands',
     'TestLogCommands',
     'TestDescriptorCluster',
+    'TestBasicInformation',
     'TestOperationalCredentialsCluster',
   ];
 

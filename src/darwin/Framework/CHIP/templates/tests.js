@@ -114,6 +114,7 @@ function getTests()
     'TestConstraints',
     'TestDelayCommands',
     'TestDescriptorCluster',
+    'TestBasicInformation',
     'TestOperationalCredentialsCluster',
   ];
 

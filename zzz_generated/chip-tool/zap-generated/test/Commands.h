@@ -17224,6 +17224,179 @@ private:
     }
 };
 
+class TestBasicInformation : public TestCommand
+{
+public:
+    TestBasicInformation() : TestCommand("TestBasicInformation"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestBasicInformation\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestBasicInformation\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Read location\n");
+            err = TestReadLocation_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write location\n");
+            err = TestWriteLocation_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read back location\n");
+            err = TestReadBackLocation_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Restore initial location value\n");
+            err = TestRestoreInitialLocationValue_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan location)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan location)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan location)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan location)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_0(location);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_1(location);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_2(location);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_3(location);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadLocation_0()
+    {
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeLocation(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, ""));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteLocation_1()
+    {
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        chip::ByteSpan locationArgument = chip::ByteSpan(chip::Uint8::from_const_char("us"), strlen("us"));
+
+        return cluster.WriteAttributeLocation(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), locationArgument);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(chip::CharSpan location) { NextTest(); }
+
+    CHIP_ERROR TestReadBackLocation_2()
+    {
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeLocation(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, "us"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRestoreInitialLocationValue_3()
+    {
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        chip::ByteSpan locationArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+
+        return cluster.WriteAttributeLocation(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel(), locationArgument);
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(chip::CharSpan location) { NextTest(); }
+};
+
 class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
@@ -17690,6 +17863,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestDelayCommands>(),
         make_unique<TestLogCommands>(),
         make_unique<TestDescriptorCluster>(),
+        make_unique<TestBasicInformation>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestSubscribe_OnOff>(),
     };
