@@ -88,6 +88,21 @@ public:
     virtual const char * GetR2ISessionInfo() const = 0;
 
 protected:
+    // TODO - Move EstimateTLVStructOverhead to CHIPTLV header file
+    static constexpr size_t EstimateTLVStructOverhead()
+    {
+        // The struct itself has a control byte and an end-of-struct marker.
+        return 2;
+    }
+
+    template <typename... FieldSizes>
+    static constexpr size_t EstimateTLVStructOverhead(size_t firstFieldSize, FieldSizes... otherFields)
+    {
+        // Conservatively estimate 8 bytes of overhead per field.  We should be
+        // able to do better...
+        return firstFieldSize + 8 + EstimateTLVStructOverhead(otherFields...);
+    }
+
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
