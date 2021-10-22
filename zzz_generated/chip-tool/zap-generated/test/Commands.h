@@ -17355,7 +17355,7 @@ private:
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        chip::ByteSpan locationArgument = chip::ByteSpan(chip::Uint8::from_const_char("us"), strlen("us"));
+        chip::CharSpan locationArgument = chip::CharSpan("us", strlen("us"));
 
         return cluster.WriteAttributeLocation(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), locationArgument);
     }
@@ -17385,7 +17385,7 @@ private:
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        chip::ByteSpan locationArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        chip::CharSpan locationArgument = chip::CharSpan("", strlen(""));
 
         return cluster.WriteAttributeLocation(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel(), locationArgument);
     }
