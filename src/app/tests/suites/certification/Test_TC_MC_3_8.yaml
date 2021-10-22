@@ -19,12 +19,11 @@ config:
     endpoint: 1
 
 tests:
+    # TODO: Enable test and update response value when SDK supports.
     - label: "Read attribute media input list"
+      disabled: true
       command: "readAttribute"
       attribute: "media input list"
       response:
           value:
-              [
-                  { index: 1, inputType: 4, name: 12, description: 19 },
-                  { index: 2, inputType: 4, name: 12, description: 19 },
-              ]
+              []

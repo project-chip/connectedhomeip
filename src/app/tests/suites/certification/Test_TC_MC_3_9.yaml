@@ -19,14 +19,17 @@ config:
     endpoint: 1
 
 tests:
+    # Remove disable flag when SDK supports command.
     - label: "Select Input Command"
+      disabled: true
       command: "SelectInput"
       arguments:
           values:
               - name: "index"
                 value: 1
-
+    # Remove disable flag when SDK supports attribute.
     - label: "Read current input list"
+      disabled: true
       command: "readAttribute"
       attribute: "current media input"
       response:
