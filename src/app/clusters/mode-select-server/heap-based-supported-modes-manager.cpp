@@ -2,8 +2,8 @@
 // Created by Ding, Li-an on 10/21/21.
 //
 #include <app/clusters/mode-select-server/heap-based-supported-modes-manager.h>
-#include <vector>
 #include <map>
+#include <vector>
 
 using namespace std;
 using namespace chip;
@@ -26,8 +26,7 @@ HeapBasedSupportedModesManager::Builder::addSupportedMode(EndpointId endpointId,
 }
 
 HeapBasedSupportedModesManager::Builder &
-HeapBasedSupportedModesManager::Builder::addSupportedMode(EndpointId endpointId,
-                                                          ModeOptionStructType && modeOptionStruct)
+HeapBasedSupportedModesManager::Builder::addSupportedMode(EndpointId endpointId, ModeOptionStructType && modeOptionStruct)
 {
     if (mSupportedModesByEndpoints.end() == mSupportedModesByEndpoints.find(endpointId))
     {
@@ -43,7 +42,7 @@ HeapBasedSupportedModesManager ModeSelectCluster::HeapBasedSupportedModesManager
 {
     map<EndpointId, const vector<ModeOptionStructType>> supportedOptions;
     for (map<EndpointId, vector<ModeOptionStructType> *>::iterator it = mSupportedModesByEndpoints.begin();
-        it != mSupportedModesByEndpoints.end(); ++it)
+         it != mSupportedModesByEndpoints.end(); ++it)
     {
         EndpointId endpointId = it->first;
 
@@ -54,14 +53,13 @@ HeapBasedSupportedModesManager ModeSelectCluster::HeapBasedSupportedModesManager
     return HeapBasedSupportedModesManager(supportedOptions);
 }
 
-const vector<ModeOptionStructType>
-HeapBasedSupportedModesManager::getSupportedModesForEndpoint(EndpointId endpoint) const
+const vector<ModeOptionStructType> HeapBasedSupportedModesManager::getSupportedModesForEndpoint(EndpointId endpoint) const
 {
     return _supportedModesForAllEndpoints.at(endpoint);
 };
 
-EmberAfStatus HeapBasedSupportedModesManager::getModeOptionByMode(
-    unsigned short endpointId, unsigned char mode, const ModeOptionStructType *& dataPtr) const
+EmberAfStatus HeapBasedSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
+                                                                  const ModeOptionStructType *& dataPtr) const
 {
     const vector<ModeOptionStructType> & supportedModeOptions = this->getSupportedModesForEndpoint(endpointId);
     for (uint i = 0u; i < supportedModeOptions.size(); i++)

@@ -19,24 +19,25 @@
 #pragma once
 
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
-#include <vector>
 #include <map>
+#include <vector>
 
-namespace chip{
-namespace app{
-namespace Clusters{
-namespace ModeSelectCluster{
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ModeSelectCluster {
 
 /**
  * This implementation uses the heap to store the supported options
  */
-class HeapBasedSupportedModesManager: public chip::app::Clusters::ModeSelectCluster::SupportedModesManager
+class HeapBasedSupportedModesManager : public chip::app::Clusters::ModeSelectCluster::SupportedModesManager
 {
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 
 public:
     /**
-     * A builder for HeapBasedSupportedModesManager, for conveniently injecting the supported options and building the SupportedModesManager.
+     * A builder for HeapBasedSupportedModesManager, for conveniently injecting the supported options and building the
+     * SupportedModesManager.
      */
     class Builder
     {
@@ -59,21 +60,20 @@ public:
         std::map<EndpointId, std::vector<ModeOptionStructType> *> mSupportedModesByEndpoints;
     };
 
-
     const std::vector<ModeOptionStructType> getSupportedModesForEndpoint(EndpointId endpointId) const override;
 
     EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType *& dataPtr) const override;
 
-
 private:
     HeapBasedSupportedModesManager(std::map<EndpointId, const std::vector<ModeOptionStructType>> supportedModes) :
-        _supportedModesForAllEndpoints(supportedModes) {}
+        _supportedModesForAllEndpoints(supportedModes)
+    {}
     // TODO: Implement move constructor?
 
     // endpoint index -> **ModeOptionStruct;
     std::map<EndpointId, const std::vector<ModeOptionStructType>> _supportedModesForAllEndpoints;
 };
-}
-}
-}
-}
+} // namespace ModeSelectCluster
+} // namespace Clusters
+} // namespace app
+} // namespace chip

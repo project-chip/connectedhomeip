@@ -27,7 +27,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/basic-types.h>
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -42,7 +41,6 @@ class SupportedModesManager
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 
 public:
-
     /**
      * Given the endpointId, returns all its supported modes options.
      * @param endpointId
@@ -59,10 +57,8 @@ public:
      */
     virtual EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType *& dataPtr) const = 0;
 
-    virtual ~SupportedModesManager() {};
-
+    virtual ~SupportedModesManager(){};
 };
-
 
 } // namespace ModeSelectCluster
 } // namespace Clusters

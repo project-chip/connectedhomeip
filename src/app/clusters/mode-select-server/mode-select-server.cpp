@@ -70,12 +70,13 @@ ModeSelectCluster::Structs::ModeOptionStruct::Type option1 = buildModeOptionStru
 ModeSelectCluster::Structs::ModeOptionStruct::Type option2 = buildModeOptionStruct("White", 5, 4, 0);
 ModeSelectCluster::Structs::ModeOptionStruct::Type option3 = buildModeOptionStruct("Half-and-half", 13, 7, 0);
 
-const ModeSelectCluster::HeapBasedSupportedModesManager & gSupportedModeManager = ModeSelectCluster::HeapBasedSupportedModesManager::Builder()
-                                                                             // TODO: Add as many ModeOptions as necessary.
-                                                                             .addSupportedMode((EndpointId) 0u, option1)
-                                                                             .addSupportedMode((EndpointId) 0u, option2)
-                                                                             .addSupportedMode((EndpointId) 0u, option3)
-                                                                             .build();
+const ModeSelectCluster::HeapBasedSupportedModesManager & gSupportedModeManager =
+    ModeSelectCluster::HeapBasedSupportedModesManager::Builder()
+        // TODO: Add as many ModeOptions as necessary.
+        .addSupportedMode((EndpointId) 0u, option1)
+        .addSupportedMode((EndpointId) 0u, option2)
+        .addSupportedMode((EndpointId) 0u, option3)
+        .build();
 
 CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -91,7 +92,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
             gSupportedModeManager.getSupportedModesForEndpoint(aPath.mEndpointId);
         CHIP_ERROR err;
         err = aEncoder.EncodeList([supportedOptions](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-            for (auto  modeOption: supportedOptions)
+            for (auto modeOption : supportedOptions)
             {
                 ReturnErrorOnFailure(encoder.Encode(modeOption));
             }
@@ -122,7 +123,6 @@ bool emberAfModeSelectClusterClusterChangeToModeCallback(
     }
     ModeSelectCluster::Attributes::CurrentMode::Set(endpointId, newMode);
     // TODO: Implement application logic
-
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: ChangeToMode successful");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
