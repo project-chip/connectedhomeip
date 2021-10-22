@@ -376,7 +376,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     // If we did not have a namespace provided, we can assume we're inside
     // chip::app.
     let listNamespace = options.hash.ns ? "chip::app::" : ""
-    promise = promise.then(typeStr => `${listNamespace}DataModel::${listType}<${typeStr}>`);
+    promise           = promise.then(typeStr => `${listNamespace}DataModel::${listType}<${typeStr}>`);
   }
   return templateUtil.templatePromise(this.global, promise)
 }
