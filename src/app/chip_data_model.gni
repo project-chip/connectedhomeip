@@ -144,8 +144,8 @@ template("chip_data_model") {
         ]
       } else if (cluster == "mode-select-server") {
         sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/heap-based-supported-modes-manager.cpp",
-          "${_app_root}/clusters/${cluster}/${cluster}.cpp"
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
