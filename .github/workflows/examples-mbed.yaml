@@ -82,6 +82,15 @@ jobs:
                     examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lighting-app-example.elf \
                     /tmp/bloat_reports/
 
+            - name: Build pigweed-app example
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/mbed_example.sh -a=pigweed-app -b=$APP_TARGET -p=$APP_PROFILE
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    mbed $APP_TARGET+$APP_PROFILE pigweed-app \
+                    examples/pigweed-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-pigweed-app-example.elf \
+                    /tmp/bloat_reports/
+
             - name: Build unit tests
               timeout-minutes: 10
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE

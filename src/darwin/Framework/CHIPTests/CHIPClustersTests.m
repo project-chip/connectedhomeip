@@ -8930,6 +8930,93 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTestBasicInformation_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read location"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeLocationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read location Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        NSString * locationArgument = @"";
+        XCTAssertTrue([values[@"value"] isEqualToString:locationArgument]);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestBasicInformation_000001_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write location"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    NSString * locationArgument = @"us";
+    [cluster writeAttributeLocationWithValue:locationArgument
+                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                 NSLog(@"Write location Error: %@", err);
+
+                                 XCTAssertEqual(err.code, 0);
+
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestBasicInformation_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back location"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeLocationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read back location Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        NSString * locationArgument = @"us";
+        XCTAssertTrue([values[@"value"] isEqualToString:locationArgument]);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestBasicInformation_000003_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Restore initial location value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    NSString * locationArgument = @"";
+    [cluster writeAttributeLocationWithValue:locationArgument
+                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                 NSLog(@"Restore initial location value Error: %@", err);
+
+                                 XCTAssertEqual(err.code, 0);
+
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTestOperationalCredentialsCluster_000000_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read number of supported fabrics"];

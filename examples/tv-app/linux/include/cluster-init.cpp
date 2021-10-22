@@ -19,7 +19,6 @@
 #include "application-basic/ApplicationBasicManager.h"
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
-#include "cluster-util/ClusterManager.h"
 #include "content-launcher/ContentLauncherManager.h"
 #include "media-input/MediaInputManager.h"
 #include "target-navigator/TargetNavigatorManager.h"

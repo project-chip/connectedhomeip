@@ -123,8 +123,8 @@ void OnConnection(void * context, Device * device)
     constexpr uint16_t kExampleSoftwareVersion = 0;
     constexpr uint8_t kExampleProtocolsSupported =
         EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS; // TODO: support this as a list once ember adds list support
-    const uint8_t locationBuf[] = { 'U', 'S' };
-    ByteSpan exampleLocation(locationBuf);
+    const char locationBuf[] = { 'U', 'S' };
+    CharSpan exampleLocation(locationBuf);
     constexpr bool kExampleClientCanConsent = false;
     ByteSpan metadata;
 

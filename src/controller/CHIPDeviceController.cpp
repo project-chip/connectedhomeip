@@ -1950,7 +1950,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         {
             ChipLogError(Controller, "Unable to find country code, defaulting to WW");
         }
-        chip::ByteSpan countryCode(reinterpret_cast<uint8_t *>(countryCodeStr), actualCountryCodeSize);
+        chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
