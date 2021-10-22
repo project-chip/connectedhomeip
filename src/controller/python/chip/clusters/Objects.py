@@ -6329,7 +6329,7 @@ class GeneralDiagnostics:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=0, Type=bytes),
+                            Label="Name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(
                             Label="FabricConnected", Tag=1, Type=bool),
                         ClusterObjectFieldDescriptor(
@@ -6495,7 +6495,7 @@ class SoftwareDiagnostics:
                         ClusterObjectFieldDescriptor(
                             Label="Id", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=1, Type=bytes),
+                            Label="Name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(
                             Label="StackFreeCurrent", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -8496,7 +8496,7 @@ class OperationalCredentials:
                         ClusterObjectFieldDescriptor(
                             Label="NodeId", Tag=4, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Label", Tag=5, Type=bytes),
+                            Label="Label", Tag=5, Type=str),
                     ])
 
             FabricIndex: 'uint' = None
@@ -8677,7 +8677,7 @@ class OperationalCredentials:
                         ClusterObjectFieldDescriptor(
                             Label="FabricIndex", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="DebugText", Tag=2, Type=bytes),
+                            Label="DebugText", Tag=2, Type=str),
                     ])
 
             StatusCode: 'uint' = None
@@ -8836,9 +8836,9 @@ class FixedLabel:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="Label", Tag=0, Type=bytes),
+                            Label="Label", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="Value", Tag=1, Type=bytes),
+                            Label="Value", Tag=1, Type=str),
                     ])
 
             Label: 'str' = None
@@ -14230,11 +14230,6 @@ class BallastConfiguration:
 class IlluminanceMeasurement:
     id: typing.ClassVar[int] = 0x0400
 
-    class Enums:
-        class LightSensorType(IntEnum):
-            kPhotodiode = 0x00
-            kCmos = 0x01
-
     class Attributes:
         class MeasuredValue(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -14318,6 +14313,77 @@ class IlluminanceMeasurement:
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0400
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+
+@dataclass
+class IlluminanceLevelSensing:
+    id: typing.ClassVar[int] = 0x0401
+
+    class Attributes:
+        class LevelStatus(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0401
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+        class LightSensorType(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0401
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+        class IlluminanceLevelTarget(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0401
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0010
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0401
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0401
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -18343,11 +18409,11 @@ class TvChannel:
                         ClusterObjectFieldDescriptor(
                             Label="MinorNumber", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=2, Type=bytes),
+                            Label="Name", Tag=2, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="CallSign", Tag=3, Type=bytes),
+                            Label="CallSign", Tag=3, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="AffiliateCallSign", Tag=4, Type=bytes),
+                            Label="AffiliateCallSign", Tag=4, Type=str),
                     ])
 
             MajorNumber: 'uint' = None
@@ -18531,7 +18597,7 @@ class TargetNavigator:
                         ClusterObjectFieldDescriptor(
                             Label="Identifier", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=1, Type=bytes),
+                            Label="Name", Tag=1, Type=str),
                     ])
 
             Identifier: 'uint' = None
@@ -19125,9 +19191,9 @@ class MediaInput:
                         ClusterObjectFieldDescriptor(
                             Label="InputType", Tag=1, Type=MediaInput.Enums.MediaInputType),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=2, Type=bytes),
+                            Label="Name", Tag=2, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="Description", Tag=3, Type=bytes),
+                            Label="Description", Tag=3, Type=str),
                     ])
 
             Index: 'uint' = None
@@ -19726,7 +19792,7 @@ class AudioOutput:
                         ClusterObjectFieldDescriptor(
                             Label="OutputType", Tag=1, Type=AudioOutput.Enums.AudioOutputType),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=2, Type=bytes),
+                            Label="Name", Tag=2, Type=str),
                     ])
 
             Index: 'uint' = None
