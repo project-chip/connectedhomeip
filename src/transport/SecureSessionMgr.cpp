@@ -181,7 +181,7 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const En
     else
     {
         auto unauthenticated = session.GetUnauthenticatedSession();
-        mUnauthenticatedSessions.MarkSessionActive(unauthenticated.Get());
+        mUnauthenticatedSessions.MarkSessionActive(unauthenticated);
         destination = &unauthenticated->GetPeerAddress();
 
         ChipLogProgress(Inet, "Sending %s msg %p to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec", "plaintext",
@@ -329,13 +329,14 @@ void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System
 void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                        System::PacketBufferHandle && msg)
 {
-    Transport::UnauthenticatedSession * session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
-    if (session == nullptr)
+    Optional<Transport::UnauthenticatedSessionHandle> optionalSession = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
+    if (!optionalSession.HasValue())
     {
         ChipLogError(Inet, "UnauthenticatedSession exhausted");
         return;
     }
 
+    Transport::UnauthenticatedSessionHandle session      = optionalSession.Value();
     SecureSessionMgrDelegate::DuplicateMessage isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::No;
 
     // Verify message counter
@@ -348,7 +349,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
     }
     VerifyOrDie(err == CHIP_NO_ERROR);
 
-    mUnauthenticatedSessions.MarkSessionActive(*session);
+    mUnauthenticatedSessions.MarkSessionActive(session);
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
@@ -357,8 +358,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
 
     if (mCB != nullptr)
     {
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(Transport::UnauthenticatedSessionHandle(*session)),
-                               peerAddress, isDuplicate, std::move(msg));
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(session), peerAddress, isDuplicate, std::move(msg));
     }
 }
 
