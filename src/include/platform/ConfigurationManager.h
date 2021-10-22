@@ -80,7 +80,7 @@ public:
     virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                                    = 0;
     virtual CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) = 0;
     virtual CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize)                        = 0;
-    virtual CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev)                                  = 0;
+    virtual CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev)                                  = 0;
     virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode)                                     = 0;
     virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
