@@ -352,7 +352,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
     // Ensure that station mode is enabled.
     wifi_on(RTW_MODE_STA);
-    
+
     // Ensure that station mode is enabled in the WiFi layer.
     wifi_set_mode(RTW_MODE_STA);;
 
@@ -418,7 +418,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
         DriveStationState();
-        DHCPProcess();   
+        DHCPProcess();
     }
 #endif
 }

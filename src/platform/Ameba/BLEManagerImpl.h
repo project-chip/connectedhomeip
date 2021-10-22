@@ -128,7 +128,7 @@ private:
     CHIPoBLEConState mBleConnections[kMaxConnections];
 
     CHIPoBLEServiceMode mServiceMode;
-    
+
     uint16_t mNumGAPCons;
     uint16_t mTXCharCCCDAttrHandle;
     uint16_t mSubscribedConIds[kMaxConnections];
@@ -150,10 +150,10 @@ private:
     CHIP_ERROR SetSubscribed(uint16_t conId);
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
-    
+
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle);
-    
+
     BLEManagerImpl::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
     static CHIP_ERROR ble_svr_gap_msg_event(void *param, T_IO_MSG *p_gap_msg);
     static CHIP_ERROR ble_svr_gap_event(void *param, int cb_type, void *p_cb_data);

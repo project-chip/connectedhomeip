@@ -58,4 +58,3 @@ void LEDWidget::DoSet(bool state)
        gpio_write(&gpio_led, state);
     }
 }
-

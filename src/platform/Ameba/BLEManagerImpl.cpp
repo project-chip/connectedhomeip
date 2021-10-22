@@ -405,7 +405,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (deviceName != NULL && deviceName[0] != 0)
@@ -482,7 +482,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     ChipLogProgress(DeviceLayer, "Updating advertising data");
     StartAdvertising();
     break;
-    
+
     default:
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent default:  event->Type = %d", event->Type);
         break;
@@ -550,7 +550,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     //struct os_mbuf * om;
-    
+
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
     server_send_data(conId, bt_matter_adapter_service_id, BT_MATTER_ADAPTER_SERVICE_CHAR_NOTIFY_CCCD_INDEX-1, data->Start(), data->DataLength(), GATT_PDU_TYPE_NOTIFICATION);
 
@@ -636,7 +636,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = ConfigureAdvertisingData();		
+    err = ConfigureAdvertisingData();
     SuccessOrExit(err);
 
     //Start advertising
@@ -922,7 +922,7 @@ CHIP_ERROR BLEManagerImpl::ble_svr_gap_event(void *param, int cb_type, void *p_c
 #endif
 		case GAP_MSG_LE_MODIFY_WHITE_LIST:
 			break;
-	
+
 		default:
 			break;
 		}
