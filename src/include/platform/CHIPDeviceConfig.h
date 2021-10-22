@@ -696,7 +696,7 @@
  * Amount of services available for advertising using SRP.
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
-#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_DEVICE_ADMINS + 1)
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES 3
 #endif
 
 /**
