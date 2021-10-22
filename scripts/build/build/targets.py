@@ -143,12 +143,7 @@ def AndroidTargets():
     yield target.Extend('x64-chip-tool', board=AndroidBoard.X64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('x86-chip-tool', board=AndroidBoard.X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('arm64-chip-test', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TEST)
-    # TODO: android studio build is broken:
-    #   - When compile succeeds, build artifact copy fails with "No such file or
-    #     directory: '<out_prefix>/android-androidstudio-chip-tool/outputs/apk/debug/app-debug.apk'
-    #   - Compiling locally in the vscode image fails with
-    #     "2 files found with path 'lib/armeabi-v7a/libCHIPController.so'"
-    # yield target.Extend('androidstudio-chip-tool', board=AndroidBoard.AndroidStudio, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('androidstudio-chip-tool', board=AndroidBoard.AndroidStudio, app=AndroidApp.CHIP_TOOL)
 
 
 ALL = []

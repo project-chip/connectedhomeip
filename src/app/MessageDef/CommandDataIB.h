@@ -17,14 +17,14 @@
  */
 /**
  *    @file
- *      This file defines CommandDataElement parser and builder in CHIP interaction model
+ *      This file defines CommandDataIB parser and builder in CHIP interaction model
  *
  */
 
 #pragma once
 
 #include "Builder.h"
-#include "CommandPath.h"
+#include "CommandPathIB.h"
 
 #include "Parser.h"
 #include "StatusIB.h"
@@ -38,7 +38,7 @@
 
 namespace chip {
 namespace app {
-namespace CommandDataElement {
+namespace CommandDataIB {
 enum
 {
     kCsTag_CommandPath = 0,
@@ -52,7 +52,7 @@ public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandDataElement
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandDataIB
      *
      *  @return #CHIP_NO_ERROR on success
      */
@@ -76,7 +76,7 @@ public:
 #endif
 
     /**
-     *  @brief Get a TLVReader for the CommandPath. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the CommandPathIB. Next() must be called before accessing them.
      *
      *  @param [in] apCommandPath    A pointer to apCommandPath
      *
@@ -84,7 +84,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetCommandPath(CommandPath::Parser * const apCommandPath) const;
+    CHIP_ERROR GetCommandPath(CommandPathIB::Parser * const apCommandPath) const;
 
     /**
      *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
@@ -125,11 +125,11 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Initialize a CommandPath::Builder for writing into the TLV stream
+     *  @brief Initialize a CommandPathIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to CommandPath::Builder
+     *  @return A reference to CommandPathIB::Builder
      */
-    CommandPath::Builder & CreateCommandPathBuilder();
+    CommandPathIB::Builder & CreateCommandPathBuilder();
 
     /**
      *  @brief Initialize a StatusIB::Builder for writing into the TLV stream
@@ -139,16 +139,16 @@ public:
     StatusIB::Builder & CreateStatusIBBuilder();
 
     /**
-     *  @brief Mark the end of this CommandDataElement
+     *  @brief Mark the end of this CommandDataIB
      *
      *  @return A reference to *this
      */
-    CommandDataElement::Builder & EndOfCommandDataElement();
+    CommandDataIB::Builder & EndOfCommandDataIB();
 
 private:
-    CommandPath::Builder mCommandPathBuilder;
+    CommandPathIB::Builder mCommandPathBuilder;
     StatusIB::Builder mStatusIBBuilder;
 };
-}; // namespace CommandDataElement
+}; // namespace CommandDataIB
 }; // namespace app
 }; // namespace chip

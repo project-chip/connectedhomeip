@@ -196,13 +196,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadError(chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         mReadError = true;
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ReadDone(chip::app::ReadClient * apReadClient) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR SubscriptionEstablished(const chip::app::ReadHandler * apReadHandler) override
     {

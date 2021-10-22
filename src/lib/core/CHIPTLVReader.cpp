@@ -298,6 +298,19 @@ CHIP_ERROR TLVReader::Get(ByteSpan & v)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TLVReader::Get(CharSpan & v)
+{
+    if (!TLVTypeIsUTF8String(ElementType()))
+    {
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+
+    const uint8_t * bytes;
+    ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
+    v = CharSpan(Uint8::to_const_char(bytes), GetLength());
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, size_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))
@@ -949,15 +962,7 @@ CHIP_ERROR ContiguousBufferTLVReader::OpenContainer(ContiguousBufferTLVReader & 
 
 CHIP_ERROR ContiguousBufferTLVReader::GetStringView(Span<const char> & data)
 {
-    if (!TLVTypeIsUTF8String(ElementType()))
-    {
-        return CHIP_ERROR_WRONG_TLV_TYPE;
-    }
-
-    const uint8_t * bytes;
-    ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
-    data = Span<const char>(Uint8::to_const_char(bytes), GetLength());
-    return CHIP_NO_ERROR;
+    return Get(data);
 }
 
 CHIP_ERROR ContiguousBufferTLVReader::GetByteView(ByteSpan & data)

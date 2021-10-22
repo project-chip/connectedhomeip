@@ -55,7 +55,7 @@ System::SocketEvents SocketEventsFromLibeventFlags(short eventFlags)
 
 CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
 {
-    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterPOSIXErrorFormatter();
 
@@ -83,7 +83,7 @@ CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
 
     Mutex::Init(mTimerListMutex);
 
-    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
@@ -111,7 +111,7 @@ void LayerImplLibevent::MdnsTimeoutCallbackHandler()
 
 CHIP_ERROR LayerImplLibevent::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
 
     event_base_loopbreak(mEventBase);
 
@@ -133,6 +133,7 @@ CHIP_ERROR LayerImplLibevent::Shutdown()
     mEventBase   = nullptr;
     mSystemLayer = nullptr;
 
+    mLayerState.SetShutdown();
     mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
@@ -163,7 +164,7 @@ void LayerImplLibevent::Signal()
     }
 }
 
-CHIP_ERROR LayerImplLibevent::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplLibevent::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -180,9 +181,9 @@ CHIP_ERROR LayerImplLibevent::StartTimer(uint32_t delayMilliseconds, TimerComple
     VerifyOrReturnError(e != nullptr, CHIP_ERROR_NO_MEMORY);
     timer->mEvent = e;
 
-    timeval delay;
-    Clock::MillisecondsToTimeval(delayMilliseconds, delay);
-    int status = evtimer_add(e, &delay);
+    timeval tv;
+    Clock::ToTimeval(delay, tv);
+    int status = evtimer_add(e, &tv);
     VerifyOrReturnError(status == 0, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -209,7 +210,7 @@ CHIP_ERROR LayerImplLibevent::ScheduleWork(TimerCompleteCallback onComplete, voi
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    return StartTimer(0, onComplete, appState);
+    return StartTimer(Clock::Zero, onComplete, appState);
 }
 
 // static

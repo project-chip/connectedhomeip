@@ -90,7 +90,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 }
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+                                                  uint8_t type, uint16_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);
@@ -217,7 +217,7 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 
     if (identifyTimerCount)
     {
-        systemLayer->StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
+        systemLayer->StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, appState);
         // Decrement the timer count.
         identifyTimerCount--;
     }
@@ -236,7 +236,7 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
     identifyTimerCount = (*value) * 4;
 
     DeviceLayer::SystemLayer().CancelTimer(IdentifyTimerHandler, this);
-    DeviceLayer::SystemLayer().StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
+    DeviceLayer::SystemLayer().StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, this);
 
 exit:
     return;

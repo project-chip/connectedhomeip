@@ -78,13 +78,13 @@ ip_addr_t IPAddress::ToLwIPAddr(void) const
     switch (Type())
     {
 #if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4:
+    case IPAddressType::kIPv4:
         IP_SET_TYPE_VAL(ret, IPADDR_TYPE_V4);
         *ip_2_ip4(&ret) = IPAddress::ToIPv4();
         break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    case kIPAddressType_IPv6:
+    case IPAddressType::kIPv6:
         IP_SET_TYPE_VAL(ret, IPADDR_TYPE_V6);
         *ip_2_ip6(&ret) = IPAddress::ToIPv6();
         break;
@@ -132,12 +132,12 @@ lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)
     switch (typ)
     {
 #if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4:
+    case IPAddressType::kIPv4:
         ret = IPADDR_TYPE_V4;
         break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    case kIPAddressType_IPv6:
+    case IPAddressType::kIPv6:
         ret = IPADDR_TYPE_V6;
         break;
 
@@ -321,12 +321,12 @@ uint64_t IPAddress::GlobalId() const
 IPAddressType IPAddress::Type() const
 {
     if (Addr[0] == 0 && Addr[1] == 0 && Addr[2] == 0 && Addr[3] == 0)
-        return kIPAddressType_Any;
+        return IPAddressType::kAny;
 #if INET_CONFIG_ENABLE_IPV4
     if (Addr[0] == 0 && Addr[1] == 0 && Addr[2] == htonl(0xFFFF))
-        return kIPAddressType_IPv4;
+        return IPAddressType::kIPv4;
 #endif // INET_CONFIG_ENABLE_IPV4
-    return kIPAddressType_IPv6;
+    return IPAddressType::kIPv6;
 }
 
 // Encode IPAddress to buffer in network byte order. Buffer must have at least 128 bits of available space.
@@ -382,10 +382,11 @@ IPAddress IPAddress::MakeLLA(uint64_t interfaceId)
     return addr;
 }
 
-IPAddress IPAddress::MakeIPv6Multicast(uint8_t aFlags, uint8_t aScope,
+IPAddress IPAddress::MakeIPv6Multicast(IPv6MulticastFlags aFlags, uint8_t aScope,
                                        const uint8_t aGroupId[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES])
 {
-    const uint32_t lFlagsAndScope = (((uint32_t(aFlags) & 0xF) << 20) | ((uint32_t(aScope) & 0xF) << 16));
+    const uint32_t lFlagsAndScope =
+        (((static_cast<uint32_t>(aFlags.Raw()) & 0xF) << 20) | ((static_cast<uint32_t>(aScope) & 0xF) << 16));
     IPAddress addr;
 
     addr.Addr[0] = htonl((0xFF000000U | lFlagsAndScope) | (uint32_t(aGroupId[0]) << 8) | (uint32_t(aGroupId[1]) << 0));
@@ -399,7 +400,7 @@ IPAddress IPAddress::MakeIPv6Multicast(uint8_t aFlags, uint8_t aScope,
     return addr;
 }
 
-IPAddress IPAddress::MakeIPv6Multicast(uint8_t aFlags, uint8_t aScope, uint32_t aGroupId)
+IPAddress IPAddress::MakeIPv6Multicast(IPv6MulticastFlags aFlags, uint8_t aScope, uint32_t aGroupId)
 {
     const uint8_t lGroupId[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES] = { 0,
                                                                       0,
@@ -421,23 +422,22 @@ IPAddress IPAddress::MakeIPv6Multicast(uint8_t aFlags, uint8_t aScope, uint32_t 
 
 IPAddress IPAddress::MakeIPv6WellKnownMulticast(uint8_t aScope, uint32_t aGroupId)
 {
-    const uint8_t lFlags = 0;
+    constexpr IPv6MulticastFlags lFlags;
 
     return (MakeIPv6Multicast(lFlags, aScope, aGroupId));
 }
 
-IPAddress IPAddress::MakeIPv6TransientMulticast(uint8_t aFlags, uint8_t aScope,
+IPAddress IPAddress::MakeIPv6TransientMulticast(IPv6MulticastFlags aFlags, uint8_t aScope,
                                                 const uint8_t aGroupId[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES])
 {
-    const uint8_t lFlags = (aFlags | kIPv6MulticastFlag_Transient);
-
-    return (MakeIPv6Multicast(lFlags, aScope, aGroupId));
+    aFlags.Set(IPv6MulticastFlag::kTransient);
+    return (MakeIPv6Multicast(aFlags, aScope, aGroupId));
 }
 
 IPAddress IPAddress::MakeIPv6PrefixMulticast(uint8_t aScope, uint8_t aPrefixLength, const uint64_t & aPrefix, uint32_t aGroupId)
 {
     const uint8_t lReserved                                       = 0;
-    const uint8_t lFlags                                          = kIPv6MulticastFlag_Prefix;
+    const IPv6MulticastFlags lFlags                               = IPv6MulticastFlag::kPrefix;
     const uint8_t lGroupId[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES] = { lReserved,
                                                                       aPrefixLength,
                                                                       static_cast<uint8_t>((aPrefix & 0xFF00000000000000ULL) >> 56),

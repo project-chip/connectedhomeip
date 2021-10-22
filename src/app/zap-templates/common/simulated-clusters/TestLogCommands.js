@@ -15,11 +15,27 @@
  *    limitations under the License.
  */
 
-#pragma once
+/*
+ * This file declares test suite utility methods for logging.
+ *
+ * Each method declared in this file needs to be implemented on a per-language
+ * basis and allows exposing  methods to the test suites that are not part
+ * of the regular cluster set of APIs.
+ *
+ */
 
-#include <app/util/af-enums.h>
+const Log = {
+  name : 'Log',
+  arguments : [ { type : 'CHAR_STRING', name : 'message' } ],
+  response : { arguments : [] }
+};
 
-#include <lib/core/CHIPTLV.h>
-#include <lib/support/SafeInt.h>
+const LogCommands = {
+  name : 'LogCommands',
+  commands : [ Log ],
+};
 
-EmberAfStatus PrepareListFromTLV(chip::TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen);
+//
+// Module exports
+//
+exports.LogCommands = LogCommands;

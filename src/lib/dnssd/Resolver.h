@@ -27,13 +27,12 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
+#include <lib/dnssd/Constants.h>
 #include <lib/support/BytesToHex.h>
 
 namespace chip {
 namespace Dnssd {
 
-// Largest host name is 64-bits in hex.
-static constexpr int kMaxHostNameSize      = 16;
 constexpr uint32_t kUndefinedRetryInterval = std::numeric_limits<uint32_t>::max();
 
 struct ResolvedNodeData
@@ -41,7 +40,7 @@ struct ResolvedNodeData
     void LogNodeIdResolved()
     {
 #if CHIP_PROGRESS_LOGGING
-        char addrBuffer[Inet::kMaxIPAddressStringLength + 1];
+        char addrBuffer[Inet::IPAddress::kMaxStringLength + 1];
         mAddress.ToString(addrBuffer);
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
@@ -63,26 +62,25 @@ struct ResolvedNodeData
     }
 
     PeerId mPeerId;
-    Inet::IPAddress mAddress             = Inet::IPAddress::Any;
-    Inet::InterfaceId mInterfaceId       = INET_NULL_INTERFACEID;
-    uint16_t mPort                       = 0;
-    char mHostName[kMaxHostNameSize + 1] = {};
-    bool mSupportsTcp                    = false;
-    uint32_t mMrpRetryIntervalIdle       = kUndefinedRetryInterval;
-    uint32_t mMrpRetryIntervalActive     = kUndefinedRetryInterval;
+    Inet::IPAddress mAddress               = Inet::IPAddress::Any;
+    Inet::InterfaceId mInterfaceId         = INET_NULL_INTERFACEID;
+    uint16_t mPort                         = 0;
+    char mHostName[kHostNameMaxLength + 1] = {};
+    bool mSupportsTcp                      = false;
+    uint32_t mMrpRetryIntervalIdle         = kUndefinedRetryInterval;
+    uint32_t mMrpRetryIntervalActive       = kUndefinedRetryInterval;
 };
 
 constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
 constexpr size_t kMaxPairingInstructionLen = 128;
 
-static constexpr int kMaxInstanceNameSize = 16;
 struct DiscoveredNodeData
 {
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
-    char hostName[kMaxHostNameSize + 1];
-    char instanceName[kMaxInstanceNameSize + 1];
+    char hostName[kHostNameMaxLength + 1];
+    char instanceName[Commissionable::kInstanceNameMaxLength + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
@@ -185,7 +183,7 @@ struct DiscoveredNodeData
         for (int j = 0; j < numIPs; j++)
         {
 #if CHIP_DETAIL_LOGGING
-            char buf[Inet::kMaxIPAddressStringLength];
+            char buf[Inet::IPAddress::kMaxStringLength];
             char * ipAddressOut = ipAddress[j].ToString(buf);
             ChipLogDetail(Discovery, "\tIP Address #%d: %s", j + 1, ipAddressOut);
             (void) ipAddressOut;

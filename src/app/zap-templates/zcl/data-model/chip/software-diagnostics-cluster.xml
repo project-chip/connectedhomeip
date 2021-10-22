@@ -19,8 +19,7 @@ limitations under the License.
   <struct name="ThreadMetrics">
     <cluster code="0x0034"/>
     <item name="Id" type="INT64U"/>
-    <!-- TODO: CHAR_STRING not supported yet in structs. -->
-    <item name="Name" type="OCTET_STRING" length="8"/>
+    <item name="Name" type="CHAR_STRING" length="8"/>
     <item name="StackFreeCurrent" type="INT32U"/>
     <item name="StackFreeMinimum" type="INT32U"/>
     <item name="StackSize" type="INT32U"/>

@@ -246,7 +246,7 @@ private:
 void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
 #ifdef DETAIL_LOGGING
-    char srcAddressString[chip::Inet::kMaxIPAddressStringLength];
+    char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
     VerifyOrDie(info->SrcAddress.ToString(srcAddressString) != nullptr);
     ChipLogDetail(Discovery, "Received an mDNS query from %s", srcAddressString);
 #endif
@@ -339,7 +339,7 @@ QueryResponderAllocator<AdvertiserMinMdns::kMaxOperationalRecords> * AdvertiserM
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
-    char nameBuffer[kOperationalServiceNamePrefix + 1] = "";
+    char nameBuffer[Operational::kInstanceNameMaxLength + 1] = "";
 
     /// need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
@@ -439,7 +439,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
 CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    if (maxLength < (kMaxInstanceNameSize + 1))
+    if (maxLength < (Commissionable::kInstanceNameMaxLength + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }

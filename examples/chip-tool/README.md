@@ -1,10 +1,9 @@
-# CHIP Client Example
+# Matter Client Example
 
-An example application that uses CHIP to send messages to a CHIP server.
+An example application that uses Matter to send messages to a Matter server.
 
 ---
 
--   [CHIP Client Example](#chip-client-example)
 -   [Building the Example Application](#building-the-example-application)
 -   [Using the Client to Request an Echo](#using-the-client-to-request-an-echo)
 
@@ -48,7 +47,7 @@ and choose the pairing mode.
 The command below commissions a device with the provided IP address and port of
 the server to talk to.
 
-    $ chip-tool pairing bypass 192.168.0.30 5540
+    $ chip-tool pairing bypass ${NODE_ID_TO_ASSIGN} 192.168.0.30 5540
 
 #### Commission a device over BLE
 
@@ -58,48 +57,53 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
-    $ chip-tool pairing ble-wifi ssid password 0 20202021 3840
+    $ chip-tool pairing ble-wifi ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} 0 20202021 3840
 
 where:
 
--   ssid is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX where
-    the bytes of the SSID are encoded as two-digit hex numbers.
--   password is the Wi-Fi password, again either as a string or as hex data
+-   \${NODE_ID_TO_ASSIGN} (which must be a decimal number or a 0x-prefixed hex
+    number) is the node id to assign to the node being commissioned.
+-   \${SSID} is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX
+    where the bytes of the SSID are encoded as two-digit hex numbers.
+-   \${PASSWORD} is the Wi-Fi password, again either as a string or as hex data
 -   The 0 is the fabric id, until more complete support for multiple fabrics is
     implemented in our commissioning process.
 
 For example:
 
-    $ chip-tool pairing ble-wifi xyz secret 0 20202021 3840
+    $ chip-tool pairing ble-wifi 0x11 xyz secret 0 20202021 3840
 
 or equivalently:
 
-    $ chip-tool pairing ble-wifi hex:787980 hex:736563726574 0 20202021 3840
+    $ chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 0 20202021 3840
 
 #### Pair a device over IP
 
 The command below will discover devices and try to pair with the first one it
 discovers using the provided setup code.
 
-    $ chip-tool pairing onnetwork 20202021
+    $ chip-tool pairing onnetwork ${NODE_ID_TO_ASSIGN} 20202021
 
 The command below will discover devices with long discriminator 3840 and try to
 pair with the first one it discovers using the provided setup code.
 
-    $ chip-tool pairing onnetwork-long 20202021 3840
+    $ chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840
 
 The command below will discover devices based on the given QR code (which
 devices log when they start up) and try to pair with the first one it discovers.
 
-    $ chip-tool pairing qrcode MT:#######
+    $ chip-tool pairing qrcode ${NODE_ID_TO_ASSIGN} MT:#######
+
+In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`
+(which must be a decimal number or a 0x-prefixed hex number).
 
 ### Forget the currently-commissioned device
 
     $ chip-tool pairing unpair
 
-## Using the Client to Send CHIP Commands
+## Using the Client to Send Matter Commands
 
-To use the Client to send a CHIP commands, run the built executable and pass it
+To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name as well as an endpoint id.
 
 The endpoint id must be between 1 and 240.

@@ -110,6 +110,10 @@ public:
     bool IsWiFiManagementStarted();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    static const char * GetWiFiIfName() { return sWiFiIfName; }
+#endif
+
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
@@ -220,7 +224,7 @@ private:
     uint32_t mPacketUnicastRxCount   = 0;
     uint32_t mPacketUnicastTxCount   = 0;
     uint64_t mOverrunCount           = 0;
-    char mWiFiIfName[IFNAMSIZ];
+    static char sWiFiIfName[IFNAMSIZ];
 #endif
 };
 

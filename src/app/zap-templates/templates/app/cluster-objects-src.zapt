@@ -70,8 +70,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
     VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR) {
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
@@ -93,6 +92,47 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 } // namespace {{asUpperCamelCase name}}.
 {{/zcl_commands}}
 } // namespace Commands
+
+namespace Events {
+{{#zcl_events}}
+namespace {{asUpperCamelCase name}} {
+CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    {{#zcl_event_fields}}
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase name}})), {{asLowerCamelCase name}}));
+    {{/zcl_event_fields}}
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR) {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+            {{#zcl_event_fields}}
+        case to_underlying(Fields::k{{asUpperCamelCase name}}):
+            ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase name}}));
+            break;
+            {{/zcl_event_fields}}
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace {{asUpperCamelCase name}}.
+{{/zcl_events}}
+} // namespace Commands
+
 } // namespace {{asUpperCamelCase name}}
 {{/zcl_clusters}}
 

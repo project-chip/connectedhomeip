@@ -67,6 +67,7 @@ int AppTask::Init()
 {
     // Initialize LEDs
     LEDWidget::InitGpio();
+    LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
 
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLockLED.Init(LOCK_STATE_LED);
@@ -74,6 +75,8 @@ int AppTask::Init()
 
     sUnusedLED.Init(DK_LED3);
     sUnusedLED_1.Init(DK_LED4);
+
+    UpdateStatusLED();
 
     // Initialize buttons
     int ret = dk_buttons_init(ButtonEventHandler);
@@ -123,60 +126,8 @@ int AppTask::StartApp()
 
     while (true)
     {
-        ret = k_msgq_get(&sAppEventQueue, &event, K_MSEC(10));
-
-        while (!ret)
-        {
-            DispatchEvent(&event);
-            ret = k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT);
-        }
-
-        // Collect connectivity and configuration state from the CHIP stack.  Because the
-        // CHIP event loop is being run in a separate task, the stack must be locked
-        // while these values are queried.  However we use a non-blocking lock request
-        // (TryLockChipStack()) to avoid blocking other UI activities when the CHIP
-        // task is busy (e.g. with a long crypto operation).
-
-        if (PlatformMgr().TryLockChipStack())
-        {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
-            PlatformMgr().UnlockChipStack();
-        }
-
-        // Update the status LED if factory reset has not been initiated.
-        //
-        // If system has "full connectivity", keep the LED On constantly.
-        //
-        // If thread and service provisioned, but not attached to the thread network yet OR no
-        // connectivity to the service OR subscriptions are not fully established
-        // THEN blink the LED Off for a short period of time.
-        //
-        // If the system has ble connection(s) uptill the stage above, THEN blink the LEDs at an even
-        // rate of 100ms.
-        //
-        // Otherwise, blink the LED ON for a very short time.
-        if (sAppTask.mFunction != kFunction_FactoryReset)
-        {
-            if (sIsThreadProvisioned && sIsThreadEnabled)
-            {
-                sStatusLED.Blink(950, 50);
-            }
-            else if (sHaveBLEConnections)
-            {
-                sStatusLED.Blink(100, 100);
-            }
-            else
-            {
-                sStatusLED.Blink(50, 950);
-            }
-        }
-
-        sStatusLED.Animate();
-        sLockLED.Animate();
-        sUnusedLED.Animate();
-        sUnusedLED_1.Animate();
+        k_msgq_get(&sAppEventQueue, &event, K_FOREVER);
+        DispatchEvent(&event);
     }
 }
 
@@ -331,6 +282,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             // Set lock status LED back to show state of lock.
             sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
+            UpdateStatusLED();
             sAppTask.CancelTimer();
 
             // Change the function to none selected since factory reset has been canceled.
@@ -386,29 +338,81 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     }
 }
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
+void AppTask::UpdateLedStateEventHandler(AppEvent * aEvent)
 {
-    if (event->Type != DeviceEventType::kCHIPoBLEAdvertisingChange)
-        return;
-
-    if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+    if (aEvent->Type == AppEvent::kEventType_UpdateLedState)
     {
-        if (NFCMgr().IsTagEmulationStarted())
-        {
-            LOG_INF("NFC Tag emulation is already started");
-        }
-        else
-        {
-            ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-        }
-    }
-    else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
-    {
-        NFCMgr().StopTagEmulation();
+        aEvent->UpdateLedStateEvent.LedWidget->UpdateState();
     }
 }
+
+void AppTask::LEDStateUpdateHandler(LEDWidget & ledWidget)
+{
+    AppEvent event;
+    event.Type                          = AppEvent::kEventType_UpdateLedState;
+    event.Handler                       = UpdateLedStateEventHandler;
+    event.UpdateLedStateEvent.LedWidget = &ledWidget;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::UpdateStatusLED()
+{
+    /* Update the status LED.
+     *
+     * If thread and service provisioned, keep the LED On constantly.
+     *
+     * If the system has ble connection(s) uptill the stage above, THEN blink the LED at an even
+     * rate of 100ms.
+     *
+     * Otherwise, blink the LED On for a very short time. */
+    if (sIsThreadProvisioned && sIsThreadEnabled)
+    {
+        sStatusLED.Set(true);
+    }
+    else if (sHaveBLEConnections)
+    {
+        sStatusLED.Blink(100, 100);
+    }
+    else
+    {
+        sStatusLED.Blink(50, 950);
+    }
+}
+
+void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kCHIPoBLEAdvertisingChange:
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+        if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+        {
+            if (NFCMgr().IsTagEmulationStarted())
+            {
+                LOG_INF("NFC Tag emulation is already started");
+            }
+            else
+            {
+                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+            }
+        }
+        else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+        {
+            NFCMgr().StopTagEmulation();
+        }
 #endif
+        sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
+        UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadStateChange:
+        sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+        sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+        UpdateStatusLED();
+        break;
+    default:
+        break;
+    }
+}
 
 void AppTask::CancelTimer()
 {

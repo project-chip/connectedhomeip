@@ -10,6 +10,18 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
+# Generating android-androidstudio-chip-tool
+gn gen --check --fail-on-unused-args {out}/android-androidstudio-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
 # Generating android-arm-chip-tool
 gn gen --check --fail-on-unused-args {out}/android-arm-chip-tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
@@ -247,6 +259,9 @@ gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '
 
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters
+
+# Building APP android-androidstudio-chip-tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-chip-tool -PmatterSdkSourceBuild=true assembleDebug
 
 # Building JNI android-arm-chip-tool
 ninja -C {out}/android-arm-chip-tool

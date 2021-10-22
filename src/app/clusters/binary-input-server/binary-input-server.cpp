@@ -19,14 +19,15 @@
 
 #include <app/util/af.h>
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 
 #ifndef emberAfBinaryInputBasicClusterPrintln
 #define emberAfBinaryInputBasicClusterPrintln(...) ChipLogProgress(Zcl, __VA_ARGS__);
@@ -34,24 +35,24 @@ using namespace chip;
 
 EmberAfStatus emberAfBinaryInputBasicClusterGetPresentValue(EndpointId endpoint, bool * presentValue)
 {
-    return emberAfReadServerAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_PRESENT_VALUE_ATTRIBUTE_ID,
+    return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, BinaryInputBasic::Attributes::PresentValue::Id,
                                       (uint8_t *) presentValue, sizeof(uint8_t));
 }
 
 EmberAfStatus emberAfBinaryInputBasicClusterGetOutOfService(EndpointId endpoint, bool * isOutOfService)
 {
-    return emberAfReadServerAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_OUT_OF_SERVICE_ATTRIBUTE_ID,
+    return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, BinaryInputBasic::Attributes::OutOfService::Id,
                                       (uint8_t *) isOutOfService, sizeof(uint8_t));
 }
 
 EmberAfStatus emberAfBinaryInputBasicClusterSetPresentValueCallback(EndpointId endpoint, bool presentValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_PRESENT_VALUE_ATTRIBUTE_ID,
+    return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, BinaryInputBasic::Attributes::PresentValue::Id,
                                        (uint8_t *) &presentValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus emberAfBinaryInputBasicClusterSetOutOfServiceCallback(EndpointId endpoint, bool isOutOfService)
 {
-    return emberAfWriteServerAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_OUT_OF_SERVICE_ATTRIBUTE_ID,
+    return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, BinaryInputBasic::Attributes::OutOfService::Id,
                                        (uint8_t *) &isOutOfService, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }

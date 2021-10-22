@@ -26,7 +26,7 @@
 
 #include <app/Command.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/CommandDataElement.h>
+#include <app/MessageDef/CommandDataIB.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -88,9 +88,9 @@ public:
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
         ReturnErrorOnFailure(PrepareResponse(aRequestCommandPath, CommandData::GetCommandId()));
-        TLV::TLVWriter * writer = GetCommandDataElementTLVWriter();
+        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataElement::kCsTag_Data), aData));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::kCsTag_Data), aData));
 
         return FinishCommand(/* aEndDataStruct = */ false);
     }
@@ -105,7 +105,7 @@ private:
 
     friend class TestCommandInteraction;
     CHIP_ERROR SendCommandResponse();
-    CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
+    CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement) override;
     CHIP_ERROR PrepareResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommand);
     Callback * mpCallback = nullptr;
 };
