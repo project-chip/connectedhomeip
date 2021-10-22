@@ -65,7 +65,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
-        (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
+            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
         {
             // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
             // will not trigger a 'internet connectivity change' as there is no internet
@@ -82,9 +82,9 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 {
     switch (clusterId)
     {
-     case ZCL_ON_OFF_CLUSTER_ID:
-         OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
-         break;
+    case ZCL_ON_OFF_CLUSTER_ID:
+        OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
+        break;
 
     case ZCL_IDENTIFY_CLUSTER_ID:
         OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
@@ -127,14 +127,16 @@ void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
 
 void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ChipLogError(DeviceLayer, TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
-    VerifyOrExit(endpointId == 1 || endpointId == 2, ChipLogError(DeviceLayer, TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
+                 ChipLogError(DeviceLayer, TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(endpointId == 1 || endpointId == 2,
+                 ChipLogError(DeviceLayer, TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
     statusLED1.Set(*value);
 
-    exit:
-        return;
+exit:
+    return;
 }
 
 void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error)

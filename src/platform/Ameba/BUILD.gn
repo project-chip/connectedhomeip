@@ -39,9 +39,9 @@ static_library("Ameba") {
     "LwIPCoreLock.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "SoftwareUpdateManagerImpl.h",
     "ServiceProvisioning.cpp",
     "ServiceProvisioning.h",
+    "SoftwareUpdateManagerImpl.h",
     "SystemTimeSupport.cpp",
   ]
 

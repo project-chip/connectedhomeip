@@ -117,9 +117,9 @@ private:
     void OnIPv6AddressAvailable(void);
 
     static void RefreshMessageLayer(void);
-    static void RtkWiFiStationConnectedHandler( char* buf, int buf_len, int flags, void* userdata);
+    static void RtkWiFiStationConnectedHandler(char * buf, int buf_len, int flags, void * userdata);
     void DHCPProcess(void);
-    static void DHCPProcessThread(void *param);
+    static void DHCPProcessThread(void * param);
 };
 
 inline bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
