@@ -17,12 +17,12 @@
 
 #include <platform_stdlib.h>
 
-#include "chip_porting.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "Globals.h"
-#include <lwip_netconf.h>
 #include "LEDWidget.h"
+#include "chip_porting.h"
+#include <lwip_netconf.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -59,7 +59,7 @@ static DeviceCallbacks EchoCallbacks;
 
 void GetGatewayIP(char * ip_buf, size_t ip_len)
 {
-    uint8_t *gateway = LwIP_GetGW(&xnetif[0]);
+    uint8_t * gateway = LwIP_GetGW(&xnetif[0]);
     sprintf(ip_buf, "%d.%d.%d.%d", gateway[0], gateway[1], gateway[2], gateway[3]);
     ChipLogProgress(DeviceLayer, "Got gateway ip: %s\r\n", ip_buf);
 }
@@ -202,7 +202,8 @@ extern "C" void ChipTest(void)
         err = EncodeQRCodeToUrl(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(DeviceLayer, "Copy/paste the below URL in a browser to see the QR CODE:\n\t%s?data=%s \r\n", QRCODE_BASE_URL, qrCode.data());
+            ChipLogProgress(DeviceLayer, "Copy/paste the below URL in a browser to see the QR CODE:\n\t%s?data=%s \r\n",
+                            QRCODE_BASE_URL, qrCode.data());
         }
     }
 
