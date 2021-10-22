@@ -63,10 +63,8 @@
 #include <unistd.h>
 
 // SOCK_CLOEXEC not defined on all platforms, e.g. iOS/macOS:
-#ifdef SOCK_CLOEXEC
-#define SOCK_FLAGS SOCK_CLOEXEC
-#else
-#define SOCK_FLAGS 0
+#ifndef SOCK_CLOEXEC
+#define SOCK_CLOEXEC 0
 #endif
 
 #if defined(SOL_TCP)
@@ -265,15 +263,13 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
 
 CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
-    if (mTCP != NULL)
+    CHIP_ERROR res = CHIP_ERROR_CONNECTION_ABORTED;
+    if (mTCP != nullptr)
     {
         *retPort = mTCP->remote_port;
 
@@ -286,9 +282,8 @@ CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) con
         *retAddr                    = IPAddress(mTCP->remote_ip.ip6);
 #endif // !INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
+        res = CHIP_NO_ERROR;
     }
-    else
-        res = CHIP_ERROR_CONNECTION_ABORTED;
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
@@ -296,17 +291,15 @@ CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) con
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
+CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
-    if (mTCP != NULL)
+    CHIP_ERROR res = CHIP_ERROR_CONNECTION_ABORTED;
+    if (mTCP != nullptr)
     {
         *retPort = mTCP->local_port;
 
@@ -319,9 +312,8 @@ CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
         *retAddr                    = IPAddress(mTCP->local_ip.ip6);
 #endif // !INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
+        res = CHIP_NO_ERROR;
     }
-    else
-        res = CHIP_ERROR_CONNECTION_ABORTED;
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
@@ -331,8 +323,8 @@ CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
 
 CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
 {
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
+
     // TODO: Does netif_get_by_index(mTCP->netif_idx) do the right thing?  I
     // can't quite tell whether LwIP supports a specific interface id for TCP at
     // all.  For now just claim no particular interface id.
@@ -355,18 +347,17 @@ CHIP_ERROR TCPEndPoint::SendQueuedImpl(bool queueWasEmpty)
 
 CHIP_ERROR TCPEndPoint::EnableNoDelay()
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
-    if (mTCP != NULL)
+    CHIP_ERROR res = CHIP_ERROR_CONNECTION_ABORTED;
+    if (mTCP != nullptr)
+    {
         tcp_nagle_disable(mTCP);
-    else
-        res = CHIP_ERROR_CONNECTION_ABORTED;
+        res = CHIP_NO_ERROR;
+    }
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
@@ -376,10 +367,8 @@ CHIP_ERROR TCPEndPoint::EnableNoDelay()
 
 CHIP_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount)
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR res = CHIP_ERROR_NOT_IMPLEMENTED;
 
 #if LWIP_TCP_KEEPALIVE
 
@@ -399,16 +388,15 @@ CHIP_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount
 
         // Enable keepalives for the connection.
         ip_set_option(mTCP, SOF_KEEPALIVE);
+        res = CHIP_NO_ERROR;
     }
     else
+    {
         res = CHIP_ERROR_CONNECTION_ABORTED;
+    }
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
-
-#else // LWIP_TCP_KEEPALIVE
-
-    res = CHIP_ERROR_NOT_IMPLEMENTED;
 
 #endif // LWIP_TCP_KEEPALIVE
 
@@ -417,10 +405,8 @@ CHIP_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount
 
 CHIP_ERROR TCPEndPoint::DisableKeepAlive()
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR res = CHIP_ERROR_NOT_IMPLEMENTED;
 
 #if LWIP_TCP_KEEPALIVE
 
@@ -431,38 +417,17 @@ CHIP_ERROR TCPEndPoint::DisableKeepAlive()
     {
         // Disable keepalives on the connection.
         ip_reset_option(mTCP, SOF_KEEPALIVE);
+        res = CHIP_NO_ERROR;
     }
     else
+    {
         res = CHIP_ERROR_CONNECTION_ABORTED;
+    }
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
-
-#else // LWIP_TCP_KEEPALIVE
-
-    res = CHIP_ERROR_NOT_IMPLEMENTED;
 
 #endif // LWIP_TCP_KEEPALIVE
-    return res;
-}
-
-CHIP_ERROR TCPEndPoint::AckReceive(uint16_t len)
-{
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
-
-    // Lock LwIP stack
-    LOCK_TCPIP_CORE();
-
-    if (mTCP != NULL)
-        tcp_recved(mTCP, len);
-    else
-        res = CHIP_ERROR_CONNECTION_ABORTED;
-
-    // Unlock LwIP stack
-    UNLOCK_TCPIP_CORE();
 
     return res;
 }
@@ -655,6 +620,27 @@ void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, State oldState)
     {
         mUnackedLength = 0;
     }
+}
+
+CHIP_ERROR TCPEndPoint::AckReceive(uint16_t len)
+{
+    CHIP_ERROR res = CHIP_NO_ERROR;
+
+    if (!IsConnected())
+        return CHIP_ERROR_INCORRECT_STATE;
+
+    // Lock LwIP stack
+    LOCK_TCPIP_CORE();
+
+    if (mTCP != nullptr)
+        tcp_recved(mTCP, len);
+    else
+        res = CHIP_ERROR_CONNECTION_ABORTED;
+
+    // Unlock LwIP stack
+    UNLOCK_TCPIP_CORE();
+
+    return res;
 }
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
@@ -1194,7 +1180,9 @@ CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
             sa.sin6_scope_id = 0;
 
             if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
+            {
                 res = CHIP_ERROR_POSIX(errno);
+            }
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == IPAddressType::kIPv4)
@@ -1206,11 +1194,15 @@ CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
             sa.sin_addr   = addr.ToIPv4();
 
             if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
+            {
                 res = CHIP_ERROR_POSIX(errno);
+            }
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
+        {
             res = INET_ERROR_WRONG_ADDRESS_TYPE;
+        }
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -1242,35 +1234,31 @@ CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
 
 CHIP_ERROR TCPEndPoint::ListenImpl(uint16_t backlog)
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
     if (listen(mSocket, backlog) != 0)
     {
-        res = CHIP_ERROR_POSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
-    else
-    {
-        // Enable non-blocking mode for the socket.
-        int flags = fcntl(mSocket, F_GETFL, 0);
-        fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
 
-        // Wait for ability to read on this endpoint.
-        res = static_cast<System::LayerSockets *>(Layer().SystemLayer())
-                  ->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this));
-        if (res == CHIP_NO_ERROR)
-        {
-            res = static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingRead(mWatch);
-        }
+    // Enable non-blocking mode for the socket.
+    int flags = fcntl(mSocket, F_GETFL, 0);
+    fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
+
+    // Wait for ability to read on this endpoint.
+    CHIP_ERROR res = static_cast<System::LayerSockets *>(Layer().SystemLayer())
+                         ->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this));
+    if (res == CHIP_NO_ERROR)
+    {
+        res = static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingRead(mWatch);
     }
+
     return res;
 }
 
 CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     IPAddressType addrType = addr.Type();
-    CHIP_ERROR res         = GetSocket(addrType);
-    if (res != CHIP_NO_ERROR)
-        return res;
+
+    ReturnErrorOnFailure(GetSocket(addrType));
 
     if (intfId == INET_NULL_INTERFACEID)
     {
@@ -1292,9 +1280,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
             struct ::ifreq ifr;
             memset(&ifr, 0, sizeof(ifr));
 
-            res = GetInterfaceName(intfId, ifr.ifr_name, sizeof(ifr.ifr_name));
-            if (res != CHIP_NO_ERROR)
-                return res;
+            ReturnErrorOnFailure(GetInterfaceName(intfId, ifr.ifr_name, sizeof(ifr.ifr_name)));
 
             // Attempt to bind to the interface using SO_BINDTODEVICE which requires privileged access.
             // If the permission is denied(EACCES) because CHIP is running in a context
@@ -1303,7 +1289,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
             int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr));
             if (r < 0 && errno != EACCES)
             {
-                return res = CHIP_ERROR_POSIX(errno);
+                return CHIP_ERROR_POSIX(errno);
             }
 
             if (r < 0)
@@ -1312,9 +1298,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
                 // Attempting to initiate a connection via a specific interface is not allowed.
                 // The only way to do this is to bind the local to an address on the desired
                 // interface.
-                res = BindSrcAddrFromIntf(addrType, intfId);
-                if (res != CHIP_NO_ERROR)
-                    return res;
+                ReturnErrorOnFailure(BindSrcAddrFromIntf(addrType, intfId));
             }
         }
     }
@@ -1356,13 +1340,15 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     }
 #endif // INET_CONFIG_ENABLE_IPV4
     else
+    {
         return INET_ERROR_WRONG_ADDRESS_TYPE;
+    }
 
     int conRes = connect(mSocket, sockaddrptr, sockaddrsize);
 
     if (conRes == -1 && errno != EINPROGRESS)
     {
-        res = CHIP_ERROR_POSIX(errno);
+        CHIP_ERROR res = CHIP_ERROR_POSIX(errno);
         DoClose(res, true);
         return res;
     }
@@ -1389,72 +1375,49 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
         ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingWrite(mWatch));
     }
 
-    return res;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
-
-    SockAddr sa;
-    memset(&sa, 0, sizeof(sa));
-    socklen_t saLen = sizeof(sa);
-
-    if (getpeername(mSocket, &sa.any, &saLen) != 0)
-        return CHIP_ERROR_POSIX(errno);
-
-    if (sa.any.sa_family == AF_INET6)
-    {
-        *retAddr = IPAddress(sa.in6.sin6_addr);
-        *retPort = ntohs(sa.in6.sin6_port);
-    }
-#if INET_CONFIG_ENABLE_IPV4
-    else if (sa.any.sa_family == AF_INET)
-    {
-        *retAddr = IPAddress(sa.in.sin_addr);
-        *retPort = ntohs(sa.in.sin_port);
-    }
-#endif // INET_CONFIG_ENABLE_IPV4
-    else
-        return CHIP_ERROR_INCORRECT_STATE;
-
-    return res;
+    return GetSocketInfo(getpeername, retAddr, retPort);
 }
 
-CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
+CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
+    return GetSocketInfo(getsockname, retAddr, retPort);
+}
 
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
+CHIP_ERROR TCPEndPoint::GetSocketInfo(int getname(int, sockaddr *, socklen_t *), IPAddress * retAddr, uint16_t * retPort) const
+{
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
     SockAddr sa;
-
     memset(&sa, 0, sizeof(sa));
     socklen_t saLen = sizeof(sa);
 
-    if (getsockname(mSocket, &sa.any, &saLen) != 0)
+    if (getname(mSocket, &sa.any, &saLen) != 0)
+    {
         return CHIP_ERROR_POSIX(errno);
+    }
 
     if (sa.any.sa_family == AF_INET6)
     {
         *retAddr = IPAddress(sa.in6.sin6_addr);
         *retPort = ntohs(sa.in6.sin6_port);
+        return CHIP_NO_ERROR;
     }
+
 #if INET_CONFIG_ENABLE_IPV4
-    else if (sa.any.sa_family == AF_INET)
+    if (sa.any.sa_family == AF_INET)
     {
         *retAddr = IPAddress(sa.in.sin_addr);
         *retPort = ntohs(sa.in.sin_port);
+        return CHIP_NO_ERROR;
     }
 #endif // INET_CONFIG_ENABLE_IPV4
-    else
-        return CHIP_ERROR_INCORRECT_STATE;
 
-    return res;
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
@@ -1495,7 +1458,7 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
 #endif // INET_CONFIG_ENABLE_IPV4
 
     *retInterface = INET_NULL_INTERFACEID;
-    return CHIP_ERROR_INCORRECT_STATE;
+    return INET_ERROR_WRONG_ADDRESS_TYPE;
 }
 
 CHIP_ERROR TCPEndPoint::SendQueuedImpl(bool queueWasEmpty)
@@ -1510,82 +1473,72 @@ CHIP_ERROR TCPEndPoint::SendQueuedImpl(bool queueWasEmpty)
 
 CHIP_ERROR TCPEndPoint::EnableNoDelay()
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
-
-    {
-        int val;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
 #ifdef TCP_NODELAY
-        // Disable TCP Nagle buffering by setting TCP_NODELAY socket option to true
-        val = 1;
-        if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_NODELAY, &val, sizeof(val)) != 0)
-            return CHIP_ERROR_POSIX(errno);
-#endif // defined(TCP_NODELAY)
+    // Disable TCP Nagle buffering by setting TCP_NODELAY socket option to true
+    int val = 1;
+    if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_NODELAY, &val, sizeof(val)) != 0)
+    {
+        return CHIP_ERROR_POSIX(errno);
     }
+#endif // defined(TCP_NODELAY)
 
-    return res;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount)
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
-
+    // Set the idle interval
+    int val = interval;
+    if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_IDLE_INTERVAL_OPT_NAME, &val, sizeof(val)) != 0)
     {
-        int val;
-
-        // Set the idle interval
-        val = interval;
-        if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_IDLE_INTERVAL_OPT_NAME, &val, sizeof(val)) != 0)
-            return CHIP_ERROR_POSIX(errno);
-
-        // Set the probe retransmission interval.
-        val = interval;
-        if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPINTVL, &val, sizeof(val)) != 0)
-            return CHIP_ERROR_POSIX(errno);
-
-        // Set the probe timeout count
-        val = timeoutCount;
-        if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPCNT, &val, sizeof(val)) != 0)
-            return CHIP_ERROR_POSIX(errno);
-
-        // Enable keepalives for the connection.
-        val = 1; // enable
-        if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
-            return CHIP_ERROR_POSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
 
-    return res;
+    // Set the probe retransmission interval.
+    val = interval;
+    if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPINTVL, &val, sizeof(val)) != 0)
+    {
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    // Set the probe timeout count
+    val = timeoutCount;
+    if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPCNT, &val, sizeof(val)) != 0)
+    {
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    // Enable keepalives for the connection.
+    val = 1; // enable
+    if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
+    {
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TCPEndPoint::DisableKeepAlive()
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
-
+    // Disable keepalives on the connection.
+    int val = 0; // disable
+    if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
     {
-        int val;
-
-        // Disable keepalives on the connection.
-        val = 0; // disable
-        if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
-            return CHIP_ERROR_POSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
 
-    return res;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TCPEndPoint::AckReceive(uint16_t len)
 {
-    if (!IsConnected())
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
     // nothing to do for sockets case
     return CHIP_NO_ERROR;
@@ -1920,7 +1873,7 @@ CHIP_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
 #endif // INET_CONFIG_ENABLE_IPV4
         else
             return INET_ERROR_WRONG_ADDRESS_TYPE;
-        mSocket = ::socket(family, SOCK_STREAM | SOCK_FLAGS, 0);
+        mSocket = ::socket(family, SOCK_STREAM | SOCK_CLOEXEC, 0);
         if (mSocket == -1)
             return CHIP_ERROR_POSIX(errno);
         ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(mSocket, &mWatch));
@@ -2011,7 +1964,7 @@ void TCPEndPoint::HandlePendingIO(System::SocketEvents events)
 
         // If in a state were receiving is allowed, and the app is ready to receive data, and data is ready
         // on the socket, receive inbound data from the connection.
-        if ((mState == State::kConnected || mState == State::kSendShutdown) && ReceiveEnabled && OnDataReceived != nullptr &&
+        if ((mState == State::kConnected || mState == State::kSendShutdown) && mReceiveEnabled && OnDataReceived != nullptr &&
             events.Has(System::SocketEventFlags::kRead))
             ReceiveData();
     }
@@ -2553,7 +2506,7 @@ void TCPEndPoint::Init(InetLayer * inetLayer)
 {
     InitEndPointBasis(*inetLayer);
 
-    ReceiveEnabled = true;
+    mReceiveEnabled = true;
 
     // Initialize to zero for using system defaults.
     mConnectTimeoutMsecs = 0;
@@ -2594,7 +2547,7 @@ void TCPEndPoint::DriveReceiving()
 {
     // If there's data in the receive queue and the app is ready to receive it then call the app's callback
     // with the entire receive queue.
-    if (!mRcvQueue.IsNull() && ReceiveEnabled && OnDataReceived != nullptr)
+    if (!mRcvQueue.IsNull() && mReceiveEnabled && OnDataReceived != nullptr)
     {
         // Acknowledgement is done after handling the buffers to allow the
         // application processing to throttle flow.
