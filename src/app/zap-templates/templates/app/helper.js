@@ -375,7 +375,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
   let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
   if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
     passByReference = true;
-    let listType = isDecodable ? "DecodableList" : "List";
+    let listType    = isDecodable ? "DecodableList" : "List";
     // If we did not have a namespace provided, we can assume we're inside
     // chip::app.
     let listNamespace = options.hash.ns ? "chip::app::" : ""
