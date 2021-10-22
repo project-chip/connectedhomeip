@@ -79,7 +79,7 @@ ClusterBase::WriteAttribute<chip::app::Clusters::AdministratorCommissioning::Att
     void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                 Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -124,7 +124,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Application
 
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationName(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback,
-                                                                      chip::ByteSpan value)
+                                                                      chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -168,7 +168,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Application
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationId(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -498,7 +498,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                      Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -542,7 +542,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicClusterTest::WriteAttributeProductName(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                       Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -607,7 +607,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicClusterTest::WriteAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                 Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -651,7 +651,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicClusterTest::WriteAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                 Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -674,7 +674,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicClusterTest::WriteAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                             Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -697,7 +697,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicClusterTest::WriteAttributePartNumber(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                      Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -720,7 +720,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicClusterTest::WriteAttributeProductURL(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                      Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -743,7 +743,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicClusterTest::WriteAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -766,7 +766,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicClusterTest::WriteAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -894,8 +894,50 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Binding::At
     const chip::app::Clusters::Binding::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
+CHIP_ERROR BooleanStateClusterTest::WriteAttributeStateValue(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback, bool value)
+{
+    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
+    {
+        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
+        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
+        // TYPE: boolean
+        return WriteAttribute<app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(value, onSuccess->mContext,
+                                                                                             onSuccess->mCall, onFailure->mCall);
+    }
+    else
+    {
+        return WriteAttribute<app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(value, nullptr, nullptr, nullptr);
+    }
+}
+
+template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(
+    const chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo::Type & requestData, void * context,
+    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
+
+CHIP_ERROR BooleanStateClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint16_t value)
+{
+    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
+    {
+        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
+        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
+        // TYPE: int16u
+        return WriteAttribute<app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
+            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
+    }
+    else
+    {
+        return WriteAttribute<app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(value, nullptr, nullptr, nullptr);
+    }
+}
+
+template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
+    const chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
+    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
+
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -939,7 +981,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDevi
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductName(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -985,7 +1027,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDevi
 
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
-                                                                              chip::ByteSpan value)
+                                                                              chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -1032,7 +1074,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDevi
 
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
-                                                                              chip::ByteSpan value)
+                                                                              chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -1057,7 +1099,7 @@ ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes:
 
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
-                                                                          chip::ByteSpan value)
+                                                                          chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -1080,7 +1122,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDevi
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributePartNumber(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -1103,7 +1145,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDevi
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductURL(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -1126,7 +1168,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDevi
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                     Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -1149,7 +1191,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDevi
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                     Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -1343,7 +1385,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ColorControlClusterTest::WriteAttributeCompensationText(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -3944,7 +3986,7 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeDescription(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                             Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {
@@ -6911,7 +6953,7 @@ ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attri
     WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR WakeOnLanClusterTest::WriteAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
     {

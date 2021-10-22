@@ -7270,7 +7270,7 @@ private:
 
     void OnSuccessResponse_0(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 4U));
         NextTest();
     }
 
@@ -7301,7 +7301,7 @@ private:
 
     void OnSuccessResponse_2(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 4U));
         NextTest();
     }
 
@@ -16040,7 +16040,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan charStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("☉T☉"), strlen("☉T☉"));
+        chip::CharSpan charStringArgument = chip::CharSpan("☉T☉", strlen("☉T☉"));
 
         return cluster.WriteAttributeCharString(mOnSuccessCallback_99.Cancel(), mOnFailureCallback_99.Cancel(), charStringArgument);
     }
@@ -16054,8 +16054,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan charStringArgument =
-            chip::ByteSpan(chip::Uint8::from_const_char("☉TestValueLongerThan10☉"), strlen("☉TestValueLongerThan10☉"));
+        chip::CharSpan charStringArgument = chip::CharSpan("☉TestValueLongerThan10☉", strlen("☉TestValueLongerThan10☉"));
 
         return cluster.WriteAttributeCharString(mOnSuccessCallback_100.Cancel(), mOnFailureCallback_100.Cancel(),
                                                 charStringArgument);
@@ -16070,7 +16069,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan charStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        chip::CharSpan charStringArgument = chip::CharSpan("", strlen(""));
 
         return cluster.WriteAttributeCharString(mOnSuccessCallback_101.Cancel(), mOnFailureCallback_101.Cancel(),
                                                 charStringArgument);
@@ -16101,11 +16100,10 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan longCharStringArgument = chip::ByteSpan(
-            chip::Uint8::from_const_char(
-                "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"),
+        chip::CharSpan longCharStringArgument = chip::CharSpan(
+            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉",
             strlen("☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
                    "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
                    "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"));
@@ -16143,7 +16141,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan longCharStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        chip::CharSpan longCharStringArgument = chip::CharSpan("", strlen(""));
 
         return cluster.WriteAttributeLongCharString(mOnSuccessCallback_105.Cancel(), mOnFailureCallback_105.Cancel(),
                                                     longCharStringArgument);
@@ -17357,7 +17355,7 @@ private:
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        chip::ByteSpan locationArgument = chip::ByteSpan(chip::Uint8::from_const_char("us"), strlen("us"));
+        chip::CharSpan locationArgument = chip::CharSpan("us", strlen("us"));
 
         return cluster.WriteAttributeLocation(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), locationArgument);
     }
@@ -17387,7 +17385,7 @@ private:
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        chip::ByteSpan locationArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        chip::CharSpan locationArgument = chip::CharSpan("", strlen(""));
 
         return cluster.WriteAttributeLocation(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel(), locationArgument);
     }

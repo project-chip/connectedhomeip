@@ -48,6 +48,7 @@
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/Dnssd.h>
@@ -66,7 +67,6 @@
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
-#include <app/clusters/temperature-measurement-server/temperature-measurement-server.h>
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
@@ -216,7 +216,7 @@ public:
             if (name == "Temperature")
             {
                 // update the temp attribute here for hardcoded endpoint 1
-                emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(1, static_cast<int16_t>(n * 100));
+                chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
             }
             value = buffer;
         }
@@ -245,8 +245,7 @@ public:
             {
                 // update the doorlock attribute here
                 uint8_t attributeValue = value == "Closed" ? EMBER_ZCL_DOOR_LOCK_STATE_LOCKED : EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED;
-                emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID,
-                                            (uint8_t *) &attributeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+                chip::app::Clusters::DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT, attributeValue);
             }
         }
     }
@@ -468,16 +467,14 @@ void SetupPretendDevices()
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
     // write the temp attribute
-    emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(1, static_cast<int16_t>(21 * 100));
+    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
 
     AddDevice("Door Lock");
     AddEndpoint("Default");
     AddCluster("Lock");
     AddAttribute("State", "Open");
     // write the door lock state
-    uint8_t attributeValue = EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED;
-    emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID, &attributeValue,
-                                ZCL_INT8U_ATTRIBUTE_TYPE);
+    chip::app::Clusters::DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT, EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED);
     AddDevice("Garage 1");
     AddEndpoint("Door 1");
     AddCluster("Door");

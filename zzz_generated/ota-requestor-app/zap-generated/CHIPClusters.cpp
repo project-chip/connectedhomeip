@@ -143,7 +143,7 @@ exit:
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint16_t vendorId,
                                                         uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion,
-                                                        uint8_t protocolsSupported, chip::ByteSpan location,
+                                                        uint8_t protocolsSupported, chip::CharSpan location,
                                                         bool requestorCanConsent, chip::ByteSpan metadataForProvider)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -179,8 +179,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     // protocolsSupported: OTADownloadProtocol
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
     // location: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(location.data()), location.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), location.data()));
     // requestorCanConsent: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
     // metadataForProvider: octetString
