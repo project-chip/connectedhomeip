@@ -19,7 +19,7 @@ config:
     endpoint: 1
 
 tests:
-   # TODO: Update the corresponding values when feature is supported
+    # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
       command: "LaunchApp"
@@ -32,7 +32,7 @@ tests:
               - name: "applicationId"
                 value: "HelloWorldApp"
 
-   # TODO: Update the corresponding values when feature is supported
+    # TODO: Update the corresponding values when feature is supported
     - label: "Stop an app with the provided application ID"
       disabled: true
       command: "StopApp"
@@ -41,7 +41,7 @@ tests:
               - name: "applicationId"
                 value: "HelloWorldApp"
 
-   # TODO: Update the corresponding values when feature is supported
+    # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
       command: "LaunchApp"
@@ -56,7 +56,7 @@ tests:
       response:
           error: 1
 
-   # TODO: Update the corresponding values when feature is supported
+    # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
       command: "LaunchApp"
@@ -69,7 +69,7 @@ tests:
               - name: "applicationId"
                 value: "HelloWorldApp"
 
-   # TODO: Update the corresponding values when feature is supported
+    # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
       command: "LaunchApp"
