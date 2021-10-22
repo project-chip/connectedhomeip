@@ -8880,7 +8880,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] count], 18);
+        XCTAssertEqual([values[@"value"] count], 19);
 
         [expectation fulfill];
     }];
@@ -9057,6 +9057,111 @@ CHIPDevice * GetConnectedDevice()
         XCTAssertEqual(err.code, 0);
 
         XCTAssertGreaterThanOrEqual([values[@"value"] unsignedCharValue], 1);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestModeSelectCluster_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read CurrentMode"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelectCluster * cluster = [[CHIPTestModeSelectCluster alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read CurrentMode Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestModeSelectCluster_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read OnMode"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelectCluster * cluster = [[CHIPTestModeSelectCluster alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read OnMode Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestModeSelectCluster_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read StartUpMode"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelectCluster * cluster = [[CHIPTestModeSelectCluster alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read StartUpMode Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestModeSelectCluster_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read Description"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelectCluster * cluster = [[CHIPTestModeSelectCluster alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeDescriptionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read Description Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        NSString * descriptionArgument = @"Coffee";
+        XCTAssertTrue([values[@"value"] isEqualToString:descriptionArgument]);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestModeSelectCluster_000004_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read SupportedModes"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelectCluster * cluster = [[CHIPTestModeSelectCluster alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeSupportedModesWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read SupportedModes Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
 
         [expectation fulfill];
     }];

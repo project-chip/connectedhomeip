@@ -17185,7 +17185,7 @@ private:
 
     void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<chip::ClusterId> & serverList)
     {
-        VerifyOrReturn(CheckValueAsListLength("serverList", serverList, 18));
+        VerifyOrReturn(CheckValueAsListLength("serverList", serverList, 19));
         NextTest();
     }
 
@@ -17507,6 +17507,224 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("commissionedFabrics", "", "uint8"));
         VerifyOrReturn(CheckConstraintMinValue<uint8_t>("commissionedFabrics", commissionedFabrics, 1));
+        NextTest();
+    }
+};
+
+class TestModeSelectCluster : public TestCommand
+{
+public:
+    TestModeSelectCluster() : TestCommand("TestModeSelectCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestModeSelectCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestModeSelectCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Read CurrentMode\n");
+            err = TestReadCurrentMode_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read OnMode\n");
+            err = TestReadOnMode_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read StartUpMode\n");
+            err = TestReadStartUpMode_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read Description\n");
+            err = TestReadDescription_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read SupportedModes\n");
+            err = TestReadSupportedModes_4();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 5;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentMode)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t onMode)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t startUpMode)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan description)> mOnSuccessCallback_3{ OnSuccessCallback_3,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(
+        void * context,
+        const chip::app::DataModel::DecodableList<
+            chip::app::Clusters::ModeSelectCluster::Structs::ModeOptionStruct::DecodableType> & supportedModes)>
+        mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t currentMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_0(currentMode);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t onMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_1(onMode);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t startUpMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_2(startUpMode);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, chip::CharSpan description)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_3(description);
+    }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void
+    OnSuccessCallback_4(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::ModeSelectCluster::Structs::ModeOptionStruct::DecodableType> & supportedModes)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_4(supportedModes);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadCurrentMode_0()
+    {
+        chip::Controller::ModeSelectClusterClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeCurrentMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t currentMode)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentMode", currentMode, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadOnMode_1()
+    {
+        chip::Controller::ModeSelectClusterClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeOnMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t onMode)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("onMode", onMode, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadStartUpMode_2()
+    {
+        chip::Controller::ModeSelectClusterClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeStartUpMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t startUpMode)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("startUpMode", startUpMode, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadDescription_3()
+    {
+        chip::Controller::ModeSelectClusterClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeDescription(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(chip::CharSpan description)
+    {
+        VerifyOrReturn(CheckValueAsString("description", description, "Coffee"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadSupportedModes_4()
+    {
+        chip::Controller::ModeSelectClusterClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeSupportedModes(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(const chip::app::DataModel::DecodableList<
+                             chip::app::Clusters::ModeSelectCluster::Structs::ModeOptionStruct::DecodableType> & supportedModes)
+    {
+
         NextTest();
     }
 };
@@ -17863,6 +18081,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestDescriptorCluster>(),
         make_unique<TestBasicInformation>(),
         make_unique<TestOperationalCredentialsCluster>(),
+        make_unique<TestModeSelectCluster>(),
         make_unique<TestSubscribe_OnOff>(),
     };
 

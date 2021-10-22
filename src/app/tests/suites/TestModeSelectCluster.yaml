@@ -12,35 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Descriptor Cluster Tests
+name: Mode Select Cluster Tests
 
 config:
-    cluster: "Descriptor"
+    cluster: "Mode Select Cluster"
     endpoint: 0
 
 tests:
-    - label: "Read attribute Device list"
+    - label: "Read CurrentMode"
       command: "readAttribute"
-      attribute: "Device List"
+      attribute: "CurrentMode"
       response:
-          value: [{ deviceTypeId: 1, revision: 1 }]
+          value: 0
 
-    - label: "Read attribute Server list"
+    - label: "Read OnMode"
       command: "readAttribute"
-      attribute: "Server List"
+      attribute: "OnMode"
       response:
-          value: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    # CLUSTER_ID value is dummy 0 since yaml compares only the length of the List.
-    # right now
+          value: 0
 
-    - label: "Read attribute Client list"
+    - label: "Read StartUpMode"
       command: "readAttribute"
-      attribute: "Client List"
+      attribute: "StartUpMode"
       response:
-          value: []
+        value: 0
 
-    - label: "Read attribute Parts list"
+    - label: "Read Description"
       command: "readAttribute"
-      attribute: "Parts List"
+      attribute: "Description"
       response:
-          value: [1, 2]
+        value: "Coffee"
+
+
+    - label: "Read SupportedModes"
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+        constraints:
+          - type: list
+          - minLength: 3
+          - maxLength: 3

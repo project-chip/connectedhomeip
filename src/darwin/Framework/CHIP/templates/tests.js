@@ -116,6 +116,7 @@ function getTests()
     'TestDescriptorCluster',
     'TestBasicInformation',
     'TestOperationalCredentialsCluster',
+    'TestModeSelectCluster',
   ];
 
   const Subscriptions = [
