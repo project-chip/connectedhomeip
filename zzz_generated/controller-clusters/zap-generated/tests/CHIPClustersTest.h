@@ -174,6 +174,18 @@ public:
                                              uint16_t value);
 };
 
+class DLL_EXPORT BooleanStateClusterTest : public BooleanStateCluster
+{
+public:
+    BooleanStateClusterTest() : BooleanStateCluster() {}
+    ~BooleanStateClusterTest() {}
+
+    CHIP_ERROR WriteAttributeStateValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        bool value);
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
 class DLL_EXPORT BridgedDeviceBasicClusterTest : public BridgedDeviceBasicCluster
 {
 public:
