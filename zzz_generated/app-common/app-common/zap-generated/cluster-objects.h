@@ -5559,7 +5559,7 @@ public:
     chip::NodeId providerLocation;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
-    chip::ByteSpan metadataForNode;
+    Optional<chip::ByteSpan> metadataForNode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5573,7 +5573,7 @@ public:
     chip::NodeId providerLocation;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
-    chip::ByteSpan metadataForNode;
+    Optional<chip::ByteSpan> metadataForNode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AnnounceOtaProvider
@@ -9358,7 +9358,7 @@ public:
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
 
     chip::ByteSpan NOCValue;
-    chip::ByteSpan ICACValue;
+    Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
     chip::NodeId caseAdminNode;
     uint16_t adminVendorId;
@@ -9373,7 +9373,7 @@ public:
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
 
     chip::ByteSpan NOCValue;
-    chip::ByteSpan ICACValue;
+    Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
     chip::NodeId caseAdminNode;
     uint16_t adminVendorId;
@@ -9395,7 +9395,7 @@ public:
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
 
     chip::ByteSpan NOCValue;
-    chip::ByteSpan ICACValue;
+    Optional<chip::ByteSpan> ICACValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9407,7 +9407,7 @@ public:
     static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
 
     chip::ByteSpan NOCValue;
-    chip::ByteSpan ICACValue;
+    Optional<chip::ByteSpan> ICACValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateNOC
@@ -16183,8 +16183,8 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type          = DataModel::Nullable<uint16_t>;
+    using DecodableType = DataModel::Nullable<uint16_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16193,8 +16193,8 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type          = DataModel::Nullable<uint16_t>;
+    using DecodableType = DataModel::Nullable<uint16_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16203,8 +16203,8 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type          = DataModel::Nullable<uint16_t>;
+    using DecodableType = DataModel::Nullable<uint16_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16223,8 +16223,8 @@ struct TypeInfo
 namespace LightSensorType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type          = DataModel::Nullable<uint8_t>;
+    using DecodableType = DataModel::Nullable<uint8_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
