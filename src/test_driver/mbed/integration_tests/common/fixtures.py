@@ -24,6 +24,8 @@ from .device import Device
 from .serial_connection import SerialConnection
 from .serial_device import SerialDevice
 
+from chip import ChipDeviceCtrl
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -50,12 +52,19 @@ def serial_baudrate(request):
         return int(request.config.getoption('serial_baudrate'))
     return 115200
 
+@pytest.fixture(scope="session")
+def network(request):
+    if request.config.getoption('network'):
+        credentials = request.config.getoption('network')
+        params = credentials.split(':')
+        return (params[0], params[1])
+    return None
+
 
 class BoardAllocation:
     def __init__(self, description: Mapping[str, Any]):
         self.description = description
         self.device = None
-
 
 class BoardAllocator:
     def __init__(self, platforms_supported: List[str], serial_inter_byte_delay: float, baudrate: int):
@@ -123,3 +132,10 @@ def device(board_allocator):
     device = board_allocator.allocate(name='DUT')
     yield device
     board_allocator.release(device)
+
+
+@pytest.fixture(scope="function")
+def device_controller():
+    devCtrl = ChipDeviceCtrl.ChipDeviceController()
+    yield devCtrl
+    devCtrl.__del__
