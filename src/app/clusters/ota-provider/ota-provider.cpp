@@ -16,14 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
@@ -34,6 +28,7 @@
 #include "ota-provider.h"
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using chip::app::Clusters::OTAProviderDelegate;
 
@@ -46,7 +41,7 @@ OTAProviderDelegate * gDelegateTable[EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOI
 
 OTAProviderDelegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_OTA_PROVIDER_CLUSTER_ID);
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id);
     return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
 }
 
@@ -212,7 +207,7 @@ namespace OTAProvider {
 
 void SetDelegate(EndpointId endpoint, OTAProviderDelegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_OTA_PROVIDER_CLUSTER_ID);
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id);
     if (ep != 0xFFFF)
     {
         gDelegateTable[ep] = delegate;

@@ -39,14 +39,13 @@
  ******************************************************************************/
 
 #include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TvChannel;
 
 ::TvChannelInfo tvChannelClusterChangeChannel(std::string match);
@@ -56,8 +55,8 @@ bool tvChannelClusterSkipChannel(uint16_t count);
 void sendResponse(app::CommandHandler * command, ::TvChannelInfo channelInfo)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TV_CHANNEL_CLUSTER_ID,
-                                         ZCL_CHANGE_CHANNEL_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, TvChannel::Id,
+                                         Commands::ChangeChannelResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
     VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
