@@ -1107,56 +1107,19 @@
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *) (&generatedAttributes[index]))
 
-// Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS                                                                                                  \
-    const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
-        (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {                                                             \
-        (EmberAfGenericClusterFunction) emberAfBasicClusterServerInitCallback,                                                     \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayGeneralDiagnosticsServer[] = {                                                \
-        (EmberAfGenericClusterFunction) emberAfGeneralDiagnosticsClusterServerInitCallback,                                        \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArraySoftwareDiagnosticsServer[] = {                                               \
-        (EmberAfGenericClusterFunction) emberAfSoftwareDiagnosticsClusterServerInitCallback,                                       \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayThreadNetworkDiagnosticsServer[] = {                                          \
-        (EmberAfGenericClusterFunction) emberAfThreadNetworkDiagnosticsClusterServerInitCallback,                                  \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayWiFiNetworkDiagnosticsServer[] = {                                            \
-        (EmberAfGenericClusterFunction) emberAfWiFiNetworkDiagnosticsClusterServerInitCallback,                                    \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayEthernetNetworkDiagnosticsServer[] = {                                        \
-        (EmberAfGenericClusterFunction) emberAfEthernetNetworkDiagnosticsClusterServerInitCallback,                                \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
-        (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayPumpConfigurationAndControlServer[] = {                                       \
-        (EmberAfGenericClusterFunction) emberAfPumpConfigurationAndControlClusterServerInitCallback,                               \
-        (EmberAfGenericClusterFunction) MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback,                    \
-    };
-
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
 #define GENERATED_CLUSTER_COUNT 21
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
-        { 0x0008,                                                                                                                  \
-          ZAP_ATTRIBUTE_INDEX(0),                                                                                                  \
-          2,                                                                                                                       \
-          3,                                                                                                                       \
-          ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                              \
-          chipFuncArrayLevelControlServer }, /* Endpoint: 0, Cluster: Level Control (server) */                                    \
+        {                                                                                                                          \
+            0x0008, ZAP_ATTRIBUTE_INDEX(0), 2, 3, ZAP_CLUSTER_MASK(SERVER), NULL                                                   \
+        }, /* Endpoint: 0, Cluster: Level Control (server) */                                                                      \
             {                                                                                                                      \
                 0x001D, ZAP_ATTRIBUTE_INDEX(2), 5, 1018, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 0, Cluster: Descriptor (server) */                                                                     \
-            { 0x0028,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(7),                                                                                              \
-              12,                                                                                                                  \
-              246,                                                                                                                 \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                               \
+            {                                                                                                                      \
+                0x0028, ZAP_ATTRIBUTE_INDEX(7), 12, 246, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 0, Cluster: Basic (server) */                                                                          \
             {                                                                                                                      \
                 0x0030, ZAP_ATTRIBUTE_INDEX(19), 3, 264, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
@@ -1166,55 +1129,32 @@
             {                                                                                                                      \
                 0x0032, ZAP_ATTRIBUTE_INDEX(23), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                \
-            { 0x0033,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(23),                                                                                             \
-              6,                                                                                                                   \
-              271,                                                                                                                 \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayGeneralDiagnosticsServer }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                    \
-            { 0x0034,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(29),                                                                                             \
-              4,                                                                                                                   \
-              26,                                                                                                                  \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArraySoftwareDiagnosticsServer }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                  \
-            { 0x0035,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(33),                                                                                             \
-              64,                                                                                                                  \
-              774,                                                                                                                 \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayThreadNetworkDiagnosticsServer }, /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */       \
-            { 0x0036,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(97),                                                                                             \
-              14,                                                                                                                  \
-              54,                                                                                                                  \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayWiFiNetworkDiagnosticsServer }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */           \
-            { 0x0037,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(111),                                                                                            \
-              10,                                                                                                                  \
-              53,                                                                                                                  \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayEthernetNetworkDiagnosticsServer }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */   \
+            {                                                                                                                      \
+                0x0033, ZAP_ATTRIBUTE_INDEX(23), 6, 271, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                            \
+            {                                                                                                                      \
+                0x0034, ZAP_ATTRIBUTE_INDEX(29), 4, 26, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                           \
+            {                                                                                                                      \
+                0x0035, ZAP_ATTRIBUTE_INDEX(33), 64, 774, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+            }, /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                     \
+            {                                                                                                                      \
+                0x0036, ZAP_ATTRIBUTE_INDEX(97), 14, 54, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                       \
+            {                                                                                                                      \
+                0x0037, ZAP_ATTRIBUTE_INDEX(111), 10, 53, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+            }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                   \
             {                                                                                                                      \
                 0x003C, ZAP_ATTRIBUTE_INDEX(121), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                     \
             {                                                                                                                      \
                 0x003E, ZAP_ATTRIBUTE_INDEX(122), 5, 724, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
-            { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(127),                                                                                            \
-              2,                                                                                                                   \
-              3,                                                                                                                   \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/Off (server) */                                              \
             {                                                                                                                      \
-                0x0200,                                                                                                            \
-                ZAP_ATTRIBUTE_INDEX(129),                                                                                          \
-                8,                                                                                                                 \
-                13,                                                                                                                \
-                ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),         \
-                chipFuncArrayPumpConfigurationAndControlServer                                                                     \
+                0x0006, ZAP_ATTRIBUTE_INDEX(127), 2, 3, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 1, Cluster: On/Off (server) */                                                                         \
+            {                                                                                                                      \
+                0x0200, ZAP_ATTRIBUTE_INDEX(129), 8, 13, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                 \
             {                                                                                                                      \
                 0x0402, ZAP_ATTRIBUTE_INDEX(137), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
