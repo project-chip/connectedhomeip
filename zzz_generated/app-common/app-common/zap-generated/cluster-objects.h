@@ -616,7 +616,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -626,7 +626,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -731,7 +731,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -741,7 +741,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -933,7 +933,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -943,7 +943,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -1274,7 +1274,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -1284,7 +1284,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -2054,7 +2054,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -2064,7 +2064,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -2495,7 +2495,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -2505,7 +2505,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -2540,7 +2540,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -2550,7 +2550,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -2997,7 +2997,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -3007,7 +3007,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -3206,7 +3206,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -3216,7 +3216,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -3331,7 +3331,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -3341,7 +3341,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -3446,7 +3446,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -3456,7 +3456,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -4269,7 +4269,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -4279,7 +4279,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -4625,7 +4625,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -4635,7 +4635,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -4713,7 +4713,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -4723,7 +4723,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -4946,7 +4946,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -4956,7 +4956,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -5250,7 +5250,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -5260,7 +5260,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -5509,7 +5509,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -5519,7 +5519,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -5607,7 +5607,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -5617,7 +5617,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -5942,7 +5942,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -5952,7 +5952,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -6245,7 +6245,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -6255,7 +6255,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -6910,7 +6910,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -6920,7 +6920,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7049,7 +7049,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7059,7 +7059,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7269,7 +7269,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7279,7 +7279,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7390,7 +7390,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7400,7 +7400,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -8246,7 +8246,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -8256,7 +8256,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -8460,7 +8460,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -8470,7 +8470,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -8622,7 +8622,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -8632,7 +8632,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -8886,7 +8886,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -8896,7 +8896,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -8941,7 +8941,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -8951,7 +8951,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -9077,7 +9077,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -9087,7 +9087,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -9607,7 +9607,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -9617,7 +9617,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -9665,7 +9665,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -9675,7 +9675,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -9740,7 +9740,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -9750,7 +9750,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -11998,7 +11998,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -12008,7 +12008,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -12588,7 +12588,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -12598,7 +12598,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -12768,7 +12768,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -12778,7 +12778,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -13077,7 +13077,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -13087,7 +13087,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -14273,7 +14273,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -14283,7 +14283,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -14318,7 +14318,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -14328,7 +14328,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -14423,7 +14423,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -14433,7 +14433,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -14478,7 +14478,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -14488,7 +14488,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -15895,7 +15895,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -15905,7 +15905,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16080,7 +16080,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16090,7 +16090,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16155,7 +16155,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16165,7 +16165,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16210,7 +16210,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceLevelSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16220,7 +16220,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceLevelSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16275,7 +16275,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16285,7 +16285,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16390,7 +16390,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16400,7 +16400,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16455,7 +16455,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16465,7 +16465,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16520,7 +16520,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16530,7 +16530,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16665,7 +16665,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16675,7 +16675,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16730,7 +16730,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16740,7 +16740,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16795,7 +16795,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16805,7 +16805,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16860,7 +16860,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16870,7 +16870,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16925,7 +16925,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16935,7 +16935,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16990,7 +16990,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17000,7 +17000,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17055,7 +17055,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17065,7 +17065,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17120,7 +17120,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17130,7 +17130,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17185,7 +17185,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17195,7 +17195,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17250,7 +17250,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17260,7 +17260,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17315,7 +17315,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17325,7 +17325,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17380,7 +17380,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17390,7 +17390,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17445,7 +17445,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17455,7 +17455,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17510,7 +17510,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17520,7 +17520,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17575,7 +17575,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17585,7 +17585,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17640,7 +17640,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17650,7 +17650,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17705,7 +17705,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17715,7 +17715,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17770,7 +17770,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17780,7 +17780,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17835,7 +17835,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17845,7 +17845,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17900,7 +17900,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17910,7 +17910,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17965,7 +17965,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -17975,7 +17975,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18030,7 +18030,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18040,7 +18040,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18095,7 +18095,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18105,7 +18105,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18160,7 +18160,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18170,7 +18170,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18225,7 +18225,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18235,7 +18235,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18290,7 +18290,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18300,7 +18300,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18355,7 +18355,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18365,7 +18365,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18420,7 +18420,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18430,7 +18430,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18485,7 +18485,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18495,7 +18495,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18550,7 +18550,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18560,7 +18560,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18615,7 +18615,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18625,7 +18625,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18970,7 +18970,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18980,7 +18980,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -19781,7 +19781,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -19791,7 +19791,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -19900,7 +19900,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -19910,7 +19910,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -19935,7 +19935,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -19945,7 +19945,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20187,7 +20187,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20197,7 +20197,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20333,7 +20333,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20343,7 +20343,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21078,7 +21078,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21088,7 +21088,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21282,7 +21282,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21292,7 +21292,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21334,7 +21334,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21344,7 +21344,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21527,7 +21527,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21537,7 +21537,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21880,7 +21880,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21890,7 +21890,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22028,7 +22028,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22038,7 +22038,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22187,7 +22187,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22197,7 +22197,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22327,7 +22327,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22337,7 +22337,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22442,7 +22442,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22452,7 +22452,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -23426,7 +23426,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -23436,7 +23436,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -23903,7 +23903,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -23913,7 +23913,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -24048,7 +24048,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -24058,7 +24058,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -24193,7 +24193,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -24203,7 +24203,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -24368,7 +24368,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -24378,7 +24378,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -24604,7 +24604,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -24614,7 +24614,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -26050,7 +26050,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26060,7 +26060,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -26152,7 +26152,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26162,7 +26162,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -26260,7 +26260,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26270,7 +26270,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -26336,7 +26336,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26346,7 +26346,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -26412,7 +26412,7 @@ struct TypeInfo
     using DecodableType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::FeatureMap::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26422,7 +26422,7 @@ struct TypeInfo
     using DecodableType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
-    static constexpr AttributeId GetAttributeId() { return Globals::Attributes::ClusterRevision::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes

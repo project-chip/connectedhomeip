@@ -143,11 +143,7 @@ namespace {{asUpperCamelCase label}} {
     {{/if}}
 
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
-{{#if clusterRef}}
         static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
-{{else}}
-        static constexpr AttributeId GetAttributeId() { return Globals::Attributes::{{asUpperCamelCase label}}::Id; }
-{{/if}}
     };
 } // namespace {{asUpperCamelCase label}}
 {{#last}}
