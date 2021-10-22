@@ -21,7 +21,7 @@
  *server implementation of the Mode Select Cluster.
  *******************************************************************************
  ******************************************************************************/
-#include <string>
+#include <cstring>
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/att-storage.h>
@@ -57,7 +57,7 @@ ModeSelectCluster::Structs::ModeOptionStruct::Type buildModeOptionStruct(const c
                                                                          uint32_t semanticTag)
 {
     ModeSelectCluster::Structs::ModeOptionStruct::Type option;
-    option.label       = CharSpan(label, std::strlen(label));
+    option.label       = CharSpan(label, strlen(label));
     option.mode        = mode;
     option.semanticTag = semanticTag;
     return option;
