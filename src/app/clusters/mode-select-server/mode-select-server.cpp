@@ -116,7 +116,7 @@ bool emberAfModeSelectClusterClusterChangeToModeCallback(
     EmberAfStatus checkSupportedModeStatus = gSupportedModeManager.getModeOptionByMode(endpointId, newMode, modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: Failed to find the option with mode %hhu", newMode);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: Failed to find the option with mode %" PRIu8, newMode);
         emberAfSendImmediateDefaultResponse(checkSupportedModeStatus);
         return false;
     }
