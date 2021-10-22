@@ -192,3 +192,54 @@ into master
 Documentation undergoes the same review process as code See the
 [Documentation Style Guide](https://github.com/project-chip/connectedhomeip/blob/master/docs/STYLE_GUIDE.md)
 for more information on how to author and format documentation for contribution.
+
+
+## Merge Processes
+Merges require at least 3 approvals from unique require-reviewers lists, and all CI tests passing.
+
+
+### Shorter Reviews
+
+Development Lead & Vice Leads can merge a change with fewer then the required approvals have been submitted.
+
+A separate "fast track" label will be created that will only require a single checkbox to be set, this label shall only be set by the SW Development Lead, and/or Vice Lead (unless they’re both unavailable, in which case a replacement can be temporarily appointed)
+
+"Day" here means "business day" (i.e. PRs on friday do not get fast-tracked faster).
+
+### Fast track types
+
+### Trivial changes
+
+Small changes or changes that do not affect the main functionality of the code can be fast tracked immediately. Examples:
+* Adding/removing documentation (.md files)
+* Adding tests (may include small reorganization/method adding/changes to enable testability): 
+    * certification tests
+    * stability tests
+    * integration tests
+    * functional tests
+    * Test scripts
+    * Additional tests following a pattern (e.g. YAML tests)
+* Adding/updating/fixing tooling to aid in development
+* Re-running code generation
+* Code readability refactors:
+    * renaming enum/classes/structure members
+    * moving constant header location
+    * Obviously trivial build rule changes (e.g. adding missing files to build rules)
+    * Changing comments
+    * Adding/removing includes (include what you need and only what you need rules)
+* Pulling new third-party repo files
+* Platform vendors/maintainers adding platform features/logic/bug fixes to their own platforms
+* Most changes to existing docker files (pulling new versions, reorganizing)
+* Most changes to new dockerfile version in workflows
+
+#### Fast track changes
+Larger functionality changes are allowed to be fast tracked with these requirements/restrictions:
+* Require at least 1 day to have passed since the creation of the PR
+* Require at least 1 checkmark from someone familiar with the code or problem space
+    * This requirement shall be dropped after a PR is 3 days old with stale or no feedback.
+* Code is sufficiently covered by automated tests (or impossible to automatically test with a very solid reason for this - e.g. changes to BLE parameters cannot be automatically tested, but should have been manually verified)
+
+Fast tracking these changes will involve resolving any obviously 'resolved' comments (judgment call here: were they replied to or addressed) and merging the change.
+
+Any "request for changes" marker will always be respected unless obviously resolved (i.e. author marked "requesting changes because of X and X was done in the PR")
+* This requirement shall be dropped after a PR is 3 days old with stale or no feedback.
