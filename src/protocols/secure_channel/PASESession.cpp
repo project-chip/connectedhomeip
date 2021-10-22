@@ -443,8 +443,8 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
 {
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    const size_t max_msg_len = EstimateTLVStructOverhead(
-                                                         kPBKDFParamRandomNumberSize, kPBKDFParamRandomNumberSize, sizeof(uint16_t), sizeof(uint16_t), sizeof(uint8_t));
+    const size_t max_msg_len = EstimateTLVStructOverhead(kPBKDFParamRandomNumberSize, kPBKDFParamRandomNumberSize, sizeof(uint16_t),
+                                                         sizeof(uint16_t), sizeof(uint8_t));
     System::PacketBufferHandle resp = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!resp.IsNull(), CHIP_ERROR_NO_MEMORY);
 

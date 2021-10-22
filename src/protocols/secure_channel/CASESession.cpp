@@ -488,8 +488,8 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
 {
-    size_t max_sigma2_resume_data_len = EstimateTLVStructOverhead(
-                                                                  kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sizeof(uint16_t) /*, kMRPOptionalParamsLength, */);
+    size_t max_sigma2_resume_data_len = EstimateTLVStructOverhead(kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                                                                  sizeof(uint16_t) /*, kMRPOptionalParamsLength, */);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R2_resume;
@@ -572,7 +572,8 @@ CHIP_ERROR CASESession::SendSigma2()
                                            kKDFInfoLength, sr2k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
 
     // Construct Sigma2 TBS Data
-    size_t msg_r2_signed_len = EstimateTLVStructOverhead(nocCert.size(), icaCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+    size_t msg_r2_signed_len =
+        EstimateTLVStructOverhead(nocCert.size(), icaCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Signed;
     VerifyOrReturnError(msg_R2_Signed.Alloc(msg_r2_signed_len), CHIP_ERROR_NO_MEMORY);
@@ -840,8 +841,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = Validate_and_RetrieveResponderID(responderNOC, responderICAC, remoteCredential));
 
     // Construct msg_R2_Signed and validate the signature in msg_r2_encrypted
-    msg_r2_signed_len =
-        EstimateTLVStructOverhead(sizeof(uint16_t), responderNOC.size(), responderICAC.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+    msg_r2_signed_len = EstimateTLVStructOverhead(sizeof(uint16_t), responderNOC.size(), responderICAC.size(),
+                                                  kP256_PublicKey_Length, kP256_PublicKey_Length);
 
     VerifyOrExit(msg_R2_Signed.Alloc(msg_r2_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
@@ -1094,8 +1095,8 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = Validate_and_RetrieveResponderID(initiatorNOC, initiatorICAC, remoteCredential));
 
     // Step 4 - Construct Sigma3 TBS Data
-    msg_r3_signed_len =
-        EstimateTLVStructOverhead(sizeof(uint16_t), initiatorNOC.size(), initiatorICAC.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+    msg_r3_signed_len = EstimateTLVStructOverhead(sizeof(uint16_t), initiatorNOC.size(), initiatorICAC.size(),
+                                                  kP256_PublicKey_Length, kP256_PublicKey_Length);
 
     VerifyOrExit(msg_R3_Signed.Alloc(msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
