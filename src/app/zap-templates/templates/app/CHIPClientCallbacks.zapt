@@ -32,7 +32,7 @@ typedef void (*{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}C
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
 void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
-typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback)(void * context, const {{zapTypeToDecodableClusterObjectType type ns=parent.name}} & data);
+typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback)(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} data);
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

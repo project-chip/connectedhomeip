@@ -1,4 +1,5 @@
 {{#if isArray}}
+
   {{! forceNotList=true because we really want the type of a single item here }}
   {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true}} {{asLowerCamelCase label}}List[{{definedValue.length}}];
   {{#each definedValue}}
