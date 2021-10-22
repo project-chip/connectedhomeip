@@ -24,8 +24,6 @@ from .device import Device
 from .serial_connection import SerialConnection
 from .serial_device import SerialDevice
 
-from chip import ChipDeviceCtrl
-
 import logging
 log = logging.getLogger(__name__)
 
@@ -132,10 +130,3 @@ def device(board_allocator):
     device = board_allocator.allocate(name='DUT')
     yield device
     board_allocator.release(device)
-
-
-@pytest.fixture(scope="function")
-def device_controller():
-    devCtrl = ChipDeviceCtrl.ChipDeviceController()
-    yield devCtrl
-    devCtrl.__del__
