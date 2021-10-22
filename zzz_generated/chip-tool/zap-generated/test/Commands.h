@@ -78,21 +78,18 @@ private:
     const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_BI_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -102,7 +99,7 @@ private:
         (static_cast<Test_TC_BI_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
     }
@@ -112,7 +109,7 @@ private:
         (static_cast<Test_TC_BI_1_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
     }
@@ -131,7 +128,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision)
+    void OnSuccessResponse_0(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 1U));
         NextTest();
@@ -150,7 +147,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_1(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_1(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
@@ -162,7 +159,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint16_t & clusterRevision)
+    void OnSuccessResponse_2(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 1U));
         NextTest();
@@ -218,15 +215,14 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_CC_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -248,7 +244,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
 class Test_TC_CC_3_1 : public TestCommand
@@ -327,16 +323,16 @@ private:
     const uint16_t mTestCount = 8;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -346,7 +342,7 @@ private:
         (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const bool & onOff)
+    static void OnSuccessCallback_7(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_7(onOff);
     }
@@ -389,7 +385,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -545,7 +541,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const bool & onOff)
+    void OnSuccessResponse_7(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -628,16 +624,16 @@ private:
     const uint16_t mTestCount = 8;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -647,7 +643,7 @@ private:
         (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const bool & onOff)
+    static void OnSuccessCallback_7(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_7(onOff);
     }
@@ -690,7 +686,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -842,7 +838,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const bool & onOff)
+    void OnSuccessResponse_7(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -917,16 +913,16 @@ private:
     const uint16_t mTestCount = 6;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -936,7 +932,7 @@ private:
         (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const bool & onOff)
+    static void OnSuccessCallback_5(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_5(onOff);
     }
@@ -979,7 +975,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -1077,7 +1073,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const bool & onOff)
+    void OnSuccessResponse_5(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -1148,16 +1144,16 @@ private:
     const uint16_t mTestCount = 5;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_4_1 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -1167,7 +1163,7 @@ private:
         (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const bool & onOff)
+    static void OnSuccessCallback_4(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_4_1 *>(context))->OnSuccessResponse_4(onOff);
     }
@@ -1210,7 +1206,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -1278,7 +1274,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const bool & onOff)
+    void OnSuccessResponse_4(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -1353,16 +1349,16 @@ private:
     const uint16_t mTestCount = 6;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -1372,7 +1368,7 @@ private:
         (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const bool & onOff)
+    static void OnSuccessCallback_5(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_5(onOff);
     }
@@ -1415,7 +1411,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -1511,7 +1507,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const bool & onOff)
+    void OnSuccessResponse_5(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -1586,16 +1582,16 @@ private:
     const uint16_t mTestCount = 6;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -1605,7 +1601,7 @@ private:
         (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const bool & onOff)
+    static void OnSuccessCallback_5(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_5(onOff);
     }
@@ -1648,7 +1644,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -1746,7 +1742,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const bool & onOff)
+    void OnSuccessResponse_5(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -1817,16 +1813,16 @@ private:
     const uint16_t mTestCount = 5;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_4_4 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -1836,7 +1832,7 @@ private:
         (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const bool & onOff)
+    static void OnSuccessCallback_4(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_4_4 *>(context))->OnSuccessResponse_4(onOff);
     }
@@ -1879,7 +1875,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -1948,7 +1944,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const bool & onOff)
+    void OnSuccessResponse_4(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -2019,16 +2015,16 @@ private:
     const uint16_t mTestCount = 5;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_5_1 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -2038,7 +2034,7 @@ private:
         (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const bool & onOff)
+    static void OnSuccessCallback_4(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_5_1 *>(context))->OnSuccessResponse_4(onOff);
     }
@@ -2081,7 +2077,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -2150,7 +2146,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const bool & onOff)
+    void OnSuccessResponse_4(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -2225,16 +2221,16 @@ private:
     const uint16_t mTestCount = 6;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -2244,7 +2240,7 @@ private:
         (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const bool & onOff)
+    static void OnSuccessCallback_5(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_5(onOff);
     }
@@ -2287,7 +2283,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -2381,7 +2377,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const bool & onOff)
+    void OnSuccessResponse_5(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -2452,16 +2448,16 @@ private:
     const uint16_t mTestCount = 5;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_5_3 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -2471,7 +2467,7 @@ private:
         (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const bool & onOff)
+    static void OnSuccessCallback_4(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_5_3 *>(context))->OnSuccessResponse_4(onOff);
     }
@@ -2514,7 +2510,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -2583,7 +2579,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const bool & onOff)
+    void OnSuccessResponse_4(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -2654,16 +2650,16 @@ private:
     const uint16_t mTestCount = 5;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_6_1 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -2673,7 +2669,7 @@ private:
         (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const bool & onOff)
+    static void OnSuccessCallback_4(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_6_1 *>(context))->OnSuccessResponse_4(onOff);
     }
@@ -2716,7 +2712,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -2784,7 +2780,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const bool & onOff)
+    void OnSuccessResponse_4(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -2863,16 +2859,16 @@ private:
     const uint16_t mTestCount = 7;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -2882,7 +2878,7 @@ private:
         (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const bool & onOff)
+    static void OnSuccessCallback_6(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_6(onOff);
     }
@@ -2925,7 +2921,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -3055,7 +3051,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const bool & onOff)
+    void OnSuccessResponse_6(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -3130,16 +3126,16 @@ private:
     const uint16_t mTestCount = 6;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -3149,7 +3145,7 @@ private:
         (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const bool & onOff)
+    static void OnSuccessCallback_5(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_5(onOff);
     }
@@ -3192,7 +3188,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -3294,7 +3290,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const bool & onOff)
+    void OnSuccessResponse_5(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -3370,19 +3366,18 @@ private:
     const uint16_t mTestCount = 6;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & remainingTime)> mOnSuccessCallback_3{ OnSuccessCallback_3,
-                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t remainingTime)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_7_1 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -3392,7 +3387,7 @@ private:
         (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint16_t & remainingTime)
+    static void OnSuccessCallback_3(void * context, uint16_t remainingTime)
     {
         (static_cast<Test_TC_CC_7_1 *>(context))->OnSuccessResponse_3(remainingTime);
     }
@@ -3402,7 +3397,7 @@ private:
         (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const bool & onOff)
+    static void OnSuccessCallback_5(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_7_1 *>(context))->OnSuccessResponse_5(onOff);
     }
@@ -3445,7 +3440,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -3490,7 +3485,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint16_t & remainingTime)
+    void OnSuccessResponse_3(uint16_t remainingTime)
     {
         VerifyOrReturn(CheckValue<uint16_t>("remainingTime", remainingTime, 1U));
         NextTest();
@@ -3530,7 +3525,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const bool & onOff)
+    void OnSuccessResponse_5(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -3613,16 +3608,16 @@ private:
     const uint16_t mTestCount = 8;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -3632,7 +3627,7 @@ private:
         (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const bool & onOff)
+    static void OnSuccessCallback_7(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_7(onOff);
     }
@@ -3675,7 +3670,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -3827,7 +3822,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const bool & onOff)
+    void OnSuccessResponse_7(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -3902,16 +3897,16 @@ private:
     const uint16_t mTestCount = 6;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -3921,7 +3916,7 @@ private:
         (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const bool & onOff)
+    static void OnSuccessCallback_5(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_5(onOff);
     }
@@ -3964,7 +3959,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -4062,7 +4057,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const bool & onOff)
+    void OnSuccessResponse_5(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -4133,16 +4128,16 @@ private:
     const uint16_t mTestCount = 5;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_7_4 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -4152,7 +4147,7 @@ private:
         (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const bool & onOff)
+    static void OnSuccessCallback_4(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_7_4 *>(context))->OnSuccessResponse_4(onOff);
     }
@@ -4195,7 +4190,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -4264,7 +4259,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const bool & onOff)
+    void OnSuccessResponse_4(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -4379,44 +4374,37 @@ private:
     const uint16_t mTestCount = 16;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & colorLoopDirection)> mOnSuccessCallback_3{
-        OnSuccessCallback_3, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_3{ OnSuccessCallback_3,
+                                                                                                         this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & colorLoopTime)> mOnSuccessCallback_4{ OnSuccessCallback_4,
-                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopTime)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & colorLoopStartEnhancedHue)> mOnSuccessCallback_5{
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStartEnhancedHue)> mOnSuccessCallback_5{
         OnSuccessCallback_5, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & colorLoopActive)> mOnSuccessCallback_6{ OnSuccessCallback_6,
-                                                                                                              this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & colorLoopActive)> mOnSuccessCallback_8{ OnSuccessCallback_8,
-                                                                                                              this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & colorLoopDirection)> mOnSuccessCallback_10{
-        OnSuccessCallback_10, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_10{ OnSuccessCallback_10,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & colorLoopTime)> mOnSuccessCallback_11{ OnSuccessCallback_11,
-                                                                                                              this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopTime)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & colorLoopDirection)> mOnSuccessCallback_13{
-        OnSuccessCallback_13, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_13{ OnSuccessCallback_13,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_15{ OnFailureCallback_15, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_15{ OnSuccessCallback_15, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_15{ OnSuccessCallback_15, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -4426,7 +4414,7 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint8_t & colorLoopDirection)
+    static void OnSuccessCallback_3(void * context, uint8_t colorLoopDirection)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_3(colorLoopDirection);
     }
@@ -4436,7 +4424,7 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const uint16_t & colorLoopTime)
+    static void OnSuccessCallback_4(void * context, uint16_t colorLoopTime)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_4(colorLoopTime);
     }
@@ -4446,7 +4434,7 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const uint16_t & colorLoopStartEnhancedHue)
+    static void OnSuccessCallback_5(void * context, uint16_t colorLoopStartEnhancedHue)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_5(colorLoopStartEnhancedHue);
     }
@@ -4456,7 +4444,7 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const uint8_t & colorLoopActive)
+    static void OnSuccessCallback_6(void * context, uint8_t colorLoopActive)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_6(colorLoopActive);
     }
@@ -4466,7 +4454,7 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, const uint8_t & colorLoopActive)
+    static void OnSuccessCallback_8(void * context, uint8_t colorLoopActive)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_8(colorLoopActive);
     }
@@ -4476,7 +4464,7 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, const uint8_t & colorLoopDirection)
+    static void OnSuccessCallback_10(void * context, uint8_t colorLoopDirection)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_10(colorLoopDirection);
     }
@@ -4486,7 +4474,7 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, const uint16_t & colorLoopTime)
+    static void OnSuccessCallback_11(void * context, uint16_t colorLoopTime)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_11(colorLoopTime);
     }
@@ -4496,7 +4484,7 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_13(status);
     }
 
-    static void OnSuccessCallback_13(void * context, const uint8_t & colorLoopDirection)
+    static void OnSuccessCallback_13(void * context, uint8_t colorLoopDirection)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_13(colorLoopDirection);
     }
@@ -4506,7 +4494,7 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_15(status);
     }
 
-    static void OnSuccessCallback_15(void * context, const bool & onOff)
+    static void OnSuccessCallback_15(void * context, bool onOff)
     {
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_15(onOff);
     }
@@ -4549,7 +4537,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -4596,7 +4584,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint8_t & colorLoopDirection)
+    void OnSuccessResponse_3(uint8_t colorLoopDirection)
     {
         VerifyOrReturn(CheckValue<uint8_t>("colorLoopDirection", colorLoopDirection, 1));
         NextTest();
@@ -4612,7 +4600,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const uint16_t & colorLoopTime)
+    void OnSuccessResponse_4(uint16_t colorLoopTime)
     {
         VerifyOrReturn(CheckValue<uint16_t>("colorLoopTime", colorLoopTime, 100U));
         NextTest();
@@ -4628,7 +4616,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const uint16_t & colorLoopStartEnhancedHue)
+    void OnSuccessResponse_5(uint16_t colorLoopStartEnhancedHue)
     {
         VerifyOrReturn(CheckValue<uint16_t>("colorLoopStartEnhancedHue", colorLoopStartEnhancedHue, 500U));
         NextTest();
@@ -4644,7 +4632,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const uint8_t & colorLoopActive)
+    void OnSuccessResponse_6(uint8_t colorLoopActive)
     {
         VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 0));
         NextTest();
@@ -4691,7 +4679,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(const uint8_t & colorLoopActive)
+    void OnSuccessResponse_8(uint8_t colorLoopActive)
     {
         VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 1));
         NextTest();
@@ -4738,7 +4726,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(const uint8_t & colorLoopDirection)
+    void OnSuccessResponse_10(uint8_t colorLoopDirection)
     {
         VerifyOrReturn(CheckValue<uint8_t>("colorLoopDirection", colorLoopDirection, 0));
         NextTest();
@@ -4754,7 +4742,7 @@ private:
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(const uint16_t & colorLoopTime)
+    void OnSuccessResponse_11(uint16_t colorLoopTime)
     {
         VerifyOrReturn(CheckValue<uint16_t>("colorLoopTime", colorLoopTime, 3500U));
         NextTest();
@@ -4801,7 +4789,7 @@ private:
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_13(const uint8_t & colorLoopDirection)
+    void OnSuccessResponse_13(uint8_t colorLoopDirection)
     {
         VerifyOrReturn(CheckValue<uint8_t>("colorLoopDirection", colorLoopDirection, 1));
         NextTest();
@@ -4841,7 +4829,7 @@ private:
 
     void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_15(const bool & onOff)
+    void OnSuccessResponse_15(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -4964,74 +4952,61 @@ private:
     const uint16_t mTestCount = 18;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & interactionModelVersion)> mOnSuccessCallback_0{
-        OnSuccessCallback_0, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint16_t interactionModelVersion)> mOnSuccessCallback_0{ OnSuccessCallback_0,
+                                                                                                               this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & vendorName)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                                this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan vendorName)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & vendorID)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t vendorID)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & productName)> mOnSuccessCallback_3{
-        OnSuccessCallback_3, this
-    };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & productID)> mOnSuccessCallback_4{ OnSuccessCallback_4,
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan productName)> mOnSuccessCallback_3{ OnSuccessCallback_3,
                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t productID)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & userLabel)> mOnSuccessCallback_5{ OnSuccessCallback_5,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan userLabel)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & location)> mOnSuccessCallback_6{ OnSuccessCallback_6,
-                                                                                                              this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan location)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & hardwareVersion)> mOnSuccessCallback_7{ OnSuccessCallback_7,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t hardwareVersion)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & hardwareVersionString)> mOnSuccessCallback_8{
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan hardwareVersionString)> mOnSuccessCallback_8{
         OnSuccessCallback_8, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & softwareVersion)> mOnSuccessCallback_9{ OnSuccessCallback_9,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t softwareVersion)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & softwareVersionString)> mOnSuccessCallback_10{
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan softwareVersionString)> mOnSuccessCallback_10{
         OnSuccessCallback_10, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & manufacturingDate)> mOnSuccessCallback_11{
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan manufacturingDate)> mOnSuccessCallback_11{
         OnSuccessCallback_11, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_12{ OnFailureCallback_12, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & partNumber)> mOnSuccessCallback_12{
-        OnSuccessCallback_12, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan partNumber)> mOnSuccessCallback_12{ OnSuccessCallback_12,
+                                                                                                         this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & productURL)> mOnSuccessCallback_13{
-        OnSuccessCallback_13, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan productURL)> mOnSuccessCallback_13{ OnSuccessCallback_13,
+                                                                                                         this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_14{ OnFailureCallback_14, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & productLabel)> mOnSuccessCallback_14{
-        OnSuccessCallback_14, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan productLabel)> mOnSuccessCallback_14{ OnSuccessCallback_14,
+                                                                                                           this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_15{ OnFailureCallback_15, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & serialNumber)> mOnSuccessCallback_15{
-        OnSuccessCallback_15, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan serialNumber)> mOnSuccessCallback_15{ OnSuccessCallback_15,
+                                                                                                           this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_16{ OnFailureCallback_16, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & localConfigDisabled)> mOnSuccessCallback_16{
-        OnSuccessCallback_16, this
-    };
+    chip::Callback::Callback<void (*)(void * context, bool localConfigDisabled)> mOnSuccessCallback_16{ OnSuccessCallback_16,
+                                                                                                        this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_17{ OnFailureCallback_17, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & reachable)> mOnSuccessCallback_17{ OnSuccessCallback_17, this };
+    chip::Callback::Callback<void (*)(void * context, bool reachable)> mOnSuccessCallback_17{ OnSuccessCallback_17, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & interactionModelVersion)
+    static void OnSuccessCallback_0(void * context, uint16_t interactionModelVersion)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_0(interactionModelVersion);
     }
@@ -5041,7 +5016,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const chip::CharSpan & vendorName)
+    static void OnSuccessCallback_1(void * context, chip::CharSpan vendorName)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_1(vendorName);
     }
@@ -5051,7 +5026,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint16_t & vendorID)
+    static void OnSuccessCallback_2(void * context, uint16_t vendorID)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_2(vendorID);
     }
@@ -5061,7 +5036,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const chip::CharSpan & productName)
+    static void OnSuccessCallback_3(void * context, chip::CharSpan productName)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_3(productName);
     }
@@ -5071,7 +5046,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const uint16_t & productID)
+    static void OnSuccessCallback_4(void * context, uint16_t productID)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_4(productID);
     }
@@ -5081,7 +5056,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const chip::CharSpan & userLabel)
+    static void OnSuccessCallback_5(void * context, chip::CharSpan userLabel)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_5(userLabel);
     }
@@ -5091,7 +5066,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const chip::CharSpan & location)
+    static void OnSuccessCallback_6(void * context, chip::CharSpan location)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_6(location);
     }
@@ -5101,7 +5076,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const uint16_t & hardwareVersion)
+    static void OnSuccessCallback_7(void * context, uint16_t hardwareVersion)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_7(hardwareVersion);
     }
@@ -5111,7 +5086,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, const chip::CharSpan & hardwareVersionString)
+    static void OnSuccessCallback_8(void * context, chip::CharSpan hardwareVersionString)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_8(hardwareVersionString);
     }
@@ -5121,7 +5096,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_9(status);
     }
 
-    static void OnSuccessCallback_9(void * context, const uint32_t & softwareVersion)
+    static void OnSuccessCallback_9(void * context, uint32_t softwareVersion)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_9(softwareVersion);
     }
@@ -5131,7 +5106,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, const chip::CharSpan & softwareVersionString)
+    static void OnSuccessCallback_10(void * context, chip::CharSpan softwareVersionString)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_10(softwareVersionString);
     }
@@ -5141,7 +5116,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, const chip::CharSpan & manufacturingDate)
+    static void OnSuccessCallback_11(void * context, chip::CharSpan manufacturingDate)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_11(manufacturingDate);
     }
@@ -5151,7 +5126,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_12(status);
     }
 
-    static void OnSuccessCallback_12(void * context, const chip::CharSpan & partNumber)
+    static void OnSuccessCallback_12(void * context, chip::CharSpan partNumber)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_12(partNumber);
     }
@@ -5161,7 +5136,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_13(status);
     }
 
-    static void OnSuccessCallback_13(void * context, const chip::CharSpan & productURL)
+    static void OnSuccessCallback_13(void * context, chip::CharSpan productURL)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_13(productURL);
     }
@@ -5171,7 +5146,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_14(status);
     }
 
-    static void OnSuccessCallback_14(void * context, const chip::CharSpan & productLabel)
+    static void OnSuccessCallback_14(void * context, chip::CharSpan productLabel)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_14(productLabel);
     }
@@ -5181,7 +5156,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_15(status);
     }
 
-    static void OnSuccessCallback_15(void * context, const chip::CharSpan & serialNumber)
+    static void OnSuccessCallback_15(void * context, chip::CharSpan serialNumber)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_15(serialNumber);
     }
@@ -5191,7 +5166,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_16(status);
     }
 
-    static void OnSuccessCallback_16(void * context, const bool & localConfigDisabled)
+    static void OnSuccessCallback_16(void * context, bool localConfigDisabled)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_16(localConfigDisabled);
     }
@@ -5201,7 +5176,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_17(status);
     }
 
-    static void OnSuccessCallback_17(void * context, const bool & reachable)
+    static void OnSuccessCallback_17(void * context, bool reachable)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_17(reachable);
     }
@@ -5220,7 +5195,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint16_t & interactionModelVersion)
+    void OnSuccessResponse_0(uint16_t interactionModelVersion)
     {
         VerifyOrReturn(CheckConstraintType("interactionModelVersion", "", "uint16"));
         NextTest();
@@ -5236,7 +5211,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const chip::CharSpan & vendorName)
+    void OnSuccessResponse_1(chip::CharSpan vendorName)
     {
         VerifyOrReturn(CheckConstraintType("vendorName", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("vendorName", vendorName.size(), 32));
@@ -5253,7 +5228,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint16_t & vendorID)
+    void OnSuccessResponse_2(uint16_t vendorID)
     {
         VerifyOrReturn(CheckConstraintType("vendorID", "", "uint16"));
         NextTest();
@@ -5269,7 +5244,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const chip::CharSpan & productName)
+    void OnSuccessResponse_3(chip::CharSpan productName)
     {
         VerifyOrReturn(CheckConstraintType("productName", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("productName", productName.size(), 32));
@@ -5286,7 +5261,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const uint16_t & productID)
+    void OnSuccessResponse_4(uint16_t productID)
     {
         VerifyOrReturn(CheckConstraintType("productID", "", "uint16"));
         NextTest();
@@ -5302,7 +5277,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const chip::CharSpan & userLabel)
+    void OnSuccessResponse_5(chip::CharSpan userLabel)
     {
         VerifyOrReturn(CheckConstraintType("userLabel", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("userLabel", userLabel.size(), 32));
@@ -5319,7 +5294,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const chip::CharSpan & location)
+    void OnSuccessResponse_6(chip::CharSpan location)
     {
         VerifyOrReturn(CheckConstraintType("location", "", "string"));
         VerifyOrReturn(CheckConstraintFormat("location", "", "ISO 3166-1 alpha-2"));
@@ -5337,7 +5312,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const uint16_t & hardwareVersion)
+    void OnSuccessResponse_7(uint16_t hardwareVersion)
     {
         VerifyOrReturn(CheckConstraintType("hardwareVersion", "", "uint16"));
         NextTest();
@@ -5353,7 +5328,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(const chip::CharSpan & hardwareVersionString)
+    void OnSuccessResponse_8(chip::CharSpan hardwareVersionString)
     {
         VerifyOrReturn(CheckConstraintType("hardwareVersionString", "", "string"));
         VerifyOrReturn(CheckConstraintMinLength("hardwareVersionString", hardwareVersionString.size(), 1));
@@ -5371,7 +5346,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(const uint32_t & softwareVersion)
+    void OnSuccessResponse_9(uint32_t softwareVersion)
     {
         VerifyOrReturn(CheckConstraintType("softwareVersion", "", "uint32"));
         NextTest();
@@ -5387,7 +5362,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(const chip::CharSpan & softwareVersionString)
+    void OnSuccessResponse_10(chip::CharSpan softwareVersionString)
     {
         VerifyOrReturn(CheckConstraintType("softwareVersionString", "", "string"));
         VerifyOrReturn(CheckConstraintFormat("softwareVersionString", "", "ASCII"));
@@ -5409,7 +5384,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11(const chip::CharSpan & manufacturingDate)
+    void OnSuccessResponse_11(chip::CharSpan manufacturingDate)
     {
         VerifyOrReturn(CheckConstraintType("manufacturingDate", "", "string"));
         VerifyOrReturn(CheckConstraintFormat("manufacturingDate", "", "ISO 8601"));
@@ -5431,7 +5406,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12(const chip::CharSpan & partNumber)
+    void OnSuccessResponse_12(chip::CharSpan partNumber)
     {
         VerifyOrReturn(CheckConstraintType("partNumber", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("partNumber", partNumber.size(), 32));
@@ -5451,7 +5426,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(const chip::CharSpan & productURL)
+    void OnSuccessResponse_13(chip::CharSpan productURL)
     {
         VerifyOrReturn(CheckConstraintType("productURL", "", "string"));
         VerifyOrReturn(CheckConstraintFormat("productURL", "", "RFC3986"));
@@ -5472,7 +5447,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14(const chip::CharSpan & productLabel)
+    void OnSuccessResponse_14(chip::CharSpan productLabel)
     {
         VerifyOrReturn(CheckConstraintType("productLabel", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("productLabel", productLabel.size(), 64));
@@ -5492,7 +5467,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15(const chip::CharSpan & serialNumber)
+    void OnSuccessResponse_15(chip::CharSpan serialNumber)
     {
         VerifyOrReturn(CheckConstraintType("serialNumber", "", "string"));
         VerifyOrReturn(CheckConstraintMaxLength("serialNumber", serialNumber.size(), 32));
@@ -5512,7 +5487,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_16(const bool & localConfigDisabled)
+    void OnSuccessResponse_16(bool localConfigDisabled)
     {
         VerifyOrReturn(CheckConstraintType("localConfigDisabled", "", "boolean"));
         NextTest();
@@ -5531,7 +5506,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17(const bool & reachable)
+    void OnSuccessResponse_17(bool reachable)
     {
         VerifyOrReturn(CheckConstraintType("reachable", "", "boolean"));
         NextTest();
@@ -5635,15 +5610,14 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_FLW_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_FLW_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -5665,7 +5639,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
 class Test_TC_FLW_2_1 : public TestCommand
@@ -5744,36 +5718,28 @@ private:
     const uint16_t mTestCount = 8;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & measuredValue)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & minMeasuredValue)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, int16_t minMeasuredValue)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & maxMeasuredValue)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, int16_t maxMeasuredValue)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & minMeasuredValue)> mOnSuccessCallback_3{ OnSuccessCallback_3,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, int16_t minMeasuredValue)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & maxMeasuredValue)> mOnSuccessCallback_4{ OnSuccessCallback_4,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, int16_t maxMeasuredValue)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & measuredValue)> mOnSuccessCallback_5{ OnSuccessCallback_5,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & minMeasuredValue)> mOnSuccessCallback_6{ OnSuccessCallback_6,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, int16_t minMeasuredValue)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & maxMeasuredValue)> mOnSuccessCallback_7{ OnSuccessCallback_7,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, int16_t maxMeasuredValue)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const int16_t & measuredValue)
+    static void OnSuccessCallback_0(void * context, int16_t measuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_0(measuredValue);
     }
@@ -5783,7 +5749,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const int16_t & minMeasuredValue)
+    static void OnSuccessCallback_1(void * context, int16_t minMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_1(minMeasuredValue);
     }
@@ -5793,7 +5759,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const int16_t & maxMeasuredValue)
+    static void OnSuccessCallback_2(void * context, int16_t maxMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_2(maxMeasuredValue);
     }
@@ -5803,7 +5769,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const int16_t & minMeasuredValue)
+    static void OnSuccessCallback_3(void * context, int16_t minMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_3(minMeasuredValue);
     }
@@ -5813,7 +5779,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const int16_t & maxMeasuredValue)
+    static void OnSuccessCallback_4(void * context, int16_t maxMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_4(maxMeasuredValue);
     }
@@ -5823,7 +5789,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const int16_t & measuredValue)
+    static void OnSuccessCallback_5(void * context, int16_t measuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_5(measuredValue);
     }
@@ -5833,7 +5799,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const int16_t & minMeasuredValue)
+    static void OnSuccessCallback_6(void * context, int16_t minMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_6(minMeasuredValue);
     }
@@ -5843,7 +5809,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const int16_t & maxMeasuredValue)
+    static void OnSuccessCallback_7(void * context, int16_t maxMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_7(maxMeasuredValue);
     }
@@ -5862,7 +5828,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const int16_t & measuredValue)
+    void OnSuccessResponse_0(int16_t measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -5878,7 +5844,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const int16_t & minMeasuredValue)
+    void OnSuccessResponse_1(int16_t minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
         NextTest();
@@ -5894,7 +5860,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const int16_t & maxMeasuredValue)
+    void OnSuccessResponse_2(int16_t maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "uint16"));
         NextTest();
@@ -5913,7 +5879,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_3(const int16_t & minMeasuredValue) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3(int16_t minMeasuredValue) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_4()
     {
@@ -5928,7 +5894,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_4(const int16_t & maxMeasuredValue) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_4(int16_t maxMeasuredValue) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_5()
     {
@@ -5940,7 +5906,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const int16_t & measuredValue)
+    void OnSuccessResponse_5(int16_t measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -5956,7 +5922,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const int16_t & minMeasuredValue)
+    void OnSuccessResponse_6(int16_t minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
         NextTest();
@@ -5972,7 +5938,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const int16_t & maxMeasuredValue)
+    void OnSuccessResponse_7(int16_t maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "uint16"));
         NextTest();
@@ -6031,18 +5997,16 @@ private:
     const uint16_t mTestCount = 2;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & measuredValue)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & measuredValue)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const int16_t & measuredValue)
+    static void OnSuccessCallback_0(void * context, int16_t measuredValue)
     {
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnSuccessResponse_0(measuredValue);
     }
@@ -6052,7 +6016,7 @@ private:
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const int16_t & measuredValue)
+    static void OnSuccessCallback_1(void * context, int16_t measuredValue)
     {
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnSuccessResponse_1(measuredValue);
     }
@@ -6071,7 +6035,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const int16_t & measuredValue)
+    void OnSuccessResponse_0(int16_t measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -6087,7 +6051,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const int16_t & measuredValue)
+    void OnSuccessResponse_1(int16_t measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -6143,15 +6107,14 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_LVL_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_LVL_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -6173,7 +6136,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
 class Test_TC_LVL_2_1 : public TestCommand
@@ -6272,28 +6235,23 @@ private:
     const uint16_t mTestCount = 13;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & currentLevel)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & currentLevel)> mOnSuccessCallback_3{ OnSuccessCallback_3,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & currentLevel)> mOnSuccessCallback_6{ OnSuccessCallback_6,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & onOffTransitionTime)> mOnSuccessCallback_7{
-        OnSuccessCallback_7, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint16_t onOffTransitionTime)> mOnSuccessCallback_7{ OnSuccessCallback_7,
+                                                                                                           this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & currentLevel)> mOnSuccessCallback_10{ OnSuccessCallback_10,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint8_t & currentLevel)
+    static void OnSuccessCallback_0(void * context, uint8_t currentLevel)
     {
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_0(currentLevel);
     }
@@ -6303,7 +6261,7 @@ private:
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint8_t & currentLevel)
+    static void OnSuccessCallback_3(void * context, uint8_t currentLevel)
     {
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_3(currentLevel);
     }
@@ -6313,7 +6271,7 @@ private:
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const uint8_t & currentLevel)
+    static void OnSuccessCallback_6(void * context, uint8_t currentLevel)
     {
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_6(currentLevel);
     }
@@ -6323,7 +6281,7 @@ private:
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const uint16_t & onOffTransitionTime)
+    static void OnSuccessCallback_7(void * context, uint16_t onOffTransitionTime)
     {
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_7(onOffTransitionTime);
     }
@@ -6333,7 +6291,7 @@ private:
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, const uint8_t & currentLevel)
+    static void OnSuccessCallback_10(void * context, uint8_t currentLevel)
     {
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_10(currentLevel);
     }
@@ -6352,7 +6310,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint8_t & currentLevel)
+    void OnSuccessResponse_0(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 0));
         NextTest();
@@ -6398,7 +6356,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint8_t & currentLevel)
+    void OnSuccessResponse_3(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 64));
         NextTest();
@@ -6444,7 +6402,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const uint8_t & currentLevel)
+    void OnSuccessResponse_6(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 128));
         NextTest();
@@ -6460,7 +6418,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const uint16_t & onOffTransitionTime)
+    void OnSuccessResponse_7(uint16_t onOffTransitionTime)
     {
         VerifyOrReturn(CheckValue<uint16_t>("onOffTransitionTime", onOffTransitionTime, 0U));
         NextTest();
@@ -6506,7 +6464,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(const uint8_t & currentLevel)
+    void OnSuccessResponse_10(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 254));
         NextTest();
@@ -6643,34 +6601,28 @@ private:
     const uint16_t mTestCount = 14;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & currentLevel)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & maxLevel)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t maxLevel)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & currentLevel)> mOnSuccessCallback_4{ OnSuccessCallback_4,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & minLevel)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t minLevel)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & currentLevel)> mOnSuccessCallback_8{ OnSuccessCallback_8,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & defaultMoveRate)> mOnSuccessCallback_9{ OnSuccessCallback_9,
-                                                                                                              this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t defaultMoveRate)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & defaultMoveRate)> mOnSuccessCallback_10{ OnSuccessCallback_10,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t defaultMoveRate)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & currentLevel)> mOnSuccessCallback_13{ OnSuccessCallback_13,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentLevel)> mOnSuccessCallback_13{ OnSuccessCallback_13, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint8_t & currentLevel)
+    static void OnSuccessCallback_0(void * context, uint8_t currentLevel)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_0(currentLevel);
     }
@@ -6680,7 +6632,7 @@ private:
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint8_t & maxLevel)
+    static void OnSuccessCallback_1(void * context, uint8_t maxLevel)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_1(maxLevel);
     }
@@ -6690,7 +6642,7 @@ private:
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const uint8_t & currentLevel)
+    static void OnSuccessCallback_4(void * context, uint8_t currentLevel)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_4(currentLevel);
     }
@@ -6700,7 +6652,7 @@ private:
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const uint8_t & minLevel)
+    static void OnSuccessCallback_5(void * context, uint8_t minLevel)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_5(minLevel);
     }
@@ -6710,7 +6662,7 @@ private:
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, const uint8_t & currentLevel)
+    static void OnSuccessCallback_8(void * context, uint8_t currentLevel)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_8(currentLevel);
     }
@@ -6720,7 +6672,7 @@ private:
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_9(status);
     }
 
-    static void OnSuccessCallback_9(void * context, const uint8_t & defaultMoveRate)
+    static void OnSuccessCallback_9(void * context, uint8_t defaultMoveRate)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_9(defaultMoveRate);
     }
@@ -6730,7 +6682,7 @@ private:
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, const uint8_t & defaultMoveRate)
+    static void OnSuccessCallback_10(void * context, uint8_t defaultMoveRate)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_10(defaultMoveRate);
     }
@@ -6740,7 +6692,7 @@ private:
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_13(status);
     }
 
-    static void OnSuccessCallback_13(void * context, const uint8_t & currentLevel)
+    static void OnSuccessCallback_13(void * context, uint8_t currentLevel)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_13(currentLevel);
     }
@@ -6759,7 +6711,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint8_t & currentLevel)
+    void OnSuccessResponse_0(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 0));
         NextTest();
@@ -6775,7 +6727,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const uint8_t & maxLevel)
+    void OnSuccessResponse_1(uint8_t maxLevel)
     {
         VerifyOrReturn(CheckValue<uint8_t>("maxLevel", maxLevel, 255));
         NextTest();
@@ -6821,7 +6773,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const uint8_t & currentLevel)
+    void OnSuccessResponse_4(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 255));
         NextTest();
@@ -6837,7 +6789,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const uint8_t & minLevel)
+    void OnSuccessResponse_5(uint8_t minLevel)
     {
         VerifyOrReturn(CheckValue<uint8_t>("minLevel", minLevel, 0));
         NextTest();
@@ -6883,7 +6835,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(const uint8_t & currentLevel)
+    void OnSuccessResponse_8(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckValue<uint8_t>("currentLevel", currentLevel, 0));
         NextTest();
@@ -6902,7 +6854,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(const uint8_t & defaultMoveRate) { NextTest(); }
+    void OnSuccessResponse_9(uint8_t defaultMoveRate) { NextTest(); }
 
     CHIP_ERROR TestReadsDefaultMoveRateAttributeFromDut_10()
     {
@@ -6914,7 +6866,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(const uint8_t & defaultMoveRate)
+    void OnSuccessResponse_10(uint8_t defaultMoveRate)
     {
         VerifyOrReturn(CheckValue<uint8_t>("defaultMoveRate", defaultMoveRate, 20));
         NextTest();
@@ -6960,7 +6912,7 @@ private:
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_13(const uint8_t & currentLevel)
+    void OnSuccessResponse_13(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckConstraintNotValue<uint8_t>("currentLevel", currentLevel, 255));
         NextTest();
@@ -7016,15 +6968,14 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_MC_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_MC_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -7046,7 +6997,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
 class Test_TC_OCC_1_1 : public TestCommand
@@ -7102,18 +7053,16 @@ private:
     const uint16_t mTestCount = 2;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_OCC_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_OCC_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -7123,7 +7072,7 @@ private:
         (static_cast<Test_TC_OCC_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_OCC_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
     }
@@ -7142,7 +7091,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision)
+    void OnSuccessResponse_0(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 2U));
         NextTest();
@@ -7161,7 +7110,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_1(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_1(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
 class Test_TC_OO_1_1 : public TestCommand
@@ -7233,30 +7182,24 @@ private:
     const uint16_t mTestCount = 6;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & featureMap)> mOnSuccessCallback_3{ OnSuccessCallback_3,
-                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t featureMap)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & featureMap)> mOnSuccessCallback_4{ OnSuccessCallback_4,
-                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t featureMap)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & featureMap)> mOnSuccessCallback_5{ OnSuccessCallback_5,
-                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t featureMap)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -7266,7 +7209,7 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
     }
@@ -7276,7 +7219,7 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
     }
@@ -7286,7 +7229,7 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint32_t & featureMap)
+    static void OnSuccessCallback_3(void * context, uint32_t featureMap)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_3(featureMap);
     }
@@ -7296,7 +7239,7 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const uint32_t & featureMap)
+    static void OnSuccessCallback_4(void * context, uint32_t featureMap)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_4(featureMap);
     }
@@ -7306,7 +7249,7 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const uint32_t & featureMap)
+    static void OnSuccessCallback_5(void * context, uint32_t featureMap)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_5(featureMap);
     }
@@ -7325,7 +7268,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision)
+    void OnSuccessResponse_0(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
         NextTest();
@@ -7344,7 +7287,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_1(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_1(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
@@ -7356,7 +7299,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint16_t & clusterRevision)
+    void OnSuccessResponse_2(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
         NextTest();
@@ -7372,7 +7315,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint32_t & featureMap)
+    void OnSuccessResponse_3(uint32_t featureMap)
     {
         VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
         NextTest();
@@ -7390,7 +7333,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_4(const uint32_t & featureMap) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_4(uint32_t featureMap) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_5()
     {
@@ -7402,7 +7345,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const uint32_t & featureMap)
+    void OnSuccessResponse_5(uint32_t featureMap)
     {
         VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
         NextTest();
@@ -7501,43 +7444,36 @@ private:
     const uint16_t mTestCount = 12;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & globalSceneControl)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                              this };
+    chip::Callback::Callback<void (*)(void * context, bool globalSceneControl)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & onTime)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t onTime)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & offWaitTime)> mOnSuccessCallback_4{ OnSuccessCallback_4,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t offWaitTime)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & startUpOnOff)> mOnSuccessCallback_5{ OnSuccessCallback_5,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t startUpOnOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & onTime)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t onTime)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & offWaitTime)> mOnSuccessCallback_7{ OnSuccessCallback_7,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t offWaitTime)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & startUpOnOff)> mOnSuccessCallback_8{ OnSuccessCallback_8,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t startUpOnOff)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & onTime)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t onTime)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & offWaitTime)> mOnSuccessCallback_10{ OnSuccessCallback_10,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t offWaitTime)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & startUpOnOff)> mOnSuccessCallback_11{ OnSuccessCallback_11,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t startUpOnOff)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const bool & onOff)
+    static void OnSuccessCallback_0(void * context, bool onOff)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_0(onOff);
     }
@@ -7547,7 +7483,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -7557,7 +7493,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const bool & globalSceneControl)
+    static void OnSuccessCallback_2(void * context, bool globalSceneControl)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_2(globalSceneControl);
     }
@@ -7567,7 +7503,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint16_t & onTime)
+    static void OnSuccessCallback_3(void * context, uint16_t onTime)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_3(onTime);
     }
@@ -7577,7 +7513,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const uint16_t & offWaitTime)
+    static void OnSuccessCallback_4(void * context, uint16_t offWaitTime)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_4(offWaitTime);
     }
@@ -7587,7 +7523,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const uint8_t & startUpOnOff)
+    static void OnSuccessCallback_5(void * context, uint8_t startUpOnOff)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_5(startUpOnOff);
     }
@@ -7597,7 +7533,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const uint16_t & onTime)
+    static void OnSuccessCallback_6(void * context, uint16_t onTime)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_6(onTime);
     }
@@ -7607,7 +7543,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const uint16_t & offWaitTime)
+    static void OnSuccessCallback_7(void * context, uint16_t offWaitTime)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_7(offWaitTime);
     }
@@ -7617,7 +7553,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, const uint8_t & startUpOnOff)
+    static void OnSuccessCallback_8(void * context, uint8_t startUpOnOff)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_8(startUpOnOff);
     }
@@ -7627,7 +7563,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_9(status);
     }
 
-    static void OnSuccessCallback_9(void * context, const uint16_t & onTime)
+    static void OnSuccessCallback_9(void * context, uint16_t onTime)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_9(onTime);
     }
@@ -7637,7 +7573,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, const uint16_t & offWaitTime)
+    static void OnSuccessCallback_10(void * context, uint16_t offWaitTime)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_10(offWaitTime);
     }
@@ -7647,7 +7583,7 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, const uint8_t & startUpOnOff)
+    static void OnSuccessCallback_11(void * context, uint8_t startUpOnOff)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_11(startUpOnOff);
     }
@@ -7666,7 +7602,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const bool & onOff)
+    void OnSuccessResponse_0(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -7682,7 +7618,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -7698,7 +7634,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const bool & globalSceneControl)
+    void OnSuccessResponse_2(bool globalSceneControl)
     {
         VerifyOrReturn(CheckValue<bool>("globalSceneControl", globalSceneControl, 1));
         NextTest();
@@ -7714,7 +7650,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint16_t & onTime)
+    void OnSuccessResponse_3(uint16_t onTime)
     {
         VerifyOrReturn(CheckValue<uint16_t>("onTime", onTime, 0U));
         NextTest();
@@ -7730,7 +7666,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const uint16_t & offWaitTime)
+    void OnSuccessResponse_4(uint16_t offWaitTime)
     {
         VerifyOrReturn(CheckValue<uint16_t>("offWaitTime", offWaitTime, 0U));
         NextTest();
@@ -7746,7 +7682,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const uint8_t & startUpOnOff)
+    void OnSuccessResponse_5(uint8_t startUpOnOff)
     {
         VerifyOrReturn(CheckValue<uint8_t>("startUpOnOff", startUpOnOff, 0));
         NextTest();
@@ -7764,7 +7700,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const uint16_t & onTime) { NextTest(); }
+    void OnSuccessResponse_6(uint16_t onTime) { NextTest(); }
 
     CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOffWaitTime_7()
     {
@@ -7778,7 +7714,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const uint16_t & offWaitTime) { NextTest(); }
+    void OnSuccessResponse_7(uint16_t offWaitTime) { NextTest(); }
 
     CHIP_ERROR TestWriteTheDefaultValueToLtAttributeStartUpOnOff_8()
     {
@@ -7793,7 +7729,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(const uint8_t & startUpOnOff) { NextTest(); }
+    void OnSuccessResponse_8(uint8_t startUpOnOff) { NextTest(); }
 
     CHIP_ERROR TestReadsBackLtAttributeOnTime_9()
     {
@@ -7805,7 +7741,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(const uint16_t & onTime)
+    void OnSuccessResponse_9(uint16_t onTime)
     {
         VerifyOrReturn(CheckValue<uint16_t>("onTime", onTime, 0U));
         NextTest();
@@ -7821,7 +7757,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(const uint16_t & offWaitTime)
+    void OnSuccessResponse_10(uint16_t offWaitTime)
     {
         VerifyOrReturn(CheckValue<uint16_t>("offWaitTime", offWaitTime, 0U));
         NextTest();
@@ -7837,7 +7773,7 @@ private:
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(const uint8_t & startUpOnOff)
+    void OnSuccessResponse_11(uint8_t startUpOnOff)
     {
         VerifyOrReturn(CheckValue<uint8_t>("startUpOnOff", startUpOnOff, 0));
         NextTest();
@@ -7944,26 +7880,26 @@ private:
     const uint16_t mTestCount = 14;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_13{ OnSuccessCallback_13, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_13{ OnSuccessCallback_13, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -7973,7 +7909,7 @@ private:
         (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const bool & onOff)
+    static void OnSuccessCallback_3(void * context, bool onOff)
     {
         (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_3(onOff);
     }
@@ -7983,7 +7919,7 @@ private:
         (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const bool & onOff)
+    static void OnSuccessCallback_5(void * context, bool onOff)
     {
         (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_5(onOff);
     }
@@ -7993,7 +7929,7 @@ private:
         (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const bool & onOff)
+    static void OnSuccessCallback_7(void * context, bool onOff)
     {
         (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_7(onOff);
     }
@@ -8003,7 +7939,7 @@ private:
         (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_9(status);
     }
 
-    static void OnSuccessCallback_9(void * context, const bool & onOff)
+    static void OnSuccessCallback_9(void * context, bool onOff)
     {
         (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_9(onOff);
     }
@@ -8013,7 +7949,7 @@ private:
         (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, const bool & onOff)
+    static void OnSuccessCallback_11(void * context, bool onOff)
     {
         (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_11(onOff);
     }
@@ -8023,7 +7959,7 @@ private:
         (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_13(status);
     }
 
-    static void OnSuccessCallback_13(void * context, const bool & onOff)
+    static void OnSuccessCallback_13(void * context, bool onOff)
     {
         (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_13(onOff);
     }
@@ -8066,7 +8002,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -8106,7 +8042,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const bool & onOff)
+    void OnSuccessResponse_3(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -8146,7 +8082,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const bool & onOff)
+    void OnSuccessResponse_5(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -8186,7 +8122,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const bool & onOff)
+    void OnSuccessResponse_7(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -8226,7 +8162,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(const bool & onOff)
+    void OnSuccessResponse_9(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -8266,7 +8202,7 @@ private:
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(const bool & onOff)
+    void OnSuccessResponse_11(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
         NextTest();
@@ -8306,7 +8242,7 @@ private:
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_13(const bool & onOff)
+    void OnSuccessResponse_13(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
         NextTest();
@@ -8362,15 +8298,14 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_PCC_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_PCC_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -8392,7 +8327,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
 class Test_TC_PCC_2_1 : public TestCommand
@@ -8471,38 +8406,32 @@ private:
     const uint16_t mTestCount = 8;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & maxPressure)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, int16_t maxPressure)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & effectiveOperationMode)> mOnSuccessCallback_1{
-        OnSuccessCallback_1, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t effectiveOperationMode)> mOnSuccessCallback_1{ OnSuccessCallback_1,
+                                                                                                             this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & effectiveControlMode)> mOnSuccessCallback_2{
-        OnSuccessCallback_2, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t effectiveControlMode)> mOnSuccessCallback_2{ OnSuccessCallback_2,
+                                                                                                           this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & capacity)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t capacity)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & maxPressure)> mOnSuccessCallback_4{ OnSuccessCallback_4,
-                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, int16_t maxPressure)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & effectiveOperationMode)> mOnSuccessCallback_5{
-        OnSuccessCallback_5, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t effectiveOperationMode)> mOnSuccessCallback_5{ OnSuccessCallback_5,
+                                                                                                             this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & effectiveControlMode)> mOnSuccessCallback_6{
-        OnSuccessCallback_6, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t effectiveControlMode)> mOnSuccessCallback_6{ OnSuccessCallback_6,
+                                                                                                           this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & capacity)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t capacity)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const int16_t & maxPressure)
+    static void OnSuccessCallback_0(void * context, int16_t maxPressure)
     {
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_0(maxPressure);
     }
@@ -8512,7 +8441,7 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint8_t & effectiveOperationMode)
+    static void OnSuccessCallback_1(void * context, uint8_t effectiveOperationMode)
     {
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_1(effectiveOperationMode);
     }
@@ -8522,7 +8451,7 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint8_t & effectiveControlMode)
+    static void OnSuccessCallback_2(void * context, uint8_t effectiveControlMode)
     {
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_2(effectiveControlMode);
     }
@@ -8532,7 +8461,7 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const int16_t & capacity)
+    static void OnSuccessCallback_3(void * context, int16_t capacity)
     {
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_3(capacity);
     }
@@ -8542,7 +8471,7 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const int16_t & maxPressure)
+    static void OnSuccessCallback_4(void * context, int16_t maxPressure)
     {
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_4(maxPressure);
     }
@@ -8552,7 +8481,7 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const uint8_t & effectiveOperationMode)
+    static void OnSuccessCallback_5(void * context, uint8_t effectiveOperationMode)
     {
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_5(effectiveOperationMode);
     }
@@ -8562,7 +8491,7 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const uint8_t & effectiveControlMode)
+    static void OnSuccessCallback_6(void * context, uint8_t effectiveControlMode)
     {
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_6(effectiveControlMode);
     }
@@ -8572,7 +8501,7 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const int16_t & capacity)
+    static void OnSuccessCallback_7(void * context, int16_t capacity)
     {
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_7(capacity);
     }
@@ -8591,7 +8520,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const int16_t & maxPressure)
+    void OnSuccessResponse_0(int16_t maxPressure)
     {
         VerifyOrReturn(CheckConstraintType("maxPressure", "", "int16"));
         NextTest();
@@ -8607,7 +8536,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const uint8_t & effectiveOperationMode)
+    void OnSuccessResponse_1(uint8_t effectiveOperationMode)
     {
         VerifyOrReturn(CheckConstraintType("effectiveOperationMode", "", "enum8"));
         NextTest();
@@ -8623,7 +8552,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint8_t & effectiveControlMode)
+    void OnSuccessResponse_2(uint8_t effectiveControlMode)
     {
         VerifyOrReturn(CheckConstraintType("effectiveControlMode", "", "enum8"));
         NextTest();
@@ -8639,7 +8568,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const int16_t & capacity)
+    void OnSuccessResponse_3(int16_t capacity)
     {
         VerifyOrReturn(CheckConstraintType("capacity", "", "int16"));
         NextTest();
@@ -8655,7 +8584,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const int16_t & maxPressure)
+    void OnSuccessResponse_4(int16_t maxPressure)
     {
         VerifyOrReturn(CheckConstraintType("maxPressure", "", "int16"));
         NextTest();
@@ -8671,7 +8600,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const uint8_t & effectiveOperationMode)
+    void OnSuccessResponse_5(uint8_t effectiveOperationMode)
     {
         VerifyOrReturn(CheckConstraintType("effectiveOperationMode", "", "enum8"));
         NextTest();
@@ -8687,7 +8616,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const uint8_t & effectiveControlMode)
+    void OnSuccessResponse_6(uint8_t effectiveControlMode)
     {
         VerifyOrReturn(CheckConstraintType("effectiveControlMode", "", "enum8"));
         NextTest();
@@ -8703,7 +8632,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const int16_t & capacity)
+    void OnSuccessResponse_7(int16_t capacity)
     {
         VerifyOrReturn(CheckConstraintType("capacity", "", "int16"));
         NextTest();
@@ -8759,15 +8688,14 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_RH_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_RH_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -8789,7 +8717,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
 class Test_TC_TM_1_1 : public TestCommand
@@ -8849,21 +8777,18 @@ private:
     const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_TM_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -8873,7 +8798,7 @@ private:
         (static_cast<Test_TC_TM_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
     }
@@ -8883,7 +8808,7 @@ private:
         (static_cast<Test_TC_TM_1_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
     }
@@ -8902,7 +8827,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision)
+    void OnSuccessResponse_0(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
         NextTest();
@@ -8921,7 +8846,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_1(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_1(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
@@ -8933,7 +8858,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint16_t & clusterRevision)
+    void OnSuccessResponse_2(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
         NextTest();
@@ -8988,15 +8913,14 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & measuredValue)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_TM_2_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const int16_t & measuredValue)
+    static void OnSuccessCallback_0(void * context, int16_t measuredValue)
     {
         (static_cast<Test_TC_TM_2_1 *>(context))->OnSuccessResponse_0(measuredValue);
     }
@@ -9015,7 +8939,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const int16_t & measuredValue)
+    void OnSuccessResponse_0(int16_t measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "int16"));
         NextTest();
@@ -9071,15 +8995,14 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -9101,7 +9024,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
 class Test_TC_TSUIC_1_1 : public TestCommand
@@ -9153,15 +9076,14 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -9183,7 +9105,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
 class Test_TC_TSUIC_2_1 : public TestCommand
@@ -9290,58 +9212,48 @@ private:
     const uint16_t mTestCount = 15;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & temperatureDisplayMode)> mOnSuccessCallback_0{
-        OnSuccessCallback_0, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t temperatureDisplayMode)> mOnSuccessCallback_0{ OnSuccessCallback_0,
+                                                                                                             this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & temperatureDisplayMode)> mOnSuccessCallback_1{
-        OnSuccessCallback_1, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t temperatureDisplayMode)> mOnSuccessCallback_1{ OnSuccessCallback_1,
+                                                                                                             this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & temperatureDisplayMode)> mOnSuccessCallback_2{
-        OnSuccessCallback_2, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t temperatureDisplayMode)> mOnSuccessCallback_2{ OnSuccessCallback_2,
+                                                                                                             this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & temperatureDisplayMode)> mOnSuccessCallback_3{
-        OnSuccessCallback_3, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t temperatureDisplayMode)> mOnSuccessCallback_3{ OnSuccessCallback_3,
+                                                                                                             this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & temperatureDisplayMode)> mOnSuccessCallback_4{
-        OnSuccessCallback_4, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t temperatureDisplayMode)> mOnSuccessCallback_4{ OnSuccessCallback_4,
+                                                                                                             this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & keypadLockout)> mOnSuccessCallback_5{ OnSuccessCallback_5,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t keypadLockout)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & keypadLockout)> mOnSuccessCallback_6{ OnSuccessCallback_6,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t keypadLockout)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & keypadLockout)> mOnSuccessCallback_7{ OnSuccessCallback_7,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t keypadLockout)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & keypadLockout)> mOnSuccessCallback_8{ OnSuccessCallback_8,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t keypadLockout)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & keypadLockout)> mOnSuccessCallback_9{ OnSuccessCallback_9,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t keypadLockout)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & scheduleProgrammingVisibility)> mOnSuccessCallback_10{
+    chip::Callback::Callback<void (*)(void * context, uint8_t scheduleProgrammingVisibility)> mOnSuccessCallback_10{
         OnSuccessCallback_10, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & scheduleProgrammingVisibility)> mOnSuccessCallback_11{
+    chip::Callback::Callback<void (*)(void * context, uint8_t scheduleProgrammingVisibility)> mOnSuccessCallback_11{
         OnSuccessCallback_11, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_12{ OnFailureCallback_12, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & scheduleProgrammingVisibility)> mOnSuccessCallback_12{
+    chip::Callback::Callback<void (*)(void * context, uint8_t scheduleProgrammingVisibility)> mOnSuccessCallback_12{
         OnSuccessCallback_12, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & scheduleProgrammingVisibility)> mOnSuccessCallback_13{
+    chip::Callback::Callback<void (*)(void * context, uint8_t scheduleProgrammingVisibility)> mOnSuccessCallback_13{
         OnSuccessCallback_13, this
     };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_14{ OnFailureCallback_14, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & scheduleProgrammingVisibility)> mOnSuccessCallback_14{
+    chip::Callback::Callback<void (*)(void * context, uint8_t scheduleProgrammingVisibility)> mOnSuccessCallback_14{
         OnSuccessCallback_14, this
     };
 
@@ -9350,7 +9262,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint8_t & temperatureDisplayMode)
+    static void OnSuccessCallback_0(void * context, uint8_t temperatureDisplayMode)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_0(temperatureDisplayMode);
     }
@@ -9360,7 +9272,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint8_t & temperatureDisplayMode)
+    static void OnSuccessCallback_1(void * context, uint8_t temperatureDisplayMode)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_1(temperatureDisplayMode);
     }
@@ -9370,7 +9282,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint8_t & temperatureDisplayMode)
+    static void OnSuccessCallback_2(void * context, uint8_t temperatureDisplayMode)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_2(temperatureDisplayMode);
     }
@@ -9380,7 +9292,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint8_t & temperatureDisplayMode)
+    static void OnSuccessCallback_3(void * context, uint8_t temperatureDisplayMode)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_3(temperatureDisplayMode);
     }
@@ -9390,7 +9302,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const uint8_t & temperatureDisplayMode)
+    static void OnSuccessCallback_4(void * context, uint8_t temperatureDisplayMode)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_4(temperatureDisplayMode);
     }
@@ -9400,7 +9312,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const uint8_t & keypadLockout)
+    static void OnSuccessCallback_5(void * context, uint8_t keypadLockout)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_5(keypadLockout);
     }
@@ -9410,7 +9322,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const uint8_t & keypadLockout)
+    static void OnSuccessCallback_6(void * context, uint8_t keypadLockout)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_6(keypadLockout);
     }
@@ -9420,7 +9332,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const uint8_t & keypadLockout)
+    static void OnSuccessCallback_7(void * context, uint8_t keypadLockout)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_7(keypadLockout);
     }
@@ -9430,7 +9342,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, const uint8_t & keypadLockout)
+    static void OnSuccessCallback_8(void * context, uint8_t keypadLockout)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_8(keypadLockout);
     }
@@ -9440,7 +9352,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_9(status);
     }
 
-    static void OnSuccessCallback_9(void * context, const uint8_t & keypadLockout)
+    static void OnSuccessCallback_9(void * context, uint8_t keypadLockout)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_9(keypadLockout);
     }
@@ -9450,7 +9362,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, const uint8_t & scheduleProgrammingVisibility)
+    static void OnSuccessCallback_10(void * context, uint8_t scheduleProgrammingVisibility)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_10(scheduleProgrammingVisibility);
     }
@@ -9460,7 +9372,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, const uint8_t & scheduleProgrammingVisibility)
+    static void OnSuccessCallback_11(void * context, uint8_t scheduleProgrammingVisibility)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_11(scheduleProgrammingVisibility);
     }
@@ -9470,7 +9382,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_12(status);
     }
 
-    static void OnSuccessCallback_12(void * context, const uint8_t & scheduleProgrammingVisibility)
+    static void OnSuccessCallback_12(void * context, uint8_t scheduleProgrammingVisibility)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_12(scheduleProgrammingVisibility);
     }
@@ -9480,7 +9392,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_13(status);
     }
 
-    static void OnSuccessCallback_13(void * context, const uint8_t & scheduleProgrammingVisibility)
+    static void OnSuccessCallback_13(void * context, uint8_t scheduleProgrammingVisibility)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_13(scheduleProgrammingVisibility);
     }
@@ -9490,7 +9402,7 @@ private:
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnFailureResponse_14(status);
     }
 
-    static void OnSuccessCallback_14(void * context, const uint8_t & scheduleProgrammingVisibility)
+    static void OnSuccessCallback_14(void * context, uint8_t scheduleProgrammingVisibility)
     {
         (static_cast<Test_TC_TSUIC_2_1 *>(context))->OnSuccessResponse_14(scheduleProgrammingVisibility);
     }
@@ -9509,7 +9421,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint8_t & temperatureDisplayMode)
+    void OnSuccessResponse_0(uint8_t temperatureDisplayMode)
     {
         VerifyOrReturn(CheckValue<uint8_t>("temperatureDisplayMode", temperatureDisplayMode, 0));
         NextTest();
@@ -9525,7 +9437,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const uint8_t & temperatureDisplayMode)
+    void OnSuccessResponse_1(uint8_t temperatureDisplayMode)
     {
         VerifyOrReturn(CheckConstraintType("temperatureDisplayMode", "", "enum8"));
         NextTest();
@@ -9544,7 +9456,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint8_t & temperatureDisplayMode) { NextTest(); }
+    void OnSuccessResponse_2(uint8_t temperatureDisplayMode) { NextTest(); }
 
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_3()
     {
@@ -9556,7 +9468,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint8_t & temperatureDisplayMode)
+    void OnSuccessResponse_3(uint8_t temperatureDisplayMode)
     {
         VerifyOrReturn(CheckValue<uint8_t>("temperatureDisplayMode", temperatureDisplayMode, 0));
         NextTest();
@@ -9572,7 +9484,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const uint8_t & temperatureDisplayMode)
+    void OnSuccessResponse_4(uint8_t temperatureDisplayMode)
     {
         VerifyOrReturn(CheckConstraintType("temperatureDisplayMode", "", "enum8"));
         NextTest();
@@ -9588,7 +9500,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const uint8_t & keypadLockout)
+    void OnSuccessResponse_5(uint8_t keypadLockout)
     {
         VerifyOrReturn(CheckValue<uint8_t>("keypadLockout", keypadLockout, 0));
         NextTest();
@@ -9604,7 +9516,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const uint8_t & keypadLockout)
+    void OnSuccessResponse_6(uint8_t keypadLockout)
     {
         VerifyOrReturn(CheckConstraintType("keypadLockout", "", "enum8"));
         NextTest();
@@ -9623,7 +9535,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const uint8_t & keypadLockout) { NextTest(); }
+    void OnSuccessResponse_7(uint8_t keypadLockout) { NextTest(); }
 
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_8()
     {
@@ -9635,7 +9547,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(const uint8_t & keypadLockout)
+    void OnSuccessResponse_8(uint8_t keypadLockout)
     {
         VerifyOrReturn(CheckValue<uint8_t>("keypadLockout", keypadLockout, 0));
         NextTest();
@@ -9651,7 +9563,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(const uint8_t & keypadLockout)
+    void OnSuccessResponse_9(uint8_t keypadLockout)
     {
         VerifyOrReturn(CheckConstraintType("keypadLockout", "", "enum8"));
         NextTest();
@@ -9667,7 +9579,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(const uint8_t & scheduleProgrammingVisibility)
+    void OnSuccessResponse_10(uint8_t scheduleProgrammingVisibility)
     {
         VerifyOrReturn(CheckValue<uint8_t>("scheduleProgrammingVisibility", scheduleProgrammingVisibility, 0));
         NextTest();
@@ -9683,7 +9595,7 @@ private:
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(const uint8_t & scheduleProgrammingVisibility)
+    void OnSuccessResponse_11(uint8_t scheduleProgrammingVisibility)
     {
         VerifyOrReturn(CheckConstraintType("scheduleProgrammingVisibility", "", "enum8"));
         NextTest();
@@ -9702,7 +9614,7 @@ private:
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_12(const uint8_t & scheduleProgrammingVisibility) { NextTest(); }
+    void OnSuccessResponse_12(uint8_t scheduleProgrammingVisibility) { NextTest(); }
 
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_13()
     {
@@ -9714,7 +9626,7 @@ private:
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_13(const uint8_t & scheduleProgrammingVisibility)
+    void OnSuccessResponse_13(uint8_t scheduleProgrammingVisibility)
     {
         VerifyOrReturn(CheckValue<uint8_t>("scheduleProgrammingVisibility", scheduleProgrammingVisibility, 0));
         NextTest();
@@ -9730,7 +9642,7 @@ private:
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_14(const uint8_t & scheduleProgrammingVisibility)
+    void OnSuccessResponse_14(uint8_t scheduleProgrammingVisibility)
     {
         VerifyOrReturn(CheckConstraintType("scheduleProgrammingVisibility", "", "enum8"));
         NextTest();
@@ -9794,21 +9706,18 @@ private:
     const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -9818,7 +9727,7 @@ private:
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
     }
@@ -9828,7 +9737,7 @@ private:
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
     }
@@ -9847,7 +9756,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision)
+    void OnSuccessResponse_0(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 1U));
         NextTest();
@@ -9866,7 +9775,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_1(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_1(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
@@ -9878,7 +9787,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint16_t & clusterRevision)
+    void OnSuccessResponse_2(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 1U));
         NextTest();
@@ -9942,21 +9851,18 @@ private:
     const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
     }
@@ -9966,7 +9872,7 @@ private:
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
     }
@@ -9976,7 +9882,7 @@ private:
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint16_t & clusterRevision)
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
     }
@@ -9995,7 +9901,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint16_t & clusterRevision)
+    void OnSuccessResponse_0(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 5U));
         NextTest();
@@ -10014,7 +9920,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_1(const uint16_t & clusterRevision) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_1(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
@@ -10026,7 +9932,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint16_t & clusterRevision)
+    void OnSuccessResponse_2(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 5U));
         NextTest();
@@ -10121,40 +10027,34 @@ private:
     const uint16_t mTestCount = 11;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & type)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t type)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & type)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t type)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & configStatus)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t configStatus)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & configStatus)> mOnSuccessCallback_3{ OnSuccessCallback_3,
-                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t configStatus)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & operationalStatus)> mOnSuccessCallback_4{ OnSuccessCallback_4,
-                                                                                                                this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t operationalStatus)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & operationalStatus)> mOnSuccessCallback_5{ OnSuccessCallback_5,
-                                                                                                                this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t operationalStatus)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & endProductType)> mOnSuccessCallback_6{ OnSuccessCallback_6,
-                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t endProductType)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & endProductType)> mOnSuccessCallback_7{ OnSuccessCallback_7,
-                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t endProductType)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & mode)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t mode)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & mode)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t mode)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & mode)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t mode)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint8_t & type)
+    static void OnSuccessCallback_0(void * context, uint8_t type)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_0(type);
     }
@@ -10164,7 +10064,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint8_t & type)
+    static void OnSuccessCallback_1(void * context, uint8_t type)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_1(type);
     }
@@ -10174,7 +10074,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint8_t & configStatus)
+    static void OnSuccessCallback_2(void * context, uint8_t configStatus)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_2(configStatus);
     }
@@ -10184,7 +10084,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint8_t & configStatus)
+    static void OnSuccessCallback_3(void * context, uint8_t configStatus)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_3(configStatus);
     }
@@ -10194,7 +10094,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const uint8_t & operationalStatus)
+    static void OnSuccessCallback_4(void * context, uint8_t operationalStatus)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_4(operationalStatus);
     }
@@ -10204,7 +10104,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const uint8_t & operationalStatus)
+    static void OnSuccessCallback_5(void * context, uint8_t operationalStatus)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_5(operationalStatus);
     }
@@ -10214,7 +10114,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const uint8_t & endProductType)
+    static void OnSuccessCallback_6(void * context, uint8_t endProductType)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_6(endProductType);
     }
@@ -10224,7 +10124,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const uint8_t & endProductType)
+    static void OnSuccessCallback_7(void * context, uint8_t endProductType)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_7(endProductType);
     }
@@ -10234,7 +10134,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, const uint8_t & mode)
+    static void OnSuccessCallback_8(void * context, uint8_t mode)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_8(mode);
     }
@@ -10244,7 +10144,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_9(status);
     }
 
-    static void OnSuccessCallback_9(void * context, const uint8_t & mode)
+    static void OnSuccessCallback_9(void * context, uint8_t mode)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_9(mode);
     }
@@ -10254,7 +10154,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, const uint8_t & mode)
+    static void OnSuccessCallback_10(void * context, uint8_t mode)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_10(mode);
     }
@@ -10273,7 +10173,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint8_t & type)
+    void OnSuccessResponse_0(uint8_t type)
     {
         VerifyOrReturn(CheckValue<uint8_t>("type", type, 0));
         NextTest();
@@ -10289,7 +10189,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const uint8_t & type)
+    void OnSuccessResponse_1(uint8_t type)
     {
         VerifyOrReturn(CheckValue<uint8_t>("type", type, 0));
         NextTest();
@@ -10305,7 +10205,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint8_t & configStatus)
+    void OnSuccessResponse_2(uint8_t configStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("configStatus", configStatus, 3));
         NextTest();
@@ -10321,7 +10221,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint8_t & configStatus)
+    void OnSuccessResponse_3(uint8_t configStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("configStatus", configStatus, 3));
         NextTest();
@@ -10337,7 +10237,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const uint8_t & operationalStatus)
+    void OnSuccessResponse_4(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("operationalStatus", operationalStatus, 0));
         NextTest();
@@ -10353,7 +10253,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const uint8_t & operationalStatus)
+    void OnSuccessResponse_5(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("operationalStatus", operationalStatus, 0));
         NextTest();
@@ -10369,7 +10269,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const uint8_t & endProductType)
+    void OnSuccessResponse_6(uint8_t endProductType)
     {
         VerifyOrReturn(CheckValue<uint8_t>("endProductType", endProductType, 0));
         NextTest();
@@ -10385,7 +10285,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const uint8_t & endProductType)
+    void OnSuccessResponse_7(uint8_t endProductType)
     {
         VerifyOrReturn(CheckValue<uint8_t>("endProductType", endProductType, 0));
         NextTest();
@@ -10401,7 +10301,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(const uint8_t & mode)
+    void OnSuccessResponse_8(uint8_t mode)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mode", mode, 0));
         NextTest();
@@ -10419,7 +10319,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(const uint8_t & mode) { NextTest(); }
+    void OnSuccessResponse_9(uint8_t mode) { NextTest(); }
 
     CHIP_ERROR TestReadsBackTheRwMandatoryAttributeMode_10()
     {
@@ -10431,7 +10331,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(const uint8_t & mode)
+    void OnSuccessResponse_10(uint8_t mode)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mode", mode, 7));
         NextTest();
@@ -10494,15 +10394,14 @@ private:
     const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & operationalStatus)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                                this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t operationalStatus)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
 
     static void OnFailureCallback_2(void * context, uint8_t status)
     {
         (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint8_t & operationalStatus)
+    static void OnSuccessCallback_2(void * context, uint8_t operationalStatus)
     {
         (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_2(operationalStatus);
     }
@@ -10569,7 +10468,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint8_t & operationalStatus)
+    void OnSuccessResponse_2(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("operationalStatus", operationalStatus, 0));
         NextTest();
@@ -10632,15 +10531,14 @@ private:
     const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & operationalStatus)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                                this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t operationalStatus)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
 
     static void OnFailureCallback_2(void * context, uint8_t status)
     {
         (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint8_t & operationalStatus)
+    static void OnSuccessCallback_2(void * context, uint8_t operationalStatus)
     {
         (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_2(operationalStatus);
     }
@@ -10707,7 +10605,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint8_t & operationalStatus)
+    void OnSuccessResponse_2(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("operationalStatus", operationalStatus, 0));
         NextTest();
@@ -10770,15 +10668,14 @@ private:
     const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & operationalStatus)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                                this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t operationalStatus)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
 
     static void OnFailureCallback_2(void * context, uint8_t status)
     {
         (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint8_t & operationalStatus)
+    static void OnSuccessCallback_2(void * context, uint8_t operationalStatus)
     {
         (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_2(operationalStatus);
     }
@@ -10845,7 +10742,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint8_t & operationalStatus)
+    void OnSuccessResponse_2(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("operationalStatus", operationalStatus, 0));
         NextTest();
@@ -10969,11 +10866,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const chip::app::Clusters::TargetNavigator::NavigateTargetStatus & status, const chip::CharSpan & data)
-    {
-
-        NextTest();
-    }
+    void OnSuccessResponse_1(chip::app::Clusters::TargetNavigator::NavigateTargetStatus status, chip::CharSpan data) { NextTest(); }
 };
 
 class TV_AudioOutputCluster : public TestCommand
@@ -11189,11 +11082,9 @@ private:
                                       const chip::app::DataModel::DecodableList<uint16_t> & applicationLauncherList)>
         mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & catalogVendorId)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                              this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t catalogVendorId)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & applicationId)> mOnSuccessCallback_3{ OnSuccessCallback_3,
-                                                                                                            this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t applicationId)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
@@ -11210,7 +11101,7 @@ private:
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint8_t & catalogVendorId)
+    static void OnSuccessCallback_2(void * context, uint8_t catalogVendorId)
     {
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(catalogVendorId);
     }
@@ -11220,7 +11111,7 @@ private:
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint8_t & applicationId)
+    static void OnSuccessCallback_3(void * context, uint8_t applicationId)
     {
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_3(applicationId);
     }
@@ -11270,8 +11161,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus & status,
-                             const chip::CharSpan & data)
+    void OnSuccessResponse_1(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
     {
 
         NextTest();
@@ -11287,7 +11177,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint8_t & catalogVendorId)
+    void OnSuccessResponse_2(uint8_t catalogVendorId)
     {
         VerifyOrReturn(CheckValue<uint8_t>("catalogVendorId", catalogVendorId, 0));
         NextTest();
@@ -11303,7 +11193,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint8_t & applicationId)
+    void OnSuccessResponse_3(uint8_t applicationId)
     {
         VerifyOrReturn(CheckValue<uint8_t>("applicationId", applicationId, 0));
         NextTest();
@@ -11384,7 +11274,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const chip::app::Clusters::KeypadInput::KeypadInputStatus & status) { NextTest(); }
+    void OnSuccessResponse_0(chip::app::Clusters::KeypadInput::KeypadInputStatus status) { NextTest(); }
 };
 
 class TV_AccountLoginCluster : public TestCommand
@@ -11465,7 +11355,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const chip::CharSpan & setupPIN) { NextTest(); }
+    void OnSuccessResponse_0(chip::CharSpan setupPIN) { NextTest(); }
 
     CHIP_ERROR TestLoginCommand_1()
     {
@@ -11542,7 +11432,7 @@ private:
     const uint16_t mTestCount = 1;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & wakeOnLanMacAddress)> mOnSuccessCallback_0{
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan wakeOnLanMacAddress)> mOnSuccessCallback_0{
         OnSuccessCallback_0, this
     };
 
@@ -11551,7 +11441,7 @@ private:
         (static_cast<TV_WakeOnLanCluster *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const chip::CharSpan & wakeOnLanMacAddress)
+    static void OnSuccessCallback_0(void * context, chip::CharSpan wakeOnLanMacAddress)
     {
         (static_cast<TV_WakeOnLanCluster *>(context))->OnSuccessResponse_0(wakeOnLanMacAddress);
     }
@@ -11570,7 +11460,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const chip::CharSpan & wakeOnLanMacAddress)
+    void OnSuccessResponse_0(chip::CharSpan wakeOnLanMacAddress)
     {
         VerifyOrReturn(CheckValueAsString("wakeOnLanMacAddress", wakeOnLanMacAddress, "00:00:00:00:00"));
         NextTest();
@@ -11637,20 +11527,18 @@ private:
     const uint16_t mTestCount = 4;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & vendorId)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t vendorId)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & productId)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t productId)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & catalogVendorId)> mOnSuccessCallback_3{ OnSuccessCallback_3,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t catalogVendorId)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint16_t & vendorId)
+    static void OnSuccessCallback_1(void * context, uint16_t vendorId)
     {
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_1(vendorId);
     }
@@ -11660,7 +11548,7 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint16_t & productId)
+    static void OnSuccessCallback_2(void * context, uint16_t productId)
     {
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_2(productId);
     }
@@ -11670,7 +11558,7 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint16_t & catalogVendorId)
+    static void OnSuccessCallback_3(void * context, uint16_t catalogVendorId)
     {
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_3(catalogVendorId);
     }
@@ -11714,7 +11602,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const uint16_t & vendorId)
+    void OnSuccessResponse_1(uint16_t vendorId)
     {
         VerifyOrReturn(CheckValue<uint16_t>("vendorId", vendorId, 1U));
         NextTest();
@@ -11730,7 +11618,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint16_t & productId)
+    void OnSuccessResponse_2(uint16_t productId)
     {
         VerifyOrReturn(CheckValue<uint16_t>("productId", productId, 1U));
         NextTest();
@@ -11746,7 +11634,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint16_t & catalogVendorId)
+    void OnSuccessResponse_3(uint16_t catalogVendorId)
     {
         VerifyOrReturn(CheckValue<uint16_t>("catalogVendorId", catalogVendorId, 1U));
         NextTest();
@@ -11866,7 +11754,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_0(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11894,7 +11782,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_1(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11922,7 +11810,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_2(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11950,7 +11838,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_3(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -11978,7 +11866,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_4(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -12006,7 +11894,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_5(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -12034,7 +11922,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_6(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -12062,7 +11950,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -12091,7 +11979,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_8(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -12120,7 +12008,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_9(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -12149,7 +12037,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(const chip::app::Clusters::MediaPlayback::MediaPlaybackStatus & mediaPlaybackStatus)
+    void OnSuccessResponse_10(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mediaPlaybackStatus", mediaPlaybackStatus, 0));
         NextTest();
@@ -12454,8 +12342,7 @@ private:
             mediaInputList)>
         mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & currentMediaInput)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                                this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentMediaInput)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
@@ -12475,7 +12362,7 @@ private:
         (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint8_t & currentMediaInput)
+    static void OnSuccessCallback_2(void * context, uint8_t currentMediaInput)
     {
         (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_2(currentMediaInput);
     }
@@ -12537,7 +12424,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint8_t & currentMediaInput)
+    void OnSuccessResponse_2(uint8_t currentMediaInput)
     {
         VerifyOrReturn(CheckValue<uint8_t>("currentMediaInput", currentMediaInput, 1));
         NextTest();
@@ -13150,258 +13037,225 @@ private:
     const uint16_t mTestCount = 122;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & boolean)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, bool boolean)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & boolean)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, bool boolean)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & boolean)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, bool boolean)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & boolean)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, bool boolean)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & boolean)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
+    chip::Callback::Callback<void (*)(void * context, bool boolean)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & bitmap8)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t bitmap8)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & bitmap8)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t bitmap8)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_12{ OnFailureCallback_12, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & bitmap8)> mOnSuccessCallback_12{ OnSuccessCallback_12, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t bitmap8)> mOnSuccessCallback_12{ OnSuccessCallback_12, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & bitmap8)> mOnSuccessCallback_13{ OnSuccessCallback_13, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t bitmap8)> mOnSuccessCallback_13{ OnSuccessCallback_13, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_14{ OnFailureCallback_14, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & bitmap8)> mOnSuccessCallback_14{ OnSuccessCallback_14, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t bitmap8)> mOnSuccessCallback_14{ OnSuccessCallback_14, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_15{ OnFailureCallback_15, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & bitmap16)> mOnSuccessCallback_15{ OnSuccessCallback_15,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t bitmap16)> mOnSuccessCallback_15{ OnSuccessCallback_15, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_16{ OnFailureCallback_16, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & bitmap16)> mOnSuccessCallback_16{ OnSuccessCallback_16,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t bitmap16)> mOnSuccessCallback_16{ OnSuccessCallback_16, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_17{ OnFailureCallback_17, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & bitmap16)> mOnSuccessCallback_17{ OnSuccessCallback_17,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t bitmap16)> mOnSuccessCallback_17{ OnSuccessCallback_17, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_18{ OnFailureCallback_18, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & bitmap16)> mOnSuccessCallback_18{ OnSuccessCallback_18,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t bitmap16)> mOnSuccessCallback_18{ OnSuccessCallback_18, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_19{ OnFailureCallback_19, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & bitmap16)> mOnSuccessCallback_19{ OnSuccessCallback_19,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t bitmap16)> mOnSuccessCallback_19{ OnSuccessCallback_19, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_20{ OnFailureCallback_20, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & bitmap32)> mOnSuccessCallback_20{ OnSuccessCallback_20,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t bitmap32)> mOnSuccessCallback_20{ OnSuccessCallback_20, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_21{ OnFailureCallback_21, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & bitmap32)> mOnSuccessCallback_21{ OnSuccessCallback_21,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t bitmap32)> mOnSuccessCallback_21{ OnSuccessCallback_21, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_22{ OnFailureCallback_22, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & bitmap32)> mOnSuccessCallback_22{ OnSuccessCallback_22,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t bitmap32)> mOnSuccessCallback_22{ OnSuccessCallback_22, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_23{ OnFailureCallback_23, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & bitmap32)> mOnSuccessCallback_23{ OnSuccessCallback_23,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t bitmap32)> mOnSuccessCallback_23{ OnSuccessCallback_23, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_24{ OnFailureCallback_24, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & bitmap32)> mOnSuccessCallback_24{ OnSuccessCallback_24,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t bitmap32)> mOnSuccessCallback_24{ OnSuccessCallback_24, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_25{ OnFailureCallback_25, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & bitmap64)> mOnSuccessCallback_25{ OnSuccessCallback_25,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t bitmap64)> mOnSuccessCallback_25{ OnSuccessCallback_25, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_26{ OnFailureCallback_26, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & bitmap64)> mOnSuccessCallback_26{ OnSuccessCallback_26,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t bitmap64)> mOnSuccessCallback_26{ OnSuccessCallback_26, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_27{ OnFailureCallback_27, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & bitmap64)> mOnSuccessCallback_27{ OnSuccessCallback_27,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t bitmap64)> mOnSuccessCallback_27{ OnSuccessCallback_27, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_28{ OnFailureCallback_28, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & bitmap64)> mOnSuccessCallback_28{ OnSuccessCallback_28,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t bitmap64)> mOnSuccessCallback_28{ OnSuccessCallback_28, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_29{ OnFailureCallback_29, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & bitmap64)> mOnSuccessCallback_29{ OnSuccessCallback_29,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t bitmap64)> mOnSuccessCallback_29{ OnSuccessCallback_29, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_30{ OnFailureCallback_30, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & int8u)> mOnSuccessCallback_30{ OnSuccessCallback_30, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t int8u)> mOnSuccessCallback_30{ OnSuccessCallback_30, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_31{ OnFailureCallback_31, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & int8u)> mOnSuccessCallback_31{ OnSuccessCallback_31, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t int8u)> mOnSuccessCallback_31{ OnSuccessCallback_31, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_32{ OnFailureCallback_32, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & int8u)> mOnSuccessCallback_32{ OnSuccessCallback_32, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t int8u)> mOnSuccessCallback_32{ OnSuccessCallback_32, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_33{ OnFailureCallback_33, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & int8u)> mOnSuccessCallback_33{ OnSuccessCallback_33, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t int8u)> mOnSuccessCallback_33{ OnSuccessCallback_33, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_34{ OnFailureCallback_34, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & int8u)> mOnSuccessCallback_34{ OnSuccessCallback_34, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t int8u)> mOnSuccessCallback_34{ OnSuccessCallback_34, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_35{ OnFailureCallback_35, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & int16u)> mOnSuccessCallback_35{ OnSuccessCallback_35, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t int16u)> mOnSuccessCallback_35{ OnSuccessCallback_35, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_36{ OnFailureCallback_36, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & int16u)> mOnSuccessCallback_36{ OnSuccessCallback_36, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t int16u)> mOnSuccessCallback_36{ OnSuccessCallback_36, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_37{ OnFailureCallback_37, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & int16u)> mOnSuccessCallback_37{ OnSuccessCallback_37, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t int16u)> mOnSuccessCallback_37{ OnSuccessCallback_37, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_38{ OnFailureCallback_38, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & int16u)> mOnSuccessCallback_38{ OnSuccessCallback_38, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t int16u)> mOnSuccessCallback_38{ OnSuccessCallback_38, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_39{ OnFailureCallback_39, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & int16u)> mOnSuccessCallback_39{ OnSuccessCallback_39, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t int16u)> mOnSuccessCallback_39{ OnSuccessCallback_39, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_40{ OnFailureCallback_40, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & int32u)> mOnSuccessCallback_40{ OnSuccessCallback_40, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t int32u)> mOnSuccessCallback_40{ OnSuccessCallback_40, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_41{ OnFailureCallback_41, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & int32u)> mOnSuccessCallback_41{ OnSuccessCallback_41, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t int32u)> mOnSuccessCallback_41{ OnSuccessCallback_41, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_42{ OnFailureCallback_42, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & int32u)> mOnSuccessCallback_42{ OnSuccessCallback_42, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t int32u)> mOnSuccessCallback_42{ OnSuccessCallback_42, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_43{ OnFailureCallback_43, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & int32u)> mOnSuccessCallback_43{ OnSuccessCallback_43, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t int32u)> mOnSuccessCallback_43{ OnSuccessCallback_43, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_44{ OnFailureCallback_44, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & int32u)> mOnSuccessCallback_44{ OnSuccessCallback_44, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t int32u)> mOnSuccessCallback_44{ OnSuccessCallback_44, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_45{ OnFailureCallback_45, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & int64u)> mOnSuccessCallback_45{ OnSuccessCallback_45, this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t int64u)> mOnSuccessCallback_45{ OnSuccessCallback_45, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_46{ OnFailureCallback_46, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & int64u)> mOnSuccessCallback_46{ OnSuccessCallback_46, this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t int64u)> mOnSuccessCallback_46{ OnSuccessCallback_46, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_47{ OnFailureCallback_47, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & int64u)> mOnSuccessCallback_47{ OnSuccessCallback_47, this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t int64u)> mOnSuccessCallback_47{ OnSuccessCallback_47, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_48{ OnFailureCallback_48, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & int64u)> mOnSuccessCallback_48{ OnSuccessCallback_48, this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t int64u)> mOnSuccessCallback_48{ OnSuccessCallback_48, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_49{ OnFailureCallback_49, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & int64u)> mOnSuccessCallback_49{ OnSuccessCallback_49, this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t int64u)> mOnSuccessCallback_49{ OnSuccessCallback_49, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_50{ OnFailureCallback_50, this };
-    chip::Callback::Callback<void (*)(void * context, const int8_t & int8s)> mOnSuccessCallback_50{ OnSuccessCallback_50, this };
+    chip::Callback::Callback<void (*)(void * context, int8_t int8s)> mOnSuccessCallback_50{ OnSuccessCallback_50, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_51{ OnFailureCallback_51, this };
-    chip::Callback::Callback<void (*)(void * context, const int8_t & int8s)> mOnSuccessCallback_51{ OnSuccessCallback_51, this };
+    chip::Callback::Callback<void (*)(void * context, int8_t int8s)> mOnSuccessCallback_51{ OnSuccessCallback_51, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_52{ OnFailureCallback_52, this };
-    chip::Callback::Callback<void (*)(void * context, const int8_t & int8s)> mOnSuccessCallback_52{ OnSuccessCallback_52, this };
+    chip::Callback::Callback<void (*)(void * context, int8_t int8s)> mOnSuccessCallback_52{ OnSuccessCallback_52, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_53{ OnFailureCallback_53, this };
-    chip::Callback::Callback<void (*)(void * context, const int8_t & int8s)> mOnSuccessCallback_53{ OnSuccessCallback_53, this };
+    chip::Callback::Callback<void (*)(void * context, int8_t int8s)> mOnSuccessCallback_53{ OnSuccessCallback_53, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_54{ OnFailureCallback_54, this };
-    chip::Callback::Callback<void (*)(void * context, const int8_t & int8s)> mOnSuccessCallback_54{ OnSuccessCallback_54, this };
+    chip::Callback::Callback<void (*)(void * context, int8_t int8s)> mOnSuccessCallback_54{ OnSuccessCallback_54, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_55{ OnFailureCallback_55, this };
-    chip::Callback::Callback<void (*)(void * context, const int8_t & int8s)> mOnSuccessCallback_55{ OnSuccessCallback_55, this };
+    chip::Callback::Callback<void (*)(void * context, int8_t int8s)> mOnSuccessCallback_55{ OnSuccessCallback_55, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_56{ OnFailureCallback_56, this };
-    chip::Callback::Callback<void (*)(void * context, const int8_t & int8s)> mOnSuccessCallback_56{ OnSuccessCallback_56, this };
+    chip::Callback::Callback<void (*)(void * context, int8_t int8s)> mOnSuccessCallback_56{ OnSuccessCallback_56, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_57{ OnFailureCallback_57, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & int16s)> mOnSuccessCallback_57{ OnSuccessCallback_57, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t int16s)> mOnSuccessCallback_57{ OnSuccessCallback_57, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_58{ OnFailureCallback_58, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & int16s)> mOnSuccessCallback_58{ OnSuccessCallback_58, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t int16s)> mOnSuccessCallback_58{ OnSuccessCallback_58, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_59{ OnFailureCallback_59, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & int16s)> mOnSuccessCallback_59{ OnSuccessCallback_59, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t int16s)> mOnSuccessCallback_59{ OnSuccessCallback_59, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_60{ OnFailureCallback_60, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & int16s)> mOnSuccessCallback_60{ OnSuccessCallback_60, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t int16s)> mOnSuccessCallback_60{ OnSuccessCallback_60, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_61{ OnFailureCallback_61, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & int16s)> mOnSuccessCallback_61{ OnSuccessCallback_61, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t int16s)> mOnSuccessCallback_61{ OnSuccessCallback_61, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_62{ OnFailureCallback_62, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & int16s)> mOnSuccessCallback_62{ OnSuccessCallback_62, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t int16s)> mOnSuccessCallback_62{ OnSuccessCallback_62, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_63{ OnFailureCallback_63, this };
-    chip::Callback::Callback<void (*)(void * context, const int16_t & int16s)> mOnSuccessCallback_63{ OnSuccessCallback_63, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t int16s)> mOnSuccessCallback_63{ OnSuccessCallback_63, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_64{ OnFailureCallback_64, this };
-    chip::Callback::Callback<void (*)(void * context, const int32_t & int32s)> mOnSuccessCallback_64{ OnSuccessCallback_64, this };
+    chip::Callback::Callback<void (*)(void * context, int32_t int32s)> mOnSuccessCallback_64{ OnSuccessCallback_64, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_65{ OnFailureCallback_65, this };
-    chip::Callback::Callback<void (*)(void * context, const int32_t & int32s)> mOnSuccessCallback_65{ OnSuccessCallback_65, this };
+    chip::Callback::Callback<void (*)(void * context, int32_t int32s)> mOnSuccessCallback_65{ OnSuccessCallback_65, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_66{ OnFailureCallback_66, this };
-    chip::Callback::Callback<void (*)(void * context, const int32_t & int32s)> mOnSuccessCallback_66{ OnSuccessCallback_66, this };
+    chip::Callback::Callback<void (*)(void * context, int32_t int32s)> mOnSuccessCallback_66{ OnSuccessCallback_66, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_67{ OnFailureCallback_67, this };
-    chip::Callback::Callback<void (*)(void * context, const int32_t & int32s)> mOnSuccessCallback_67{ OnSuccessCallback_67, this };
+    chip::Callback::Callback<void (*)(void * context, int32_t int32s)> mOnSuccessCallback_67{ OnSuccessCallback_67, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_68{ OnFailureCallback_68, this };
-    chip::Callback::Callback<void (*)(void * context, const int32_t & int32s)> mOnSuccessCallback_68{ OnSuccessCallback_68, this };
+    chip::Callback::Callback<void (*)(void * context, int32_t int32s)> mOnSuccessCallback_68{ OnSuccessCallback_68, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_69{ OnFailureCallback_69, this };
-    chip::Callback::Callback<void (*)(void * context, const int32_t & int32s)> mOnSuccessCallback_69{ OnSuccessCallback_69, this };
+    chip::Callback::Callback<void (*)(void * context, int32_t int32s)> mOnSuccessCallback_69{ OnSuccessCallback_69, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_70{ OnFailureCallback_70, this };
-    chip::Callback::Callback<void (*)(void * context, const int32_t & int32s)> mOnSuccessCallback_70{ OnSuccessCallback_70, this };
+    chip::Callback::Callback<void (*)(void * context, int32_t int32s)> mOnSuccessCallback_70{ OnSuccessCallback_70, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_71{ OnFailureCallback_71, this };
-    chip::Callback::Callback<void (*)(void * context, const int64_t & int64s)> mOnSuccessCallback_71{ OnSuccessCallback_71, this };
+    chip::Callback::Callback<void (*)(void * context, int64_t int64s)> mOnSuccessCallback_71{ OnSuccessCallback_71, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_72{ OnFailureCallback_72, this };
-    chip::Callback::Callback<void (*)(void * context, const int64_t & int64s)> mOnSuccessCallback_72{ OnSuccessCallback_72, this };
+    chip::Callback::Callback<void (*)(void * context, int64_t int64s)> mOnSuccessCallback_72{ OnSuccessCallback_72, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_73{ OnFailureCallback_73, this };
-    chip::Callback::Callback<void (*)(void * context, const int64_t & int64s)> mOnSuccessCallback_73{ OnSuccessCallback_73, this };
+    chip::Callback::Callback<void (*)(void * context, int64_t int64s)> mOnSuccessCallback_73{ OnSuccessCallback_73, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_74{ OnFailureCallback_74, this };
-    chip::Callback::Callback<void (*)(void * context, const int64_t & int64s)> mOnSuccessCallback_74{ OnSuccessCallback_74, this };
+    chip::Callback::Callback<void (*)(void * context, int64_t int64s)> mOnSuccessCallback_74{ OnSuccessCallback_74, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_75{ OnFailureCallback_75, this };
-    chip::Callback::Callback<void (*)(void * context, const int64_t & int64s)> mOnSuccessCallback_75{ OnSuccessCallback_75, this };
+    chip::Callback::Callback<void (*)(void * context, int64_t int64s)> mOnSuccessCallback_75{ OnSuccessCallback_75, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_76{ OnFailureCallback_76, this };
-    chip::Callback::Callback<void (*)(void * context, const int64_t & int64s)> mOnSuccessCallback_76{ OnSuccessCallback_76, this };
+    chip::Callback::Callback<void (*)(void * context, int64_t int64s)> mOnSuccessCallback_76{ OnSuccessCallback_76, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_77{ OnFailureCallback_77, this };
-    chip::Callback::Callback<void (*)(void * context, const int64_t & int64s)> mOnSuccessCallback_77{ OnSuccessCallback_77, this };
+    chip::Callback::Callback<void (*)(void * context, int64_t int64s)> mOnSuccessCallback_77{ OnSuccessCallback_77, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_78{ OnFailureCallback_78, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & enum8)> mOnSuccessCallback_78{ OnSuccessCallback_78, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t enum8)> mOnSuccessCallback_78{ OnSuccessCallback_78, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_79{ OnFailureCallback_79, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & enum8)> mOnSuccessCallback_79{ OnSuccessCallback_79, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t enum8)> mOnSuccessCallback_79{ OnSuccessCallback_79, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_80{ OnFailureCallback_80, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & enum8)> mOnSuccessCallback_80{ OnSuccessCallback_80, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t enum8)> mOnSuccessCallback_80{ OnSuccessCallback_80, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_81{ OnFailureCallback_81, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & enum8)> mOnSuccessCallback_81{ OnSuccessCallback_81, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t enum8)> mOnSuccessCallback_81{ OnSuccessCallback_81, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_82{ OnFailureCallback_82, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & enum8)> mOnSuccessCallback_82{ OnSuccessCallback_82, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t enum8)> mOnSuccessCallback_82{ OnSuccessCallback_82, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_83{ OnFailureCallback_83, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & enum16)> mOnSuccessCallback_83{ OnSuccessCallback_83, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t enum16)> mOnSuccessCallback_83{ OnSuccessCallback_83, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_84{ OnFailureCallback_84, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & enum16)> mOnSuccessCallback_84{ OnSuccessCallback_84, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t enum16)> mOnSuccessCallback_84{ OnSuccessCallback_84, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_85{ OnFailureCallback_85, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & enum16)> mOnSuccessCallback_85{ OnSuccessCallback_85, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t enum16)> mOnSuccessCallback_85{ OnSuccessCallback_85, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_86{ OnFailureCallback_86, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & enum16)> mOnSuccessCallback_86{ OnSuccessCallback_86, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t enum16)> mOnSuccessCallback_86{ OnSuccessCallback_86, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_87{ OnFailureCallback_87, this };
-    chip::Callback::Callback<void (*)(void * context, const uint16_t & enum16)> mOnSuccessCallback_87{ OnSuccessCallback_87, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t enum16)> mOnSuccessCallback_87{ OnSuccessCallback_87, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_88{ OnFailureCallback_88, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & octetString)> mOnSuccessCallback_88{
-        OnSuccessCallback_88, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan octetString)> mOnSuccessCallback_88{ OnSuccessCallback_88,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_89{ OnFailureCallback_89, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & octetString)> mOnSuccessCallback_89{
-        OnSuccessCallback_89, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan octetString)> mOnSuccessCallback_89{ OnSuccessCallback_89,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_90{ OnFailureCallback_90, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & octetString)> mOnSuccessCallback_90{
-        OnSuccessCallback_90, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan octetString)> mOnSuccessCallback_90{ OnSuccessCallback_90,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_91{ OnFailureCallback_91, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & octetString)> mOnSuccessCallback_91{
-        OnSuccessCallback_91, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan octetString)> mOnSuccessCallback_91{ OnSuccessCallback_91,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_92{ OnFailureCallback_92, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & octetString)> mOnSuccessCallback_92{
-        OnSuccessCallback_92, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan octetString)> mOnSuccessCallback_92{ OnSuccessCallback_92,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_93{ OnFailureCallback_93, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & octetString)> mOnSuccessCallback_93{
-        OnSuccessCallback_93, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan octetString)> mOnSuccessCallback_93{ OnSuccessCallback_93,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_94{ OnFailureCallback_94, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & longOctetString)> mOnSuccessCallback_94{
-        OnSuccessCallback_94, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan longOctetString)> mOnSuccessCallback_94{ OnSuccessCallback_94,
+                                                                                                              this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_95{ OnFailureCallback_95, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & longOctetString)> mOnSuccessCallback_95{
-        OnSuccessCallback_95, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan longOctetString)> mOnSuccessCallback_95{ OnSuccessCallback_95,
+                                                                                                              this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_96{ OnFailureCallback_96, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & longOctetString)> mOnSuccessCallback_96{
-        OnSuccessCallback_96, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan longOctetString)> mOnSuccessCallback_96{ OnSuccessCallback_96,
+                                                                                                              this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_97{ OnFailureCallback_97, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::ByteSpan & longOctetString)> mOnSuccessCallback_97{
-        OnSuccessCallback_97, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::ByteSpan longOctetString)> mOnSuccessCallback_97{ OnSuccessCallback_97,
+                                                                                                              this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_98{ OnFailureCallback_98, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & charString)> mOnSuccessCallback_98{
-        OnSuccessCallback_98, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan charString)> mOnSuccessCallback_98{ OnSuccessCallback_98,
+                                                                                                         this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_99{ OnFailureCallback_99, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & charString)> mOnSuccessCallback_99{
-        OnSuccessCallback_99, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan charString)> mOnSuccessCallback_99{ OnSuccessCallback_99,
+                                                                                                         this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_100{ OnFailureCallback_100, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & charString)> mOnSuccessCallback_100{
-        OnSuccessCallback_100, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan charString)> mOnSuccessCallback_100{ OnSuccessCallback_100,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_101{ OnFailureCallback_101, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & charString)> mOnSuccessCallback_101{
-        OnSuccessCallback_101, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan charString)> mOnSuccessCallback_101{ OnSuccessCallback_101,
+                                                                                                          this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_102{ OnFailureCallback_102, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & longCharString)> mOnSuccessCallback_102{
-        OnSuccessCallback_102, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan longCharString)> mOnSuccessCallback_102{ OnSuccessCallback_102,
+                                                                                                              this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_103{ OnFailureCallback_103, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & longCharString)> mOnSuccessCallback_103{
-        OnSuccessCallback_103, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan longCharString)> mOnSuccessCallback_103{ OnSuccessCallback_103,
+                                                                                                              this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_104{ OnFailureCallback_104, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & longCharString)> mOnSuccessCallback_104{
-        OnSuccessCallback_104, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan longCharString)> mOnSuccessCallback_104{ OnSuccessCallback_104,
+                                                                                                              this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_105{ OnFailureCallback_105, this };
-    chip::Callback::Callback<void (*)(void * context, const chip::CharSpan & longCharString)> mOnSuccessCallback_105{
-        OnSuccessCallback_105, this
-    };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan longCharString)> mOnSuccessCallback_105{ OnSuccessCallback_105,
+                                                                                                              this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_106{ OnFailureCallback_106, this };
     chip::Callback::Callback<void (*)(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)>
         mOnSuccessCallback_106{ OnSuccessCallback_106, this };
@@ -13415,48 +13269,36 @@ private:
             listStructOctetString)>
         mOnSuccessCallback_108{ OnSuccessCallback_108, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_109{ OnFailureCallback_109, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & epochUs)> mOnSuccessCallback_109{ OnSuccessCallback_109,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t epochUs)> mOnSuccessCallback_109{ OnSuccessCallback_109, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_110{ OnFailureCallback_110, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & epochUs)> mOnSuccessCallback_110{ OnSuccessCallback_110,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t epochUs)> mOnSuccessCallback_110{ OnSuccessCallback_110, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_111{ OnFailureCallback_111, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & epochUs)> mOnSuccessCallback_111{ OnSuccessCallback_111,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t epochUs)> mOnSuccessCallback_111{ OnSuccessCallback_111, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_112{ OnFailureCallback_112, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & epochUs)> mOnSuccessCallback_112{ OnSuccessCallback_112,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t epochUs)> mOnSuccessCallback_112{ OnSuccessCallback_112, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_113{ OnFailureCallback_113, this };
-    chip::Callback::Callback<void (*)(void * context, const uint64_t & epochUs)> mOnSuccessCallback_113{ OnSuccessCallback_113,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t epochUs)> mOnSuccessCallback_113{ OnSuccessCallback_113, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_114{ OnFailureCallback_114, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & epochS)> mOnSuccessCallback_114{ OnSuccessCallback_114,
-                                                                                                        this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t epochS)> mOnSuccessCallback_114{ OnSuccessCallback_114, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_115{ OnFailureCallback_115, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & epochS)> mOnSuccessCallback_115{ OnSuccessCallback_115,
-                                                                                                        this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t epochS)> mOnSuccessCallback_115{ OnSuccessCallback_115, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_116{ OnFailureCallback_116, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & epochS)> mOnSuccessCallback_116{ OnSuccessCallback_116,
-                                                                                                        this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t epochS)> mOnSuccessCallback_116{ OnSuccessCallback_116, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_117{ OnFailureCallback_117, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & epochS)> mOnSuccessCallback_117{ OnSuccessCallback_117,
-                                                                                                        this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t epochS)> mOnSuccessCallback_117{ OnSuccessCallback_117, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_118{ OnFailureCallback_118, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & epochS)> mOnSuccessCallback_118{ OnSuccessCallback_118,
-                                                                                                        this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t epochS)> mOnSuccessCallback_118{ OnSuccessCallback_118, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_119{ OnFailureCallback_119, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & unsupported)> mOnSuccessCallback_119{ OnSuccessCallback_119,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, bool unsupported)> mOnSuccessCallback_119{ OnSuccessCallback_119, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_120{ OnFailureCallback_120, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & unsupported)> mOnSuccessCallback_120{ OnSuccessCallback_120,
-                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, bool unsupported)> mOnSuccessCallback_120{ OnSuccessCallback_120, this };
 
     static void OnFailureCallback_5(void * context, uint8_t status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, const bool & boolean)
+    static void OnSuccessCallback_5(void * context, bool boolean)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_5(boolean);
     }
@@ -13466,7 +13308,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const bool & boolean)
+    static void OnSuccessCallback_6(void * context, bool boolean)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_6(boolean);
     }
@@ -13476,7 +13318,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, const bool & boolean)
+    static void OnSuccessCallback_7(void * context, bool boolean)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_7(boolean);
     }
@@ -13486,7 +13328,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, const bool & boolean)
+    static void OnSuccessCallback_8(void * context, bool boolean)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_8(boolean);
     }
@@ -13496,7 +13338,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_9(status);
     }
 
-    static void OnSuccessCallback_9(void * context, const bool & boolean)
+    static void OnSuccessCallback_9(void * context, bool boolean)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_9(boolean);
     }
@@ -13506,7 +13348,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, const uint8_t & bitmap8)
+    static void OnSuccessCallback_10(void * context, uint8_t bitmap8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_10(bitmap8);
     }
@@ -13516,7 +13358,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, const uint8_t & bitmap8)
+    static void OnSuccessCallback_11(void * context, uint8_t bitmap8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_11(bitmap8);
     }
@@ -13526,7 +13368,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_12(status);
     }
 
-    static void OnSuccessCallback_12(void * context, const uint8_t & bitmap8)
+    static void OnSuccessCallback_12(void * context, uint8_t bitmap8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_12(bitmap8);
     }
@@ -13536,7 +13378,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_13(status);
     }
 
-    static void OnSuccessCallback_13(void * context, const uint8_t & bitmap8)
+    static void OnSuccessCallback_13(void * context, uint8_t bitmap8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_13(bitmap8);
     }
@@ -13546,7 +13388,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_14(status);
     }
 
-    static void OnSuccessCallback_14(void * context, const uint8_t & bitmap8)
+    static void OnSuccessCallback_14(void * context, uint8_t bitmap8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_14(bitmap8);
     }
@@ -13556,7 +13398,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_15(status);
     }
 
-    static void OnSuccessCallback_15(void * context, const uint16_t & bitmap16)
+    static void OnSuccessCallback_15(void * context, uint16_t bitmap16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_15(bitmap16);
     }
@@ -13566,7 +13408,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_16(status);
     }
 
-    static void OnSuccessCallback_16(void * context, const uint16_t & bitmap16)
+    static void OnSuccessCallback_16(void * context, uint16_t bitmap16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_16(bitmap16);
     }
@@ -13576,7 +13418,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_17(status);
     }
 
-    static void OnSuccessCallback_17(void * context, const uint16_t & bitmap16)
+    static void OnSuccessCallback_17(void * context, uint16_t bitmap16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_17(bitmap16);
     }
@@ -13586,7 +13428,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_18(status);
     }
 
-    static void OnSuccessCallback_18(void * context, const uint16_t & bitmap16)
+    static void OnSuccessCallback_18(void * context, uint16_t bitmap16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_18(bitmap16);
     }
@@ -13596,7 +13438,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_19(status);
     }
 
-    static void OnSuccessCallback_19(void * context, const uint16_t & bitmap16)
+    static void OnSuccessCallback_19(void * context, uint16_t bitmap16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_19(bitmap16);
     }
@@ -13606,7 +13448,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_20(status);
     }
 
-    static void OnSuccessCallback_20(void * context, const uint32_t & bitmap32)
+    static void OnSuccessCallback_20(void * context, uint32_t bitmap32)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_20(bitmap32);
     }
@@ -13616,7 +13458,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_21(status);
     }
 
-    static void OnSuccessCallback_21(void * context, const uint32_t & bitmap32)
+    static void OnSuccessCallback_21(void * context, uint32_t bitmap32)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_21(bitmap32);
     }
@@ -13626,7 +13468,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_22(status);
     }
 
-    static void OnSuccessCallback_22(void * context, const uint32_t & bitmap32)
+    static void OnSuccessCallback_22(void * context, uint32_t bitmap32)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_22(bitmap32);
     }
@@ -13636,7 +13478,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_23(status);
     }
 
-    static void OnSuccessCallback_23(void * context, const uint32_t & bitmap32)
+    static void OnSuccessCallback_23(void * context, uint32_t bitmap32)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_23(bitmap32);
     }
@@ -13646,7 +13488,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_24(status);
     }
 
-    static void OnSuccessCallback_24(void * context, const uint32_t & bitmap32)
+    static void OnSuccessCallback_24(void * context, uint32_t bitmap32)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_24(bitmap32);
     }
@@ -13656,7 +13498,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_25(status);
     }
 
-    static void OnSuccessCallback_25(void * context, const uint64_t & bitmap64)
+    static void OnSuccessCallback_25(void * context, uint64_t bitmap64)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_25(bitmap64);
     }
@@ -13666,7 +13508,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_26(status);
     }
 
-    static void OnSuccessCallback_26(void * context, const uint64_t & bitmap64)
+    static void OnSuccessCallback_26(void * context, uint64_t bitmap64)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_26(bitmap64);
     }
@@ -13676,7 +13518,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_27(status);
     }
 
-    static void OnSuccessCallback_27(void * context, const uint64_t & bitmap64)
+    static void OnSuccessCallback_27(void * context, uint64_t bitmap64)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_27(bitmap64);
     }
@@ -13686,7 +13528,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_28(status);
     }
 
-    static void OnSuccessCallback_28(void * context, const uint64_t & bitmap64)
+    static void OnSuccessCallback_28(void * context, uint64_t bitmap64)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_28(bitmap64);
     }
@@ -13696,7 +13538,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_29(status);
     }
 
-    static void OnSuccessCallback_29(void * context, const uint64_t & bitmap64)
+    static void OnSuccessCallback_29(void * context, uint64_t bitmap64)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_29(bitmap64);
     }
@@ -13706,7 +13548,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_30(status);
     }
 
-    static void OnSuccessCallback_30(void * context, const uint8_t & int8u)
+    static void OnSuccessCallback_30(void * context, uint8_t int8u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_30(int8u);
     }
@@ -13716,7 +13558,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_31(status);
     }
 
-    static void OnSuccessCallback_31(void * context, const uint8_t & int8u)
+    static void OnSuccessCallback_31(void * context, uint8_t int8u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_31(int8u);
     }
@@ -13726,7 +13568,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_32(status);
     }
 
-    static void OnSuccessCallback_32(void * context, const uint8_t & int8u)
+    static void OnSuccessCallback_32(void * context, uint8_t int8u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_32(int8u);
     }
@@ -13736,7 +13578,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_33(status);
     }
 
-    static void OnSuccessCallback_33(void * context, const uint8_t & int8u)
+    static void OnSuccessCallback_33(void * context, uint8_t int8u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_33(int8u);
     }
@@ -13746,7 +13588,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_34(status);
     }
 
-    static void OnSuccessCallback_34(void * context, const uint8_t & int8u)
+    static void OnSuccessCallback_34(void * context, uint8_t int8u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_34(int8u);
     }
@@ -13756,7 +13598,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_35(status);
     }
 
-    static void OnSuccessCallback_35(void * context, const uint16_t & int16u)
+    static void OnSuccessCallback_35(void * context, uint16_t int16u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_35(int16u);
     }
@@ -13766,7 +13608,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_36(status);
     }
 
-    static void OnSuccessCallback_36(void * context, const uint16_t & int16u)
+    static void OnSuccessCallback_36(void * context, uint16_t int16u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_36(int16u);
     }
@@ -13776,7 +13618,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_37(status);
     }
 
-    static void OnSuccessCallback_37(void * context, const uint16_t & int16u)
+    static void OnSuccessCallback_37(void * context, uint16_t int16u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_37(int16u);
     }
@@ -13786,7 +13628,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_38(status);
     }
 
-    static void OnSuccessCallback_38(void * context, const uint16_t & int16u)
+    static void OnSuccessCallback_38(void * context, uint16_t int16u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_38(int16u);
     }
@@ -13796,7 +13638,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_39(status);
     }
 
-    static void OnSuccessCallback_39(void * context, const uint16_t & int16u)
+    static void OnSuccessCallback_39(void * context, uint16_t int16u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_39(int16u);
     }
@@ -13806,7 +13648,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_40(status);
     }
 
-    static void OnSuccessCallback_40(void * context, const uint32_t & int32u)
+    static void OnSuccessCallback_40(void * context, uint32_t int32u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_40(int32u);
     }
@@ -13816,7 +13658,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_41(status);
     }
 
-    static void OnSuccessCallback_41(void * context, const uint32_t & int32u)
+    static void OnSuccessCallback_41(void * context, uint32_t int32u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_41(int32u);
     }
@@ -13826,7 +13668,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_42(status);
     }
 
-    static void OnSuccessCallback_42(void * context, const uint32_t & int32u)
+    static void OnSuccessCallback_42(void * context, uint32_t int32u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_42(int32u);
     }
@@ -13836,7 +13678,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_43(status);
     }
 
-    static void OnSuccessCallback_43(void * context, const uint32_t & int32u)
+    static void OnSuccessCallback_43(void * context, uint32_t int32u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_43(int32u);
     }
@@ -13846,7 +13688,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_44(status);
     }
 
-    static void OnSuccessCallback_44(void * context, const uint32_t & int32u)
+    static void OnSuccessCallback_44(void * context, uint32_t int32u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_44(int32u);
     }
@@ -13856,7 +13698,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_45(status);
     }
 
-    static void OnSuccessCallback_45(void * context, const uint64_t & int64u)
+    static void OnSuccessCallback_45(void * context, uint64_t int64u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_45(int64u);
     }
@@ -13866,7 +13708,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_46(status);
     }
 
-    static void OnSuccessCallback_46(void * context, const uint64_t & int64u)
+    static void OnSuccessCallback_46(void * context, uint64_t int64u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_46(int64u);
     }
@@ -13876,7 +13718,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_47(status);
     }
 
-    static void OnSuccessCallback_47(void * context, const uint64_t & int64u)
+    static void OnSuccessCallback_47(void * context, uint64_t int64u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_47(int64u);
     }
@@ -13886,7 +13728,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_48(status);
     }
 
-    static void OnSuccessCallback_48(void * context, const uint64_t & int64u)
+    static void OnSuccessCallback_48(void * context, uint64_t int64u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_48(int64u);
     }
@@ -13896,7 +13738,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_49(status);
     }
 
-    static void OnSuccessCallback_49(void * context, const uint64_t & int64u)
+    static void OnSuccessCallback_49(void * context, uint64_t int64u)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_49(int64u);
     }
@@ -13906,7 +13748,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_50(status);
     }
 
-    static void OnSuccessCallback_50(void * context, const int8_t & int8s)
+    static void OnSuccessCallback_50(void * context, int8_t int8s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_50(int8s);
     }
@@ -13916,7 +13758,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_51(status);
     }
 
-    static void OnSuccessCallback_51(void * context, const int8_t & int8s)
+    static void OnSuccessCallback_51(void * context, int8_t int8s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_51(int8s);
     }
@@ -13926,7 +13768,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_52(status);
     }
 
-    static void OnSuccessCallback_52(void * context, const int8_t & int8s)
+    static void OnSuccessCallback_52(void * context, int8_t int8s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_52(int8s);
     }
@@ -13936,7 +13778,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_53(status);
     }
 
-    static void OnSuccessCallback_53(void * context, const int8_t & int8s)
+    static void OnSuccessCallback_53(void * context, int8_t int8s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_53(int8s);
     }
@@ -13946,7 +13788,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_54(status);
     }
 
-    static void OnSuccessCallback_54(void * context, const int8_t & int8s)
+    static void OnSuccessCallback_54(void * context, int8_t int8s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_54(int8s);
     }
@@ -13956,7 +13798,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_55(status);
     }
 
-    static void OnSuccessCallback_55(void * context, const int8_t & int8s)
+    static void OnSuccessCallback_55(void * context, int8_t int8s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_55(int8s);
     }
@@ -13966,7 +13808,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_56(status);
     }
 
-    static void OnSuccessCallback_56(void * context, const int8_t & int8s)
+    static void OnSuccessCallback_56(void * context, int8_t int8s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_56(int8s);
     }
@@ -13976,7 +13818,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_57(status);
     }
 
-    static void OnSuccessCallback_57(void * context, const int16_t & int16s)
+    static void OnSuccessCallback_57(void * context, int16_t int16s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_57(int16s);
     }
@@ -13986,7 +13828,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_58(status);
     }
 
-    static void OnSuccessCallback_58(void * context, const int16_t & int16s)
+    static void OnSuccessCallback_58(void * context, int16_t int16s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_58(int16s);
     }
@@ -13996,7 +13838,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_59(status);
     }
 
-    static void OnSuccessCallback_59(void * context, const int16_t & int16s)
+    static void OnSuccessCallback_59(void * context, int16_t int16s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_59(int16s);
     }
@@ -14006,7 +13848,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_60(status);
     }
 
-    static void OnSuccessCallback_60(void * context, const int16_t & int16s)
+    static void OnSuccessCallback_60(void * context, int16_t int16s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_60(int16s);
     }
@@ -14016,7 +13858,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_61(status);
     }
 
-    static void OnSuccessCallback_61(void * context, const int16_t & int16s)
+    static void OnSuccessCallback_61(void * context, int16_t int16s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_61(int16s);
     }
@@ -14026,7 +13868,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_62(status);
     }
 
-    static void OnSuccessCallback_62(void * context, const int16_t & int16s)
+    static void OnSuccessCallback_62(void * context, int16_t int16s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_62(int16s);
     }
@@ -14036,7 +13878,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_63(status);
     }
 
-    static void OnSuccessCallback_63(void * context, const int16_t & int16s)
+    static void OnSuccessCallback_63(void * context, int16_t int16s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_63(int16s);
     }
@@ -14046,7 +13888,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_64(status);
     }
 
-    static void OnSuccessCallback_64(void * context, const int32_t & int32s)
+    static void OnSuccessCallback_64(void * context, int32_t int32s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_64(int32s);
     }
@@ -14056,7 +13898,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_65(status);
     }
 
-    static void OnSuccessCallback_65(void * context, const int32_t & int32s)
+    static void OnSuccessCallback_65(void * context, int32_t int32s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_65(int32s);
     }
@@ -14066,7 +13908,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_66(status);
     }
 
-    static void OnSuccessCallback_66(void * context, const int32_t & int32s)
+    static void OnSuccessCallback_66(void * context, int32_t int32s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_66(int32s);
     }
@@ -14076,7 +13918,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_67(status);
     }
 
-    static void OnSuccessCallback_67(void * context, const int32_t & int32s)
+    static void OnSuccessCallback_67(void * context, int32_t int32s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_67(int32s);
     }
@@ -14086,7 +13928,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_68(status);
     }
 
-    static void OnSuccessCallback_68(void * context, const int32_t & int32s)
+    static void OnSuccessCallback_68(void * context, int32_t int32s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_68(int32s);
     }
@@ -14096,7 +13938,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_69(status);
     }
 
-    static void OnSuccessCallback_69(void * context, const int32_t & int32s)
+    static void OnSuccessCallback_69(void * context, int32_t int32s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_69(int32s);
     }
@@ -14106,7 +13948,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_70(status);
     }
 
-    static void OnSuccessCallback_70(void * context, const int32_t & int32s)
+    static void OnSuccessCallback_70(void * context, int32_t int32s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_70(int32s);
     }
@@ -14116,7 +13958,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_71(status);
     }
 
-    static void OnSuccessCallback_71(void * context, const int64_t & int64s)
+    static void OnSuccessCallback_71(void * context, int64_t int64s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_71(int64s);
     }
@@ -14126,7 +13968,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_72(status);
     }
 
-    static void OnSuccessCallback_72(void * context, const int64_t & int64s)
+    static void OnSuccessCallback_72(void * context, int64_t int64s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_72(int64s);
     }
@@ -14136,7 +13978,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_73(status);
     }
 
-    static void OnSuccessCallback_73(void * context, const int64_t & int64s)
+    static void OnSuccessCallback_73(void * context, int64_t int64s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_73(int64s);
     }
@@ -14146,7 +13988,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_74(status);
     }
 
-    static void OnSuccessCallback_74(void * context, const int64_t & int64s)
+    static void OnSuccessCallback_74(void * context, int64_t int64s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_74(int64s);
     }
@@ -14156,7 +13998,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_75(status);
     }
 
-    static void OnSuccessCallback_75(void * context, const int64_t & int64s)
+    static void OnSuccessCallback_75(void * context, int64_t int64s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_75(int64s);
     }
@@ -14166,7 +14008,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_76(status);
     }
 
-    static void OnSuccessCallback_76(void * context, const int64_t & int64s)
+    static void OnSuccessCallback_76(void * context, int64_t int64s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_76(int64s);
     }
@@ -14176,7 +14018,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_77(status);
     }
 
-    static void OnSuccessCallback_77(void * context, const int64_t & int64s)
+    static void OnSuccessCallback_77(void * context, int64_t int64s)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_77(int64s);
     }
@@ -14186,7 +14028,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_78(status);
     }
 
-    static void OnSuccessCallback_78(void * context, const uint8_t & enum8)
+    static void OnSuccessCallback_78(void * context, uint8_t enum8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_78(enum8);
     }
@@ -14196,7 +14038,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_79(status);
     }
 
-    static void OnSuccessCallback_79(void * context, const uint8_t & enum8)
+    static void OnSuccessCallback_79(void * context, uint8_t enum8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_79(enum8);
     }
@@ -14206,7 +14048,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_80(status);
     }
 
-    static void OnSuccessCallback_80(void * context, const uint8_t & enum8)
+    static void OnSuccessCallback_80(void * context, uint8_t enum8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_80(enum8);
     }
@@ -14216,7 +14058,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_81(status);
     }
 
-    static void OnSuccessCallback_81(void * context, const uint8_t & enum8)
+    static void OnSuccessCallback_81(void * context, uint8_t enum8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_81(enum8);
     }
@@ -14226,7 +14068,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_82(status);
     }
 
-    static void OnSuccessCallback_82(void * context, const uint8_t & enum8)
+    static void OnSuccessCallback_82(void * context, uint8_t enum8)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_82(enum8);
     }
@@ -14236,7 +14078,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_83(status);
     }
 
-    static void OnSuccessCallback_83(void * context, const uint16_t & enum16)
+    static void OnSuccessCallback_83(void * context, uint16_t enum16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_83(enum16);
     }
@@ -14246,7 +14088,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_84(status);
     }
 
-    static void OnSuccessCallback_84(void * context, const uint16_t & enum16)
+    static void OnSuccessCallback_84(void * context, uint16_t enum16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_84(enum16);
     }
@@ -14256,7 +14098,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_85(status);
     }
 
-    static void OnSuccessCallback_85(void * context, const uint16_t & enum16)
+    static void OnSuccessCallback_85(void * context, uint16_t enum16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_85(enum16);
     }
@@ -14266,7 +14108,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_86(status);
     }
 
-    static void OnSuccessCallback_86(void * context, const uint16_t & enum16)
+    static void OnSuccessCallback_86(void * context, uint16_t enum16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_86(enum16);
     }
@@ -14276,7 +14118,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_87(status);
     }
 
-    static void OnSuccessCallback_87(void * context, const uint16_t & enum16)
+    static void OnSuccessCallback_87(void * context, uint16_t enum16)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_87(enum16);
     }
@@ -14286,7 +14128,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_88(status);
     }
 
-    static void OnSuccessCallback_88(void * context, const chip::ByteSpan & octetString)
+    static void OnSuccessCallback_88(void * context, chip::ByteSpan octetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_88(octetString);
     }
@@ -14296,7 +14138,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_89(status);
     }
 
-    static void OnSuccessCallback_89(void * context, const chip::ByteSpan & octetString)
+    static void OnSuccessCallback_89(void * context, chip::ByteSpan octetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_89(octetString);
     }
@@ -14306,7 +14148,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_90(status);
     }
 
-    static void OnSuccessCallback_90(void * context, const chip::ByteSpan & octetString)
+    static void OnSuccessCallback_90(void * context, chip::ByteSpan octetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_90(octetString);
     }
@@ -14316,7 +14158,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_91(status);
     }
 
-    static void OnSuccessCallback_91(void * context, const chip::ByteSpan & octetString)
+    static void OnSuccessCallback_91(void * context, chip::ByteSpan octetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_91(octetString);
     }
@@ -14326,7 +14168,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_92(status);
     }
 
-    static void OnSuccessCallback_92(void * context, const chip::ByteSpan & octetString)
+    static void OnSuccessCallback_92(void * context, chip::ByteSpan octetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_92(octetString);
     }
@@ -14336,7 +14178,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_93(status);
     }
 
-    static void OnSuccessCallback_93(void * context, const chip::ByteSpan & octetString)
+    static void OnSuccessCallback_93(void * context, chip::ByteSpan octetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_93(octetString);
     }
@@ -14346,7 +14188,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_94(status);
     }
 
-    static void OnSuccessCallback_94(void * context, const chip::ByteSpan & longOctetString)
+    static void OnSuccessCallback_94(void * context, chip::ByteSpan longOctetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_94(longOctetString);
     }
@@ -14356,7 +14198,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_95(status);
     }
 
-    static void OnSuccessCallback_95(void * context, const chip::ByteSpan & longOctetString)
+    static void OnSuccessCallback_95(void * context, chip::ByteSpan longOctetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_95(longOctetString);
     }
@@ -14366,7 +14208,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_96(status);
     }
 
-    static void OnSuccessCallback_96(void * context, const chip::ByteSpan & longOctetString)
+    static void OnSuccessCallback_96(void * context, chip::ByteSpan longOctetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_96(longOctetString);
     }
@@ -14376,7 +14218,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_97(status);
     }
 
-    static void OnSuccessCallback_97(void * context, const chip::ByteSpan & longOctetString)
+    static void OnSuccessCallback_97(void * context, chip::ByteSpan longOctetString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_97(longOctetString);
     }
@@ -14386,7 +14228,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_98(status);
     }
 
-    static void OnSuccessCallback_98(void * context, const chip::CharSpan & charString)
+    static void OnSuccessCallback_98(void * context, chip::CharSpan charString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_98(charString);
     }
@@ -14396,7 +14238,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_99(status);
     }
 
-    static void OnSuccessCallback_99(void * context, const chip::CharSpan & charString)
+    static void OnSuccessCallback_99(void * context, chip::CharSpan charString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_99(charString);
     }
@@ -14406,7 +14248,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_100(status);
     }
 
-    static void OnSuccessCallback_100(void * context, const chip::CharSpan & charString)
+    static void OnSuccessCallback_100(void * context, chip::CharSpan charString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_100(charString);
     }
@@ -14416,7 +14258,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_101(status);
     }
 
-    static void OnSuccessCallback_101(void * context, const chip::CharSpan & charString)
+    static void OnSuccessCallback_101(void * context, chip::CharSpan charString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_101(charString);
     }
@@ -14426,7 +14268,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_102(status);
     }
 
-    static void OnSuccessCallback_102(void * context, const chip::CharSpan & longCharString)
+    static void OnSuccessCallback_102(void * context, chip::CharSpan longCharString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_102(longCharString);
     }
@@ -14436,7 +14278,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_103(status);
     }
 
-    static void OnSuccessCallback_103(void * context, const chip::CharSpan & longCharString)
+    static void OnSuccessCallback_103(void * context, chip::CharSpan longCharString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_103(longCharString);
     }
@@ -14446,7 +14288,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_104(status);
     }
 
-    static void OnSuccessCallback_104(void * context, const chip::CharSpan & longCharString)
+    static void OnSuccessCallback_104(void * context, chip::CharSpan longCharString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_104(longCharString);
     }
@@ -14456,7 +14298,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_105(status);
     }
 
-    static void OnSuccessCallback_105(void * context, const chip::CharSpan & longCharString)
+    static void OnSuccessCallback_105(void * context, chip::CharSpan longCharString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_105(longCharString);
     }
@@ -14499,7 +14341,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_109(status);
     }
 
-    static void OnSuccessCallback_109(void * context, const uint64_t & epochUs)
+    static void OnSuccessCallback_109(void * context, uint64_t epochUs)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_109(epochUs);
     }
@@ -14509,7 +14351,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_110(status);
     }
 
-    static void OnSuccessCallback_110(void * context, const uint64_t & epochUs)
+    static void OnSuccessCallback_110(void * context, uint64_t epochUs)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_110(epochUs);
     }
@@ -14519,7 +14361,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_111(status);
     }
 
-    static void OnSuccessCallback_111(void * context, const uint64_t & epochUs)
+    static void OnSuccessCallback_111(void * context, uint64_t epochUs)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_111(epochUs);
     }
@@ -14529,7 +14371,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_112(status);
     }
 
-    static void OnSuccessCallback_112(void * context, const uint64_t & epochUs)
+    static void OnSuccessCallback_112(void * context, uint64_t epochUs)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_112(epochUs);
     }
@@ -14539,7 +14381,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_113(status);
     }
 
-    static void OnSuccessCallback_113(void * context, const uint64_t & epochUs)
+    static void OnSuccessCallback_113(void * context, uint64_t epochUs)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_113(epochUs);
     }
@@ -14549,7 +14391,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_114(status);
     }
 
-    static void OnSuccessCallback_114(void * context, const uint32_t & epochS)
+    static void OnSuccessCallback_114(void * context, uint32_t epochS)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_114(epochS);
     }
@@ -14559,7 +14401,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_115(status);
     }
 
-    static void OnSuccessCallback_115(void * context, const uint32_t & epochS)
+    static void OnSuccessCallback_115(void * context, uint32_t epochS)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_115(epochS);
     }
@@ -14569,7 +14411,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_116(status);
     }
 
-    static void OnSuccessCallback_116(void * context, const uint32_t & epochS)
+    static void OnSuccessCallback_116(void * context, uint32_t epochS)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_116(epochS);
     }
@@ -14579,7 +14421,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_117(status);
     }
 
-    static void OnSuccessCallback_117(void * context, const uint32_t & epochS)
+    static void OnSuccessCallback_117(void * context, uint32_t epochS)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_117(epochS);
     }
@@ -14589,7 +14431,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_118(status);
     }
 
-    static void OnSuccessCallback_118(void * context, const uint32_t & epochS)
+    static void OnSuccessCallback_118(void * context, uint32_t epochS)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_118(epochS);
     }
@@ -14599,7 +14441,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_119(status);
     }
 
-    static void OnSuccessCallback_119(void * context, const bool & unsupported)
+    static void OnSuccessCallback_119(void * context, bool unsupported)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_119(unsupported);
     }
@@ -14609,7 +14451,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_120(status);
     }
 
-    static void OnSuccessCallback_120(void * context, const bool & unsupported)
+    static void OnSuccessCallback_120(void * context, bool unsupported)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_120(unsupported);
     }
@@ -14688,7 +14530,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint8_t & returnValue)
+    void OnSuccessResponse_2(uint8_t returnValue)
     {
         VerifyOrReturn(CheckValue<uint8_t>("returnValue", returnValue, 7));
         NextTest();
@@ -14718,7 +14560,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint8_t & returnValue)
+    void OnSuccessResponse_3(uint8_t returnValue)
     {
         VerifyOrReturn(CheckValue<uint8_t>("returnValue", returnValue, 20));
         NextTest();
@@ -14748,7 +14590,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_4(const uint8_t & returnValue) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_4(uint8_t returnValue) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeBooleanDefaultValue_5()
     {
@@ -14760,7 +14602,7 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const bool & boolean)
+    void OnSuccessResponse_5(bool boolean)
     {
         VerifyOrReturn(CheckValue<bool>("boolean", boolean, 0));
         NextTest();
@@ -14778,7 +14620,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const bool & boolean) { NextTest(); }
+    void OnSuccessResponse_6(bool boolean) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBooleanTrue_7()
     {
@@ -14790,7 +14632,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(const bool & boolean)
+    void OnSuccessResponse_7(bool boolean)
     {
         VerifyOrReturn(CheckValue<bool>("boolean", boolean, 1));
         NextTest();
@@ -14808,7 +14650,7 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(const bool & boolean) { NextTest(); }
+    void OnSuccessResponse_8(bool boolean) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBooleanFalse_9()
     {
@@ -14820,7 +14662,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(const bool & boolean)
+    void OnSuccessResponse_9(bool boolean)
     {
         VerifyOrReturn(CheckValue<bool>("boolean", boolean, 0));
         NextTest();
@@ -14836,7 +14678,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(const uint8_t & bitmap8)
+    void OnSuccessResponse_10(uint8_t bitmap8)
     {
         VerifyOrReturn(CheckValue<uint8_t>("bitmap8", bitmap8, 0));
         NextTest();
@@ -14854,7 +14696,7 @@ private:
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(const uint8_t & bitmap8) { NextTest(); }
+    void OnSuccessResponse_11(uint8_t bitmap8) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap8MaxValue_12()
     {
@@ -14866,7 +14708,7 @@ private:
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_12(const uint8_t & bitmap8)
+    void OnSuccessResponse_12(uint8_t bitmap8)
     {
         VerifyOrReturn(CheckValue<uint8_t>("bitmap8", bitmap8, 255));
         NextTest();
@@ -14884,7 +14726,7 @@ private:
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_13(const uint8_t & bitmap8) { NextTest(); }
+    void OnSuccessResponse_13(uint8_t bitmap8) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap8MinValue_14()
     {
@@ -14896,7 +14738,7 @@ private:
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_14(const uint8_t & bitmap8)
+    void OnSuccessResponse_14(uint8_t bitmap8)
     {
         VerifyOrReturn(CheckValue<uint8_t>("bitmap8", bitmap8, 0));
         NextTest();
@@ -14912,7 +14754,7 @@ private:
 
     void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_15(const uint16_t & bitmap16)
+    void OnSuccessResponse_15(uint16_t bitmap16)
     {
         VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 0U));
         NextTest();
@@ -14930,7 +14772,7 @@ private:
 
     void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_16(const uint16_t & bitmap16) { NextTest(); }
+    void OnSuccessResponse_16(uint16_t bitmap16) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap16MaxValue_17()
     {
@@ -14942,7 +14784,7 @@ private:
 
     void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_17(const uint16_t & bitmap16)
+    void OnSuccessResponse_17(uint16_t bitmap16)
     {
         VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 65535U));
         NextTest();
@@ -14960,7 +14802,7 @@ private:
 
     void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_18(const uint16_t & bitmap16) { NextTest(); }
+    void OnSuccessResponse_18(uint16_t bitmap16) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap16MinValue_19()
     {
@@ -14972,7 +14814,7 @@ private:
 
     void OnFailureResponse_19(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_19(const uint16_t & bitmap16)
+    void OnSuccessResponse_19(uint16_t bitmap16)
     {
         VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 0U));
         NextTest();
@@ -14988,7 +14830,7 @@ private:
 
     void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_20(const uint32_t & bitmap32)
+    void OnSuccessResponse_20(uint32_t bitmap32)
     {
         VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 0UL));
         NextTest();
@@ -15006,7 +14848,7 @@ private:
 
     void OnFailureResponse_21(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_21(const uint32_t & bitmap32) { NextTest(); }
+    void OnSuccessResponse_21(uint32_t bitmap32) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap32MaxValue_22()
     {
@@ -15018,7 +14860,7 @@ private:
 
     void OnFailureResponse_22(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_22(const uint32_t & bitmap32)
+    void OnSuccessResponse_22(uint32_t bitmap32)
     {
         VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 4294967295UL));
         NextTest();
@@ -15036,7 +14878,7 @@ private:
 
     void OnFailureResponse_23(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_23(const uint32_t & bitmap32) { NextTest(); }
+    void OnSuccessResponse_23(uint32_t bitmap32) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap32MinValue_24()
     {
@@ -15048,7 +14890,7 @@ private:
 
     void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_24(const uint32_t & bitmap32)
+    void OnSuccessResponse_24(uint32_t bitmap32)
     {
         VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 0UL));
         NextTest();
@@ -15064,7 +14906,7 @@ private:
 
     void OnFailureResponse_25(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_25(const uint64_t & bitmap64)
+    void OnSuccessResponse_25(uint64_t bitmap64)
     {
         VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 0ULL));
         NextTest();
@@ -15082,7 +14924,7 @@ private:
 
     void OnFailureResponse_26(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_26(const uint64_t & bitmap64) { NextTest(); }
+    void OnSuccessResponse_26(uint64_t bitmap64) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap64MaxValue_27()
     {
@@ -15094,7 +14936,7 @@ private:
 
     void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_27(const uint64_t & bitmap64)
+    void OnSuccessResponse_27(uint64_t bitmap64)
     {
         VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 18446744073709551615ULL));
         NextTest();
@@ -15112,7 +14954,7 @@ private:
 
     void OnFailureResponse_28(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_28(const uint64_t & bitmap64) { NextTest(); }
+    void OnSuccessResponse_28(uint64_t bitmap64) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeBitmap64MinValue_29()
     {
@@ -15124,7 +14966,7 @@ private:
 
     void OnFailureResponse_29(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_29(const uint64_t & bitmap64)
+    void OnSuccessResponse_29(uint64_t bitmap64)
     {
         VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 0ULL));
         NextTest();
@@ -15140,7 +14982,7 @@ private:
 
     void OnFailureResponse_30(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_30(const uint8_t & int8u)
+    void OnSuccessResponse_30(uint8_t int8u)
     {
         VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 0));
         NextTest();
@@ -15158,7 +15000,7 @@ private:
 
     void OnFailureResponse_31(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_31(const uint8_t & int8u) { NextTest(); }
+    void OnSuccessResponse_31(uint8_t int8u) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8uMaxValue_32()
     {
@@ -15170,7 +15012,7 @@ private:
 
     void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_32(const uint8_t & int8u)
+    void OnSuccessResponse_32(uint8_t int8u)
     {
         VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 255));
         NextTest();
@@ -15188,7 +15030,7 @@ private:
 
     void OnFailureResponse_33(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_33(const uint8_t & int8u) { NextTest(); }
+    void OnSuccessResponse_33(uint8_t int8u) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8uMinValue_34()
     {
@@ -15200,7 +15042,7 @@ private:
 
     void OnFailureResponse_34(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_34(const uint8_t & int8u)
+    void OnSuccessResponse_34(uint8_t int8u)
     {
         VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 0));
         NextTest();
@@ -15216,7 +15058,7 @@ private:
 
     void OnFailureResponse_35(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_35(const uint16_t & int16u)
+    void OnSuccessResponse_35(uint16_t int16u)
     {
         VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 0U));
         NextTest();
@@ -15234,7 +15076,7 @@ private:
 
     void OnFailureResponse_36(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_36(const uint16_t & int16u) { NextTest(); }
+    void OnSuccessResponse_36(uint16_t int16u) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16uMaxValue_37()
     {
@@ -15246,7 +15088,7 @@ private:
 
     void OnFailureResponse_37(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_37(const uint16_t & int16u)
+    void OnSuccessResponse_37(uint16_t int16u)
     {
         VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 65535U));
         NextTest();
@@ -15264,7 +15106,7 @@ private:
 
     void OnFailureResponse_38(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_38(const uint16_t & int16u) { NextTest(); }
+    void OnSuccessResponse_38(uint16_t int16u) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16uMinValue_39()
     {
@@ -15276,7 +15118,7 @@ private:
 
     void OnFailureResponse_39(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_39(const uint16_t & int16u)
+    void OnSuccessResponse_39(uint16_t int16u)
     {
         VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 0U));
         NextTest();
@@ -15292,7 +15134,7 @@ private:
 
     void OnFailureResponse_40(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_40(const uint32_t & int32u)
+    void OnSuccessResponse_40(uint32_t int32u)
     {
         VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 0UL));
         NextTest();
@@ -15310,7 +15152,7 @@ private:
 
     void OnFailureResponse_41(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_41(const uint32_t & int32u) { NextTest(); }
+    void OnSuccessResponse_41(uint32_t int32u) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32uMaxValue_42()
     {
@@ -15322,7 +15164,7 @@ private:
 
     void OnFailureResponse_42(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_42(const uint32_t & int32u)
+    void OnSuccessResponse_42(uint32_t int32u)
     {
         VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 4294967295UL));
         NextTest();
@@ -15340,7 +15182,7 @@ private:
 
     void OnFailureResponse_43(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_43(const uint32_t & int32u) { NextTest(); }
+    void OnSuccessResponse_43(uint32_t int32u) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32uMinValue_44()
     {
@@ -15352,7 +15194,7 @@ private:
 
     void OnFailureResponse_44(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_44(const uint32_t & int32u)
+    void OnSuccessResponse_44(uint32_t int32u)
     {
         VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 0UL));
         NextTest();
@@ -15368,7 +15210,7 @@ private:
 
     void OnFailureResponse_45(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_45(const uint64_t & int64u)
+    void OnSuccessResponse_45(uint64_t int64u)
     {
         VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 0ULL));
         NextTest();
@@ -15386,7 +15228,7 @@ private:
 
     void OnFailureResponse_46(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_46(const uint64_t & int64u) { NextTest(); }
+    void OnSuccessResponse_46(uint64_t int64u) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64uMaxValue_47()
     {
@@ -15398,7 +15240,7 @@ private:
 
     void OnFailureResponse_47(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_47(const uint64_t & int64u)
+    void OnSuccessResponse_47(uint64_t int64u)
     {
         VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 18446744073709551615ULL));
         NextTest();
@@ -15416,7 +15258,7 @@ private:
 
     void OnFailureResponse_48(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_48(const uint64_t & int64u) { NextTest(); }
+    void OnSuccessResponse_48(uint64_t int64u) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64uMinValue_49()
     {
@@ -15428,7 +15270,7 @@ private:
 
     void OnFailureResponse_49(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_49(const uint64_t & int64u)
+    void OnSuccessResponse_49(uint64_t int64u)
     {
         VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 0ULL));
         NextTest();
@@ -15444,7 +15286,7 @@ private:
 
     void OnFailureResponse_50(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_50(const int8_t & int8s)
+    void OnSuccessResponse_50(int8_t int8s)
     {
         VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 0));
         NextTest();
@@ -15462,7 +15304,7 @@ private:
 
     void OnFailureResponse_51(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_51(const int8_t & int8s) { NextTest(); }
+    void OnSuccessResponse_51(int8_t int8s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8sMaxValue_52()
     {
@@ -15474,7 +15316,7 @@ private:
 
     void OnFailureResponse_52(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_52(const int8_t & int8s)
+    void OnSuccessResponse_52(int8_t int8s)
     {
         VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 127));
         NextTest();
@@ -15492,7 +15334,7 @@ private:
 
     void OnFailureResponse_53(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_53(const int8_t & int8s) { NextTest(); }
+    void OnSuccessResponse_53(int8_t int8s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8sMinValue_54()
     {
@@ -15504,7 +15346,7 @@ private:
 
     void OnFailureResponse_54(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_54(const int8_t & int8s)
+    void OnSuccessResponse_54(int8_t int8s)
     {
         VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, -128));
         NextTest();
@@ -15522,7 +15364,7 @@ private:
 
     void OnFailureResponse_55(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_55(const int8_t & int8s) { NextTest(); }
+    void OnSuccessResponse_55(int8_t int8s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt8sDefaultValue_56()
     {
@@ -15534,7 +15376,7 @@ private:
 
     void OnFailureResponse_56(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_56(const int8_t & int8s)
+    void OnSuccessResponse_56(int8_t int8s)
     {
         VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 0));
         NextTest();
@@ -15550,7 +15392,7 @@ private:
 
     void OnFailureResponse_57(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_57(const int16_t & int16s)
+    void OnSuccessResponse_57(int16_t int16s)
     {
         VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 0));
         NextTest();
@@ -15568,7 +15410,7 @@ private:
 
     void OnFailureResponse_58(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_58(const int16_t & int16s) { NextTest(); }
+    void OnSuccessResponse_58(int16_t int16s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16sMaxValue_59()
     {
@@ -15580,7 +15422,7 @@ private:
 
     void OnFailureResponse_59(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_59(const int16_t & int16s)
+    void OnSuccessResponse_59(int16_t int16s)
     {
         VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 32767));
         NextTest();
@@ -15598,7 +15440,7 @@ private:
 
     void OnFailureResponse_60(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_60(const int16_t & int16s) { NextTest(); }
+    void OnSuccessResponse_60(int16_t int16s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16sMinValue_61()
     {
@@ -15610,7 +15452,7 @@ private:
 
     void OnFailureResponse_61(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_61(const int16_t & int16s)
+    void OnSuccessResponse_61(int16_t int16s)
     {
         VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, -32768));
         NextTest();
@@ -15628,7 +15470,7 @@ private:
 
     void OnFailureResponse_62(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_62(const int16_t & int16s) { NextTest(); }
+    void OnSuccessResponse_62(int16_t int16s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt16sDefaultValue_63()
     {
@@ -15640,7 +15482,7 @@ private:
 
     void OnFailureResponse_63(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_63(const int16_t & int16s)
+    void OnSuccessResponse_63(int16_t int16s)
     {
         VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 0));
         NextTest();
@@ -15656,7 +15498,7 @@ private:
 
     void OnFailureResponse_64(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_64(const int32_t & int32s)
+    void OnSuccessResponse_64(int32_t int32s)
     {
         VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 0L));
         NextTest();
@@ -15674,7 +15516,7 @@ private:
 
     void OnFailureResponse_65(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_65(const int32_t & int32s) { NextTest(); }
+    void OnSuccessResponse_65(int32_t int32s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32sMaxValue_66()
     {
@@ -15686,7 +15528,7 @@ private:
 
     void OnFailureResponse_66(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_66(const int32_t & int32s)
+    void OnSuccessResponse_66(int32_t int32s)
     {
         VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 2147483647L));
         NextTest();
@@ -15704,7 +15546,7 @@ private:
 
     void OnFailureResponse_67(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_67(const int32_t & int32s) { NextTest(); }
+    void OnSuccessResponse_67(int32_t int32s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32sMinValue_68()
     {
@@ -15716,7 +15558,7 @@ private:
 
     void OnFailureResponse_68(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_68(const int32_t & int32s)
+    void OnSuccessResponse_68(int32_t int32s)
     {
         VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, -2147483648L));
         NextTest();
@@ -15734,7 +15576,7 @@ private:
 
     void OnFailureResponse_69(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_69(const int32_t & int32s) { NextTest(); }
+    void OnSuccessResponse_69(int32_t int32s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32sDefaultValue_70()
     {
@@ -15746,7 +15588,7 @@ private:
 
     void OnFailureResponse_70(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_70(const int32_t & int32s)
+    void OnSuccessResponse_70(int32_t int32s)
     {
         VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 0L));
         NextTest();
@@ -15762,7 +15604,7 @@ private:
 
     void OnFailureResponse_71(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_71(const int64_t & int64s)
+    void OnSuccessResponse_71(int64_t int64s)
     {
         VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 0LL));
         NextTest();
@@ -15780,7 +15622,7 @@ private:
 
     void OnFailureResponse_72(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_72(const int64_t & int64s) { NextTest(); }
+    void OnSuccessResponse_72(int64_t int64s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64sMaxValue_73()
     {
@@ -15792,7 +15634,7 @@ private:
 
     void OnFailureResponse_73(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_73(const int64_t & int64s)
+    void OnSuccessResponse_73(int64_t int64s)
     {
         VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 9223372036854775807LL));
         NextTest();
@@ -15810,7 +15652,7 @@ private:
 
     void OnFailureResponse_74(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_74(const int64_t & int64s) { NextTest(); }
+    void OnSuccessResponse_74(int64_t int64s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64sMinValue_75()
     {
@@ -15822,7 +15664,7 @@ private:
 
     void OnFailureResponse_75(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_75(const int64_t & int64s)
+    void OnSuccessResponse_75(int64_t int64s)
     {
         VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, -9223372036854775807LL));
         NextTest();
@@ -15840,7 +15682,7 @@ private:
 
     void OnFailureResponse_76(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_76(const int64_t & int64s) { NextTest(); }
+    void OnSuccessResponse_76(int64_t int64s) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt64sDefaultValue_77()
     {
@@ -15852,7 +15694,7 @@ private:
 
     void OnFailureResponse_77(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_77(const int64_t & int64s)
+    void OnSuccessResponse_77(int64_t int64s)
     {
         VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 0LL));
         NextTest();
@@ -15868,7 +15710,7 @@ private:
 
     void OnFailureResponse_78(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_78(const uint8_t & enum8)
+    void OnSuccessResponse_78(uint8_t enum8)
     {
         VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 0));
         NextTest();
@@ -15886,7 +15728,7 @@ private:
 
     void OnFailureResponse_79(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_79(const uint8_t & enum8) { NextTest(); }
+    void OnSuccessResponse_79(uint8_t enum8) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum8MaxValue_80()
     {
@@ -15898,7 +15740,7 @@ private:
 
     void OnFailureResponse_80(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_80(const uint8_t & enum8)
+    void OnSuccessResponse_80(uint8_t enum8)
     {
         VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 255));
         NextTest();
@@ -15916,7 +15758,7 @@ private:
 
     void OnFailureResponse_81(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_81(const uint8_t & enum8) { NextTest(); }
+    void OnSuccessResponse_81(uint8_t enum8) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum8MinValue_82()
     {
@@ -15928,7 +15770,7 @@ private:
 
     void OnFailureResponse_82(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_82(const uint8_t & enum8)
+    void OnSuccessResponse_82(uint8_t enum8)
     {
         VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 0));
         NextTest();
@@ -15944,7 +15786,7 @@ private:
 
     void OnFailureResponse_83(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_83(const uint16_t & enum16)
+    void OnSuccessResponse_83(uint16_t enum16)
     {
         VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 0U));
         NextTest();
@@ -15962,7 +15804,7 @@ private:
 
     void OnFailureResponse_84(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_84(const uint16_t & enum16) { NextTest(); }
+    void OnSuccessResponse_84(uint16_t enum16) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum16MaxValue_85()
     {
@@ -15974,7 +15816,7 @@ private:
 
     void OnFailureResponse_85(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_85(const uint16_t & enum16)
+    void OnSuccessResponse_85(uint16_t enum16)
     {
         VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 65535U));
         NextTest();
@@ -15992,7 +15834,7 @@ private:
 
     void OnFailureResponse_86(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_86(const uint16_t & enum16) { NextTest(); }
+    void OnSuccessResponse_86(uint16_t enum16) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEnum16MinValue_87()
     {
@@ -16004,7 +15846,7 @@ private:
 
     void OnFailureResponse_87(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_87(const uint16_t & enum16)
+    void OnSuccessResponse_87(uint16_t enum16)
     {
         VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 0U));
         NextTest();
@@ -16020,7 +15862,7 @@ private:
 
     void OnFailureResponse_88(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_88(const chip::ByteSpan & octetString)
+    void OnSuccessResponse_88(chip::ByteSpan octetString)
     {
         VerifyOrReturn(CheckValueAsString("octetString", octetString, ""));
         NextTest();
@@ -16039,7 +15881,7 @@ private:
 
     void OnFailureResponse_89(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_89(const chip::ByteSpan & octetString) { NextTest(); }
+    void OnSuccessResponse_89(chip::ByteSpan octetString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeOctetString_90()
     {
@@ -16051,7 +15893,7 @@ private:
 
     void OnFailureResponse_90(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_90(const chip::ByteSpan & octetString)
+    void OnSuccessResponse_90(chip::ByteSpan octetString)
     {
         VerifyOrReturn(CheckValueAsString("octetString", octetString, "TestValue"));
         NextTest();
@@ -16071,7 +15913,7 @@ private:
 
     void OnFailureResponse_91(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_91(const chip::ByteSpan & octetString) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_91(chip::ByteSpan octetString) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestReadAttributeOctetString_92()
     {
@@ -16083,7 +15925,7 @@ private:
 
     void OnFailureResponse_92(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_92(const chip::ByteSpan & octetString)
+    void OnSuccessResponse_92(chip::ByteSpan octetString)
     {
         VerifyOrReturn(CheckValueAsString("octetString", octetString, "TestValue"));
         NextTest();
@@ -16102,7 +15944,7 @@ private:
 
     void OnFailureResponse_93(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_93(const chip::ByteSpan & octetString) { NextTest(); }
+    void OnSuccessResponse_93(chip::ByteSpan octetString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongOctetStringDefaultValue_94()
     {
@@ -16114,7 +15956,7 @@ private:
 
     void OnFailureResponse_94(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_94(const chip::ByteSpan & longOctetString)
+    void OnSuccessResponse_94(chip::ByteSpan longOctetString)
     {
         VerifyOrReturn(CheckValueAsString("longOctetString", longOctetString, ""));
         NextTest();
@@ -16140,7 +15982,7 @@ private:
 
     void OnFailureResponse_95(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_95(const chip::ByteSpan & longOctetString) { NextTest(); }
+    void OnSuccessResponse_95(chip::ByteSpan longOctetString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongOctetString_96()
     {
@@ -16152,7 +15994,7 @@ private:
 
     void OnFailureResponse_96(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_96(const chip::ByteSpan & longOctetString)
+    void OnSuccessResponse_96(chip::ByteSpan longOctetString)
     {
         VerifyOrReturn(CheckValueAsString(
             "longOctetString", longOctetString,
@@ -16175,7 +16017,7 @@ private:
 
     void OnFailureResponse_97(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_97(const chip::ByteSpan & longOctetString) { NextTest(); }
+    void OnSuccessResponse_97(chip::ByteSpan longOctetString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeCharStringDefaultValue_98()
     {
@@ -16187,7 +16029,7 @@ private:
 
     void OnFailureResponse_98(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_98(const chip::CharSpan & charString)
+    void OnSuccessResponse_98(chip::CharSpan charString)
     {
         VerifyOrReturn(CheckValueAsString("charString", charString, ""));
         NextTest();
@@ -16205,7 +16047,7 @@ private:
 
     void OnFailureResponse_99(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_99(const chip::CharSpan & charString) { NextTest(); }
+    void OnSuccessResponse_99(chip::CharSpan charString) { NextTest(); }
 
     CHIP_ERROR TestWriteAttributeCharStringValueTooLong_100()
     {
@@ -16221,7 +16063,7 @@ private:
 
     void OnFailureResponse_100(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_100(const chip::CharSpan & charString) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_100(chip::CharSpan charString) { ThrowSuccessResponse(); }
 
     CHIP_ERROR TestWriteAttributeCharStringEmpty_101()
     {
@@ -16236,7 +16078,7 @@ private:
 
     void OnFailureResponse_101(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_101(const chip::CharSpan & charString) { NextTest(); }
+    void OnSuccessResponse_101(chip::CharSpan charString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongCharStringDefaultValue_102()
     {
@@ -16248,7 +16090,7 @@ private:
 
     void OnFailureResponse_102(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_102(const chip::CharSpan & longCharString)
+    void OnSuccessResponse_102(chip::CharSpan longCharString)
     {
         VerifyOrReturn(CheckValueAsString("longCharString", longCharString, ""));
         NextTest();
@@ -16274,7 +16116,7 @@ private:
 
     void OnFailureResponse_103(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_103(const chip::CharSpan & longCharString) { NextTest(); }
+    void OnSuccessResponse_103(chip::CharSpan longCharString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeLongCharString_104()
     {
@@ -16286,7 +16128,7 @@ private:
 
     void OnFailureResponse_104(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_104(const chip::CharSpan & longCharString)
+    void OnSuccessResponse_104(chip::CharSpan longCharString)
     {
         VerifyOrReturn(CheckValueAsString(
             "longCharString", longCharString,
@@ -16309,7 +16151,7 @@ private:
 
     void OnFailureResponse_105(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_105(const chip::CharSpan & longCharString) { NextTest(); }
+    void OnSuccessResponse_105(chip::CharSpan longCharString) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeList_106()
     {
@@ -16371,7 +16213,7 @@ private:
 
     void OnFailureResponse_109(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_109(const uint64_t & epochUs)
+    void OnSuccessResponse_109(uint64_t epochUs)
     {
         VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 0ULL));
         NextTest();
@@ -16389,7 +16231,7 @@ private:
 
     void OnFailureResponse_110(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_110(const uint64_t & epochUs) { NextTest(); }
+    void OnSuccessResponse_110(uint64_t epochUs) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochUsMaxValue_111()
     {
@@ -16401,7 +16243,7 @@ private:
 
     void OnFailureResponse_111(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_111(const uint64_t & epochUs)
+    void OnSuccessResponse_111(uint64_t epochUs)
     {
         VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 18446744073709551615ULL));
         NextTest();
@@ -16419,7 +16261,7 @@ private:
 
     void OnFailureResponse_112(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_112(const uint64_t & epochUs) { NextTest(); }
+    void OnSuccessResponse_112(uint64_t epochUs) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochUsMinValue_113()
     {
@@ -16431,7 +16273,7 @@ private:
 
     void OnFailureResponse_113(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_113(const uint64_t & epochUs)
+    void OnSuccessResponse_113(uint64_t epochUs)
     {
         VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 0ULL));
         NextTest();
@@ -16447,7 +16289,7 @@ private:
 
     void OnFailureResponse_114(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_114(const uint32_t & epochS)
+    void OnSuccessResponse_114(uint32_t epochS)
     {
         VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 0UL));
         NextTest();
@@ -16465,7 +16307,7 @@ private:
 
     void OnFailureResponse_115(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_115(const uint32_t & epochS) { NextTest(); }
+    void OnSuccessResponse_115(uint32_t epochS) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochSMaxValue_116()
     {
@@ -16477,7 +16319,7 @@ private:
 
     void OnFailureResponse_116(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_116(const uint32_t & epochS)
+    void OnSuccessResponse_116(uint32_t epochS)
     {
         VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 4294967295UL));
         NextTest();
@@ -16495,7 +16337,7 @@ private:
 
     void OnFailureResponse_117(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_117(const uint32_t & epochS) { NextTest(); }
+    void OnSuccessResponse_117(uint32_t epochS) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeEpochSMinValue_118()
     {
@@ -16507,7 +16349,7 @@ private:
 
     void OnFailureResponse_118(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_118(const uint32_t & epochS)
+    void OnSuccessResponse_118(uint32_t epochS)
     {
         VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 0UL));
         NextTest();
@@ -16526,7 +16368,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_119(const bool & unsupported)
+    void OnSuccessResponse_119(bool unsupported)
     {
         VerifyOrReturn(CheckValue<bool>("unsupported", unsupported, 0));
         NextTest();
@@ -16548,7 +16390,7 @@ private:
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_120(const bool & unsupported) { NextTest(); }
+    void OnSuccessResponse_120(bool unsupported) { NextTest(); }
 
     CHIP_ERROR TestSendTestCommandToUnsupportedEndpoint_121()
     {
@@ -16724,6 +16566,7 @@ private:
         using responseType = chip::app::DataModel::NullObjectType;
 
         chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
+
         uint8_t arg1List[9];
         arg1List[0]  = 1;
         arg1List[1]  = 2;
@@ -16759,6 +16602,7 @@ private:
         using responseType = chip::app::DataModel::NullObjectType;
 
         chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
+
         uint8_t arg1List[10];
         arg1List[0]  = 1;
         arg1List[1]  = 2;
@@ -16795,6 +16639,7 @@ private:
         using responseType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
 
         chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+
         uint8_t arg1List[9];
         arg1List[0]  = 1;
         arg1List[1]  = 2;
@@ -16834,6 +16679,7 @@ private:
         using responseType = chip::app::DataModel::NullObjectType;
 
         chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
+
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type arg1List[2];
 
         arg1List[0].a = 0;
@@ -16875,6 +16721,7 @@ private:
         using responseType = chip::app::DataModel::NullObjectType;
 
         chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
+
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type arg1List[2];
 
         arg1List[0].a = 1;
@@ -16968,20 +16815,20 @@ private:
     const uint16_t mTestCount = 4;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & int32u)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t int32u)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & int32u)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t int32u)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & int32u)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t int32u)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, const uint32_t & int32u)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t int32u)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<TestConstraints *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint32_t & int32u)
+    static void OnSuccessCallback_0(void * context, uint32_t int32u)
     {
         (static_cast<TestConstraints *>(context))->OnSuccessResponse_0(int32u);
     }
@@ -16991,7 +16838,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint32_t & int32u)
+    static void OnSuccessCallback_1(void * context, uint32_t int32u)
     {
         (static_cast<TestConstraints *>(context))->OnSuccessResponse_1(int32u);
     }
@@ -17001,7 +16848,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const uint32_t & int32u)
+    static void OnSuccessCallback_2(void * context, uint32_t int32u)
     {
         (static_cast<TestConstraints *>(context))->OnSuccessResponse_2(int32u);
     }
@@ -17011,7 +16858,7 @@ private:
         (static_cast<TestConstraints *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, const uint32_t & int32u)
+    static void OnSuccessCallback_3(void * context, uint32_t int32u)
     {
         (static_cast<TestConstraints *>(context))->OnSuccessResponse_3(int32u);
     }
@@ -17032,7 +16879,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint32_t & int32u) { NextTest(); }
+    void OnSuccessResponse_0(uint32_t int32u) { NextTest(); }
 
     CHIP_ERROR TestReadAttributeInt32uValueMinValueConstraints_1()
     {
@@ -17044,7 +16891,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const uint32_t & int32u)
+    void OnSuccessResponse_1(uint32_t int32u)
     {
         VerifyOrReturn(CheckConstraintMinValue<uint32_t>("int32u", int32u, 5));
         NextTest();
@@ -17060,7 +16907,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const uint32_t & int32u)
+    void OnSuccessResponse_2(uint32_t int32u)
     {
         VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("int32u", int32u, 5));
         NextTest();
@@ -17076,7 +16923,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(const uint32_t & int32u)
+    void OnSuccessResponse_3(uint32_t int32u)
     {
         VerifyOrReturn(CheckConstraintNotValue<uint32_t>("int32u", int32u, 6));
         NextTest();
@@ -17429,19 +17276,17 @@ private:
     const uint16_t mTestCount = 2;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & supportedFabrics)> mOnSuccessCallback_0{ OnSuccessCallback_0,
-                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t supportedFabrics)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const uint8_t & commissionedFabrics)> mOnSuccessCallback_1{
-        OnSuccessCallback_1, this
-    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t commissionedFabrics)> mOnSuccessCallback_1{ OnSuccessCallback_1,
+                                                                                                          this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
         (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_0(status);
     }
 
-    static void OnSuccessCallback_0(void * context, const uint8_t & supportedFabrics)
+    static void OnSuccessCallback_0(void * context, uint8_t supportedFabrics)
     {
         (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_0(supportedFabrics);
     }
@@ -17451,7 +17296,7 @@ private:
         (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const uint8_t & commissionedFabrics)
+    static void OnSuccessCallback_1(void * context, uint8_t commissionedFabrics)
     {
         (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_1(commissionedFabrics);
     }
@@ -17470,7 +17315,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0(const uint8_t & supportedFabrics)
+    void OnSuccessResponse_0(uint8_t supportedFabrics)
     {
         VerifyOrReturn(CheckConstraintType("supportedFabrics", "", "uint8"));
         VerifyOrReturn(CheckConstraintMinValue<uint8_t>("supportedFabrics", supportedFabrics, 4));
@@ -17487,7 +17332,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const uint8_t & commissionedFabrics)
+    void OnSuccessResponse_1(uint8_t commissionedFabrics)
     {
         VerifyOrReturn(CheckConstraintType("commissionedFabrics", "", "uint8"));
         VerifyOrReturn(CheckConstraintMinValue<uint8_t>("commissionedFabrics", commissionedFabrics, 1));
@@ -17567,20 +17412,20 @@ private:
     const uint16_t mTestCount = 7;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, const bool & onOff)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
 
     static void OnFailureCallback_1(void * context, uint8_t status)
     {
         (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const bool & onOff)
+    static void OnSuccessCallback_1(void * context, bool onOff)
     {
         (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_1(onOff);
     }
@@ -17592,7 +17437,7 @@ private:
         (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, const bool & onOff)
+    static void OnSuccessCallback_2(void * context, bool onOff)
     {
         (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_2(onOff);
     }
@@ -17602,7 +17447,7 @@ private:
         (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, const bool & onOff)
+    static void OnSuccessCallback_4(void * context, bool onOff)
     {
         (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_4(onOff);
     }
@@ -17614,7 +17459,7 @@ private:
         (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, const bool & onOff)
+    static void OnSuccessCallback_6(void * context, bool onOff)
     {
         (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_6(onOff);
     }
@@ -17660,7 +17505,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const bool & onOff)
+    void OnSuccessResponse_1(bool onOff)
     {
         VerifyOrReturn(mReceivedReport_1 == false, ChipLogError(chipTool, "Not Fatal: on report called more than once."));
         mReceivedReport_1 = true;
@@ -17682,7 +17527,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const bool & onOff)
+    void OnSuccessResponse_2(bool onOff)
     {
         VerifyOrReturn(mReceivedReport_1, Exit("Initial report not received!"));
 
@@ -17723,7 +17568,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(const bool & onOff)
+    void OnSuccessResponse_4(bool onOff)
     {
         VerifyOrReturn(mReceivedReport_4 == false, ChipLogError(chipTool, "Not Fatal: on report called more than once."));
         mReceivedReport_4 = true;
@@ -17766,7 +17611,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(const bool & onOff)
+    void OnSuccessResponse_6(bool onOff)
     {
         VerifyOrReturn(mReceivedReport_6 == false, ChipLogError(chipTool, "Not Fatal: on report called more than once."));
         mReceivedReport_6 = true;
