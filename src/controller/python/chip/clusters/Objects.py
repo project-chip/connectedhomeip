@@ -4177,7 +4177,7 @@ class BridgedActions:
                         ClusterObjectFieldDescriptor(
                             Label="ActionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=1, Type=bytes),
+                            Label="Name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(
                             Label="Type", Tag=2, Type=BridgedActions.Enums.ActionTypeEnum),
                         ClusterObjectFieldDescriptor(
@@ -4189,7 +4189,7 @@ class BridgedActions:
                     ])
 
             ActionID: 'uint' = None
-            Name: 'bytes' = None
+            Name: 'str' = None
             Type: 'BridgedActions.Enums.ActionTypeEnum' = None
             EndpointListID: 'uint' = None
             SupportedCommands: 'uint' = None
@@ -4204,7 +4204,7 @@ class BridgedActions:
                         ClusterObjectFieldDescriptor(
                             Label="EndpointListID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=1, Type=bytes),
+                            Label="Name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(
                             Label="Type", Tag=2, Type=BridgedActions.Enums.EndpointListTypeEnum),
                         ClusterObjectFieldDescriptor(
@@ -4212,7 +4212,7 @@ class BridgedActions:
                     ])
 
             EndpointListID: 'uint' = None
-            Name: 'bytes' = None
+            Name: 'str' = None
             Type: 'BridgedActions.Enums.EndpointListTypeEnum' = None
             Endpoints: 'bytes' = None
 

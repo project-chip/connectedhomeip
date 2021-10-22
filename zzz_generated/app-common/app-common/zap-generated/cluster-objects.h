@@ -5052,7 +5052,7 @@ struct Type
 {
 public:
     uint16_t actionID;
-    chip::ByteSpan name;
+    chip::CharSpan name;
     ActionTypeEnum type;
     uint16_t endpointListID;
     uint16_t supportedCommands;
@@ -5078,7 +5078,7 @@ struct Type
 {
 public:
     uint16_t endpointListID;
-    chip::ByteSpan name;
+    chip::CharSpan name;
     EndpointListTypeEnum type;
     chip::ByteSpan endpoints;
 

@@ -101,7 +101,7 @@ typedef struct _ContentLaunchParamater
 typedef struct _ActionStruct
 {
     uint16_t ActionID;
-    chip::ByteSpan Name;
+    chip::CharSpan Name;
     uint8_t Type;
     uint16_t EndpointListID;
     uint16_t SupportedCommands;
@@ -181,7 +181,7 @@ typedef struct _DeviceType
 typedef struct _EndpointListStruct
 {
     uint16_t EndpointListID;
-    chip::ByteSpan Name;
+    chip::CharSpan Name;
     uint8_t Type;
     chip::ByteSpan Endpoints;
 } EndpointListStruct;
