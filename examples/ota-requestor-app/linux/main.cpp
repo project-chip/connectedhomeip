@@ -30,20 +30,21 @@ using chip::ByteSpan;
 using chip::CharSpan;
 using chip::EndpointId;
 using chip::FabricIndex;
-using chip::Inet::IPAddress;
 using chip::NodeId;
 using chip::Server;
-using chip::System::Layer;
-using chip::Transport::PeerAddress;
 using chip::VendorId;
 using chip::bdx::TransferSession;
 using chip::Callback::Callback;
+using chip::Inet::IPAddress;
+using chip::System::Layer;
+using chip::Transport::PeerAddress;
 using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::device;
 
 void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI, uint32_t softwareVersion,
-                          CharSpan softwareVersionString, ByteSpan updateToken, bool userConsentNeeded, ByteSpan metadataForRequestor);
+                          CharSpan softwareVersionString, ByteSpan updateToken, bool userConsentNeeded,
+                          ByteSpan metadataForRequestor);
 void OnQueryImageFailure(void * context, uint8_t status);
 void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy);
 void OnConnectionFailure(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error);
@@ -65,7 +66,7 @@ constexpr uint16_t kOptionDiscriminator       = 'd';
 constexpr uint16_t kOptionIPAddress           = 'i';
 constexpr uint16_t kOptionDelayQuery          = 'q';
 
-const char* ipAddress           = NULL;
+const char * ipAddress          = NULL;
 NodeId providerNodeId           = 0x0;
 FabricIndex providerFabricIndex = 1;
 uint16_t requestorSecurePort    = 0;
@@ -73,8 +74,8 @@ uint16_t setupDiscriminator     = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATO
 uint16_t delayQueryTimeInSec    = 0;
 
 OptionDef cmdLineOptionsDef[] = {
-    { "providerNodeId", chip::ArgParser::kArgumentRequired, kOptionProviderNodeId},
-    { "providerFabricIndex", chip::ArgParser::kArgumentRequired, kOptionProviderFabricIndex},
+    { "providerNodeId", chip::ArgParser::kArgumentRequired, kOptionProviderNodeId },
+    { "providerFabricIndex", chip::ArgParser::kArgumentRequired, kOptionProviderFabricIndex },
     { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
     { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
     { "ipaddress", chip::ArgParser::kArgumentRequired, kOptionIPAddress },
@@ -102,15 +103,15 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        The IP Address of the OTA Provider to connect to. This value must be supplied.\n"
                              "  -q/--delayQuery <Time in seconds>\n"
                              "        From boot up, the amount of time to wait before triggering the QueryImage\n"
-                             "        command. If none or zero is provided, QueryImage will not be triggered.\n"
-                            };
+                             "        command. If none or zero is provided, QueryImage will not be triggered.\n" };
 
 HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
 void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI, uint32_t softwareVersion,
-                          CharSpan softwareVersionString, ByteSpan updateToken, bool userConsentNeeded, ByteSpan metadataForRequestor)
+                          CharSpan softwareVersionString, ByteSpan updateToken, bool userConsentNeeded,
+                          ByteSpan metadataForRequestor)
 {
     ChipLogDetail(SoftwareUpdate, "%s", __FUNCTION__);
 
@@ -245,7 +246,8 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 void SendQueryImageCommand()
 {
-   // Explicitly calling UpdateAddress() should not be needed once OperationalDeviceProxy can resolve IP address from node ID and fabric index
+    // Explicitly calling UpdateAddress() should not be needed once OperationalDeviceProxy can resolve IP address from node ID and
+    // fabric index
     IPAddress ipAddr;
     IPAddress::FromString(ipAddress, ipAddr);
     PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
@@ -253,12 +255,12 @@ void SendQueryImageCommand()
 
     OperationalDeviceProxyInitParams initParams = {
         .sessionManager = &(Server::GetInstance().GetSecureSessionManager()),
-        .exchangeMgr     = &(Server::GetInstance().GetExchangeManager()),
-        .idAllocator     = &(Server::GetInstance().GetSessionIDAllocator()),
-        .fabricsTable    = &(Server::GetInstance().GetFabricTable()),
+        .exchangeMgr    = &(Server::GetInstance().GetExchangeManager()),
+        .idAllocator    = &(Server::GetInstance().GetSessionIDAllocator()),
+        .fabricsTable   = &(Server::GetInstance().GetFabricTable()),
     };
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     FabricIndex peerFabricIndex = providerFabricIndex;
     gOperationalDeviceProxy.Init(providerNodeId, peerFabricIndex, initParams);
     err = gOperationalDeviceProxy.Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
@@ -271,7 +273,7 @@ void StartDelayTimerHandler(Layer * systemLayer, void * appState)
 
 int main(int argc, char * argv[])
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     uint16_t unsecurePort = CHIP_UDC_PORT;
 
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
@@ -313,7 +315,8 @@ int main(int argc, char * argv[])
     // If a delay is provided, QueryImage after the timer expires
     if (delayQueryTimeInSec > 0)
     {
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000), StartDelayTimerHandler, nullptr);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
+                                                    StartDelayTimerHandler, nullptr);
     }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();

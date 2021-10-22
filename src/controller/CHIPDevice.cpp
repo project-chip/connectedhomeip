@@ -373,10 +373,14 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, CommissioningWindowOption
 
 void Device::UpdateSession(bool connected)
 {
-    SessionHandle session = SessionHandle(mDeviceId, mCASESession.GetLocalSessionId(), mCASESession.GetPeerSessionId(), mFabricIndex);
-    if (connected) {
+    SessionHandle session =
+        SessionHandle(mDeviceId, mCASESession.GetLocalSessionId(), mCASESession.GetPeerSessionId(), mFabricIndex);
+    if (connected)
+    {
         OnNewConnection(session);
-    } else {
+    }
+    else
+    {
         OnConnectionExpired(session);
     }
 }
