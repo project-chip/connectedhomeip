@@ -72,6 +72,7 @@ function getTests()
     'Test_TC_MC_3_2', 
     'Test_TC_MC_3_3',
     'Test_TC_MC_3_4',
+    'Test_TC_MC_3_5',
   ];
 
   const OnOff = [
