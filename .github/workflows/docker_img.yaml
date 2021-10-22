@@ -1,0 +1,48 @@
+# Copyright (c) 2020-2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Docker CHIP images
+
+on:
+    push:
+        paths:
+            - 'integrations/docker/images/**'
+    pull_request:
+        paths:
+            - 'integrations/docker/images/**'
+    workflow_dispatch:
+
+jobs:
+    build_images:
+        name: Build Docker CHIP Build images
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+        strategy:
+            fail-fast: false
+            matrix:
+                # TODO: Enables "-crosscompile" and "-vscode" images
+                img: ["", "-android", "-cirque", "-efr32", "-esp32", "-esp32-qemu", "-infineon", "-k32w", "-mbed-os", "-nrf-platform", "-telink", "-tizen"]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Build All images using project bash script
+              run: |
+                  cd integrations/docker/images/chip-build${{ matrix.img }}
+                  ./build.sh --latest
+            - name: Scan for vulnerabilities
+              uses: crazy-max/docker-scan-action@master
+              with:
+                  image: connectedhomeip/chip-build${{ matrix.img }}:latest
+                  annotations: true
+

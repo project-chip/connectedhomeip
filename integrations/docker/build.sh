@@ -44,6 +44,7 @@ VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
    --latest   update latest to the current built version (\"$VERSION\")
    --push     push image(s) to docker.io (requires docker login for \"$ORG\")
    --help     get this message
+   --squash   squash docker layers before push them to docker.io (requires docker-squash python module)
 
 "
     exit 0
@@ -73,6 +74,11 @@ docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
+}
+
+[[ ${*/--squash//} != "${*}" ]] && {
+    command -v docker-squash >/dev/null &&
+        docker-squash "$ORG"/"$IMAGE":"$VERSION" -t "$ORG"/"$IMAGE":latest
 }
 
 [[ ${*/--push//} != "${*}" ]] && {

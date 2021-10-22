@@ -128,7 +128,14 @@ class {{filename}}: public TestCommand
         {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.InvokeCommand<requestType, responseType>(request, this, success, failure){{#if async}}){{/if}};
         {{else}}
         {{#chip_tests_item_parameters}}
-        {{chipType}} {{asLowerCamelCase name}}Argument = {{#if (isString type)}}chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}")){{else}}{{definedValue}}{{asTypeLiteralSuffix type}}{{/if}};
+        {{chipType}} {{asLowerCamelCase name}}Argument =
+          {{#if (isOctetString type)}}
+            chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"))
+          {{else if (isCharString type)}}
+            chip::CharSpan("{{definedValue}}", strlen("{{definedValue}}"))
+          {{else}}
+            {{definedValue}}{{asTypeLiteralSuffix type}}
+          {{/if}};
         {{/chip_tests_item_parameters}}
 
         {{~#*inline "commandName"}}{{asUpperCamelCase commandName}}{{#if isAttribute}}Attribute{{asUpperCamelCase attribute}}{{/if}}{{/inline}}
