@@ -7270,7 +7270,7 @@ private:
 
     void OnSuccessResponse_0(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 4U));
         NextTest();
     }
 
@@ -7301,7 +7301,7 @@ private:
 
     void OnSuccessResponse_2(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 4U));
         NextTest();
     }
 
