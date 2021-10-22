@@ -48,6 +48,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
@@ -58,11 +59,12 @@
 #endif
 
 using namespace chip;
+using namespace chip::app::Clusters::OccupancySensing;
 
 //******************************************************************************
 // Plugin init function
 //******************************************************************************
-void emberAfOccupancySensingClusterServerInitCallback(EndpointId endpoint)
+static void InitCallback(EndpointId endpoint)
 {
     HalOccupancySensorType deviceType;
 
@@ -97,6 +99,16 @@ void emberAfOccupancySensingClusterServerInitCallback(EndpointId endpoint)
                           CLUSTER_MASK_SERVER, &deviceTypeBitmap, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 
     emberAfPluginOccupancyClusterServerPostInitCallback(endpoint);
+}
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+};
+
+void MatterOccupancySensingPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
 }
 
 //******************************************************************************

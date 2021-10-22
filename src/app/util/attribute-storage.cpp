@@ -85,12 +85,8 @@ const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
 const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
 #endif // GENERATED_MIN_MAX_DEFAULTS
 
-#ifdef GENERATED_FUNCTION_ARRAYS
-GENERATED_FUNCTION_ARRAYS
-#endif
-
 const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
-const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
+EmberAfCluster generatedClusters[]                        = GENERATED_CLUSTERS;
 const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
 
 const EmberAfManufacturerCodeEntry clusterManufacturerCodes[]   = GENERATED_CLUSTER_MANUFACTURER_CODES;
@@ -1356,4 +1352,25 @@ app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointI
     }
 
     return nullptr;
+}
+
+void registerServerFunctions(chip::ClusterId clusterId, const EmberAfGenericClusterFunction * functions, EmberAfClusterMask mask)
+{
+    for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+    {
+        if (!emberAfEndpointIndexIsEnabled(index))
+        {
+            continue;
+        }
+
+        EndpointId endpoint = emberAfEndpointFromIndex(index);
+        if (!emberAfContainsCluster(endpoint, clusterId))
+        {
+            continue;
+        }
+
+        EmberAfCluster * cluster = emberAfFindCluster(endpoint, clusterId, CLUSTER_MASK_SERVER);
+        cluster->functions       = functions;
+        cluster->mask |= mask;
+    }
 }

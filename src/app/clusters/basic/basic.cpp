@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/ZclString.h>
@@ -32,9 +33,10 @@
 #include <cstring>
 
 using namespace chip;
+using namespace chip::app::Clusters::Basic;
 using namespace chip::DeviceLayer;
 
-void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
+static void InitCallback(chip::EndpointId endpoint)
 {
     uint16_t vendorId;
     uint16_t productId;
@@ -95,4 +97,14 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_SOFTWARE_VERSION_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                               reinterpret_cast<uint8_t *>(&firmwareRevision), ZCL_INT32U_ATTRIBUTE_TYPE);
     }
+}
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+};
+
+void MatterBasicPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
 }

@@ -36,6 +36,7 @@
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
@@ -52,7 +53,7 @@ constexpr int16_t kDefaultCoolingSetpoint            = 2600;
 constexpr uint8_t kInvalidControlSequenceOfOperation = 0xff;
 constexpr uint8_t kInvalidRequestedSystemMode        = 0xff;
 
-void emberAfThermostatClusterServerInitCallback()
+static void InitCallback()
 {
     // TODO
     // Get from the "real thermostat"
@@ -68,9 +69,9 @@ void emberAfThermostatClusterServerInitCallback()
     // or should this just be the responsibility of the thermostat application?
 }
 
-Protocols::InteractionModel::Status
-MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
-                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+static Protocols::InteractionModel::Status PreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+                                                                       EmberAfAttributeType attributeType, uint16_t size,
+                                                                       uint8_t * value)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     EndpointId endpoint  = attributePath.mEndpointId;
@@ -522,4 +523,15 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     }
     emberAfSendImmediateDefaultResponse(status);
     return true;
+}
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+    (EmberAfGenericClusterFunction) PreAttributeChangedCallback,
+};
+
+void MatterThermostatPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION;
+    registerServerFunctions(Thermostat::Id, chipFunctionsArray, mask);
 }

@@ -17,21 +17,34 @@
 
 #include <app/util/af.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::PumpConfigurationAndControl;
 
-void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
+static void InitCallback(EndpointId endpoint)
 {
     emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
     // TODO
 }
 
-void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+static void AttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
     emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
                         attributePath.mAttributeId);
     // TODO
+}
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+    (EmberAfGenericClusterFunction) AttributeChangedCallback,
+};
+
+void MatterPumpConfigurationAndControlPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
 }

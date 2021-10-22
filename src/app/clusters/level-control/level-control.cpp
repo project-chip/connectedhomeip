@@ -51,6 +51,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 
 #include <app/reporting/reporting.h>
 
@@ -987,7 +988,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     }
 }
 
-void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
+static void InitCallback(EndpointId endpoint)
 {
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
     // StartUp behavior relies StartUpCurrentLevel attributes being tokenized.
@@ -1077,3 +1078,13 @@ static bool areStartUpLevelControlServerAttributesTokenized(EndpointId endpoint)
 #endif
 
 void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+};
+
+void MatterLevelControlPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
+}

@@ -55,6 +55,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/binding-table.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -70,7 +71,7 @@ static bool bindingGroupMatch(EndpointId endpoint, GroupId groupId, EmberBinding
 
 static uint8_t findGroupIndex(EndpointId endpoint, GroupId groupId);
 
-void emberAfGroupsClusterServerInitCallback(EndpointId endpoint)
+static void InitCallback(EndpointId endpoint)
 {
     // The high bit of Name Support indicates whether group names are supported.
     // Group names are not supported by this plugin.
@@ -537,3 +538,13 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(EndpointId endpoint)
 }
 
 void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, const CharSpan & groupName) {}
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+};
+
+void MatterGroupsPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
+}

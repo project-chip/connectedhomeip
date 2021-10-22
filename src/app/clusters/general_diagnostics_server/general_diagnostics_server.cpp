@@ -24,6 +24,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::GeneralDiagnostics;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using chip::DeviceLayer::PlatformManager;
 
@@ -92,12 +93,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath
 }
 } // anonymous namespace
 
-void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gAttrAccess);
-        attrAccessRegistered = true;
-    }
+    registerAttributeAccessOverride(&gAttrAccess);
 }

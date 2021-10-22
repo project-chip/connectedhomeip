@@ -59,6 +59,8 @@ using namespace chip::app::Clusters::DoorLock;
 EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;
 EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
 
+static void AttributeChangedCallback(const app::ConcreteAttributePath & attributePath);
+
 // The index into these tables is a userId.
 static EmberAfPluginDoorLockServerUser pinUserTable[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE];
 static EmberAfPluginDoorLockServerUser rfidUserTable[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE];
@@ -93,8 +95,15 @@ static void enableSendPinOverTheAir(void)
 #endif
 }
 
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) AttributeChangedCallback,
+};
+
 void emAfPluginDoorLockServerInitUser(void)
 {
+    EmberAfClusterMask mask = CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
+
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_NUM_TOTAL_USERS_SUPPORTED_ATTRIBUTE) ||                                                    \
     defined(ZCL_USING_DOOR_LOCK_CLUSTER_NUM_PIN_USERS_SUPPORTED_ATTRIBUTE) ||                                                      \
     defined(ZCL_USING_DOOR_LOCK_CLUSTER_NUM_RFID_USERS_SUPPORTED_ATTRIBUTE)
@@ -899,7 +908,7 @@ void emberAfPluginDoorLockServerRelockEventHandler(void)
     emberAfDoorLockClusterPrintln("Door automatically relocked: 0x%X", status);
 }
 
-void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+static void AttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
     if (attributePath.mEndpointId == DOOR_LOCK_SERVER_ENDPOINT && attributePath.mAttributeId == ZCL_LOCK_STATE_ATTRIBUTE_ID)
     {

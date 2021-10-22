@@ -48,6 +48,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -104,7 +105,7 @@ bool isEndpointInGroup(EndpointId endpoint, GroupId groupId)
 #endif // EMBER_AF_PLUGIN_GROUPS_SERVER
 }
 
-void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
+static void InitCallback(EndpointId endpoint)
 {
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
     {
@@ -1313,4 +1314,14 @@ void emberAfScenesClusterRemoveScenesInGroupCallback(EndpointId endpoint, GroupI
             emberAfScenesSetSceneCountAttribute(emberAfCurrentEndpoint(), emberAfPluginScenesServerNumSceneEntriesInUse());
         }
     }
+}
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+};
+
+void MatterScenesPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
 }

@@ -2546,7 +2546,7 @@ bool emberAfColorControlClusterStopMoveStepCallback(app::CommandHandler * comman
     return ColorControlServer::Instance().stopMoveStepCommand(optionsMask, optionsOverride);
 }
 
-void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
+static void InitCallback(EndpointId endpoint)
 {
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     ColorControlServer::Instance().startUpColorTempCommand(endpoint);
@@ -2588,3 +2588,13 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(EndpointId endp
     ColorControlServer::Instance().updateHueSatCommand(endpoint);
 }
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+};
+
+void MatterColorControlPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
+}

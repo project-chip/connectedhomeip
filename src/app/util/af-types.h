@@ -204,7 +204,7 @@ typedef struct
     /**
      *  ID of cluster according to ZCL spec
      */
-    chip::ClusterId clusterId;
+    const chip::ClusterId clusterId;
     /**
      * Pointer to attribute metadata array for this cluster.
      */
@@ -212,11 +212,11 @@ typedef struct
     /**
      * Total number of attributes
      */
-    uint16_t attributeCount;
+    const uint16_t attributeCount;
     /**
      * Total size of non-external, non-singleton attribute for this cluster.
      */
-    uint16_t clusterSize;
+    const uint16_t clusterSize;
     /**
      * Mask with additional functionality for cluster. See CLUSTER_MASK
      * macros.

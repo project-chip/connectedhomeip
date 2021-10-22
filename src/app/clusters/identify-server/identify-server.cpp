@@ -103,11 +103,6 @@ static inline void unreg(Identify * inst)
     }
 }
 
-void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
-{
-    (void) endpoint;
-}
-
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState)
 {
     uint16_t identifyTime = 0;
@@ -146,7 +141,7 @@ static inline void identify_deactivate(Identify * identify)
     }
 }
 
-void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+static void AttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
     if (attributePath.mAttributeId == Clusters::Identify::Attributes::IdentifyTime::Id)
     {
@@ -326,4 +321,14 @@ Identify::Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart,
 Identify::~Identify()
 {
     unreg(this);
+}
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) AttributeChangedCallback,
+};
+
+void MatterIdentifyPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
 }

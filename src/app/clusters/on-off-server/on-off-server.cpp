@@ -47,6 +47,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -210,7 +211,7 @@ bool emberAfOnOffClusterToggleCallback(app::CommandHandler * commandObj, const a
     return true;
 }
 
-void emberAfOnOffClusterServerInitCallback(EndpointId endpoint)
+static void InitCallback(EndpointId endpoint)
 {
 #ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
     // StartUp behavior relies on OnOff and StartUpOnOff attributes being tokenized.
@@ -296,3 +297,13 @@ static bool areStartUpOnOffServerAttributesTokenized(EndpointId endpoint)
 #endif
 
 void emberAfPluginOnOffClusterServerPostInitCallback(EndpointId endpoint) {}
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+};
+
+void MatterOnOffPluginServerInitCallback()
+{
+    EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION;
+    registerServerFunctions(::Id, chipFunctionsArray, mask);
+}

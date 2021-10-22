@@ -271,3 +271,28 @@ bool registerAttributeAccessOverride(chip::app::AttributeAccessInterface * attrO
  * endpoint, or might be one registered for all endpoints.
  */
 chip::app::AttributeAccessInterface * findAttributeAccessOverride(chip::EndpointId endpointId, chip::ClusterId clusterId);
+
+/**
+ * This method permits to register cluster specific functions for a given events.
+ *
+ * This method expects an ordered array of functions depending on the 'mask' parameter.
+ * The array order is the following:
+ *  - INIT
+ *  - ATTRIBUTE_CHANGED
+ *  - DEFAULT_RESPONSE
+ *  - MESSAGE_SENT
+ *  - MANUFACTURER_SPECIFIC_ATTRIBUTE_CHANGED
+ *  - PRE_ATTRIBUTE_CHANGED
+ *
+ * As an example, if a given cluster has both 'Init' and 'PRE_ATTRIBUTE_CHANGED' functions,
+ * the array of functions and the mask would be:
+ *
+ *  const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+ *    (EmberAfGenericClusterFunction) InitCallback,
+ *    (EmberAfGenericClusterFunction) PreAttributeChangedCallback,
+ *  };
+ *
+ *  EmberAfClusterMask mask = CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION;
+ *
+ */
+void registerServerFunctions(chip::ClusterId clusterId, const EmberAfGenericClusterFunction * functions, EmberAfClusterMask mask);

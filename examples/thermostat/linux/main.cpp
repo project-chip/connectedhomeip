@@ -19,9 +19,7 @@
 #include "AppMain.h"
 
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/Command.h>
-#include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
 
 using namespace chip;
@@ -32,20 +30,6 @@ bool emberAfBasicClusterMfgSpecificPingCallback(Command * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
-}
-
-// MatterPreAttributeChangeCallback() is called for every cluster.
-// As of 8/17/21 cluster specific PreAttributeChangeCalbacks are not yet implemented.
-
-Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t mask,
-                                                                     uint8_t type, uint16_t size, uint8_t * value)
-{
-    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
-    if (attributePath.mClusterId == Thermostat::Id)
-    {
-        status = MatterThermostatClusterServerPreAttributeChangedCallback(attributePath, type, size, value);
-    }
-    return status;
 }
 
 int main(int argc, char * argv[])

@@ -62,10 +62,12 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/binding-table.h>
 #include <system/SystemLayer.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IasZone;
 
 #define UNDEFINED_ZONE_ID 0xFF
@@ -212,9 +214,9 @@ static void enrollWithClient(EndpointId endpoint)
     }
 }
 
-Protocols::InteractionModel::Status
-MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
-                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+static Protocols::InteractionModel::Status PreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+                                                                       EmberAfAttributeType attributeType, uint16_t size,
+                                                                       uint8_t * value)
 {
     uint8_t i;
     bool zeroAddress;
@@ -537,7 +539,7 @@ void emberAfPluginIasZoneServerManageQueueEventHandler(void)
 #endif
 }
 
-void emberAfIasZoneClusterServerInitCallback(EndpointId endpoint)
+static void InitCallback(EndpointId endpoint)
 {
     EmberAfIasZoneType zoneType;
     if (!areZoneServerAttributesTokenized(endpoint))
@@ -769,8 +771,8 @@ void emberAfPluginIasZoneServerPrintQueueConfig(void)
 // destination when the destination is the only router the node is joined to.
 // In that case, the command will never have been sent, as the device will have
 // had no router by which to send the command.
-void emberAfIasZoneClusterServerMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                    uint16_t msgLen, uint8_t * message, EmberStatus status)
+static void MessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                uint8_t * message, EmberStatus status)
 {
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
     uint8_t frameControl;
@@ -924,3 +926,16 @@ uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
     return deltaTimeMs / MILLISECOND_TICKS_PER_QUARTERSECOND;
 }
 #endif
+
+static const EmberAfGenericClusterFunction chipFunctionsArray[] = {
+    (EmberAfGenericClusterFunction) InitCallback,
+    (EmberAfGenericClusterFunction) MessageSentCallback,
+    (EmberAfGenericClusterFunction) PreAttributeChangedCallback,
+};
+
+void MatterIASZonePlugingServerInitCallback()
+{
+    EmberAfClusterMask mask =
+        CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_MESSAGE_SENT_FUNCTION | CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION;
+    registerServerFunctions(IasZone::Id, chipFunctionsArray, mask);
+}

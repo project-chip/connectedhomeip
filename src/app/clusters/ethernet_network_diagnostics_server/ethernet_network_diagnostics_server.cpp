@@ -144,12 +144,7 @@ exit:
     return true;
 }
 
-void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+void MatterEthernetNetworkDiagnosticsPluginServerInitCallback()
 {
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gAttrAccess);
-        attrAccessRegistered = true;
-    }
+    registerAttributeAccessOverride(&gAttrAccess);
 }
