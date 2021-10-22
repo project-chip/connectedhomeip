@@ -52,9 +52,9 @@ public:
 
     /**
      * Given the endpointId and a mode value, find the ModeOptionStruct that matches the mode.
-     * @param endpointId
-     * @param mode
-     * @param dataPtr
+     * @param endpointId The endpoint for which to search the ModeOptionStruct.
+     * @param mode The mode for which to search the ModeOptionStruct.
+     * @param dataPtr The pointer to receive the ModeOptionStruct, if one is found.
      * @return
      */
     virtual EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType *& dataPtr) const = 0;
