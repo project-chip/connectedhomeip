@@ -35,20 +35,19 @@ tests:
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
-        value: 0
+          value: 0
 
     - label: "Read Description"
       command: "readAttribute"
       attribute: "Description"
       response:
-        value: "Coffee"
-
+          value: "Coffee"
 
     - label: "Read SupportedModes"
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
-        constraints:
-          - type: list
-          - minLength: 3
-          - maxLength: 3
+          constraints:
+              - type: list
+              - minLength: 3
+              - maxLength: 3
