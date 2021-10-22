@@ -313,16 +313,16 @@ void MatterOperationalCredentialsPluginServerInitCallback(void)
 }
 
 namespace {
-class FabricCleanupExchangeDelegate : public Messaging::ExchangeDelegate
+class FabricCleanupExchangeDelegate : public chip::Messaging::ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override
     {
         return CHIP_NO_ERROR;
     }
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
-    void OnExchangeClosing(Messaging::ExchangeContext * ec) override
+    void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
+    void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
         FabricIndex currentFabricIndex = ec->GetSecureSession().GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
@@ -352,8 +352,8 @@ exit:
     emberAfSendImmediateDefaultResponse(status);
     if (err == CHIP_NO_ERROR)
     {
-        Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
-        FabricIndex currentFabricIndex  = ec->GetSecureSession().GetFabricIndex();
+        chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
+        FabricIndex currentFabricIndex        = ec->GetSecureSession().GetFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
             // If the current fabric is being removed, expiring all the secure sessions causes crashes as
@@ -414,7 +414,7 @@ CHIP_ERROR SendNOCResponse(app::Command * commandObj, EmberAfNodeOperationalCert
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(commandObj->PrepareCommand(cmdParams));
-    writer = commandObj->GetCommandDataElementTLVWriter();
+    writer = commandObj->GetCommandDataIBTLVWriter();
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(0), status));
     if (status == EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)
     {

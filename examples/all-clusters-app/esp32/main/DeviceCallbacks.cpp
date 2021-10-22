@@ -217,7 +217,7 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 
     if (identifyTimerCount)
     {
-        systemLayer->StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
+        systemLayer->StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, appState);
         // Decrement the timer count.
         identifyTimerCount--;
     }
@@ -236,7 +236,7 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
     identifyTimerCount = (*value) * 4;
 
     DeviceLayer::SystemLayer().CancelTimer(IdentifyTimerHandler, this);
-    DeviceLayer::SystemLayer().StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
+    DeviceLayer::SystemLayer().StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, this);
 
 exit:
     return;

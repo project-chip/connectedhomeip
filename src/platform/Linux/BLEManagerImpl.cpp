@@ -803,7 +803,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeoutMs, HandleConnectTimeout, mpEndpoint);
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kConnectTimeoutMs), HandleConnectTimeout, mpEndpoint);
     mDeviceScanner->StopScan();
 
     ConnectDevice(device, mpEndpoint);

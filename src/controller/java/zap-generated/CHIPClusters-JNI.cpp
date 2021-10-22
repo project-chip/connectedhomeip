@@ -8270,9 +8270,8 @@ JNI_METHOD(void, AccountLoginCluster, getSetupPIN)
     cppCluster = reinterpret_cast<AccountLoginCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err =
-        cppCluster->GetSetupPIN(onSuccess->Cancel(), onFailure->Cancel(),
-                                chip::ByteSpan((const uint8_t *) tempAccountIdentifier, strlen(tempAccountIdentifierStr.c_str())));
+    err = cppCluster->GetSetupPIN(onSuccess->Cancel(), onFailure->Cancel(),
+                                  chip::CharSpan(tempAccountIdentifierStr.c_str(), strlen(tempAccountIdentifierStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -8323,8 +8322,8 @@ JNI_METHOD(void, AccountLoginCluster, login)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->Login(onSuccess->Cancel(), onFailure->Cancel(),
-                            chip::ByteSpan((const uint8_t *) tempAccountIdentifier, strlen(tempAccountIdentifierStr.c_str())),
-                            chip::ByteSpan((const uint8_t *) setupPIN, strlen(setupPINStr.c_str())));
+                            chip::CharSpan(tempAccountIdentifierStr.c_str(), strlen(tempAccountIdentifierStr.c_str())),
+                            chip::CharSpan(setupPINStr.c_str(), strlen(setupPINStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -8853,9 +8852,8 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchApp)
     cppCluster = reinterpret_cast<ApplicationLauncherCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->LaunchApp(onSuccess->Cancel(), onFailure->Cancel(),
-                                chip::ByteSpan((const uint8_t *) data, strlen(dataStr.c_str())), catalogVendorId,
-                                chip::ByteSpan((const uint8_t *) applicationId, strlen(applicationIdStr.c_str())));
+    err = cppCluster->LaunchApp(onSuccess->Cancel(), onFailure->Cancel(), chip::CharSpan(dataStr.c_str(), strlen(dataStr.c_str())),
+                                catalogVendorId, chip::CharSpan(applicationIdStr.c_str(), strlen(applicationIdStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -9020,7 +9018,7 @@ JNI_METHOD(void, AudioOutputCluster, renameOutput)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->RenameOutput(onSuccess->Cancel(), onFailure->Cancel(), index,
-                                   chip::ByteSpan((const uint8_t *) name, strlen(nameStr.c_str())));
+                                   chip::CharSpan(nameStr.c_str(), strlen(nameStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -9632,7 +9630,7 @@ JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
 
     JniUtfString valueStr(env, value);
     err = cppCluster->WriteAttributeUserLabel(onSuccess->Cancel(), onFailure->Cancel(),
-                                              chip::ByteSpan((const uint8_t *) valueStr.c_str(), strlen(valueStr.c_str())));
+                                              chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
     VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
     onSuccess.release();
@@ -9685,7 +9683,7 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
 
     JniUtfString valueStr(env, value);
     err = cppCluster->WriteAttributeLocation(onSuccess->Cancel(), onFailure->Cancel(),
-                                             chip::ByteSpan((const uint8_t *) valueStr.c_str(), strlen(valueStr.c_str())));
+                                             chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
     VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
     onSuccess.release();
@@ -10402,6 +10400,111 @@ JNI_METHOD(void, BindingCluster, readClusterRevisionAttribute)(JNIEnv * env, job
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(jlong, BooleanStateCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    BooleanStateCluster * cppCluster = new BooleanStateCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
+JNI_METHOD(void, BooleanStateCluster, readStateValueAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBooleanAttributeCallback, void (*)(CHIPBooleanAttributeCallback *)> onSuccess(
+        Platform::New<CHIPBooleanAttributeCallback>(callback), Platform::Delete<CHIPBooleanAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeStateValue(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, BooleanStateCluster, subscribeStateValueAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->SubscribeAttributeStateValue(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(minInterval),
+                                                   static_cast<uint16_t>(maxInterval));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, BooleanStateCluster, reportStateValueAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBooleanAttributeCallback, void (*)(CHIPBooleanAttributeCallback *)> onReport(
+        Platform::New<CHIPBooleanAttributeCallback>(callback, true), Platform::Delete<CHIPBooleanAttributeCallback>);
+    VerifyOrReturn(onReport.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native report callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReportAttributeStateValue(onReport->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ReturnIllegalStateException(env, callback, "Error registering for attribute reporting", err));
+
+    onReport.release();
+}
+
+JNI_METHOD(void, BooleanStateCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback), Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(jlong, BridgedDeviceBasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -10533,7 +10636,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, writeUserLabelAttribute)
 
     JniUtfString valueStr(env, value);
     err = cppCluster->WriteAttributeUserLabel(onSuccess->Cancel(), onFailure->Cancel(),
-                                              chip::ByteSpan((const uint8_t *) valueStr.c_str(), strlen(valueStr.c_str())));
+                                              chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
     VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
     onSuccess.release();
@@ -13707,7 +13810,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchContent)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->LaunchContent(onSuccess->Cancel(), onFailure->Cancel(), autoPlay,
-                                    chip::ByteSpan((const uint8_t *) data, strlen(dataStr.c_str())));
+                                    chip::CharSpan(dataStr.c_str(), strlen(dataStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -13760,8 +13863,8 @@ JNI_METHOD(void, ContentLauncherCluster, launchURL)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->LaunchURL(onSuccess->Cancel(), onFailure->Cancel(),
-                                chip::ByteSpan((const uint8_t *) contentURL, strlen(contentURLStr.c_str())),
-                                chip::ByteSpan((const uint8_t *) displayString, strlen(displayStringStr.c_str())));
+                                chip::CharSpan(contentURLStr.c_str(), strlen(contentURLStr.c_str())),
+                                chip::CharSpan(displayStringStr.c_str(), strlen(displayStringStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -16286,7 +16389,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), location,
-                                          chip::ByteSpan((const uint8_t *) countryCode, strlen(countryCodeStr.c_str())), breadcrumb,
+                                          chip::CharSpan(countryCodeStr.c_str(), strlen(countryCodeStr.c_str())), breadcrumb,
                                           timeoutMs);
     SuccessOrExit(err);
 
@@ -16704,7 +16807,7 @@ JNI_METHOD(void, GroupsCluster, addGroup)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->AddGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId,
-                               chip::ByteSpan((const uint8_t *) groupName, strlen(groupNameStr.c_str())));
+                               chip::CharSpan(groupNameStr.c_str(), strlen(groupNameStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -16754,7 +16857,7 @@ JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->AddGroupIfIdentifying(onSuccess->Cancel(), onFailure->Cancel(), groupId,
-                                            chip::ByteSpan((const uint8_t *) groupName, strlen(groupNameStr.c_str())));
+                                            chip::CharSpan(groupNameStr.c_str(), strlen(groupNameStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -18503,7 +18606,7 @@ JNI_METHOD(void, MediaInputCluster, renameInput)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->RenameInput(onSuccess->Cancel(), onFailure->Cancel(), index,
-                                  chip::ByteSpan((const uint8_t *) name, strlen(nameStr.c_str())));
+                                  chip::CharSpan(nameStr.c_str(), strlen(nameStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -20138,7 +20241,7 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, hardwareVersion, softwareVersion,
-                                 protocolsSupported, chip::ByteSpan((const uint8_t *) location, strlen(locationStr.c_str())),
+                                 protocolsSupported, chip::CharSpan(locationStr.c_str(), strlen(locationStr.c_str())),
                                  requestorCanConsent,
                                  chip::ByteSpan((const uint8_t *) metadataForProviderArr.data(), metadataForProviderArr.size()));
     SuccessOrExit(err);
@@ -21613,7 +21716,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->UpdateFabricLabel(onSuccess->Cancel(), onFailure->Cancel(),
-                                        chip::ByteSpan((const uint8_t *) label, strlen(labelStr.c_str())));
+                                        chip::CharSpan(labelStr.c_str(), strlen(labelStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -23224,7 +23327,7 @@ JNI_METHOD(void, ScenesCluster, addScene)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->AddScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime,
-                               chip::ByteSpan((const uint8_t *) sceneName, strlen(sceneNameStr.c_str())), clusterId, length, value);
+                               chip::CharSpan(sceneNameStr.c_str(), strlen(sceneNameStr.c_str())), clusterId, length, value);
     SuccessOrExit(err);
 
 exit:
@@ -24009,7 +24112,7 @@ JNI_METHOD(void, TvChannelCluster, changeChannel)(JNIEnv * env, jobject self, jl
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->ChangeChannel(onSuccess->Cancel(), onFailure->Cancel(),
-                                    chip::ByteSpan((const uint8_t *) match, strlen(matchStr.c_str())));
+                                    chip::CharSpan(matchStr.c_str(), strlen(matchStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -24264,7 +24367,7 @@ JNI_METHOD(void, TargetNavigatorCluster, navigateTarget)
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->NavigateTarget(onSuccess->Cancel(), onFailure->Cancel(), target,
-                                     chip::ByteSpan((const uint8_t *) data, strlen(dataStr.c_str())));
+                                     chip::CharSpan(dataStr.c_str(), strlen(dataStr.c_str())));
     SuccessOrExit(err);
 
 exit:
@@ -24730,7 +24833,7 @@ JNI_METHOD(void, TestClusterCluster, testListStructArgumentRequest)
 
     err = cppCluster->TestListStructArgumentRequest(onSuccess->Cancel(), onFailure->Cancel(), a, b, c,
                                                     chip::ByteSpan((const uint8_t *) dArr.data(), dArr.size()),
-                                                    chip::ByteSpan((const uint8_t *) e, strlen(eStr.c_str())), f);
+                                                    chip::CharSpan(eStr.c_str(), strlen(eStr.c_str())), f);
     SuccessOrExit(err);
 
 exit:
@@ -24876,7 +24979,7 @@ JNI_METHOD(void, TestClusterCluster, testStructArgumentRequest)
 
     err = cppCluster->TestStructArgumentRequest(onSuccess->Cancel(), onFailure->Cancel(), a, b, c,
                                                 chip::ByteSpan((const uint8_t *) dArr.data(), dArr.size()),
-                                                chip::ByteSpan((const uint8_t *) e, strlen(eStr.c_str())), f);
+                                                chip::CharSpan(eStr.c_str(), strlen(eStr.c_str())), f);
     SuccessOrExit(err);
 
 exit:
@@ -25950,7 +26053,7 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
 
     JniUtfString valueStr(env, value);
     err = cppCluster->WriteAttributeCharString(onSuccess->Cancel(), onFailure->Cancel(),
-                                               chip::ByteSpan((const uint8_t *) valueStr.c_str(), strlen(valueStr.c_str())));
+                                               chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
     VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
     onSuccess.release();
@@ -26003,7 +26106,7 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
 
     JniUtfString valueStr(env, value);
     err = cppCluster->WriteAttributeLongCharString(onSuccess->Cancel(), onFailure->Cancel(),
-                                                   chip::ByteSpan((const uint8_t *) valueStr.c_str(), strlen(valueStr.c_str())));
+                                                   chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
     VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
     onSuccess.release();

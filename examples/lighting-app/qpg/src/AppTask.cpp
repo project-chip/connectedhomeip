@@ -374,7 +374,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     CHIP_ERROR err;
 
-    err = SystemLayer().StartTimer(aTimeoutInMs, TimerEventHandler, this);
+    err = SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
     SuccessOrExit(err);
 
     mFunctionTimerActive = true;

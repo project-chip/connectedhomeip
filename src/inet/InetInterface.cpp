@@ -214,12 +214,12 @@ IPAddress InterfaceAddressIterator::GetAddress()
 
         if (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
         {
-            return IPAddress::FromIPv6(*netif_ip6_addr(curIntf, mCurAddrIndex));
+            return IPAddress(*netif_ip6_addr(curIntf, mCurAddrIndex));
         }
 #if INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
         else
         {
-            return IPAddress::FromIPv4(*netif_ip4_addr(curIntf));
+            return IPAddress(*netif_ip4_addr(curIntf));
         }
 #endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
     }
@@ -844,7 +844,7 @@ IPAddress InterfaceAddressIterator::GetAddress()
 {
     if (HasCurrent())
     {
-        return IPAddress::FromIPv6(mIpv6->unicast[mCurAddrIndex].address.in6_addr);
+        return IPAddress(mIpv6->unicast[mCurAddrIndex].address.in6_addr);
     }
 
     return IPAddress::Any;

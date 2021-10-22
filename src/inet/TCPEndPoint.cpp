@@ -278,12 +278,12 @@ CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) con
         *retPort = mTCP->remote_port;
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        *retAddr = IPAddress::FromLwIPAddr(mTCP->remote_ip);
+        *retAddr = IPAddress(mTCP->remote_ip);
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 #if INET_CONFIG_ENABLE_IPV4
-        *retAddr = PCB_ISIPV6(mTCP) ? IPAddress::FromIPv6(mTCP->remote_ip.ip6) : IPAddress::FromIPv4(mTCP->remote_ip.ip4);
+        *retAddr = PCB_ISIPV6(mTCP) ? IPAddress(mTCP->remote_ip.ip6) : IPAddress(mTCP->remote_ip.ip4);
 #else  // !INET_CONFIG_ENABLE_IPV4
-        *retAddr                    = IPAddress::FromIPv6(mTCP->remote_ip.ip6);
+        *retAddr                    = IPAddress(mTCP->remote_ip.ip6);
 #endif // !INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
     }
@@ -311,12 +311,12 @@ CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
         *retPort = mTCP->local_port;
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        *retAddr = IPAddress::FromLwIPAddr(mTCP->local_ip);
+        *retAddr = IPAddress(mTCP->local_ip);
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 #if INET_CONFIG_ENABLE_IPV4
-        *retAddr = PCB_ISIPV6(mTCP) ? IPAddress::FromIPv6(mTCP->local_ip.ip6) : IPAddress::FromIPv4(mTCP->local_ip.ip4);
+        *retAddr = PCB_ISIPV6(mTCP) ? IPAddress(mTCP->local_ip.ip6) : IPAddress(mTCP->local_ip.ip4);
 #else  // !INET_CONFIG_ENABLE_IPV4
-        *retAddr                    = IPAddress::FromIPv6(mTCP->local_ip.ip6);
+        *retAddr                    = IPAddress(mTCP->local_ip.ip6);
 #endif // !INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
     }
@@ -1332,14 +1332,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     socklen_t sockaddrsize       = 0;
     const sockaddr * sockaddrptr = nullptr;
 
-    union
-    {
-        sockaddr any;
-        sockaddr_in6 in6;
-#if INET_CONFIG_ENABLE_IPV4
-        sockaddr_in in;
-#endif // INET_CONFIG_ENABLE_IPV4
-    } sa;
+    SockAddr sa;
     memset(&sa, 0, sizeof(sa));
 
     if (addrType == IPAddressType::kIPv6)
@@ -1406,12 +1399,7 @@ CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) con
     if (!IsConnected())
         return CHIP_ERROR_INCORRECT_STATE;
 
-    union
-    {
-        sockaddr any;
-        sockaddr_in in;
-        sockaddr_in6 in6;
-    } sa;
+    SockAddr sa;
     memset(&sa, 0, sizeof(sa));
     socklen_t saLen = sizeof(sa);
 
@@ -1420,13 +1408,13 @@ CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) con
 
     if (sa.any.sa_family == AF_INET6)
     {
-        *retAddr = IPAddress::FromIPv6(sa.in6.sin6_addr);
+        *retAddr = IPAddress(sa.in6.sin6_addr);
         *retPort = ntohs(sa.in6.sin6_port);
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (sa.any.sa_family == AF_INET)
     {
-        *retAddr = IPAddress::FromIPv4(sa.in.sin_addr);
+        *retAddr = IPAddress(sa.in.sin_addr);
         *retPort = ntohs(sa.in.sin_port);
     }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -1443,14 +1431,7 @@ CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
     if (!IsConnected())
         return CHIP_ERROR_INCORRECT_STATE;
 
-    union
-    {
-        sockaddr any;
-        sockaddr_in6 in6;
-#if INET_CONFIG_ENABLE_IPV4
-        sockaddr_in in;
-#endif // INET_CONFIG_ENABLE_IPV4
-    } sa;
+    SockAddr sa;
 
     memset(&sa, 0, sizeof(sa));
     socklen_t saLen = sizeof(sa);
@@ -1460,13 +1441,13 @@ CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
 
     if (sa.any.sa_family == AF_INET6)
     {
-        *retAddr = IPAddress::FromIPv6(sa.in6.sin6_addr);
+        *retAddr = IPAddress(sa.in6.sin6_addr);
         *retPort = ntohs(sa.in6.sin6_port);
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (sa.any.sa_family == AF_INET)
     {
-        *retAddr = IPAddress::FromIPv4(sa.in.sin_addr);
+        *retAddr = IPAddress(sa.in.sin_addr);
         *retPort = ntohs(sa.in.sin_port);
     }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -1481,15 +1462,7 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
     if (!IsConnected())
         return CHIP_ERROR_INCORRECT_STATE;
 
-    union
-    {
-        sockaddr any;
-        sockaddr_in6 in6;
-#if INET_CONFIG_ENABLE_IPV4
-        sockaddr_in in;
-#endif // INET_CONFIG_ENABLE_IPV4
-    } sa;
-
+    SockAddr sa;
     memset(&sa, 0, sizeof(sa));
     socklen_t saLen = sizeof(sa);
 
@@ -1500,7 +1473,7 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
 
     if (sa.any.sa_family == AF_INET6)
     {
-        if (IPAddress::FromIPv6(sa.in6.sin6_addr).IsIPv6LinkLocal())
+        if (IPAddress(sa.in6.sin6_addr).IsIPv6LinkLocal())
         {
             *retInterface = sa.in6.sin6_scope_id;
         }
@@ -2185,12 +2158,7 @@ void TCPEndPoint::HandleIncomingConnection()
     IPAddress peerAddr;
     uint16_t peerPort;
 
-    union
-    {
-        sockaddr any;
-        sockaddr_in in;
-        sockaddr_in6 in6;
-    } sa;
+    SockAddr sa;
     memset(&sa, 0, sizeof(sa));
     socklen_t saLen = sizeof(sa);
 
@@ -2217,13 +2185,13 @@ void TCPEndPoint::HandleIncomingConnection()
     {
         if (sa.any.sa_family == AF_INET6)
         {
-            peerAddr = IPAddress::FromIPv6(sa.in6.sin6_addr);
+            peerAddr = IPAddress(sa.in6.sin6_addr);
             peerPort = ntohs(sa.in6.sin6_port);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (sa.any.sa_family == AF_INET)
         {
-            peerAddr = IPAddress::FromIPv4(sa.in.sin_addr);
+            peerAddr = IPAddress(sa.in.sin_addr);
             peerPort = ntohs(sa.in.sin_port);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -2522,7 +2490,8 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
-        Layer().SystemLayer()->StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, InetLayer::HandleTCPInactivityTimer, &lInetLayer);
+        Layer().SystemLayer()->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL),
+                                          InetLayer::HandleTCPInactivityTimer, &lInetLayer);
     }
 }
 #endif // INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -2554,7 +2523,7 @@ void TCPEndPoint::StartConnectTimerIfSet()
 {
     if (mConnectTimeoutMsecs > 0)
     {
-        Layer().SystemLayer()->StartTimer(mConnectTimeoutMsecs, TCPConnectTimeoutHandler, this);
+        Layer().SystemLayer()->StartTimer(System::Clock::Milliseconds32(mConnectTimeoutMsecs), TCPConnectTimeoutHandler, this);
     }
 }
 
@@ -2746,7 +2715,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 
 void TCPEndPoint::ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut)
 {
-    Layer().SystemLayer()->StartTimer(aTimeOut, TCPUserTimeoutHandler, this);
+    Layer().SystemLayer()->StartTimer(System::Clock::Milliseconds32(aTimeOut), TCPUserTimeoutHandler, this);
 }
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS

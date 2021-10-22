@@ -40,6 +40,7 @@
  ******************************************************************************/
 
 #include "app/util/common.h"
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -47,6 +48,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 
 using namespace chip;
 
@@ -997,10 +999,15 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             }
         }
 
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-        // Rebuild descriptor attributes on all endpoints
-        MatterDescriptorPluginServerInitCallback();
-#endif
+        // TODO: We should notify about the fact that all the attributes for
+        // this endpoint have appeared/disappeared, but the reporting engine has
+        // no way to do that right now.
+
+        // TODO: Once endpoints are in parts lists other than that of endpoint
+        // 0, something more complicated might need to happen here.
+
+        MatterReportingAttributeChangeCallback(/* EndpointId = */ 0, app::Clusters::Descriptor::Id,
+                                               app::Clusters::Descriptor::Attributes::PartsList::Id);
     }
 
     return true;

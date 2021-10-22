@@ -123,7 +123,8 @@ CHIP_ERROR CHIPCommand::StartWaiting(uint16_t seconds)
     }
     LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
 #else
-    ReturnLogErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(seconds * 1000, OnResponseTimeout, this));
+    ReturnLogErrorOnFailure(
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(seconds), OnResponseTimeout, this));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
 

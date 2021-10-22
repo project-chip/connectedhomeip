@@ -1311,7 +1311,10 @@ chip::ChipError::StorageType chip_ime_AppendCommand_AccountLogin_GetSetupPIN(chi
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::AccountLoginCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.GetSetupPIN(nullptr, nullptr, chip::ByteSpan(tempAccountIdentifier, tempAccountIdentifier_Len)).AsInteger();
+    return cluster
+        .GetSetupPIN(nullptr, nullptr,
+                     chip::CharSpan(reinterpret_cast<const char *>(tempAccountIdentifier), tempAccountIdentifier_Len))
+        .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_AccountLogin_Login(chip::Controller::Device * device,
                                                                        chip::EndpointId ZCLendpointId, chip::GroupId,
@@ -1323,8 +1326,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_AccountLogin_Login(chip::Con
     chip::Controller::AccountLoginCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .Login(nullptr, nullptr, chip::ByteSpan(tempAccountIdentifier, tempAccountIdentifier_Len),
-               chip::ByteSpan(setupPIN, setupPIN_Len))
+        .Login(nullptr, nullptr, chip::CharSpan(reinterpret_cast<const char *>(tempAccountIdentifier), tempAccountIdentifier_Len),
+               chip::CharSpan(reinterpret_cast<const char *>(setupPIN), setupPIN_Len))
         .AsInteger();
 }
 
@@ -1487,8 +1490,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_ApplicationLauncher_LaunchAp
     chip::Controller::ApplicationLauncherCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .LaunchApp(nullptr, nullptr, chip::ByteSpan(data, data_Len), catalogVendorId,
-                   chip::ByteSpan(applicationId, applicationId_Len))
+        .LaunchApp(nullptr, nullptr, chip::CharSpan(reinterpret_cast<const char *>(data), data_Len), catalogVendorId,
+                   chip::CharSpan(reinterpret_cast<const char *>(applicationId), applicationId_Len))
         .AsInteger();
 }
 
@@ -1545,7 +1548,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_AudioOutput_RenameOutput(chi
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::AudioOutputCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.RenameOutput(nullptr, nullptr, index, chip::ByteSpan(name, name_Len)).AsInteger();
+    return cluster.RenameOutput(nullptr, nullptr, index, chip::CharSpan(reinterpret_cast<const char *>(name), name_Len))
+        .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_AudioOutput_SelectOutput(chip::Controller::Device * device,
                                                                              chip::EndpointId ZCLendpointId, chip::GroupId,
@@ -1738,7 +1742,8 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_Basic_UserLabel(chip::Contr
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .WriteAttributeUserLabel(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), chip::ByteSpan(value, len))
+        .WriteAttributeUserLabel(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                 chip::CharSpan(reinterpret_cast<const char *>(value), len))
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_Location(chip::Controller::Device * device,
@@ -1758,7 +1763,8 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_Basic_Location(chip::Contro
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .WriteAttributeLocation(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), chip::ByteSpan(value, len))
+        .WriteAttributeLocation(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                chip::CharSpan(reinterpret_cast<const char *>(value), len))
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_HardwareVersion(chip::Controller::Device * device,
@@ -2014,6 +2020,42 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Binding_ClusterRevision(chip
 }
 
 // End of Cluster Binding
+// Cluster BooleanState
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_BooleanState_StateValue(chip::Controller::Device * device,
+                                                                            chip::EndpointId ZCLendpointId,
+                                                                            chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BooleanStateCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeStateValue(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_BooleanState_StateValue(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId,
+                                                                                 uint16_t minInterval, uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BooleanStateCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .SubscribeAttributeStateValue(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                      maxInterval)
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_BooleanState_ClusterRevision(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId,
+                                                                                 chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BooleanStateCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster BooleanState
 // Cluster BridgedDeviceBasic
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(chip::Controller::Device * device,
@@ -2064,7 +2106,8 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_BridgedDeviceBasic_UserLabe
     chip::Controller::BridgedDeviceBasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .WriteAttributeUserLabel(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), chip::ByteSpan(value, len))
+        .WriteAttributeUserLabel(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                 chip::CharSpan(reinterpret_cast<const char *>(value), len))
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersion(chip::Controller::Device * device,
@@ -3130,7 +3173,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_ContentLauncher_LaunchConten
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ContentLauncherCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.LaunchContent(nullptr, nullptr, autoPlay, chip::ByteSpan(data, data_Len)).AsInteger();
+    return cluster.LaunchContent(nullptr, nullptr, autoPlay, chip::CharSpan(reinterpret_cast<const char *>(data), data_Len))
+        .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_ContentLauncher_LaunchURL(chip::Controller::Device * device,
                                                                               chip::EndpointId ZCLendpointId, chip::GroupId,
@@ -3142,7 +3186,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_ContentLauncher_LaunchURL(ch
     chip::Controller::ContentLauncherCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .LaunchURL(nullptr, nullptr, chip::ByteSpan(contentURL, contentURL_Len), chip::ByteSpan(displayString, displayString_Len))
+        .LaunchURL(nullptr, nullptr, chip::CharSpan(reinterpret_cast<const char *>(contentURL), contentURL_Len),
+                   chip::CharSpan(reinterpret_cast<const char *>(displayString), displayString_Len))
         .AsInteger();
 }
 
@@ -3857,7 +3902,8 @@ chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig(chip::Controller
     chip::Controller::GeneralCommissioningCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .SetRegulatoryConfig(nullptr, nullptr, location, chip::ByteSpan(countryCode, countryCode_Len), breadcrumb, timeoutMs)
+        .SetRegulatoryConfig(nullptr, nullptr, location,
+                             chip::CharSpan(reinterpret_cast<const char *>(countryCode), countryCode_Len), breadcrumb, timeoutMs)
         .AsInteger();
 }
 
@@ -4015,7 +4061,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_Groups_AddGroup(chip::Contro
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::GroupsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.AddGroup(nullptr, nullptr, groupId, chip::ByteSpan(groupName, groupName_Len)).AsInteger();
+    return cluster.AddGroup(nullptr, nullptr, groupId, chip::CharSpan(reinterpret_cast<const char *>(groupName), groupName_Len))
+        .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(chip::Controller::Device * device,
                                                                                  chip::EndpointId ZCLendpointId, chip::GroupId,
@@ -4025,7 +4072,9 @@ chip::ChipError::StorageType chip_ime_AppendCommand_Groups_AddGroupIfIdentifying
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::GroupsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.AddGroupIfIdentifying(nullptr, nullptr, groupId, chip::ByteSpan(groupName, groupName_Len)).AsInteger();
+    return cluster
+        .AddGroupIfIdentifying(nullptr, nullptr, groupId, chip::CharSpan(reinterpret_cast<const char *>(groupName), groupName_Len))
+        .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_Groups_GetGroupMembership(chip::Controller::Device * device,
                                                                               chip::EndpointId ZCLendpointId, chip::GroupId,
@@ -4527,7 +4576,7 @@ chip::ChipError::StorageType chip_ime_AppendCommand_MediaInput_RenameInput(chip:
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::MediaInputCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.RenameInput(nullptr, nullptr, index, chip::ByteSpan(name, name_Len)).AsInteger();
+    return cluster.RenameInput(nullptr, nullptr, index, chip::CharSpan(reinterpret_cast<const char *>(name), name_Len)).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_MediaInput_SelectInput(chip::Controller::Device * device,
                                                                            chip::EndpointId ZCLendpointId, chip::GroupId,
@@ -4916,7 +4965,7 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_Qu
     cluster.Associate(device, ZCLendpointId);
     return cluster
         .QueryImage(nullptr, nullptr, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
-                    chip::ByteSpan(location, location_Len), requestorCanConsent,
+                    chip::CharSpan(reinterpret_cast<const char *>(location), location_Len), requestorCanConsent,
                     chip::ByteSpan(metadataForProvider, metadataForProvider_Len))
         .AsInteger();
 }
@@ -5333,7 +5382,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_Updat
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.UpdateFabricLabel(nullptr, nullptr, chip::ByteSpan(label, label_Len)).AsInteger();
+    return cluster.UpdateFabricLabel(nullptr, nullptr, chip::CharSpan(reinterpret_cast<const char *>(label), label_Len))
+        .AsInteger();
 }
 chip::ChipError::StorageType
 chip_ime_AppendCommand_OperationalCredentials_UpdateNOC(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
@@ -5921,8 +5971,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_Scenes_AddScene(chip::Contro
     chip::Controller::ScenesCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .AddScene(nullptr, nullptr, groupId, sceneId, transitionTime, chip::ByteSpan(sceneName, sceneName_Len), clusterId, length,
-                  value)
+        .AddScene(nullptr, nullptr, groupId, sceneId, transitionTime,
+                  chip::CharSpan(reinterpret_cast<const char *>(sceneName), sceneName_Len), clusterId, length, value)
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_Scenes_GetSceneMembership(chip::Controller::Device * device,
@@ -6150,7 +6200,7 @@ chip::ChipError::StorageType chip_ime_AppendCommand_TvChannel_ChangeChannel(chip
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::TvChannelCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ChangeChannel(nullptr, nullptr, chip::ByteSpan(match, match_Len)).AsInteger();
+    return cluster.ChangeChannel(nullptr, nullptr, chip::CharSpan(reinterpret_cast<const char *>(match), match_Len)).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_TvChannel_ChangeChannelByNumber(chip::Controller::Device * device,
                                                                                     chip::EndpointId ZCLendpointId, chip::GroupId,
@@ -6226,7 +6276,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_TargetNavigator_NavigateTarg
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::TargetNavigatorCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.NavigateTarget(nullptr, nullptr, target, chip::ByteSpan(data, data_Len)).AsInteger();
+    return cluster.NavigateTarget(nullptr, nullptr, target, chip::CharSpan(reinterpret_cast<const char *>(data), data_Len))
+        .AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_TargetNavigator_TargetNavigatorList(chip::Controller::Device * device,
@@ -6355,7 +6406,9 @@ chip_ime_AppendCommand_TestCluster_TestListStructArgumentRequest(chip::Controlle
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::TestClusterCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.TestListStructArgumentRequest(nullptr, nullptr, a, b, c, chip::ByteSpan(d, d_Len), chip::ByteSpan(e, e_Len), f)
+    return cluster
+        .TestListStructArgumentRequest(nullptr, nullptr, a, b, c, chip::ByteSpan(d, d_Len),
+                                       chip::CharSpan(reinterpret_cast<const char *>(e), e_Len), f)
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestNotHandled(chip::Controller::Device * device,
@@ -6382,7 +6435,9 @@ chip_ime_AppendCommand_TestCluster_TestStructArgumentRequest(chip::Controller::D
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::TestClusterCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.TestStructArgumentRequest(nullptr, nullptr, a, b, c, chip::ByteSpan(d, d_Len), chip::ByteSpan(e, e_Len), f)
+    return cluster
+        .TestStructArgumentRequest(nullptr, nullptr, a, b, c, chip::ByteSpan(d, d_Len),
+                                   chip::CharSpan(reinterpret_cast<const char *>(e), e_Len), f)
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestUnknownCommand(chip::Controller::Device * device,
@@ -6773,7 +6828,8 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_CharString(chip
     chip::Controller::TestClusterCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .WriteAttributeCharString(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), chip::ByteSpan(value, len))
+        .WriteAttributeCharString(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                  chip::CharSpan(reinterpret_cast<const char *>(value), len))
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_LongCharString(chip::Controller::Device * device,
@@ -6795,7 +6851,7 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_LongCharString(
     cluster.Associate(device, ZCLendpointId);
     return cluster
         .WriteAttributeLongCharString(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                      chip::ByteSpan(value, len))
+                                      chip::CharSpan(reinterpret_cast<const char *>(value), len))
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_EpochUs(chip::Controller::Device * device,

@@ -20,6 +20,8 @@ function atomicType(arg)
   switch (arg.name) {
   case 'boolean':
     return 'bool';
+  case 'single':
+    return 'float';
   case 'int40s':
   case 'int48s':
   case 'int56s':

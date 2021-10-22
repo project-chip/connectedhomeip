@@ -340,7 +340,7 @@ public:
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    {{#if (isCharString type)}}chip::ByteSpan{{else}}{{chipType}}{{/if}} mValue;
+    {{chipType}} mValue;
 };
 
 {{/if}}

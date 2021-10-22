@@ -350,10 +350,6 @@ function asMEI(prefix, suffix)
  */
 async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
-  if (type == 'single') {
-    return 'float';
-  }
-
   async function fn(pkgId)
   {
     const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';

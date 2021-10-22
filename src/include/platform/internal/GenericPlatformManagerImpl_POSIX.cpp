@@ -120,7 +120,7 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThr
 #endif
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t aMilliseconds)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
     // Let System::LayerSocketsLoop.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
