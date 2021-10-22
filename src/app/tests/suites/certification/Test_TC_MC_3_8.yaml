@@ -25,5 +25,4 @@ tests:
       command: "readAttribute"
       attribute: "media input list"
       response:
-          value:
-              []
+          value: []

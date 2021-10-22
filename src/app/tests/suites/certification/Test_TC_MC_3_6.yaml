@@ -19,7 +19,7 @@ config:
     endpoint: 1
 
 tests:
-   # TODO: Update the corresponding values when feature is supported
+    # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
       command: "LaunchApp"
@@ -40,7 +40,7 @@ tests:
       response:
           value: 1234
       constraints:
-        type: uint16
+          type: uint16
 
     # TODO: Update response value to correspond with application ID
     - label: "Read Current App ID attribute."
@@ -50,9 +50,9 @@ tests:
       response:
           value: "HelloWorldApp"
           constraints:
-            type: string
+              type: string
 
-   # TODO: Update the corresponding values when feature is supported
+    # TODO: Update the corresponding values when feature is supported
     - label: "Stop an app with the provided application ID"
       disabled: true
       command: "StopApp"
