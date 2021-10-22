@@ -147,7 +147,7 @@ public:
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     explicit IPAddress(const ip6_addr_t & ipv6Addr);
-#if INET_CONFIG_ENABLE_IPV4
+#if INET_CONFIG_ENABLE_IPV4 || LWIP_IPV4
     explicit IPAddress(const ip4_addr_t & ipv4Addr);
     explicit IPAddress(const ip_addr_t & addr);
 #endif // INET_CONFIG_ENABLE_IPV4
