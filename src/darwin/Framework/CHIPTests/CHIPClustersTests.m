@@ -13126,6 +13126,138 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterModeSelectClusterReadAttributeCurrentModeWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ModeSelectClusterReadAttributeCurrentModeWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPModeSelectCluster * cluster = [[CHIPModeSelectCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ModeSelectCluster CurrentMode Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterModeSelectClusterReadAttributeSupportedModesWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ModeSelectClusterReadAttributeSupportedModesWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPModeSelectCluster * cluster = [[CHIPModeSelectCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeSupportedModesWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ModeSelectCluster SupportedModes Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterModeSelectClusterReadAttributeOnModeWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"ModeSelectClusterReadAttributeOnModeWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPModeSelectCluster * cluster = [[CHIPModeSelectCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ModeSelectCluster OnMode Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterModeSelectClusterWriteAttributeOnModeWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"ModeSelectClusterWriteAttributeOnModeWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPModeSelectCluster * cluster = [[CHIPModeSelectCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0;
+    [cluster writeAttributeOnModeWithValue:value
+                           responseHandler:^(NSError * err, NSDictionary * values) {
+                               NSLog(@"ModeSelectCluster OnMode Error: %@", err);
+                               XCTAssertEqual(err.code, 0);
+                               [expectation fulfill];
+                           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterModeSelectClusterReadAttributeStartUpModeWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ModeSelectClusterReadAttributeStartUpModeWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPModeSelectCluster * cluster = [[CHIPModeSelectCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ModeSelectCluster StartUpMode Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterModeSelectClusterReadAttributeDescriptionWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ModeSelectClusterReadAttributeDescriptionWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPModeSelectCluster * cluster = [[CHIPModeSelectCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeDescriptionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ModeSelectCluster Description Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterModeSelectClusterReadAttributeClusterRevisionWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ModeSelectClusterReadAttributeClusterRevisionWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPModeSelectCluster * cluster = [[CHIPModeSelectCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ModeSelectCluster ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterNetworkCommissioningReadAttributeFeatureMapWithResponseHandler
 {
     XCTestExpectation * expectation =

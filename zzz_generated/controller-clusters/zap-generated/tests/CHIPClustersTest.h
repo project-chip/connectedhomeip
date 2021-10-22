@@ -583,6 +583,22 @@ public:
                                              uint16_t value);
 };
 
+class DLL_EXPORT ModeSelectClusterClusterTest : public ModeSelectClusterCluster
+{
+public:
+    ModeSelectClusterClusterTest() : ModeSelectClusterCluster() {}
+    ~ModeSelectClusterClusterTest() {}
+
+    CHIP_ERROR WriteAttributeCurrentMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         uint8_t value);
+    CHIP_ERROR WriteAttributeStartUpMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         uint8_t value);
+    CHIP_ERROR WriteAttributeDescription(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         chip::CharSpan value);
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
 class DLL_EXPORT NetworkCommissioningClusterTest : public NetworkCommissioningCluster
 {
 public:

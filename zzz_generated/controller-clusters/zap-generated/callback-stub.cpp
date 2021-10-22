@@ -119,6 +119,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
         emberAfMediaPlaybackClusterInitCallback(endpoint);
         break;
+    case ZCL_MODE_SELECT_CLUSTER_ID:
+        emberAfModeSelectClusterClusterInitCallback(endpoint);
+        break;
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
@@ -343,6 +346,11 @@ void __attribute__((weak)) emberAfMediaInputClusterInitCallback(EndpointId endpo
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfModeSelectClusterClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

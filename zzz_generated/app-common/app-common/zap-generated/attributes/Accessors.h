@@ -1470,6 +1470,27 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool stateValue);
 } // namespace Attributes
 } // namespace BooleanState
 
+namespace ModeSelectCluster {
+namespace Attributes {
+
+namespace CurrentMode {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentMode); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentMode);
+} // namespace CurrentMode
+
+namespace OnMode {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * onMode); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t onMode);
+} // namespace OnMode
+
+namespace StartUpMode {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * startUpMode); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t startUpMode);
+} // namespace StartUpMode
+
+} // namespace Attributes
+} // namespace ModeSelectCluster
+
 namespace ShadeConfiguration {
 namespace Attributes {
 
