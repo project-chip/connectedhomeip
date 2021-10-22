@@ -124,7 +124,7 @@ void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void *
         auto & entry = iter.GetValue();
         [array addObject:@ {
             @"ActionID" : [NSNumber numberWithUnsignedShort:entry.actionID],
-            @"Name" : [NSData dataWithBytes:entry.name.data() length:entry.name.size()],
+            @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
             @"Type" : [NSNumber numberWithUnsignedChar:entry.type],
             @"EndpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
             @"SupportedCommands" : [NSNumber numberWithUnsignedShort:entry.supportedCommands],
@@ -149,7 +149,7 @@ void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void
         auto & entry = iter.GetValue();
         [array addObject:@ {
             @"EndpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
-            @"Name" : [NSData dataWithBytes:entry.name.data() length:entry.name.size()],
+            @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
             @"Type" : [NSNumber numberWithUnsignedChar:entry.type],
             @"Endpoints" : [NSData dataWithBytes:entry.endpoints.data() length:entry.endpoints.size()],
         }];

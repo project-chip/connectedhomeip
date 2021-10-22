@@ -931,7 +931,7 @@ public class ChipClusters {
 
     public static class ActionListAttribute {
       public int actionID;
-      public byte[] name;
+      public String name;
       public int type;
       public int endpointListID;
       public int supportedCommands;
@@ -939,7 +939,7 @@ public class ChipClusters {
 
       public ActionListAttribute(
           int actionID,
-          byte[] name,
+          String name,
           int type,
           int endpointListID,
           int supportedCommands,
@@ -961,11 +961,11 @@ public class ChipClusters {
 
     public static class EndpointListAttribute {
       public int endpointListID;
-      public byte[] name;
+      public String name;
       public int type;
       public byte[] endpoints;
 
-      public EndpointListAttribute(int endpointListID, byte[] name, int type, byte[] endpoints) {
+      public EndpointListAttribute(int endpointListID, String name, int type, byte[] endpoints) {
         this.endpointListID = endpointListID;
         this.name = name;
         this.type = type;

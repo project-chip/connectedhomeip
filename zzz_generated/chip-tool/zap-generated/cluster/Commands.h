@@ -256,7 +256,7 @@ static void OnBridgedActionsActionListListAttributeResponse(
         ++i;
         ChipLogProgress(chipTool, "ActionStruct[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  actionID: %" PRIu16 "", entry.actionID);
-        ChipLogProgress(Zcl, "  Name: %zu", entry.name.size());
+        ChipLogProgress(Zcl, "  Name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
         ChipLogProgress(chipTool, "  endpointListID: %" PRIu16 "", entry.endpointListID);
         ChipLogProgress(chipTool, "  supportedCommands: %" PRIu16 "", entry.supportedCommands);
@@ -298,7 +298,7 @@ static void OnBridgedActionsEndpointListListAttributeResponse(
         ++i;
         ChipLogProgress(chipTool, "EndpointListStruct[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  endpointListID: %" PRIu16 "", entry.endpointListID);
-        ChipLogProgress(Zcl, "  Name: %zu", entry.name.size());
+        ChipLogProgress(Zcl, "  Name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
         ChipLogProgress(Zcl, "  Endpoints: %zu", entry.endpoints.size());
     }

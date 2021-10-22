@@ -6266,16 +6266,16 @@ public:
             err == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$BridgedActionsCluster$ActionListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(I[BIIII)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(ILjava/lang/String;IIII)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find ActionListAttribute constructor"));
 
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry    = iter.GetValue();
-            jint actionID   = entry.actionID;
-            jbyteArray name = env->NewByteArray(entry.name.size());
-            env->SetByteArrayRegion(name, 0, entry.name.size(), reinterpret_cast<const jbyte *>(entry.name.data()));
+            auto & entry  = iter.GetValue();
+            jint actionID = entry.actionID;
+            UtfString nameStr(env, entry.name);
+            jstring name(nameStr.jniValue());
             jint type              = entry.type;
             jint endpointListID    = entry.endpointListID;
             jint supportedCommands = entry.supportedCommands;
@@ -6362,7 +6362,7 @@ public:
             ChipLogError(Zcl,
                          "Could not find class chip/devicecontroller/ChipClusters$BridgedActionsCluster$EndpointListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(I[BI[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(ILjava/lang/String;I[B)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find EndpointListAttribute constructor"));
 
         auto iter = list.begin();
@@ -6370,8 +6370,8 @@ public:
         {
             auto & entry        = iter.GetValue();
             jint endpointListID = entry.endpointListID;
-            jbyteArray name     = env->NewByteArray(entry.name.size());
-            env->SetByteArrayRegion(name, 0, entry.name.size(), reinterpret_cast<const jbyte *>(entry.name.data()));
+            UtfString nameStr(env, entry.name);
+            jstring name(nameStr.jniValue());
             jint type            = entry.type;
             jbyteArray endpoints = env->NewByteArray(entry.endpoints.size());
             env->SetByteArrayRegion(endpoints, 0, entry.endpoints.size(), reinterpret_cast<const jbyte *>(entry.endpoints.data()));
