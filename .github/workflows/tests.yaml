@@ -84,7 +84,7 @@ jobs:
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Tests
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: |
                   scripts/tests/test_suites.sh
             - name: Run TV Tests
