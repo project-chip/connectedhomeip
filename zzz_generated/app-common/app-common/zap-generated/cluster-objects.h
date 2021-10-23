@@ -9032,6 +9032,56 @@ struct TypeInfo
 } // namespace LabelList
 } // namespace Attributes
 } // namespace FixedLabel
+namespace BooleanState {
+
+namespace Attributes {
+namespace StateValue {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return BooleanState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StateValue::Id; }
+};
+} // namespace StateValue
+} // namespace Attributes
+namespace Events {
+namespace StateChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kStateValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000000;
+    static constexpr ClusterId GetClusterId() { return BooleanState::Id; }
+
+    bool stateValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return BooleanState::Id; }
+
+    bool stateValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StateChange
+} // namespace Events
+} // namespace BooleanState
 namespace ShadeConfiguration {
 
 namespace Attributes {

@@ -766,6 +766,48 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class BooleanStateCluster extends BaseChipCluster {
+    public BooleanStateCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    public static long clusterId() {
+      return Long.parseUnsignedLong("69");
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void readStateValueAttribute(BooleanAttributeCallback callback) {
+      readStateValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeStateValueAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeStateValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportStateValueAttribute(BooleanAttributeCallback callback) {
+      reportStateValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readStateValueAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeStateValueAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportStateValueAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class BridgedDeviceBasicCluster extends BaseChipCluster {
     public BridgedDeviceBasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

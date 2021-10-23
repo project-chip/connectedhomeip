@@ -57,6 +57,10 @@
 @property (readonly) chip::Controller::BindingCluster cppCluster;
 @end
 
+@interface CHIPBooleanState ()
+@property (readonly) chip::Controller::BooleanStateCluster cppCluster;
+@end
+
 @interface CHIPBridgedDeviceBasic ()
 @property (readonly) chip::Controller::BridgedDeviceBasicCluster cppCluster;
 @end

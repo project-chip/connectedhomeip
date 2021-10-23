@@ -64,17 +64,17 @@ TransferSession::TransferSession()
     mSuppportedXferOpts.ClearAll();
 }
 
-void TransferSession::PollOutput(OutputEvent & event, uint64_t curTimeMs)
+void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp curTime)
 {
     event = OutputEvent(OutputEventType::kNone);
 
     if (mShouldInitTimeoutStart)
     {
-        mTimeoutStartTimeMs     = curTimeMs;
+        mTimeoutStartTime       = curTime;
         mShouldInitTimeoutStart = false;
     }
 
-    if (mAwaitingResponse && ((curTimeMs - mTimeoutStartTimeMs) >= mTimeoutMs))
+    if (mAwaitingResponse && ((curTime - mTimeoutStartTime) >= mTimeout))
     {
         event             = OutputEvent(OutputEventType::kTransferTimeout);
         mState            = TransferState::kErrorState;
@@ -94,8 +94,8 @@ void TransferSession::PollOutput(OutputEvent & event, uint64_t curTimeMs)
         event = OutputEvent::StatusReportEvent(OutputEventType::kStatusReceived, mStatusReportData);
         break;
     case OutputEventType::kMsgToSend:
-        event               = OutputEvent::MsgToSendEvent(mMsgTypeData, std::move(mPendingMsgHandle));
-        mTimeoutStartTimeMs = curTimeMs;
+        event             = OutputEvent::MsgToSendEvent(mMsgTypeData, std::move(mPendingMsgHandle));
+        mTimeoutStartTime = curTime;
         break;
     case OutputEventType::kInitReceived:
         event = OutputEvent::TransferInitEvent(mTransferRequestData, std::move(mPendingMsgHandle));
@@ -131,12 +131,12 @@ void TransferSession::PollOutput(OutputEvent & event, uint64_t curTimeMs)
     mPendingOutput = OutputEventType::kNone;
 }
 
-CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData, uint32_t timeoutMs)
+CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitData & initData, System::Clock::Timeout timeout)
 {
     VerifyOrReturnError(mState == TransferState::kUnitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    mRole      = role;
-    mTimeoutMs = timeoutMs;
+    mRole    = role;
+    mTimeout = timeout;
 
     // Set transfer parameters. They may be overridden later by an Accept message
     mSuppportedXferOpts    = initData.TransferCtlFlags;
@@ -169,13 +169,13 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
 }
 
 CHIP_ERROR TransferSession::WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
-                                            uint16_t maxBlockSize, uint32_t timeoutMs)
+                                            uint16_t maxBlockSize, System::Clock::Timeout timeout)
 {
     VerifyOrReturnError(mState == TransferState::kUnitialized, CHIP_ERROR_INCORRECT_STATE);
 
     // Used to determine compatibility with any future TransferInit parameters
     mRole                  = role;
-    mTimeoutMs             = timeoutMs;
+    mTimeout               = timeout;
     mSuppportedXferOpts    = xferControlOpts;
     mMaxSupportedBlockSize = maxBlockSize;
 
@@ -361,14 +361,14 @@ void TransferSession::Reset()
     mLastQueryNum      = 0;
     mNextQueryNum      = 0;
 
-    mTimeoutMs              = 0;
-    mTimeoutStartTimeMs     = 0;
+    mTimeout                = System::Clock::Zero;
+    mTimeoutStartTime       = System::Clock::Zero;
     mShouldInitTimeoutStart = true;
     mAwaitingResponse       = false;
 }
 
 CHIP_ERROR TransferSession::HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg,
-                                                  uint64_t curTimeMs)
+                                                  System::Clock::Timestamp curTime)
 {
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -376,7 +376,7 @@ CHIP_ERROR TransferSession::HandleMessageReceived(const PayloadHeader & payloadH
     {
         ReturnErrorOnFailure(HandleBdxMessage(payloadHeader, std::move(msg)));
 
-        mTimeoutStartTimeMs = curTimeMs;
+        mTimeoutStartTime = curTime;
     }
     else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
     {

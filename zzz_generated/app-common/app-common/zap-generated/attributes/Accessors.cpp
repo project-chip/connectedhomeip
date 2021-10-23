@@ -3911,6 +3911,26 @@ namespace Attributes {
 } // namespace Attributes
 } // namespace FixedLabel
 
+namespace BooleanState {
+namespace Attributes {
+
+namespace StateValue {
+
+EmberAfStatus Get(chip::EndpointId endpoint, bool * stateValue)
+{
+    return emberAfReadServerAttribute(endpoint, BooleanState::Id, StateValue::Id, (uint8_t *) stateValue, sizeof(*stateValue));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, bool stateValue)
+{
+    return emberAfWriteServerAttribute(endpoint, BooleanState::Id, StateValue::Id, (uint8_t *) &stateValue,
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+
+} // namespace StateValue
+
+} // namespace Attributes
+} // namespace BooleanState
+
 namespace ShadeConfiguration {
 namespace Attributes {
 

@@ -38,6 +38,7 @@
 #include <malloc.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include <signal.h>
 #include <unistd.h>
 
 namespace chip {

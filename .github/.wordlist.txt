@@ -28,8 +28,8 @@ AE
 aef
 algs
 alloc
-Ameba
 ameba
+Ameba
 amebad
 amebaiot
 AnnounceOTAProvider
@@ -131,6 +131,7 @@ cgroup
 changeset
 characterised
 CharString
+checkmark
 ChipBLEMgr
 CHIPCirqueTest
 CHIPCryptoPALHsm
@@ -324,6 +325,7 @@ EndpointId
 endpointName
 eno
 entrypoint
+enum
 env
 esd
 ESPPORT
@@ -795,9 +797,9 @@ ScriptBinding
 SDC
 SDHC
 SDK
+SDK's
 sdkconfig
 SDKs
-SDK's
 SDKTARGETSYSROOT
 sdl
 segger
@@ -875,6 +877,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+testability
 TestArray
 TestCluster
 TestEmptyString

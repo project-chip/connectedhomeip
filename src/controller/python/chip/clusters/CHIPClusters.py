@@ -448,6 +448,25 @@ class ChipClusters:
                 },
             },
     }
+    _BOOLEAN_STATE_CLUSTER_INFO = {
+            "clusterName": "BooleanState",
+            "clusterId": 0x00000045,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "StateValue",
+                    "attributeId": 0x00000000,
+                    "type": "bool",
+                    "reportable": True,
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
     _BRIDGED_DEVICE_BASIC_CLUSTER_INFO = {
             "clusterName": "BridgedDeviceBasic",
             "clusterId": 0x00000039,
@@ -4075,6 +4094,7 @@ class ChipClusters:
     0x00000028: _BASIC_CLUSTER_INFO,
     0x0000000F: _BINARY_INPUT_BASIC_CLUSTER_INFO,
     0x0000F000: _BINDING_CLUSTER_INFO,
+    0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
     0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
     0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
     0x0000050A: _CONTENT_LAUNCHER_CLUSTER_INFO,
@@ -4132,6 +4152,7 @@ class ChipClusters:
         "Basic": _BASIC_CLUSTER_INFO,
         "BinaryInputBasic": _BINARY_INPUT_BASIC_CLUSTER_INFO,
         "Binding": _BINDING_CLUSTER_INFO,
+        "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "ContentLauncher": _CONTENT_LAUNCHER_CLUSTER_INFO,
@@ -5006,6 +5027,12 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBinding_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBooleanState_ReadAttributeStateValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BooleanState_StateValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBooleanState_SubscribeAttributeStateValue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_BooleanState_StateValue(device, ZCLendpoint, minInterval, maxInterval)
+    def ClusterBooleanState_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBridgedDeviceBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
     def ClusterBridgedDeviceBasic_ReadAttributeVendorID(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -6201,6 +6228,16 @@ class ChipClusters:
         # Cluster Binding ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster BooleanState
+        # Cluster BooleanState ReadAttribute StateValue
+        self._chipLib.chip_ime_ReadAttribute_BooleanState_StateValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BooleanState_StateValue.restype = ctypes.c_uint32
+        # Cluster BooleanState SubscribeAttribute StateValue
+        self._chipLib.chip_ime_SubscribeAttribute_BooleanState_StateValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_BooleanState_StateValue.restype = ctypes.c_uint32
+        # Cluster BooleanState ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision.restype = ctypes.c_uint32
         # Cluster BridgedDeviceBasic
         # Cluster BridgedDeviceBasic ReadAttribute VendorName
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

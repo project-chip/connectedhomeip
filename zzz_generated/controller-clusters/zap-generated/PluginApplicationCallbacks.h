@@ -31,6 +31,7 @@
     MatterBasicPluginClientInitCallback();                                                                                         \
     MatterBinaryInputBasicPluginClientInitCallback();                                                                              \
     MatterBindingPluginClientInitCallback();                                                                                       \
+    MatterBooleanStatePluginClientInitCallback();                                                                                  \
     MatterBridgedDeviceBasicPluginClientInitCallback();                                                                            \
     MatterColorControlPluginClientInitCallback();                                                                                  \
     MatterContentLauncherPluginClientInitCallback();                                                                               \
