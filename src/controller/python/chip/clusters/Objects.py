@@ -8677,6 +8677,9 @@ class FixedLabel:
 class BooleanState:
     id: typing.ClassVar[int] = 0x0045
 
+
+
+
     class Attributes:
         class StateValue(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -8691,6 +8694,7 @@ class BooleanState:
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
+
         class FeatureMap(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -8704,6 +8708,7 @@ class BooleanState:
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
+
         class ClusterRevision(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -8716,6 +8721,8 @@ class BooleanState:
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
+
+
 
 
 @dataclass
