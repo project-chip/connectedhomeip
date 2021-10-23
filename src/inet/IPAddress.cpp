@@ -76,7 +76,7 @@ IPAddress::IPAddress(const ip6_addr_t & ipv6Addr)
     memcpy(Addr, &ipv6Addr, sizeof(ipv6Addr));
 }
 
-#if INET_CONFIG_ENABLE_IPV4
+#if INET_CONFIG_ENABLE_IPV4 || LWIP_IPV4
 
 IPAddress::IPAddress(const ip4_addr_t & ipv4Addr)
 {
@@ -105,6 +105,10 @@ IPAddress::IPAddress(const ip_addr_t & addr)
         break;
     }
 }
+
+#endif // INET_CONFIG_ENABLE_IPV4 || LWIP_IPV4
+
+#if INET_CONFIG_ENABLE_IPV4
 
 ip4_addr_t IPAddress::ToIPv4() const
 {
