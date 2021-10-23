@@ -26,7 +26,7 @@ jobs:
         name: ZAP templates re-generation
         timeout-minutes: 60
 
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         steps:
