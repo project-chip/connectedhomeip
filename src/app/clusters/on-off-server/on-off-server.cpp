@@ -40,14 +40,16 @@
  ******************************************************************************/
 #include "on-off-server.h"
 
-#include <app/common/gen/att-storage.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/att-storage.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/util/af.h>
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -63,6 +65,7 @@
 #endif
 
 using namespace chip;
+using namespace chip::app::Clusters::OnOff;
 
 #ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
 static bool areStartUpOnOffServerAttributesTokenized(EndpointId endpoint);
@@ -165,7 +168,8 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-bool emberAfOnOffClusterOffCallback(chip::app::Command * commandObj)
+bool emberAfOnOffClusterOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                    const Commands::Off::DecodableType & commandData)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_OFF_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
@@ -178,7 +182,8 @@ bool emberAfOnOffClusterOffCallback(chip::app::Command * commandObj)
     return true;
 }
 
-bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj)
+bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                   const Commands::On::DecodableType & commandData)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_ON_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
@@ -191,7 +196,8 @@ bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj)
     return true;
 }
 
-bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj)
+bool emberAfOnOffClusterToggleCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                       const Commands::Toggle::DecodableType & commandData)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_TOGGLE_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER

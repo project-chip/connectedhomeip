@@ -30,16 +30,18 @@
 #endif
 
 // Include configuration headers
-#include <core/CHIPConfig.h>
 #include <inet/InetConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 // Include dependent headers
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/init.h>
 #include <lwip/mem.h>
 #include <lwip/opt.h>
 #include <lwip/pbuf.h>
+#include <lwip/stats.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include <stdint.h>
@@ -58,17 +60,11 @@ enum
     kSystemLayer_NumPacketBufs,
 #endif
     kSystemLayer_NumTimers,
-#if INET_CONFIG_NUM_RAW_ENDPOINTS
-    kInetLayer_NumRawEps,
-#endif
 #if INET_CONFIG_NUM_TCP_ENDPOINTS
     kInetLayer_NumTCPEps,
 #endif
 #if INET_CONFIG_NUM_UDP_ENDPOINTS
     kInetLayer_NumUDPEps,
-#endif
-#if INET_CONFIG_NUM_DNS_RESOLVERS
-    kInetLayer_NumDNSResolvers,
 #endif
     kExchangeMgr_NumContexts,
     kExchangeMgr_NumUMHandlers,

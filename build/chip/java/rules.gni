@@ -18,12 +18,15 @@ import("${chip_root}/build/config/android/config.gni")
 
 javac_runner = "${chip_root}/build/chip/java/javac_runner.py"
 jar_runner = "${chip_root}/build/chip/java/jar_runner.py"
+write_build_config = "${chip_root}/build/chip/java/write_build_config.py"
 
 assert(android_sdk_root != "", "android_sdk_root must be specified")
 
 # Declare a java library target
 #
-#   sources: List of .java files included in this library.
+#   sources: List of .java files included in this library. Mutually exclusive with jar_path.
+#
+#   jar_path: A path to an existing JAR. Mutually exclusive with sources.
 #
 #   output_name: File name for the output .jar (not including extension).
 #     Defaults to the input .jar file name.
@@ -39,76 +42,137 @@ template("java_library") {
     _jar_name += ".jar"
   }
 
-  # Additional flags
-  _javac_flags = [
-    "-Werror",
-    "-Xlint:all",
-  ]
-  if (defined(invoker.javac_flags)) {
-    _javac_flags += invoker.javac_flags
-  }
-
   _deps = []
   if (defined(invoker.deps)) {
     _deps = invoker.deps
   }
 
-  _data_deps = []
-  if (defined(invoker.data_deps)) {
-    _data_deps = invoker.data_deps
-  }
-
   # What files will be compiled
-  _java_files = invoker.sources
-
-  # Generates a .java file containing all sources to be compiled
-  _java_sources_file = "$target_gen_dir/$target_name.sources"
-  if (defined(invoker.java_sources_file)) {
-    _java_sources_file = invoker.java_sources_file
-  }
-  write_file(_java_sources_file, rebase_path(_java_files, root_build_dir))
-
-  # Compiles the given files into a directory and generates a 'class list'
-  _javac_target_name = target_name + "__javac"
-  _class_dir = rebase_path(target_out_dir, root_build_dir) + "/classes"
-  _class_list_file = "$target_gen_dir/$target_name.classlist"
-  action(_javac_target_name) {
-    sources = _java_files
-
-    outputs = [ _class_list_file ]
-
-    script = javac_runner
-
-    args = [
-             "--classdir",
-             _class_dir,
-             "--outfile",
-             rebase_path(_class_list_file, root_build_dir),
-             "--",
-             "-d",
-             _class_dir,
-             "@" + rebase_path(_java_sources_file, root_build_dir),
-           ] + _javac_flags
+  _java_files = []
+  if (defined(invoker.sources)) {
+    _java_files = invoker.sources
   }
 
-  # Bundles all files within the 'class directory' into a jar file
-  _jar_output = "$root_out_dir/lib/$_jar_name"
-  action(target_name) {
-    deps = [ ":$_javac_target_name" ] + _deps
+  _is_prebuilt = defined(invoker.jar_path)
 
-    data_deps = _data_deps
+  _jar_output = ""
+  _target_dir_name = get_label_info(":$target_name", "dir")
+  if (_is_prebuilt) {
+    assert(_java_files == [])
+    _jar_output = "$root_out_dir/lib/$_target_dir_name/" +
+                  get_path_info(invoker.jar_path, "name") + ".jar"
+  } else {
+    _jar_output = "$root_out_dir/lib/$_target_dir_name/$_jar_name"
+  }
 
-    outputs = [ _jar_output ]
+  # Generate a list containing the expected build_config filepath of every dependency.
+  _deps_configs = []
+  foreach(_dep, _deps) {
+    _dep_gen_dir = get_label_info(_dep, "target_gen_dir")
+    _dep_name = get_label_info(_dep, "name")
+    _dep_config = "$_dep_gen_dir/$_dep_name.json"
+    _deps_configs += [ _dep_config ]
+  }
+  _rebased_deps_configs = rebase_path(_deps_configs, root_build_dir)
 
-    script = jar_runner
+  # Create the name for this target's build_config.
+  _library_target_name = target_name
+  _build_config = "$target_gen_dir/$_library_target_name.json"
+  _rebased_build_config = rebase_path(_build_config, root_build_dir)
 
+  # Write the build_config file for this target.
+  _config_target_name = target_name + "_config"
+  action(_config_target_name) {
+    script = write_build_config
+
+    deps = _deps
+
+    outputs = [ _build_config ]
     args = [
-      "cf",
+      "--jar-path",
       rebase_path(_jar_output, root_build_dir),
-      "-C",
-      _class_dir,
-      ".",
+      "--build-config",
+      _rebased_build_config,
+      "--deps-configs=$_rebased_deps_configs",
     ]
+  }
+
+  # Building from sources - perform Java compilation and JAR creation.
+  if (!_is_prebuilt) {
+    # Additional flags
+    _javac_flags = [
+      "-Werror",
+      "-Xlint:all",
+    ]
+    if (defined(invoker.javac_flags)) {
+      _javac_flags += invoker.javac_flags
+    }
+
+    # Data deps
+    _data_deps = []
+    if (defined(invoker.data_deps)) {
+      _data_deps = invoker.data_deps
+    }
+
+    # Generates a .java file containing all sources to be compiled
+    _java_sources_file = "$target_gen_dir/$target_name.sources"
+    if (defined(invoker.java_sources_file)) {
+      _java_sources_file = invoker.java_sources_file
+    }
+    write_file(_java_sources_file, rebase_path(_java_files, root_build_dir))
+
+    # Compiles the given files into a directory and generates a 'class list'
+    _javac_target_name = target_name + "__javac"
+    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/classes"
+    _class_list_file = "$target_gen_dir/$target_name.classlist"
+    action(_javac_target_name) {
+      sources = _java_files
+      deps = [ ":$_config_target_name" ]
+
+      outputs = [ _class_list_file ]
+
+      script = javac_runner
+
+      args = [
+               "--classdir",
+               _class_dir,
+               "--outfile",
+               rebase_path(_class_list_file, root_build_dir),
+               "--build-config",
+               _rebased_build_config,
+               "--",
+               "-d",
+               _class_dir,
+               "@" + rebase_path(_java_sources_file, root_build_dir),
+             ] + _javac_flags
+    }
+
+    # Bundles all files within the 'class directory' into a jar file
+    action(target_name) {
+      deps = [ ":$_javac_target_name" ] + _deps
+
+      data_deps = _data_deps
+
+      outputs = [ _jar_output ]
+
+      script = jar_runner
+
+      args = [
+        "cf",
+        rebase_path(_jar_output, root_build_dir),
+        "-C",
+        _class_dir,
+        ".",
+      ]
+    }
+  } else {
+    # Using pre-specified JAR instead of building from sources - simply copy the JAR to the output directory.
+    _original_jar_path = invoker.jar_path
+    copy(target_name) {
+      sources = [ _original_jar_path ]
+      outputs = [ _jar_output ]
+      deps = [ ":$_config_target_name" ] + _deps
+    }
   }
 }
 
@@ -121,13 +185,17 @@ template("android_library") {
     }
 
     javac_flags += [
-      "-classpath",
-      "${android_sdk_root}/platforms/android-${android_sdk_version}/android.jar",
       "-Xlint:-options",
       "-source",
       "8",
       "-target",
       "8",
     ]
+  }
+}
+
+template("java_prebuilt") {
+  java_library(target_name) {
+    forward_variables_from(invoker, "*")
   }
 }

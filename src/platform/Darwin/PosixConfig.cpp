@@ -27,9 +27,9 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/Darwin/PosixConfig.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -54,25 +54,23 @@ const PosixConfig::Key PosixConfig::kConfigKey_SetupPinCode        = { kConfigNa
 const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
 
 // Keys stored in the Chip-config namespace
-const PosixConfig::Key PosixConfig::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
-const PosixConfig::Key PosixConfig::kConfigKey_PairedAccountId             = { kConfigNamespace_ChipConfig, "account-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_ServiceId                   = { kConfigNamespace_ChipConfig, "service-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_FabricSecret                = { kConfigNamespace_ChipConfig, "fabric-secret" };
-const PosixConfig::Key PosixConfig::kConfigKey_GroupKeyIndex               = { kConfigNamespace_ChipConfig, "group-key-index" };
-const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_ChipConfig, "last-ek-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed               = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const PosixConfig::Key PosixConfig::kConfigKey_WiFiStationSecType          = { kConfigNamespace_ChipConfig, "sta-sec-type" };
-const PosixConfig::Key PosixConfig::kConfigKey_OperationalDeviceId         = { kConfigNamespace_ChipConfig, "op-device-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_ChipConfig, "op-device-cert" };
-const PosixConfig::Key PosixConfig::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig, "op-device-ca-certs" };
-const PosixConfig::Key PosixConfig::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
-const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const PosixConfig::Key PosixConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
-const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const PosixConfig::Key PosixConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
+const PosixConfig::Key PosixConfig::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_FabricSecret       = { kConfigNamespace_ChipConfig, "fabric-secret" };
+const PosixConfig::Key PosixConfig::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
+const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const PosixConfig::Key PosixConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
+const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
+
+uint16_t PosixConfig::mPosixSetupDiscriminator = 0xF00; // CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
 
 CHIP_ERROR PosixConfig::Init()
 {
@@ -92,9 +90,12 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
 
-exit:
+    if (key == kConfigKey_SetupDiscriminator)
+    {
+        val = mPosixSetupDiscriminator;
+        return CHIP_NO_ERROR;
+    }
     return err;
 }
 
@@ -137,9 +138,12 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
 
-exit:
+    if (key == kConfigKey_SetupDiscriminator)
+    {
+        mPosixSetupDiscriminator = val;
+        return CHIP_NO_ERROR;
+    }
     return err;
 }
 

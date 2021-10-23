@@ -25,10 +25,11 @@ to set up your OpenThread Border Router on a Raspberry Pi 3/4 device!**
 
 > Ubuntu and debian hosts are also supported!
 
-The CodeLab uses a Nordic nRF52840 DK as the Border Router RCP device.
+The CodeLab uses Nordic Semiconductor's nRF52840 DK as the Border Router RCP
+device.
 
--   See [openthread_rcp_nrf_dongle.md](./openthread_rcp_nrf_dongle.md) for using
-    nRF52840 dongle as a RCP device.
+-   See this [guide](./openthread_rcp_nrf_dongle.md) for configuring the
+    nRF52840 Dongle as an RCP device.
 -   See this
     [guide](https://www.silabs.com/documents/public/application-notes/an1256-using-sl-rcp-with-openthread-border-router.pdf)
     for creating Silicon Labs RCP devices.

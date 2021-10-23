@@ -34,14 +34,6 @@
 
 #include "em_device.h"
 #include "em_se.h"
-#include "sl_malloc.h"
-
-/**
- * Enable FreeRTOS threading support
- */
-#define MBEDTLS_FREERTOS
-#define MBEDTLS_THREADING_C
-#define MBEDTLS_THREADING_ALT
 
 #define SL_CATALOG_FREERTOS_KERNEL_PRESENT
 
@@ -53,12 +45,7 @@
 #define MBEDTLS_ECDH_C
 #define MBEDTLS_ENTROPY_C
 #define MBEDTLS_SHA256_C
-#define MBEDTLS_CIPHER_MODE_CTR
 #define MBEDTLS_TRNG_C
-
-#if defined(MBEDTLS_ECP_ALT) && !defined(MBEDTLS_ECP_RESTARTABLE)
-typedef void mbedtls_ecp_restart_ctx;
-#endif
 
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
@@ -69,8 +56,6 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_BIGNUM_C
 #define MBEDTLS_CCM_C
 #define MBEDTLS_CIPHER_C
-#define MBEDTLS_CIPHER_MODE_CBC
-#define MBEDTLS_CIPHER_MODE_CFB
 #define MBEDTLS_CMAC_C
 #define MBEDTLS_CTR_DRBG_C
 #define MBEDTLS_ECDH_LEGACY_CONTEXT
@@ -103,7 +88,6 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_PSA_CRYPTO_C
 #define MBEDTLS_PSA_CRYPTO_CONFIG
 #define MBEDTLS_PSA_CRYPTO_DRIVERS
-#define MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS
 #define MBEDTLS_PSA_CRYPTO_STORAGE_C
 #define MBEDTLS_SHA256_SMALLER
 #define MBEDTLS_SHA512_C
@@ -132,9 +116,6 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
 #define MBEDTLS_ENTROPY_MAX_SOURCES 2   /**< Maximum number of sources supported */
 
-#define MBEDTLS_PLATFORM_STD_CALLOC sl_calloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE sl_free     /**< Default free to use, can be undefined */
-
 #if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
 #else
@@ -143,5 +124,9 @@ typedef void mbedtls_ecp_restart_ctx;
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
+#define MBEDTLS_CIPHER_MODE_WITH_PADDING
+
+#include "check_crypto_config.h"
 #include "config-device-acceleration.h"
 #include "mbedtls/check_config.h"
+#include "mbedtls/config_psa.h"

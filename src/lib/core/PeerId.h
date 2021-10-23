@@ -17,19 +17,19 @@
 
 #pragma once
 
+#include <lib/core/NodeId.h>
+
 namespace chip {
 
-/// Convenience types to make it clear what different number types mean
-using NodeId   = uint64_t;
-using FabricId = uint64_t;
+using CompressedFabricId = uint64_t;
+using FabricId           = uint64_t;
 
-constexpr NodeId kUndefinedNodeId = 0ULL;
-constexpr NodeId kAnyNodeId       = 0xFFFFFFFFFFFFFFFFULL;
+constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
 
 constexpr FabricId kUndefinedFabricId = 0ULL;
 constexpr uint16_t kUndefinedVendorId = 0U;
 
-/// A peer is identified by a node id within a fabric
+/// A peer is identified by a node id within a compressed fabric ID
 class PeerId
 {
 public:
@@ -42,19 +42,26 @@ public:
         return *this;
     }
 
-    NodeId GetFabricId() const { return mFabricId; }
-    PeerId & SetFabricId(FabricId id)
+    CompressedFabricId GetCompressedFabricId() const { return mCompressedFabricId; }
+    PeerId & SetCompressedFabricId(CompressedFabricId id)
     {
-        mFabricId = id;
+        mCompressedFabricId = id;
         return *this;
     }
 
-    bool operator==(const PeerId & other) const { return (mNodeId == other.mNodeId) && (mFabricId == other.mFabricId); }
-    bool operator!=(const PeerId & other) const { return (mNodeId != other.mNodeId) || (mFabricId != other.mFabricId); }
+    bool operator==(const PeerId & other) const
+    {
+        return (mNodeId == other.mNodeId) && (mCompressedFabricId == other.mCompressedFabricId);
+    }
+    bool operator!=(const PeerId & other) const
+    {
+        return (mNodeId != other.mNodeId) || (mCompressedFabricId != other.mCompressedFabricId);
+    }
 
 private:
-    NodeId mNodeId     = kUndefinedNodeId;
-    FabricId mFabricId = kUndefinedFabricId;
+    NodeId mNodeId = kUndefinedNodeId;
+
+    CompressedFabricId mCompressedFabricId = kUndefinedCompressedFabricId;
 };
 
 } // namespace chip

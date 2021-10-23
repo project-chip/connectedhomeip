@@ -5,8 +5,11 @@ future>=0.15.2
 cryptography>=2.1.4
 pyparsing>=2.0.3,<2.4.0
 pyelftools>=0.22
-gdbgui==0.13.2.0 ; platform_machine != 'aarch64'
+gdbgui==0.13.2.0
 pygdbmi<=0.9.0.2
 reedsolo>=1.5.3,<=1.5.4
 bitstring>=3.1.6
 ecdsa>=0.16.0
+kconfiglib==13.7.1
+construct==2.10.54
+python-socketio<5

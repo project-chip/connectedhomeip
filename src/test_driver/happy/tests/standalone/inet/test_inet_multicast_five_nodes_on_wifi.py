@@ -68,15 +68,9 @@ class test_chip_inet_multicast_five_nodes_on_wifi(unittest.TestCase):
         options = happy.HappyNodeList.option()
         options["quiet"] = True
 
-        # This test runs four (4) separate invocations / runs:
-        #
-        #   1) UDP over IPv6
-        #   2) UDP over IPv4
-        #   3) ICMPv6 over IPv6
-        #   4) ICMPv4 over IPv4
-        #
-        # each with one sender and four receivers. Each receiver
-        # varies in the number of multicast groups it participates in.
+        # This test validates UDP over IPv6 with one sender and four receivers.
+        # Each receiver varies in the number of multicast groups it participates
+        # in.
         #
         # The ipv4-local-addr configuration key-value pairs are only
         # used for LwIP hosted OS topologies where a network tap
@@ -185,22 +179,16 @@ class test_chip_inet_multicast_five_nodes_on_wifi(unittest.TestCase):
         }
 
         # Topology-independent test parameters:
+        TEST_TRANSPORT = "udp"
+        TEST_IP_NETWORK = "6"
 
-        transports = ["udp", "raw"]
-        networks = ["6", "4"]
+        # Run the test.
+        value, data = self.__run_inet_multicast_test(
+            configuration, self.interface, TEST_IP_NETWORK, TEST_TRANSPORT)
 
-        for network in networks:
-            for transport in transports:
-
-                # Run the test.
-
-                value, data = self.__run_inet_multicast_test(
-                    configuration, self.interface, network, transport)
-
-                # Process and report the results.
-
-                self.__process_result(
-                    configuration, self.interface, network, transport, value, data)
+        # Process and report the results.
+        self.__process_result(
+            configuration, self.interface, TEST_IP_NETWORK, TEST_TRANSPORT, value, data)
 
     def __process_result(self, configuration, interface, network, transport, value, data):
         nodes = len(configuration['sender']) + len(configuration['receivers'])

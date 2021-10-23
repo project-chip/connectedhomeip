@@ -35,10 +35,10 @@
 #include <nlunit-test.h>
 
 #include <CHIPVersion.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/PersistedCounter.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <platform/PersistedStorage.h>
-#include <support/CHIPMem.h>
-#include <support/PersistedCounter.h>
-#include <support/UnitTestRegistration.h>
 
 #include "TestPersistedStorageImplementation.h"
 

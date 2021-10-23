@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 // from which the GenericPlatformManagerImpl_Zephyr<> template inherits.
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
 
+#include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
@@ -39,6 +40,13 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+namespace {
+System::LayerSocketsLoop & SystemLayerSocketsLoop()
+{
+    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+}
+} // anonymous namespace
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
@@ -80,9 +88,9 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_UnlockChipStack(void)
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
+CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
-    // Let SystemLayer.PrepareSelect() handle timers.
+    // Let Systemlayer.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
@@ -96,20 +104,23 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
-    VerifyOrDieWithMsg(false, DeviceLayer, "Shutdown is not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     // For some reasons mentioned in https://github.com/zephyrproject-rtos/zephyr/issues/22301
     // k_msgq_put takes `void*` instead of `const void*`. Nonetheless, it should be safe to
     // const_cast here and there are components in Zephyr itself which do the same.
-    if (k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT) == 0)
-        SystemLayer.WakeSelect(); // Trigger wake select on CHIP thread
-    else
+    int status = k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT);
+    if (status != 0)
+    {
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
+        return System::MapErrorZephyr(status);
+    }
+    SystemLayerSocketsLoop().Signal(); // Trigger wake on CHIP thread
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -122,64 +133,24 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessDeviceEvents()
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_Zephyr<ImplClass>::SysUpdate()
-{
-    FD_ZERO(&mReadSet);
-    FD_ZERO(&mWriteSet);
-    FD_ZERO(&mErrorSet);
-    mMaxFd = 0;
-
-    // Max out this duration and let CHIP set it appropriately.
-    mNextTimeout.tv_sec  = DEFAULT_MIN_SLEEP_PERIOD;
-    mNextTimeout.tv_usec = 0;
-
-    if (SystemLayer.State() == System::kLayerState_Initialized)
-    {
-        SystemLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
-    }
-
-    if (InetLayer.State == InetLayer::kState_Initialized)
-    {
-        InetLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
-    }
-}
-
-template <class ImplClass>
-void GenericPlatformManagerImpl_Zephyr<ImplClass>::SysProcess()
-{
-    Impl()->UnlockChipStack();
-    int selectRes = select(mMaxFd + 1, &mReadSet, &mWriteSet, &mErrorSet, &mNextTimeout);
-    Impl()->LockChipStack();
-
-    if (selectRes < 0)
-    {
-        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
-        return;
-    }
-
-    if (SystemLayer.State() == System::kLayerState_Initialized)
-    {
-        SystemLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
-    }
-
-    if (InetLayer.State == InetLayer::kState_Initialized)
-    {
-        InetLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
-    }
-
-    ProcessDeviceEvents();
-}
-
-template <class ImplClass>
 void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 {
     Impl()->LockChipStack();
 
+    SystemLayerSocketsLoop().EventLoopBegins();
     while (true)
     {
-        SysUpdate();
-        SysProcess();
+        SystemLayerSocketsLoop().PrepareEvents();
+
+        Impl()->UnlockChipStack();
+        SystemLayerSocketsLoop().WaitForEvents();
+        Impl()->LockChipStack();
+
+        SystemLayerSocketsLoop().HandleEvents();
+
+        ProcessDeviceEvents();
     }
+    SystemLayerSocketsLoop().EventLoopEnds();
 
     Impl()->UnlockChipStack();
 }

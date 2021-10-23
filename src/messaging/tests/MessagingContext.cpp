@@ -17,66 +17,74 @@
 
 #include "MessagingContext.h"
 
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
 
 namespace chip {
 namespace Test {
 
-CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport)
+CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport, IOContext * ioContext)
 {
-    ReturnErrorOnFailure(IOContext::Init(suite));
+    VerifyOrReturnError(mInitialized == false, CHIP_ERROR_INTERNAL);
+    mInitialized = true;
 
-    mAdmins.Reset();
+    mIOContext = ioContext;
 
-    chip::Transport::AdminPairingInfo * srcNodeAdmin = mAdmins.AssignAdminId(mSrcAdminId, GetSourceNodeId());
-    VerifyOrReturnError(srcNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager));
 
-    chip::Transport::AdminPairingInfo * destNodeAdmin = mAdmins.AssignAdminId(mDestAdminId, GetDestinationNodeId());
-    VerifyOrReturnError(destNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(
-        mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mMessageCounterManager));
-
-    ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
+    ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
-                                                      SecureSession::SessionRole::kInitiator, mSrcAdminId));
+    ReturnErrorOnFailure(mSessionManager.NewPairing(Optional<Transport::PeerAddress>::Value(mAliceAddress), GetAliceNodeId(),
+                                                    &mPairingBobToAlice, CryptoContext::SessionRole::kInitiator, mSrcFabricIndex));
 
-    return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder,
-                                        mDestAdminId);
+    return mSessionManager.NewPairing(Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(), &mPairingAliceToBob,
+                                      CryptoContext::SessionRole::kResponder, mDestFabricIndex);
 }
 
 // Shutdown all layers, finalize operations
 CHIP_ERROR MessagingContext::Shutdown()
 {
+    VerifyOrReturnError(mInitialized == true, CHIP_ERROR_INTERNAL);
+    mInitialized = false;
+
     mExchangeManager.Shutdown();
-    return IOContext::Shutdown();
+    mSessionManager.Shutdown();
+    return CHIP_NO_ERROR;
 }
 
-SecureSessionHandle MessagingContext::GetSessionLocalToPeer()
+SessionHandle MessagingContext::GetSessionBobToAlice()
 {
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
-    return { GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() };
+    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
+    return SessionHandle(GetAliceNodeId(), GetBobKeyId(), GetAliceKeyId(), GetFabricIndex());
 }
 
-SecureSessionHandle MessagingContext::GetSessionPeerToLocal()
+SessionHandle MessagingContext::GetSessionAliceToBob()
 {
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
-    return { GetSourceNodeId(), GetLocalKeyId(), GetAdminId() };
+    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
+    return SessionHandle(GetBobNodeId(), GetAliceKeyId(), GetBobKeyId(), mDestFabricIndex);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext(GetSessionLocalToPeer(), delegate);
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress).Value(), delegate);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext(GetSessionPeerToLocal(), delegate);
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mBobAddress).Value(), delegate);
+}
+
+Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)
+{
+    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
+    return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate);
+}
+
+Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
+{
+    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
+    return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
 }
 
 } // namespace Test

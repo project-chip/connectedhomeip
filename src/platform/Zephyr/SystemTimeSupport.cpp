@@ -32,63 +32,23 @@
 
 namespace chip {
 namespace System {
-namespace Platform {
-namespace Layer {
+namespace Clock {
 
-static uint64_t sBootTimeUS = 0;
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
 
-uint64_t GetClock_Monotonic(void)
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return k_ticks_to_us_floor64(k_uptime_ticks());
+    return Microseconds64(k_ticks_to_us_floor64(k_uptime_ticks()));
 }
 
-uint64_t GetClock_MonotonicMS(void)
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return k_uptime_get();
+    return Milliseconds64(k_uptime_get());
 }
 
-uint64_t GetClock_MonotonicHiRes(void)
-{
-    return GetClock_Monotonic();
-}
-
-Error GetClock_RealTime(uint64_t & curTime)
-{
-    if (sBootTimeUS == 0)
-    {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    curTime = sBootTimeUS + GetClock_Monotonic();
-    return CHIP_SYSTEM_NO_ERROR;
-}
-
-Error GetClock_RealTimeMS(uint64_t & curTime)
-{
-    if (sBootTimeUS == 0)
-    {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    curTime = (sBootTimeUS + GetClock_Monotonic()) / 1000;
-    return CHIP_SYSTEM_NO_ERROR;
-}
-
-Error SetClock_RealTime(uint64_t newCurTime)
-{
-    // FIXME: make thread-safe or update comment in SystemClock.h
-    uint64_t timeSinceBootUS = GetClock_Monotonic();
-    if (newCurTime > timeSinceBootUS)
-    {
-        sBootTimeUS = newCurTime - timeSinceBootUS;
-    }
-    else
-    {
-        sBootTimeUS = 0;
-    }
-    return CHIP_SYSTEM_NO_ERROR;
-}
-
-} // namespace Layer
-} // namespace Platform
+} // namespace Clock
 } // namespace System
 } // namespace chip
 

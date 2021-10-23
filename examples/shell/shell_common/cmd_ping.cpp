@@ -29,7 +29,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
@@ -129,10 +129,9 @@ private:
 } gPingArguments;
 
 Protocols::Echo::EchoClient gEchoClient;
-Transport::AdminPairingTable gAdmins;
 
 CHIP_ERROR SendEchoRequest(streamer_t * stream);
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, chip::System::Error error);
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
 Transport::PeerAddress GetEchoPeerAddress()
 {
@@ -151,7 +150,7 @@ Transport::PeerAddress GetEchoPeerAddress()
 
 void Shutdown()
 {
-    chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
+    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
@@ -166,7 +165,7 @@ void Shutdown()
     gSessionManager.Shutdown();
 }
 
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     if (gPingArguments.GetEchoRespCount() != gPingArguments.GetEchoCount())
     {
@@ -211,8 +210,9 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
         sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
     }
 
-    gPingArguments.SetLastEchoTime(System::Timer::GetCurrentEpoch());
-    SuccessOrExit(chip::DeviceLayer::SystemLayer.StartTimer(gPingArguments.GetEchoInterval(), EchoTimerHandler, NULL));
+    gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicMilliseconds());
+    SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(gPingArguments.GetEchoInterval()),
+                                                              EchoTimerHandler, NULL));
 
     streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
@@ -226,7 +226,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
     else
     {
-        chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
+        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
     }
 
 exit:
@@ -249,14 +249,14 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, const Transport::PeerAddr
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator,
-                                     gAdminId);
+    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, CryptoContext::SessionRole::kInitiator,
+                                     gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Establish secure session failed, err: %s\n", ErrorStr(err));
-        gPingArguments.SetLastEchoTime(System::Timer::GetCurrentEpoch());
+        gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicMilliseconds());
     }
     else
     {
@@ -268,8 +268,8 @@ exit:
 
 void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
 {
-    uint32_t respTime    = System::Timer::GetCurrentEpoch();
-    uint32_t transitTime = respTime - gPingArguments.GetLastEchoTime();
+    uint64_t respTime    = System::SystemClock().GetMonotonicMilliseconds();
+    uint64_t transitTime = respTime - gPingArguments.GetLastEchoTime();
     streamer_t * sout    = streamer_get();
 
     gPingArguments.SetWaitingForEchoResp(false);
@@ -285,16 +285,11 @@ void StartPinging(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::AdminPairingInfo * adminInfo = nullptr;
-
     if (!IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid Echo Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-
-    adminInfo = gAdmins.AssignAdminId(gAdminId, kTestControllerNodeId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
@@ -311,8 +306,7 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &gAdmins, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -321,8 +315,7 @@ void StartPinging(streamer_t * stream, char * destination)
     else
 #endif
     {
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &gAdmins, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -336,8 +329,7 @@ void StartPinging(streamer_t * stream, char * destination)
     err = EstablishSecureSession(stream, GetEchoPeerAddress());
     SuccessOrExit(err);
 
-    // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { kTestDeviceNodeId, 0, gAdminId });
+    err = gEchoClient.Init(&gExchangeManager, SessionHandle(kTestDeviceNodeId, 1, 1, gFabricIndex));
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
@@ -374,10 +366,9 @@ void PrintUsage(streamer_t * stream)
     streamer_printf(stream, "  -s  <size>      application payload size in bytes\n");
 }
 
-int cmd_ping(int argc, char ** argv)
+CHIP_ERROR cmd_ping(int argc, char ** argv)
 {
     streamer_t * sout = streamer_get();
-    int ret           = 0;
     int optIndex      = 0;
 
     gPingArguments.Reset();
@@ -388,7 +379,7 @@ int cmd_ping(int argc, char ** argv)
         {
         case 'h':
             PrintUsage(sout);
-            return 0;
+            return CHIP_NO_ERROR;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         case 'u':
             gPingArguments.SetUsingTCP(false);
@@ -401,7 +392,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -i\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -412,7 +403,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -c\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -423,7 +414,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -p\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -434,7 +425,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -s\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -445,7 +436,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -r\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -461,12 +452,12 @@ int cmd_ping(int argc, char ** argv)
                 }
                 else
                 {
-                    ret = -1;
+                    return CHIP_ERROR_INVALID_ARGUMENT;
                 }
             }
             break;
         default:
-            ret = -1;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         optIndex++;
@@ -475,16 +466,13 @@ int cmd_ping(int argc, char ** argv)
     if (optIndex >= argc)
     {
         streamer_printf(sout, "Missing IP address\n");
-        ret = -1;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (ret == 0)
-    {
-        streamer_printf(sout, "IP address: %s\n", argv[optIndex]);
-        StartPinging(sout, argv[optIndex]);
-    }
+    streamer_printf(sout, "IP address: %s\n", argv[optIndex]);
+    StartPinging(sout, argv[optIndex]);
 
-    return ret;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace

@@ -2,6 +2,6 @@
 {{pad "| Cluster Name" 70 ' '}}{{pad "|   ID" 9 ' '}}|
 {{pad "|" 70 '-'}}{{pad "+" 9 '-'}}|
 {{#chip_clusters}}
-{{pad (concat "| " (asCamelCased name false)) 70  " "}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{pad (concat "| " (asUpperCamelCase name)) 70  " "}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
 {{/chip_clusters}}
 {{pad '\*' 78 '-'}}*/

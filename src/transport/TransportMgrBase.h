@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
@@ -41,13 +41,13 @@ public:
 
     void Disconnect(const Transport::PeerAddress & address);
 
-    void SetSecureSessionMgr(TransportMgrDelegate * secureSessionMgr) { mSecureSessionMgr = secureSessionMgr; }
+    void SetSessionManager(TransportMgrDelegate * sessionManager) { mSessionManager = sessionManager; }
 
     void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg) override;
 
 private:
-    TransportMgrDelegate * mSecureSessionMgr = nullptr;
-    Transport::Base * mTransport             = nullptr;
+    TransportMgrDelegate * mSessionManager = nullptr;
+    Transport::Base * mTransport           = nullptr;
 };
 
 } // namespace chip

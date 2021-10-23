@@ -35,11 +35,7 @@
 #pragma once
 
 /// Dev board suppports OQPSK modulation in 2.4GHz band.
-#if (BRD4161A || BRD4163A || BRD4164A || BRD4166A || BRD4170A || BRD4304A || BRD4180A)
 #define RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT 1
-#else
-#define RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT 0
-#endif
 
 /// Dev board doesn't support OQPSK modulation in 915MHz band.
 #if (BRD4170A)

@@ -62,8 +62,6 @@ extern "C" void vApplicationStackOverflowHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret = CHIP_ERROR_MAX;
-
     Board_init();
     bpool((void *) GlobalHeapZoneBuffer, TOTAL_ICALL_HEAP_SIZE);
 
@@ -79,8 +77,8 @@ int main(void)
 
     SHA2_init();
 
-    ret = GetAppTask().StartAppTask();
-    if (ret != CHIP_NO_ERROR)
+    int ret = GetAppTask().StartAppTask();
+    if (ret != 0)
     {
         // can't log until the kernel is started
         // PLAT_LOG("GetAppTask().StartAppTask() failed");

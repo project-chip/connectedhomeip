@@ -50,9 +50,13 @@ class SelectActionFragment : Fragment() {
         isEnabled = hasLocationPermission()
         setOnClickListener { getCallback()?.onProvisionThreadCredentialsClicked() }
       }
-      echoClientBtn.setOnClickListener { getCallback()?.handleEchoClientClicked() }
       onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
+      sensorClustersBtn.setOnClickListener{ getCallback()?.handleSensorClicked() }
+      multiAdminClusterBtn.setOnClickListener{ getCallback()?.handleMultiAdminClicked() }
+      opCredClustersBtn.setOnClickListener{ getCallback()?.handleOpCredClicked() }
+      basicClusterBtn.setOnClickListener{ getCallback()?.handleBasicClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
+      clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
     }
   }
 
@@ -105,12 +109,22 @@ class SelectActionFragment : Fragment() {
     fun onProvisionWifiCredentialsClicked()
     /** Notifies listener of provision-Thread-credentials button click. */
     fun onProvisionThreadCredentialsClicked()
-    /** Notifies listener of Echo client button click. */
-    fun handleEchoClientClicked()
-    /** Notifies listener of send command button click. */
+    /** Notifies listener of Light On/Off & Level Cluster button click. */
     fun handleOnOffClicked()
+    /** Notifies listener of Sensor Clusters button click. */
+    fun handleSensorClicked()
+    /** Notifies listener of Multi-admin Clusters button click. */
+    fun handleMultiAdminClicked()
+    /** Notifies listener of Operational Credentials Clusters button click. */
+    fun handleOpCredClicked()
+    /** Notifies listener of Basic Clusters button click. */
+    fun handleBasicClicked()
     /** Notifies listener of attestation command button clicked. */
     fun handleAttestationTestClicked()
+    /** Notifies listener of a click to manually input the CHIP device address.. */
+    fun onShowDeviceAddressInput()
+    /** Notifies listener of cluster interaction button click.. */
+    fun handleClusterInteractionClicked()
   }
 
   companion object {

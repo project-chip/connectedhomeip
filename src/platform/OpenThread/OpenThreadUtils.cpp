@@ -24,6 +24,7 @@
 
 #include "OpenThreadUtils.h"
 
+#include <inet/IPAddress.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -38,15 +39,15 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Map an OpenThread error into the OpenChip error space.
+ * Map an OpenThread error into the CHIP error space.
  */
 CHIP_ERROR MapOpenThreadError(otError otErr)
 {
-    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_CONFIG_OPENTHREAD_ERROR_MIN + (CHIP_ERROR) otErr;
+    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kOpenThread, static_cast<unsigned int>(otErr));
 }
 
 /**
- * Given an OpenChip error value that represents an OpenThread error, returns a
+ * Given an CHIP error value that represents an OpenThread error, returns a
  * human-readable NULL-terminated C string describing the error.
  *
  * @param[in] buf                   Buffer into which the error string will be placed.
@@ -57,9 +58,9 @@ CHIP_ERROR MapOpenThreadError(otError otErr)
  * @return false                    If the supplied error was not an OpenThread error.
  *
  */
-bool FormatOpenThreadError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatOpenThreadError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    if (err < CHIP_CONFIG_OPENTHREAD_ERROR_MIN || err > CHIP_CONFIG_OPENTHREAD_ERROR_MAX)
+    if (!err.IsRange(ChipError::Range::kOpenThread))
     {
         return false;
     }
@@ -67,7 +68,7 @@ bool FormatOpenThreadError(char * buf, uint16_t bufSize, int32_t err)
 #if CHIP_CONFIG_SHORT_ERROR_STR
     const char * desc = NULL;
 #else  // CHIP_CONFIG_SHORT_ERROR_STR
-    otError otErr     = (otError)(err - CHIP_CONFIG_OPENTHREAD_ERROR_MIN);
+    otError otErr     = (otError) err.GetValue();
     const char * desc = otThreadErrorToString(otErr);
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
 
@@ -95,8 +96,13 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
 {
 #if CHIP_DETAIL_LOGGING
 
+#if OPENTHREAD_API_VERSION >= 126
+    const uint32_t kParamsChanged = (OT_CHANGED_THREAD_NETWORK_NAME | OT_CHANGED_THREAD_PANID | OT_CHANGED_THREAD_EXT_PANID |
+                                     OT_CHANGED_THREAD_CHANNEL | OT_CHANGED_NETWORK_KEY | OT_CHANGED_PSKC);
+#else
     const uint32_t kParamsChanged = (OT_CHANGED_THREAD_NETWORK_NAME | OT_CHANGED_THREAD_PANID | OT_CHANGED_THREAD_EXT_PANID |
                                      OT_CHANGED_THREAD_CHANNEL | OT_CHANGED_MASTER_KEY | OT_CHANGED_PSKC);
+#endif
 
     static char strBuf[64];
 
@@ -126,10 +132,15 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
         }
 #if CHIP_CONFIG_SECURITY_TEST_MODE
         {
+#if OPENTHREAD_API_VERSION >= 126
+            const otNetworkKey * otKey = otThreadGetNetworkKey(otInst);
+            for (int i = 0; i < OT_NETWORK_KEY_SIZE; i++)
+#else
             const otMasterKey * otKey = otThreadGetMasterKey(otInst);
             for (int i = 0; i < OT_MASTER_KEY_SIZE; i++)
+#endif
                 snprintf(&strBuf[i * 2], 3, "%02X", otKey->m8[i]);
-            ChipLogDetail(DeviceLayer, "   Master Key: %s", strBuf);
+            ChipLogDetail(DeviceLayer, "   Network Key: %s", strBuf);
         }
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
     }
@@ -161,7 +172,7 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 
     char srcStr[50], destStr[50], typeBuf[20];
     const char * type = typeBuf;
-    IPAddress addr;
+    Inet::IPAddress addr;
     uint8_t headerData[44];
     uint16_t pktLen;
 
@@ -238,7 +249,7 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 #endif // CHIP_DETAIL_LOGGING
 }
 
-bool IsOpenThreadMeshLocalAddress(otInstance * otInst, const IPAddress & addr)
+bool IsOpenThreadMeshLocalAddress(otInstance * otInst, const Inet::IPAddress & addr)
 {
     const otMeshLocalPrefix * otMeshPrefix = otThreadGetMeshLocalPrefix(otInst);
 

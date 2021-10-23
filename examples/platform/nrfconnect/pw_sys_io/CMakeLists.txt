@@ -10,7 +10,6 @@ pw_add_module_library(pw_sys_io.nrfconnect
     SOURCES
       sys_io_nrfconnect.cc
     PRIVATE_DEPS
-      zephyr_interface
       pw_sys_io
       suppress_zephyr_warnings
 )

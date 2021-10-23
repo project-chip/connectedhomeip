@@ -40,8 +40,8 @@
 #include <sys/time.h>
 
 #include <inet/InetLayer.h>
-#include <support/CodeUtils.h>
-#include <system/SystemLayer.h>
+#include <lib/support/CodeUtils.h>
+#include <system/SystemLayerImpl.h>
 
 #define CHIP_TOOL_COPYRIGHT "Copyright (c) 2020 Project CHIP Authors\nAll rights reserved.\n"
 
@@ -51,7 +51,7 @@
         InetFailError((ERR), (MSG));                                                                                               \
     } while (0)
 
-extern chip::System::Layer gSystemLayer;
+extern chip::System::LayerImpl gSystemLayer;
 
 extern chip::Inet::InetLayer gInet;
 
@@ -60,15 +60,15 @@ extern bool gDone;
 void InitTestInetCommon();
 void InitSystemLayer();
 void ShutdownSystemLayer();
-void InetFailError(int32_t err, const char * msg);
+void InetFailError(CHIP_ERROR err, const char * msg);
 
 void InitNetwork();
-void ServiceEvents(struct ::timeval & aSleepTime);
+void ServiceEvents(uint32_t aSleepTimeMilliseconds);
 void ShutdownNetwork();
 void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t rowWidth);
 void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix);
 
-inline static void ServiceNetwork(struct ::timeval & aSleepTime)
+inline static void ServiceNetwork(uint32_t aSleepTimeMilliseconds)
 {
-    ServiceEvents(aSleepTime);
+    ServiceEvents(aSleepTimeMilliseconds);
 }

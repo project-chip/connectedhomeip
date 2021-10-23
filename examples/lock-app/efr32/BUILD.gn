@@ -53,13 +53,11 @@ efr32_sdk("sdk") {
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   defines = [
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "SL_HEAP_SIZE=(13 * 1024)",
   ]
 }
 
@@ -68,12 +66,11 @@ efr32_executable("lock_app") {
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
-    "${examples_plat_dir}/Service.cpp",
+    "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
-    "src/ButtonHandler.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
@@ -105,11 +102,7 @@ efr32_executable("lock_app") {
     sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
   }
 
-  if (efr32_family == "efr32mg12") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
-  } else if (efr32_family == "efr32mg21") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
-  }
+  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 

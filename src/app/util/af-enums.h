@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 
-enum EmberAfStatus : uint32_t
+enum EmberAfStatus : uint8_t
 {
     EMBER_ZCL_STATUS_SUCCESS                     = 0x00,
     EMBER_ZCL_STATUS_FAILURE                     = 0x01,
@@ -59,9 +59,3 @@ enum EmberAfStatus : uint32_t
     EMBER_ZCL_STATUS_LIMIT_REACHED               = 0xC4,
     EMBER_ZCL_STATUS_INVALID_ARGUMENT            = 0xC6,
 };
-
-typedef enum
-{
-    EMBER_ZCL_REPORTING_DIRECTION_REPORTED = 0x00,
-    EMBER_ZCL_REPORTING_DIRECTION_RECEIVED = 0x01,
-} EmberAfReportingDirection;

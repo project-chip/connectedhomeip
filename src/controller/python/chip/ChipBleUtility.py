@@ -195,7 +195,8 @@ class BleSubscribeEvent:
             "%sBleEvent Type: %s"
             % (
                 prefix,
-                ("SUBSCRIBE" if self.EventType == BLE_EVENT_TYPE_SUBSCRIBE else "ERROR"),
+                ("SUBSCRIBE" if self.EventType ==
+                 BLE_EVENT_TYPE_SUBSCRIBE else "ERROR"),
             )
         )
         print("%sStatus: %s" % (prefix, str(self.Status)))
@@ -238,7 +239,8 @@ class BleSubscribeEvent:
 class BleTxEventStruct(Structure):
     _fields_ = [
         ("EventType", c_int32),  # The type of event.
-        ("ConnObj", c_void_p),  # a Handle back to the connection object or None.
+        # a Handle back to the connection object or None.
+        ("ConnObj", c_void_p),
         ("SvcId", c_void_p),  # the byte array of the service UUID.
         ("CharId", c_void_p),  # the byte array of the characteristic UUID.
         ("Status", c_bool),  # The status of the previous Tx request
@@ -256,8 +258,10 @@ class BleTxEventStruct(Structure):
         bleTxEventStruct = cls()
         bleTxEventStruct.EventType = bleTxEvent.EventType
         bleTxEventStruct.ConnObj = c_void_p(FAKE_CONN_OBJ_VALUE)
-        bleTxEventStruct.SvcId = ChipUtility.ByteArrayToVoidPtr(bleTxEvent.SvcId)
-        bleTxEventStruct.CharId = ChipUtility.ByteArrayToVoidPtr(bleTxEvent.CharId)
+        bleTxEventStruct.SvcId = ChipUtility.ByteArrayToVoidPtr(
+            bleTxEvent.SvcId)
+        bleTxEventStruct.CharId = ChipUtility.ByteArrayToVoidPtr(
+            bleTxEvent.CharId)
         bleTxEventStruct.Status = bleTxEvent.Status
         return bleTxEventStruct
 
@@ -265,7 +269,8 @@ class BleTxEventStruct(Structure):
 class BleDisconnectEventStruct(Structure):
     _fields_ = [
         ("EventType", c_int32),  # The type of event.
-        ("ConnObj", c_void_p),  # a Handle back to the connection object or None.
+        # a Handle back to the connection object or None.
+        ("ConnObj", c_void_p),
         ("Error", c_int32),  # The disconnect error code.
     ]
 
@@ -284,7 +289,8 @@ class BleDisconnectEventStruct(Structure):
 class BleRxEventStruct(Structure):
     _fields_ = [
         ("EventType", c_int32),  # The type of event.
-        ("ConnObj", c_void_p),  # a Handle back to the connection object or None.
+        # a Handle back to the connection object or None.
+        ("ConnObj", c_void_p),
         ("SvcId", c_void_p),  # the byte array of the service UUID.
         ("CharId", c_void_p),  # the byte array of the characteristic UUID.
         ("Buffer", c_void_p),  # the byte array of the Rx packet.
@@ -303,9 +309,12 @@ class BleRxEventStruct(Structure):
         bleRxEventStruct = cls()
         bleRxEventStruct.EventType = bleRxEvent.EventType
         bleRxEventStruct.ConnObj = c_void_p(FAKE_CONN_OBJ_VALUE)
-        bleRxEventStruct.SvcId = ChipUtility.ByteArrayToVoidPtr(bleRxEvent.SvcId)
-        bleRxEventStruct.CharId = ChipUtility.ByteArrayToVoidPtr(bleRxEvent.CharId)
-        bleRxEventStruct.Buffer = ChipUtility.ByteArrayToVoidPtr(bleRxEvent.Buffer)
+        bleRxEventStruct.SvcId = ChipUtility.ByteArrayToVoidPtr(
+            bleRxEvent.SvcId)
+        bleRxEventStruct.CharId = ChipUtility.ByteArrayToVoidPtr(
+            bleRxEvent.CharId)
+        bleRxEventStruct.Buffer = ChipUtility.ByteArrayToVoidPtr(
+            bleRxEvent.Buffer)
         bleRxEventStruct.Length = (
             len(bleRxEvent.Buffer) if (bleRxEvent.Buffer != None) else 0
         )
@@ -315,7 +324,8 @@ class BleRxEventStruct(Structure):
 class BleSubscribeEventStruct(Structure):
     _fields_ = [
         ("EventType", c_int32),  # The type of event.
-        ("ConnObj", c_void_p),  # a Handle back to the connection object or None.
+        # a Handle back to the connection object or None.
+        ("ConnObj", c_void_p),
         ("SvcId", c_void_p),  # the byte array of the service UUID.
         ("CharId", c_void_p),  # the byte array of the characteristic UUID.
         ("Operation", c_int32),  # The subscribe operation.
@@ -345,12 +355,14 @@ class BleSubscribeEventStruct(Structure):
         bleSubscribeEventStruct.Status = bleSubscribeEvent.Status
         return bleSubscribeEventStruct
 
+
 class BleDeviceIdentificationInfo:
     def __init__(self, pairingState, discriminator, vendorId, productId):
         self.pairingState = pairingState
         self.discriminator = discriminator
         self.vendorId = vendorId
         self.productId = productId
+
 
 def ParseServiceData(data):
     if len(data) != 7:

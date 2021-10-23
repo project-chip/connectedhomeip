@@ -17,17 +17,19 @@
  */
 
 #include "ApplicationBasicManager.h"
-
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
+#include <app/Command.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
+#include <lib/support/ZclString.h>
 
 #include <inipp/inipp.h>
 
-using namespace std;
+using namespace chip;
 
 CHIP_ERROR ApplicationBasicManager::Init()
 {
@@ -42,9 +44,13 @@ exit:
 
 void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * application)
 {
+    uint8_t bufferMemory[64];
+    MutableByteSpan zclString(bufferMemory);
+
+    MakeZclCharString(zclString, application->vendorName);
     EmberAfStatus vendorNameStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_VENDOR_NAME_ATTRIBUTE_ID,
-                                    (uint8_t *) &application->vendorName, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                                    zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (vendorNameStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store vendor name attribute.");
@@ -58,9 +64,10 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
         ChipLogError(Zcl, "Failed to store vendor id attribute.");
     }
 
+    MakeZclCharString(zclString, application->name);
     EmberAfStatus nameStatus =
-        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_NAME_ATTRIBUTE_ID,
-                                    (uint8_t *) &application->name, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_NAME_ATTRIBUTE_ID, zclString.data(),
+                                    ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (nameStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store name attribute.");
@@ -74,9 +81,10 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
         ChipLogError(Zcl, "Failed to store product id attribute.");
     }
 
+    MakeZclCharString(zclString, application->id);
     EmberAfStatus idStatus =
-        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_ID_ATTRIBUTE_ID,
-                                    (uint8_t *) &application->id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_ID_ATTRIBUTE_ID, zclString.data(),
+                                    ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (idStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store id attribute.");
@@ -104,7 +112,7 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
     Application app = {};
     uint16_t size   = static_cast<uint16_t>(sizeof(app.name));
 
-    string section = "endpoint" + std::to_string(endpoint);
+    std::string section = "endpoint" + std::to_string(endpoint);
 
     CHIP_ERROR err = es->get(section, "name", app.name, size);
     if (err != CHIP_NO_ERROR)
@@ -143,4 +151,11 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
     }
 
     return app;
+}
+
+bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatus status, chip::EndpointId endpoint)
+{
+    // TODO: Insert code here
+    ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", status, endpoint);
+    return true;
 }

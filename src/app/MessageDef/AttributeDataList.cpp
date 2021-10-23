@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -82,7 +84,6 @@ CHIP_ERROR AttributeDataList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -94,11 +95,15 @@ AttributeDataElement::Builder & AttributeDataList::Builder::CreateAttributeDataE
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataElementBuilder.ResetError(mError));
 
     mError = mAttributeDataElementBuilder.Init(mpWriter);
-    ChipLogFunctError(mError);
 
 exit:
 
     // on error, mAttributeDataElementBuilder would be un-/partial initialized and cannot be used to write anything
+    return mAttributeDataElementBuilder;
+}
+
+AttributeDataElement::Builder & AttributeDataList::Builder::GetAttributeDataElementBuilder()
+{
     return mAttributeDataElementBuilder;
 }
 

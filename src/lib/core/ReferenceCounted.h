@@ -26,7 +26,7 @@
 #include <limits>
 #include <stdlib.h>
 
-#include <support/CHIPMem.h>
+#include <lib/support/CHIPMem.h>
 
 namespace chip {
 

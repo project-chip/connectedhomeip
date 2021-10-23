@@ -2,6 +2,30 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Build specific example",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --target ${input:exampleTarget} build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Build examples (glob)",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --target-glob \"${input:exampleGlob}\" build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
             "label": "Main Build",
             "type": "shell",
             "command": "scripts/build/default.sh",
@@ -79,81 +103,6 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Build Shell",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/shell/standalone out/shell",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": ["relative", "${workspaceFolder}/out/shell/"]
-            }
-        },
-        {
-            "label": "Build Chip Tool",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/chip-tool out/chip_tool",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/chip_tool/"
-                ]
-            }
-        },
-        {
-            "label": "Build Lighting App (Linux)",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/linux out/lighting-app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/lighting-app/"
-                ]
-            }
-        },
-        {
-            "label": "Build QPG6100 Lock Example",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lock-app/qpg6100 out/qpg6100_lock_app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/qpg6100_lock_app/"
-                ]
-            }
-        },
-        {
-            "label": "Build EFR32 Lock Example",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lock-app/efr32 out/efr32_lock_app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/efr32_lock_app/"
-                ]
-            }
-        },
-        {
-            "label": "Build EFR32 Light Example",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/efr32 out/efr32_lighting_app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/efr32_lighting/"
-                ]
-            }
-        },
-        {
             "label": "Build Minimal MDNS Example",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/minimal-mdns out/minimal_mdns 'chip_build_tools=false is_debug=false optimize_for_size=true'",
@@ -167,63 +116,10 @@
             }
         },
         {
-            "label": "Build ESP32 all-clusters-app Example",
-            "type": "shell",
-            "command": "scripts/examples/build-all-clusters-app.py",
-            "group": "build",
-            "problemMatcher": ["$gcc"]
-        },
-        {
             "label": "QEMU: run esp32-qemu unit tests",
             "type": "shell",
             "command": "scripts/tests/esp32_qemu_tests.sh /tmp/test_logs",
             "problemMatcher": []
-        },
-        {
-            "label": "Build Android App",
-            "type": "shell",
-            "command": "TARGET_CPU=arm64 scripts/examples/android_app.sh",
-            "group": "build",
-            "problemMatcher": ["$gcc"]
-        },
-        {
-            "label": "Build nRF Connect Lock Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lock-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
-            "label": "Build nRF Connect Lighting Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
-            "label": "Build nRF Connect Shell Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/shell/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
         },
         {
             "label": "Build nRF Connect Pigweed Example (nRF52840)",
@@ -239,56 +135,127 @@
             }
         },
         {
-            "label": "Build nRF Connect Lock Example (nRF5340)",
+            "label": "Run Mbed Application",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app nrf5340dk_nrf5340_cpuapp",
+            "command": "scripts/examples/mbed_example.sh",
+            "args": [
+                "-c=${input:mbedCommand}",
+                "-a=${input:mbedApp}",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/examples/lock-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
+                    "${workspaceFolder}/examples/${input:mbedApp}/mbed/build"
                 ]
             }
         },
         {
-            "label": "Build nRF Connect Lighting Example (nRF5340)",
+            "label": "Run Mbed Unit Tests",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app nrf5340dk_nrf5340_cpuapp",
+            "command": "scripts/tests/mbed/mbed_unit_tests.sh",
+            "args": [
+                "-c=${input:mbedCommand}",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
+                    "${workspaceFolder}/src/test_driver/mbed/build"
                 ]
             }
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "mbedCommand",
+            "description": "What do you want to do?",
+            "options": ["build", "flash", "build-flash"],
+            "default": "build"
         },
         {
-            "label": "Build nRF Connect Shell Example (nRF5340)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/shell/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
-                ]
-            }
+            "type": "pickString",
+            "id": "mbedApp",
+            "description": "What mbed application do you want to use?",
+            "options": ["lock-app", "lighting-app", "pigweed-app"],
+            "default": "lock-app"
         },
         {
-            "label": "Build Telink Lighting Example (TLSR9518ADK80D)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/telink_example.sh lighting-app tlsr9518adk80d",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lighting-app/telink/build/tlsr9518adk80d"
-                ]
-            }
+            "type": "pickString",
+            "id": "mbedTarget",
+            "description": "What mbed target do you want to use?",
+            "options": ["CY8CPROTO_062_4343W"],
+            "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedProfile",
+            "description": "What mbed profile do you want to use?",
+            "options": ["develop", "release", "debug"],
+            "default": "develop"
+        },
+        {
+            "type": "promptString",
+            "id": "exampleGlob",
+            "description": "What applications to build (e.g. '*m5stack*' or 'esp32-*')"
+        },
+        {
+            "type": "pickString",
+            "id": "exampleTarget",
+            "description": "What target to build",
+            "options": [
+                "ameba-amebad-all-clusters",
+                "android-arm-chip-tool",
+                "android-arm64-chip-test",
+                "android-arm64-chip-tool",
+                "android-x64-chip-tool",
+                "android-x86-chip-tool",
+                "efr32-brd4161a-light",
+                "efr32-brd4161a-light-rpc",
+                "efr32-brd4161a-lock",
+                "efr32-brd4161a-window-covering",
+                "esp32-c3devkit-all-clusters",
+                "esp32-devkitc-all-clusters",
+                "esp32-devkitc-bridge",
+                "esp32-devkitc-lock",
+                "esp32-devkitc-shell",
+                "esp32-devkitc-temperature-measurement",
+                "esp32-m5stack-all-clusters",
+                "esp32-m5stack-all-clusters-rpc",
+                "infineon-p6-lock",
+                "linux-arm64-all-clusters",
+                "linux-arm64-all-clusters-ipv6only",
+                "linux-arm64-chip-tool",
+                "linux-arm64-chip-tool-ipv6only",
+                "linux-arm64-thermostat",
+                "linux-arm64-thermostat-ipv6only",
+                "linux-x64-all-clusters",
+                "linux-x64-all-clusters-ipv6only",
+                "linux-x64-chip-tool",
+                "linux-x64-chip-tool-ipv6only",
+                "linux-x64-thermostat",
+                "linux-x64-thermostat-ipv6only",
+                "nrf-nrf52840-light",
+                "nrf-nrf52840-lock",
+                "nrf-nrf52840-pump",
+                "nrf-nrf52840-pump-controller",
+                "nrf-nrf52840-shell",
+                "nrf-nrf5340-light",
+                "nrf-nrf5340-lock",
+                "nrf-nrf5340-pump",
+                "nrf-nrf5340-pump-controller",
+                "nrf-nrf5340-shell",
+                "qpg-qpg6100-lock",
+                "telink-tlsr9518adk80d-light",
+                "tizen-arm-light"
+            ]
         }
     ]
 }

@@ -30,11 +30,6 @@
 
 // ==================== Platform Adaptations ====================
 
-#define INET_CONFIG_ERROR_TYPE esp_err_t
-#define INET_CONFIG_NO_ERROR ESP_OK
-#define INET_CONFIG_ERROR_MIN 1000000
-#define INET_CONFIG_ERROR_MAX 1000999
-
 // ==================== General Configuration Overrides ====================
 
 // NOTE: Values that are mapped to CONFIG_ #defines are settable via the ESP-IDF Kconfig mechanism.

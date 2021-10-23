@@ -33,15 +33,15 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
+#include <crypto/RandUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding;
 using namespace chip::Inet;
@@ -64,15 +64,15 @@ ExchangeManager::ExchangeManager() : mDelegate(nullptr), mReliableMessageMgr(mCo
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSessionMgr = sessionMgr;
+    mSessionManager = sessionManager;
 
-    mNextExchangeId = GetRandU16();
+    mNextExchangeId = chip::Crypto::GetRandU16();
     mNextKeyId      = 0;
 
     for (auto & handler : UMHandlerPool)
@@ -83,10 +83,10 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
         handler.Reset();
     }
 
-    sessionMgr->SetDelegate(this);
+    sessionManager->SetDelegate(this);
 
-    mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
-    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionMgr));
+    mReliableMessageMgr.Init(sessionManager->SystemLayer(), sessionManager);
+    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionManager));
 
     mState = State::kState_Initialized;
 
@@ -103,10 +103,10 @@ CHIP_ERROR ExchangeManager::Shutdown()
         return true;
     });
 
-    if (mSessionMgr != nullptr)
+    if (mSessionManager != nullptr)
     {
-        mSessionMgr->SetDelegate(nullptr);
-        mSessionMgr = nullptr;
+        mSessionManager->SetDelegate(nullptr);
+        mSessionManager = nullptr;
     }
 
     mState = State::kState_NotInitialized;
@@ -114,7 +114,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
 {
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
@@ -140,7 +140,7 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
+void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source)
 {
 #if CHIP_ERROR_LOGGING
     char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
@@ -196,16 +196,22 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, const Transport::PeerAddress & source,
-                                        System::PacketBufferHandle && msgBuf, SecureSessionMgr * msgLayer)
+                                        SessionHandle session, const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
+                                        System::PacketBufferHandle && msgBuf)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
-    bool sendAckAndCloseExchange            = false;
 
-    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %" PRIu32 " on exchange %d",
-                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
-                    payloadHeader.GetExchangeID());
+    ChipLogProgress(ExchangeManager,
+                    "Received message of type " ChipLogFormatMessageType " with protocolId " ChipLogFormatProtocolId
+                    " and MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchangeId,
+                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
+                    packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
+
+    MessageFlags msgFlags;
+    if (isDuplicate == DuplicateMessage::Yes)
+    {
+        msgFlags.Set(MessageFlagValues::kDuplicateMessage);
+    }
 
     // Search for an existing exchange that the message applies to. If a match is found...
     bool found = false;
@@ -220,7 +226,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
+            ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
             found = true;
             return false;
         }
@@ -229,13 +235,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
     if (found)
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        return;
     }
 
-    // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
-    // find an existing exchange that matches the message, it must be an unsolicited message. However all
+    // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
+    // Since we didn't find an existing exchange that matches the message, it must be an unsolicited message. However all
     // unsolicited messages must be marked as being from an initiator.
-    if (payloadHeader.IsInitiator())
+    if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsInitiator())
     {
         // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.
@@ -260,49 +266,50 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // an ack to the peer.
     else if (!payloadHeader.NeedsAck())
     {
-        ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
+        // Using same error message for all errors to reduce code size.
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR));
+        return;
     }
 
-    // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
-    // to hand this message, we need to create a temporary exchange to send an ack for this message and then close this exchange.
-    sendAckAndCloseExchange = payloadHeader.NeedsAck() && (matchingUMH == nullptr);
-
-    // If we found a handler or we need to create a new exchange context (EC).
-    if (matchingUMH != nullptr || sendAckAndCloseExchange)
+    // If we found a handler or we need to send an ack, create an exchange to
+    // handle the message.
+    if (matchingUMH != nullptr || payloadHeader.NeedsAck())
     {
-        ExchangeContext * ec = nullptr;
+        ExchangeDelegate * delegate = matchingUMH ? matchingUMH->Delegate : nullptr;
+        // If rcvd msg is from initiator then this exchange is created as not Initiator.
+        // If rcvd msg is not from initiator then this exchange is created as Initiator.
+        // Note that if matchingUMH is not null then rcvd msg if from initiator.
+        // TODO: Figure out which channel to use for the received message
+        ExchangeContext * ec =
+            mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), delegate);
 
-        if (sendAckAndCloseExchange)
+        if (ec == nullptr)
         {
-            // If rcvd msg is from initiator then this exchange is created as not Initiator.
-            // If rcvd msg is not from initiator then this exchange is created as Initiator.
-            // TODO: Figure out which channel to use for the received message
-            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_MEMORY));
+            return;
         }
-        else
+
+        ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: 0x%p", ChipLogValueExchange(ec),
+                      ec->GetDelegate());
+
+        if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
         {
-            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
-        }
-
-        VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-        ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
-
-        ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
-
-        // Close exchange if it was created only to send ack for a duplicate message.
-        if (sendAckAndCloseExchange)
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
             ec->Close();
-    }
+            return;
+        }
 
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
+        if (err != CHIP_NO_ERROR)
+        {
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+        }
     }
 }
 
-void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnNewConnection(SessionHandle session)
 {
     if (mDelegate != nullptr)
     {
@@ -310,7 +317,7 @@ void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSession
     }
 }
 
-void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnConnectionExpired(SessionHandle session)
 {
     if (mDelegate != nullptr)
     {
@@ -318,7 +325,7 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     }
 
     mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->mSecureSession == session)
+        if (ec->mSecureSession.HasValue() && ec->mSecureSession.Value() == session)
         {
             ec->OnConnectionExpired();
             // Continue to iterate because there can be multiple exchanges
@@ -326,23 +333,6 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
         }
         return true;
     });
-}
-
-void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf)
-{
-    PacketHeader header;
-
-    ReturnOnFailure(header.DecodeAndConsume(msgBuf));
-
-    Optional<NodeId> peer = header.GetSourceNodeId();
-    if (!peer.HasValue())
-    {
-        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
-        source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
-                     addrBuffer);
-        return;
-    }
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)

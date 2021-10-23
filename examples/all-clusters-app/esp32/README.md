@@ -12,6 +12,7 @@ control.
         -   [Setting up Python Controller](#setting-up-python-controller)
         -   [Commissioning over BLE](#commissioning-over-ble)
         -   [Cluster control](#cluster-control)
+    -   [Flashing app using script](#flashing-app-using-script)
     -   [Note](#note)
 
 ---
@@ -23,7 +24,8 @@ devices: the
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
 the
 [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
-and the [M5Stack](http://m5stack.com).
+the [M5Stack](http://m5stack.com), and the
+[ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html).
 
 Note: M5Stack Core 2 display is not supported in the tft component, while other
 functionality can still work fine.
@@ -31,18 +33,20 @@ functionality can still work fine.
 ## Building the Example Application
 
 Building the example application requires the use of the Espressif ESP32 IoT
-Development Framework and the xtensa-esp32-elf toolchain.
+Development Framework and the xtensa-esp32-elf toolchain for ESP32 modules or
+the riscv-esp32-elf toolchain for ESP32C3 modules.
 
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
+-   Clone the Espressif ESP-IDF and checkout
+    [v4.3 tag](https://github.com/espressif/esp-idf/releases/v4.3)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.2
+          $ git checkout v4.3
           $ git submodule update --init
           $ ./install.sh
 
@@ -69,6 +73,13 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
         $ source ./scripts/activate.sh
 
+-   Target Set
+
+To set IDF target, run set-target with one of the commands.
+
+          $ idf.py set-target esp32
+          $ idf.py set-target esp32c3
+
 -   Configuration Options
 
 To choose from the different configuration options, run menuconfig.
@@ -77,7 +88,7 @@ To choose from the different configuration options, run menuconfig.
 
 Select ESP32 based `Device Type` through `Demo`->`Device Type`. The device types
 that are currently supported include `ESP32-DevKitC` (default),
-`ESP32-WROVER-KIT_V4.1` and `M5Stack`
+`ESP32-WROVER-KIT_V4.1`, `M5Stack` and `ESP32C3-DevKitM`.
 
 -   To build the demo application.
 
@@ -194,24 +205,82 @@ commissioning and cluster control.
 
 -   Resolve DNS-SD name and update address of the node in the device controller.
 
-         - chip-device-ctrl > resolve 0 135246
+         - chip-device-ctrl > resolve 135246
 
 ### Cluster control
 
--   After successful commissioning, use the OnOff cluster command to control the
-    OnOff attribute. This allows you to toggle a parameter implemented by the
-    device to be On or Off.
+-   After successful commissioning, use the OnOff cluster commands to control
+    the OnOff attribute. This allows you to toggle a parameter implemented by
+    the device to be On or Off.
 
-    `chip-device-ctrl > zcl OnOff Off 135246 1 0`
+    `chip-device-ctrl > zcl OnOff Off 135246 1 1`
+
+-   Use the LevelControl cluster commands to control the CurrentLevel attribute.
+    This allows you to control the brightness of the led.
+
+    `chip-device-ctrl > zcl LevelControl MoveToLevel 135246 1 1 level=10 transitionTime=0 optionMask=0 optionOverride=0`
+
+-   For ESP32C3-DevKitM, use the ColorControl cluster commands to control the
+    CurrentHue and CurrentSaturation attribute. This allows you to control the
+    color of on-board LED.
+
+    `zcl ColorControl MoveToHue 135246 1 1 hue=100 direction=0 transitionTime=0 optionsMask=0 optionsOverride=0`
+    `zcl ColorControl MoveToSaturation 135245 1 1 saturation=200 transitionTime=0 optionsMask=0 optionsOverride=0`
+
+### Flashing app using script
+
+-   Follow these steps to use `${app_name}.flash.py`.
+
+    -   First set IDF target, run set-target with one of the commands.
+
+            $ idf.py set-target esp32
+            $ idf.py set-target esp32c3
+
+    -   Execute below sequence of commands
+
+```
+        $ export ESPPORT=/dev/tty.SLAB_USBtoUART
+        $ idf.py build
+        $ idf.py flashing_script
+        $ python ${app_name}.flash.py
+```
 
 ### Note
 
 This demo app illustrates controlling OnOff cluster (Server) attributes of an
-endpoint. For `ESP32-DevKitC` and `ESP32-WROVER-KIT_V4.1`, a GPIO (configurable
-through `STATUS_LED_GPIO_NUM` in `main/main.cpp`) is updated through the
-on/off/toggle commands from the `python-controller`. For `M5Stack`, a virtual
-Green LED on the display is used for the same.
+endpoint. For `ESP32-DevKitC`, `ESP32-WROVER-KIT_V4.1` and `ESP32C3-DevKitM`, a
+GPIO (configurable through `STATUS_LED_GPIO_NUM` in `main/main.cpp`) is updated
+through the on/off/toggle commands from the `python-controller`. For `M5Stack`,
+a virtual Green LED on the display is used for the same.
 
-If you wish to see the actual effect of the commands on `ESP32-DevKitC` and
+If you wish to see the actual effect of the commands on `ESP32-DevKitC`,
 `ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
-`STATUS_LED_GPIO_NUM`.
+`STATUS_LED_GPIO_NUM`. For `ESP32C3-DevKitM`, the on-board LED will show the
+actual effect of the commands.
+
+## Using the RPC console
+
+Enable RPCs in the build using menuconfig:
+
+    $ idf.py menuconfig
+
+Enable the RPC library:
+
+    Component config → CHIP Core → General Options → Enable Pigweed PRC library
+
+After flashing a build with RPCs enabled you can use the rpc console to send
+commands to the device.
+
+Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
+
+Start the console
+
+    python -m chip_rpc.console --device /dev/ttyUSB0
+
+From within the console you can then invoke rpcs:
+
+    rpcs.chip.rpc.Wifi.Connect(ssid=b"MySSID", secret=b"MyPASSWORD")
+    rpcs.chip.rpc.Wifi.GetIP6Address()
+
+    rpcs.chip.rpc.Lighting.Get()
+    rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))

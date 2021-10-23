@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/enums.h>
 
 struct Application
 {

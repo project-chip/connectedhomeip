@@ -31,7 +31,8 @@ namespace chip {
 namespace Controller {
 
 extern "C" {
-typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(CHIP_ERROR err);
+typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(ChipError::StorageType err);
+typedef void (*DevicePairingDelegate_OnCommissioningCompleteFunct)(NodeId nodeId, ChipError::StorageType err);
 }
 
 class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelegate
@@ -39,10 +40,13 @@ class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelega
 public:
     ~ScriptDevicePairingDelegate() = default;
     void SetKeyExchangeCallback(DevicePairingDelegate_OnPairingCompleteFunct callback);
+    void SetCommissioningCompleteCallback(DevicePairingDelegate_OnCommissioningCompleteFunct callback);
     void OnPairingComplete(CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err) override;
 
 private:
-    DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback = nullptr;
+    DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback             = nullptr;
+    DevicePairingDelegate_OnCommissioningCompleteFunct mOnCommissioningCompleteCallback = nullptr;
 };
 
 } // namespace Controller

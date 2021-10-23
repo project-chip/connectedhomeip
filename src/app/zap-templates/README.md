@@ -11,7 +11,13 @@ This directory contains generation templates for ZAP, ZCL Advanced Platform.
 Run ZAP with UI to configure endpoints and clusters
 
 ```
-./scripts/tools/zap/configure.sh
+./scripts/tools/zap/run_zaptool.sh
+```
+
+or
+
+```
+./scripts/tools/zap/run_zaptool.sh <path to *.zap file>
 ```
 
 ### How to generate files for all applications
@@ -25,24 +31,24 @@ need to be updated. You can regenerate all files with:
 
 ### How to generate files for a single application
 
-By default generated files are located in a `gen/` folder next to the
-application `zap` file that has been created during the application
-configuration.
+By default generated files are located in a `zap-generated/` folder under
+`zzz_generated/app-name/`.
 
-The `gen/` folder content is the output of the templates listed into
+The `zap-generated/` folder content is the output of the templates listed into
 `app-templates.json`.
 
-#### To generate the application `gen/` folder the command is:
+#### To generate the application `zap-generated/` folder the command is:
 
 ```
-./scripts/tools/zap/generate.py <path to application *.zap file>
-```
-
-For example, to generate `examples/lighting-app/lighting-common/gen/` folder the
-command is:
+./scripts/tools/zap/generate.py <path to application *.zap file> -o zzz_generated/app-name/zap-generated
 
 ```
-./scripts/tools/zap/generate.py examples/lighting-app/lighting-common/lighting-app.zap
+
+For example, to generate the `zzz_generated/lighting-app/zap-generated/` folder
+the command is:
+
+```
+./scripts/tools/zap/generate.py examples/lighting-app/lighting-common/lighting-app.zap -o zzz_generated/lighting-app/zap-generated
 ```
 
 ### How to generate files for a single application using custom templates

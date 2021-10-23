@@ -19,21 +19,23 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <app/common/gen/af-structs.h>
+#include <app-common/zap-generated/af-structs.h>
 
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <core/CHIPError.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ZclString.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CHIPMem.h>
-#include <support/RandUtils.h>
 
 #include "Device.h"
 #include "Options.h"
@@ -43,6 +45,7 @@
 #include <iostream>
 
 using namespace chip;
+using namespace chip::Credentials;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
@@ -96,7 +99,7 @@ static uint8_t gDescriptorAttrStorage[DYNAMIC_ENDPOINT_COUNT][kDescriptorAttribu
 // Declare On/Off cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(onOffAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_ON_OFF_ATTRIBUTE_ID, BOOLEAN, 1, 0) /* on/off */
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(0x0001);
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
@@ -104,18 +107,18 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_DEVICE_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttrib
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_SERVER_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CLIENT_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_PARTS_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0)   /* parts list */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(0x0001);
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Bridged Device Basic information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_USER_LABEL_ATTRIBUTE_ID, CHAR_STRING, kUserLabelSize, 0), /* UserLabel */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0)                /* Reachable */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(0x0003);
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Fixed Label cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(fixedLabelAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_LABEL_LIST_ATTRIBUTE_ID, ARRAY, kFixedLabelAttributeArraySize, 0) /* label list */
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(0x0001);
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Cluster List for Bridged Light endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
@@ -125,6 +128,14 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs), DECLARE_DYNAMIC_CLUS
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
+
+// REVISION DEFINITIONS:
+// =================================================================================
+
+#define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
+#define ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION (1u)
+#define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
+#define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
 // ---------------------------------------------------------------------------
 
@@ -173,23 +184,14 @@ int RemoveDeviceEndpoint(Device * dev)
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             gDevices[index] = NULL;
             ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
+            // Silence complaints about unused ep when progress logging
+            // disabled.
+            UNUSED_VAR(ep);
             return index;
         }
         index++;
     }
     return -1;
-}
-
-uint8_t * ToZclCharString(uint8_t * zclString, const char * cString, uint8_t maxLength)
-{
-    size_t len = strlen(cString);
-    if (len > maxLength)
-    {
-        len = maxLength;
-    }
-    zclString[0] = static_cast<uint8_t>(len);
-    memcpy(&zclString[1], cString, zclString[0]);
-    return zclString;
 }
 
 void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, uint16_t length, EmberAfAttributeMetadata * am)
@@ -198,10 +200,14 @@ void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, 
     uint16_t listCount = 1;
     _LabelStruct labelStruct;
 
-    labelStruct.label = chip::ByteSpan(reinterpret_cast<const uint8_t *>(label), kFixedLabelElementsOctetStringSize);
+    // TODO: This size is obviously wrong.  See
+    // https://github.com/project-chip/connectedhomeip/issues/10743
+    labelStruct.label = CharSpan(label, kFixedLabelElementsOctetStringSize);
 
     strncpy(zclOctetStrBuf, value, sizeof(zclOctetStrBuf));
-    labelStruct.value = chip::ByteSpan(reinterpret_cast<uint8_t *>(&zclOctetStrBuf[0]), sizeof(zclOctetStrBuf));
+    // TODO: This size is obviously wrong.  See
+    // https://github.com/project-chip/connectedhomeip/issues/10743
+    labelStruct.value = CharSpan(&zclOctetStrBuf[0], sizeof(zclOctetStrBuf));
 
     emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&labelStruct), 1);
     emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&listCount), 0);
@@ -212,25 +218,26 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     if (itemChangedMask & Device::kChanged_Reachable)
     {
         uint8_t reachable = dev->IsReachable() ? 1 : 0;
-        emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                                ZCL_REACHABLE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                &reachable);
+        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
+                                               ZCL_REACHABLE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
+                                               &reachable);
     }
 
     if (itemChangedMask & Device::kChanged_State)
     {
         uint8_t isOn = dev->IsOn() ? 1 : 0;
-        emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                                CLUSTER_MASK_SERVER, 0, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
+        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
+                                               CLUSTER_MASK_SERVER, 0, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
     }
 
     if (itemChangedMask & Device::kChanged_Name)
     {
         uint8_t zclName[kUserLabelSize];
-        ToZclCharString(zclName, dev->GetName(), kUserLabelSize - 1);
-        emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                                ZCL_USER_LABEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                zclName);
+        MutableByteSpan zclNameSpan(zclName);
+        MakeZclCharString(zclNameSpan, dev->GetName());
+        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
+                                               ZCL_USER_LABEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
+                                               zclNameSpan.data());
     }
 
     if (itemChangedMask & Device::kChanged_Location)
@@ -242,8 +249,8 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 
         EncodeFixedLabel("room", dev->GetLocation(), buffer, sizeof(buffer), &am);
 
-        emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_FIXED_LABEL_CLUSTER_ID, ZCL_LABEL_LIST_ATTRIBUTE_ID,
-                                                CLUSTER_MASK_SERVER, 0, ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
+        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_FIXED_LABEL_CLUSTER_ID, ZCL_LABEL_LIST_ATTRIBUTE_ID,
+                                               CLUSTER_MASK_SERVER, 0, ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
     }
 }
 
@@ -258,7 +265,14 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else if ((attributeId == ZCL_USER_LABEL_ATTRIBUTE_ID) && (maxReadLength == 32))
     {
-        ToZclCharString(buffer, dev->GetName(), static_cast<uint8_t>(maxReadLength - 1));
+        uint8_t bufferMemory[254];
+        MutableByteSpan zclString(bufferMemory);
+        MakeZclCharString(zclString, dev->GetName());
+        buffer = zclString.data();
+    }
+    else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
+    {
+        *buffer = (uint16_t) ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_REVISION;
     }
     else
     {
@@ -275,6 +289,10 @@ EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attribute
     if ((attributeId == ZCL_ON_OFF_ATTRIBUTE_ID) && (maxReadLength == 1))
     {
         *buffer = dev->IsOn() ? 1 : 0;
+    }
+    else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
+    {
+        *buffer = (uint16_t) ZCL_ON_OFF_CLUSTER_REVISION;
     }
     else
     {
@@ -307,16 +325,23 @@ EmberAfStatus HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attribut
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleReadDescriptorAttribute(uint8_t endpointIndex, chip::AttributeId attributeId, uint8_t * buffer,
+EmberAfStatus HandleReadDescriptorAttribute(uint16_t endpointIndex, chip::AttributeId attributeId, uint8_t * buffer,
                                             uint16_t maxReadLength)
 {
     if ((maxReadLength <= kDescriptorAttributeArraySize) && (attributeId < kDescriptorAttributeCount))
     {
         memcpy(buffer, &gDescriptorAttrStorage[endpointIndex][attributeId][0], maxReadLength);
-        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+    else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
+    {
+        *buffer = (uint16_t) ZCL_DESCRIPTOR_CLUSTER_REVISION;
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength)
@@ -324,14 +349,20 @@ EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, EmberAfAttributeMetada
     if ((am->attributeId == ZCL_LABEL_LIST_ATTRIBUTE_ID) && (maxReadLength <= kFixedLabelAttributeArraySize))
     {
         EncodeFixedLabel("room", dev->GetLocation(), buffer, maxReadLength, am);
-
-        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+    else if ((am->attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
+    {
+        *buffer = (uint16_t) ZCL_FIXED_LABEL_CLUSTER_REVISION;
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleWriteDescriptorAttribute(uint8_t endpointIndex, EmberAfAttributeMetadata * am, uint8_t * buffer,
+EmberAfStatus HandleWriteDescriptorAttribute(uint16_t endpointIndex, EmberAfAttributeMetadata * am, uint8_t * buffer,
                                              uint16_t length, int32_t index)
 {
     chip::AttributeId attributeId = am->attributeId;
@@ -349,7 +380,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                    uint8_t * buffer, uint16_t maxReadLength, int32_t index)
 {
-    uint8_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
+    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
@@ -382,7 +413,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                     uint8_t * buffer, int32_t index)
 {
-    uint8_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
+    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
@@ -514,17 +545,20 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
     // Init ZCL Data Model and CHIP App Server
-    InitServer();
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
-        static_cast<int>(emberAfEndpointFromIndex(static_cast<uint8_t>(emberAfFixedEndpointCount() - 1))) + 1);
+        static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     gCurrentEndpointId = gFirstDynamicEndpointId;
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
-    emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint8_t>(emberAfFixedEndpointCount() - 1)), false);
+    emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);

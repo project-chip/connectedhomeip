@@ -15,13 +15,16 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CodeUtils.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
-#include <support/CodeUtils.h>
 
 #include <string>
+#include <type_traits>
 
 using namespace chip;
+
+static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
 
 namespace {
 
@@ -56,22 +59,25 @@ void YieldSetupPayloadAttributes(const SetupPayload & payload, AttributeVisitor 
 
 } // namespace
 
-extern "C" CHIP_ERROR pychip_SetupPayload_ParseQrCode(const char * qrCode, AttributeVisitor attrVisitor,
-                                                      VendorAttributeVisitor vendorAttrVisitor)
+extern "C" ChipError::StorageType pychip_SetupPayload_ParseQrCode(const char * qrCode, AttributeVisitor attrVisitor,
+                                                                  VendorAttributeVisitor vendorAttrVisitor)
 {
     SetupPayload payload;
-    ReturnErrorOnFailure(QRCodeSetupPayloadParser(qrCode).populatePayload(payload));
+    CHIP_ERROR err = QRCodeSetupPayloadParser(qrCode).populatePayload(payload);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     YieldSetupPayloadAttributes(payload, attrVisitor, vendorAttrVisitor);
-    return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR.AsInteger();
 }
 
-extern "C" CHIP_ERROR pychip_SetupPayload_ParseManualPairingCode(const char * manualPairingCode, AttributeVisitor attrVisitor,
-                                                                 VendorAttributeVisitor vendorAttrVisitor)
+extern "C" ChipError::StorageType pychip_SetupPayload_ParseManualPairingCode(const char * manualPairingCode,
+                                                                             AttributeVisitor attrVisitor,
+                                                                             VendorAttributeVisitor vendorAttrVisitor)
 {
     SetupPayload payload;
-    ReturnErrorOnFailure(ManualSetupPayloadParser(manualPairingCode).populatePayload(payload));
+    CHIP_ERROR err = ManualSetupPayloadParser(manualPairingCode).populatePayload(payload);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     YieldSetupPayloadAttributes(payload, attrVisitor, vendorAttrVisitor);
-    return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR.AsInteger();
 }

@@ -30,8 +30,13 @@ if(NOT CHIP_ROOT)
 endif()
 
 set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs)
+
 if (CONFIG_ENABLE_CHIP_SHELL)
     list(APPEND CHIP_REQURIE_COMPONENTS console)
+endif()
+
+if (CONFIG_OPENTHREAD_ENABLED)
+    list(APPEND CHIP_REQURIE_COMPONENTS openthread)
 endif()
 
 idf_component_register(SRCS chip.c chip.cpp
@@ -59,8 +64,19 @@ chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                is_debug)
 
+if(CONFIG_BT_ENABLED)
+chip_gn_arg_append("chip_config_network_layer_ble"           "true")
+else()
+chip_gn_arg_append("chip_config_network_layer_ble"           "false")
+endif()
+
+if(CONFIG_DISABLE_IPV4)
+    chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
+    chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]")
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
     chip_gn_arg_append("pw_log_BACKEND"                     "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"")
     chip_gn_arg_append("pw_assert_BACKEND"                  "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"")
@@ -77,6 +93,9 @@ if (CONFIG_ENABLE_CHIP_SHELL)
     chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
+if (CONFIG_OPENTHREAD_ENABLED)
+    chip_gn_arg_append("chip_enable_openthread"                 "true")
+endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
@@ -153,6 +172,7 @@ target_include_directories(${COMPONENT_LIB} PRIVATE
 
 target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/src/platform/ESP32"
+    "${CHIP_ROOT}/src/platform/OpenThread"
     "${CHIP_ROOT}/src/include"
     "${CHIP_ROOT}/src/lib"
     "${CHIP_ROOT}/src"
@@ -166,13 +186,25 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
 idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)
 
 if(CONFIG_BT_ENABLED)
-    idf_component_get_property(bt_lib bt COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
+    if("${CONFIG_IDF_TARGET}" STREQUAL "esp32h2")
+        idf_component_get_property(bt_lib bt COMPONENT_LIB)
+        idf_component_get_property(bt_dir bt COMPONENT_DIR)
+        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
+        list(APPEND chip_libraries ${bt_dir}/controller/lib/esp32h2beta/libcontroller_5p0_seq.a)
+    else()
+        idf_component_get_property(bt_lib bt COMPONENT_LIB)
+        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
+    endif()
 endif()
 
 if (CONFIG_ENABLE_CHIP_SHELL)
     idf_component_get_property(console_lib console COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${console_lib}>)
+endif()
+
+if(CONFIG_OPENTHREAD_ENABLED)
+    idf_component_get_property(openthread_lib openthread COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
 endif()
 
 if(NOT CONFIG_USE_MINIMAL_MDNS)
@@ -183,9 +215,9 @@ endif()
 idf_component_get_property(main_lib main COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
-target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group 
+target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
-                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}> 
+                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}>
                                                 -Wl,--end-group)
 
 # Make the component dependent on our CHIP build

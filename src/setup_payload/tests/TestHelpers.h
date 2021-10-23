@@ -15,26 +15,29 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include <bitset>
 
-#include <setup_payload/Base38.cpp>
-#include <setup_payload/QRCodeSetupPayloadGenerator.cpp>
-#include <setup_payload/QRCodeSetupPayloadParser.cpp>
-#include <setup_payload/SetupPayload.cpp>
+#include <setup_payload/Base38Decode.h>
+#include <setup_payload/Base38Encode.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <setup_payload/SetupPayload.h>
 
 namespace chip {
 
 const uint16_t kSmallBufferSizeInBytes   = 1;
 const uint16_t kDefaultBufferSizeInBytes = 512;
 
-const uint8_t kOptionalDefaultStringTag       = 2;
-const std::string kOptionalDefaultStringValue = "myData";
+const uint8_t kOptionalDefaultStringTag      = 2;
+constexpr char kOptionalDefaultStringValue[] = "myData";
 
 const uint8_t kOptionalDefaultIntTag    = 3;
 const uint32_t kOptionalDefaultIntValue = 12;
 
-const char * kSerialNumberDefaultStringValue   = "123456789";
-const uint32_t kSerialNumberDefaultUInt32Value = 123456789;
+constexpr char kSerialNumberDefaultStringValue[] = "123456789";
+const uint32_t kSerialNumberDefaultUInt32Value   = 123456789;
 
 constexpr const char * kDefaultPayloadQRCode = "MT:R5L90MP500K64J00000";
 

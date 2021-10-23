@@ -97,15 +97,25 @@ shift $((OPTIND - 1))
 
 for arg; do
     case $arg in
-        enable_qpg6100_builds=true)
-            qpg6100_enabled=1
+        enable_qpg_builds=true)
+            qpg_enabled=1
             ;;
         enable_efr32_builds=true)
             efr32_enabled=1
             ;;
+        enable_p6_builds=true)
+            p6_builds_enabled=1
+            ;;
+        p6_board=*)
+            p6_board_selected=1
+            ;;
     esac
     user_args+=" $arg"
 done
+
+# Android prebuilt JAR setup
+python3 build/chip/java/tests/generate_jars_for_test.py
+python3 third_party/android_deps/set_up_android_deps.py
 
 # Android SDK setup
 android_sdk_args=""
@@ -130,6 +140,18 @@ else
     echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug; ninja -C out/debug)"
 fi
 
+echo
+
+# P6 Build setup
+if [[ -z "$p6_builds_enabled" ]]; then
+    echo "Hint: Pass enable_p6_builds=true to this script to enable building for PSoC6-43012"
+else
+    p6_sdk_args=""
+    if [[ -z "$p6_board_selected" ]]; then
+        p6_sdk_args="p6_board=\"CY8CKIT-062S2-43012\""
+    fi
+fi
+
 # K32W SDK setup
 k32w_sdk_args=""
 
@@ -147,11 +169,11 @@ else
 fi
 echo
 
-if [[ -z "$qpg6100_enabled" ]]; then
-    echo "Hint: Pass enable_qpg6100_builds=true to this script to enable building for QPG6100"
+if [[ -z "$qpg_enabled" ]]; then
+    echo "Hint: Pass enable_qpg_builds=true to this script to enable building for QPG"
 else
     echo 'To build the QPG6100 lock sample as a standalone project:'
-    echo "(cd $CHIP_ROOT/examples/lock-app/qpg6100; gn gen out/debug; ninja -C out/debug)"
+    echo "(cd $CHIP_ROOT/examples/lock-app/qpg; gn gen out/debug; ninja -C out/debug)"
 fi
 
 echo

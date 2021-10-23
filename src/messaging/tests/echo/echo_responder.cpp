@@ -29,11 +29,11 @@
 
 #include "common.h"
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
@@ -61,10 +61,7 @@ int main(int argc, char * argv[])
     bool useTCP      = false;
     bool disableEcho = false;
 
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = nullptr;
-
-    const chip::Transport::AdminId gAdminId = 0;
+    const chip::FabricIndex gFabricIndex = 0;
 
     if (argc > 2)
     {
@@ -84,27 +81,27 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
     if (useTCP)
     {
-        err = gTCPManager.Init(
-            chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
+        err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
+#if INET_CONFIG_ENABLE_IPV4
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv4)
+#else
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6)
+#endif
+        );
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins,
-                                   &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
     {
         err = gUDPManager.Init(
-            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
+            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::IPAddressType::kIPv6));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins,
-                                   &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 
@@ -120,8 +117,8 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
-                                     gAdminId);
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::CryptoContext::SessionRole::kResponder,
+                                     gFabricIndex);
     SuccessOrExit(err);
 
     if (!disableEcho)

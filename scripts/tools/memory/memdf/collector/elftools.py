@@ -37,7 +37,7 @@ def read_segments(config: Config, ef: ELFFile) -> SegmentDF:
     rows = []
     for segment in ef.iter_segments():
         rows.append([
-            elftools.elf.descriptions.describe_p_type(segment['p_type']),
+            segment['p_type'],
             segment['p_vaddr'], segment['p_paddr'], segment['p_memsz'],
             segment['p_flags']
         ])

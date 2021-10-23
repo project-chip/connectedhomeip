@@ -28,16 +28,6 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define CHIP_CONFIG_ERROR_TYPE int32_t
-#define CHIP_CONFIG_NO_ERROR 0
-#define CHIP_CONFIG_ERROR_MIN 4000000
-#define CHIP_CONFIG_ERROR_MAX 4000999
-
-#define ASN1_CONFIG_ERROR_TYPE int32_t
-#define ASN1_CONFIG_NO_ERROR 0
-#define ASN1_CONFIG_ERROR_MIN 5000000
-#define ASN1_CONFIG_ERROR_MAX 5000999
-
 #define ChipDie() abort()
 
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE uint8_t
@@ -124,6 +114,18 @@
 #ifndef CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 #define CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS 4
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
+
+/**
+ *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *
+ *  @brief
+ *    Maximum number of administrators that can provision the device. Each admin
+ *    can provision the device with their unique operational credentials and manage
+ *    their access control lists.
+ */
+#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
+#define CHIP_CONFIG_MAX_DEVICE_ADMINS 5 // 4 fabrics + 1 for rotation slack
+#endif
 
 // ==================== Security Configuration Overrides ====================
 

@@ -19,8 +19,7 @@
  * @file - This file contains Spake2+ RFC test vectors.
  */
 
-#ifndef _SPAKE2P_POINT_RFC_TEST_VECTORS_H_
-#define _SPAKE2P_POINT_RFC_TEST_VECTORS_H_
+#pragma once
 
 namespace chip {
 namespace Crypto {
@@ -441,5 +440,3 @@ static const struct spake2p_rfc_tv * rfc_tvs[] = { &chiptest_e4836c3b50dd_test_v
 
 } // namespace Crypto
 } // namespace chip
-
-#endif

@@ -30,9 +30,9 @@
 #include <openthread/ip6.h>
 #include <openthread/thread.h>
 
-#include <core/CHIPError.h>
 #include <inet/IPAddress.h>
 #include <inet/IPPrefix.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace DeviceLayer {

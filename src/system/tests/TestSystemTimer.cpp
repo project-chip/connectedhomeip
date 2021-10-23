@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,23 +29,18 @@
 
 #include <system/SystemConfig.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
 #include <system/SystemError.h>
-#include <system/SystemLayer.h>
-#include <system/SystemTimer.h>
+#include <system/SystemLayerImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#include <sys/select.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #include <errno.h>
 #include <stdint.h>
@@ -54,42 +49,20 @@
 using chip::ErrorStr;
 using namespace chip::System;
 
-static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
+static void ServiceEvents(Layer & aLayer)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
-
-    FD_ZERO(&readFDs);
-    FD_ZERO(&writeFDs);
-    FD_ZERO(&exceptFDs);
-
-    if (aLayer.State() == kLayerState_Initialized)
-        aLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-
-    int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
-    if (selectRes < 0)
-    {
-        printf("select failed: %s\n", ErrorStr(MapErrorPOSIX(errno)));
-        return;
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-    if (aLayer.State() == kLayerState_Initialized)
-    {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-        aLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
+    static_cast<LayerSocketsLoop &>(aLayer).PrepareEvents();
+    static_cast<LayerSocketsLoop &>(aLayer).WaitForEvents();
+    static_cast<LayerSocketsLoop &>(aLayer).HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        if (aLayer.State() == kLayerState_Initialized)
-        {
-            // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
-            // aSleepTime according to the next timer.
-            aLayer.HandlePlatformTimer();
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (aLayer.IsInitialized())
+    {
+        static_cast<LayerImplLwIP &>(aLayer).HandlePlatformTimer();
     }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 // Test input vector format.
@@ -112,7 +85,6 @@ public:
             return;
         }
 
-        mLayer->StartTimer(0, &mGreedyTimer);
         mNumTimersHandled++;
     }
     static void GreedyTimer(void * p)
@@ -135,13 +107,13 @@ void TimerFailed(void * aState)
     sOverflowTestDone = true;
 }
 
-void HandleTimerFailed(Layer * inetLayer, void * aState, Error aError)
+void HandleTimerFailed(Layer * inetLayer, void * aState)
 {
-    (void) inetLayer, (void) aError;
+    (void) inetLayer;
     TimerFailed(aState);
 }
 
-void HandleTimer10Success(Layer * inetLayer, void * aState, Error aError)
+void HandleTimer10Success(Layer * inetLayer, void * aState)
 {
     TestContext & lContext = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, true);
@@ -150,9 +122,8 @@ void HandleTimer10Success(Layer * inetLayer, void * aState, Error aError)
 
 static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 {
-    uint32_t timeout_overflow_0ms = 652835029;
-    uint32_t timeout_overflow_1ms = 1958505088;
-    uint32_t timeout_10ms         = 10;
+    chip::System::Clock::Milliseconds32 timeout_overflow_0ms{ 652835029 };
+    chip::System::Clock::Milliseconds32 timeout_10ms{ 10 };
 
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer & lSys           = *lContext.mLayer;
@@ -160,16 +131,11 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
     sOverflowTestDone = false;
 
     lSys.StartTimer(timeout_overflow_0ms, HandleTimerFailed, aContext);
-    chip::Callback::Callback<> cb(TimerFailed, aContext);
-    lSys.StartTimer(timeout_overflow_1ms, &cb);
     lSys.StartTimer(timeout_10ms, HandleTimer10Success, aContext);
 
     while (!sOverflowTestDone)
     {
-        struct timeval sleepTime;
-        sleepTime.tv_sec  = 0;
-        sleepTime.tv_usec = 1000; // 1 ms tick
-        ServiceEvents(lSys, sleepTime);
+        ServiceEvents(lSys);
     }
 
     lSys.CancelTimer(HandleTimerFailed, aContext);
@@ -177,7 +143,7 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
     lSys.CancelTimer(HandleTimer10Success, aContext);
 }
 
-void HandleGreedyTimer(Layer * aLayer, void * aState, Error aError)
+void HandleGreedyTimer(Layer * aLayer, void * aState)
 {
     static uint32_t sNumTimersHandled = 0;
     TestContext & lContext            = *static_cast<TestContext *>(aState);
@@ -188,7 +154,7 @@ void HandleGreedyTimer(Layer * aLayer, void * aState, Error aError)
         return;
     }
 
-    aLayer->StartTimer(0, HandleGreedyTimer, aState);
+    aLayer->StartTimer(chip::System::Clock::Zero, HandleGreedyTimer, aState);
     sNumTimersHandled++;
 }
 
@@ -196,14 +162,10 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer & lSys           = *lContext.mLayer;
-    struct timeval sleepTime;
 
-    lSys.StartTimer(0, HandleGreedyTimer, aContext);
-    lSys.StartTimer(0, &lContext.mGreedyTimer);
+    lSys.StartTimer(chip::System::Clock::Zero, HandleGreedyTimer, aContext);
 
-    sleepTime.tv_sec  = 0;
-    sleepTime.tv_usec = 1000; // 1 ms tick
-    ServiceEvents(lSys, sleepTime);
+    ServiceEvents(lSys);
 }
 
 // Test Suite
@@ -233,7 +195,7 @@ static nlTestSuite kTheSuite =
 };
 // clang-format on
 
-static Layer sLayer;
+static LayerImpl sLayer;
 
 /**
  *  Set up the test suite.
@@ -241,19 +203,15 @@ static Layer sLayer;
 static int TestSetup(void * aContext)
 {
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
-    void * lLayerContext   = nullptr;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
     sys_mbox_new(sLwIPEventQueue, 100);
-    lLayerContext = &sLwIPEventQueue;
     tcpip_init(NULL, NULL);
-#endif
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
 
-    sLayer.Init(lLayerContext);
+    sLayer.Init();
 
     lContext.mLayer     = &sLayer;
     lContext.mTestSuite = &kTheSuite;

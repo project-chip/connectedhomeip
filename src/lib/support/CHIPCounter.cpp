@@ -17,7 +17,7 @@
  *    limitations under the License.
  */
 
-#include <support/CHIPCounter.h>
+#include <lib/support/CHIPCounter.h>
 
 namespace chip {
 

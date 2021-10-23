@@ -47,10 +47,12 @@
 
 // for pulling in defines dealing with EITHER server or client
 #include "app/util/common.h"
-#include "gen/callback.h"
+#include <app-common/zap-generated/callback.h>
 #include <app/util/af-main.h>
+#include <app/util/error-mapping.h>
 
 #include <app/reporting/reporting.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 
@@ -214,7 +216,7 @@ bool emberAfReadSequentialAttributesAddToResponse(EndpointId endpoint, ClusterId
         }
         else if (discovered < maxAttributeIds)
         {
-            emberAfPutInt16uInResp(metadata->attributeId);
+            emberAfPutInt32uInResp(metadata->attributeId);
             emberAfPutInt8uInResp(metadata->attributeType);
             if (includeAccessControl)
             {
@@ -281,8 +283,9 @@ void emberAfPrintAttributeTable(void)
                 // manually reset the watchdog.
                 //        halResetWatchdog();
 
-                emberAfAttributesPrint("%2x / %p / %2x / ", cluster->clusterId,
-                                       (emberAfAttributeIsClient(metaData) ? "clnt" : "srvr"), metaData->attributeId);
+                emberAfAttributesPrint(ChipLogFormatMEI " / %p / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
+                                       (emberAfAttributeIsClient(metaData) ? "clnt" : "srvr"),
+                                       ChipLogValueMEI(metaData->attributeId));
                 mfgCode = emAfGetManufacturerCodeForAttribute(cluster, metaData);
                 if (mfgCode == EMBER_AF_NULL_MANUFACTURER_CODE)
                 {
@@ -350,8 +353,8 @@ void emberAfRetrieveAttributeAndCraftResponse(EndpointId endpoint, ClusterId clu
         return;
     }
 
-    emberAfAttributesPrintln("OTA READ: ep:%x cid:%2x attid:%2x msk:%x mfcode:%2x", endpoint, clusterId, attrId, mask,
-                             manufacturerCode);
+    emberAfAttributesPrintln("OTA READ: ep:%" PRIx16 " cid:" ChipLogFormatMEI " attid:" ChipLogFormatMEI " msk:%x mfcode:%2x",
+                             endpoint, ChipLogValueMEI(clusterId), ChipLogValueMEI(attrId), mask, manufacturerCode);
 
     // lookup the attribute in our table
     status = emAfReadAttribute(endpoint, clusterId, attrId, mask, manufacturerCode, data, ATTRIBUTE_LARGEST, &dataType);
@@ -365,15 +368,16 @@ void emberAfRetrieveAttributeAndCraftResponse(EndpointId endpoint, ClusterId clu
     }
     else
     {
-        emberAfPutInt16uInResp(attrId);
-        emberAfPutInt8uInResp(status);
-        emberAfAttributesPrintln("READ: clus %2x, attr %2x failed %x", clusterId, attrId, status);
+        emberAfPutInt32uInResp(attrId);
+        emberAfPutStatusInResp(status);
+        emberAfAttributesPrintln("READ: clus " ChipLogFormatMEI ", attr " ChipLogFormatMEI " failed %x", ChipLogValueMEI(clusterId),
+                                 ChipLogValueMEI(attrId), status);
         emberAfAttributesFlush();
         return;
     }
 
     // put attribute in least sig byte first
-    emberAfPutInt16uInResp(attrId);
+    emberAfPutInt32uInResp(attrId);
 
     // attribute is found, so copy in the status and the data type
     emberAfPutInt8uInResp(EMBER_ZCL_STATUS_SUCCESS);
@@ -404,7 +408,8 @@ void emberAfRetrieveAttributeAndCraftResponse(EndpointId endpoint, ClusterId clu
         appResponseLength = static_cast<uint16_t>(appResponseLength + dataLen);
     }
 
-    emberAfAttributesPrintln("READ: clus %2x, attr %2x, dataLen: %x, OK", clusterId, attrId, dataLen);
+    emberAfAttributesPrintln("READ: clus " ChipLogFormatMEI ", attr " ChipLogFormatMEI ", dataLen: %x, OK",
+                             ChipLogValueMEI(clusterId), ChipLogValueMEI(attrId), dataLen);
     emberAfAttributesFlush();
 }
 
@@ -453,7 +458,8 @@ EmberAfStatus emberAfAppendAttributeReportFields(EndpointId endpoint, ClusterId 
     *bufIndex = static_cast<uint8_t>(*bufIndex + size);
 
 kickout:
-    emberAfAttributesPrintln("REPORT: clus 0x%2x, attr 0x%2x: 0x%x", clusterId, attributeId, status);
+    emberAfAttributesPrintln("REPORT: clus " ChipLogFormatMEI ", attr " ChipLogFormatMEI ": 0x%x", ChipLogValueMEI(clusterId),
+                             ChipLogValueMEI(attributeId), status);
     emberAfAttributesFlush();
 
     return status;
@@ -502,7 +508,8 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     // if we dont support that attribute
     if (metadata == NULL)
     {
-        emberAfAttributesPrintln("%pep %x clus %2x attr %2x not supported", "WRITE ERR: ", endpoint, cluster, attributeID);
+        emberAfAttributesPrintln("%pep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported",
+                                 "WRITE ERR: ", endpoint, ChipLogValueMEI(cluster), ChipLogValueMEI(attributeID));
         emberAfAttributesFlush();
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
@@ -566,19 +573,21 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     // write the data unless this is only a test
     if (!justTest)
     {
+        const app::ConcreteAttributePath attributePath(endpoint, cluster, attributeID);
+
         // Pre write attribute callback for all attribute changes,
         // regardless of cluster.
-        EmberAfStatus status = emberAfPreAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType,
-                                                                 emberAfAttributeSize(metadata), data);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        Protocols::InteractionModel::Status imStatus =
+            MatterPreAttributeChangeCallback(attributePath, mask, dataType, emberAfAttributeSize(metadata), data);
+        if (imStatus != Protocols::InteractionModel::Status::Success)
         {
-            return status;
+            return app::ToEmberAfStatus(imStatus);
         }
 
         // Pre-write attribute callback specific
         // to the cluster that the attribute lives in.
-        status = emAfClusterPreAttributeChangedCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType,
-                                                        emberAfAttributeSize(metadata), data);
+        EmberAfStatus status =
+            emAfClusterPreAttributeChangedCallback(attributePath, mask, dataType, emberAfAttributeSize(metadata), data);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             return status;
@@ -600,16 +609,15 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // Function itself will weed out tokens that are not tokenized.
         emAfSaveAttributeToToken(data, endpoint, cluster, metadata);
 
-        emberAfReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
+        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
 
         // Post write attribute callback for all attributes changes, regardless
         // of cluster.
-        emberAfPostAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType,
-                                           emberAfAttributeSize(metadata), data);
+        MatterPostAttributeChangeCallback(attributePath, mask, dataType, emberAfAttributeSize(metadata), data);
 
         // Post-write attribute callback specific
         // to the cluster that the attribute lives in.
-        emAfClusterAttributeChangedCallback(endpoint, cluster, attributeID, mask, manufacturerCode);
+        emAfClusterAttributeChangedCallback(attributePath, mask);
     }
     else
     {

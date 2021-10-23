@@ -28,9 +28,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 #include <nlunit-test.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
 #include <system/SystemClock.h>
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -40,7 +41,6 @@
 
 using namespace chip;
 using namespace chip::Logging;
-using namespace chip::System::Platform::Layer;
 
 // =================================
 //      Test Vectors
@@ -64,41 +64,10 @@ static const struct time_test_vector test_vector_system_time_us[] = {
 };
 
 // =================================
-//      OS-specific utils
-// =================================
-// TODO: Make tests OS agnostic
-
-#include <unistd.h>
-
-void test_os_sleep_ms(uint64_t millisecs)
-{
-    struct timespec sleep_time;
-    int s = millisecs / 1000;
-
-    millisecs -= s * 1000;
-    sleep_time.tv_sec  = s;
-    sleep_time.tv_nsec = millisecs * 1000000;
-
-    nanosleep(&sleep_time, nullptr);
-}
-
-void test_os_sleep_us(uint64_t microsecs)
-{
-    struct timespec sleep_time;
-    int s = microsecs / 1000000;
-
-    microsecs -= s * 1000000;
-    sleep_time.tv_sec  = s;
-    sleep_time.tv_nsec = microsecs * 1000;
-
-    nanosleep(&sleep_time, nullptr);
-}
-
-// =================================
 //      Unit tests
 // =================================
 
-static void TestDevice_GetClock_Monotonic(nlTestSuite * inSuite, void * inContext)
+static void TestDevice_GetMonotonicMicroseconds(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestVectors = ArraySize(test_vector_system_time_us);
     int numOfTestsRan    = 0;
@@ -111,11 +80,11 @@ static void TestDevice_GetClock_Monotonic(nlTestSuite * inSuite, void * inContex
     {
         test_params = &test_vector_system_time_us[vectorIndex];
         Tdelay      = test_params->delay;
-        Tstart      = GetClock_Monotonic();
+        Tstart      = System::SystemClock().GetMonotonicMicroseconds();
 
-        test_os_sleep_us(test_params->delay);
+        chip::test_utils::SleepMicros(test_params->delay);
 
-        Tend   = GetClock_Monotonic();
+        Tend   = System::SystemClock().GetMonotonicMicroseconds();
         Tdelta = Tend - Tstart;
 
         ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart, Tend, Tdelta,
@@ -129,7 +98,7 @@ static void TestDevice_GetClock_Monotonic(nlTestSuite * inSuite, void * inContex
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestDevice_GetClock_MonotonicMS(nlTestSuite * inSuite, void * inContext)
+static void TestDevice_GetMonotonicMilliseconds(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestVectors = ArraySize(test_vector_system_time_ms);
     int numOfTestsRan    = 0;
@@ -142,11 +111,11 @@ static void TestDevice_GetClock_MonotonicMS(nlTestSuite * inSuite, void * inCont
     {
         test_params = &test_vector_system_time_ms[vectorIndex];
         Tdelay      = test_params->delay;
-        Tstart      = GetClock_MonotonicMS();
+        Tstart      = System::SystemClock().GetMonotonicMilliseconds();
 
-        test_os_sleep_ms(test_params->delay);
+        chip::test_utils::SleepMillis(test_params->delay);
 
-        Tend   = GetClock_MonotonicMS();
+        Tend   = System::SystemClock().GetMonotonicMilliseconds();
         Tdelta = Tend - Tstart;
 
         ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart, Tend, Tdelta,
@@ -160,42 +129,13 @@ static void TestDevice_GetClock_MonotonicMS(nlTestSuite * inSuite, void * inCont
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestDevice_GetClock_MonotonicHiRes(nlTestSuite * inSuite, void * inContext)
-{
-    int numOfTestVectors = ArraySize(test_vector_system_time_us);
-    int numOfTestsRan    = 0;
-    const struct time_test_vector * test_params;
-
-    uint64_t margin = TEST_TIME_MARGIN_US;
-    uint64_t Tstart, Tend, Tdelta, Tdelay;
-
-    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
-    {
-        test_params = &test_vector_system_time_us[vectorIndex];
-        Tdelay      = test_params->delay;
-        Tstart      = GetClock_MonotonicHiRes();
-
-        test_os_sleep_us(test_params->delay);
-
-        Tend   = GetClock_MonotonicHiRes();
-        Tdelta = Tend - Tstart;
-
-        ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart, Tend, Tdelta,
-                        Tdelay);
-        NL_TEST_ASSERT(inSuite, Tdelta > (Tdelay - margin));
-        numOfTestsRan++;
-    }
-    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
-}
-
 /**
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = {
 
-    NL_TEST_DEF("Test DeviceLayer::GetClock_Monotonic", TestDevice_GetClock_Monotonic),
-    NL_TEST_DEF("Test DeviceLayer::GetClock_MonotonicMS", TestDevice_GetClock_MonotonicMS),
-    NL_TEST_DEF("Test DeviceLayer::GetClock_MonotonicHiRes", TestDevice_GetClock_MonotonicHiRes),
+    NL_TEST_DEF("Test DeviceLayer::GetMonotonicMicroseconds", TestDevice_GetMonotonicMicroseconds),
+    NL_TEST_DEF("Test DeviceLayer::GetMonotonicMilliseconds", TestDevice_GetMonotonicMilliseconds),
 
     NL_TEST_SENTINEL()
 };

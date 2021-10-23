@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <support/UnitTestRegistration.h>
-#include <support/Variant.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/Variant.h>
 
 #include <nlunit-test.h>
 
@@ -25,14 +25,13 @@ namespace {
 
 struct Simple
 {
-    static constexpr const std::size_t VariantId = 1;
+    bool operator==(const Simple &) const { return true; }
 };
 
 struct Pod
 {
-    static constexpr const std::size_t VariantId = 2;
-
     Pod(int v1, int v2) : m1(v1), m2(v2) {}
+    bool operator==(const Pod & other) const { return m1 == other.m1 && m2 == other.m2; }
 
     int m1;
     int m2;
@@ -40,8 +39,6 @@ struct Pod
 
 struct Movable
 {
-    static constexpr const std::size_t VariantId = 3;
-
     Movable(int v1, int v2) : m1(v1), m2(v2) {}
 
     Movable(Movable &) = delete;
@@ -56,8 +53,6 @@ struct Movable
 
 struct Count
 {
-    static constexpr const std::size_t VariantId = 4;
-
     Count() { ++created; }
     ~Count() { ++destroyed; }
 
@@ -213,6 +208,50 @@ void TestVariantMoveAssign(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m2 == 10);
 }
 
+void TestVariantCompare(nlTestSuite * inSuite, void * inContext)
+{
+    Variant<Simple, Pod> v0;
+    Variant<Simple, Pod> v1;
+    Variant<Simple, Pod> v2;
+    Variant<Simple, Pod> v3;
+    Variant<Simple, Pod> v4;
+
+    v1.Set<Simple>();
+    v2.Set<Pod>(5, 10);
+    v3.Set<Pod>(5, 10);
+    v4.Set<Pod>(5, 11);
+
+    NL_TEST_ASSERT(inSuite, (v0 == v0));
+    NL_TEST_ASSERT(inSuite, !(v0 == v1));
+    NL_TEST_ASSERT(inSuite, !(v0 == v2));
+    NL_TEST_ASSERT(inSuite, !(v0 == v3));
+    NL_TEST_ASSERT(inSuite, !(v0 == v4));
+
+    NL_TEST_ASSERT(inSuite, !(v1 == v0));
+    NL_TEST_ASSERT(inSuite, (v1 == v1));
+    NL_TEST_ASSERT(inSuite, !(v1 == v2));
+    NL_TEST_ASSERT(inSuite, !(v1 == v3));
+    NL_TEST_ASSERT(inSuite, !(v1 == v4));
+
+    NL_TEST_ASSERT(inSuite, !(v2 == v0));
+    NL_TEST_ASSERT(inSuite, !(v2 == v1));
+    NL_TEST_ASSERT(inSuite, (v2 == v2));
+    NL_TEST_ASSERT(inSuite, (v2 == v3));
+    NL_TEST_ASSERT(inSuite, !(v2 == v4));
+
+    NL_TEST_ASSERT(inSuite, !(v3 == v0));
+    NL_TEST_ASSERT(inSuite, !(v3 == v1));
+    NL_TEST_ASSERT(inSuite, (v3 == v2));
+    NL_TEST_ASSERT(inSuite, (v3 == v3));
+    NL_TEST_ASSERT(inSuite, !(v3 == v4));
+
+    NL_TEST_ASSERT(inSuite, !(v4 == v0));
+    NL_TEST_ASSERT(inSuite, !(v4 == v1));
+    NL_TEST_ASSERT(inSuite, !(v4 == v2));
+    NL_TEST_ASSERT(inSuite, !(v4 == v3));
+    NL_TEST_ASSERT(inSuite, (v4 == v4));
+}
+
 int Setup(void * inContext)
 {
     return SUCCESS;
@@ -229,10 +268,11 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestVariantSimple),     NL_TEST_DEF_FN(TestVariantMovable),
-                                 NL_TEST_DEF_FN(TestVariantCtorDtor),   NL_TEST_DEF_FN(TestVariantCopy),
-                                 NL_TEST_DEF_FN(TestVariantMove),       NL_TEST_DEF_FN(TestVariantCopyAssign),
-                                 NL_TEST_DEF_FN(TestVariantMoveAssign), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = {
+    NL_TEST_DEF_FN(TestVariantSimple),     NL_TEST_DEF_FN(TestVariantMovable), NL_TEST_DEF_FN(TestVariantCtorDtor),
+    NL_TEST_DEF_FN(TestVariantCopy),       NL_TEST_DEF_FN(TestVariantMove),    NL_TEST_DEF_FN(TestVariantCopyAssign),
+    NL_TEST_DEF_FN(TestVariantMoveAssign), NL_TEST_DEF_FN(TestVariantCompare), NL_TEST_SENTINEL()
+};
 
 int TestVariant()
 {

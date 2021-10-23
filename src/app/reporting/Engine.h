@@ -27,12 +27,12 @@
 #include <app/MessageDef/ReportData.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -60,15 +60,29 @@ public:
      */
     CHIP_ERROR Init();
 
+    void Shutdown();
+
     /**
      * Main work-horse function that executes the run-loop.
      */
     void Run();
 
     /**
+     * Should be invoked when the device receives a Status report, or when the Report data request times out.
+     * This allows the engine to do some clean-up.
+     *
+     */
+    void OnReportConfirm();
+
+    /**
      * Main work-horse function that executes the run-loop asynchronously on the CHIP thread
      */
     CHIP_ERROR ScheduleRun();
+
+    /**
+     * Application marks mutated change path and would be sent out in later report.
+     */
+    CHIP_ERROR SetDirty(ClusterInfo & aClusterInfo);
 
 private:
     friend class TestReportingEngine;
@@ -80,9 +94,15 @@ private:
 
     CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     CHIP_ERROR BuildSingleReportDataEventList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
-    CHIP_ERROR RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo);
+    CHIP_ERROR RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
+    /**
+     * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
+     * it would clear dirty flag for that subscription
+     *
+     */
+    void UpdateReadHandlerDirty(ReadHandler & aReadHandler);
     /**
      * Send Report via ReadHandler
      *
@@ -90,17 +110,10 @@ private:
     CHIP_ERROR SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload);
 
     /**
-     * Should be invoked when the device receives a Status report, or when the Report data request times out.
-     * This allows the engine to do some clean-up.
-     *
-     */
-    void OnReportConfirm();
-
-    /**
      * Generate and send the report data request when there exists subscription or read request
      *
      */
-    static void Run(System::Layer * aSystemLayer, void * apAppState, System::Error);
+    static void Run(System::Layer * aSystemLayer, void * apAppState);
 
     /**
      * Boolean to show if more chunk message on the way
@@ -119,6 +132,15 @@ private:
      *
      */
     uint32_t mCurReadHandlerIdx = 0;
+
+    /**
+     *  mpGlobalDirtySet is used to track the dirty cluster info application modified for attributes during
+     *  post-subscription via SetDirty API, and further form the report. This reporting engine acquires this global dirty
+     *  set from mClusterInfoPool managed by InteractionModelEngine, where all active read handlers also acquire the interested
+     *  cluster Info list from mClusterInfoPool.
+     *
+     */
+    ClusterInfo * mpGlobalDirtySet = nullptr;
 };
 
 }; // namespace reporting

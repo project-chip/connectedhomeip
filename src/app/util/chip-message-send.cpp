@@ -24,11 +24,11 @@
 
 #include <assert.h>
 #include <inet/InetLayer.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/temp_zcl/TempZCL.h>
-#include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
 using namespace chip;
@@ -43,9 +43,11 @@ namespace chip {
 //       Delete this class when Device::SendMessage() is obsoleted.
 class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
 {
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override
-    {}
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        return CHIP_NO_ERROR;
+    }
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
@@ -108,7 +110,8 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
         return EMBER_DELIVERY_FAILED;
     }
 
-    Messaging::ExchangeContext * exchange = exchangeMgr->NewContext({ destination, Transport::kAnyKeyId, 0 }, nullptr);
+    Messaging::ExchangeContext * exchange =
+        exchangeMgr->NewContext(SessionHandle(destination, 0, Transport::kAnyKeyId, 0), nullptr);
     if (exchange == nullptr)
     {
         return EMBER_DELIVERY_FAILED;
@@ -128,8 +131,12 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
 
     EmberStatus err = chipSendUnicast(exchange, apsFrame, messageLength, message, sendFlags);
 
-    // Make sure we always close the temporary exchange we just created.
-    exchange->Close();
+    // Make sure we always close the temporary exchange we just created, unless
+    // we sent a message successfully.
+    if (err != EMBER_SUCCESS)
+    {
+        exchange->Close();
+    }
 
     return err;
 }

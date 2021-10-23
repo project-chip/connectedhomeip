@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -78,7 +80,6 @@ CHIP_ERROR EventPathList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -90,7 +91,6 @@ EventPath::Builder & EventPathList::Builder::CreateEventPathBuilder()
     VerifyOrExit(CHIP_NO_ERROR == mError, mEventPathBuilder.ResetError(mError));
 
     mError = mEventPathBuilder.Init(mpWriter);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mPathBuilder would be un-/partial initialized and cannot be used to write anything

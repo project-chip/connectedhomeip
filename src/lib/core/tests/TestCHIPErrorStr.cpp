@@ -36,9 +36,9 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <core/CHIPError.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -47,7 +47,7 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static int32_t sContext[] =
+static const CHIP_ERROR kTestElements[] =
 {
     CHIP_ERROR_TOO_MANY_CONNECTIONS,
     CHIP_ERROR_SENDING_BLOCKED,
@@ -150,7 +150,7 @@ static int32_t sContext[] =
     CHIP_ERROR_DEVICE_AUTH_TIMEOUT,
     CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED,
     CHIP_ERROR_RETRANS_TABLE_FULL,
-    CHIP_ERROR_INVALID_ACK_ID,
+    CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER,
     CHIP_ERROR_SEND_THROTTLED,
     CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE,
     CHIP_ERROR_TRANSACTION_CANCELED,
@@ -226,6 +226,7 @@ static int32_t sContext[] =
     CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT,
     CHIP_ERROR_IM_MALFORMED_STATUS_CODE,
     CHIP_ERROR_PEER_NODE_NOT_FOUND,
+    CHIP_ERROR_IM_STATUS_CODE_RECEIVED,
 };
 // clang-format on
 
@@ -236,13 +237,13 @@ static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
     RegisterCHIPLayerErrorFormatter();
 
     // For each defined error...
-    for (int err : sContext)
+    for (const auto & err : kTestElements)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 
         // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err);
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
         NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
@@ -279,7 +280,7 @@ int TestCHIPErrorStr(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
+    nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);
 }

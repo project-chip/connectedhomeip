@@ -30,11 +30,13 @@ OPENTHREAD=$REPO_DIR/third_party/openthread/repo
 OPENTHREAD_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/openthread/repo)
 
 CIRQUE_CACHE_PATH=${GITHUB_CACHE_PATH:-"/tmp/cirque-cache/"}
-OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation.tgz"
+OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation-cmake.tgz"
+OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
     "EchoTest"
+    "EchoOverTcpTest"
     "MobileDeviceTest"
     "InteractionModelTest"
 )
@@ -44,66 +46,38 @@ BOLD_YELLOW_TEXT="\033[1;33m"
 BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
 
-function __screen() {
-    if [[ "x$GITHUB_ACTION_RUN" == "x1" ]]; then
-        "$@"
-    elif which screen; then
-        screen -dm "$@"
-    else
-        "$@"
-    fi
-}
-
-function __kill_grep() {
-    ps aux | grep "$1" | awk '{print $2}' | sort -k2 -rn |
-        while read -r pid; do
-            kill -2 -"$pid"
-        done
-}
-
-function __flask_clean() {
-    __kill_grep 'flask run'
-}
-
-function __socat_clean() {
-    __kill_grep 'socat'
-}
-
-function __virtual_thread_clean() {
-    __kill_grep 'ot-ncp-ftd'
-}
-
 function __cirquetest_start_flask() {
     echo 'Start Flask'
     cd "$REPO_DIR"/third_party/cirque/repo
-    # screen is a wrapper function, it run the program directly on github actions and wrap
-    # the command using screen when running locally.
     # When running the ManualTests, if Ctrl-C is send to the shell, it will stop flask as well.
-    # This is not expected, so we append a screen to make it run totally background.
-    # We don't have this issue on GitHub actions, so we don't need screen.
-    __screen bash -c 'FLASK_APP=cirque/restservice/service.py \
-        PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/output/simulation/bin/ \
-        python3 -m flask run >"'"$LOG_DIR"'"/"'"$CURRENT_TEST"'"/flask.log 2>&1'
+    # This is not expected. Start a new session to prevent it from receiving signals
+    setsid bash -c 'FLASK_APP=cirque/restservice/service.py \
+        PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/build/simulation/examples/apps/ncp/ \
+        python3 -m flask run >"'"$LOG_DIR"'"/"'"$CURRENT_TEST"'"/flask.log 2>&1' &
+    FLASK_PID=$!
+    echo "Flask running in backgroud with pid $FLASK_PID"
 }
 
 function __cirquetest_clean_flask() {
-    echo 'Cleanup Flask'
-    __flask_clean
-    __socat_clean
-    __virtual_thread_clean
+    echo "Cleanup Flask pid $FLASK_PID"
+    kill -SIGTERM -"$FLASK_PID"
 }
 
 function __cirquetest_build_ot() {
     echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Cache miss, build openthread simulation."
-    ./bootstrap
-    make -f examples/Makefile-simulation
-    tar czf "$OT_SIMULATION_CACHE" output
+    script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF
+    tar czf "$OT_SIMULATION_CACHE" build
+    echo "$OPENTHREAD_CHECKOUT" >"$OT_SIMULATION_CACHE_STAMP_FILE"
 }
 
 function __cirquetest_build_ot_lazy() {
     pushd .
     cd "$REPO_DIR"/third_party/openthread/repo
-    ([[ -f "$OT_SIMULATION_CACHE" ]] && tar zxf "$OT_SIMULATION_CACHE") || __cirquetest_build_ot
+    ([[ -f "$OT_SIMULATION_CACHE_STAMP_FILE" ]] &&
+        [[ "$(cat "$OT_SIMULATION_CACHE_STAMP_FILE")" = "$OPENTHREAD_CHECKOUT" ]] &&
+        [[ -f "$OT_SIMULATION_CACHE" ]] &&
+        tar zxf "$OT_SIMULATION_CACHE") ||
+        __cirquetest_build_ot
     popd
 }
 
@@ -150,9 +124,9 @@ function cirquetest_run_test() {
     export DEVICE_LOG_DIR="$LOG_DIR/$CURRENT_TEST"/device_logs
     shift
     mkdir -p "$DEVICE_LOG_DIR"
-    __cirquetest_start_flask &
+    __cirquetest_start_flask
     sleep 5
-    "$TEST_DIR/$CURRENT_TEST.sh" "$@"
+    "$TEST_DIR/$CURRENT_TEST.py" "$@"
     exitcode=$?
     __cirquetest_clean_flask
     # TODO: Do docker system prune, we cannot filter which container

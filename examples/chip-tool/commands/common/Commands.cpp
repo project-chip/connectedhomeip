@@ -23,12 +23,8 @@
 #include <algorithm>
 #include <string>
 
-#if CONFIG_DEVICE_LAYER
-#include <platform/CHIPDeviceLayer.h>
-#endif
-
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
@@ -38,61 +34,27 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
     }
 }
 
-int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
+int Commands::Run(int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::CommissionerInitParams initParams;
 
     err = chip::Platform::MemoryInit();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
-
-#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
-    SuccessOrExit(err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ 0, /* BLE central */ true));
-#endif
 
     err = mStorage.Init();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
-    initParams.storageDelegate = &mStorage;
-
-    err = mOpCredsIssuer.Initialize(mStorage);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", chip::ErrorStr(err)));
-
-    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
-
-    err = mController.SetUdpListenPort(mStorage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
-
-    err = mController.Init(localId, initParams);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
-
-    err = mController.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
-
-    err = RunCommand(localId, remoteId, argc, argv);
-    SuccessOrExit(err);
+    err = RunCommand(argc, argv);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err)));
 
 exit:
-#if CONFIG_DEVICE_LAYER
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-#endif
-
-    //
-    // We can call DeviceController::Shutdown() safely without grabbing the stack lock
-    // since the CHIP thread and event queue have been stopped, preventing any thread
-    // races.
-    //
-    mController.Shutdown();
-
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv)
+CHIP_ERROR Commands::RunCommand(int argc, char ** argv)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     std::map<std::string, CommandsVector>::iterator cluster;
     Command * command = nullptr;
 
@@ -100,7 +62,7 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
     {
         ChipLogError(chipTool, "Missing cluster name");
         ShowClusters(argv[0]);
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     cluster = GetCluster(argv[1]);
@@ -108,14 +70,14 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
     {
         ChipLogError(chipTool, "Unknown cluster: %s", argv[1]);
         ShowClusters(argv[0]);
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (argc <= 2)
     {
         ChipLogError(chipTool, "Missing command name");
         ShowCluster(argv[0], argv[1], cluster->second);
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (!IsGlobalCommand(argv[2]))
@@ -125,7 +87,7 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
         {
             ChipLogError(chipTool, "Unknown command: %s", argv[2]);
             ShowCluster(argv[0], argv[1], cluster->second);
-            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
     else
@@ -134,7 +96,7 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
         {
             ChipLogError(chipTool, "Missing attribute name");
             ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
-            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         command = GetGlobalCommand(cluster->second, argv[2], argv[3]);
@@ -142,35 +104,17 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
         {
             ChipLogError(chipTool, "Unknown attribute: %s", argv[3]);
             ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
-            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
 
     if (!command->InitArguments(argc - 3, &argv[3]))
     {
         ShowCommand(argv[0], argv[1], command);
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    {
-        Command::ExecutionContext execContext;
-
-        execContext.commissioner  = &mController;
-        execContext.opCredsIssuer = &mOpCredsIssuer;
-        execContext.storage       = &mStorage;
-
-        command->SetExecutionContext(execContext);
-
-        err = command->Run(localId, remoteId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
-            ExitNow();
-        }
-    }
-
-exit:
-    return err;
+    return command->Run();
 }
 
 std::map<std::string, Commands::CommandsVector>::iterator Commands::GetCluster(std::string clusterName)

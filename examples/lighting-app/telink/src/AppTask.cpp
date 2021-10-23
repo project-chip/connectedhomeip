@@ -28,16 +28,19 @@
 
 #include "ThreadUtil.h"
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
+
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
+#include <lib/support/ErrorStr.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/ErrorStr.h>
 #include <system/SystemClock.h>
 
 #include <logging/log.h>
@@ -61,32 +64,31 @@ Button sFactoryResetButton;
 Button sLightingButton;
 Button sThreadStartButton;
 
-bool sIsThreadProvisioned     = false;
-bool sIsThreadEnabled         = false;
-bool sIsThreadAttached        = false;
-bool sHaveBLEConnections      = false;
-bool sHaveServiceConnectivity = false;
+bool sIsThreadProvisioned = false;
+bool sIsThreadEnabled     = false;
+bool sIsThreadAttached    = false;
+bool sHaveBLEConnections  = false;
 
 } // namespace
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-int AppTask::Init()
+CHIP_ERROR AppTask::Init()
 {
-    int ret;
+    CHIP_ERROR ret;
 
-    // Initialize LEDs
-    LEDWidget::InitGpio();
-
+    // Initialize status LED
+    LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
     sStatusLED.Init(SYSTEM_STATE_LED_PIN);
 
     InitButtons();
 
     // Init lighting manager
     ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL);
-    if (ret != 0)
+    if (ret != CHIP_NO_ERROR)
     {
         LOG_ERR("Failed to int lighting manager");
         return ret;
@@ -95,36 +97,39 @@ int AppTask::Init()
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Init ZCL Data Model and start server
-    InitServer();
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-    // Setup test pairing
-    ret = AddTestPairing();
+    ret = chip::Server::GetInstance().AddTestCommissioning();
     if (ret != CHIP_NO_ERROR)
     {
         LOG_ERR("Failed to add test pairing");
         return ret;
     }
 
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-int AppTask::StartApp()
+CHIP_ERROR AppTask::StartApp()
 {
-    int ret = Init();
+    CHIP_ERROR err = Init();
 
-    if (ret)
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("AppTask.Init() failed");
-        return ret;
+        return err;
     }
 
     AppEvent event = {};
 
     while (true)
     {
-        ret = k_msgq_get(&sAppEventQueue, &event, K_MSEC(10));
+        int ret = k_msgq_get(&sAppEventQueue, &event, K_MSEC(10));
 
         while (!ret)
         {
@@ -140,19 +145,14 @@ int AppTask::StartApp()
 
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
-        if (sHaveServiceConnectivity)
-        {
-            sStatusLED.Set(true);
-        }
-        else if (sIsThreadProvisioned && sIsThreadEnabled)
+        if (sIsThreadProvisioned && sIsThreadEnabled)
         {
             if (sIsThreadAttached)
             {
@@ -322,7 +322,7 @@ void AppTask::UpdateClusterState()
     uint8_t level = LightingMgr().GetLevel();
 
     status = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
-                                   ZCL_DATA8_ATTRIBUTE_TYPE);
+                                   ZCL_INT8U_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -332,12 +332,9 @@ void AppTask::UpdateClusterState()
 
 void AppTask::InitButtons(void)
 {
-    const struct device * port = device_get_binding(BUTTON_PORT);
-    assert(port != NULL);
-
-    sFactoryResetButton.Configure(port, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sLightingButton.Configure(port, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
-    sThreadStartButton.Configure(port, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
+    sLightingButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
+    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
     ButtonManagerInst().AddButton(sLightingButton);

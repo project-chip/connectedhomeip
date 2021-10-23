@@ -24,28 +24,37 @@
 
 #include "AppEvent.h"
 #include "LightingManager.h"
+#include "sl_simple_button_instances.h"
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
 #include <platform/CHIPDeviceLayer.h>
 
+// Application-defined error codes in the CHIP_ERROR space.
+#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
+#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
+#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
+#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
+#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
+#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+
 class AppTask
 {
 
 public:
-    int StartAppTask();
+    CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
-    void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
+    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
 
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(LightingManager::Action_t aAction);

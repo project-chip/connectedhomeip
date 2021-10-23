@@ -1,0 +1,4 @@
+---
+Checks: '-*,bugprone-use-after-move'
+WarningsAsErrors: '*'
+HeaderFilterRegex: ''

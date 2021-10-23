@@ -1,5 +1,5 @@
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #import <CoreBluetooth/CoreBluetooth.h>
 

@@ -18,7 +18,7 @@
  * @file
  *   This file implements a stateless TransportMgr, it will took a raw message
  * buffer from transports, and then extract the message header without decode it.
- * For secure messages, it will pass it to the SecureSessionMgr, and for unsecure
+ * For secure messages, it will pass it to the SessionManager, and for unsecure
  * messages (rendezvous messages), it will pass it to RendezvousSession.
  *   When sending messages, it will encode the packet header, and pass it to the
  * transports.
@@ -27,8 +27,8 @@
 
 #pragma once
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <transport/TransportMgrBase.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>

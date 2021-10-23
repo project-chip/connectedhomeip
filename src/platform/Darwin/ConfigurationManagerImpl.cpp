@@ -25,13 +25,13 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <TargetConditionals.h>
 #if TARGET_OS_OSX
@@ -132,19 +132,19 @@ exit:
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
-CHIP_ERROR ConfigurationManagerImpl::_Init()
+CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
+    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
 #if TARGET_OS_OSX
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -162,18 +162,18 @@ CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 #endif // TARGET_OS_OSX
 }
 
-bool ConfigurationManagerImpl::_CanFactoryReset()
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     // TODO(#742): query the application to determine if factory reset is allowed.
     return true;
 }
 
-void ConfigurationManagerImpl::_InitiateFactoryReset()
+void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     ChipLogError(DeviceLayer, "InitiateFactoryReset not implemented");
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
 
@@ -185,7 +185,7 @@ CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);

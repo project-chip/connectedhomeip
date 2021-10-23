@@ -28,13 +28,13 @@ Use `--output-format=help` to see available output formats.
 
 import sys
 
-import numpy as np  # type: ignore
+import numpy  # type: ignore
 
 import memdf.collect
 import memdf.report
 import memdf.select
 
-from memdf import Config, DFs, SectionDF, SymbolDF
+from memdf import Config, DFs, SymbolDF
 
 
 def main(argv):
@@ -49,14 +49,11 @@ def main(argv):
             }, argv)
         dfs: DFs = memdf.collect.collect_files(config)
 
-        by = config['report.by']
         symbols = dfs[SymbolDF.name]
-        summary = symbols[[by, 'size'
-                           ]].groupby(by).aggregate(np.sum).reset_index()
+        summary = memdf.select.groupby(config, symbols)
         memdf.report.write_dfs(config, {SymbolDF.name: summary})
 
     except Exception as exception:
-        status = 1
         raise exception
 
     return status

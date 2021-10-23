@@ -17,9 +17,11 @@
 
 #pragma once
 
+#include <ble/BleLayer.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
+#include <protocols/secure_channel/SessionIDAllocator.h>
 
 namespace chip {
 
@@ -31,44 +33,43 @@ public:
     {
         if (mExchangeManager != nullptr)
         {
-            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
+            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
         }
-
-        mCredentials.Release();
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins);
+                                             Ble::BleLayer * bleLayer, SessionManager * sessionManager, FabricTable * fabrics,
+                                             SessionIDAllocator * idAllocator);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
     //// ExchangeDelegate Implementation ////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
-                                                            SecureSessionMgr * sessionMgr) override
+                                                            SessionManager * sessionManager) override
     {
-        return mPairingSession.GetMessageDispatch(reliableMessageManager, sessionMgr);
+        return GetSession().GetMessageDispatch(reliableMessageManager, sessionManager);
     }
+
+    virtual CASESession & GetSession() { return mPairingSession; }
 
 private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
     CASESession mPairingSession;
-    uint16_t mNextKeyId            = 0;
-    SecureSessionMgr * mSessionMgr = nullptr;
+    uint16_t mSessionKeyId           = 0;
+    SessionManager * mSessionManager = nullptr;
+    Ble::BleLayer * mBleLayer        = nullptr;
 
-    Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
-
-    Transport::AdminPairingTable * mAdmins = nullptr;
-    Credentials::ChipCertificateSet mCertificates;
-    Credentials::OperationalCredentialSet mCredentials;
-    Credentials::CertificateKeyId mRootKeyId;
+    FabricTable * mFabrics = nullptr;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
+
+    SessionIDAllocator * mIDAllocator = nullptr;
 
     void Cleanup();
 };

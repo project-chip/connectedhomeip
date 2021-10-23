@@ -30,12 +30,6 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define CHIP_CONFIG_ERROR_TYPE uint32_t
-#define CHIP_CONFIG_NO_ERROR (0)
-
-#define ASN1_CONFIG_ERROR_TYPE uint32_t
-#define ASN1_CONFIG_NO_ERROR (0)
-
 #define ChipDie() assert()
 
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE uint16_t
@@ -47,13 +41,16 @@
 
 // ==================== Security Adaptations ====================
 
+// This platform uses mbedtls, but these defines don't seem to be used in source
 #define CHIP_CONFIG_USE_OPENSSL_ECC 0
 #define CHIP_CONFIG_USE_MICRO_ECC 1
 
 #define CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL 0
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT 1
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS 0
+#define CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT 0
+#define CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS 1
 #define CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM 0
+
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(unsigned int) * 76)
 
 #define CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL 0
 #define CHIP_CONFIG_AES_IMPLEMENTATION_AESNI 0

@@ -27,43 +27,48 @@
 #include <string.h>
 #include <vector>
 
-#include <core/CHIPError.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 namespace chip {
 
 CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayloadData::AdditionalDataPayload & outPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVReader reader;
-    TLV::TLVReader innerReader;
+    TLV::ContiguousBufferTLVReader reader;
+    TLV::ContiguousBufferTLVReader innerReader;
 
     reader.Init(mPayloadBufferData, mPayloadBufferLength);
-    err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag));
 
     // Open the container
-    err = reader.OpenContainer(innerReader);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.OpenContainer(innerReader));
+    if (innerReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(SetupPayloadData::kRotatingDeviceIdTag)) == CHIP_NO_ERROR)
+    {
+        // Get the value of the rotating device id
+        ByteSpan rotatingDeviceId;
+        ReturnErrorOnFailure(innerReader.GetByteView(rotatingDeviceId));
 
-    err = innerReader.Next(TLV::kTLVType_UTF8String, TLV::ContextTag(SetupPayloadData::kRotatingDeviceIdTag));
-    SuccessOrExit(err);
+        VerifyOrReturnError(rotatingDeviceId.size() <= RotatingDeviceId::kMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+        char rotatingDeviceIdBufferTemp[RotatingDeviceId::kHexMaxLength];
 
-    // Get the value of the rotating device id
-    char rotatingDeviceId[SetupPayloadData::kRotatingDeviceIdLength];
-    err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
-    SuccessOrExit(err);
-    outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
+        ReturnErrorOnFailure(Encoding::BytesToUppercaseHexString(rotatingDeviceId.data(), rotatingDeviceId.size(),
+                                                                 rotatingDeviceIdBufferTemp, RotatingDeviceId::kHexMaxLength));
+        outPayload.rotatingDeviceId = std::string(rotatingDeviceIdBufferTemp, rotatingDeviceId.size() * 2);
+    }
+    else
+    {
+        outPayload.rotatingDeviceId = "";
+    }
 
     // Verify the end of the container
-    err = reader.VerifyEndOfContainer();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

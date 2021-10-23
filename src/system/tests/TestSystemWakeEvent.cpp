@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This is a unit test suite for <tt>chip::System::SystemWakeEvent</tt>
+ *      This is a unit test suite for <tt>chip::System::WakeEvent</tt>
  *
  */
 
@@ -27,13 +27,12 @@
 
 #include <system/SystemConfig.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
 #include <system/SystemError.h>
-#include <system/SystemLayer.h>
-#include <system/SystemWakeEvent.h>
+#include <system/SystemLayerImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
@@ -42,32 +41,52 @@
 using namespace chip::System;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+namespace chip {
+namespace System {
+class WakeEventTest
+{
+public:
+    static int GetReadFD(const WakeEvent & wakeEvent) { return wakeEvent.GetReadFD(); }
+};
+} // namespace System
+} // namespace chip
+
 namespace {
 
 struct TestContext
 {
-    SystemWakeEvent mWakeEvent;
+    ::chip::System::LayerImpl mSystemLayer;
+    WakeEvent mWakeEvent;
     fd_set mReadSet;
     fd_set mWriteSet;
     fd_set mErrorSet;
 
-    TestContext() { mWakeEvent.Open(); }
-    ~TestContext() { mWakeEvent.Close(); }
+    TestContext()
+    {
+        mSystemLayer.Init();
+        mWakeEvent.Open(mSystemLayer);
+    }
+    ~TestContext()
+    {
+        mWakeEvent.Close(mSystemLayer);
+        mSystemLayer.Shutdown();
+    }
 
     int SelectWakeEvent(timeval timeout = {})
     {
         FD_ZERO(&mReadSet);
         FD_ZERO(&mWriteSet);
         FD_ZERO(&mErrorSet);
-        FD_SET(mWakeEvent.GetNotifFD(), &mReadSet);
-        return select(mWakeEvent.GetNotifFD() + 1, &mReadSet, &mWriteSet, &mErrorSet, &timeout);
+        FD_SET(WakeEventTest::GetReadFD(mWakeEvent), &mReadSet);
+        return select(WakeEventTest::GetReadFD(mWakeEvent) + 1, &mReadSet, &mWriteSet, &mErrorSet, &timeout);
     }
 };
 
 void TestOpen(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
-    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.GetNotifFD() >= 0);
+    NL_TEST_ASSERT(inSuite, WakeEventTest::GetReadFD(lContext.mWakeEvent) >= 0);
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 0);
 }
 
@@ -79,11 +98,11 @@ void TestNotify(nlTestSuite * inSuite, void * aContext)
     // Check that select() succeeds after Notify() has been called
     lContext.mWakeEvent.Notify();
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 1);
-    NL_TEST_ASSERT(inSuite, FD_ISSET(lContext.mWakeEvent.GetNotifFD(), &lContext.mReadSet));
+    NL_TEST_ASSERT(inSuite, FD_ISSET(WakeEventTest::GetReadFD(lContext.mWakeEvent), &lContext.mReadSet));
 
     // ...and state of the event is not cleared automatically
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 1);
-    NL_TEST_ASSERT(inSuite, FD_ISSET(lContext.mWakeEvent.GetNotifFD(), &lContext.mReadSet));
+    NL_TEST_ASSERT(inSuite, FD_ISSET(WakeEventTest::GetReadFD(lContext.mWakeEvent), &lContext.mReadSet));
 }
 
 void TestConfirm(nlTestSuite * inSuite, void * aContext)
@@ -93,7 +112,7 @@ void TestConfirm(nlTestSuite * inSuite, void * aContext)
     // Check that select() succeeds after Notify() has been called
     lContext.mWakeEvent.Notify();
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 1);
-    NL_TEST_ASSERT(inSuite, FD_ISSET(lContext.mWakeEvent.GetNotifFD(), &lContext.mReadSet));
+    NL_TEST_ASSERT(inSuite, FD_ISSET(WakeEventTest::GetReadFD(lContext.mWakeEvent), &lContext.mReadSet));
 
     // Check that Confirm() clears state of the event
     lContext.mWakeEvent.Confirm();
@@ -128,12 +147,12 @@ void TestBlockingSelect(nlTestSuite *, void *) {}
 void TestClose(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
-    lContext.mWakeEvent.Close();
+    lContext.mWakeEvent.Close(lContext.mSystemLayer);
 
-    const auto notifFD = lContext.mWakeEvent.GetNotifFD();
+    const auto notifFD = WakeEventTest::GetReadFD(lContext.mWakeEvent);
 
     // Check that Close() has cleaned up itself and reopen is possible
-    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open() == CHIP_SYSTEM_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open(lContext.mSystemLayer) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, notifFD < 0);
 }
 } // namespace
@@ -155,13 +174,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-// clang-format off
-static nlTestSuite kTheSuite =
-{
-    "chip-system-wake-event",
-    sTests
-};
-// clang-format on
+static nlTestSuite kTheSuite = { "chip-system-wake-event", sTests };
 
 int TestSystemWakeEvent(void)
 {

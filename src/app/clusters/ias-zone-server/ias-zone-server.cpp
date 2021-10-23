@@ -51,20 +51,22 @@
 // *****************************************************************************
 
 #include "ias-zone-server.h"
-#include <app/Command.h>
-#include <app/common/gen/att-storage.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/att-storage.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 #include <system/SystemLayer.h>
 
-#include "gen/callback.h"
-
 using namespace chip;
+using namespace chip::app::Clusters::IasZone;
 
 #define UNDEFINED_ZONE_ID 0xFF
 #define DELAY_TIMER_MS (1 * MILLISECOND_TICKS_PER_SECOND)
@@ -210,22 +212,23 @@ static void enrollWithClient(EndpointId endpoint)
     }
 }
 
-EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint16_t size,
-                                                                     uint8_t * value)
+Protocols::InteractionModel::Status
+MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     uint8_t i;
     bool zeroAddress;
     EmberBindingTableEntry bindingEntry;
     EmberBindingTableEntry currentBind;
     NodeId destNodeId;
+    EndpointId endpoint   = attributePath.mEndpointId;
     uint8_t ieeeAddress[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
     // If this is not a CIE Address write, the CIE address has already been
     // written, or the IAS Zone server is already enrolled, do nothing.
-    if (attributeId != ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID || emberAfCurrentCommand() == NULL)
+    if (attributePath.mAttributeId != ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID || emberAfCurrentCommand() == NULL)
     {
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return Protocols::InteractionModel::Status::Success;
     }
 
     memcpy(&destNodeId, value, sizeof(NodeId));
@@ -293,7 +296,7 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId 
                                           EMBER_AF_STAY_AWAKE);
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(EndpointId endpoint, EmberAfIasZoneEnrollmentMode method)
@@ -349,8 +352,12 @@ static void updateEnrollState(EndpointId endpoint, bool enrolled)
     emberAfIasZoneClusterPrintln("IAS Zone Server State: %pEnrolled", (enrolled ? "" : "NOT "));
 }
 
-bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::app::Command * commandObj, uint8_t enrollResponseCode, uint8_t zoneId)
+bool emberAfIasZoneClusterZoneEnrollResponseCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::ZoneEnrollResponse::DecodableType & commandData)
 {
+    auto & enrollResponseCode = commandData.enrollResponseCode;
+    auto & zoneId             = commandData.zoneId;
+
     EndpointId endpoint;
     uint8_t epZoneId;
     EmberAfStatus status;
@@ -408,7 +415,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     IasZoneStatusQueueEntry newBufferEntry;
     newBufferEntry.endpoint    = endpoint;
     newBufferEntry.status      = newStatus;
-    newBufferEntry.eventTimeMs = System::Layer::GetClock_MonotonicMS();
+    newBufferEntry.eventTimeMs = System::SystemClock().GetMonotonicMilliseconds();
 #endif
     EmberStatus sendStatus = EMBER_SUCCESS;
 
@@ -630,7 +637,7 @@ static void unenrollSecurityDevice(EndpointId endpoint)
     uint16_t zoneType     = EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE;
 
     emberAfWriteServerAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID, (uint8_t *) ieeeAddress,
-                                ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE);
+                                ZCL_NODE_ID_ATTRIBUTE_TYPE);
 
     emberAfWriteServerAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, (uint8_t *) &zoneType,
                                 ZCL_INT16U_ATTRIBUTE_TYPE);
@@ -906,7 +913,7 @@ static int16_t popFromBuffer(IasZoneStatusQueue * ring, IasZoneStatusQueueEntry 
 
 uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
 {
-    uint32_t currentTimeMs = System::Layer::GetClock_MonotonicMS();
+    uint64_t currentTimeMs = System::SystemClock().GetMonotonicMilliseconds();
     int64_t deltaTimeMs    = currentTimeMs - entry->eventTimeMs;
 
     if (deltaTimeMs < 0)

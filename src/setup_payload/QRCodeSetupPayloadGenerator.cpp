@@ -23,16 +23,15 @@
  */
 
 #include "QRCodeSetupPayloadGenerator.h"
-#include "Base38.h"
+#include "Base38Encode.h"
 
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -43,13 +42,10 @@ namespace chip {
 static CHIP_ERROR populateBits(uint8_t * bits, size_t & offset, uint64_t input, size_t numberOfBits,
                                size_t totalPayloadDataSizeInBits)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t index;
+    VerifyOrReturnError(offset + numberOfBits <= totalPayloadDataSizeInBits, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input < 1u << numberOfBits, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(offset + numberOfBits <= totalPayloadDataSizeInBits, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(input < 1u << numberOfBits, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    index = offset;
+    size_t index = offset;
     offset += numberOfBits;
     while (input != 0)
     {
@@ -60,27 +56,21 @@ static CHIP_ERROR populateBits(uint8_t * bits, size_t & offset, uint64_t input, 
         index++;
         input >>= 1;
     }
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR populateTLVBits(uint8_t * bits, size_t & offset, const uint8_t * tlvBuf, size_t tlvBufSizeInBytes,
                                   size_t totalPayloadDataSizeInBits)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     for (size_t i = 0; i < tlvBufSizeInBytes; i++)
     {
-        uint8_t value = tlvBuf[i];
-        err           = populateBits(bits, offset, value, 8, totalPayloadDataSizeInBits);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        const uint8_t value = tlvBuf[i];
+        ReturnErrorOnFailure(populateBits(bits, offset, value, 8, totalPayloadDataSizeInBits));
     }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR writeTag(TLV::TLVWriter & writer, uint64_t tag, OptionalQRCodeInfo & info)
+CHIP_ERROR writeTag(TLV::TLVWriter & writer, TLV::Tag tag, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -100,7 +90,7 @@ CHIP_ERROR writeTag(TLV::TLVWriter & writer, uint64_t tag, OptionalQRCodeInfo & 
     return err;
 }
 
-CHIP_ERROR writeTag(TLV::TLVWriter & writer, uint64_t tag, OptionalQRCodeInfoExtension & info)
+CHIP_ERROR writeTag(TLV::TLVWriter & writer, TLV::Tag tag, OptionalQRCodeInfoExtension & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -131,81 +121,83 @@ CHIP_ERROR writeTag(TLV::TLVWriter & writer, uint64_t tag, OptionalQRCodeInfoExt
 CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart,
                                                                     uint32_t maxLen, size_t & tlvDataLengthInBytes)
 {
-    CHIP_ERROR err                                                 = CHIP_NO_ERROR;
     std::vector<OptionalQRCodeInfo> optionalData                   = outPayload.getAllOptionalVendorData();
     std::vector<OptionalQRCodeInfoExtension> optionalExtensionData = outPayload.getAllOptionalExtensionData();
-    VerifyOrExit(!optionalData.empty() || !optionalExtensionData.empty(), err = CHIP_NO_ERROR);
+    VerifyOrReturnError(!optionalData.empty() || !optionalExtensionData.empty(), CHIP_NO_ERROR);
 
     TLV::TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
 
     TLV::TLVWriter innerStructureWriter;
 
-    err = rootWriter.OpenContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, innerStructureWriter);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(rootWriter.OpenContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, innerStructureWriter));
 
     for (OptionalQRCodeInfo info : optionalData)
     {
-        err = writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info));
     }
 
     for (OptionalQRCodeInfoExtension info : optionalExtensionData)
     {
-        err = writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info));
     }
 
-    err = rootWriter.CloseContainer(innerStructureWriter);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(rootWriter.CloseContainer(innerStructureWriter));
 
-    err = rootWriter.Finalize();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(rootWriter.Finalize());
 
     tlvDataLengthInBytes = rootWriter.GetLengthWritten();
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
+static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bits, uint8_t * tlvDataStart,
+                                 size_t tlvDataLengthInBytes)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
     size_t offset                 = 0;
     size_t totalPayloadSizeInBits = kTotalPayloadDataSizeInBits + (tlvDataLengthInBytes * 8);
-    err = populateBits(bits, offset, payload.version, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, payload.vendorID, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, static_cast<uint64_t>(payload.commissioningFlow), kCommissioningFlowFieldLengthInBits,
-                       kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, payload.rendezvousInformation.Raw(), kRendezvousInfoFieldLengthInBits,
-                       kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateTLVBits(bits, offset, tlvDataStart, tlvDataLengthInBytes, totalPayloadSizeInBits);
-    return err;
+    VerifyOrReturnError(bits.size() * 8 >= totalPayloadSizeInBits, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    ReturnErrorOnFailure(
+        populateBits(bits.data(), offset, payload.version, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(
+        populateBits(bits.data(), offset, payload.vendorID, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(
+        populateBits(bits.data(), offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, static_cast<uint64_t>(payload.commissioningFlow),
+                                      kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Raw(), kRendezvousInfoFieldLengthInBits,
+                                      kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits,
+                                      kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(
+        populateBits(bits.data(), offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateTLVBits(bits.data(), offset, tlvDataStart, tlvDataLengthInBytes, totalPayloadSizeInBits));
+
+    return CHIP_NO_ERROR;
 }
 
-// TODO: issue #3663 - Unbounded stack in payloadBase38RepresentationWithTLV()
-#if !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
-
-static CHIP_ERROR payloadBase38RepresentationWithTLV(SetupPayload & setupPayload, std::string & base38Representation,
-                                                     size_t bitsetSize, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
+static CHIP_ERROR payloadBase38RepresentationWithTLV(PayloadContents & payload, MutableCharSpan & outBuffer, MutableByteSpan bits,
+                                                     uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
 {
-    uint8_t bits[bitsetSize];
-    memset(bits, 0, bitsetSize);
-    std::string encodedPayload;
-    CHIP_ERROR err = generateBitSet(setupPayload, bits, tlvDataStart, tlvDataLengthInBytes);
-    SuccessOrExit(err);
+    memset(bits.data(), 0, bits.size());
+    ReturnErrorOnFailure(generateBitSet(payload, bits, tlvDataStart, tlvDataLengthInBytes));
 
-    encodedPayload = base38Encode(bits, ArraySize(bits));
-    encodedPayload.insert(0, kQRCodePrefix);
-    base38Representation = encodedPayload;
-exit:
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    size_t prefixLen = strlen(kQRCodePrefix);
+
+    if (outBuffer.size() < prefixLen + 1)
+    {
+        err = CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    else
+    {
+        MutableCharSpan subSpan = outBuffer.SubSpan(prefixLen, outBuffer.size() - prefixLen);
+        memcpy(outBuffer.data(), kQRCodePrefix, prefixLen);
+        err = base38Encode(bits, subSpan);
+    }
+
     return err;
 }
 
@@ -219,23 +211,28 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string & base38Representation, uint8_t * tlvDataStart,
                                                                     uint32_t tlvDataStartSize)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
     size_t tlvDataLengthInBytes = 0;
 
-    VerifyOrExit(mPayload.isValidQRCodePayload(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    err = generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes);
-    SuccessOrExit(err);
+    VerifyOrReturnError(mPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes));
 
-    err = payloadBase38RepresentationWithTLV(mPayload, base38Representation, kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes,
-                                             tlvDataStart, tlvDataLengthInBytes);
-    SuccessOrExit(err);
+    std::vector<uint8_t> bits(kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes);
+    MutableByteSpan bitsSpan(bits.data(), bits.capacity());
+    std::vector<char> buffer(base38EncodedLength(bits.capacity()) + strlen(kQRCodePrefix));
+    MutableCharSpan bufferSpan(buffer.data(), buffer.capacity());
 
-exit:
-    return err;
+    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload, bufferSpan, bitsSpan, tlvDataStart, tlvDataLengthInBytes));
+
+    base38Representation.assign(bufferSpan.data());
+    return CHIP_NO_ERROR;
 }
 
-#if !defined(__clang__)
-#pragma GCC diagnostic pop // -Wstack-usage
-#endif
+CHIP_ERROR QRCodeBasicSetupPayloadGenerator::payloadBase38Representation(MutableCharSpan & outBuffer)
+{
+    uint8_t bits[kTotalPayloadDataSizeInBytes];
+    VerifyOrReturnError(mPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    return payloadBase38RepresentationWithTLV(mPayload, outBuffer, MutableByteSpan(bits), nullptr, 0);
+}
 
 } // namespace chip

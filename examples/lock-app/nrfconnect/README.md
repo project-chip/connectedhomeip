@@ -1,4 +1,4 @@
-# CHIP nRF Connect Lock Example Application
+# Matter nRF Connect Lock Example Application
 
 The nRF Connect Lock Example demonstrates how to remotely control a door lock
 device with one basic bolt. It uses buttons to test changing the lock and device
@@ -10,12 +10,13 @@ a reference for creating your own application.
   <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 </p>
 
-The example is based on [CHIP](https://github.com/project-chip/connectedhomeip)
-and Nordic Semiconductor's nRF Connect SDK, and supports remote access and
-control of a simulated door lock over a low-power, 802.15.4 Thread network.
+The example is based on
+[Matter](https://github.com/project-chip/connectedhomeip) and Nordic
+Semiconductor's nRF Connect SDK, and supports remote access and control of a
+simulated door lock over a low-power, 802.15.4 Thread network.
 
-The example behaves as a CHIP accessory, that is a device that can be paired
-into an existing CHIP network and can be controlled by this network.
+The example behaves as a Matter accessory, that is a device that can be paired
+into an existing Matter network and can be controlled by this network.
 
 <hr>
 
@@ -48,19 +49,19 @@ into an existing CHIP network and can be controlled by this network.
 This example is running on the nRF Connect platform, which is based on Nordic
 Semiconductor's
 [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
-and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
+and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
-The CHIP device that runs the lock application is controlled by the CHIP
-controller device over the Thread protocol. By default, the CHIP device has
-Thread disabled, and it should be paired with CHIP controller and get
+The Matter device that runs the lock application is controlled by the Matter
+controller device over the Thread protocol. By default, the Matter device has
+Thread disabled, and it should be paired with Matter controller and get
 configuration from it. Some actions required before establishing full
 communication are described below.
 
 The example also comes with a test mode, which allows to start Thread with the
 default settings by pressing button manually. However, this mode does not
-guarantee that the device will be able to communicate with the CHIP controller
+guarantee that the device will be able to communicate with the Matter controller
 and other devices.
 
 The example can be configured to use the secure bootloader and utilize it for
@@ -68,34 +69,34 @@ performing over-the-air Device Firmware Upgrade using Bluetooth LE.
 
 ### Bluetooth LE advertising
 
-In this example, to commission the device onto a CHIP network, it must be
+In this example, to commission the device onto a Matter network, it must be
 discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
 LE advertising manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
-In this example, the commissioning procedure (called rendezvous) is done over
-Bluetooth LE between a CHIP device and the CHIP controller, where the controller
-has the commissioner role.
+In this example, the commissioning procedure is done over Bluetooth LE between a
+Matter device and the Matter controller, where the controller has the
+commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
-from the CHIP device. The data payload is encoded within a QR code, printed to
-the UART console, and shared using an NFC tag. For security reasons, you must
-start NFC tag emulation manually after powering up the device by pressing
-**Button 4**.
+from the Matter device. The data payload is encoded within a QR code, printed to
+the UART console, and shared using an NFC tag. NFC tag emulation starts
+automatically when Bluetooth LE advertising is started and stays enabled until
+Bluetooth LE advertising timeout expires.
 
 #### Thread provisioning
 
 Last part of the rendezvous procedure, the provisioning operation involves
-sending the Thread network credentials from the CHIP controller to the CHIP
+sending the Thread network credentials from the Matter controller to the Matter
 device. As a result, device is able to join the Thread network and communicate
 with other Thread devices in the network.
 
 ### Device Firmware Upgrade
 
 The example allows enabling the over-the-air Device Firmware Upgrade feature. In
-this process, the device hosting new firmware image sends the image to the CHIP
-device using Bluetooth LE transport and
+this process, the device hosting new firmware image sends the image to the
+Matter device using Bluetooth LE transport and
 [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt).
 The
 [MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html)
@@ -122,8 +123,8 @@ Simple Management Protocol (SMP) is a basic transfer encoding that is used for
 device management purposes, including application image management. SMP supports
 using different transports, such as Bluetooth LE, UDP, or serial USB/UART.
 
-In this example, the CHIP device runs the SMP Server to download the application
-update image using the Bluetooth LE transport.
+In this example, the Matter device runs the SMP Server to download the
+application update image using the Bluetooth LE transport.
 
 See the
 [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
@@ -146,10 +147,10 @@ more information.
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                      |
-| ----------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840-DK_top-view-small.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340-DK_top-view-small.jpg" alt="nRF5340 DK"/></details>    |
+| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
+| ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
 
 <hr>
 
@@ -209,7 +210,8 @@ opposite one.
 the test mode using the default configuration.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time.
+enables Bluetooth LE advertising for the predefined period of time (15 minutes
+by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
@@ -217,13 +219,14 @@ communicate with it using the
 
 **NFC port with antenna attached** can be used to start the
 [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
-information from the CHIP device in a data payload that can be shared using NFC.
+information from the Matter device in a data payload that can be shared using
+NFC.
 
 <hr>
 
 ## Setting up the environment
 
-Before building the example, check out the CHIP repository and sync submodules
+Before building the example, check out the Matter repository and sync submodules
 using the following command:
 
         $ git submodule update --init
@@ -308,10 +311,10 @@ To use the native shell for setup, complete the following steps:
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
 
 4.  Update the nRF Connect SDK to the most recent supported revision by running
-    the following command (replace _chip-dir_ with the path to CHIP repository
-    directory):
+    the following command (replace _matter-dir_ with the path to Matter
+    repository directory):
 
-         $ cd chip-dir
+         $ cd matter-dir
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update
 
 Now you can proceed with the [Building](#building) instruction.
@@ -364,23 +367,38 @@ To build the example with configuration that enables DFU, run the following
 command with _build-target_ replaced with the build target name of the Nordic
 Semiconductor's kit you own (for example `nrf52840dk_nrf52840`):
 
-> **_WARNING:_** Please do remember about replacing _build-target_ also in the
-> PM_STATIC_YML_FILE path.
+    $ west build -b build-target -- -DBUILD_WITH_DFU=1
 
-    $ west build -b build-target -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/app/overlay-dfu_support.conf -DPM_STATIC_YML_FILE="configuration/build-target/pm_static.yml"
+> **Note**:
+>
+> There are two types of Device Firmware Upgrade modes: single-image DFU and
+> multi-image DFU. Single-image mode supports upgrading only one firmware image,
+> the application image, and should be used for single-core nRF52840 DK devices.
+> Multi-image mode allows to upgrade more firmware images and is suitable for
+> upgrading the application core and network core firmware in two-core nRF5340
+> DK devices.
+
+#### Changing Device Firmware Upgrade configuration
+
+To change the default DFU configuration, edit the
+`overlay-single_image_dfu_support.conf` or
+`overlay-multi_image_dfu_support.conf` overlay files depending on whether the
+build target device supports multi-image DFU (nRF5340 DK) or single-image DFU
+(nRF52840 DK). The files are located in the `config/nrfconnect/app` directory.
+You can also define the desired options in your example's `prj.conf` file.
 
 #### Changing bootloader configuration
 
-To change the default MCUboot configuration, edit the `overlay-dfu_support.conf`
-overlay file that contains bootloader configuration options. The file is located
-in the `config/nrfconnect/app` directory. You can also define the desired
-options in your example's `prj.conf` file.
+To change the default MCUboot configuration, edit the
+`mcuboot_single_image_dfu.conf` or `mcuboot_multi_image_dfu.conf` overlay files
+depending on whether the build target device supports multi-image DFU (nRF5340
+DK) or single-image DFU (nRF52840 DK). The files are located in the
+`configuration` directory.
 
-Make sure to apply the same configuration changes in the
-`child_image/mcuboot.conf` file. This is necessary for the configuration to
-work, as the bootloader image is a separate application from the user
-application and it has its own configuration file. The contents of this file
-must be consistent with the application configuration.
+Make sure to keep the configuration consistent with changes made to the
+application configuration. This is necessary for the configuration to work, as
+the bootloader image is a separate application from the user application and it
+has its own configuration file.
 
 #### Changing flash memory settings
 
@@ -450,7 +468,7 @@ Read the
 [Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
 to see how to use [CHIPTool](../../../src/android/CHIPTool/README.md) for
 Android smartphones to commission and control the application within a
-CHIP-enabled Thread network.
+Matter-enabled Thread network.
 
 ### Testing Device Firmware Upgrade
 

@@ -30,16 +30,16 @@ static_library("helpers") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/inet/tests:helpers" ]
+  public_deps = [
+    "${chip_root}/src/inet/tests:helpers",
+    "${chip_root}/src/transport/raw",
+  ]
 }
 
 chip_test_suite("tests") {
   output_name = "libRawTransportTests"
 
-  test_sources = [
-    "TestMessageHeader.cpp",
-    "TestUDP.cpp",
-  ]
+  test_sources = [ "TestMessageHeader.cpp" ]
 
   if (current_os != "mac") {
     test_sources += [ "TestTCP.cpp" ]

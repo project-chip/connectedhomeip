@@ -18,10 +18,10 @@
 
 #pragma once
 
-// ---- Lock Example App Config ----
+// ---- Pump Controller Example App Config ----
 
-#define LOCK_BUTTON DK_BTN2
-#define LOCK_BUTTON_MASK DK_BTN2_MSK
+#define START_BUTTON DK_BTN2
+#define START_BUTTON_MASK DK_BTN2_MSK
 #define FUNCTION_BUTTON DK_BTN1
 #define FUNCTION_BUTTON_MASK DK_BTN1_MSK
 #define THREAD_START_BUTTON DK_BTN3
@@ -30,7 +30,7 @@
 #define BLE_ADVERTISEMENT_START_BUTTON_MASK DK_BTN4_MSK
 
 #define SYSTEM_STATE_LED DK_LED1
-#define LOCK_STATE_LED DK_LED2
+#define PUMP_STATE_LED DK_LED2
 
-// Time it takes in ms for the simulated actuator to move from one state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
+// Time it takes in ms for the simulated pump to move from one state to another.
+#define PUMP_START_PERIOS_MS 2000

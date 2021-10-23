@@ -19,7 +19,9 @@ on:
 
 concurrency:
     group: ${{ github.workflow }}
-    cancel-in-progress: true
+    # Don't cancel an already-running bloat check just because it took more
+    # than 5 minutes to run and our cron job is trying to schedule a new one.
+    cancel-in-progress: false
   
 jobs:
     pull_request_update:
@@ -28,7 +30,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build:0.5.18
 
         steps:
             - name: Checkout
@@ -39,3 +41,16 @@ jobs:
                   scripts/helpers/bloat_check.py                        \
                        --github-repository project-chip/connectedhomeip \
                        --github-api-token "${{ secrets.GITHUB_TOKEN }}"
+
+            - name: Report2
+              run: |
+                  scripts/tools/memory/gh_report.py \
+                    --verbose \
+                    --report-increases 1 \
+                    --report-pr \
+                    --github-comment \
+                    --github-limit-artifact-pages 50 \
+                    --github-limit-artifacts 500 \
+                    --github-limit-comments 20 \
+                    --github-repository project-chip/connectedhomeip \
+                    --github-api-token "${{ secrets.GITHUB_TOKEN }}"

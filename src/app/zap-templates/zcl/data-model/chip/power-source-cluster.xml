@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>CHIP</domain>
+    <name>Power Source</name>
+    <code>0x002F</code>
+    <define>POWER_SOURCE_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node.</description>
+    <!-- TODO: Add feature map once it is supported 
+    <tag name="WIRED" description="A wired power source"/>
+    <tag name="BAT" description="A battery powered source"/>
+    <tag name="RECHG" description="A rechargeable battery power source"/>
+    <tag name="REPLC" description="A replaceable battery power source"/>
+    -->
+    
+    <attribute side="server" code="0x0000" define="POWER_SOURCE_STATUS" type="ENUM8"  min="0x00" max="0x03" writable="false">Status</attribute>
+    <attribute side="server" code="0x0001" define="POWER_SOURCE_ORDER" type="INT8U" min="0x00" max="0xFF" writable="false">Order</attribute>
+    <attribute side="server" code="0x0002" define="POWER_SOURCE_DESCRIPTION" type="CHAR_STRING" length="60" writable="false">Description</attribute>
+    <attribute side="server" code="0x0003" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredAssessedInputVoltage</attribute>
+    <attribute side="server" code="0x0004" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">WiredAssessedInputFrequency</attribute>
+    <attribute side="server" code="0x0005" define="POWER_SOURCE_WIRED_CURRENT_TYPE" type="ENUM8" min="0x00" max="0x01" writable="false" optional="true">WiredCurrentType</attribute>
+    <attribute side="server" code="0x0006" define="POWER_SOURCE_WIRED_ASSESSED_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredAssessedCurrent</attribute>
+    <attribute side="server" code="0x0007" define="POWER_SOURCE_WIRED_NOMINAL_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredNominalVoltage</attribute>
+    <attribute side="server" code="0x0008" define="POWER_SOURCE_WIRED_MAXIMUM_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredMaximumCurrent</attribute>
+    <attribute side="server" code="0x0009" define="POWER_SOURCE_WIRED_PRESENT" type="BOOLEAN" writable="false" optional="true">WiredPresent</attribute>
+    <attribute side="server" code="0x000A" define="POWER_SOURCE_ACTIVE_WIRED_FAULTS" type="ARRAY" entryType="ENUM8" length="8" writable="false" optional="true">ActiveWiredFaults</attribute>
+    <attribute side="server" code="0x000B" define="POWER_SOURCE_BAT_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryVoltage</attribute>
+    <attribute side="server" code="0x000C" define="POWER_SOURCE_BAT_PERCENT_REMAINING" type="INT8U" min="0x00" max="0xC8" writable="false" optional="true">BatteryPercentRemaining</attribute>
+    <attribute side="server" code="0x000D" define="POWER_SOURCE_BAT_TIME_REMAINING" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryTimeRemaining</attribute>
+    <attribute side="server" code="0x000E" define="POWER_SOURCE_BAT_CHARGE_LEVEL" type="ENUM8" min="0x00" max="0x02" writable="false" optional="true">BatteryChargeLevel</attribute>
+    <attribute side="server" code="0x000F" define="POWER_SOURCE_BAT_REPLACEMENT_NEEDED" type="BOOLEAN" writable="false" optional="true">BatteryReplacementNeeded</attribute>
+    <attribute side="server" code="0x0010" define="POWER_SOURCE_BAT_REPLACEABILITY" type="ENUM8" min="0x00" max="0x03" writable="false" optional="true">BatteryReplaceability</attribute>
+    <attribute side="server" code="0x0011" define="POWER_SOURCE_BAT_PRESENT" type="BOOLEAN" writable="false" optional="true">BatteryPresent</attribute>
+    <attribute side="server" code="0x0012" define="POWER_SOURCE_ACTIVE_BAT_FAULTS" type="ARRAY" entryType="ENUM8" length="8" writable="false" optional="true">ActiveBatteryFaults</attribute>
+    <attribute side="server" code="0x0013" define="POWER_SOURCE_BAT_REPLACEMENT_DESCRIPTION" type="CHAR_STRING" length="60" writable="false" optional="true">BatteryReplacementDescription</attribute>
+    <attribute side="server" code="0x0014" define="POWER_SOURCE_BAT_COMMON_DESIGNATION" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryCommonDesignation</attribute>
+    <attribute side="server" code="0x0015" define="POWER_SOURCE_BAT_ANSI_DESIGNATION" type="CHAR_STRING" length="20" writable="false" optional="true">BatteryANSIDesignation</attribute>
+    <attribute side="server" code="0x0016" define="POWER_SOURCE_BAT_IEC_DESIGNATION" type="CHAR_STRING" length="20" writable="false" optional="true">BatteryIECDesignation</attribute>
+    <attribute side="server" code="0x0017" define="POWER_SOURCE_BAT_APPROVED_CHEMISTRY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryApprovedChemistry</attribute>
+    <attribute side="server" code="0x0018" define="POWER_SOURCE_BAT_CAPACITY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryCapacity</attribute>
+    <attribute side="server" code="0x0019" define="POWER_SOURCE_BAT_QUANTITY" type="INT8U" min="0x00" max="0xC8" writable="false" optional="true">BatteryQuantity</attribute>
+    <attribute side="server" code="0x001A" define="POWER_SOURCE_BAT_CHARGE_STATE" type="ENUM8" min="0x00" max="0x03" writable="false" optional="true">BatteryChargeState</attribute>
+    <attribute side="server" code="0x001B" define="POWER_SOURCE_BAT_TIME_TO_FULL_CHARGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryTimeToFullCharge</attribute>
+    <attribute side="server" code="0x001C" define="POWER_SOURCE_BAT_FUNCTIONAL_WHILE_CHARGING" type="BOOLEAN" writable="false" optional="true">BatteryFunctionalWhileCharging</attribute>
+    <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryChargingCurrent</attribute>
+    <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="ARRAY" entryType="ENUM8" length="16" writable="false" optional="true">ActiveBatteryChargeFaults</attribute>
+
+    <!-- TODO: Do events work?
+    <event code="0x0000" name="WiredFaultChange" priority="info" side="server">
+      <description>The WiredFaultChange Event SHALL indicate a change in the set of wired faults currently detected by the Node on this wired power source.</description>
+      <field id="1" name="WiredFaultChangeType" type="WiredFaultChangeType"/>
+    </event>
+
+    <event code="0x0001" name="BatFaultChange" priority="info" side="server">
+      <description>The BatFaultChange Event SHALL indicate a change in the set of battery faults currently detected by the Node on this battery power source.</description>
+      <field id="1" name="BatFaultChangeType" type="BatFaultChangeType"/>
+    </event>
+
+    <event code="0x0002" name="BatChargeFaultChange" priority="info" side="server">
+      <description>The BatChargeFaultChange Event SHALL indicate a change in the set of charge faults currently detected by the Node on this battery power source.</description>
+      <field id="1" name="BatChargeFaultChangeType" type="BatChargeFaultChangeType"/>
+    </event>
+    -->
+
+  </cluster>
+
+  <enum name="WiredFaultType" type="ENUM8">
+    <item name="Unspecfied" value="0x00"/>
+    <item name="OverVoltage" value="0x01"/>
+    <item name="UnderVoltage" value="0x02"/>
+  </enum>
+
+  <enum name="BatFaultType" type="ENUM8">
+    <item name="Unspecfied" value="0x00"/>
+    <item name="OverTemp" value="0x01"/>
+    <item name="UnderTemp" value="0x02"/>
+  </enum>
+
+  <enum name="BatChargeFaultType" type="ENUM8">
+    <item name="Unspecfied" value="0x00"/>
+    <item name="AmbientTooHot" value="0x01"/>
+    <item name="AmbientTooCold" value="0x02"/>
+    <item name="BatteryTooHot" value="0x03"/>
+    <item name="BatteryTooCold" value="0x04"/>
+    <item name="BatteryAbsent" value="0x05"/>
+    <item name="BatteryOverVoltage" value="0x06"/>
+    <item name="BatteryUnderVoltage" value="0x07"/>
+    <item name="ChargerOverVoltage" value="0x08"/>
+    <item name="ChargerUnderVoltage" value="0x09"/>
+    <item name="SafetyTimeout" value="0x0A"/>
+  </enum>
+
+  <enum name="PowerSourceStatus" type="ENUM8">
+    <item name="Unspecfied" value="0x00"/>
+    <item name="Active" value="0x01"/>
+    <item name="Standby" value="0x02"/>
+    <item name="Unavailable" value="0x03"/>
+  </enum>
+
+  <enum name="WiredCurrentType" type="ENUM8">
+    <item name="AC" value="0x00"/>
+    <item name="DC" value="0x01"/>
+  </enum>
+
+  <enum name="BatChargeLevel" type="ENUM8">
+    <item name="Ok" value="0x00"/>
+    <item name="Warning" value="0x01"/>
+    <item name="Critical" value="0x02"/>
+  </enum>
+
+  <enum name="BatReplaceability" type="ENUM8">
+    <item name="Unspecified" value="0x00"/>
+    <item name="NotReplaceable" value="0x01"/>
+    <item name="UserReplaceable" value="0x02"/>
+    <item name="FactoryReplaceable" value="0x03"/>
+  </enum>
+
+  <enum name="BatChargeState" type="ENUM8">
+    <item name="Unknown" value="0x00"/>
+    <item name="IsCharging" value="0x01"/>
+    <item name="IsAtFullCharge" value="0x02"/>
+    <item name="IsNotCharging" value="0x03"/>
+  </enum>
+
+  <struct name="WiredFaultChangeType">
+    <item name="current" type="WiredFaultType" array="true" length="8"/>
+    <item name="previous" type="WiredFaultType" array="true" length="8"/>
+  </struct>
+
+  <struct name="BatFaultChangeType">
+    <item name="current" type="BatFaultType" array="true" length="8"/>
+    <item name="previous" type="BatFaultType" array="true" length="8"/>
+  </struct>
+
+  <struct name="BatChargeFaultChangeType">
+    <item name="current" type="BatChargeFaultType" array="true" length="16"/>
+    <item name="previous" type="BatChargeFaultType" array="true" length="16"/>
+  </struct>
+
+</configurator>

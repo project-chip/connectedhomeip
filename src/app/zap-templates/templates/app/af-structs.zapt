@@ -4,8 +4,11 @@
 #pragma once
 
 #include <stdint.h>
+
 #include <app/util/basic-types.h>
-#include <support/Span.h>
+#include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
+
 #include "enums.h"
 
 {{#zcl_structs}}
@@ -14,7 +17,7 @@
 // Struct for {{label}}
 typedef struct _{{asType label}} {
 {{#zcl_struct_items}}
-{{ident}}{{asChipUnderlyingType label type}} {{asSymbol label}};
+{{ident}}{{asUnderlyingZclType type}} {{asSymbol label}};
 {{/zcl_struct_items}}
 } {{asUnderlyingType label}};
 {{else}}

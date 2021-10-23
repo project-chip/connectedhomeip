@@ -18,15 +18,13 @@
 #pragma once
 
 #include <memory>
-#include <thread>
-#include <vector>
 
-#include "platform/internal/CHIPDeviceLayerInternal.h"
-
-#include "dbus/client/thread_api_dbus.hpp"
-#include "platform/internal/DeviceNetworkInfo.h"
-
-#include <support/ThreadOperationalDataset.h>
+#include <app/AttributeAccessInterface.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <platform/Linux/GlibTypeDeleter.h>
+#include <platform/Linux/dbus/openthread/introspect.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -88,30 +86,35 @@ public:
 
     CHIP_ERROR _JoinerStart();
 
+    void _ResetThreadNetworkDiagnosticsCounts();
+
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
+
     ~ThreadStackManagerImpl() = default;
 
     static ThreadStackManagerImpl sInstance;
 
 private:
-    struct DBusConnectionDeleter
-    {
-        void operator()(DBusConnection * aConnection)
-        {
-            dbus_connection_close(aConnection);
-            dbus_connection_unref(aConnection);
-        }
-    };
+    static constexpr char kDBusOpenThreadService[]    = "io.openthread.BorderRouter.wpan0";
+    static constexpr char kDBusOpenThreadObjectPath[] = "/io/openthread/BorderRouter/wpan0";
 
-    using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
+    static constexpr char kOpenthreadDeviceRoleDisabled[] = "disabled";
+    static constexpr char kOpenthreadDeviceRoleDetached[] = "detached";
+    static constexpr char kOpenthreadDeviceRoleChild[]    = "child";
+    static constexpr char kOpenthreadDeviceRoleRouter[]   = "router";
+    static constexpr char kOpenthreadDeviceRoleLeader[]   = "leader";
 
-    void _ThreadDevcieRoleChangedHandler(otbr::DBus::DeviceRole role);
+    static constexpr char kPropertyDeviceRole[] = "DeviceRole";
+
+    std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
+
+    static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
+                                        const gchar * const * invalidated_properties, gpointer user_data);
+    void ThreadDevcieRoleChangedHandler(const gchar * role);
 
     Thread::OperationalDataset mDataset = {};
 
-    std::unique_ptr<otbr::DBus::ThreadApiDBus> mThreadApi;
-    UniqueDBusConnection mConnection;
     bool mAttached;
-    std::thread mDBusEventLoop;
 };
 
 } // namespace DeviceLayer

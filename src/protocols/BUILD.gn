@@ -23,6 +23,11 @@ static_library("protocols") {
     "echo/EchoServer.cpp",
     "secure_channel/MessageCounterManager.cpp",
     "secure_channel/MessageCounterManager.h",
+    "user_directed_commissioning/UDCClientState.h",
+    "user_directed_commissioning/UDCClients.h",
+    "user_directed_commissioning/UserDirectedCommissioning.h",
+    "user_directed_commissioning/UserDirectedCommissioningClient.cpp",
+    "user_directed_commissioning/UserDirectedCommissioningServer.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

@@ -31,7 +31,7 @@ limitations under the License.
       <description>
         Command description for ReadAttributes
       </description>
-      <arg name="attributeIds" type="ATTRIBUTE_ID" array="true"/>
+      <arg name="attributeIds" type="ATTRIB_ID" array="true"/>
     </command>
     <command code="0x01" name="ReadAttributesResponse" source="either" disableDefaultResponse="true">
       <description>
@@ -63,56 +63,12 @@ limitations under the License.
       </description>
       <arg name="writeAttributeRecords" type="WriteAttributeRecord" array="true"/>
     </command>
-    <command code="0x06" name="ConfigureReporting" source="either">
-      <description>
-        Command description for ConfigureReporting
-      </description>
-      <arg name="configureReportingRecords" type="ConfigureReportingRecord" array="true"/>
-    </command>
-    <command code="0x07" name="ConfigureReportingResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for ConfigureReportingResponse
-      </description>
-      <arg name="configureReportingStatusRecords" type="ConfigureReportingStatusRecord" array="true"/>
-    </command>
-    <command code="0x08" name="ReadReportingConfiguration" source="either">
-      <description>
-        Command description for ReadReportingConfiguration
-      </description>
-      <arg name="readReportingConfigurationAttributeRecords" type="ReadReportingConfigurationAttributeRecord" array="true"/>
-    </command>
-    <command code="0x09" name="ReadReportingConfigurationResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for ReadReportingConfigurationResponse
-      </description>
-      <arg name="readReportingConfigurationRecords" type="ReadReportingConfigurationRecord" array="true"/>
-    </command>
-    <command code="0x0A" name="ReportAttributes" source="either">
-      <description>
-        Command description for ReportAttributes
-      </description>
-      <arg name="reportAttributeRecords" type="ReportAttributeRecord" array="true"/>
-    </command>
     <command code="0x0B" name="DefaultResponse" source="either" disableDefaultResponse="true">
       <description>
         Command description for DefaultResponse
       </description>
       <arg name="commandId" type="INT8U"/>
       <arg name="status" type="Status"/>
-    </command>
-    <command code="0x0C" name="DiscoverAttributes" source="either">
-      <description>
-        Command description for DiscoverAttributes
-      </description>
-      <arg name="startId" type="ATTRIBUTE_ID"/>
-      <arg name="maxAttributeIds" type="INT8U"/>
-    </command>
-    <command code="0x0D" name="DiscoverAttributesResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for DiscoverAttributesResponse
-      </description>
-      <arg name="discoveryComplete" type="INT8U"/>
-      <arg name="discoverAttributesInfoRecords" type="DiscoverAttributesInfoRecord" array="true"/>
     </command>
     <command code="0x0E" name="ReadAttributesStructured" source="either">
       <description>
@@ -132,80 +88,7 @@ limitations under the License.
       </description>
       <arg name="writeStructuredAttributeStatusRecords" type="WriteStructuredAttributeStatusRecord" array="true"/>
     </command>
-    <command code="0x11" name="DiscoverCommandsReceived" source="either">
-      <description>This command may be used to discover all commands processed (received) by this cluster, including optional or manufacturer specific commands.</description>
-      <arg name="startCommandId" type="INT8U"/>
-      <arg name="maxCommandIds" type="INT8U"/>
-    </command>
-    <command code="0x12" name="DiscoverCommandsReceivedResponse" source="either" disableDefaultResponse="true">
-      <description>The discover commands received response command is sent in response to a discover commands received command, and is used to discover which commands a particular cluster can process.</description>
-      <arg name="discoveryComplete" type="INT8U"/>
-      <arg name="commandIds" type="INT8U" array="true"/>
-    </command>
-    <command code="0x13" name="DiscoverCommandsGenerated" source="either">
-      <description>This command may be used to discover all commands which may be generated (sent) by the cluster, including optional or manufacturer specific commands.</description>
-      <arg name="startCommandId" type="INT8U"/>
-      <arg name="maxCommandIds" type="INT8U"/>
-    </command>
-    <command code="0x14" name="DiscoverCommandsGeneratedResponse" source="either" disableDefaultResponse="true">
-      <description>The discover client commands response command is sent in response to a discover client commands command, and is used to discover which commands a particular cluster supports.</description>
-      <arg name="discoveryComplete" type="INT8U"/>
-      <arg name="commandIds" type="INT8U" array="true"/>
-    </command>
-    <command code="0x15" name="DiscoverAttributesExtended" source="either">
-      <description>This command is similar to the discover attributes command, but also includes a field to indicate whether the attribute is readable, writeable or reportable.</description>
-      <arg name="startId" type="ATTRIBUTE_ID"/>
-      <arg name="maxAttributeIds" type="INT8U"/>
-    </command>
-    <command code="0x16" name="DiscoverAttributesExtendedResponse" source="either" disableDefaultResponse="true">
-      <description>This command is sent in response to a discover attribute extended command and is used to determine if attributes are readable, writable or reportable.</description>
-      <arg name="discoveryComplete" type="INT8U"/>
-      <arg name="extendedDiscoverAttributesInfoRecords" type="ExtendedDiscoverAttributesInfoRecord" array="true"/>
-    </command>
-    <attribute side="client" code="0xFFFD" define="CLUSTER_REVISION_CLIENT" type="INT16U" min="0x0001" max="0xFFFE" writable="false" default="0x0001" optional="false" introducedIn="zcl-6.0-15-02017-001">cluster revision</attribute>
-    <attribute side="client" code="0xFFFC" define="FEATURE_MAP_CLIENT" type="INT32U" writable="false" default="0x0000" optional="true">feature map</attribute>
-    <attribute side="server" code="0xFFFD" define="CLUSTER_REVISION_SERVER" type="INT16U" min="0x0001" max="0xFFFE" writable="false" default="0x0001" optional="false" introducedIn="zcl-6.0-15-02017-001">cluster revision</attribute>
-    <attribute side="server" code="0xFFFC" define="FEATURE_MAP_SERVER" type="INT32U" writable="false" default="0x0000" optional="true">feature map</attribute>
   </global>
-  <cluster singleton="true">
-    <name>Basic</name>
-    <domain>General</domain>
-    <description>Attributes for determining basic information about a device, and setting user device information such as location.</description>
-    <code>0x0028</code>
-    <define>BASIC_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
-
-    <attribute side="server" code="0x0000" define="INTERACTION_MODEL_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">InteractionModelVersion</attribute>
-    <attribute side="server" code="0x0001" define="VENDOR_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="false">VendorName</attribute>
-    <attribute side="server" code="0x0002" define="VENDOR_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">VendorID</attribute>
-    <attribute side="server" code="0x0003" define="PRODUCT_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="false">ProductName</attribute>
-    <attribute side="server" code="0x0004" define="PRODUCT_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">ProductID</attribute>
-    <attribute side="server" code="0x0005" define="USER_LABEL" type="CHAR_STRING" length="32" writable="true" default="" optional="false">UserLabel</attribute>
-    <attribute side="server" code="0x0006" define="LOCATION" type="CHAR_STRING" length="16" writable="true" default="" optional="false">Location</attribute>
-    <attribute side="server" code="0x0007" define="HARDWARE_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="false">HardwareVersion</attribute>
-    <attribute side="server" code="0x0008" define="HARDWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">HardwareVersionString</attribute>
-    <attribute side="server" code="0x0009" define="SOFTWARE_VERSION" type="INT32U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="false">SoftwareVersion</attribute>
-    <attribute side="server" code="0x000A" define="SOFTWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="false">SoftwareVersionString</attribute>
-    <attribute side="server" code="0x000B" define="MANUFACTURING_DATE" type="CHAR_STRING" length="16" writable="false" default="" optional="true">ManufacturingDate</attribute>
-    <!-- TODO The actual length is not defined in the spec. But the current implementation expect a length -->
-    <attribute side="server" code="0x000C" define="PART_NUMBER" type="CHAR_STRING" length="254" writable="false" optional="true">PartNumber</attribute>
-    <!-- TODO The spec says the length is 256 ASCII characters. But the current implementation does not support values bigger than 254 -->
-    <attribute side="server" code="0x000D" define="PRODUCT_URL" type="CHAR_STRING" length="254" writable="false" optional="true">ProductURL</attribute>
-    <attribute side="server" code="0x000E" define="PRODUCT_LABEL" type="CHAR_STRING" length="64" writable="false" default="" optional="true">ProductLabel</attribute>
-    <attribute side="server" code="0x000F" define="SERIAL_NUMBER" type="CHAR_STRING" length="32" writable="false" default="" optional="true">SerialNumber</attribute>
-    <attribute side="server" code="0x0010" define="LOCAL_CONFIG_DISABLED" type="BOOLEAN" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LocalConfigDisabled</attribute>
-    <command source="server" code="0x00" name="StartUp" optional="false">
-      <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
-    </command>
-    <command source="server" code="0x01" name="ShutDown" optional="false">
-      <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
-    </command>
-    <command source="server" code="0x02" name="Leave" optional="false">
-      <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
-    </command>
-  </cluster>
   <cluster singleton="true">
     <name>Power Configuration</name>
     <domain>General</domain>
@@ -292,48 +175,6 @@ limitations under the License.
     <attribute side="server" code="0x0014" define="HIGH_TEMP_DWELL_TRIP_POINT" type="INT24U" min="0x000000" max="0xFFFFFF" writable="true" optional="true">high temp dwell trip point</attribute>
   </cluster>
   <cluster>
-    <name>Identify</name>
-    <domain>General</domain>
-    <description>Attributes and commands for putting a device into Identification mode (e.g. flashing a light).</description>
-    <code>0x0003</code>
-    <define>IDENTIFY_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="false">identify time</attribute>
-    <attribute side="server" code="0x0001" define="COMMISSION_STATE" type="BITMAP8" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">commission state</attribute>
-    <command source="client" code="0x00" name="Identify" optional="false" cli="zcl identify id">
-      <description>
-        Command description for Identify
-      </description>
-      <arg name="identifyTime" type="INT16U"/>
-    </command>
-    <command source="client" code="0x01" name="IdentifyQuery" optional="false" cli="zcl identify query">
-      <description>
-        Command description for IdentifyQuery
-      </description>
-    </command>
-    <command source="client" code="0x02" name="EZModeInvoke" optional="true" cli="zcl identify ez-mode">
-      <description>
-	   Invoke EZMode on an Identify Server
-      </description>
-      <arg name="action" type="BITMAP8"/>
-    </command>
-    <command source="client" code="0x03" name="UpdateCommissionState" optional="true">
-      <description>
-          Update Commission State on the server device.
-      </description>
-      <arg name="action" type="ENUM8"/>
-      <arg name="commissionStateMask" type="BITMAP8"/>
-    </command>
-    <command source="server" code="0x00" name="IdentifyQueryResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for IdentifyQueryResponse
-      </description>
-      <arg name="timeout" type="INT16U"/>
-    </command>
-  </cluster>
-  <cluster>
     <name>Groups</name>
     <domain>General</domain>
     <description>Attributes and commands for group configuration and manipulation.</description>
@@ -386,14 +227,14 @@ limitations under the License.
       <description>
         Command description for AddGroupResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
     </command>
     <command source="server" code="0x01" name="ViewGroupResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for ViewGroupResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="groupName" type="CHAR_STRING"/>
     </command>
@@ -409,7 +250,7 @@ limitations under the License.
       <description>
         Command description for RemoveGroupResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
     </command>
   </cluster>
@@ -428,7 +269,7 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="SCENE_VALID" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">scene valid</attribute>
     <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
-    <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="IEEE_ADDRESS" writable="false" optional="true">last configured by</attribute>
+    <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="NODE_ID" writable="false" optional="true">last configured by</attribute>
     <command source="client" code="0x00" name="AddScene" optional="false" cli="zcl scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as arrays of the form [[cluster ID] [length] [value0...n] ...]
@@ -484,7 +325,7 @@ limitations under the License.
       <description>
         Command description for AddSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
@@ -492,7 +333,7 @@ limitations under the License.
       <description>
         Command description for ViewSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
       <arg name="transitionTime" type="INT16U" presentIf="status==0"/>
@@ -503,7 +344,7 @@ limitations under the License.
       <description>
         Command description for RemoveSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
@@ -511,14 +352,14 @@ limitations under the License.
       <description>
         Command description for RemoveAllScenesResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
     </command>
     <command source="server" code="0x04" name="StoreSceneResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for StoreSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
@@ -526,38 +367,11 @@ limitations under the License.
       <description>
         Command description for GetSceneMembershipResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="capacity" type="INT8U"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneCount" type="INT8U" arrayLength="true" presentIf="status==0"/>
       <arg name="sceneList" type="INT8U" array="true" presentIf="status==0"/>
-    </command>
-  </cluster>
-  <cluster>
-    <name>On/off</name>
-    <domain>General</domain>
-    <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
-    <code>0x0006</code>
-    <define>ON_OFF_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="ON_OFF" type="BOOLEAN" min="0x00" max="0x01" writable="false" reportable="true" default="0x00" optional="false">on/off</attribute>
-    <attribute side="server" code="0x4003" define="START_UP_ON_OFF" type="ENUM8" min="0x00" max="0xFF" writable="true" optional="true" introducedIn="l&amp;o-1.0-15-0014-04">start up on off</attribute>
-    <command source="client" code="0x00" name="Off" optional="false" cli="zcl on-off off">
-      <description>
-        Command description for Off
-      </description>
-    </command>
-    <command source="client" code="0x01" name="On" optional="false" cli="zcl on-off on">
-      <description>
-        Command description for On
-      </description>
-    </command>
-    <command source="client" code="0x02" name="Toggle" optional="false" cli="zcl on-off toggle">
-      <description>
-        Command description for Toggle
-      </description>
     </command>
   </cluster>
   <cluster>
@@ -582,7 +396,12 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
     <attribute side="server" code="0x0000" define="CURRENT_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" reportable="true" default="0x00" optional="false">current level</attribute>
     <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">remaining time</attribute>
-    <!-- REMAINING_TIME -->
+    <attribute side="server" code="0x0002" define="MINIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">min level</attribute>
+    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0xFF" optional="true">max level</attribute>
+    <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">current frequency</attribute>
+    <attribute side="server" code="0x0005" define="MIN_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">min frequency</attribute>
+    <attribute side="server" code="0x0006" define="MAX_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">max frequency</attribute>
+    
     <attribute side="server" code="0x0010" define="ON_OFF_TRANSITION_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">on off transition time</attribute>
     <attribute side="server" code="0x0011" define="ON_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="true" default="0xFE" optional="true">on level</attribute>
     <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">on transition time</attribute>
@@ -695,10 +514,10 @@ limitations under the License.
       <description>
         Command description for GetAlarmResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="alarmCode" type="ENUM8"/>
       <arg name="clusterId" type="CLUSTER_ID"/>
-      <arg name="timeStamp" type="INT32U"/>
+      <arg name="timeStamp" type="epoch_s"/>
     </command>
   </cluster>
   <cluster singleton="true">
@@ -710,7 +529,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="TIME" type="UTC_TIME" min="0x00000000" max="0xFFFFFFFE" writable="true" optional="false">time</attribute>
+    <attribute side="server" code="0x0000" define="TIME" type="epoch_s" min="0x00000000" max="0xFFFFFFFE" writable="true" optional="false">time</attribute>
     <attribute side="server" code="0x0001" define="TIME_STATUS" type="BITMAP8" min="0x00" max="0x0F" writable="true" default="0x00" optional="false">time status</attribute>
     <attribute side="server" code="0x0002" define="TIME_ZONE" type="INT32S" min="0xFFFEAE80" max="0x00015180" writable="true" default="0x00000000" optional="true">time zone</attribute>
     <attribute side="server" code="0x0003" define="DST_START" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="true" optional="true">dst start</attribute>
@@ -718,168 +537,8 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="DST_SHIFT" type="INT32S" min="0xFFFEAE80" max="0x00015180" writable="true" default="0x00000000" optional="true">dst shift</attribute>
     <attribute side="server" code="0x0006" define="STANDARD_TIME" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="false" optional="true">standard time</attribute>
     <attribute side="server" code="0x0007" define="LOCAL_TIME" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="false" optional="true">local time</attribute>
-    <attribute side="server" code="0x0008" define="LAST_SET_TIME" type="UTC_TIME" min="0x00000000" max="0xFFFFFFFE" writable="false" default="0xFFFFFFFF" optional="true">last set time</attribute>
-    <attribute side="server" code="0x0009" define="VALID_UNTIL_TIME" type="UTC_TIME" min="0x00000000" max="0xFFFFFFFE" writable="true" default="0xFFFFFFFF" optional="true">valid until time</attribute>
-  </cluster>
-  <cluster>
-    <name>RSSI Location</name>
-    <domain>General</domain>
-    <description>Attributes and commands that provide a means for exchanging location information and channel parameters among devices.</description>
-    <code>0x000B</code>
-    <define>RSSI_LOCATION_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="LOCATION_TYPE" type="DATA8" min="0x00" max="0x0F" writable="false" optional="false">location type</attribute>
-    <attribute side="server" code="0x0001" define="LOCATION_METHOD" type="ENUM8" min="0x00" max="0xFF" writable="false" optional="false">location method</attribute>
-    <attribute side="server" code="0x0002" define="LOCATION_AGE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">location age</attribute>
-    <attribute side="server" code="0x0003" define="QUALITY_MEASURE" type="INT8U" min="0x00" max="0x64" writable="false" optional="true">quality measure</attribute>
-    <attribute side="server" code="0x0004" define="NUMBER_OF_DEVICES" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">number of devices</attribute>
-    <attribute side="server" code="0x0010" define="COORDINATE1" type="INT16S" min="0x8000" max="0x7FFF" writable="true" optional="false">coordinate 1</attribute>
-    <attribute side="server" code="0x0011" define="COORDINATE2" type="INT16S" min="0x8000" max="0x7FFF" writable="true" optional="false">coordinate 2</attribute>
-    <attribute side="server" code="0x0012" define="COORDINATE3" type="INT16S" min="0x8000" max="0x7FFF" writable="true" optional="true">coordinate 3</attribute>
-    <attribute side="server" code="0x0013" define="POWER" type="INT16S" min="0x8000" max="0x7FFF" writable="true" optional="false">power</attribute>
-    <attribute side="server" code="0x0014" define="PATH_LOSS_EXPONENT" type="INT16U" min="0x0000" max="0xFFFF" writable="true" optional="false">path loss exponent</attribute>
-    <attribute side="server" code="0x0015" define="REPORTING_PERIOD" type="INT16U" min="0x0000" max="0xFFFF" writable="true" optional="true">reporting period</attribute>
-    <attribute side="server" code="0x0016" define="CALCULATION_PERIOD" type="INT16U" min="0x0000" max="0xFFFF" writable="true" optional="true">calculation period</attribute>
-    <attribute side="server" code="0x0017" define="NUMBER_RSSI_MEASUREMENTS" type="INT8U" min="0x01" max="0xFF" writable="true" optional="false">number rssi measurements</attribute>
-    <command source="client" code="0x00" name="SetAbsoluteLocation" optional="false">
-      <description>
-        Command description for SetAbsoluteLocation
-      </description>
-      <arg name="coordinate1" type="INT16S"/>
-      <arg name="coordinate2" type="INT16S"/>
-      <arg name="coordinate3" type="INT16S"/>
-      <arg name="power" type="INT16S"/>
-      <arg name="pathLossExponent" type="INT16U"/>
-    </command>
-    <command source="client" code="0x01" name="SetDeviceConfiguration" optional="false">
-      <description>
-        Command description for SetDeviceConfiguration
-      </description>
-      <arg name="power" type="INT16S"/>
-      <arg name="pathLossExponent" type="INT16U"/>
-      <arg name="calculationPeriod" type="INT16U"/>
-      <arg name="numberRssiMeasurements" type="INT8U"/>
-      <arg name="reportingPeriod" type="INT16U"/>
-    </command>
-    <command source="client" code="0x02" name="GetDeviceConfiguration" optional="false">
-      <description>
-        Command description for GetDeviceConfiguration
-      </description>
-      <arg name="targetAddress" type="IEEE_ADDRESS"/>
-    </command>
-    <command source="client" code="0x03" name="GetLocationData" optional="false">
-      <description>
-        Command description for GetLocationData
-      </description>
-      <arg name="flags" type="GetLocationDataFlags"/>
-      <arg name="numberResponses" type="INT8U"/>
-      <arg name="targetAddress" type="IEEE_ADDRESS"/>
-    </command>
-    <command source="client" code="0x04" name="RssiResponse" optional="true" disableDefaultResponse="true">
-      <description>
-        Command description for RssiResponse
-      </description>
-      <arg name="replyingDevice" type="IEEE_ADDRESS"/>
-      <arg name="coordinate1" type="INT16S"/>
-      <arg name="coordinate2" type="INT16S"/>
-      <arg name="coordinate3" type="INT16S"/>
-      <arg name="rssi" type="INT8S"/>
-      <arg name="numberRssiMeasurements" type="INT8U"/>
-    </command>
-    <command source="client" code="0x05" name="SendPings" optional="true">
-      <description>
-        Command description for SendPings
-      </description>
-      <arg name="targetAddress" type="IEEE_ADDRESS"/>
-      <arg name="numberRssiMeasurements" type="INT8U"/>
-      <arg name="calculationPeriod" type="INT16U"/>
-    </command>
-    <command source="client" code="0x06" name="AnchorNodeAnnounce" optional="true">
-      <description>
-        Command description for AnchorNodeAnnounce
-      </description>
-      <arg name="anchorNodeIeeeAddress" type="IEEE_ADDRESS"/>
-      <arg name="coordinate1" type="INT16S"/>
-      <arg name="coordinate2" type="INT16S"/>
-      <arg name="coordinate3" type="INT16S"/>
-    </command>
-    <command source="server" code="0x00" name="DeviceConfigurationResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for DeviceConfigurationResponse
-      </description>
-      <arg name="status" type="Status"/>
-      <arg name="power" type="INT16S"/>
-      <arg name="pathLossExponent" type="INT16U"/>
-      <arg name="calculationPeriod" type="INT16U"/>
-      <arg name="numberRssiMeasurements" type="INT8U"/>
-      <arg name="reportingPeriod" type="INT16U"/>
-    </command>
-    <command source="server" code="0x01" name="LocationDataResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for LocationDataResponse
-      </description>
-      <arg name="status" type="Status"/>
-      <arg name="locationType" type="LocationType"/>
-      <arg name="coordinate1" type="INT16S"/>
-      <arg name="coordinate2" type="INT16S"/>
-      <arg name="coordinate3" type="INT16S"/>
-      <arg name="power" type="INT16S"/>
-      <arg name="pathLossExponent" type="INT16U"/>
-      <arg name="locationMethod" type="LocationMethod"/>
-      <arg name="qualityMeasure" type="INT8U"/>
-      <arg name="locationAge" type="INT16U"/>
-    </command>
-    <command source="server" code="0x02" name="LocationDataNotification" optional="false">
-      <description>
-        Command description for LocationDataNotification
-      </description>
-      <arg name="locationType" type="LocationType"/>
-      <arg name="coordinate1" type="INT16S"/>
-      <arg name="coordinate2" type="INT16S"/>
-      <arg name="coordinate3" type="INT16S"/>
-      <arg name="power" type="INT16S"/>
-      <arg name="pathLossExponent" type="INT16U"/>
-      <arg name="locationMethod" type="LocationMethod"/>
-      <arg name="qualityMeasure" type="INT8U"/>
-      <arg name="locationAge" type="INT16U"/>
-    </command>
-    <command source="server" code="0x03" name="CompactLocationDataNotification" optional="false">
-      <description>
-        Command description for CompactLocationDataNotification
-      </description>
-      <arg name="locationType" type="LocationType"/>
-      <arg name="coordinate1" type="INT16S"/>
-      <arg name="coordinate2" type="INT16S"/>
-      <arg name="coordinate3" type="INT16S"/>
-      <arg name="qualityMeasure" type="INT8U"/>
-      <arg name="locationAge" type="INT16U"/>
-    </command>
-    <command source="server" code="0x04" name="RssiPing" optional="false">
-      <description>
-        Command description for RssiPing
-      </description>
-      <arg name="locationType" type="LocationType"/>
-    </command>
-    <command source="server" code="0x05" name="RssiRequest" optional="true">
-      <description>
-        Command description for RssiRequest
-      </description>
-    </command>
-    <command source="server" code="0x06" name="ReportRssiMeasurements" optional="true">
-      <description>
-        Command description for ReportRssiMeasurements
-      </description>
-      <arg name="measuringDevice" type="IEEE_ADDRESS"/>
-      <arg name="neighbors" type="INT8U"/>
-      <arg name="neighborsInfo" type="NeighborInfo" array="true"/>
-    </command>
-    <command source="server" code="0x07" name="RequestOwnLocation" optional="true">
-      <description>
-        Command description for RequestOwnLocation
-      </description>
-      <arg name="blindNode" type="IEEE_ADDRESS"/>
-    </command>
+    <attribute side="server" code="0x0008" define="LAST_SET_TIME" type="epoch_s" min="0x00000000" max="0xFFFFFFFE" writable="false" default="0xFFFFFFFF" optional="true">last set time</attribute>
+    <attribute side="server" code="0x0009" define="VALID_UNTIL_TIME" type="epoch_s" min="0x00000000" max="0xFFFFFFFE" writable="true" default="0xFFFFFFFF" optional="true">valid until time</attribute>
   </cluster>
   <cluster>
     <name>Binary Input (Basic)</name>
@@ -898,92 +557,5 @@ limitations under the License.
     <attribute side="server" code="0x0067" define="RELIABILITY" type="ENUM8" writable="true" default="0x00" optional="true">reliability</attribute>
     <attribute side="server" code="0x006F" define="STATUS_FLAGS" type="BITMAP8" min="0x00" max="0x0F" writable="false" default="0x00" reportable="true" optional="false">status flags</attribute>
     <attribute side="server" code="0x0100" define="APPLICATION_TYPE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">application type</attribute>
-  </cluster>
-  <cluster>
-    <name>Commissioning</name>
-    <domain>General</domain>
-    <description>Attributes and commands for commissioning and managing a ZigBee device.</description>
-    <code>0x0015</code>
-    <define>COMMISSIONING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="SHORT_ADDRESS" type="INT16U" min="0x0000" max="0xFFF7" writable="true" default="0xFFFF" optional="false">short address</attribute>
-    <attribute side="server" code="0x0001" define="EXTENDED_PAN_ID" type="IEEE_ADDRESS" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFE" writable="true" default="0xFFFFFFFFFFFFFFFF" optional="false">extended pan id</attribute>
-    <attribute side="server" code="0x0002" define="PAN_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0xFFFF" optional="false">pan id</attribute>
-    <attribute side="server" code="0x0003" define="CHANNEL_MASK" type="BITMAP32" writable="true" default="0x07FFF800" optional="false">channel mask</attribute>
-    <attribute side="server" code="0x0004" define="PROTOCOL_VERSION" type="INT8U" min="0x02" max="0x02" writable="true" default="0x02" optional="false">protocol version</attribute>
-    <attribute side="server" code="0x0005" define="STACK_PROFILE" type="INT8U" min="0x01" max="0x02" writable="true" default="0x02" optional="false">stack profile</attribute>
-    <attribute side="server" code="0x0006" define="STARTUP_CONTROL" type="ENUM8" min="0x00" max="0x03" writable="true" default="0x03" optional="false">startup control</attribute>
-    <attribute side="server" code="0x0010" define="TRUST_CENTER_ADDRESS" type="IEEE_ADDRESS" writable="true" default="0x0000000000000000" optional="false">trust center address</attribute>
-    <attribute side="server" code="0x0011" define="TRUST_CENTER_MASTER_KEY" type="SECURITY_KEY" writable="true" default="0x00000000000000000000000000000000" optional="true">trust center master key</attribute>
-    <attribute side="server" code="0x0012" define="NETWORK_KEY" type="SECURITY_KEY" writable="true" default="0x00000000000000000000000000000000" optional="false">network key</attribute>
-    <attribute side="server" code="0x0013" define="USE_INSECURE_JOIN" type="BOOLEAN" min="0x00" max="0x01" writable="true" default="0x01" optional="false">use insecure join</attribute>
-    <attribute side="server" code="0x0014" define="PRECONFIGURED_LINK_KEY" type="SECURITY_KEY" writable="true" default="0x00000000000000000000000000000000" optional="false">preconfigured link key</attribute>
-    <attribute side="server" code="0x0015" define="NETWORK_KEY_SEQUENCE_NUMBER" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="false">network key sequence number</attribute>
-    <attribute side="server" code="0x0016" define="NETWORK_KEY_TYPE" type="ENUM8" writable="true" default="0x05" optional="false">network key type</attribute>
-    <attribute side="server" code="0x0017" define="NETWORK_MANAGER_ADDRESS" type="INT16U" writable="true" default="0x0000" optional="false">network manager address</attribute>
-    <attribute side="server" code="0x0020" define="SCAN_ATTEMPTS" type="INT8U" min="0x01" max="0xFF" writable="true" default="0x05" optional="false">scan attempts</attribute>
-    <attribute side="server" code="0x0021" define="TIME_BETWEEN_SCANS" type="INT16U" min="0x0001" max="0xFFFF" writable="true" default="0x0064" optional="false">time between scans</attribute>
-    <attribute side="server" code="0x0022" define="REJOIN_INTERVAL" type="INT16U" min="0x0001" max="0xFFFF" writable="true" default="0x003C" optional="false">rejoin interval</attribute>
-    <attribute side="server" code="0x0023" define="MAX_REJOIN_INTERVAL" type="INT16U" min="0x0001" max="0xFFFF" writable="true" default="0x0E10" optional="false">max rejoin interval</attribute>
-    <attribute side="server" code="0x0030" define="INDIRECT_POLL_RATE" type="INT16U" min="0x0000" max="0xFFFF" writable="true" optional="false">indirect poll rate</attribute>
-    <attribute side="server" code="0x0031" define="PARENT_RETRY_THRESHOLD" type="INT8U" min="0x00" max="0xFF" writable="true" optional="false">parent retry threshold</attribute>
-    <attribute side="server" code="0x0040" define="CONCENTRATOR_FLAG" type="BOOLEAN" min="0x00" max="0x01" writable="true" default="0x00" optional="false">concentrator flag</attribute>
-    <attribute side="server" code="0x0041" define="CONCENTRATOR_RADIUS" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x0F" optional="false">concentrator radius</attribute>
-    <attribute side="server" code="0x0042" define="CONCENTRATOR_DISCOVERY_TIME" type="INT8U" min="0x00" max="0xFF" writable="true" default="0x00" optional="false">concentrator discovery time</attribute>
-    <command source="client" code="0x00" name="RestartDevice" optional="false">
-      <description>
-        Command description for RestartDevice
-      </description>
-      <arg name="options" type="RestartOptions"/>
-      <arg name="delay" type="INT8U"/>
-      <arg name="jitter" type="INT8U"/>
-    </command>
-    <command source="client" code="0x01" name="SaveStartupParameters" optional="true">
-      <description>
-        Command description for SaveStartupParameters
-      </description>
-      <arg name="options" type="BITMAP8"/>
-      <arg name="index" type="INT8U"/>
-    </command>
-    <command source="client" code="0x02" name="RestoreStartupParameters" optional="true">
-      <description>
-        Command description for RestoreStartupParameters
-      </description>
-      <arg name="options" type="BITMAP8"/>
-      <arg name="index" type="INT8U"/>
-    </command>
-    <command source="client" code="0x03" name="ResetStartupParameters" optional="false">
-      <description>
-        Command description for ResetStartupParameters
-      </description>
-      <arg name="options" type="ResetOptions"/>
-      <arg name="index" type="INT8U"/>
-    </command>
-    <command source="server" code="0x00" name="RestartDeviceResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for RestartDeviceResponse
-      </description>
-      <arg name="status" type="ENUM8"/>
-    </command>
-    <command source="server" code="0x01" name="SaveStartupParametersResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for SaveStartupParametersResponse
-      </description>
-      <arg name="status" type="ENUM8"/>
-    </command>
-    <command source="server" code="0x02" name="RestoreStartupParametersResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for RestoreStartupParametersResponse
-      </description>
-      <arg name="status" type="ENUM8"/>
-    </command>
-    <command source="server" code="0x03" name="ResetStartupParametersResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for ResetStartupParametersResponse
-      </description>
-      <arg name="status" type="ENUM8"/>
-    </command>
   </cluster>
 </configurator>

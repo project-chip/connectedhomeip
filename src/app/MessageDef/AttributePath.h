@@ -25,11 +25,13 @@
 
 #include "Builder.h"
 #include "Parser.h"
+
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -113,7 +115,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetFieldId(chip::FieldId * const apFieldId) const;
+    CHIP_ERROR GetFieldId(chip::AttributeId * const apFieldId) const;
 
     /**
      *  @brief Get a TLVReader for the ListIndex. Next() must be called before accessing them.
@@ -184,7 +186,7 @@ public:
      *
      *  @return A reference to *this
      */
-    AttributePath::Builder & FieldId(const chip::FieldId aFieldId);
+    AttributePath::Builder & FieldId(const chip::AttributeId aFieldId);
 
     /**
      *  @brief Inject NodeId into the TLV stream.
@@ -203,7 +205,7 @@ public:
     AttributePath::Builder & EndOfAttributePath();
 
 private:
-    CHIP_ERROR _Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag);
+    CHIP_ERROR _Init(TLV::TLVWriter * const apWriter, const TLV::Tag aTag);
 };
 
 }; // namespace AttributePath

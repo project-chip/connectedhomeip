@@ -1,0 +1,299 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <struct name="TestListStructOctet">
+    <cluster code="0x050F"/>
+    <item name="fabricIndex" type="INT64U"/>
+    <item name="operationalCert" type="OCTET_STRING" length="32"/>
+  </struct>
+
+  <enum name="SimpleEnum" type="ENUM8">
+    <cluster code="0x050F"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="ValueA" value="0x01"/>
+    <item name="ValueB" value="0x02"/>
+    <item name="ValueC" value="0x03"/>
+  </enum>
+
+  <bitmap name="SimpleBitmap" type="BITMAP8">
+    <cluster code="0x050F"/>
+    <field name="ValueA" mask="0x1"/>
+    <field name="ValueB" mask="0x2"/>
+    <field name="ValueC" mask="0x4"/>
+  </bitmap>
+
+  <struct name="SimpleStruct">
+    <cluster code="0x050F"/>
+    <item name="a" type="INT8U" optional="false"/>
+    <item name="b" type="BOOLEAN" optional="false"/>
+    <item name="c" type="SimpleEnum" optional="false"/>
+    <item name="d" type="OCTET_STRING" optional="false"/>
+    <item name="e" type="CHAR_STRING" optional="false"/>
+    <item name="f" type="SimpleBitmap" optional="false"/>
+  </struct>
+
+  <struct name="NestedStruct">
+    <cluster code="0x050F"/>
+    <item name="a" type="INT8U" optional="false"/>
+    <item name="b" type="BOOLEAN" optional="false"/>
+    <item name="c" type="SimpleStruct" optional="false"/>
+  </struct>
+
+  <struct name="NestedStructList">
+    <cluster code="0x050F"/>
+    <item name="a" type="INT8U" optional="false"/>
+    <item name="b" type="BOOLEAN" optional="false"/>
+    <item name="c" type="SimpleStruct" optional="false"/>
+    <item name="d" type="SimpleStruct" array="true" optional="false"/>
+    <item name="e" type="INT32U" array="true" optional="false"/>
+    <item name="f" type="OCTET_STRING" array="true" optional="false"/>
+    <item name="g" type="INT8U" array="true" optional="false"/>
+  </struct>
+
+  <struct name="DoubleNestedStructList">
+    <cluster code="0x050F"/>
+    <item name="a" type="NestedStructList" array="true" optional="false"/>
+  </struct>
+
+  <cluster>
+    <domain>CHIP</domain>
+    <name>Test Cluster</name>
+    <code>0x050F</code>
+    <define>TEST_CLUSTER</define>
+    <description>The Test Cluster is meant to validate the generated code</description>
+    <!-- Base data types -->
+    <attribute side="server" code="0x0000" define="BOOLEAN" type="BOOLEAN" writable="true" default="false" optional="false">boolean</attribute>
+    <attribute side="server" code="0x0001" define="BITMAP8" type="BITMAP8" writable="true" default="0" optional="false">bitmap8</attribute>
+    <attribute side="server" code="0x0002" define="BITMAP16" type="BITMAP16" writable="true" default="0" optional="false">bitmap16</attribute>
+    <attribute side="server" code="0x0003" define="BITMAP32" type="BITMAP32" writable="true" default="0" optional="false">bitmap32</attribute>
+    <attribute side="server" code="0x0004" define="BITMAP64" type="BITMAP64" writable="true" default="0" optional="false">bitmap64</attribute>
+    <attribute side="server" code="0x0005" define="INT8U" type="INT8U" writable="true" default="0" optional="false">int8u</attribute>
+    <attribute side="server" code="0x0006" define="INT16U" type="INT16U" writable="true" default="0" optional="false">int16u</attribute>
+    <!--<attribute side="server" code="0x0007" define="INT24U" type="INT24U" writable="true" default="0" optional="false">int24u</attribute>-->
+    <attribute side="server" code="0x0008" define="INT32U" type="INT32U" writable="true" default="0" optional="false">int32u</attribute>
+    <!--<attribute side="server" code="0x0009" define="INT40U" type="INT40U" writable="true" default="0" optional="false">int40u</attribute>-->
+    <!--<attribute side="server" code="0x000A" define="INT48U" type="INT48U" writable="true" default="0" optional="false">int48u</attribute>-->
+    <!--<attribute side="server" code="0x000B" define="INT56U" type="INT56U" writable="true" default="0" optional="false">int56u</attribute>-->
+    <attribute side="server" code="0x000C" define="INT64U" type="INT64U" writable="true" default="0" optional="false">int64u</attribute>
+    <attribute side="server" code="0x000D" define="INT8S" type="INT8S" writable="true" default="0" optional="false">int8s</attribute>
+    <attribute side="server" code="0x000E" define="INT16S" type="INT16S" writable="true" default="0" optional="false">int16s</attribute>
+    <!--<attribute side="server" code="0x000F" define="INT24S" type="INT24S" writable="true" default="0" optional="false">int24s</attribute>-->
+    <attribute side="server" code="0x0010" define="INT32S" type="INT32S" writable="true" default="0" optional="false">int32s</attribute>
+    <!--<attribute side="server" code="0x0011" define="INT40S" type="INT40S" writable="true" default="0" optional="false">int40s</attribute>-->
+    <!--<attribute side="server" code="0x0012" define="INT48S" type="INT48S" writable="true" default="0" optional="false">int48s</attribute>-->
+    <!--<attribute side="server" code="0x0013" define="INT56S" type="INT56S" writable="true" default="0" optional="false">int56s</attribute>-->
+    <attribute side="server" code="0x0014" define="INT64S" type="INT64S" writable="true" default="0" optional="false">int64s</attribute>
+    <attribute side="server" code="0x0015" define="ENUM8" type="ENUM8" writable="true" default="0" optional="false">enum8</attribute>
+    <attribute side="server" code="0x0016" define="ENUM16" type="ENUM16" writable="true" default="0" optional="false">enum16</attribute>
+    <!--<attribute side="server" code="0x0017" define="FLOAT_SINGLE" type="FLOAT_SINGLE" writable="true" default="0" optional="false">float_single</attribute>-->
+    <!--<attribute side="server" code="0x0018" define="FLOAT_DOUBLE" type="FLOAT_DOUBLE" writable="true" default="0" optional="false">float_double</attribute>-->
+    <attribute side="server" code="0x0019" define="OCTET_STRING" type="OCTET_STRING" length="10" writable="true" optional="false">octet_string</attribute>
+    <attribute side="server" code="0x001A" define="LIST" type="ARRAY" entryType="INT8U" length="10" writable="false" optional="false">list_int8u</attribute>
+    <attribute side="server" code="0x001B" define="LIST_OCTET_STRING" type="ARRAY" entryType="OCTET_STRING" length="254" writable="false" optional="false">list_octet_string</attribute>
+    <attribute side="server" code="0x001C" define="LIST_STRUCT_OCTET_STRING" type="ARRAY" entryType="TestListStructOctet" length="254" writable="false" optional="false">list_struct_octet_string</attribute>
+    <!--<attribute side="server" code="0x001B" define="STRUCT" type="ARRAY" writable="true" optional="false">struct</attribute>-->
+    <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="LONG_OCTET_STRING" length="1000" writable="true" optional="false">long_octet_string</attribute>
+    <attribute side="server" code="0x001E" define="CHAR_STRING" type="CHAR_STRING" length="10" writable="true" optional="false">char_string</attribute>
+    <attribute side="server" code="0x001F" define="LONG_CHAR_STRING" type="LONG_CHAR_STRING" length="1000" writable="true" optional="false">long_char_string</attribute>
+    <attribute side="server" code="0x0020" define="EPOCH_US" type="EPOCH_US" writable="true" optional="false">epoch_us</attribute>
+    <attribute side="server" code="0x0021" define="EPOCH_S" type="EPOCH_S" writable="true" optional="false">epoch_s</attribute>
+
+    <!-- This attribute should not be enabled on the server side -->
+    <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="false">unsupported</attribute>
+
+    <!-- Test Commands -->
+    <command source="client" code="0x00" name="Test" optional="false">
+      <description>
+        Simple command without any parameters and without a specific response
+      </description>
+    </command>
+
+    <command source="client" code="0x01" name="TestNotHandled" optional="false">
+      <description>
+        Simple command without any parameters and without a specific response not handled by the server
+      </description>
+    </command>
+
+    <command source="client" code="0x02" name="TestSpecific" optional="false">
+      <description>
+        Simple command without any parameters and with a specific response
+      </description>
+    </command>
+
+    <command source="client" code="0x03" name="TestUnknownCommand" optional="true">
+      <description>
+        Simple command that should not be added to the server.
+      </description>
+    </command>
+
+    <command source="client" code="0x04" name="TestAddArguments" optional="false">
+      <description>
+        Command that takes two arguments and returns their sum.
+      </description>
+      <arg name="arg1" type="INT8U"/>
+      <arg name="arg2" type="INT8U"/>
+    </command>
+
+    <command source="client" code="0x05" name="TestSimpleArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is bool
+      </description>
+      <arg name="arg1" type="BOOLEAN"/>
+    </command>
+
+    <command source="client" code="0x06" name="TestStructArrayArgumentRequest" optional="false">
+      <description>
+        Command that takes various arguments that are arrays, including an array of structs which have a list member.
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
+      <arg name="arg2" type="SimpleStruct" array="true"/>
+      <arg name="arg3" type="SimpleEnum" array="true"/>
+      <arg name="arg4" type="BOOLEAN" array="true"/>
+      <arg name="arg5" type="SimpleEnum"/>
+      <arg name="arg6" type="BOOLEAN"/>
+    </command>
+
+    <!--
+      This command expect a success response if:
+        * 'b' field of arg1 is true
+    -->
+    <command source="client" code="0x07" name="TestStructArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is struct
+      </description>
+      <arg name="arg1" type="SimpleStruct"/>
+    </command>
+
+    <!--
+      This command expect a success response if:
+        * 'b' field of arg1.c is true
+    -->
+    <command source="client" code="0x08" name="TestNestedStructArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is nested struct
+      </description>
+      <arg name="arg1" type="NestedStruct"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1 is an empty list
+        * the field 'b' of all the SimpleStruct contained in arg1 are true
+    -->
+    <command source="client" code="0x09" name="TestListStructArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of struct
+      </description>
+      <arg name="arg1" type="SimpleStruct" array="true"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1 is an empty list
+        * no element is 0
+    -->
+    <command source="client" code="0x0A" name="TestListInt8UArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of INT8U
+      </description>
+      <arg name="arg1" type="INT8U" array="true"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1.d is an empty list
+        * the field 'b' of all the SimpleStruct contained in arg1 are true
+    -->
+    <command source="client" code="0x0B" name="TestNestedStructListArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a Nested Struct List
+      </description>
+      <arg name="arg1" type="NestedStructList"/>
+    </command>
+
+    <!--
+      This command expect a success response if either of the following is true:
+        * arg1 is an empty list
+        * the field 'b' of all the SimpleStruct contained in arg1 are true
+    -->
+    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of Nested Struct List
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
+    </command>
+
+    <command source="client" code="0x0D" name="TestListInt8UReverseRequest" optional="false">
+      <description>
+        Command that takes an argument which is a list of INT8U and expects a
+        response that reverses the list.
+      </description>
+      <arg name="arg1" type="INT8U" array="true"/>
+    </command>
+
+    <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Simple response for TestWithResponse with a simple return value
+      </description>
+      <arg name="returnValue" type="INT8U"/>
+    </command>
+
+    <command source="server" code="0x01" name="TestAddArgumentsResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Response for TestAddArguments that returns the sum.
+      </description>
+      <arg name="returnValue" type="INT8U"/>
+    </command>
+
+    <command source="server" code="0x02" name="TestSimpleArgumentResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Simple response for TestSimpleArgumentRequest with a simple return value
+      </description>
+      <arg name="returnValue" type="BOOLEAN"/>
+    </command>
+
+    <command source="server" code="0x03" name="TestStructArrayArgumentResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Response for TestStructArrayArgumentRequest with complicated return arguments
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
+      <arg name="arg2" type="SimpleStruct" array="true"/>
+      <arg name="arg3" type="SimpleEnum" array="true"/>
+      <arg name="arg4" type="BOOLEAN" array="true"/>
+      <arg name="arg5" type="SimpleEnum"/>
+      <arg name="arg6" type="BOOLEAN"/>
+    </command>
+
+    <command source="server" code="0x04" name="TestListInt8UReverseResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Response that delivers the reversed list of uint8.
+      </description>
+      <arg name="arg1" type="INT8U" array="true"/>
+    </command>
+
+    <event code="0x0001" name="TestEvent" priority="info" side="server">
+      <description>Example test event</description>
+      <field id="1" name="arg1" type="INT8U"/>
+      <field id="2" name="arg2" type="SimpleEnum"/>
+      <field id="3" name="arg3" type="BOOLEAN"/>
+      <field id="4" name="arg4" type="SimpleStruct"/>
+      <field id="5" name="arg5" type="SimpleStruct" array="true"/>
+      <field id="6" name="arg6" type="SimpleEnum" array="true"/>
+    </event>
+  </cluster>
+</configurator>

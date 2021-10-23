@@ -1,11 +1,12 @@
 {{> header}}
 
-#include <app/common/gen/af-structs.h>
+#include <app-common/zap-generated/af-structs.h>
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app::List;
@@ -51,7 +52,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         return kSizeLengthInBytes;
     }
 
-    if (!chip::CanCastTo<uint16_t>(index))
+    if (!CanCastTo<uint16_t>(index))
     {
         ChipLogError(Zcl, "Index %" PRId32 " is invalid. Should be between 1 and 65534", index);
         return 0;
@@ -61,7 +62,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     switch (clusterId)
     {
  {{#chip_server_clusters}}
- {{#if (chip_has_list_attributes)}}
+ {{#if (chip_server_has_list_attributes)}}
     case {{asHex code 4}}: // {{name}} Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -85,7 +86,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 {{chipType}} * entry = reinterpret_cast<{{chipType}} *>(write ? src : dest);
                 {{#chip_attribute_list_entryTypes}}
                 {{#if (isString type)}}
-                chip::ByteSpan * {{name}}Span = &entry->{{name}}; // {{type}}
+                {{#if (isOctetString type)}}
+                ByteSpan * {{name}}Span = &entry->{{name}}; // {{type}}
+                {{else}}
+                ByteSpan {{name}}SpanStorage(Uint8::from_const_char(entry->{{name}}.data()), entry->{{name}}.size()); // {{type}}
+                ByteSpan * {{name}}Span = &{{name}}SpanStorage;
+                {{/if}}
                 if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, {{size}}, {{name}}Span) : ReadByteSpan(src + entryOffset, {{size}}, {{name}}Span)))
                 {
                     ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
@@ -98,22 +104,27 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 {{/chip_attribute_list_entryTypes}}
                 {{else}}
                 {{#if (isString type)}}
-                entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, index - 1);
+                entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
                 if (entryOffset == 0)
                 {
                     ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
                     return 0;
                 }
 
-                chip::ByteSpan * {{asCamelCased name}}Span   = reinterpret_cast<chip::ByteSpan *>(write ? src : dest); // {{type}}
-                uint16_t {{asCamelCased name}}RemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
-                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, {{asCamelCased name}}RemainingSpace, {{asCamelCased name}}Span) : ReadByteSpan(src + entryOffset, {{asCamelCased name}}RemainingSpace, {{asCamelCased name}}Span)))
+                ByteSpan * {{asLowerCamelCase name}}Span   = reinterpret_cast<ByteSpan *>(write ? src : dest); // {{type}}
+                uint16_t {{asLowerCamelCase name}}RemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
+                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, {{asLowerCamelCase name}}RemainingSpace, {{asLowerCamelCase name}}Span) : ReadByteSpan(src + entryOffset, {{asLowerCamelCase name}}RemainingSpace, {{asLowerCamelCase name}}Span)))
                 {
                     ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
                     return 0;
                 }
 
-                entryLength = {{asCamelCased name}}Span->size();
+                if (!CanCastTo<uint16_t>({{asLowerCamelCase name}}Span->size()))
+                {
+                    ChipLogError(Zcl, "Span size %zu is too large", {{asLowerCamelCase name}}Span->size());
+                    return 0;
+                }
+                entryLength = static_cast<uint16_t>({{asLowerCamelCase name}}Span->size());
                 {{else}}
                 copyListMember(dest, src, write, &entryOffset, entryLength); // {{type}}
                 {{/if}}
@@ -147,7 +158,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     switch (clusterId)
     {
 {{#chip_server_clusters}}
-{{#if (chip_has_list_attributes)}}
+{{#if (chip_server_has_list_attributes)}}
     case {{asHex code 4}}: // {{name}} Cluster
         switch (attributeId)
         {
@@ -174,9 +185,9 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     }
 
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);
-    if (!chip::CanCastTo<uint16_t>(totalSize))
+    if (!CanCastTo<uint16_t>(totalSize))
     {
-        ChipLogError(Zcl, "Cluster 0x%04x: Size of attribute 0x%02x is too large.", clusterId, attributeId);
+        ChipLogError(Zcl, "Cluster " ChipLogFormatMEI ": Size of attribute " ChipLogFormatMEI " is too large.", ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
         return 0;
     }
 

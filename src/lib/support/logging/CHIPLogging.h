@@ -34,11 +34,11 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 #include <platform/logging/LogV.h>
 
-#include <support/logging/Constants.h>
+#include <lib/support/logging/Constants.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -113,7 +113,7 @@ void SetLogFilter(uint8_t category);
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Error, MSG, ##__VA_ARGS__)
 #endif
 #else
-#define ChipLogError(MOD, MSG, ...)
+#define ChipLogError(MOD, MSG, ...) ((void) 0)
 #endif
 
 #ifndef CHIP_PROGRESS_LOGGING
@@ -134,7 +134,7 @@ void SetLogFilter(uint8_t category);
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Progress, MSG, ##__VA_ARGS__)
 #endif
 #else
-#define ChipLogProgress(MOD, MSG, ...)
+#define ChipLogProgress(MOD, MSG, ...) ((void) 0)
 #endif
 
 #ifndef CHIP_DETAIL_LOGGING
@@ -155,7 +155,7 @@ void SetLogFilter(uint8_t category);
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Detail, MSG, ##__VA_ARGS__)
 #endif
 #else
-#define ChipLogDetail(MOD, MSG, ...)
+#define ChipLogDetail(MOD, MSG, ...) ((void) 0)
 #endif
 
 #if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING
@@ -253,63 +253,6 @@ bool IsCategoryEnabled(uint8_t category);
 
 #endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
-/**
- *  @def ChipLogFunctError(aErr)
- *
- *  @brief
- *    If the given error value (@a aErr) is not successful (!= CHIP_NO_ERROR),
- *    the method logs the file name, line number, and the error code.
- *
- *  @note
- *    Evaluation of @a aErr is always done, but logging is only enabled when
- *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING is enabled. This can be turned
- *    on or off for each compilation unit by enabling or disabling, as desired,
- *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING before ChipLogging.h is included
- *    by the preprocessor.
- *
- *  Example Usage:
- *
- *  @code
- *  #define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
- *
- *  #include <chip/Support/Logging/ChipLogging.h>
- *
- *  ...
- *
- *  void foo(void)
- *  {
- *      CHIP_ERROR err = CHIP_NO_ERROR;
- *
- *      ...
- *
- *  exit:
- *      ChipLogFunctError(err);
- *  }
- *  @endcode
- *
- *  @param[in]  aErr     A scalar status to be evaluated against CHIP_NO_ERROR.
- *
- *  @sa #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
- *
- */
-
-#if CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING && !defined(ChipLogFunctError)
-
-#define ChipLogFunctError(aErr)                                                                                                    \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if ((aErr) != CHIP_NO_ERROR)                                                                                               \
-        {                                                                                                                          \
-            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(aErr), __FILE__, __LINE__);                                         \
-        }                                                                                                                          \
-    } while (0)
-
-#else // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
-#define ChipLogFunctError(aErr) IgnoreUnusedVariable(aErr)
-
-#endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
 /*
  *  @brief
  *      Macro for use in a string formatter for a 64-bit hex print.
@@ -344,6 +287,75 @@ bool IsCategoryEnabled(uint8_t category);
  *  @param[in]  aValue    64-bit value that will be split in 32-bit MSB/LSB part
  */
 #define ChipLogValueX64(aValue) static_cast<uint32_t>(aValue >> 32), static_cast<uint32_t>(aValue)
+
+/*
+ *  @brief
+ *      Macro for use in a string formatter for a MEI hex print.
+ *      Will split into 2x 16-bit prints to display both the MEI prefix/suffix
+ *
+ *  Example Usage:
+ *
+ *  @code
+ *  void foo() {
+ *      chip::CommandId value = 0x12340001;
+ *      ChipLogProgress(Foo, "A MEI value: " ChipLogFormatMEI, ChipLogValueMEI(value));
+ *  }
+ *  @endcode
+ *
+ */
+#define ChipLogFormatMEI "0x%04" PRIX16 "_%04" PRIX16
+
+/*
+ *  @brief
+ *      Macro for use in a printf parameter list for MEI value.
+ *      Will split into MSB/LSB 16-bit values to separate prefix/suffix.
+ *
+ *  Example Usage:
+ *
+ *  @code
+ *  void foo() {
+ *      chip::CommandId value = 0x12340001;
+ *      ChipLogProgress(Foo, "A MEI value: " ChipLogFormatMEI, ChipLogValueMEI(value));
+ *  }
+ *  @endcode
+ *
+ *  @param[in]  aValue    "32-bit value that will be split in 16-bit MSB/LSB part
+ */
+#define ChipLogValueMEI(aValue) static_cast<uint16_t>(aValue >> 16), static_cast<uint16_t>(aValue)
+
+/**
+ * Logging helpers for exchanges.  For now just log the exchange id and whether
+ * it's an initiator or responder, but eventually we may want to log the peer
+ * node id as well (especially for the responder case).  Some callsites only
+ * have the exchange id and initiator/responder boolean, not an actual exchange,
+ * so we want to have a helper for that case too.
+ */
+#define ChipLogFormatExchangeId "%" PRIu16 "%c"
+#define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
+#define ChipLogFormatExchange ChipLogFormatExchangeId
+#define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
+#define ChipLogValueExchangeIdFromSentHeader(payloadHeader)                                                                        \
+    ChipLogValueExchangeId((payloadHeader).GetExchangeID(), (payloadHeader).IsInitiator())
+// A received header's initiator boolean is the inverse of the exchange's.
+#define ChipLogValueExchangeIdFromReceivedHeader(payloadHeader)                                                                    \
+    ChipLogValueExchangeId((payloadHeader).GetExchangeID(), !(payloadHeader).IsInitiator())
+
+/**
+ * Logging helpers for protocol ids.  A protocol id is a (vendor-id,
+ * protocol-id) pair.
+ */
+#define ChipLogFormatProtocolId "(%" PRIu16 ", %" PRIu16 ")"
+#define ChipLogValueProtocolId(id) (id).GetVendorId(), (id).GetProtocolId()
+
+/**
+ * Logging helpers for message counters, so we format them consistently.
+ */
+#define ChipLogFormatMessageCounter "%" PRIu32
+
+/**
+ * Logging helpers for message types, so we format them consistently.
+ */
+#define ChipLogFormatMessageType "0x%" PRIx8
 
 } // namespace Logging
 } // namespace chip

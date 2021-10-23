@@ -18,11 +18,35 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../../common/cmake/idf_flashing.cmake)
+
 
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
 )
 
 project(chip-pigweed-app)
-idf_build_set_property(CXX_COMPILE_OPTIONS "-std=c++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
+idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
+
+get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
+
+include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
+include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
+
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert pw_assert_log)
+pw_set_backend(pw_sys_io pw_sys_io.esp32)
+
+add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
+add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
+add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
+
+get_target_property(_target_cxx_flags pw_build.cpp17 INTERFACE_COMPILE_OPTIONS)
+list(REMOVE_ITEM _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
+list(APPEND _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
+set_target_properties(pw_build.cpp17 PROPERTIES INTERFACE_COMPILE_OPTIONS "${_target_cxx_flags}")
+
+idf_build_get_property(project_path PROJECT_DIR)
+flashing_script(DEPENDS "${project_path}/echo_test_config.yml" "${project_path}/../mobly_tests/echo_test.py")

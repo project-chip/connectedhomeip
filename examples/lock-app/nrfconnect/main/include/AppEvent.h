@@ -20,6 +20,8 @@
 
 #include <cstdint>
 
+#include "LEDWidget.h"
+
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
@@ -31,6 +33,10 @@ struct AppEvent
         kEventType_Timer,
         kEventType_Lock,
         kEventType_Install,
+        kEventType_UpdateLedState,
+#ifdef CONFIG_MCUMGR_SMP_BT
+        kEventType_StartSMPAdvertising,
+#endif
     };
 
     uint16_t Type;
@@ -51,6 +57,10 @@ struct AppEvent
             uint8_t Action;
             int32_t Actor;
         } LockEvent;
+        struct
+        {
+            LEDWidget * LedWidget;
+        } UpdateLedStateEvent;
     };
 
     EventHandler Handler;

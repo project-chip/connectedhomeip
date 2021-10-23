@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="General"/>
+  <cluster singleton="true">
+    <name>Basic</name>
+    <domain>General</domain>
+    <code>0x0028</code>
+    <define>BASIC_CLUSTER</define>
+    <description>Attributes for determining basic information about a device, and setting user device information such as location.</description>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0"  define="INTERACTION_MODEL_VERSION" type="int16u"                                 default="1"                                >InteractionModelVersion</attribute>
+    <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                                             >VendorName</attribute>
+    <attribute side="server" code="2"  define="VENDOR_ID"                 type="int16u"                                                                            >VendorID</attribute>
+    <attribute side="server" code="3"  define="PRODUCT_NAME"              type="char_string"               length="32"                                             >ProductName</attribute>
+    <attribute side="server" code="4"  define="PRODUCT_ID"                type="int16u"                                                                            >ProductID</attribute>
+    <attribute side="server" code="5"  define="USER_LABEL"                type="char_string"               length="32"  default=""  writable="true"                >UserLabel</attribute>
+    <attribute side="server" code="6"  define="LOCATION"                  type="char_string"               length="2"   default=""  writable="true"                >Location</attribute>
+    <attribute side="server" code="7"  define="HARDWARE_VERSION"          type="int16u"                                 default="0"                                >HardwareVersion</attribute>
+    <attribute side="server" code="8"  define="HARDWARE_VERSION_STRING"   type="char_string" minLength="1" length="64"                                             >HardwareVersionString</attribute>
+    <attribute side="server" code="9"  define="SOFTWARE_VERSION"          type="int32u"                                 default="0"                                >SoftwareVersion</attribute>
+    <attribute side="server" code="10" define="SOFTWARE_VERSION_STRING"   type="char_string" minLength="1" length="64"                                             >SoftwareVersionString</attribute>
+    <attribute side="server" code="11" define="MANUFACTURING_DATE"        type="char_string" minLength="8" length="16"                              optional="true">ManufacturingDate</attribute>
+    <attribute side="server" code="12" define="PART_NUMBER"               type="char_string"               length="32"                              optional="true">PartNumber</attribute>
+    <attribute side="server" code="13" define="PRODUCT_URL"               type="char_string"               length="256"                             optional="true">ProductURL</attribute>
+    <attribute side="server" code="14" define="PRODUCT_LABEL"             type="char_string"               length="64"                              optional="true">ProductLabel</attribute>
+    <attribute side="server" code="15" define="SERIAL_NUMBER"             type="char_string"               length="32"                              optional="true">SerialNumber</attribute>
+    <attribute side="server" code="16" define="LOCAL_CONFIG_DISABLED"     type="boolean"                                default="0" writable="true" optional="true">LocalConfigDisabled</attribute>
+    <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                 optional="true">Reachable</attribute>
+
+    <command source="server" code="0x00" name="StartUp">
+      <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
+    </command>
+
+    <command source="server" code="0x01" name="ShutDown">
+      <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
+    </command>
+
+    <command source="server" code="0x02" name="Leave">
+      <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
+    </command>
+
+  </cluster>
+</configurator>

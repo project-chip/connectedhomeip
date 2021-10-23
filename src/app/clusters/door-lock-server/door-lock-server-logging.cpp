@@ -39,18 +39,20 @@
  ******************************************************************************/
 
 #include "door-lock-server.h"
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/util/af.h>
 #include <assert.h>
 
-#include "gen/callback.h"
-
-#include <app/Command.h>
-#include <support/CodeUtils.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::DoorLock;
 
 static EmberAfPluginDoorLockServerLogEntry entries[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_LOG_ENTRIES];
 static uint8_t nextEntryId = 1;
@@ -118,8 +120,12 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
     return true;
 }
 
-bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj, uint16_t entryId)
+bool emberAfDoorLockClusterGetLogRecordCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                const Commands::GetLogRecord::DecodableType & commandData)
 {
+    // Note: we make a copy of the entry id, because we will be modifying it.
+    uint16_t entryId = commandData.logIndex;
+
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -133,33 +139,20 @@ bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj,
     }
     else
     {
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID, "vwuuuvs", entry.logEntryId, entry.timestamp,
-                                      entry.eventType, entry.source, entry.eventId, entry.userId, entry.pin);
-
-            status = emberAfSendResponse();
-            if (status != EMBER_SUCCESS)
-            {
-                emberAfDoorLockClusterPrintln("Failed to send GetLogRecordResponse: 0x%X", status);
-            }
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID,
-                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                 (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-            VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), entry.logEntryId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), entry.timestamp));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(2), entry.eventType));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(3), entry.source));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(4), entry.eventId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(5), entry.userId));
-            SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(6), entry.pin + 1, entry.pin[0]));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(6), ByteSpan::fromZclString(entry.pin)));
             SuccessOrExit(err = commandObj->FinishCommand());
         }
     }

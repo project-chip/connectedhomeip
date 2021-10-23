@@ -23,7 +23,7 @@
 
 #include <system/TLVPacketBufferBackingStore.h>
 
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace System {

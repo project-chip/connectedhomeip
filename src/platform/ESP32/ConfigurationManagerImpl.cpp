@@ -25,11 +25,11 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#include <support/CodeUtils.h>
 
 #include "esp_wifi.h"
 #include "nvs.h"
@@ -54,9 +54,10 @@ enum
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
-CHIP_ERROR ConfigurationManagerImpl::_Init()
+CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
+    uint32_t rebootCount;
     bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
@@ -67,8 +68,29 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
     err = EnsureNamespace(kConfigNamespace_ChipCounters);
     SuccessOrExit(err);
 
+    if (ConfigValueExists(kCounterKey_RebootCount))
+    {
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+
+        err = StoreRebootCount(rebootCount + 1);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
+
+    if (!ConfigValueExists(kCounterKey_TotalOperationalHours))
+    {
+        err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
+    }
+
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
+    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
     SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here (#1266)
@@ -89,10 +111,10 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (_GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
         ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        _InitiateFactoryReset();
+        InitiateFactoryReset();
     }
     err = CHIP_NO_ERROR;
 
@@ -100,23 +122,68 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
-    return esp_wifi_get_mac(WIFI_IF_STA, buf);
+    return ReadConfigValue(kCounterKey_RebootCount, rebootCount);
 }
 
-bool ConfigurationManagerImpl::_CanFactoryReset()
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    wifi_mode_t mode;
+    esp_wifi_get_mode(&mode);
+    if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
+        return MapConfigError(esp_wifi_get_mac(WIFI_IF_AP, buf));
+    else
+        return MapConfigError(esp_wifi_get_mac(WIFI_IF_STA, buf));
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+CHIP_ERROR ConfigurationManagerImpl::MapConfigError(esp_err_t error)
+{
+    switch (error)
+    {
+    case ESP_OK:
+        return CHIP_NO_ERROR;
+    case ESP_ERR_WIFI_NOT_INIT:
+        return CHIP_ERROR_WELL_UNINITIALIZED;
+    case ESP_ERR_INVALID_ARG:
+    case ESP_ERR_WIFI_IF:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    default:
+        return CHIP_ERROR_INTERNAL;
+    }
+}
+
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     // TODO: query the application to determine if factory reset is allowed.
     return true;
 }
 
-void ConfigurationManagerImpl::_InitiateFactoryReset()
+void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     ESP32Config::Key configKey{ kConfigNamespace_ChipCounters, key };
 
@@ -128,7 +195,7 @@ CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     ESP32Config::Key configKey{ kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
@@ -148,12 +215,15 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     }
 
     // Restore WiFi persistent settings to default values.
-    err = esp_wifi_restore();
-    if (err != ESP_OK)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    esp_err_t error = esp_wifi_restore();
+    if (error != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", esp_err_to_name(error));
     }
-
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ThreadStackMgr().ErasePersistentInfo();
+#endif
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     esp_restart();

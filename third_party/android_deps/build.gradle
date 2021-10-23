@@ -1,0 +1,16 @@
+apply plugin: 'base'
+apply from: 'android_deps.gradle'
+
+task setUpAndroidDeps(type: GnBuildGenerator) {}
+
+task copyArtifacts(type: Copy) {
+  // Defined in android_deps.gradle
+  from configurations.chipDeps
+  into 'artifacts'
+}
+
+clean {
+  delete 'artifacts'
+}
+
+setUpAndroidDeps.dependsOn copyArtifacts

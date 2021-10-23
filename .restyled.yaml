@@ -65,6 +65,8 @@ exclude:
     - "third_party/bluez/repo/**/*"
     - "third_party/cirque/repo/**/*"
     - "third_party/nanopb/repo/**/*"
+    - "src/android/CHIPTool/gradlew" # gradle wrapper generated file
+    - "third_party/android_deps/gradlew" # gradle wrapper generated file
 
 
 changed_paths:
@@ -109,6 +111,7 @@ restylers:
           - "**/*.mm"
     - name: google-java-format
       enabled: true
+      # Update https://github.com/project-chip/connectedhomeip/blob/master/scripts/tools/zap/generate.py if this version changes.
       image: restyled/restyler-google-java-format:v1.6
       command:
           - google-java-format
@@ -197,3 +200,13 @@ restylers:
       include:
           - "**/*.sh"
           - "**/*.bash"
+    - name: autopep8
+      image: 'restyled/restyler-autopep8:v1.5.7'
+      command:
+        - autopep8
+        - '--in-place'
+      arguments: []
+      include:
+        - '**/*.py'
+      interpreters:
+        - python

@@ -22,34 +22,22 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include "Service.h"
 #include "ThreadUtil.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
+
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 #include <system/SystemClock.h>
-
-// MCUMgr BT FOTA includes
-#ifdef CONFIG_MCUMGR_CMD_OS_MGMT
-#include "os_mgmt/os_mgmt.h"
-#endif
-#ifdef CONFIG_MCUMGR_CMD_IMG_MGMT
-#include "img_mgmt/img_mgmt.h"
-#endif
-#ifdef CONFIG_MCUMGR_SMP_BT
-#include <mgmt/mcumgr/smp_bt.h>
-#endif
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-#include <dfu/mcuboot.h>
-#endif
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
@@ -65,7 +53,6 @@ constexpr int kAppEventQueueSize               = 10;
 constexpr int kExampleVendorID                 = 0xabcd;
 constexpr uint8_t kButtonPushEvent             = 1;
 constexpr uint8_t kButtonReleaseEvent          = 0;
-constexpr uint32_t kPublishServicePeriodUs     = 5000000;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFunctionTimer;
@@ -74,13 +61,13 @@ LEDWidget sStatusLED;
 LEDWidget sUnusedLED;
 LEDWidget sUnusedLED_1;
 
-bool sIsThreadProvisioned     = false;
-bool sIsThreadEnabled         = false;
-bool sHaveBLEConnections      = false;
-bool sHaveServiceConnectivity = false;
+bool sIsThreadProvisioned = false;
+bool sIsThreadEnabled     = false;
+bool sHaveBLEConnections  = false;
 
 } // namespace
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -89,10 +76,13 @@ int AppTask::Init()
 {
     // Initialize LEDs
     LEDWidget::InitGpio();
+    LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
 
     sStatusLED.Init(SYSTEM_STATE_LED);
     sUnusedLED.Init(DK_LED3);
     sUnusedLED_1.Init(DK_LED4);
+
+    UpdateStatusLED();
 
     // Initialize buttons
     int ret = dk_buttons_init(ButtonEventHandler);
@@ -106,20 +96,9 @@ int AppTask::Init()
     k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-    // Check if the image is run in the REVERT mode and eventually
-    // confirm it to prevent reverting on the next boot.
-    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-    {
-        if (boot_write_img_confirmed())
-        {
-            LOG_ERR("Confirming firmware image failed, it will be reverted on the next boot.");
-        }
-        else
-        {
-            LOG_INF("New firmware image confirmed.");
-        }
-    }
+#ifdef CONFIG_MCUMGR_SMP_BT
+    GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
+    GetDFUOverSMP().ConfirmNewImage();
 #endif
 
     ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL);
@@ -129,12 +108,15 @@ int AppTask::Init()
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Init ZCL Data Model and start server
-    InitServer();
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-    PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
+#if defined(CONFIG_CHIP_NFC_COMMISSIONING)
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 #endif
 
     return 0;
@@ -142,8 +124,7 @@ int AppTask::Init()
 
 int AppTask::StartApp()
 {
-    int ret                            = Init();
-    uint64_t mLastPublishServiceTimeUS = 0;
+    int ret = Init();
 
     if (ret)
     {
@@ -155,73 +136,8 @@ int AppTask::StartApp()
 
     while (true)
     {
-        ret = k_msgq_get(&sAppEventQueue, &event, K_MSEC(10));
-
-        while (!ret)
-        {
-            DispatchEvent(&event);
-            ret = k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT);
-        }
-
-        // Collect connectivity and configuration state from the CHIP stack.  Because the
-        // CHIP event loop is being run in a separate task, the stack must be locked
-        // while these values are queried.  However we use a non-blocking lock request
-        // (TryLockChipStack()) to avoid blocking other UI activities when the CHIP
-        // task is busy (e.g. with a long crypto operation).
-
-        if (PlatformMgr().TryLockChipStack())
-        {
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
-            PlatformMgr().UnlockChipStack();
-        }
-
-        // Update the status LED if factory reset has not been initiated.
-        //
-        // If system has "full connectivity", keep the LED On constantly.
-        //
-        // If thread and service provisioned, but not attached to the thread network yet OR no
-        // connectivity to the service OR subscriptions are not fully established
-        // THEN blink the LED Off for a short period of time.
-        //
-        // If the system has ble connection(s) uptill the stage above, THEN blink the LEDs at an even
-        // rate of 100ms.
-        //
-        // Otherwise, blink the LED ON for a very short time.
-        if (sAppTask.mFunction != kFunction_FactoryReset)
-        {
-            if (sHaveServiceConnectivity)
-            {
-                sStatusLED.Set(true);
-            }
-            else if (sIsThreadProvisioned && sIsThreadEnabled)
-            {
-                sStatusLED.Blink(950, 50);
-            }
-            else if (sHaveBLEConnections)
-            {
-                sStatusLED.Blink(100, 100);
-            }
-            else
-            {
-                sStatusLED.Blink(50, 950);
-            }
-        }
-
-        sStatusLED.Animate();
-        sUnusedLED.Animate();
-        sUnusedLED_1.Animate();
-
-        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
-        uint64_t nextChangeTimeUS = mLastPublishServiceTimeUS + kPublishServicePeriodUs;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            PublishService();
-            mLastPublishServiceTimeUS = nowUS;
-        }
+        k_msgq_get(&sAppEventQueue, &event, K_FOREVER);
+        DispatchEvent(&event);
     }
 }
 
@@ -323,13 +239,15 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     }
 }
 
-int AppTask::SoftwareUpdateConfirmationHandler(uint32_t offset, uint32_t size, void * arg)
+#ifdef CONFIG_MCUMGR_SMP_BT
+void AppTask::RequestSMPAdvertisingStart(void)
 {
-    // For now just print update progress and confirm data chunk without any additional checks.
-    LOG_INF("Software update progress %d B / %d B", offset, size);
-
-    return 0;
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_StartSMPAdvertising;
+    event.Handler = [](AppEvent *) { GetDFUOverSMP().StartBLEAdvertising(); };
+    sAppTask.PostEvent(&event);
 }
+#endif
 
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
@@ -358,22 +276,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
 
-#if defined(CONFIG_MCUMGR_SMP_BT) && defined(CONFIG_MCUMGR_CMD_IMG_MGMT) && defined(CONFIG_MCUMGR_CMD_OS_MGMT)
-            if (!sAppTask.mSoftwareUpdateEnabled)
-            {
-                sAppTask.mSoftwareUpdateEnabled = true;
-                os_mgmt_register_group();
-                img_mgmt_register_group();
-                img_mgmt_set_upload_cb(SoftwareUpdateConfirmationHandler, NULL);
-                smp_bt_register();
-
-                LOG_INF("Enabled software update");
-            }
-            else
-            {
-                LOG_INF("Software update is already enabled");
-            }
-
+#ifdef CONFIG_MCUMGR_SMP_BT
+            GetDFUOverSMP().StartServer();
 #else
             LOG_INF("Software update is disabled");
 #endif
@@ -382,6 +286,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         {
             sUnusedLED.Set(false);
             sUnusedLED_1.Set(false);
+            UpdateStatusLED();
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
             LOG_INF("Factory Reset has been Canceled");
@@ -394,7 +299,7 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
 
-    if (AddTestPairing() != CHIP_NO_ERROR)
+    if (chip::Server::GetInstance().AddTestCommissioning() != CHIP_NO_ERROR)
     {
         LOG_ERR("Failed to add test pairing");
     }
@@ -415,49 +320,100 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
-    // In case of having software update enabled, allow on starting BLE advertising after Thread provisioning.
-    if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() && !sAppTask.mSoftwareUpdateEnabled)
+    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
+    if (ConnectivityMgr().IsThreadProvisioned())
     {
-        LOG_INF("NFC Tag emulation and BLE advertisement not started - device is commissioned to a Thread network.");
+        LOG_INF("NFC Tag emulation and Matter service BLE advertising not started - device is commissioned to a Thread network.");
         return;
     }
-
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-    if (NFCMgr().IsTagEmulationStarted())
-    {
-        LOG_INF("NFC Tag emulation is already started");
-    }
-    else
-    {
-        ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-    }
-#endif
 
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
-        LOG_INF("BLE Advertisement is already enabled");
+        LOG_INF("BLE advertising is already enabled");
         return;
     }
 
-    if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
-        LOG_INF("Enabled BLE Advertisement");
-    }
-    else
-    {
-        LOG_ERR("OpenDefaultPairingWindow() failed");
+        LOG_ERR("OpenBasicCommissioningWindow() failed");
     }
 }
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
+void AppTask::UpdateLedStateEventHandler(AppEvent * aEvent)
 {
-    if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+    if (aEvent->Type == AppEvent::kEventType_UpdateLedState)
     {
-        NFCMgr().StopTagEmulation();
+        aEvent->UpdateLedStateEvent.LedWidget->UpdateState();
     }
 }
+
+void AppTask::LEDStateUpdateHandler(LEDWidget & ledWidget)
+{
+    AppEvent event;
+    event.Type                          = AppEvent::kEventType_UpdateLedState;
+    event.Handler                       = UpdateLedStateEventHandler;
+    event.UpdateLedStateEvent.LedWidget = &ledWidget;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::UpdateStatusLED()
+{
+    /* Update the status LED.
+     *
+     * If thread and service provisioned, keep the LED On constantly.
+     *
+     * If the system has ble connection(s) uptill the stage above, THEN blink the LED at an even
+     * rate of 100ms.
+     *
+     * Otherwise, blink the LED On for a very short time. */
+    if (sIsThreadProvisioned && sIsThreadEnabled)
+    {
+        sStatusLED.Set(true);
+    }
+    else if (sHaveBLEConnections)
+    {
+        sStatusLED.Blink(100, 100);
+    }
+    else
+    {
+        sStatusLED.Blink(50, 950);
+    }
+}
+
+void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kCHIPoBLEAdvertisingChange:
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+        if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+        {
+            if (NFCMgr().IsTagEmulationStarted())
+            {
+                LOG_INF("NFC Tag emulation is already started");
+            }
+            else
+            {
+                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+            }
+        }
+        else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+        {
+            NFCMgr().StopTagEmulation();
+        }
 #endif
+        sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
+        UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadStateChange:
+        sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+        sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+        UpdateStatusLED();
+        break;
+    default:
+        break;
+    }
+}
 
 void AppTask::CancelTimer()
 {
@@ -552,7 +508,7 @@ void AppTask::UpdateClusterState()
     uint8_t level = LightingMgr().GetLevel();
 
     status = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
-                                   ZCL_DATA8_ATTRIBUTE_TYPE);
+                                   ZCL_INT8U_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {

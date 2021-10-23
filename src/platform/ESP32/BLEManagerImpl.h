@@ -31,10 +31,10 @@
 
 #if CONFIG_BT_BLUEDROID_ENABLED
 
-#include "core/CHIPCallback.h"
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
+#include <lib/core/CHIPCallback.h>
 #elif CONFIG_BT_NIMBLE_ENABLED
 
 /* min max macros in NimBLE can cause build issues with generic min max
@@ -56,6 +56,8 @@ struct ble_gatt_char_context
 
 #endif
 
+#include "ble/Ble.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -69,7 +71,7 @@ class BLEManagerImpl final : public BLEManager,
                              private Ble::BleApplicationDelegate
 {
 public:
-    BLEManagerImpl();
+    BLEManagerImpl() {}
 
 private:
     // Allow the BLEManager interface class to delegate method calls to
@@ -196,15 +198,15 @@ private:
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
 
-    static constexpr uint32_t kAdvertiseTimeout     = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
-    static constexpr uint32_t kFastAdvertiseTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
-    uint64_t mAdvertiseStartTime;
-    chip::Callback::Callback<> mAdvertiseTimerCallback;
-    chip::Callback::Callback<> mFastAdvertiseTimerCallback;
+    static constexpr System::Clock::Timeout kAdvertiseTimeout =
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);
+    static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+    System::Clock::Timestamp mAdvertiseStartTime;
 
-    static void HandleFastAdvertisementTimer(void * context);
+    static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleFastAdvertisementTimer();
-    static void HandleAdvertisementTimer(void * context);
+    static void HandleAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleAdvertisementTimer();
 
 #if CONFIG_BT_BLUEDROID_ENABLED

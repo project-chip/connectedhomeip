@@ -14,23 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *
- *    Copyright (c) 2021 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 /****************************************************************************
  * @file
  * @brief Routines for the Media Input plugin, the
@@ -38,32 +21,77 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <string>
 
-bool emberAfMediaInputClusterSelectInputCallback(chip::app::Command * commandObj, unsigned char)
+using namespace chip;
+using namespace chip::app::Clusters::MediaInput;
+
+bool mediaInputClusterSelectInput(uint8_t input);
+bool mediaInputClusterShowInputStatus();
+bool mediaInputClusterHideInputStatus();
+bool mediaInputClusterRenameInput(uint8_t input, std::string name);
+
+static void storeCurrentInput(EndpointId endpoint, uint8_t currentInput)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = emberAfWriteServerAttribute(
+        endpoint, ZCL_MEDIA_INPUT_CLUSTER_ID, ZCL_MEDIA_INPUT_CURRENT_INPUT_ATTRIBUTE_ID, &currentInput, ZCL_INT8U_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to store media playback attribute.");
+    }
+}
+
+bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::SelectInput::DecodableType & commandData)
+{
+    auto & input = commandData.index;
+
+    bool success         = mediaInputClusterSelectInput(input);
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
+    if (success)
+    {
+        storeCurrentInput(emberAfCurrentEndpoint(), input);
+    }
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::Command * commandObj)
+
+bool emberAfMediaInputClusterShowInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::ShowInputStatus::DecodableType & commandData)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    bool success         = mediaInputClusterShowInputStatus();
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaInputClusterRenameInputCallback(chip::app::Command * commandObj, unsigned char, unsigned char *)
+bool emberAfMediaInputClusterHideInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::HideInputStatus::DecodableType & commandData)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    bool success         = mediaInputClusterHideInputStatus();
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::Command * commandObj)
+bool emberAfMediaInputClusterRenameInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::RenameInput::DecodableType & commandData)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    auto & input = commandData.index;
+    auto & name  = commandData.name;
+
+    // TODO: char is not null terminated, verify this code once #7963 gets merged.
+    std::string nameString(name.data(), name.size());
+    bool success         = mediaInputClusterRenameInput(input, nameString);
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }

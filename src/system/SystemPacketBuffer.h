@@ -29,9 +29,9 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 #include <system/SystemAlignSize.h>
 #include <system/SystemError.h>
 
@@ -130,6 +130,21 @@ struct pbuf
  *          @ref chip::chipTLVReader
  *          @ref chip::chipTLVWriter
  *
+ * ### PacketBuffer format
+ *
+ * <pre>
+ *           ┌────────────────────────────────────┐
+ *           │       ┌────────────────────┐       │
+ *           │       │                    │◁──────┴───────▷│
+ *  ┏━━━━━━━━┿━━━━━━━┿━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┓
+ *  ┃ pbuf len payload ┃ reserve          ┃ data           ┃ unused                  ┃
+ *  ┗━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ *  │                  │← ReservedSize() →│← DataLength() →│← AvailableDataLength() →│
+ *  │                  │                  │← MaxDataLength() → · · · · · · · · · · ·→│
+ *  │                  │                  Start()                                    │
+ *  │← kStructureSize →│← AllocSize() → · · · · · · · · · · · · · · · · · · · · · · →│
+ * </pre>
+ *
  */
 class DLL_EXPORT PacketBuffer : private pbuf
 {
@@ -146,7 +161,7 @@ public:
      * The maximum size buffer an application can allocate with no protocol header reserve.
      */
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr uint16_t kMaxSizeWithoutReserve = (LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - PacketBuffer::kStructureSize);
+    static constexpr uint16_t kMaxSizeWithoutReserve = LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE);
 #else
     static constexpr uint16_t kMaxSizeWithoutReserve = CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX;
 #endif
@@ -829,7 +844,6 @@ using PacketBufferWriter = PacketBufferWriterBase<chip::Encoding::BigEndian::Buf
 namespace chip {
 
 namespace Inet {
-class RawEndPoint;
 class UDPEndPoint;
 class IPEndPointBasis;
 } // namespace Inet
@@ -850,7 +864,6 @@ private:
      * @note This should be used ONLY by low-level code interfacing with LwIP.
      */
     static struct pbuf * UnsafeGetLwIPpbuf(const PacketBufferHandle & handle) { return PacketBufferHandle::GetLwIPpbuf(handle); }
-    friend class Inet::RawEndPoint;
     friend class Inet::UDPEndPoint;
     friend class Inet::IPEndPointBasis;
 };

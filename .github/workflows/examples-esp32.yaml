@@ -19,17 +19,20 @@ on:
     pull_request:
 
 concurrency:
-    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
   
 jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
         name: ESP32
-        timeout-minutes: 60
+        timeout-minutes: 70
 
         env:
             BUILD_TYPE: esp32
+            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
+            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+            GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -43,44 +46,68 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
               with:
-                  fetch-depth: 0
                   submodules: true
-#             - name: Initialize CodeQL
-#               uses: github/codeql-action/init@v1
-#               with:
-#                   languages: "cpp, python"
             - name: Bootstrap
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Build example All Clusters App
-              timeout-minutes: 15
-              run: scripts/examples/esp_example.sh all-clusters-app
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_m5stack.defaults
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
-            - name: Build example Pigweed App
-              timeout-minutes: 5
-              run: scripts/examples/esp_example.sh pigweed-app
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 m5stack all-clusters-app \
+                     example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf \
+                     /tmp/bloat_reports/
+            - name: Build example All Clusters App C3
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/pigweed-app/esp32/build/chip-pigweed-app.elf \
-                     example_binaries/$BUILD_TYPE-build/chip-pigweed-app.elf
+                  cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 c3devkit all-clusters-app \
+                     example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf \
+                     /tmp/bloat_reports/
+            - name: Build example Pigweed App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
+            - name: Build example Lock App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults
+            - name: Build example Bridge App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh bridge-app
+            - name: Build example Persistent Storage App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
+            - name: Build example Shell App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh shell sdkconfig.defaults
+            - name: Build example Temperature Measurement App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh temperature-measurement-app sdkconfig.optimize.defaults
+            - name: Build example IPv6 Only App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
+              if: ${{ !env.ACT }}
               with:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
@@ -89,16 +116,16 @@ jobs:
               run: |
                   cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
               with:
                   name:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find . -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove m5stack-tft binaries for CodeQL Analysis
-            #   run: find . -type d -name "m5stack-tft" -exec rm -rf {} +
-#             - name: Perform CodeQL Analysis
-#               if: ${{ github.event_name == 'push' }}
-#               uses: github/codeql-action/analyze@v1
+            - name: Uploading Size Reports
+              uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
+              with:
+                  name: Size,ESP32-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  path: /tmp/bloat_reports/

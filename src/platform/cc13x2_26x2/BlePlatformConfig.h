@@ -26,6 +26,3 @@
  */
 
 #pragma once
-
-#define BLE_CONFIG_ERROR_TYPE int32_t
-#define BLE_CONFIG_ERROR_FORMAT PRId32

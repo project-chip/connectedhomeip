@@ -69,10 +69,6 @@ public:
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
-    static const Key kConfigKey_OperationalDeviceId;
-    static const Key kConfigKey_OperationalDeviceCert;
-    static const Key kConfigKey_OperationalDeviceICACerts;
-    static const Key kConfigKey_OperationalDevicePrivateKey;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
@@ -104,6 +100,10 @@ protected:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
+
+private:
+    // TODO: This is temporary until Darwin implements a proper ReadConfigValue
+    static uint16_t mPosixSetupDiscriminator;
 };
 
 struct PosixConfig::Key

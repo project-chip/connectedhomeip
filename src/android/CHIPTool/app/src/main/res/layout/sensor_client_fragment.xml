@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/deviceEndpointLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/deviceIdEd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:hint="@string/enter_device_id_hint_text"
+                android:inputType="number"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/endpointIdEd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:hint="@string/enter_endpoint_id_hint_text"
+                android:inputType="number"
+                android:text="1"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <Spinner
+            android:id="@+id/clusterNameSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/deviceEndpointLayout"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:spinnerMode="dialog"></Spinner>
+
+        <LinearLayout
+            android:id="@+id/buttonsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/clusterNameSpinner"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/readSensorBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:padding="16dp"
+                android:text="@string/sensor_client_read_btn_text"
+                android:textAllCaps="true"
+                android:textSize="16sp" />
+
+            <ToggleButton
+                android:id="@+id/watchSensorBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:padding="16dp"
+                android:textAllCaps="true"
+                android:textOff="@string/sensor_client_watch_btn_text"
+                android:textOn="@string/sensor_client_watch_btn_text"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lastValueTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/buttonsLayout"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:padding="8dp"
+            android:textSize="16dp"
+            android:textAlignment="center"/>
+
+        <com.jjoe64.graphview.GraphView
+            android:id="@+id/sensorGraph"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@+id/lastValueTv"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:padding="8dp"/>
+
+    </RelativeLayout>
+</ScrollView>

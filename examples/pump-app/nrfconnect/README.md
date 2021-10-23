@@ -1,21 +1,23 @@
-# CHIP nRF Connect Lock Example Application
+# Matter nRF Connect Pump Example Application
 
-The nRF Connect Lock Example demonstrates how to remotely control a door lock
-device with one basic bolt. It uses buttons to test changing the lock and device
-states and LEDs to show the state of these changes. You can use this example as
-a reference for creating your own application.
+The nRF Connect Pump Example demonstrates how to remotely control a pump device
+with basic start/stop functionality. It uses buttons to test changing the pump
+state and device states and LEDs to show the state of these changes. This
+example is inherited from the "lock-app" example but modified to simulate a pump
+device and can be used as a reference for creating your own pump application.
 
 <p align="center">
   <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
   <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 </p>
 
-The example is based on [CHIP](https://github.com/project-chip/connectedhomeip)
-and Nordic Semiconductor's nRF Connect SDK, and supports remote access and
-control of a simulated door lock over a low-power, 802.15.4 Thread network.
+The example is based on
+[Matter](https://github.com/project-chip/connectedhomeip) and Nordic
+Semiconductor's nRF Connect SDK, and supports remote access and control of a
+simulated pump over a low-power, 802.15.4 Thread network.
 
-The example behaves as a CHIP accessory, that is a device that can be paired
-into an existing CHIP network and can be controlled by this network.
+The example behaves as a Matter accessory, that is a device that can be paired
+into an existing Matter network and can be controlled by this network.
 
 <hr>
 
@@ -43,35 +45,35 @@ into an existing CHIP network and can be controlled by this network.
 This example is running on the nRF Connect platform, which is based on Nordic
 Semiconductor's
 [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
-and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
+and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
-The CHIP device that runs the lock application is controlled by the CHIP
-controller device over the Thread protocol. By default, the CHIP device has
-Thread disabled, and it should be paired with CHIP controller and get
+The Matter device that runs the pump application is controlled by the Matter
+controller device over the Thread protocol. By default, the Matter device has
+Thread disabled, and it should be paired with Matter controller and get
 configuration from it. Some actions required before establishing full
 communication are described below.
 
 The example also comes with a test mode, which allows to start Thread with the
 default settings by pressing button manually. However, this mode does not
-guarantee that the device will be able to communicate with the CHIP controller
+guarantee that the device will be able to communicate with the Matter controller
 and other devices.
 
 ### Bluetooth LE advertising
 
-In this example, to commission the device onto a CHIP network, it must be
+In this example, to commission the device onto a Matter network, it must be
 discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
 LE advertising manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
 In this example, the commissioning procedure (called rendezvous) is done over
-Bluetooth LE between a CHIP device and the CHIP controller, where the controller
-has the commissioner role.
+Bluetooth LE between a Matter device and the Matter controller, where the
+controller has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
-from the CHIP device. The data payload is encoded within a QR code, printed to
+from the Matter device. The data payload is encoded within a QR code, printed to
 the UART console, and shared using an NFC tag. For security reasons, you must
 start NFC tag emulation manually after powering up the device by pressing
 **Button 4**.
@@ -79,7 +81,7 @@ start NFC tag emulation manually after powering up the device by pressing
 #### Thread provisioning
 
 Last part of the rendezvous procedure, the provisioning operation involves
-sending the Thread network credentials from the CHIP controller to the CHIP
+sending the Thread network credentials from the Matter controller to the Matter
 device. As a result, device is able to join the Thread network and communicate
 with other Thread devices in the network.
 
@@ -132,15 +134,15 @@ following states are possible:
 -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
     network and service connectivity.
 
-**LED 2** simulates the lock bolt and shows the state of the lock. The following
-states are possible:
+**LED 2** simulates the pump motor and shows the state of the pump. The
+following states are possible:
 
--   _Solid On_ &mdash; The bolt is extended and the door is locked.
+-   _Solid On_ &mdash; The pump is running.
 
--   _Off_ &mdash; The bolt is retracted and the door is unlocked.
+-   _Off_ &mdash; The pump is stopped.
 
 -   _Rapid Even Flashing (100 ms on/100 ms off during 2 s)_ &mdash; The
-    simulated bolt is in motion from one position to another.
+    simulated pump motor is starting.
 
 **Button 1** can be used for the following purposes:
 
@@ -152,14 +154,15 @@ states are possible:
 -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
     process. This feature is not currently supported.
 
-**Button 2** &mdash; Pressing the button once changes the lock state to the
+**Button 2** &mdash; Pressing the button once changes the pump state to the
 opposite one.
 
 **Button 3** &mdash; Pressing the button once starts the Thread networking in
 the test mode using the default configuration.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time.
+enables Bluetooth LE advertising for the predefined period of time (15 minutes
+by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
@@ -167,13 +170,14 @@ communicate with it using the
 
 **NFC port with antenna attached** can be used to start the
 [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
-information from the CHIP device in a data payload that can be shared using NFC.
+information from the Matter device in a data payload that can be shared using
+NFC.
 
 <hr>
 
 ## Setting up the environment
 
-Before building the example, check out the CHIP repository and sync submodules
+Before building the example, check out the Matter repository and sync submodules
 using the following command:
 
         $ git submodule update --init
@@ -211,7 +215,7 @@ To use the Docker container for setup, complete the following steps:
 
     -   _~/nrfconnect_ can be replaced with an absolute path to the nRF Connect
         SDK source directory.
-    -   _~/connectedhomeip_ must be replaced with an absolute path to the CHIP
+    -   _~/connectedhomeip_ must be replaced with an absolute path to the Matter
         source directory.
     -   _-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:_ rmw"\*
         parameters can be omitted if you are not planning to flash the example
@@ -248,20 +252,20 @@ To use the native shell for setup, complete the following steps:
     If you have the SDK already installed, continue to the next step and update
     the nRF Connect SDK after initializing environment variables.
 
-3.  Initialize environment variables referred to by the CHIP and the nRF Connect
-    SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
-    Connect SDK installation directory, and _toolchain-dir_ with the path to GNU
-    Arm Embedded Toolchain.
+3.  Initialize environment variables referred to by the Matter and the nRF
+    Connect SDK build scripts. Replace _nrfconnect-dir_ with the path to your
+    nRF Connect SDK installation directory, and _toolchain-dir_ with the path to
+    GNU Arm Embedded Toolchain.
 
          $ source nrfconnect-dir/zephyr/zephyr-env.sh
          $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
 
 4.  Update the nRF Connect SDK to the most recent supported revision by running
-    the following command (replace _chip-dir_ with the path to CHIP repository
-    directory):
+    the following command (replace _matter-dir_ with the path to Matter
+    repository directory):
 
-         $ cd chip-dir
+         $ cd matter-dir
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update
 
 Now you can proceed with the [Building](#building) instruction.
@@ -277,7 +281,7 @@ environment:
 
 1.  Navigate to the example's directory:
 
-        $ cd examples/lock-app/nrfconnect
+        $ cd examples/pump-app/nrfconnect
 
 2.  Run the following command to build the example, with _build-target_ replaced
     with the build target name of the Nordic Semiconductor's kit you own, for
@@ -363,4 +367,4 @@ Read the
 [Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
 to see how to use [CHIPTool](../../../src/android/CHIPTool/README.md) for
 Android smartphones to commission and control the application within a
-CHIP-enabled Thread network.
+Matter-enabled Thread network.

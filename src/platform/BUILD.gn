@@ -58,10 +58,15 @@ if (chip_device_platform != "none") {
 
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
+
+    # todo: below operates are not work without root permission
+    # pthread_attr_setschedpolicy in GenericPlatformManagerImpl_POSIX.cpp
+    chip_device_config_run_as_root = current_os != "android"
   }
 
   if (chip_stack_lock_tracking == "auto") {
-    if (chip_device_platform == "linux") {
+    if (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
+        chip_device_platform == "android") {
       # TODO: should be fatal for development. Change once bugs are fixed
       chip_stack_lock_tracking = "log"
     } else {
@@ -84,7 +89,7 @@ if (chip_device_platform != "none") {
 
     chip_with_gio = chip_enable_wifi
     chip_device_config_enable_wpa = chip_enable_wifi
-    chip_device_config_enable_mdns = chip_mdns != "none"
+    chip_device_config_enable_dnssd = chip_mdns != "none"
     chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
     chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
 
@@ -94,15 +99,17 @@ if (chip_device_platform != "none") {
       "CHIP_WITH_GIO=${chip_with_gio}",
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
       "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=${chip_use_clusters_for_ip_commissioning}",
-      "CHIP_DEVICE_CONFIG_ENABLE_MDNS=${chip_device_config_enable_mdns}",
+      "CHIP_DEVICE_CONFIG_ENABLE_DNSSD=${chip_device_config_enable_dnssd}",
       "CHIP_BYPASS_RENDEZVOUS=${chip_bypass_rendezvous}",
       "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
       "CHIP_ENABLE_ROTATING_DEVICE_ID=${chip_enable_rotating_device_id}",
+      "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=${chip_device_config_run_as_root}",
     ]
 
-    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
+        chip_device_platform == "tizen" || chip_device_platform == "android") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
@@ -144,30 +151,64 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_ESP32=1",
         "CHIP_DEVICE_LAYER_TARGET=ESP32",
       ]
+    } else if (chip_device_platform == "p6") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_P6=1",
+        "CHIP_DEVICE_LAYER_TARGET=P6",
+      ]
     } else if (chip_device_platform == "linux") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
         "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+    } else if (chip_device_platform == "tizen") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_TIZEN=1",
+        "CHIP_DEVICE_LAYER_TARGET=Tizen",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+      defines -=
+          [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
     } else if (chip_device_platform == "nrfconnect") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=1",
         "CHIP_DEVICE_LAYER_TARGET=nrfconnect",
       ]
-    } else if (chip_device_platform == "qpg6100") {
+    } else if (chip_device_platform == "qpg") {
       defines += [
-        "CHIP_DEVICE_LAYER_TARGET_QPG6100=1",
-        "CHIP_DEVICE_LAYER_TARGET=qpg6100",
+        "CHIP_DEVICE_LAYER_TARGET_QPG=1",
+        "CHIP_DEVICE_LAYER_TARGET=qpg",
       ]
-    } else if (chip_device_platform == "k32w") {
+    } else if (chip_device_platform == "k32w0") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_K32W=1",
-        "CHIP_DEVICE_LAYER_TARGET=K32W",
+        "CHIP_DEVICE_LAYER_TARGET=nxp/k32w/k32w0",
       ]
     } else if (chip_device_platform == "telink") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_TELINK=1",
         "CHIP_DEVICE_LAYER_TARGET=telink",
+      ]
+    } else if (chip_device_platform == "mbed") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_MBED=1",
+        "CHIP_DEVICE_LAYER_TARGET=mbed",
+      ]
+    } else if (chip_device_platform == "fake") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_FAKE=1",
+        "CHIP_DEVICE_LAYER_TARGET=fake",
+      ]
+    } else if (chip_device_platform == "android") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_ANDROID=1",
+        "CHIP_DEVICE_LAYER_TARGET=android",
+      ]
+    } else if (chip_device_platform == "ameba") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_AMEBA=1",
+        "CHIP_DEVICE_LAYER_TARGET=Ameba",
       ]
     }
   }
@@ -182,22 +223,28 @@ if (chip_device_platform != "none") {
     ]
 
     if (current_os == "android") {
-      defines += [ "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"" ]
+      chip_device_config_enable_dnssd = chip_mdns != "none"
+      defines += [
+        "CHIP_DEVICE_CONFIG_ENABLE_DNSSD=${chip_device_config_enable_dnssd}",
+        "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=${chip_use_clusters_for_ip_commissioning}",
+        "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"",
+      ]
     }
   }
 }
 
-if (chip_device_platform != "none" && chip_device_platform != "external") {
-  config("platform_config") {
-    if (chip_device_platform == "darwin") {
-      frameworks = [
-        "CoreData.framework",
-        "CoreFoundation.framework",
-        "CoreBluetooth.framework",
-        "Foundation.framework",
-        "IOKit.framework",
-      ]
-    }
+if (chip_device_platform != "none") {
+  group("platform_base") {
+    public_deps = [
+      ":platform_buildconfig",
+      "${chip_root}/src/ble",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/system",
+    ]
+
+    public_configs = [ "${chip_root}/src:includes" ]
   }
 
   static_library("platform") {
@@ -214,9 +261,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
-      "../include/platform/SoftwareUpdateManagerImpl.h",
       "../include/platform/ThreadStackManager.h",
-      "../include/platform/TimeSyncManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
       "../include/platform/internal/DeviceControlServer.h",
@@ -234,447 +279,70 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/internal/GenericPlatformManagerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
-      "../include/platform/internal/GenericSoftwareUpdateManagerImpl.h",
-      "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "DeviceControlServer.cpp",
+      "Entropy.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",
+      "LwIPEventSupport.cpp",
       "PersistedStorage.cpp",
-      "SystemEventSupport.cpp",
-      "SystemTimerSupport.cpp",
       "TestIdentity.cpp",
     ]
 
     cflags = [ "-Wconversion" ]
 
     public_deps = [
-      ":platform_buildconfig",
-      "${chip_root}/src/ble",
-      "${chip_root}/src/inet",
-      "${chip_root}/src/lib/core",
-      "${chip_root}/src/lib/core:chip_config_header",
+      ":platform_base",
+      "${chip_root}/src/app:app_buildconfig",
+      "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
-      "${chip_root}/src/platform/logging:headers",
-      "${chip_root}/src/setup_payload",
-      "${nlio_root}:nlio",
     ]
-
-    public_configs = [
-      ":platform_config",
-      "${chip_root}/src:includes",
-    ]
-
-    if (chip_mdns != "none") {
-      public_deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
-    }
 
     if (chip_device_platform == "cc13x2_26x2") {
-      sources += [
-        "FreeRTOS/SystemTimeSupport.cpp",
-        "cc13x2_26x2/BlePlatformConfig.h",
-        "cc13x2_26x2/CC13X2_26X2Config.cpp",
-        "cc13x2_26x2/CC13X2_26X2Config.h",
-        "cc13x2_26x2/CHIPDevicePlatformConfig.h",
-        "cc13x2_26x2/CHIPDevicePlatformConfig.h",
-        "cc13x2_26x2/CHIPDevicePlatformEvent.h",
-        "cc13x2_26x2/ConfigurationManagerImpl.cpp",
-        "cc13x2_26x2/ConnectivityManagerImpl.cpp",
-        "cc13x2_26x2/ConnectivityManagerImpl.h",
-        "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.cpp",
-        "cc13x2_26x2/DeviceNetworkProvisioningDelegateImpl.h",
-        "cc13x2_26x2/InetPlatformConfig.h",
-        "cc13x2_26x2/KeyValueStoreManagerImpl.cpp",
-        "cc13x2_26x2/KeyValueStoreManagerImpl.h",
-        "cc13x2_26x2/Logging.cpp",
-        "cc13x2_26x2/PlatformManagerImpl.cpp",
-        "cc13x2_26x2/PlatformManagerImpl.h",
-        "cc13x2_26x2/Random.c",
-        "cc13x2_26x2/SystemPlatformConfig.h",
-      ]
-
-      if (chip_enable_ble) {
-        sources += [
-          "cc13x2_26x2/BLEManagerImpl.cpp",
-          "cc13x2_26x2/BLEManagerImpl.h",
-        ]
-      }
-
-      if (chip_enable_openthread) {
-        # needed for MTD/FTD
-        import("//build_overrides/ti_simplelink_sdk.gni")
-        import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
-        public_deps += [
-          "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
-          "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
-          "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
-        ]
-
-        if (ti_simplelink_device_family == "cc13x2_26x2") {
-          public_deps += [ "${openthread_root}:libopenthread-mtd" ]
-        } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-          public_deps += [ "${openthread_root}:libopenthread-ftd" ]
-        }
-
-        sources += [
-          "OpenThread/OpenThreadUtils.cpp",
-          "cc13x2_26x2/ThreadStackManagerImpl.cpp",
-          "cc13x2_26x2/ThreadStackManagerImpl.h",
-        ]
-      }
+      _platform_target = "cc13x2_26x2"
     } else if (chip_device_platform == "darwin") {
-      cflags += [ "-fobjc-arc" ]
-
-      sources += [
-        "Darwin/BLEManagerImpl.cpp",
-        "Darwin/BLEManagerImpl.h",
-        "Darwin/BlePlatformConfig.h",
-        "Darwin/CHIPDevicePlatformConfig.h",
-        "Darwin/CHIPDevicePlatformEvent.h",
-        "Darwin/CHIPPlatformConfig.h",
-        "Darwin/ConfigurationManagerImpl.cpp",
-        "Darwin/ConfigurationManagerImpl.h",
-        "Darwin/ConnectivityManagerImpl.cpp",
-        "Darwin/ConnectivityManagerImpl.h",
-        "Darwin/InetPlatformConfig.h",
-        "Darwin/KeyValueStoreManagerImpl.h",
-        "Darwin/KeyValueStoreManagerImpl.mm",
-        "Darwin/Logging.cpp",
-        "Darwin/MdnsError.cpp",
-        "Darwin/MdnsError.h",
-        "Darwin/MdnsImpl.cpp",
-        "Darwin/MdnsImpl.h",
-        "Darwin/PlatformManagerImpl.cpp",
-        "Darwin/PlatformManagerImpl.h",
-        "Darwin/PosixConfig.cpp",
-        "Darwin/PosixConfig.h",
-        "Darwin/SystemPlatformConfig.h",
-      ]
-
-      if (chip_enable_ble) {
-        sources += [
-          "Darwin/BleApplicationDelegate.h",
-          "Darwin/BleApplicationDelegateImpl.mm",
-          "Darwin/BleConnectionDelegate.h",
-          "Darwin/BleConnectionDelegateImpl.mm",
-          "Darwin/BlePlatformDelegate.h",
-          "Darwin/BlePlatformDelegateImpl.mm",
-          "Darwin/UUIDHelper.h",
-          "Darwin/UUIDHelperImpl.mm",
-        ]
-      }
+      _platform_target = "Darwin"
     } else if (chip_device_platform == "efr32") {
-      sources += [
-        "EFR32/BLEManagerImpl.cpp",
-        "EFR32/BLEManagerImpl.h",
-        "EFR32/BlePlatformConfig.h",
-        "EFR32/CHIPDevicePlatformConfig.h",
-        "EFR32/CHIPDevicePlatformEvent.h",
-        "EFR32/CHIPMem-Platform.cpp",
-        "EFR32/CHIPPlatformConfig.h",
-        "EFR32/ConfigurationManagerImpl.cpp",
-        "EFR32/ConfigurationManagerImpl.h",
-        "EFR32/ConnectivityManagerImpl.cpp",
-        "EFR32/ConnectivityManagerImpl.h",
-        "EFR32/DeviceNetworkProvisioningDelegateImpl.cpp",
-        "EFR32/DeviceNetworkProvisioningDelegateImpl.h",
-        "EFR32/EFR32Config.cpp",
-        "EFR32/EFR32Config.h",
-        "EFR32/InetPlatformConfig.h",
-        "EFR32/Logging.cpp",
-        "EFR32/PlatformManagerImpl.cpp",
-        "EFR32/PlatformManagerImpl.h",
-        "EFR32/SystemPlatformConfig.h",
-        "EFR32/freertos_bluetooth.c",
-        "EFR32/freertos_bluetooth.h",
-        "EFR32/gatt_db.c",
-        "EFR32/gatt_db.h",
-        "FreeRTOS/SystemTimeSupport.cpp",
-      ]
-
-      # Add pigweed KVS
-      deps = [
-        "$dir_pw_kvs:crc16",
-        "$dir_pw_log",
-      ]
-      public_deps += [
-        "$dir_pw_checksum",
-        "$dir_pw_kvs",
-      ]
-      sources += [
-        "EFR32/KeyValueStoreManagerImpl.cpp",
-        "EFR32/KeyValueStoreManagerImpl.h",
-      ]
-
-      if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
-
-        sources += [
-          "EFR32/ThreadStackManagerImpl.cpp",
-          "EFR32/ThreadStackManagerImpl.h",
-          "OpenThread/OpenThreadUtils.cpp",
-        ]
-      }
+      _platform_target = "EFR32"
     } else if (chip_device_platform == "esp32") {
-      sources += [
-        "ESP32/BLEManagerImpl.h",
-        "ESP32/CHIPDevicePlatformConfig.h",
-        "ESP32/CHIPDevicePlatformEvent.h",
-        "ESP32/ConfigurationManagerImpl.cpp",
-        "ESP32/ConfigurationManagerImpl.h",
-        "ESP32/ConnectivityManagerImpl.cpp",
-        "ESP32/ConnectivityManagerImpl.h",
-        "ESP32/DeviceNetworkProvisioningDelegateImpl.cpp",
-        "ESP32/DeviceNetworkProvisioningDelegateImpl.h",
-        "ESP32/ESP32Config.cpp",
-        "ESP32/ESP32Config.h",
-        "ESP32/ESP32Utils.cpp",
-        "ESP32/ESP32Utils.h",
-        "ESP32/KeyValueStoreManagerImpl.cpp",
-        "ESP32/KeyValueStoreManagerImpl.h",
-        "ESP32/Logging.cpp",
-        "ESP32/LwIPCoreLock.cpp",
-        "ESP32/MdnsImpl.cpp",
-        "ESP32/PlatformManagerImpl.cpp",
-        "ESP32/PlatformManagerImpl.h",
-        "ESP32/ServiceProvisioning.cpp",
-        "ESP32/ServiceProvisioning.h",
-        "ESP32/SoftwareUpdateManagerImpl.h",
-        "ESP32/SystemTimeSupport.cpp",
-        "ESP32/bluedroid/BLEManagerImpl.cpp",
-        "ESP32/nimble/BLEManagerImpl.cpp",
-        "FreeRTOS/SystemTimeSupport.cpp",
-      ]
-
-      public_deps += [ "${chip_root}/src/crypto" ]
-    } else if (chip_device_platform == "k32w") {
-      sources += [
-        "FreeRTOS/SystemTimeSupport.cpp",
-        "K32W/BLEManagerImpl.cpp",
-        "K32W/BLEManagerImpl.h",
-        "K32W/CHIPDevicePlatformConfig.h",
-        "K32W/CHIPDevicePlatformEvent.h",
-        "K32W/ConfigurationManagerImpl.cpp",
-        "K32W/ConfigurationManagerImpl.h",
-        "K32W/ConnectivityManagerImpl.cpp",
-        "K32W/ConnectivityManagerImpl.h",
-        "K32W/DeviceNetworkProvisioningDelegateImpl.cpp",
-        "K32W/DeviceNetworkProvisioningDelegateImpl.h",
-        "K32W/K32WConfig.cpp",
-        "K32W/K32WConfig.h",
-        "K32W/KeyValueStoreManagerImpl.cpp",
-        "K32W/KeyValueStoreManagerImpl.h",
-        "K32W/Logging.cpp",
-        "K32W/NFCManagerImpl.cpp",
-        "K32W/NFCManagerImpl.h",
-        "K32W/PlatformManagerImpl.cpp",
-        "K32W/PlatformManagerImpl.h",
-        "K32W/SoftwareUpdateManagerImpl.h",
-        "K32W/ble_function_mux.c",
-      ]
-
-      if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
-
-        sources += [
-          "K32W/ThreadStackManagerImpl.cpp",
-          "K32W/ThreadStackManagerImpl.h",
-          "OpenThread/OpenThreadUtils.cpp",
-        ]
-      }
-
-      public_deps += [ "${chip_root}/src/crypto" ]
+      _platform_target = "ESP32"
+    } else if (chip_device_platform == "k32w0") {
+      _platform_target = "nxp/k32w/k32w0"
     } else if (chip_device_platform == "linux") {
-      sources += [
-        "Linux/BLEManagerImpl.cpp",
-        "Linux/BLEManagerImpl.h",
-        "Linux/BlePlatformConfig.h",
-        "Linux/CHIPDevicePlatformConfig.h",
-        "Linux/CHIPDevicePlatformEvent.h",
-        "Linux/CHIPLinuxStorage.cpp",
-        "Linux/CHIPLinuxStorage.h",
-        "Linux/CHIPLinuxStorageIni.cpp",
-        "Linux/CHIPLinuxStorageIni.h",
-        "Linux/CHIPPlatformConfig.h",
-        "Linux/ConfigurationManagerImpl.cpp",
-        "Linux/ConfigurationManagerImpl.h",
-        "Linux/ConnectivityManagerImpl.cpp",
-        "Linux/ConnectivityManagerImpl.h",
-        "Linux/DeviceNetworkProvisioningDelegateImpl.cpp",
-        "Linux/DeviceNetworkProvisioningDelegateImpl.h",
-        "Linux/InetPlatformConfig.h",
-        "Linux/KeyValueStoreManagerImpl.cpp",
-        "Linux/KeyValueStoreManagerImpl.h",
-        "Linux/Logging.cpp",
-        "Linux/PlatformManagerImpl.cpp",
-        "Linux/PlatformManagerImpl.h",
-        "Linux/PosixConfig.cpp",
-        "Linux/PosixConfig.h",
-        "Linux/SystemPlatformConfig.h",
-        "Linux/SystemTimeSupport.cpp",
-        "Linux/bluez/AdapterIterator.cpp",
-        "Linux/bluez/AdapterIterator.h",
-        "Linux/bluez/ChipDeviceScanner.cpp",
-        "Linux/bluez/ChipDeviceScanner.h",
-        "Linux/bluez/Helper.cpp",
-        "Linux/bluez/Helper.h",
-        "Linux/bluez/MainLoop.cpp",
-        "Linux/bluez/MainLoop.h",
-        "Linux/bluez/Types.h",
-      ]
-
-      if (chip_mdns != "none") {
-        sources += [
-          "Linux/MdnsImpl.cpp",
-          "Linux/MdnsImpl.h",
-        ]
-
-        public_configs += [ ":avahi_client_config" ]
-      }
-
-      if (chip_enable_openthread) {
-        sources += [
-          "Linux/ThreadStackManagerImpl.cpp",
-          "Linux/ThreadStackManagerImpl.h",
-        ]
-        public_deps += [ "${ot_br_posix_root}:ot_br_client" ]
-      }
-
-      if (chip_enable_wifi) {
-        public_deps += [ "Linux/dbus/wpa" ]
-      }
-
-      if (chip_enable_ble) {
-        public_deps += [ "Linux/dbus/bluez" ]
-      }
-
-      public_deps += [ "${chip_root}/third_party/inipp" ]
+      _platform_target = "Linux"
     } else if (chip_device_platform == "nrfconnect") {
-      sources += [
-        "Zephyr/BLEManagerImpl.cpp",
-        "Zephyr/ConfigurationManagerImpl.cpp",
-        "Zephyr/KeyValueStoreManagerImpl.cpp",
-        "Zephyr/Logging.cpp",
-        "Zephyr/PlatformManagerImpl.cpp",
-        "Zephyr/SystemTimeSupport.cpp",
-        "Zephyr/ZephyrConfig.cpp",
-        "Zephyr/ZephyrConfig.h",
-        "nrfconnect/BLEManagerImpl.h",
-        "nrfconnect/BlePlatformConfig.h",
-        "nrfconnect/CHIPDevicePlatformConfig.h",
-        "nrfconnect/CHIPDevicePlatformEvent.h",
-        "nrfconnect/CHIPPlatformConfig.h",
-        "nrfconnect/ConfigurationManagerImpl.h",
-        "nrfconnect/ConnectivityManagerImpl.cpp",
-        "nrfconnect/ConnectivityManagerImpl.h",
-        "nrfconnect/DeviceNetworkProvisioningDelegateImpl.cpp",
-        "nrfconnect/DeviceNetworkProvisioningDelegateImpl.h",
-        "nrfconnect/InetPlatformConfig.h",
-        "nrfconnect/KeyValueStoreManagerImpl.h",
-        "nrfconnect/PlatformManagerImpl.h",
-        "nrfconnect/SystemPlatformConfig.h",
-      ]
-
-      if (chip_enable_openthread) {
-        sources += [
-          "OpenThread/OpenThreadUtils.cpp",
-          "Zephyr/ThreadStackManagerImpl.cpp",
-          "nrfconnect/ThreadStackManagerImpl.h",
-        ]
-      }
-
-      if (chip_enable_nfc) {
-        sources += [
-          "Zephyr/NFCManagerImpl.cpp",
-          "nrfconnect/NFCManagerImpl.h",
-        ]
-      }
-    } else if (chip_device_platform == "qpg6100") {
-      sources += [
-        "FreeRTOS/SystemTimeSupport.cpp",
-        "qpg6100/BLEManagerImpl.cpp",
-        "qpg6100/BLEManagerImpl.h",
-        "qpg6100/BlePlatformConfig.h",
-        "qpg6100/CHIPDevicePlatformConfig.h",
-        "qpg6100/CHIPDevicePlatformEvent.h",
-        "qpg6100/CHIPPlatformConfig.h",
-        "qpg6100/ConfigurationManagerImpl.cpp",
-        "qpg6100/ConfigurationManagerImpl.h",
-        "qpg6100/ConnectivityManagerImpl.cpp",
-        "qpg6100/ConnectivityManagerImpl.h",
-        "qpg6100/DeviceNetworkProvisioningDelegateImpl.cpp",
-        "qpg6100/DeviceNetworkProvisioningDelegateImpl.h",
-        "qpg6100/InetPlatformConfig.h",
-        "qpg6100/Logging.cpp",
-        "qpg6100/PlatformManagerImpl.cpp",
-        "qpg6100/PlatformManagerImpl.h",
-        "qpg6100/SystemPlatformConfig.h",
-        "qpg6100/qpg6100Config.cpp",
-        "qpg6100/qpg6100Config.h",
-      ]
-
-      sources += [
-        "qpg6100/KeyValueStoreManagerImpl.cpp",
-        "qpg6100/KeyValueStoreManagerImpl.h",
-      ]
-
-      if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-mtd" ]
-
-        public_configs += [ "${chip_root}/third_party/openthread/platforms/qpg6100:openthread_qpg6100_config" ]
-
-        sources += [
-          "OpenThread/OpenThreadUtils.cpp",
-          "qpg6100/ThreadStackManagerImpl.cpp",
-          "qpg6100/ThreadStackManagerImpl.h",
-        ]
-      }
+      _platform_target = "nrfconnect"
+    } else if (chip_device_platform == "qpg") {
+      _platform_target = "qpg"
     } else if (chip_device_platform == "telink") {
-      sources += [
-        "Zephyr/BLEManagerImpl.cpp",
-        "Zephyr/ConfigurationManagerImpl.cpp",
-        "Zephyr/KeyValueStoreManagerImpl.cpp",
-        "Zephyr/Logging.cpp",
-        "Zephyr/PlatformManagerImpl.cpp",
-        "Zephyr/SystemTimeSupport.cpp",
-        "Zephyr/ZephyrConfig.cpp",
-        "Zephyr/ZephyrConfig.h",
-        "telink/BLEManagerImpl.h",
-        "telink/BlePlatformConfig.h",
-        "telink/CHIPDevicePlatformConfig.h",
-        "telink/CHIPDevicePlatformEvent.h",
-        "telink/CHIPPlatformConfig.h",
-        "telink/ConfigurationManagerImpl.h",
-        "telink/ConnectivityManagerImpl.cpp",
-        "telink/ConnectivityManagerImpl.h",
-        "telink/DeviceNetworkProvisioningDelegateImpl.cpp",
-        "telink/DeviceNetworkProvisioningDelegateImpl.h",
-        "telink/InetPlatformConfig.h",
-        "telink/KeyValueStoreManagerImpl.h",
-        "telink/PlatformManagerImpl.h",
-        "telink/SystemPlatformConfig.h",
-      ]
-
-      if (chip_enable_openthread) {
-        sources += [
-          "OpenThread/OpenThreadUtils.cpp",
-          "Zephyr/ThreadStackManagerImpl.cpp",
-          "telink/ThreadStackManagerImpl.h",
-        ]
-      }
+      _platform_target = "telink"
+    } else if (chip_device_platform == "mbed") {
+      _platform_target = "mbed"
+    } else if (chip_device_platform == "tizen") {
+      _platform_target = "Tizen"
+    } else if (chip_device_platform == "android") {
+      _platform_target = "android"
+    } else if (chip_device_platform == "external") {
+      _platform_target = chip_platform_target
+    } else if (chip_device_platform == "p6") {
+      _platform_target = "P6"
+    } else if (chip_device_platform == "ameba") {
+      _platform_target = "Ameba"
+    } else if (chip_device_platform == "fake") {
+      _platform_target = "fake"
+    } else {
+      assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
 
-    if (chip_enable_openthread && chip_mdns == "platform" &&
-        chip_device_platform != "linux") {
-      sources += [ "OpenThread/MdnsImpl.cpp" ]
-    }
+    public_deps += [ _platform_target ]
 
-    allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
-  }
-} else if (chip_device_platform == "external") {
-  group("platform") {
-    public_deps = [ "${chip_platform_target}" ]
+    # The platform target needs to include the headers, so allow that here.
+    # It should be considered logically part of this target.
+    allow_circular_includes_from = [
+      _platform_target,
+      "${chip_root}/src/lib/support",
+    ]
   }
 } else {
   group("platform") {

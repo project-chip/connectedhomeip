@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <support/StringBuilder.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/StringBuilder.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

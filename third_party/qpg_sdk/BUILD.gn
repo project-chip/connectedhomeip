@@ -12,16 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/qpg6100_sdk.gni")
-import("${qpg6100_sdk_build_root}/qpg6100_sdk.gni")
+import("//build_overrides/freertos.gni")
+import("//build_overrides/qpg_sdk.gni")
+import("${freertos_root}/freertos.gni")
+import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
 declare_args() {
-  # Build target to use for QPG6100 SDK. Use this to set global SDK defines.
-  qpg6100_sdk_target = ""
+  # Build target to use for QPG SDK. Use this to set global SDK defines.
+  qpg_sdk_target = ""
 }
 
-assert(qpg6100_sdk_target != "", "qpg6100_sdk_target must be specified")
+assert(qpg_sdk_target != "", "qpg_sdk_target must be specified")
 
-group("qpg6100_sdk") {
-  public_deps = [ qpg6100_sdk_target ]
+group("qpg_sdk") {
+  public_deps = [
+    ":freertos",
+    qpg_sdk_target,
+  ]
+}
+
+config("qpg_freertos_config") {
+  include_dirs = [
+    "${chip_root}/third_party/qpg_sdk/repo/qpg6100/comps/gpFreeRTOS/config",
+    "${freertos_root}/repo/portable/GCC/ARM_CM3",
+  ]
+}
+
+freertos_target("freertos") {
+  sources = [
+    "${freertos_root}/repo/portable/GCC/ARM_CM3/port.c",
+    "${freertos_root}/repo/portable/MemMang/heap_3.c",
+  ]
+
+  public_configs = [ ":qpg_freertos_config" ]
 }

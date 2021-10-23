@@ -1,4 +1,4 @@
-# CHIP nRF Connect Pigweed Example Application
+# Matter nRF Connect Pigweed Example Application
 
 The nRF Connect Pigweed Example demonstrates the usage of Pigweed module
 functionalities in an application.
@@ -8,17 +8,18 @@ functionalities in an application.
   <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 </p>
 
-The example is based on [CHIP](https://github.com/project-chip/connectedhomeip),
-the [Pigweed](https://pigweed.googlesource.com/pigweed/pigweed) module, which is
-a collection of libraries that provide different functionalities for embedded
+The example is based on
+[Matter](https://github.com/project-chip/connectedhomeip), the
+[Pigweed](https://pigweed.googlesource.com/pigweed/pigweed) module, which is a
+collection of libraries that provide different functionalities for embedded
 systems, and Nordic Semiconductor's nRF Connect SDK.
 
 You can use this example as a training ground for making experiments, testing
 Pigweed module features and checking what actions are necessary to fully
-integrate Pigweed in a CHIP project.
+integrate Pigweed in a Matter project.
 
-Pigweed functionalities are being gradually integrated into CHIP. Currently, the
-following features are available:
+Pigweed functionalities are being gradually integrated into Matter. Currently,
+the following features are available:
 
 -   **Echo RPC** - Creates a Remote Procedure Call server and allows sending
     commands through the serial port to the device, which makes echo and sends
@@ -48,12 +49,12 @@ following features are available:
 
 This example is running on the nRF Connect platform, which is based on the
 [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
-and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
+and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
 Pigweed libraries are built and organized in a way that enables faster and more
-reliable development. In the CHIP project, the Pigweed module is planned to be
+reliable development. In the Matter project, the Pigweed module is planned to be
 used to create system infrastructures, for example for performing on-device
 tests, but considering its general functionalities, it can be useful also in
 other cases.
@@ -74,10 +75,10 @@ more information.
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                                 | Build target              | Platform image                                                                                                                                         |
-| ------------------------------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-Dongle) | `nrf52840dongle_nrf52840` | <details><summary>nRF52840 Dongle</summary><img src="../../platform/nrfconnect/doc/images/nRF52840-Dongle-small.jpg" alt="nRF52840 Dongle"/></details> |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)         | `nrf52840dk_nrf52840`     | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840-DK_top-view-small.jpg" alt="nRF52840 DK"/></details>    |
+| Hardware platform                                                                                 | Build target              | Platform image                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-Dongle) | `nrf52840dongle_nrf52840` | <details><summary>nRF52840 Dongle</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_Dongle-medium.jpg" alt="nRF52840 Dongle"/></details> |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)         | `nrf52840dk_nrf52840`     | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details>        |
 
 <hr>
 
@@ -111,7 +112,7 @@ and receiving responses.
 
 ## Setting up the environment
 
-Before building the example, check out the CHIP repository and sync submodules
+Before building the example, check out the Matter repository and sync submodules
 using the following command:
 
         $ git submodule update --init
@@ -149,7 +150,7 @@ To use the Docker container for setup, complete the following steps:
 
     -   _~/nrfconnect_ can be replaced with an absolute path to the nRF Connect
         SDK source directory.
-    -   _~/connectedhomeip_ must be replaced with an absolute path to the CHIP
+    -   _~/connectedhomeip_ must be replaced with an absolute path to the Matter
         source directory.
     -   _-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:_ rmw"\*
         parameters can be omitted if you are not planning to flash the example
@@ -186,20 +187,20 @@ To use the native shell for setup, complete the following steps:
     If you have the SDK already installed, continue to the next step and update
     the nRF Connect SDK after initializing environment variables.
 
-3.  Initialize environment variables referred to by the CHIP and the nRF Connect
-    SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
-    Connect SDK installation directory, and _toolchain-dir_ with the path to GNU
-    Arm Embedded Toolchain.
+3.  Initialize environment variables referred to by the Matter and the nRF
+    Connect SDK build scripts. Replace _nrfconnect-dir_ with the path to your
+    nRF Connect SDK installation directory, and _toolchain-dir_ with the path to
+    GNU Arm Embedded Toolchain.
 
          $ source nrfconnect-dir/zephyr/zephyr-env.sh
          $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
 
 4.  Update the nRF Connect SDK to the most recent supported revision by running
-    the following command (replace _chip-dir_ with the path to CHIP repository
-    directory):
+    the following command (replace _matter-dir_ with the path to Matter
+    repository directory):
 
-         $ cd chip-dir
+         $ cd matter-dir
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update
 
 Now you can proceed with the [Building](#building) instruction.
@@ -313,7 +314,7 @@ directory:
 ### Flashing on the nRF52840 Dongle
 
 Visit
-[Programming and Flashing nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
+[Programming and Debugging nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
 to read more about flashing on the nRF52840 Dongle.
 
 <hr>
@@ -325,7 +326,7 @@ to read more about flashing on the nRF52840 Dongle.
 Run the following command to start an interactive Python shell, where the Echo
 RPC commands can be invoked:
 
-        python -m pw_hdlc.rpc_console --device /dev/ttyACM0 -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
+        python -m pw_hdlc.rpc_console --device /dev/ttyACM0 -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/echo.proto -o /tmp/pw_rpc.out
 
 To send an Echo RPC message, type the following command, where the actual
 message is the text in quotation marks after the `msg=` phrase:

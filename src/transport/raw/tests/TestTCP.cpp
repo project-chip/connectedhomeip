@@ -23,11 +23,11 @@
 
 #include "NetworkTestHelpers.h"
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemLayer.h>
 #include <system/SystemObject.h>
 #include <transport/TransportMgr.h>
@@ -67,7 +67,7 @@ using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPacke
 
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
-constexpr uint32_t kMessageId       = 18;
+constexpr uint32_t kMessageCounter  = 18;
 
 using TestContext = chip::Test::IOContext;
 TestContext sContext;
@@ -110,7 +110,7 @@ public:
         CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&mContext.GetInetLayer()).SetAddressType(addr.Type()));
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
-        mTransportMgrBase.SetSecureSessionMgr(this);
+        mTransportMgrBase.SetSessionManager(this);
         mTransportMgrBase.Init(&tcp);
 
         mReceiveHandlerCallCount = 0;
@@ -122,7 +122,7 @@ public:
         NL_TEST_ASSERT(mSuite, !buffer.IsNull());
 
         PacketHeader header;
-        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
 
         SetCallback([](const uint8_t * message, size_t length, int count, void * data) { return memcmp(message, data, length); },
                     const_cast<void *>(static_cast<const void *>(PAYLOAD)));
@@ -132,7 +132,7 @@ public:
 
         // Should be able to send a message to itself by just calling send.
         err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
-        if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
+        if (err == CHIP_ERROR_POSIX(EADDRNOTAVAIL))
         {
             // TODO(#2698): the underlying system does not support IPV6. This early return
             // should be removed and error should be made fatal.
@@ -181,13 +181,13 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 #if INET_CONFIG_ENABLE_IPV4
 void CheckSimpleInitTest4(nlTestSuite * inSuite, void * inContext)
 {
-    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv4);
+    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv4);
 }
 #endif
 
 void CheckSimpleInitTest6(nlTestSuite * inSuite, void * inContext)
 {
-    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv6);
+    CheckSimpleInitTest(inSuite, inContext, IPAddressType::kIPv6);
 }
 
 /////////////////////////// Messaging test
@@ -203,12 +203,14 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
 }
 
+#if INET_CONFIG_ENABLE_IPV4
 void CheckMessageTest4(nlTestSuite * inSuite, void * inContext)
 {
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
     CheckMessageTest(inSuite, inContext, addr);
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
 {
@@ -241,7 +243,7 @@ bool TestData::Init(const uint16_t sizes[])
     Free();
 
     PacketHeader header;
-    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
     const size_t headerLength = header.EncodeSizeBytes();
 
     // Determine the total length.

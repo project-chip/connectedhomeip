@@ -23,7 +23,7 @@ namespace rpc {
 
 class LightingService;
 
-int Init();
+void Init();
 void RunRpcService(void *);
 
 } // namespace rpc

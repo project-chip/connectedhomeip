@@ -20,7 +20,8 @@ declare_args() {
   optimize_for_size = true
 
   # Optimize debug builds with -Og.
-  optimize_debug = current_os == "freertos" || current_os == "zephyr"
+  optimize_debug =
+      current_os == "freertos" || current_os == "zephyr" || current_os == "mbed"
 
   # Symbol level for debugging.
   symbol_level = 2

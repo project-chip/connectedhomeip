@@ -26,6 +26,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -43,7 +45,6 @@ CHIP_ERROR WriteResponse::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -97,7 +98,6 @@ CHIP_ERROR WriteResponse::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -130,12 +130,20 @@ CHIP_ERROR WriteResponse::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 AttributeStatusList::Builder & WriteResponse::Builder::CreateAttributeStatusListBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeStatusListBuilder.ResetError(mError));
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mAttributeStatusListBuilder.Init(mpWriter, kCsTag_AttributeStatusList);
+    }
+    else
+    {
+        mAttributeStatusListBuilder.ResetError(mError);
+    }
 
-    mError = mAttributeStatusListBuilder.Init(mpWriter, kCsTag_AttributeStatusList);
-    ChipLogFunctError(mError);
+    return mAttributeStatusListBuilder;
+}
 
-exit:
+AttributeStatusList::Builder & WriteResponse::Builder::GetAttributeStatusListBuilder()
+{
     return mAttributeStatusListBuilder;
 }
 

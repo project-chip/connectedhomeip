@@ -19,10 +19,10 @@
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 namespace chip {
 namespace Platform {
 namespace Internal {

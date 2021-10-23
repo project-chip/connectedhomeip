@@ -35,8 +35,8 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     // indicate the error occurred during getting time.
     gettimeofday(&tv, nullptr);
 
-    printf("[%" PRIu64 ".%06" PRIu64 "][%ld] CHIP:%s: ", static_cast<uint64_t>(tv.tv_sec), static_cast<uint64_t>(tv.tv_usec),
-           static_cast<long>(syscall(SYS_gettid)), module);
+    printf("[%" PRIu64 ".%06" PRIu64 "][%lld:%lld] CHIP:%s: ", static_cast<uint64_t>(tv.tv_sec), static_cast<uint64_t>(tv.tv_usec),
+           static_cast<long long>(syscall(SYS_getpid)), static_cast<long long>(syscall(SYS_gettid)), module);
     vprintf(msg, v);
     printf("\n");
     fflush(stdout);

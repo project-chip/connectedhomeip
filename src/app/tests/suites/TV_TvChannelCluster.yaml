@@ -1,0 +1,65 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: TV Channel Cluster Tests
+
+config:
+    cluster: "TV Channel"
+    endpoint: 1
+
+tests:
+    - label: "Read attribute TV Channel list"
+      command: "readAttribute"
+      attribute: "TV Channel list"
+      response:
+          value:
+              [
+                  {
+                      majorNumber: 1,
+                      minorNumber: 2,
+                      name: 12,
+                      callSign: 13,
+                      affiliateCallSign: 13,
+                  },
+                  {
+                      majorNumber: 2,
+                      minorNumber: 3,
+                      name: 12,
+                      callSign: 13,
+                      affiliateCallSign: 13,
+                  },
+              ]
+    # TODO: Enable the test once struct response is supported
+    # - label: "Change Channel Command"
+    #   command: "ChangeChannel"
+    #   arguments:
+    #       values:
+    #           - name: "match"
+    #             value: "CNN"
+
+    - label: "Change Channel By Number Command"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "majorNumber"
+                value: 1
+              - name: "minorNumber"
+                value: 2
+
+    - label: "Skip Channel Command"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "count"
+                value: 1

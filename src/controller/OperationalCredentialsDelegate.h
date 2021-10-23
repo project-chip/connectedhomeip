@@ -19,14 +19,20 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <core/PeerId.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <support/DLLUtil.h>
-#include <support/Span.h>
+#include <lib/core/CHIPCallback.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Controller {
+
+typedef void (*OnNOCChainGeneration)(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
+                                     const ByteSpan & rcac);
+
+constexpr uint32_t kMaxCHIPDERCertLength = 600;
 
 /// Callbacks for CHIP operational credentials generation
 class DLL_EXPORT OperationalCredentialsDelegate
@@ -36,65 +42,40 @@ public:
 
     /**
      * @brief
-     *   This function generates an operational certificate for the given node.
+     *   This function generates an operational certificate chain for the device.
      *   The API generates the certificate in X.509 DER format.
      *
      *   The delegate is expected to use the certificate authority whose certificate
-     *   is returned in `GetIntermediateCACertificate()` or `GetRootCACertificate()`
-     *   API calls.
+     *   is returned in `GetRootCACertificate()` API call.
      *
-     * @param[in] peerId       Node ID and Fabric ID of the target device.
-     * @param[in] csr          Certificate Signing Request from the node in DER format.
-     * @param[in] serialNumber Serial number to assign to the new certificate.
-     * @param[in] certBuf      The API will fill in the generated cert in this buffer. The buffer is allocated by the caller.
-     * @param[in] certBufSize  The size of certBuf buffer.
-     * @param[out] outCertLen  The size of the actual certificate that was written in the certBuf.
+     *   The delegate will call `onCompletion` when the NOC certificate chain is ready.
+     *
+     * @param[in] csrElements          CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] attestationSignature Attestation signature as per specifications section 11.22.7.6. CSRResponse Command.
+     * @param[in] DAC                  Device attestation certificate received from the device being commissioned
+     * @param[in] PAI                  Product Attestation Intermediate certificate
+     * @param[in] PAA                  Product Attestation Authority certificate
+     * @param[in] onCompletion         Callback handler to provide generated NOC chain to the caller of GenerateNOCChain()
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr, int64_t serialNumber,
-                                                          uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) = 0;
+    virtual CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
+                                        const ByteSpan & PAI, const ByteSpan & PAA,
+                                        Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
     /**
-     * @brief
-     *   This function returns the intermediate certificate authority (ICA) certificate corresponding to the
-     *   provided fabric ID. Intermediate certificate authority is optional. If the controller
-     *   application does not require ICA, this API call will return `CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED`.
-     *
-     *   The returned certificate is in X.509 DER format.
-     *
-     * @param[in] fabricId    Fabric ID for which the certificate is being requested.
-     * @param[in] certBuf     The API will fill in the cert in this buffer. The buffer is allocated by the caller.
-     * @param[in] certBufSize The size of certBuf buffer.
-     * @param[out] outCertLen The size of the actual certificate that was written in the certBuf.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     *         CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED is not a critical error. It indicates that ICA is not needed.
+     *   This function sets the node ID for which the next NOC Chain would be requested. The node ID is
+     *   provided as a hint, and the delegate implementation may chose to ignore it and pick node ID of
+     *   their choice.
      */
-    virtual CHIP_ERROR GetIntermediateCACertificate(FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
-                                                    uint32_t & outCertLen)
-    {
-        // By default, let's return CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED status. It'll allow
-        // commissioner applications to not implement GetIntermediateCACertificate() if they don't require an
-        // intermediate CA.
-        return CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED;
-    }
+    virtual void SetNodeIdForNextNOCRequest(NodeId nodeId) {}
 
     /**
-     * @brief
-     *   This function returns the root certificate authority (root CA) certificate corresponding to the
-     *   provided fabric ID.
-     *
-     *   The returned certificate is in X.509 DER format.
-     *
-     * @param[in] fabricId    Fabric ID for which the certificate is being requested.
-     * @param[in] certBuf     The API will fill in the cert in this buffer. The buffer is allocated by the caller.
-     * @param[in] certBufSize The size of certBuf buffer.
-     * @param[out] outCertLen The size of the actual certificate that was written in the certBuf.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     *   This function sets the fabric ID for which the next NOC Chain should be generated. This API is
+     *   not required to be implemented if the delegate implementation has other mechanisms to find the
+     *   fabric ID.
      */
-    virtual CHIP_ERROR GetRootCACertificate(FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) = 0;
+    virtual void SetFabricIdForNextNOCRequest(FabricId fabricId) {}
 };
 
 } // namespace Controller

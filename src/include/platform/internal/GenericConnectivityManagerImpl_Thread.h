@@ -24,8 +24,9 @@
 
 #pragma once
 
+#include <app/AttributeAccessInterface.h>
+#include <lib/support/BitFlags.h>
 #include <platform/ThreadStackManager.h>
-#include <support/BitFlags.h>
 
 #include <cstdint>
 
@@ -67,7 +68,8 @@ protected:
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
-    bool _HaveServiceConnectivityViaThread();
+    void _ResetThreadNetworkDiagnosticsCounts();
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     // ===== Members for use by the implementation subclass.
 
@@ -151,9 +153,17 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPo
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_HaveServiceConnectivityViaThread()
+inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()
 {
-    return mFlags.Has(Flags::kHaveServiceConnectivity);
+    ThreadStackMgrImpl().ResetThreadNetworkDiagnosticsCounts();
+}
+
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_Thread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                                              app::AttributeValueEncoder & encoder)
+{
+    return ThreadStackMgrImpl().WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 } // namespace Internal

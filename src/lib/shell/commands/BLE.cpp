@@ -15,16 +15,16 @@
  *    limitations under the License.
  */
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 
 using chip::DeviceLayer::ConnectivityMgr;
 
@@ -33,13 +33,13 @@ namespace Shell {
 
 static chip::Shell::Engine sShellDeviceSubcommands;
 
-int BLEHelpHandler(int argc, char ** argv)
+CHIP_ERROR BLEHelpHandler(int argc, char ** argv)
 {
     sShellDeviceSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-int BLEAdvertiseHandler(int argc, char ** argv)
+CHIP_ERROR BLEAdvertiseHandler(int argc, char ** argv)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
@@ -72,15 +72,26 @@ int BLEAdvertiseHandler(int argc, char ** argv)
             streamer_printf(sout, "BLE advertising already stopped\r\n");
         }
     }
+    else if (strcmp(argv[0], "state") == 0)
+    {
+        if (adv_enabled)
+        {
+            streamer_printf(sout, "BLE advertising is enabled\r\n");
+        }
+        else
+        {
+            streamer_printf(sout, "BLE advertising is disabled\r\n");
+        }
+    }
     else
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return CHIP_NO_ERROR;
+    return error;
 }
 
-int BLEDispatch(int argc, char ** argv)
+CHIP_ERROR BLEDispatch(int argc, char ** argv)
 {
     if (argc == 0)
     {
@@ -94,7 +105,7 @@ void RegisterBLECommands()
 {
     static const shell_command_t sBLESubCommands[] = {
         { &BLEHelpHandler, "help", "Usage: ble <subcommand>" },
-        { &BLEAdvertiseHandler, "adv", "Enable or disable advertisement. Usage: ble adv <start|stop>" },
+        { &BLEAdvertiseHandler, "adv", "Enable or disable advertisement. Usage: ble adv <start|stop|state>" },
     };
 
     static const shell_command_t sBLECommand = { &BLEDispatch, "ble", "BLE transport commands" };

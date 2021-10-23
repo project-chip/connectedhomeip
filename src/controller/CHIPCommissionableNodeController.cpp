@@ -19,24 +19,18 @@
 // module header, comes first
 #include <controller/CHIPCommissionableNodeController.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR CommissionableNodeController::DiscoverCommissioners()
+CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return chip::Mdns::Resolver::Instance().FindCommissioners();
+    return mResolver->FindCommissioners(discoveryFilter);
 }
 
-CHIP_ERROR CommissionableNodeController::DiscoverCommissionersLongDiscriminator(uint16_t long_discriminator)
-{
-    ReturnErrorOnFailure(SetUpNodeDiscoveryLongDiscriminator(long_discriminator));
-    return chip::Mdns::Resolver::Instance().FindCommissioners(filter);
-}
-
-const Mdns::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
+const Dnssd::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
 {
     return GetDiscoveredNode(idx);
 }

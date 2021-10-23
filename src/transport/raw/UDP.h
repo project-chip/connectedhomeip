@@ -27,10 +27,10 @@
 
 #include <utility>
 
-#include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
+#include <lib/core/CHIPCore.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
@@ -71,10 +71,10 @@ public:
     }
 
 private:
-    Inet::InetLayer * mLayer         = nullptr;                   ///< Associated inet layer
-    Inet::IPAddressType mAddressType = Inet::kIPAddressType_IPv6; ///< type of listening socket
-    uint16_t mListenPort             = CHIP_PORT;                 ///< UDP listen port
-    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;     ///< Interface to listen on
+    Inet::InetLayer * mLayer         = nullptr;                    ///< Associated inet layer
+    Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
+    uint16_t mListenPort             = CHIP_PORT;                  ///< UDP listen port
+    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;      ///< Interface to listen on
 };
 
 /** Implements a transport using UDP. */
@@ -105,6 +105,8 @@ public:
      */
     CHIP_ERROR Init(UdpListenParameters & params);
 
+    uint16_t GetBoundPort();
+
     /**
      * Close the open endpoint without destroying the object
      */
@@ -123,9 +125,9 @@ private:
     static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer,
                              const Inet::IPPacketInfo * pktInfo);
 
-    Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
-    Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
-    State mState                         = State::kNotReady;                            ///< State of the UDP transport
+    Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                       ///< UDP socket used by the transport
+    Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
+    State mState                         = State::kNotReady;              ///< State of the UDP transport
 };
 
 } // namespace Transport

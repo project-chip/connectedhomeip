@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -53,7 +55,7 @@ CHIP_ERROR CommandList::Parser::CheckSchemaValidity() const
         VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
         {
-            CommandDataElement::Parser data;
+            CommandDataIB::Parser data;
             err = data.Init(reader);
             SuccessOrExit(err);
 
@@ -83,23 +85,21 @@ CHIP_ERROR CommandList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CommandDataElement::Builder & CommandList::Builder::CreateCommandDataElementBuilder()
+CommandDataIB::Builder & CommandList::Builder::CreateCommandDataIBBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mCommandDataElementBuilder.ResetError(mError));
+    VerifyOrExit(CHIP_NO_ERROR == mError, mCommandDataIBBuilder.ResetError(mError));
 
-    mError = mCommandDataElementBuilder.Init(mpWriter);
-    ChipLogFunctError(mError);
+    mError = mCommandDataIBBuilder.Init(mpWriter);
 
 exit:
-    // on error, mCommandDataElementBuilder would be un-/partial initialized and cannot be used to write anything
-    return mCommandDataElementBuilder;
+    // on error, mCommandDataIBBuilder would be un-/partial initialized and cannot be used to write anything
+    return mCommandDataIBBuilder;
 }
 
 CommandList::Builder & CommandList::Builder::EndOfCommandList()

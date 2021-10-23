@@ -22,6 +22,8 @@ static_library("bdx") {
     "BdxMessages.h",
     "BdxTransferSession.cpp",
     "BdxTransferSession.h",
+    "TransferFacilitator.cpp",
+    "TransferFacilitator.h",
   ]
 
   cflags = [ "-Wconversion" ]

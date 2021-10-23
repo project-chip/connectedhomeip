@@ -63,13 +63,11 @@ public:
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
-    static const Key kConfigKey_OperationalDeviceId;
-    static const Key kConfigKey_OperationalDeviceCert;
-    static const Key kConfigKey_OperationalDeviceICACerts;
-    static const Key kConfigKey_OperationalDevicePrivateKey;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_KVS_key;   // special key for KVS system, key storage
+    static const Key kConfigKey_KVS_value; // special key for KVS system, value storage
 
     static CHIP_ERROR Init(void);
 
@@ -90,6 +88,11 @@ public:
     static CHIP_ERROR FactoryResetConfig(void);
 
     static void RunConfigUnitTest(void);
+
+    // internal to the platform for KeyValueStoreManagerImpl.cpp
+    static CHIP_ERROR ReadKVS(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes);
+    static CHIP_ERROR WriteKVS(const char * key, const void * value, size_t value_size);
+    static CHIP_ERROR ClearKVS(const char * key);
 };
 
 struct CC13X2_26X2Config::Key

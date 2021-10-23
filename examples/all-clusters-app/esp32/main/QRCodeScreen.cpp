@@ -38,9 +38,9 @@
 
 #include "qrcodegen.h"
 
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <support/CodeUtils.h>
 
 // TODO need sensible library tag when put in library
 extern const char * TAG;

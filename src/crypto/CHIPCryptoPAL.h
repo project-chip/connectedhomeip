@@ -20,16 +20,18 @@
  *      Header that exposes the platform agnostic CHIP crypto primitives
  */
 
-#ifndef _CHIP_CRYPTO_PAL_H_
-#define _CHIP_CRYPTO_PAL_H_
+#pragma once
 
 #if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
 #endif
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
-#include <support/Span.h>
+#include <system/SystemConfig.h>
+
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -37,36 +39,78 @@
 namespace chip {
 namespace Crypto {
 
-const size_t kMax_x509_Certificate_Length = 600;
+constexpr size_t kMax_x509_Certificate_Length = 600;
 
-// TODO: Consider renaming these values to be closer to definisions in the spec:
-// CHIP_CRYPTO_GROUP_SIZE_BYTES
-// CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES
-const size_t kP256_FE_Length                  = 32;
-const size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
-const size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
-const size_t kSHA256_Hash_Length              = 32;
+constexpr size_t kP256_FE_Length                  = 32;
+constexpr size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
+constexpr size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
+constexpr size_t kSHA256_Hash_Length              = 32;
+constexpr size_t kSHA1_Hash_Length                = 20;
 
-const size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
-const size_t kMax_ECDSA_Signature_Length = 72;
-const size_t kMAX_FE_Length              = kP256_FE_Length;
-const size_t kMAX_Point_Length           = kP256_Point_Length;
-const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
-const size_t kMAX_CSR_Length             = 512;
+constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
+constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
 
-const size_t kMin_Salt_Length = 8;
-const size_t kMax_Salt_Length = 16;
+constexpr size_t CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES      = 16;
+constexpr size_t CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES = 16;
 
-const size_t kP256_PrivateKey_Length = 32;
-const size_t kP256_PublicKey_Length  = 65;
+constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
+constexpr size_t kMax_ECDSA_Signature_Length = kP256_ECDSA_Signature_Length_Raw;
+constexpr size_t kMAX_FE_Length              = kP256_FE_Length;
+constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
+constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
+constexpr size_t kMAX_CSR_Length             = 512;
+
+constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
+
+constexpr size_t kMin_Salt_Length = 16;
+constexpr size_t kMax_Salt_Length = 32;
+
+constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
+constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
+
+constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
+constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
+
+// TODO: Remove AES-256 from CryptoPAL since not required by V1 spec
+constexpr size_t kAES_CCM256_Key_Length   = 256u / 8u;
+constexpr size_t kAES_CCM256_Block_Length = kAES_CCM256_Key_Length;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.
  */
-const size_t kMAX_Spake2p_Context_Size     = 1024;
-const size_t kMAX_Hash_SHA256_Context_Size = 296;
-const size_t kMAX_P256Keypair_Context_Size = 512;
+constexpr size_t kMAX_Spake2p_Context_Size     = 1024;
+constexpr size_t kMAX_P256Keypair_Context_Size = 512;
+
+constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
+constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
+
+constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE;
+
+/*
+ * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
+ *
+ * Ecdsa-Sig-Value ::= SEQUENCE {
+ *     r       INTEGER,
+ *     s       INTEGER
+ * }
+ *
+ * --> SEQUENCE, universal constructed tag (0x30), length over 2 bytes, up to 255 (to support future larger sizes up to 512 bits)
+ *   -> SEQ_OVERHEAD = 3 bytes
+ * --> INTEGER, universal primitive tag (0x02), length over 1 byte, one extra byte worst case
+ *     over max for 0x00 when MSB is set.
+ *       -> INT_OVERHEAD = 3 bytes
+ *
+ * There is 1 sequence of 2 integers. Overhead is SEQ_OVERHEAD + (2 * INT_OVERHEAD) = 3 + (2 * 3) = 9.
+ */
+constexpr size_t kMax_ECDSA_X9Dot62_Asn1_Overhead = 9;
+constexpr size_t kMax_ECDSA_Signature_Length_Der  = kMax_ECDSA_Signature_Length + kMax_ECDSA_X9Dot62_Asn1_Overhead;
+
+static_assert(kMax_ECDH_Secret_Length >= kP256_FE_Length, "ECDH shared secret is too short for crypto suite");
+static_assert(kMax_ECDSA_Signature_Length >= kP256_ECDSA_Signature_Length_Raw,
+              "ECDSA signature buffer length is too short for crypto suite");
+
+constexpr size_t kCompressedFabricIdentifierSize = 8;
 
 /**
  * Spake2+ parameters for P256
@@ -112,40 +156,48 @@ enum class SupportedECPKeyTypes : uint8_t
     ECP256R1 = 0,
 };
 
+/** @brief Safely clears the first `len` bytes of memory area `buf`.
+ * @param buf Pointer to a memory buffer holding secret data that must be cleared.
+ * @param len Specifies secret data size in bytes.
+ **/
+void ClearSecretData(uint8_t * buf, size_t len);
+
 template <typename Sig>
 class ECPKey
 {
 public:
     virtual ~ECPKey() {}
-    virtual SupportedECPKeyTypes Type() const = 0;
-    virtual size_t Length() const             = 0;
-    virtual operator const uint8_t *() const  = 0;
-    virtual operator uint8_t *()              = 0;
+    virtual SupportedECPKeyTypes Type() const  = 0;
+    virtual size_t Length() const              = 0;
+    virtual bool IsUncompressed() const        = 0;
+    virtual operator const uint8_t *() const   = 0;
+    virtual operator uint8_t *()               = 0;
+    virtual const uint8_t * ConstBytes() const = 0;
+    virtual uint8_t * Bytes()                  = 0;
 
-    virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length, const Sig & signature) const
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const = 0;
+    virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
+                                                     const Sig & signature) const                                              = 0;
 };
 
 template <size_t Cap>
 class CapacityBoundBuffer
 {
 public:
+    ~CapacityBoundBuffer()
+    {
+        // Sanitize after use
+        ClearSecretData(&bytes[0], Cap);
+    }
+
     /** @brief Set current length of the buffer that's being used
      * @return Returns error if new length is > capacity
      **/
     CHIP_ERROR SetLength(size_t len)
     {
-        CHIP_ERROR error = CHIP_NO_ERROR;
-        VerifyOrExit(len <= sizeof(bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(len <= sizeof(bytes), CHIP_ERROR_INVALID_ARGUMENT);
         length = len;
-    exit:
-        return error;
+        return CHIP_NO_ERROR;
     }
 
     /** @brief Returns current length of the buffer that's being used
@@ -155,7 +207,15 @@ public:
 
     /** @brief Returns max capacity of the buffer
      **/
-    size_t Capacity() const { return sizeof(bytes); }
+    static constexpr size_t Capacity() { return sizeof(bytes); }
+
+    /** @brief Returns pointer to start of underlying buffer
+     **/
+    uint8_t * Bytes() { return &bytes[0]; }
+
+    /** @brief Returns const pointer to start of underlying buffer
+     **/
+    const uint8_t * ConstBytes() const { return &bytes[0]; }
 
     /** @brief Returns buffer pointer
      **/
@@ -174,10 +234,35 @@ typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
 class P256PublicKey : public ECPKey<P256ECDSASignature>
 {
 public:
+    P256PublicKey() {}
+
+    template <size_t N>
+    constexpr P256PublicKey(const uint8_t (&raw_value)[N])
+    {
+        static_assert(N == kP256_PublicKey_Length, "Can only array-initialize from proper bounds");
+        memcpy(&bytes[0], &raw_value[0], N);
+    }
+
+    template <size_t N>
+    constexpr P256PublicKey(const FixedByteSpan<N> & value)
+    {
+        static_assert(N == kP256_PublicKey_Length, "Can only initialize from proper sized byte span");
+        memcpy(&bytes[0], value.data(), N);
+    }
+
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
     operator uint8_t *() override { return bytes; }
     operator const uint8_t *() const override { return bytes; }
+    const uint8_t * ConstBytes() const override { return &bytes[0]; }
+    uint8_t * Bytes() override { return &bytes[0]; }
+    bool IsUncompressed() const override
+    {
+        constexpr uint8_t kUncompressedPointMarker = 0x04;
+        // SEC1 definition of an uncompressed point is (0x04 || X || Y) where X and Y are
+        // raw zero-padded big-endian large integers of the group size.
+        return (Length() == ((kP256_FE_Length * 2) + 1)) && (ConstBytes()[0] == kUncompressedPointMarker);
+    }
 
     CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
                                             const P256ECDSASignature & signature) const override;
@@ -207,7 +292,7 @@ public:
      * @param msg Message that needs to be signed
      * @param msg_length Length of message
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) = 0;
@@ -217,7 +302,7 @@ public:
      * @param hash Hash that needs to be signed
      * @param hash_length Length of hash
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, Sig & out_signature) = 0;
@@ -241,29 +326,51 @@ struct alignas(size_t) P256KeypairContext
 
 typedef CapacityBoundBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length> P256SerializedKeypair;
 
-class P256Keypair : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
+class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
 public:
-    P256Keypair() {}
-    ~P256Keypair();
-
     /**
      * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Initialize();
+    virtual CHIP_ERROR Initialize() = 0;
 
     /**
      * @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const;
+    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const = 0;
 
     /**
      * @brief Deserialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input);
+    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) = 0;
+};
+
+class P256Keypair : public P256KeypairBase
+{
+public:
+    P256Keypair() {}
+    virtual ~P256Keypair();
+
+    /**
+     * @brief Initialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Initialize() override;
+
+    /**
+     * @brief Serialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
+
+    /**
+     * @brief Deserialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
 
     /**
      * @brief Generate a new Certificate Signing Request (CSR).
@@ -279,7 +386,7 @@ public:
      * @param msg Message that needs to be signed
      * @param msg_length Length of message
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) override;
@@ -289,12 +396,18 @@ public:
      * @param hash Hash that needs to be signed
      * @param hash_length Length of hash
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
 
-    /** @brief A function to derive a shared secret using ECDH
+    /**
+     * @brief A function to derive a shared secret using ECDH
+     *
+     * This implements the CHIP_Crypto_ECDH(PrivateKey myPrivateKey, PublicKey theirPublicKey) cryptographic primitive
+     * from the specification, using this class's private key from `mKeypair` as `myPrivateKey` and the remote
+     * public key from `remote_public_key` as `theirPublicKey`.
+     *
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
      * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
      * [https://www.secg.org/sec1-v2.pdf]
@@ -311,10 +424,76 @@ private:
     P256PublicKey mPublicKey;
     P256KeypairContext mKeypair;
     bool mInitialized = false;
+
+    void Clear();
 };
 
 /**
+ * @brief Convert a raw ECDSA signature to ASN.1 signature (per X9.62) as used by TLS libraries.
+ *
+ * Errors are:
+ *   - CHIP_ERROR_INVALID_ARGUMENT on any argument being invalid (e.g. nullptr), wrong sizes,
+ *     wrong or unsupported format,
+ *   - CHIP_ERROR_BUFFER_TOO_SMALL on running out of space at runtime.
+ *   - CHIP_ERROR_INTERNAL on any unexpected processing error.
+ *
+ * @param[in] fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
+ * @param[in] raw_sig Raw signature of <r,s> concatenated
+ * @param[out] out_asn1_sig ASN.1 DER signature format output buffer. Size must have space for at least
+ * kMax_ECDSA_X9Dot62_Asn1_Overhead. On CHIP_NO_ERROR, the out_asn1_sig buffer will be re-assigned
+ * to have the correct size based on variable-length output.
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_sig, MutableByteSpan & out_asn1_sig);
+
+/**
+ * @brief Convert an ASN.1 DER signature (per X9.62) as used by TLS libraries to SEC1 raw format
+ *
+ * Errors are:
+ *   - CHIP_ERROR_INVALID_ARGUMENT on any argument being invalid (e.g. nullptr), wrong sizes,
+ *     wrong or unsupported format,
+ *   - CHIP_ERROR_BUFFER_TOO_SMALL on running out of space at runtime.
+ *   - CHIP_ERROR_INTERNAL on any unexpected processing error.
+ *
+ * @param[in] fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
+ * @param[in] asn1_sig ASN.1 DER signature input
+ * @param[out] out_raw_sig Raw signature of <r,s> concatenated format output buffer. Size must be at
+ * least >= `2 * fe_length_bytes`. On CHIP_NO_ERROR, the out_asn1_sig buffer will be re-assigned
+ * to have the correct size based on variable-length output.
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan & out_raw_sig);
+
+/**
+ * @brief Utility to emit a DER-encoded INTEGER given a raw unsigned large integer
+ *        in big-endian order. The `out_der_integer` span is updated to reflect the final
+ *        variable length, including tag and length, and must have at least `kEmitDerIntegerOverhead`
+ *        extra space in addition to the `raw_integer.size()`.
+ * @param[in] raw_integer Bytes of a large unsigned integer in big-endian, possibly including leading zeroes
+ * @param[out] out_der_integer Buffer to receive the DER-encoded integer
+ * @return Returns CHIP_ERROR_INVALID_ARGUMENT or CHIP_ERROR_BUFFER_TOO_SMALL on error, CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR ConvertIntegerRawToDer(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer);
+
+/**
+ * @brief Utility to emit a DER-encoded INTEGER given a raw unsigned large integer
+ *        in big-endian order. The `out_der_integer` span is updated to reflect the final
+ *        variable length, excluding tag and length, and must have at least `kEmitDerIntegerWithoutTagOverhead`
+ *        extra space in addition to the `raw_integer.size()`.
+ * @param[in] raw_integer Bytes of a large unsigned integer in big-endian, possibly including leading zeroes
+ * @param[out] out_der_integer Buffer to receive the DER-encoded integer
+ * @return Returns CHIP_ERROR_INVALID_ARGUMENT or CHIP_ERROR_BUFFER_TOO_SMALL on error, CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer);
+
+/**
  * @brief A function that implements AES-CCM encryption
+ *
+ * This implements the CHIP_Crypto_AEAD_GenerateEncrypt() cryptographic primitive
+ * from the specification. For an empty plaintext, the user of the API can provide
+ * an empty string, or a nullptr, and provide plaintext_length as 0. The output buffer,
+ * ciphertext can also be an empty string, or a nullptr for this case.
+ *
  * @param plaintext Plaintext to encrypt
  * @param plaintext_length Length of plain_text
  * @param aad Additional authentication data
@@ -334,6 +513,12 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
 
 /**
  * @brief A function that implements AES-CCM decryption
+ *
+ * This implements the CHIP_Crypto_AEAD_DecryptVerify() cryptographic primitive
+ * from the specification. For an empty ciphertext, the user of the API can provide
+ * an empty string, or a nullptr, and provide ciphertext_length as 0. The output buffer,
+ * plaintext can also be an empty string, or a nullptr for this case.
+ *
  * @param ciphertext Ciphertext to decrypt
  * @param ciphertext_length Length of ciphertext
  * @param aad Additional authentical data.
@@ -363,6 +548,10 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr, size_t csr_lengt
 
 /**
  * @brief A function that implements SHA-256 hash
+ *
+ * This implements the CHIP_Crypto_Hash() cryptographic primitive
+ * in the the specification.
+ *
  * @param data The data to hash
  * @param data_length Length of the data
  * @param out_buffer Pointer to buffer to write output into
@@ -398,9 +587,52 @@ public:
     Hash_SHA256_stream();
     ~Hash_SHA256_stream();
 
+    /**
+     * @brief Re-initialize digest computation to an empty context.
+     *
+     * @return CHIP_ERROR_INTERNAL on failure to initialize the context,
+     *         CHIP_NO_ERROR otherwise.
+     */
     CHIP_ERROR Begin();
-    CHIP_ERROR AddData(const uint8_t * data, size_t data_length);
-    CHIP_ERROR Finish(uint8_t * out_buffer);
+
+    /**
+     * @brief Add some data to the digest computation, updating internal state.
+     *
+     * @param[in] data The span of bytes to include in the digest update process.
+     *
+     * @return CHIP_ERROR_INTERNAL on failure to ingest the data, CHIP_NO_ERROR otherwise.
+     */
+    CHIP_ERROR AddData(const ByteSpan data);
+
+    /**
+     * @brief Get the intermediate padded digest for the current state of the stream.
+     *
+     * More data can be added before finish is called.
+     *
+     * @param[in,out] out_buffer Output buffer to receive the digest. `out_buffer` must
+     * be at least `kSHA256_Hash_Length` bytes long. The `out_buffer` size
+     * will be set to `kSHA256_Hash_Length` on success.
+     *
+     * @return CHIP_ERROR_INTERNAL on failure to compute the digest, CHIP_ERROR_BUFFER_TOO_SMALL
+     *         if out_buffer is too small, CHIP_NO_ERROR otherwise.
+     */
+    CHIP_ERROR GetDigest(MutableByteSpan & out_buffer);
+
+    /**
+     * @brief Finalize the stream digest computation, getting the final digest.
+     *
+     * @param[in,out] out_buffer Output buffer to receive the digest. `out_buffer` must
+     * be at least `kSHA256_Hash_Length` bytes long. The `out_buffer` size
+     * will be set to `kSHA256_Hash_Length` on success.
+     *
+     * @return CHIP_ERROR_INTERNAL on failure to compute the digest, CHIP_ERROR_BUFFER_TOO_SMALL
+     *         if out_buffer is too small, CHIP_NO_ERROR otherwise.
+     */
+    CHIP_ERROR Finish(MutableByteSpan & out_buffer);
+
+    /**
+     * @brief Clear-out internal digest data to avoid lingering the state.
+     */
     void Clear();
 
 private:
@@ -415,6 +647,16 @@ public:
 
     /**
      * @brief A function that implements SHA-256 based HKDF
+     *
+     * This implements the CHIP_Crypto_KDF() cryptographic primitive
+     * in the the specification.
+     *
+     *  Error values are:
+     *   - CHIP_ERROR_INVALID_ARGUMENT: for any bad arguments or nullptr input on
+     *     any pointer.
+     *   - CHIP_ERROR_INTERNAL: for any unexpected error arising in the underlying
+     *     cryptographic layers.
+     *
      * @param secret The secret to use as the key to the HKDF
      * @param secret_length Length of the secret
      * @param salt Optional salt to use as input to the HKDF
@@ -422,7 +664,7 @@ public:
      * @param info Optional info to use as input to the HKDF
      * @param info_length Length of the info
      * @param out_buffer Pointer to buffer to write output into.
-     * @param out_length Resulting length of out_buffer
+     * @param out_length Size of the underlying out_buffer. That length of output key material will be generated in out_buffer.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
 
@@ -430,9 +672,43 @@ public:
                                    const uint8_t * info, size_t info_length, uint8_t * out_buffer, size_t out_length);
 };
 
+class HMAC_sha
+{
+public:
+    HMAC_sha() {}
+    virtual ~HMAC_sha() {}
+
+    /**
+     * @brief A function that implements SHA-256 based HMAC per FIPS1981.
+     *
+     * This implements the CHIP_Crypto_HMAC() cryptographic primitive
+     * in the the specification.
+     *
+     * The `out_length` must be at least kSHA256_Hash_Length, and only
+     * kSHA256_Hash_Length bytes are written to out_buffer.
+     *
+     * Error values are:
+     *   - CHIP_ERROR_INVALID_ARGUMENT: for any bad arguments or nullptr input on
+     *     any pointer.
+     *   - CHIP_ERROR_INTERNAL: for any unexpected error arising in the underlying
+     *     cryptographic layers.
+     *
+     * @param key The key to use for the HMAC operation
+     * @param key_length Length of the key
+     * @param message Message over which to compute the HMAC
+     * @param message_length Length of the message over which to compute the HMAC
+     * @param out_buffer Pointer to buffer into which to write the output.
+     * @param out_length Underlying size of the `out_buffer`.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+
+    virtual CHIP_ERROR HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                   uint8_t * out_buffer, size_t out_length);
+};
+
 /**
  * @brief A cryptographically secure random number generator based on NIST SP800-90A
- * @param out_buffer Buffer to write random bytes into
+ * @param out_buffer Buffer into which to write random bytes
  * @param out_length Number of random bytes to generate
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
@@ -513,6 +789,11 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR Init(const uint8_t * context, size_t context_len);
+
+    /**
+     * @brief Free Spake2+ underlying objects.
+     **/
+    virtual void Clear() = 0;
 
     /**
      * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned).
@@ -836,7 +1117,7 @@ protected:
                            size_t info_len, uint8_t * out, size_t out_len) = 0;
 
     CHIP_SPAKE2P_ROLE role;
-    CHIP_SPAKE2P_STATE state;
+    CHIP_SPAKE2P_STATE state = CHIP_SPAKE2P_STATE::PREINIT;
     size_t fe_size;
     size_t hash_size;
     size_t point_size;
@@ -861,8 +1142,9 @@ public:
         memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
     }
 
-    ~Spake2p_P256_SHA256_HKDF_HMAC() override { FreeImpl(); }
+    ~Spake2p_P256_SHA256_HKDF_HMAC() override { Spake2p_P256_SHA256_HKDF_HMAC::Clear(); }
 
+    void Clear() override;
     CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
                          size_t in_len) override;
@@ -888,22 +1170,29 @@ protected:
                    size_t info_length, uint8_t * out, size_t out_length) override;
 
 private:
-    /**
-     * @brief Free any underlying implementation curve, points, field elements, etc.
-     **/
-    void FreeImpl();
-
     CHIP_ERROR InitInternal();
     Hash_SHA256_stream sha256_hash_ctx;
 
     Spake2pOpaqueContext mSpake2pContext;
 };
 
-/** @brief Clears the first `len` bytes of memory area `buf`.
- * @param buf Pointer to a memory buffer holding secret data that should be cleared.
- * @param len Specifies secret data size in bytes.
- **/
-void ClearSecretData(uint8_t * buf, uint32_t len);
+/**
+ * @brief Compute the compressed fabric identifier used for operational discovery service
+ *        records from a Node's root public key and Fabric ID. On success, out_compressed_fabric_id
+ *        will have a size of exactly kCompressedFabricIdentifierSize.
+ *
+ * Errors are:
+ *   - CHIP_ERROR_INVALID_ARGUMENT if root_public_key is invalid
+ *   - CHIP_ERROR_BUFFER_TOO_SMALL if out_compressed_fabric_id is too small for serialization
+ *   - CHIP_ERROR_INTERNAL on any unexpected crypto or data conversion errors.
+ *
+ * @param[in] root_public_key The root public key associated with the node's fabric
+ * @param[in] fabric_id The fabric ID associated with the node's fabric
+ * @param[out] out_compressed_fabric_id Span where output will be written. Its size must be >= kCompressedFabricIdentifierSize.
+ * @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
+                                      MutableByteSpan & out_compressed_fabric_id);
 
 typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
 
@@ -918,7 +1207,20 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
 
+/**
+ * @brief Extracts the Subject Key Identifier from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & skid);
+
+/**
+ * @brief Extracts the Authority Key Identifier from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
+
+/**
+ * @brief Extracts the Vendor ID from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid);
+
 } // namespace Crypto
 } // namespace chip
-
-#endif

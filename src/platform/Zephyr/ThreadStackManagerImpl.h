@@ -31,7 +31,7 @@
 #include <openthread/thread.h>
 #include <platform/Zephyr/BLEManagerImpl.h>
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

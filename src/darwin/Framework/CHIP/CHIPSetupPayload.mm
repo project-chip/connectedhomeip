@@ -16,6 +16,7 @@
  */
 
 #import "CHIPError.h"
+#import "CHIPError_Internal.h"
 #import "CHIPSetupPayload_Internal.h"
 #import <setup_payload/SetupPayload.h>
 

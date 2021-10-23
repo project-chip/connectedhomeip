@@ -105,7 +105,7 @@ if (CONFIG_POSIX_API)
     )
 endif()
 
-zephyr_include_directories(${ZEPHYR_BASE}/../modules/crypto/mbedtls/include)
+zephyr_include_directories(${ZEPHYR_BASE}/../modules/crypto/mbedtls/mbedtls/include)
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
 
 zephyr_get_compile_flags(CHIP_CFLAGS_C C)
@@ -196,9 +196,7 @@ chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 chip_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
 chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
-chip_gn_arg_bool  ("chip_inet_config_enable_raw_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
-chip_gn_arg_bool  ("chip_inet_config_enable_dns_resolver"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                  CONFIG_CHIP_PW_RPC)
 

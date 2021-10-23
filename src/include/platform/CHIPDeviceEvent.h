@@ -23,6 +23,7 @@
  */
 
 #pragma once
+#include <stdint.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -172,6 +173,13 @@ enum PublicEventTypes
     kCHIPoBLEConnectionEstablished,
 
     /**
+     * CHIPoBLE Connection Closed
+     *
+     * Signals that an external entity has closed existing CHIPoBLE connection with the device.
+     */
+    kCHIPoBLEConnectionClosed,
+
+    /**
      * Thread State Change
      *
      * Signals that a state change has occurred in the Thread stack.
@@ -207,6 +215,11 @@ enum PublicEventTypes
      *
      */
     kOperationalNetworkEnabled,
+
+    /**
+     * Signals that DNS-SD platform layer was initialized and is ready to operate.
+     */
+    kDnssdPlatformInitialized,
 };
 
 /**
@@ -220,12 +233,14 @@ enum InternalEventTypes
     kEventTypeNotSet = kRange_Internal,
     kNoOp,
     kCallWorkFunct,
+    kChipLambdaEvent,
     kChipSystemLayerEvent,
     kCHIPoBLESubscribe,
     kCHIPoBLEUnsubscribe,
     kCHIPoBLEWriteReceived,
     kCHIPoBLEIndicateConfirm,
     kCHIPoBLEConnectionError,
+    kCHIPoBLENotifyConfirm
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -291,6 +306,10 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 #include <ble/BleConfig.h>
+#include <inet/InetLayer.h>
+#include <system/SystemEvent.h>
+#include <system/SystemLayer.h>
+#include <system/SystemObject.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -306,6 +325,7 @@ struct ChipDeviceEvent final
     union
     {
         ChipDevicePlatformEvent Platform;
+        System::LambdaBridge LambdaEvent;
         struct
         {
             ::chip::System::EventType Type;
@@ -367,7 +387,7 @@ struct ChipDeviceEvent final
         {
             uint64_t PeerNodeId;
             uint16_t SessionKeyId;
-            uint8_t EncType;
+            uint8_t SessionType;
             bool IsCommissioner;
         } SessionEstablished;
         struct
@@ -392,6 +412,10 @@ struct ChipDeviceEvent final
             BLE_CONNECTION_OBJECT ConId;
             CHIP_ERROR Reason;
         } CHIPoBLEConnectionError;
+        struct
+        {
+            BLE_CONNECTION_OBJECT ConId;
+        } CHIPoBLENotifyConfirm;
         struct
         {
             bool RoleChanged : 1;

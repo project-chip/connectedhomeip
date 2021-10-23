@@ -13,12 +13,12 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("lock-common") {
   zap_file = "lock-app.zap"
 
-  zap_pregenerated_dir = "gen"
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/lock-app/zap-generated"
   is_server = true
 }

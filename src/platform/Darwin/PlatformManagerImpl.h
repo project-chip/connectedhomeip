@@ -58,14 +58,14 @@ private:
     CHIP_ERROR _InitChipStack();
     CHIP_ERROR _Shutdown();
 
-    CHIP_ERROR _StartChipTimer(int64_t aMilliseconds) { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    CHIP_ERROR _StartChipTimer(System::Clock::Timeout delay) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
     void _RunEventLoop();
     void _LockChipStack(){};
     bool _TryLockChipStack() { return false; };
     void _UnlockChipStack(){};
-    void _PostEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool _IsChipStackLockedByCurrentThread() const { return false; };
@@ -80,7 +80,10 @@ private:
     static PlatformManagerImpl sInstance;
 
     dispatch_queue_t mWorkQueue = nullptr;
-    bool mIsWorkQueueRunning    = false;
+    // Semaphore used to implement blocking behavior in _RunEventLoop.
+    dispatch_semaphore_t mRunLoopSem;
+
+    bool mIsWorkQueueRunning = false;
 
     inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }
 };

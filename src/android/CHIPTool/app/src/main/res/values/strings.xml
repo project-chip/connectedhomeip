@@ -5,38 +5,44 @@
     <string name="location_permission_denied_title">Location permission required</string>
     <string name="location_permission_denied_message">Since location permission was denied, some functions of the app may be unavailable. </string>
     <string name="chip_device_info_title">CHIP Device Info:</string>
-    <string name="chip_device_info_subtitle">Please manually connect to this device\'s soft AP using the information below.</string>
     <string name="chip_device_info_version_label">Version:</string>
     <string name="chip_device_info_vendor_id_label">Vendor ID:</string>
     <string name="chip_device_info_product_id_label">Product ID:</string>
     <string name="chip_device_info_discriminator_label">Discriminator:</string>
     <string name="chip_device_info_setup_code_label">Setup PIN Code:</string>
     <string name="chip_device_info_optional_vendor_tags_label">Optional Vendor tags:</string>
+    <string name="chip_device_info_discovery_capabilities_text">Discovery capabilities: %1s</string>
     <string name="camera_permission_missing_alert_title">Camera permission missing</string>
     <string name="camera_permission_missing_alert_subtitle">Camera permission required to be able to scan the QR code.</string>
     <string name="camera_permission_missing_alert_try_again">Try again</string>
     <string name="camera_unavailable_alert_title">Camera unavailable</string>
     <string name="camera_unavailable_alert_subtitle">Error launching camera to scan the QR code.</string>
     <string name="camera_unavailable_alert_exit">Exit</string>
+    <string name="input_address_btn_text">Input device address</string>
 
-    <string name="send_echo_btn_text">Send echo</string>
-    <string name="echo_status_connecting">Connecting…</string>
-    <string name="echo_status_sending_message">Sending message…</string>
-    <string name="echo_status_response">Received echo response:\n\n%1$s</string>
     <string name="scan_qr_code_btn_text">Scan QR Code</string>
     <string name="provision_wifi_credentials_btn_text">Provision CHIP device with Wi-Fi</string>
     <string name="provision_thread_credentials_btn_text">Provision CHIP device with Thread</string>
-    <string name="echo_client_btn_text">Echo Client</string>
     <string name="on_off_level_btn_text">Light On/Off &amp; Level Cluster</string>
     <string name="enter_ip_address_hint_text">Enter IP Address (eg. 192.168.10.2)</string>
     <string name="enter_fabric_id_hint_text">Enter Fabric ID</string>
     <string name="enter_device_id_hint_text">Enter Device ID</string>
-    <string name="echo_input_hint_text">Enter message for device</string>
+    <string name="enter_endpoint_id_hint_text">Enter Endpoint ID</string>
     <string name="update_device_address_btn_text">Update address</string>
+
+    <string name="address_commissioning_title_text">Commission with IP address</string>
+    <string name="default_discriminator">3840</string>
+    <string name="default_pincode">20202021</string>
+    <string name="enter_device_address_label_text">Device address</string>
+    <string name="enter_discriminator_label_text">Discriminator</string>
+    <string name="enter_pincode_label_text">Pincode</string>
+    <string name="commission_btn_text">Commission</string>
 
     <string name="send_command_on_btn_text">On</string>
     <string name="send_command_off_btn_text">Off</string>
     <string name="send_command_toggle_btn_text">Toggle</string>
+    <string name="read_on_off_attribute_btn_text">Read</string>
+    <string name="show_subscribe_dialog_btn_text">Subscribe</string>
     <string name="send_command_type_label_text">%s/%d command sent!</string>
     <string name="rendezvous_over_ble_btn_text">Rendezvous over BLE</string>
     <string name="rendezvous_over_soft_ap_btn_text">Rendezvous over Soft AP</string>
@@ -48,6 +54,7 @@
     <string name="rendezvous_over_ble_pairing_failure_text">Pairing failed</string>
     <string name="rendezvous_over_ble_commissioning_success_text">Network commissioning completed</string>
     <string name="rendezvous_over_ble_commissioning_failure_text">Network commissioning failed</string>
+    <string name="commissioning_completed">Commissioning completed with result: %1$d</string>
 
     <string name="attestation_test_btn_text">Attestation Test</string>
     <string name="attestation_fetching_status">Fetching…</string>
@@ -74,4 +81,32 @@
     <string name="nfc_tag_action_wifi">Provision into Wi-Fi network</string>
     <string name="nfc_tag_action_thread">Provision into Thread network</string>
 
+    <string name="sensor_client_btn_text">Sensor clusters</string>
+    <string name="sensor_client_read_btn_text">Read</string>
+    <string name="sensor_client_watch_btn_text">Watch</string>
+    <string name="sensor_client_last_value_text">Last value: %1$.2f %2$s</string>
+    <string name="sensor_client_read_error_text">Failed to read the sensor: %1$s</string>
+    <string name="cluster_interaction_tool">Cluster Interaction Tool</string>
+
+    <string name="multi_admin_client_btn_text">Multi-admin cluster</string>
+    <string name="basic_commissioning_method_btn_text">Basic Commissioning Method</string>
+    <string name="enter_discriminator_hint_text">Enter Discriminator</string>
+    <string name="enter_setup_pin_code_hint_text">Enter Setup PIN Code</string>
+    <string name="enhanced_commissioning_method_btn_text">Enhanced Commissioning Method</string>
+    <string name="revoke_btn_text">Revoke</string>
+
+    <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
+    <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
+    <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
+    
+    <string name="basic_cluster_btn_text">Basic cluster</string>
+    <string name="basic_cluster_read_user_label_btn_text">Read User Label</string>
+    <string name="basic_cluster_write_user_label_btn_text">Write User Label</string>
+    <string name="basic_cluster_write_user_label_hint_text">Enter User Label</string>
+    <string name="basic_cluster_read_product_name_btn_text">Read Product Name</string>
+
+    <string name="subscribe_dialog_title_text">Subscribe on/off</string>
+    <string name="subscribe_dialog_subscribe_btn_text">Subscribe</string>
+    <string name="subscribe_dialog_min_interval_hint">Minimum interval (seconds)</string>
+    <string name="subscribe_dialog_max_interval_hint">Maximum interval (seconds)</string>
 </resources>

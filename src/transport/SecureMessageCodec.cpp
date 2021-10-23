@@ -25,8 +25,8 @@
  *
  */
 
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <transport/SecureMessageCodec.h>
 
 namespace chip {
@@ -36,29 +36,24 @@ using System::PacketBufferHandle;
 
 namespace SecureMessageCodec {
 
-CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
-                  PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, MessageCounter & counter)
+CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                   System::PacketBufferHandle & msgBuf, MessageCounter & counter)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(msgBuf->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
 
-    uint32_t msgId = counter.Value();
+    uint32_t messageCounter = counter.Value();
 
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
 
     packetHeader
-        .SetSourceNodeId(localNodeId) //
-        .SetMessageId(msgId)          //
-        .SetEncryptionKeyID(state->GetPeerKeyID());
+        .SetMessageCounter(messageCounter) //
+        .SetSessionId(state->GetPeerSessionId());
 
-    if (state->GetPeerNodeId() != kUndefinedNodeId)
-    {
-        packetHeader.SetDestinationNodeId(state->GetPeerNodeId());
-    }
-
-    packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
+    // TODO set Session Type (Unicast or Group)
+    // packetHeader.SetSessionType(Header::SessionType::kUnicastSession);
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
 
@@ -74,14 +69,12 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
     VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    ChipLogDetail(Inet, "Secure message was encrypted: Msg ID %" PRIu32, msgId);
-
     ReturnErrorOnFailure(counter.Advance());
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
-                  System::PacketBufferHandle & msg)
+CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+                   System::PacketBufferHandle & msg)
 {
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -98,7 +91,7 @@ CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     msg->SetDataLength(len);
 #endif
 
-    uint16_t footerLen = MessageAuthenticationCode::TagLenForEncryptionType(packetHeader.GetEncryptionType());
+    uint16_t footerLen = packetHeader.MICTagLength();
     VerifyOrReturnError(footerLen <= len, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     uint16_t taglen = 0;

@@ -23,7 +23,7 @@
 class LEDWidget
 {
 public:
-    static void InitGpio();
+    static void InitGpio(const device * port);
     const static struct device * mPort;
     void Init(gpio_pin_t gpioNum);
     void Set(bool state);

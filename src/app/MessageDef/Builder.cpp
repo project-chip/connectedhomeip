@@ -71,7 +71,6 @@ CHIP_ERROR Builder::InitAnonymousStructure(chip::TLV::TLVWriter * const apWriter
     mpWriter            = apWriter;
     mOuterContainerType = chip::TLV::kTLVType_NotSpecified;
     mError              = mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, mOuterContainerType);
-    ChipLogFunctError(mError);
 
     return mError;
 }

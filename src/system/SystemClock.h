@@ -28,192 +28,210 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <support/DLLUtil.h>
-
+#include <lib/support/DLLUtil.h>
+#include <lib/support/TimeUtils.h>
 #include <system/SystemError.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#include <sys/time.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#include <chrono>
+#include <stdint.h>
 
 namespace chip {
 namespace System {
 
-enum
-{
-    kTimerFactor_nano_per_micro  = 1000, /** Number of nanoseconds in a microsecond. */
-    kTimerFactor_micro_per_milli = 1000, /** Number of microseconds in a millisecond. */
-    kTimerFactor_milli_per_unit  = 1000, /** Number of milliseconds in a second. */
+namespace Clock {
 
-    kTimerFactor_nano_per_milli = 1000000, /** Number of nanoseconds in a millisecond. */
-    kTimerFactor_micro_per_unit = 1000000  /** Number of microseconds in a second. */
+/*
+ * We use `std::chrono::duration` for clock types to provide type safety. But unlike the predefined std types
+ * (`std::chrono::milliseconds` et al), CHIP uses unsigned base types, and types are explicity sized, with
+ * smaller-size types available for members and arguments where appropriate.
+ *
+ * Most conversions are handled by the types transparently. To convert with possible loss of information, use
+ * `std::chrono::duration_cast<>()`.
+ */
+
+using Microseconds64 = std::chrono::duration<uint64_t, std::micro>;
+using Microseconds32 = std::chrono::duration<uint32_t, std::micro>;
+
+using Milliseconds64 = std::chrono::duration<uint64_t, std::milli>;
+using Milliseconds32 = std::chrono::duration<uint32_t, std::milli>;
+
+using Seconds64 = std::chrono::duration<uint64_t>;
+using Seconds32 = std::chrono::duration<uint32_t>;
+using Seconds16 = std::chrono::duration<uint16_t>;
+
+constexpr Seconds16 Zero{ 0 };
+
+namespace Literals {
+
+constexpr Microseconds64 operator""_us(unsigned long long int us)
+{
+    return Microseconds64(us);
+}
+constexpr Microseconds64 operator""_us64(unsigned long long int us)
+{
+    return Microseconds64(us);
+}
+constexpr Microseconds32 operator""_us32(unsigned long long int us)
+{
+    return Microseconds32(us);
+}
+
+constexpr Milliseconds64 operator""_ms(unsigned long long int ms)
+{
+    return Milliseconds64(ms);
+}
+constexpr Milliseconds64 operator""_ms64(unsigned long long int ms)
+{
+    return Milliseconds64(ms);
+}
+constexpr Milliseconds32 operator""_ms32(unsigned long long int ms)
+{
+    return Milliseconds32(ms);
+}
+
+constexpr Seconds64 operator""_s(unsigned long long int s)
+{
+    return Seconds64(s);
+}
+constexpr Seconds64 operator""_s64(unsigned long long int s)
+{
+    return Seconds64(s);
+}
+constexpr Seconds32 operator""_s32(unsigned long long int s)
+{
+    return Seconds32(s);
+}
+constexpr Seconds16 operator""_s16(unsigned long long int s)
+{
+    return Seconds16(s);
+}
+
+} // namespace Literals
+
+/**
+ * Type for System time stamps.
+ */
+using Timestamp = Milliseconds64;
+
+/**
+ * Type for System time offsets (i.e. `StartTime()` duration).
+ *
+ * It is required of platforms that time stamps from `GetMonotonic…()` have the high bit(s) zero,
+ * so the sum of a `Milliseconds64` time stamp and `Milliseconds32` offset will never overflow.
+ */
+using Timeout = Milliseconds32;
+
+class ClockBase
+{
+public:
+    // Backwards compatibility types; avoid using in new code. These only provide documentation, not type safety.
+    using Tick = uint64_t;
+    static_assert(std::is_unsigned<Tick>::value, "Tick must be unsigned");
+    using MonotonicMicroseconds = Tick;
+    using MonotonicMilliseconds = Tick;
+
+    virtual ~ClockBase() = default;
+
+    /**
+     * Returns a monotonic system time.
+     *
+     * This function returns an elapsed time since an arbitrary, platform-defined epoch.
+     * The value returned is guaranteed to be ever-increasing (i.e. never wrapping or decreasing) between
+     * reboots of the system.  Additionally, the underlying time source is guaranteed to tick
+     * continuously during any system sleep modes that do not entail a restart upon wake.
+     *
+     * Although some platforms may choose to return a value that measures the time since boot for the
+     * system, applications must *not* rely on this.
+     */
+    Timestamp GetMonotonicTimestamp() { return GetMonotonicMilliseconds64(); }
+
+    /**
+     * Returns a monotonic system time in units of microseconds.
+     *
+     * This function returns an elapsed time in microseconds since an arbitrary, platform-defined epoch.
+     * The value returned is guaranteed to be ever-increasing (i.e. never wrapping or decreasing) between
+     * reboots of the system.  Additionally, the underlying time source is guaranteed to tick
+     * continuously during any system sleep modes that do not entail a restart upon wake.
+     *
+     * Although some platforms may choose to return a value that measures the time since boot for the
+     * system, applications must *not* rely on this.
+     *
+     * Applications must not rely on the time returned by GetMonotonicMicroseconds64() actually having
+     * granularity finer than milliseconds.
+     *
+     * Platform implementations *must* use the same epoch for GetMonotonicMicroseconds64() and GetMonotonicMilliseconds64().
+     *
+     * Platforms *must* use an epoch such that the upper bit of a value returned by GetMonotonicMicroseconds64() is zero
+     * for the expected operational life of the system.
+     *
+     * @returns Elapsed time in microseconds since an arbitrary, platform-defined epoch.
+     */
+    virtual Microseconds64 GetMonotonicMicroseconds64() = 0;
+
+    /**
+     * Returns a monotonic system time in units of milliseconds.
+     *
+     * This function returns an elapsed time in milliseconds since an arbitrary, platform-defined epoch.
+     * The value returned is guaranteed to be ever-increasing (i.e. never wrapping or decreasing) between
+     * reboots of the system.  Additionally, the underlying time source is guaranteed to tick
+     * continuously during any system sleep modes that do not entail a restart upon wake.
+     *
+     * Although some platforms may choose to return a value that measures the time since boot for the
+     * system, applications must *not* rely on this.
+     *
+     * Platform implementations *must* use the same epoch for GetMonotonicMicroseconds64() and GetMonotonicMilliseconds64().
+     * (As a consequence of this, and the requirement for GetMonotonicMicroseconds64() to return high bit zero, values
+     * returned by GetMonotonicMilliseconds64() will have the high ten bits zero.)
+     *
+     * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
+     */
+    virtual Milliseconds64 GetMonotonicMilliseconds64() = 0;
+
+    // Backwards compatibility methods; avoid using in new code. These only provide documentation, not type safety.
+    MonotonicMicroseconds GetMonotonicMicroseconds() { return GetMonotonicMicroseconds64().count(); }
+    MonotonicMilliseconds GetMonotonicMilliseconds() { return GetMonotonicMilliseconds64().count(); }
 };
 
-namespace Platform {
-namespace Layer {
+// Currently we have a single implementation class, ClockImpl, whose members are implemented in build-specific files.
+class ClockImpl : public ClockBase
+{
+public:
+    ~ClockImpl() = default;
+    Microseconds64 GetMonotonicMicroseconds64() override;
+    Milliseconds64 GetMonotonicMilliseconds64() override;
+};
 
-/**
- * @brief
- *   Platform-specific function for getting monotonic system time in microseconds.
- *
- * This function is expected to return elapsed time in microseconds since an arbitrary, platform-defined
- * epoch.  Platform implementations are obligated to return a value that is ever-increasing (i.e. never
- * wraps) between reboots of the system.  Additionally, the underlying time source is required to tick
- * continuously during any system sleep modes that do not entail a restart upon wake.
- *
- * The epoch for time returned by this function is *not* required to be the same that for any of the
- * other GetClock... functions, including GetClock_MonotonicMS().
- *
- * This function is expected to be thread-safe on any platform that employs threading.
- *
- * @note
- *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetClock_Monotonic().
- *
- * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
- */
-extern uint64_t GetClock_Monotonic();
+namespace Internal {
 
-/**
- * @brief
- *   Platform-specific function for getting monotonic system time in milliseconds.
- *
- * This function is expected to return elapsed time in milliseconds since an arbitrary, platform-defined
- * epoch.  Platform implementations are obligated to return a value that is ever-increasing (i.e. never
- * wraps) between reboots of the system.  Additionally, the underlying time source is required to tick
- * continuously during any system sleep modes that do not entail a restart upon wake.
- *
- * The epoch for time returned by this function is *not* required to be the same as that for any of the
- * other GetClock... functions, including GetClock_Monotonic().
- *
- * This function is expected to be thread-safe on any platform that employs threading.
- *
- * @note
- *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetClock_MonotonicMS().
- *
- * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
- */
-extern uint64_t GetClock_MonotonicMS();
+// This should only be used via SystemClock() below.
+extern ClockBase * gClockBase;
 
-/**
- * @brief
- *   Platform-specific function for getting high-resolution monotonic system time in microseconds.
- *
- * This function is expected to return elapsed time in microseconds since an arbitrary, platform-defined
- * epoch.  Values returned by GetClock_MonotonicHiRes() are required to be ever-increasing (i.e. never
- * wrap).  However, the underlying timer is *not* required to tick continuously during system
- * deep-sleep states.
- *
- * Platform are encouraged to implement GetClock_MonotonicHiRes() using a high-resolution timer
- * that is not subject to gradual clock adjustments (slewing).  On platforms without such a timer,
- * GetClock_MonotonicHiRes() can return the same value as GetClock_Monotonic().
- *
- * The epoch for time returned by this function is not required to be the same that for any of the
- * other GetClock... functions.
- *
- * This function is expected to be thread-safe on any platform that employs threading.
- *
- * @note
- *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetClock_MonotonicHiRes().
- *
- * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
- */
-extern uint64_t GetClock_MonotonicHiRes();
+inline void SetSystemClockForTesting(Clock::ClockBase * clock)
+{
+    Clock::Internal::gClockBase = clock;
+}
 
-/**
- * @brief
- *   Platform-specific function for getting the current real (civil) time in microsecond Unix time
- *   format.
- *
- * This function is expected to return the local platform's notion of current real time, expressed
- * as a Unix time value scaled to microseconds.  The underlying clock is required to tick at a
- * rate of least at whole seconds (values of 1,000,000), but may tick faster.
- *
- * On those platforms that are capable of tracking real time, GetClock_RealTime() must return the
- * error CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED whenever the system is unsynchronized with real time.
- *
- * Platforms that are incapable of tracking real time should not implement the GetClock_RealTime()
- * function, thereby forcing link-time failures of features that depend on access to real time.
- * Alternatively, such platforms may supply an implementation of GetClock_RealTime() that returns
- * the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
- *
- * This function is expected to be thread-safe on any platform that employs threading.
- *
- * @note
- *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetClock_RealTime().
- *
- * @param[out] curTime                  The current time, expressed as Unix time scaled to microseconds.
- *
- * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
- *                                      If the platform is capable of tracking real time, but is
- *                                      is currently unsynchronized.
- * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
- *                                      If the platform is incapable of tracking real time.
- */
-extern Error GetClock_RealTime(uint64_t & curTime);
+} // namespace Internal
 
-/**
- * @brief
- *   Platform-specific function for getting the current real (civil) time in millisecond Unix time
- *   format.
- *
- * This function is expected to return the local platform's notion of current real time, expressed
- * as a Unix time value scaled to milliseconds.
- *
- * See the documentation for GetClock_RealTime() for details on the expected behavior.
- *
- * @note
- *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetClock_RealTimeMS().
- *
- * @param[out] curTimeMS               The current time, expressed as Unix time scaled to milliseconds.
- *
- * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
- *                                      If the platform is capable of tracking real time, but is
- *                                      is currently unsynchronized.
- * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
- *                                      If the platform is incapable of tracking real time.
- */
-extern Error GetClock_RealTimeMS(uint64_t & curTimeMS);
+// Backwards compatibility types; avoid using in new code. These only provide documentation, not type safety.
+using MonotonicMicroseconds = ClockBase::MonotonicMicroseconds;
+using MonotonicMilliseconds = ClockBase::MonotonicMilliseconds;
 
-/**
- * @brief
- *   Platform-specific function for setting the current real (civil) time.
- *
- * CHIP calls this function to set the local platform's notion of current real time.  The new current
- * time is expressed as a Unix time value scaled to microseconds.
- *
- * Once set, underlying platform clock is expected to track real time with a granularity of at least whole
- * seconds.
- *
- * On platforms that support tracking real time, the SetClock_RealTime() function must return the error
- * CHIP_SYSTEM_ERROR_ACCESS_DENIED if the calling application does not have the privilege to set the
- * current time.
- *
- * Platforms that are incapable of tracking real time, or do not offer the ability to set real time,
- * should not implement the SetClock_RealTime() function, thereby forcing link-time failures of features
- * that depend on setting real time.  Alternatively, such platforms may supply an implementation of
- * SetClock_RealTime() that returns the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
- *
- * This function is expected to be thread-safe on any platform that employs threading.
- *
- * @note
- *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetClock_RealTimeMS().
- *
- * @param[in] newCurTime                The new current time, expressed as Unix time scaled to microseconds.
- *
- * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
- *                                      If the platform is incapable of tracking real time.
- * @retval #CHIP_SYSTEM_ERROR_ACCESS_DENIED
- *                                      If the calling application does not have the privilege to set the
- *                                      current time.
- */
-extern Error SetClock_RealTime(uint64_t newCurTime);
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+Microseconds64 TimevalToMicroseconds(const timeval & in);
+void ToTimeval(Microseconds64 in, timeval & out);
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-} // namespace Layer
-} // namespace Platform
+} // namespace Clock
+
+inline Clock::ClockBase & SystemClock()
+{
+    return *Clock::Internal::gClockBase;
+}
+
 } // namespace System
 } // namespace chip

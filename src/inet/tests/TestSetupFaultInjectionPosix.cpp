@@ -29,10 +29,10 @@
 #include "TestInetCommonOptions.h"
 #include "TestSetupFaultInjection.h"
 #include <inet/InetFaultInjection.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <stdio.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
-#include <support/ScopedBuffer.h>
 #include <system/SystemFaultInjection.h>
 
 struct RestartCallbackContext
@@ -68,13 +68,13 @@ static void RebootCallbackFn()
     if (!lArgv.Alloc(static_cast<size_t>(sRestartCallbackCtx.mArgc + 2)))
     {
         printf("** failed to allocate memory **\n");
-        ExitNow();
+        return;
     }
 
     if (gSigusr1Received)
     {
         printf("** skipping restart case after SIGUSR1 **\n");
-        ExitNow();
+        return;
     }
 
     for (i = 0; sRestartCallbackCtx.mArgv[i] != nullptr; i++)
@@ -108,9 +108,6 @@ static void RebootCallbackFn()
     printf("********** Restarting *********\n");
     fflush(stdout);
     execvp(lArgv[0], lArgv.Get());
-
-exit:
-    return;
 }
 
 static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::FaultInjection::Identifier aId,
@@ -119,15 +116,15 @@ static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::
     uint16_t numargs = aFaultRecord->mNumArguments;
     uint16_t i;
 
-    printf("***** Injecting fault %s_%s, instance number: %u; reboot: %s", aManager->GetName(), aManager->GetFaultNames()[aId],
-           aFaultRecord->mNumTimesChecked, aFaultRecord->mReboot ? "yes" : "no");
+    printf("***** Injecting fault %s_%s, instance number: %" PRIu32 "; reboot: %s", aManager->GetName(),
+           aManager->GetFaultNames()[aId], aFaultRecord->mNumTimesChecked, aFaultRecord->mReboot ? "yes" : "no");
     if (numargs)
     {
         printf(" with %u args:", numargs);
 
         for (i = 0; i < numargs; i++)
         {
-            printf(" %d", aFaultRecord->mArguments[i]);
+            printf(" %" PRIi32, aFaultRecord->mArguments[i]);
         }
     }
 
@@ -141,8 +138,8 @@ static bool PrintFaultInjectionMaxArgCbFn(nl::FaultInjection::Manager & mgr, nl:
 
     if (gFaultInjectionOptions.PrintFaultCounters && aFaultRecord->mNumArguments)
     {
-        printf("FI_instance_params: %s_%s_s%u maxArg: %u;\n", mgr.GetName(), faultName, aFaultRecord->mNumTimesChecked,
-               aFaultRecord->mArguments[0]);
+        printf("FI_instance_params: %s_%s_s%" PRIu32 " maxArg: %" PRIi32 ";\n", mgr.GetName(), faultName,
+               aFaultRecord->mNumTimesChecked, aFaultRecord->mArguments[0]);
     }
 
     return false;

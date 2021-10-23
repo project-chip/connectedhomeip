@@ -31,8 +31,9 @@ void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key);
 uint64_t CHIPGetNextAvailableDeviceID(void);
 void CHIPSetNextAvailableDeviceID(uint64_t id);
-CHIPDevice * CHIPGetPairedDevice(void);
-CHIPDevice * CHIPGetPairedDeviceWithID(uint64_t id);
+BOOL CHIPIsDevicePaired(uint64_t id);
+BOOL CHIPGetConnectedDevice(CHIPDeviceConnectionCallback completionHandler);
+BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallback completionHandler);
 void CHIPUnpairDeviceWithID(uint64_t deviceId);
 
 @interface CHIPToolPersistentStorageDelegate : NSObject <CHIPPersistentStorageDelegate>

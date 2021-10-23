@@ -25,11 +25,12 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
+#include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
 
 using namespace ::chip;
 
@@ -92,13 +93,14 @@ exit:
 } // namespace DeviceManager
 } // namespace chip
 
-void emberAfPostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
     if (cb != nullptr)
     {
-        cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, mask, manufacturerCode, type, size, value);
+        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, mask, type,
+                                        size, value);
     }
 }

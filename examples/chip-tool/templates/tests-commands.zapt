@@ -2,19 +2,18 @@
 
 #pragma once
 
-#include "TestCommand.h"
+#include <commands/tests/TestCommand.h>
 
-{{>test_cluster tests="TestCluster, Test_3_1_1, Test_3_2_1, Test_3_2_2"}}
+{{>test_cluster tests=(getTests)}}
 
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
-        make_unique<TestCluster>(),
-        make_unique<Test_3_1_1>(),
-        make_unique<Test_3_2_1>(),
-        make_unique<Test_3_2_2>(),
+      {{#chip_tests (getTests)}}
+        make_unique<{{filename}}>(),
+      {{/chip_tests}}
     };
 
     commands.Register(clusterName, clusterCommands);

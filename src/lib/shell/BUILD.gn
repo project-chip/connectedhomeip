@@ -53,17 +53,23 @@ static_library("shell") {
       "MainLoopDefault.cpp",
       "streamer_efr32.cpp",
     ]
-  } else if (chip_device_platform == "k32w") {
+  } else if (chip_device_platform == "k32w0") {
     sources += [
       "MainLoopDefault.cpp",
       "streamer_k32w.cpp",
+    ]
+  } else if (current_os == "zephyr") {
+    sources += [
+      "MainLoopZephyr.cpp",
+      "streamer_zephyr.cpp",
+      "streamer_zephyr.h",
     ]
   } else {
     sources += [ "MainLoopDefault.cpp" ]
   }
 
-  if (current_os == "zephyr") {
-    sources += [ "streamer_zephyr.cpp" ]
+  if (current_os == "mbed") {
+    sources += [ "streamer_mbed.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

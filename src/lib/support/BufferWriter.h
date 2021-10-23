@@ -21,20 +21,32 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <lib/support/Span.h>
+
 namespace chip {
 namespace Encoding {
 
 class BufferWriter
 {
 public:
-    BufferWriter(uint8_t * buf, size_t len) : mBuf(buf), mSize(len), mNeeded(0) {}
+    BufferWriter(uint8_t * buf, size_t len) : mBuf(buf), mSize(len), mNeeded(0)
+    {
+        if (buf == nullptr)
+        {
+            mSize = 0;
+        }
+    }
+    BufferWriter(MutableByteSpan buf) : BufferWriter(buf.data(), buf.size()) {}
     BufferWriter(const BufferWriter & other) = default;
     BufferWriter & operator=(const BufferWriter & other) = default;
 
     /// Append a null terminated string, exclude the null terminator
     BufferWriter & Put(const char * s);
 
-    /// Raw append a buffer, regardless of endianess
+    /// Raw append a buffer, regardless of endianess.
+    /// This is memmove-safe: if `buf` points to the underlying buffer, where output
+    /// will be written, and the overlap is legal for a memmove to have worked properly,
+    /// then this method will properly copy data.
     BufferWriter & Put(const void * buf, size_t len);
 
     /// Append a single byte
@@ -98,6 +110,7 @@ public:
 
 protected:
     EndianBufferWriterBase(uint8_t * buf, size_t len) : BufferWriter(buf, len) {}
+    EndianBufferWriterBase(MutableByteSpan buf) : BufferWriter(buf.data(), buf.size()) {}
     EndianBufferWriterBase(const EndianBufferWriterBase & other) = default;
     EndianBufferWriterBase & operator=(const EndianBufferWriterBase & other) = default;
 };
@@ -108,6 +121,7 @@ class BufferWriter : public EndianBufferWriterBase<BufferWriter>
 {
 public:
     BufferWriter(uint8_t * buf, size_t len) : EndianBufferWriterBase<BufferWriter>(buf, len) {}
+    BufferWriter(MutableByteSpan buf) : EndianBufferWriterBase<BufferWriter>(buf) {}
     BufferWriter(const BufferWriter & other) = default;
     BufferWriter & operator=(const BufferWriter & other) = default;
     BufferWriter & EndianPut(uint64_t x, size_t size);
@@ -121,6 +135,7 @@ class BufferWriter : public EndianBufferWriterBase<BufferWriter>
 {
 public:
     BufferWriter(uint8_t * buf, size_t len) : EndianBufferWriterBase<BufferWriter>(buf, len) {}
+    BufferWriter(MutableByteSpan buf) : EndianBufferWriterBase<BufferWriter>(buf) {}
     BufferWriter(const BufferWriter & other) = default;
     BufferWriter & operator=(const BufferWriter & other) = default;
     BufferWriter & EndianPut(uint64_t x, size_t size);

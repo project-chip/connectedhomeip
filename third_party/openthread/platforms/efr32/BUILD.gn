@@ -17,6 +17,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 import("${efr32_sdk_build_root}/efr32_board.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 openthread_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
 
@@ -29,9 +30,8 @@ config("openthread_efr32_config") {
 
   include_dirs = [
     "${chip_root}/examples/platform/efr32",
-    "${chip_root}/examples/platform/efr32/${efr32_family}/${efr32_board}",
+    "${efr32_sdk_root}/matter/efr32/${efr32_family}/${efr32_board}",
     "${openthread_efr32_root}/src/src",
-    "${openthread_efr32_root}/src/${efr32_family}",
   ]
 }
 
@@ -45,10 +45,6 @@ source_set("openthread_core_config_efr32") {
   public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
 
   public_configs = [ ":openthread_efr32_config" ]
-}
-
-source_set("openthread_mbedtls_config_efr32") {
-  sources = [ "${openthread_efr32_root}/src/${efr32_family}/crypto/mbedtls_config_autogen.h" ]
 }
 
 source_set("libopenthread-efr32") {

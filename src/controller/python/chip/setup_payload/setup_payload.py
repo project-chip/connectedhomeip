@@ -19,6 +19,7 @@ from chip.exceptions import ChipStackError
 
 from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8
 
+
 class SetupPayload:
     # AttributeVisitor: void(const char* name, const char* value)
     AttributeVisitor = CFUNCTYPE(None, c_char_p, c_char_p)
@@ -34,11 +35,13 @@ class SetupPayload:
 
         def AddAttribute(name, value):
             self.attributes[name.decode()] = value.decode()
+
         def AddVendorAttribute(tag, value):
             self.vendor_attributes[tag] = value.decode()
 
         self.attribute_visitor = SetupPayload.AttributeVisitor(AddAttribute)
-        self.vendor_attribute_visitor = SetupPayload.VendorAttributeVisitor(AddVendorAttribute)
+        self.vendor_attribute_visitor = SetupPayload.VendorAttributeVisitor(
+            AddVendorAttribute)
 
     def ParseQrCode(self, qrCode: str):
         self.Clear()
@@ -62,6 +65,14 @@ class SetupPayload:
 
         return self
 
+    def PrintOnboardingCodes(self, passcode, vendorId, productId, discriminator, customFlow, capabilities, version):
+        self.Clear()
+        err = self.chipLib.pychip_SetupPayload_PrintOnboardingCodes(
+            passcode, vendorId, productId, discriminator, customFlow, capabilities, version)
+
+        if err != 0:
+            raise ChipStackError(err)
+
     def Print(self):
         for name, value in self.attributes.items():
             decorated_value = self.__DecorateValue(name, value)
@@ -69,7 +80,8 @@ class SetupPayload:
             print(f"{name}: {value}{decorated_value}")
 
         for tag in self.vendor_attributes:
-            print(f"Vendor attribute '{tag:>3}': {self.vendor_attributes[tag]}")
+            print(
+                f"Vendor attribute '{tag:>3}': {self.vendor_attributes[tag]}")
 
     def Clear(self):
         self.attributes.clear()
@@ -78,9 +90,12 @@ class SetupPayload:
     def __DecorateValue(self, name, value):
         if name == "RendezvousInformation":
             rendezvous_methods = []
-            if int(value) & 0b001: rendezvous_methods += ["SoftAP"]
-            if int(value) & 0b010: rendezvous_methods += ["BLE"]
-            if int(value) & 0b100: rendezvous_methods += ["OnNetwork"]
+            if int(value) & 0b001:
+                rendezvous_methods += ["SoftAP"]
+            if int(value) & 0b010:
+                rendezvous_methods += ["BLE"]
+            if int(value) & 0b100:
+                rendezvous_methods += ["OnNetwork"]
             return ', '.join(rendezvous_methods)
 
         return None
@@ -95,3 +110,6 @@ class SetupPayload:
         setter.Set("pychip_SetupPayload_ParseManualPairingCode",
                    c_int32,
                    [c_char_p, SetupPayload.AttributeVisitor, SetupPayload.VendorAttributeVisitor])
+        setter.Set("pychip_SetupPayload_PrintOnboardingCodes",
+                   c_int32,
+                   [c_uint32, c_uint16, c_uint16, c_uint16, uint8_t, uint8_t, uint8_t])

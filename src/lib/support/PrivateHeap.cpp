@@ -20,8 +20,8 @@
 
 #include <string.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace {
 
@@ -313,9 +313,8 @@ extern "C" void PrivateHeapDump(void * top)
     ChipLogProgress(Support, "========= HEAP ===========");
     while (header->nextBytes != kInvalidHeapBlockSize)
     {
-        intptr_t offset = reinterpret_cast<char *>(header) - reinterpret_cast<char *>(top);
-        ChipLogProgress(Support, "    %ld: size: %d, state: %d", static_cast<long>(offset), static_cast<int>(header->nextBytes),
-                        static_cast<int>(header->state));
+        ChipLogProgress(Support, "    %td: size: %d, state: %d", reinterpret_cast<char *>(header) - reinterpret_cast<char *>(top),
+                        static_cast<int>(header->nextBytes), static_cast<int>(header->state));
 
         header = NextHeader(header);
     }

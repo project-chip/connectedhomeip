@@ -1,0 +1,171 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 10.1.1. [TC-DM-1.1] Basic Cluster Server Attributes
+
+config:
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Query Interaction Model Version"
+      command: "readAttribute"
+      attribute: "InteractionModelVersion"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "Query Vendor Name"
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          constraints:
+              type: string
+              maxLength: 32
+
+    - label: "Query VendorID"
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "Query Product Name"
+      command: "readAttribute"
+      attribute: "ProductName"
+      response:
+          constraints:
+              type: string
+              maxLength: 32
+
+    - label: "Query ProductID"
+      command: "readAttribute"
+      attribute: "ProductID"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "Query User Label"
+      command: "readAttribute"
+      attribute: "UserLabel"
+      response:
+          constraints:
+              type: string
+              maxLength: 32
+
+    - label: "Query User Location"
+      command: "readAttribute"
+      attribute: "Location"
+      response:
+          constraints:
+              type: string
+              maxLength: 2
+              format: "ISO 3166-1 alpha-2" # Step 6 11.2.3.1-6 Verify it follows ISO 3166-1 alpha-2 code / or it is empty, since it is user-defined
+
+    - label: "Query HardwareVersion"
+      command: "readAttribute"
+      attribute: "HardwareVersion"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "Query HardwareVersionString"
+      command: "readAttribute"
+      attribute: "HardwareVersionString"
+      response:
+          constraints:
+              type: string
+              minLength: 1
+              maxLength: 64
+
+    - label: "Query SoftwareVersion"
+      command: "readAttribute"
+      attribute: "SoftwareVersion"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "Query SoftwareVersionString"
+      command: "readAttribute"
+      attribute: "SoftwareVersionString"
+      response:
+          constraints:
+              type: string
+              minLength: 1
+              maxLength: 64
+              format: "ASCII" # Step 10 11.2.3.1-10 Verify it uses 7-bit ASCII alphanumeric and punctuation characters
+
+    - label: "Query ManufacturingDate"
+      command: "readAttribute"
+      attribute: "ManufacturingDate"
+      optional: true
+      response:
+          constraints:
+              type: string
+              minLength: 8
+              maxLength: 16
+              format: "ISO 8601" # Step 11  11.2.3.1-11 Verify if the first 8 characters specify date according to ISO 8601, i.e, YYYYMMDD
+
+    - label: "Query PartNumber"
+      command: "readAttribute"
+      attribute: "PartNumber"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 32
+
+    - label: "Query ProductURL"
+      command: "readAttribute"
+      attribute: "ProductURL"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 256
+              format: "RFC3986" # Step 13 11.2.3.1-13 Verify that it follows the syntax rules specified in RFC 3986
+
+    - label: "Query ProductLabel"
+      command: "readAttribute"
+      attribute: "ProductLabel"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 64
+
+    - label: "Query SerialNumber"
+      command: "readAttribute"
+      attribute: "SerialNumber"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 32
+
+    - label: "Query LocalConfigDisabled"
+      command: "readAttribute"
+      attribute: "LocalConfigDisabled"
+      optional: true
+      response:
+          constraints:
+              type: boolean
+
+    - label: "Query Reachable"
+      command: "readAttribute"
+      attribute: "Reachable"
+      optional: true
+      response:
+          constraints:
+              type: boolean

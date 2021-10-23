@@ -24,6 +24,7 @@ import pandas as pd  # type: ignore
 
 class DF(pd.DataFrame):  # pylint: disable=too-many-ancestors
     """DataFrame builder with default columns and types."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for c in self.required:

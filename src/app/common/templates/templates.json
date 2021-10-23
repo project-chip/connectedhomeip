@@ -4,6 +4,7 @@
     "helpers": [
         "../../zap-templates/partials/helper.js",
         "../../zap-templates/common/StringHelper.js",
+        "../../zap-templates/common/attributes/Accessors.js",
         "../../zap-templates/templates/app/helper.js",
         "../../zap-templates/templates/chip/helper.js"
     ],
@@ -18,52 +19,92 @@
         {
             "path": "../../zap-templates/templates/app/af-structs.zapt",
             "name": "ZCL af-structs header",
-            "output": "src/app/common/gen/af-structs.h"
+            "output": "af-structs.h"
         },
         {
             "path": "../../zap-templates/templates/app/att-storage.zapt",
             "name": "ZCL att-storage header",
-            "output": "src/app/common/gen/att-storage.h"
+            "output": "att-storage.h"
         },
         {
             "path": "../../zap-templates/templates/app/attribute-id.zapt",
             "name": "ZCL attribute-id header",
-            "output": "src/app/common/gen/attribute-id.h"
+            "output": "attribute-id.h"
         },
         {
             "path": "../../zap-templates/templates/app/attribute-size.zapt",
             "name": "ZCL attribute-size header",
-            "output": "src/app/common/gen/attribute-size.h"
+            "output": "attribute-size.h"
         },
         {
             "path": "../../zap-templates/templates/app/attribute-type.zapt",
             "name": "ZCL attribute-type header",
-            "output": "src/app/common/gen/attribute-type.h"
+            "output": "attribute-type.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/callback.zapt",
+            "name": "ZCL callback header",
+            "output": "callback.h"
         },
         {
             "path": "../../zap-templates/templates/app/cluster-id.zapt",
             "name": "ZCL cluster-id header",
-            "output": "src/app/common/gen/cluster-id.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/client-command-macro.zapt",
-            "name": "ZCL client command",
-            "output": "src/app/common/gen/client-command-macro.h"
+            "output": "cluster-id.h"
         },
         {
             "path": "../../zap-templates/templates/app/command-id.zapt",
             "name": "ZCL command-id header",
-            "output": "src/app/common/gen/command-id.h"
+            "output": "command-id.h"
         },
         {
             "path": "../../zap-templates/templates/app/enums.zapt",
             "name": "ZCL enums header",
-            "output": "src/app/common/gen/enums.h"
+            "output": "enums.h"
         },
         {
             "path": "../../zap-templates/templates/app/print-cluster.zapt",
             "name": "ZCL print-cluster header",
-            "output": "src/app/common/gen/print-cluster.h"
+            "output": "print-cluster.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/callbacks/PluginCallbacks.zapt",
+            "name": "Matter Callbacks header",
+            "output": "callbacks/PluginCallbacks.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/attributes/Accessors.zapt",
+            "name": "Attributes Accessors header",
+            "output": "attributes/Accessors.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/attributes/Accessors-src.zapt",
+            "name": "Attributes Accessors",
+            "output": "attributes/Accessors.cpp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Attributes.zapt",
+            "name": "Attributes Ids header",
+            "output": "ids/Attributes.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Clusters.zapt",
+            "name": "Clusters Ids header",
+            "output": "ids/Clusters.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Commands.zapt",
+            "name": "Commands Ids header",
+            "output": "ids/Commands.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-objects.zapt",
+            "name": "Cluster objects header for Interaction Model",
+            "output": "cluster-objects.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-objects-src.zapt",
+            "name": "Cluster objects header for Interaction Model",
+            "output": "cluster-objects.cpp"
         }
     ]
 }

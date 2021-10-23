@@ -25,11 +25,13 @@
 
 #include "Builder.h"
 #include "Parser.h"
+
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -183,7 +185,7 @@ public:
     EventPath::Builder & EndOfEventPath();
 
 private:
-    CHIP_ERROR _Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag);
+    CHIP_ERROR _Init(TLV::TLVWriter * const apWriter, const TLV::Tag aTag);
 };
 }; // namespace EventPath
 }; // namespace app

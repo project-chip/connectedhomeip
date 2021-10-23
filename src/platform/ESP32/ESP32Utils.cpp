@@ -24,10 +24,10 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ESP32Utils.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
 
 #include "esp_event.h"
 #include "esp_netif.h"
@@ -39,14 +39,13 @@ using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 
 CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
-    CHIP_ERROR err;
     wifi_mode_t curWiFiMode;
 
-    err = esp_wifi_get_mode(&curWiFiMode);
+    esp_err_t err = esp_wifi_get_mode(&curWiFiMode);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", chip::ErrorStr(err));
-        return err;
+        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", esp_err_to_name(err));
+        return ESP32Utils::MapError(err);
     }
 
     apEnabled = (curWiFiMode == WIFI_MODE_AP || curWiFiMode == WIFI_MODE_APSTA);
@@ -69,14 +68,13 @@ CHIP_ERROR ESP32Utils::IsStationConnected(bool & connected)
 
 CHIP_ERROR ESP32Utils::StartWiFiLayer(void)
 {
-    CHIP_ERROR err;
     int8_t ignored;
     bool wifiStarted;
 
     // There appears to be no direct way to ask the ESP WiFi layer if esp_wifi_start()
     // has been called.  So use the ESP_ERR_WIFI_NOT_STARTED error returned by
     // esp_wifi_get_max_tx_power() to detect this.
-    err = esp_wifi_get_max_tx_power(&ignored);
+    esp_err_t err = esp_wifi_get_max_tx_power(&ignored);
     switch (err)
     {
     case ESP_OK:
@@ -84,10 +82,9 @@ CHIP_ERROR ESP32Utils::StartWiFiLayer(void)
         break;
     case ESP_ERR_WIFI_NOT_STARTED:
         wifiStarted = false;
-        err         = ESP_OK;
         break;
     default:
-        ExitNow();
+        return ESP32Utils::MapError(err);
     }
 
     if (!wifiStarted)
@@ -97,26 +94,25 @@ CHIP_ERROR ESP32Utils::StartWiFiLayer(void)
         err = esp_wifi_start();
         if (err != ESP_OK)
         {
-            ChipLogError(DeviceLayer, "esp_wifi_start() failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_wifi_start() failed: %s", esp_err_to_name(err));
+            return ESP32Utils::MapError(err);
         }
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Utils::EnableStationMode(void)
 {
-    CHIP_ERROR err;
     wifi_mode_t curWiFiMode;
 
     // Get the current ESP WiFI mode.
-    err = esp_wifi_get_mode(&curWiFiMode);
+    esp_err_t err = esp_wifi_get_mode(&curWiFiMode);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", esp_err_to_name(err));
+        return ESP32Utils::MapError(err);
     }
-    SuccessOrExit(err);
 
     // If station mode is not already enabled (implying the current mode is WIFI_MODE_AP), change
     // the mode to WIFI_MODE_APSTA.
@@ -128,29 +124,27 @@ CHIP_ERROR ESP32Utils::EnableStationMode(void)
         err = esp_wifi_set_mode(WIFI_MODE_APSTA);
         if (err != ESP_OK)
         {
-            ChipLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", esp_err_to_name(err));
+            return ESP32Utils::MapError(err);
         }
-        SuccessOrExit(err);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Utils::SetAPMode(bool enabled)
 {
-    CHIP_ERROR err;
     wifi_mode_t curWiFiMode, targetWiFiMode;
 
     targetWiFiMode = (enabled) ? WIFI_MODE_APSTA : WIFI_MODE_STA;
 
     // Get the current ESP WiFI mode.
-    err = esp_wifi_get_mode(&curWiFiMode);
+    esp_err_t err = esp_wifi_get_mode(&curWiFiMode);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", esp_err_to_name(err));
+        return ESP32Utils::MapError(err);
     }
-    SuccessOrExit(err);
 
     // If station mode is not already enabled (implying the current mode is WIFI_MODE_AP), change
     // the mode to WIFI_MODE_APSTA.
@@ -161,13 +155,12 @@ CHIP_ERROR ESP32Utils::SetAPMode(bool enabled)
         err = esp_wifi_set_mode(targetWiFiMode);
         if (err != ESP_OK)
         {
-            ChipLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", esp_err_to_name(err));
+            return ESP32Utils::MapError(err);
         }
-        SuccessOrExit(err);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 int ESP32Utils::OrderScanResultsByRSSI(const void * _res1, const void * _res2)
@@ -231,13 +224,15 @@ bool ESP32Utils::HasIPv6LinkLocalAddress(const char * ifKey)
 
 CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t stationConfig;
 
-    err = esp_wifi_get_config(WIFI_IF_STA, &stationConfig);
-    SuccessOrExit(err);
+    esp_err_t err = esp_wifi_get_config(WIFI_IF_STA, &stationConfig);
+    if (err != ESP_OK)
+    {
+        return ESP32Utils::MapError(err);
+    }
 
-    VerifyOrExit(stationConfig.sta.ssid[0] != 0, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(stationConfig.sta.ssid[0] != 0, CHIP_ERROR_INCORRECT_STATE);
 
     netInfo.NetworkId              = kWiFiStationNetworkId;
     netInfo.FieldPresent.NetworkId = true;
@@ -254,13 +249,11 @@ CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & net
         memcpy(netInfo.WiFiKey, stationConfig.sta.password, netInfo.WiFiKeyLen);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t wifiConfig;
 
     char wifiSSID[kMaxWiFiSSIDLength + 1];
@@ -268,8 +261,7 @@ CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo
 
     // Ensure that ESP station mode is enabled.  This is required before esp_wifi_set_config(ESP_IF_WIFI_STA,...)
     // can be called.
-    err = ESP32Utils::EnableStationMode();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(ESP32Utils::EnableStationMode());
 
     // Enforce that wifiSSID is null terminated before copying it
     memcpy(wifiSSID, netInfo.WiFiSSID, min(netInfoSSIDLen + 1, sizeof(wifiSSID)));
@@ -290,27 +282,74 @@ CHIP_ERROR ESP32Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo
     wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
 
     // Configure the ESP WiFi interface.
-    err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+    esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", esp_err_to_name(err));
+        return ESP32Utils::MapError(err);
     }
-    SuccessOrExit(err);
 
     ChipLogProgress(DeviceLayer, "WiFi station provision set (SSID: %s)", netInfo.WiFiSSID);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t stationConfig;
 
     // Clear the ESP WiFi station configuration.
     memset(&stationConfig, 0, sizeof(stationConfig));
     esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
 
-    return err;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
+{
+    if (error == ESP_OK)
+    {
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR(ChipError::Range::kPlatform, error);
+}
+
+/**
+ * Given a CHIP error value that represents an ESP32 error, returns a
+ * human-readable NULL-terminated C string describing the error.
+ *
+ * @param[in] buf                   Buffer into which the error string will be placed.
+ * @param[in] bufSize               Size of the supplied buffer in bytes.
+ * @param[in] err                   The error to be described.
+ *
+ * @return true                     If a description string was written into the supplied buffer.
+ * @return false                    If the supplied error was not an ESP32 error.
+ *
+ */
+bool ESP32Utils::FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err)
+{
+    if (!err.IsRange(ChipError::Range::kPlatform))
+    {
+        return false;
+    }
+
+#if CHIP_CONFIG_SHORT_ERROR_STR
+    const char * desc = NULL;
+#else  // CHIP_CONFIG_SHORT_ERROR_STR
+    const char * desc = esp_err_to_name((esp_err_t) err.GetValue());
+#endif // CHIP_CONFIG_SHORT_ERROR_STR
+
+    chip::FormatError(buf, bufSize, "ESP32", err, desc);
+
+    return true;
+}
+
+/**
+ * Register a text error formatter for ESP32 errors.
+ */
+void ESP32Utils::RegisterESP32ErrorFormatter()
+{
+    static ErrorFormatter sErrorFormatter = { ESP32Utils::FormatError, NULL };
+
+    RegisterErrorFormatter(&sErrorFormatter);
 }

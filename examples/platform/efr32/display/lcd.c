@@ -21,10 +21,10 @@
 
 #include "lcd.h"
 
-#include "display.h"
 #include "dmd.h"
 #include "glib.h"
 #include "qrcodegen.h"
+#include "sl_board_control.h"
 
 #define LCD_SIZE 128
 #define QR_CODE_VERSION 4
@@ -40,6 +40,13 @@ static void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
 void initLCD(void)
 {
     EMSTATUS status;
+
+    /* Enable the memory lcd */
+    status = sl_board_enable_display();
+    if (status == SL_STATUS_OK)
+    {
+        EFR32_LOG("Board Display enable fail %d", status);
+    }
 
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);

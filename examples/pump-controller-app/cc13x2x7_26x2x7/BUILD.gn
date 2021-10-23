@@ -90,7 +90,7 @@ ti_simplelink_executable("pump_controller_app") {
     ":sysconfig",
     "${chip_root}/examples/pump-controller-app/pump-controller-common",
     "${chip_root}/src/lib",
-    "${openthread_root}:libopenthread-cli-ftd",
+    "${openthread_root}:libopenthread-ftd",
   ]
 
   include_dirs = [

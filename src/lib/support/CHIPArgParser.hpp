@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
@@ -126,7 +126,6 @@ bool ParseInt(const char * str, uint64_t & output);
 bool ParseInt(const char * str, int32_t & output, int base);
 bool ParseInt(const char * str, uint32_t & output, int base);
 bool ParseInt(const char * str, uint64_t & output, int base);
-bool ParseNodeId(const char * str, uint64_t & nodeId);
 bool ParseFabricId(const char * str, uint64_t & fabricId, bool allowReserved = false);
 bool ParseSubnetId(const char * str, uint16_t & subnetId);
 bool ParseHexString(const char * hexStr, uint32_t strLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen);

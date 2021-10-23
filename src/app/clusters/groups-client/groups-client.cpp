@@ -45,19 +45,19 @@
 // * Copyright 2010 by Ember Corporation. All rights reserved.              *80*
 // *******************************************************************
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 using namespace chip;
 
-bool emberAfGroupsClusterAddGroupResponseCallback(chip::app::Command * commandObj, uint8_t status, GroupId groupId)
+bool emberAfGroupsClusterAddGroupResponseCallback(app::CommandHandler * commandObj, uint8_t status, GroupId groupId)
 {
     emberAfGroupsClusterPrintln("RX: AddGroupResponse 0x%x, 0x%2x", status, groupId);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::Command * commandObj, uint8_t status, GroupId groupId,
+bool emberAfGroupsClusterViewGroupResponseCallback(app::CommandHandler * commandObj, uint8_t status, GroupId groupId,
                                                    uint8_t * groupName)
 {
     emberAfGroupsClusterPrint("RX: ViewGroupResponse 0x%x, 0x%2x, \"", status, groupId);
@@ -67,7 +67,7 @@ bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::Command * commandO
     return true;
 }
 
-bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::app::Command * commandObj, uint8_t capacity, uint8_t groupCount,
+bool emberAfGroupsClusterGetGroupMembershipResponseCallback(app::CommandHandler * commandObj, uint8_t capacity, uint8_t groupCount,
                                                             uint8_t * groupList)
 {
     uint8_t i;
@@ -81,7 +81,7 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::app::Command *
     return true;
 }
 
-bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::app::Command * commandObj, uint8_t status, GroupId groupId)
+bool emberAfGroupsClusterRemoveGroupResponseCallback(app::CommandHandler * commandObj, uint8_t status, GroupId groupId)
 {
     emberAfGroupsClusterPrintln("RX: RemoveGroupResponse 0x%x, 0x%2x", status, groupId);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

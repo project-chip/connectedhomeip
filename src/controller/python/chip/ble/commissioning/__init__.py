@@ -22,16 +22,19 @@ from enum import Enum
 
 TEST_NODE_ID = 11223344
 
+
 class PairNotificationType(Enum):
-  NETWORK_CREDENTIALS = 0
-  OPERATIONAL_CREDENTIALS = 1
-  COMPLETE = 2
+    NETWORK_CREDENTIALS = 0
+    OPERATIONAL_CREDENTIALS = 1
+    COMPLETE = 2
+
 
 @dataclass
 class _PairNotification:
     type: PairNotificationType
     csr: Optional[bytes]
     error_code: Optional[int]
+
 
 class Connection:
     def __init__(self, controller):
@@ -45,18 +48,16 @@ class Connection:
     def ConnectToWifi(self, ssid: str, password: str):
         if not self.needsNetworkCredentials:
             raise Exception("Not requiring network credentials yet.")
-        
+
         self._controller.PairSendWifiCredentials(ssid, password)
         self._WaitForPairProgress()
 
     def ConnectToThread(self, blob: bytes):
         if not self.needsNetworkCredentials:
             raise Exception("Not requiring network credentials yet.")
-        
+
         self._controller.PairSendThreadCredentials(blob)
         self._WaitForPairProgress()
-        
-        
 
     def _Pair(self, discriminator: int, pin: int, deprecated_nodeid: int):
         """Sets up controller callbakcs and initiates BLE pairing."""
@@ -67,15 +68,17 @@ class Connection:
 
         self._controller.BlePair(deprecated_nodeid, pin, discriminator)
 
-    
     def _OnNetworkCredentialsRequested(self):
-        self._pair_queue.put(_PairNotification(PairNotificationType.NETWORK_CREDENTIALS, None, None))
+        self._pair_queue.put(_PairNotification(
+            PairNotificationType.NETWORK_CREDENTIALS, None, None))
 
     def _OnOperationalCredentialsRequested(self, csr):
-        self._pair_queue.put(_PairNotification(PairNotificationType.OPERATIONAL_CREDENTIALS, csr, None))
+        self._pair_queue.put(_PairNotification(
+            PairNotificationType.OPERATIONAL_CREDENTIALS, csr, None))
 
     def _OnPairingComplete(self, err):
-        self._pair_queue.put(_PairNotification(PairNotificationType.COMPLETE, None, err))
+        self._pair_queue.put(_PairNotification(
+            PairNotificationType.COMPLETE, None, err))
 
     def _WaitForPairProgress(self):
         """Waits for some pairing callback progress.
@@ -94,8 +97,9 @@ class Connection:
         self.paired = step.type == PairNotificationType.COMPLETE
 
         if step.type == PairNotificationType.COMPLETE:
-          if step.error_code != 0:
-              raise Exception('Pairing ended with error code %d' % step.error_code)
+            if step.error_code != 0:
+                raise Exception('Pairing ended with error code %d' %
+                                step.error_code)
 
 
 def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = None) -> Connection:
@@ -117,7 +121,7 @@ def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optio
     controller = GetCommissioner()
 
     if controller.pairing_state != PairingState.INITIALIZED:
-       raise Exception("Controller is not ready to start a new pairing")
+        raise Exception("Controller is not ready to start a new pairing")
 
     connection = Connection(controller)
     connection._Pair(discriminator, pin, deprecated_nodeid)
@@ -142,9 +146,8 @@ def Connect(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = Non
     """
     connection = _StartAsyncConnection(discriminator, pin, deprecated_nodeid)
     connection._WaitForPairProgress()
-    
-    return connection
 
+    return connection
 
 
 __all__ = [

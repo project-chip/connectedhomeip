@@ -23,8 +23,8 @@
  */
 #include <transport/raw/UDP.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
@@ -49,6 +49,8 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
     err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
 
+    ChipLogDetail(Inet, "UDP::Init bind&listen port=%d", params.GetListenPort());
+
     err = mUDPEndPoint->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
     SuccessOrExit(err);
 
@@ -58,6 +60,8 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
     mUDPEndpointType = params.GetAddressType();
 
     mState = State::kInitialized;
+
+    ChipLogDetail(Inet, "UDP::Init bound to port=%d", mUDPEndPoint->GetBoundPort());
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -71,6 +75,12 @@ exit:
     }
 
     return err;
+}
+
+uint16_t UDP::GetBoundPort()
+{
+    VerifyOrDie(mUDPEndPoint != nullptr);
+    return mUDPEndPoint->GetBoundPort();
 }
 
 void UDP::Close()

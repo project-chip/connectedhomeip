@@ -39,7 +39,8 @@
 
 #include "SetupPayload.h"
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 
 #include <string>
 
@@ -48,12 +49,26 @@ namespace chip {
 class ManualSetupPayloadGenerator
 {
 private:
-    SetupPayload mSetupPayload;
+    PayloadContents mPayloadContents;
 
 public:
-    ManualSetupPayloadGenerator(const SetupPayload & payload) : mSetupPayload(payload) {}
+    ManualSetupPayloadGenerator(const PayloadContents & payload) : mPayloadContents(payload) {}
 
-    // Populates decimal string representation of the payload into outDecimalString
+    /**
+     * This function is called to encode the binary data of a payload to a
+     * decimal null-terminated string.
+     *
+     * @param[out] outBuffer
+     *                  Output buffer to write the decimal string.
+     *
+     * @retval #CHIP_NO_ERROR if the method succeeded.
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT if the payload is invalid.
+     * @retval #CHIP_ERROR_BUFFER_TOO_SMALL if outBuffer has insufficient size.
+     */
+    CHIP_ERROR payloadDecimalStringRepresentation(MutableCharSpan & outBuffer);
+
+    // Populates decimal string representation of the payload into outDecimalString.
+    // Wrapper for using std::string.
     CHIP_ERROR payloadDecimalStringRepresentation(std::string & outDecimalString);
 };
 

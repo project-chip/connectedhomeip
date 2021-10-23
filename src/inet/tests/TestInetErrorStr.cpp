@@ -37,9 +37,9 @@
 #include <string.h>
 
 #include <inet/InetError.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -48,31 +48,19 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static int32_t sContext[] =
+static const CHIP_ERROR kTestElements[] =
 {
     INET_ERROR_WRONG_ADDRESS_TYPE,
-    INET_ERROR_CONNECTION_ABORTED,
     INET_ERROR_PEER_DISCONNECTED,
-    INET_ERROR_INCORRECT_STATE,
-    INET_ERROR_MESSAGE_TOO_LONG,
-    INET_ERROR_NO_CONNECTION_HANDLER,
-    INET_ERROR_NO_MEMORY,
-    INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED,
-    INET_ERROR_INBOUND_MESSAGE_TOO_BIG,
     INET_ERROR_HOST_NOT_FOUND,
     INET_ERROR_DNS_TRY_AGAIN,
     INET_ERROR_DNS_NO_RECOVERY,
-    INET_ERROR_BAD_ARGS,
     INET_ERROR_WRONG_PROTOCOL_TYPE,
     INET_ERROR_UNKNOWN_INTERFACE,
-    INET_ERROR_NOT_IMPLEMENTED,
     INET_ERROR_ADDRESS_NOT_FOUND,
     INET_ERROR_HOST_NAME_TOO_LONG,
     INET_ERROR_INVALID_HOST_NAME,
-    INET_ERROR_NOT_SUPPORTED,
-    INET_ERROR_NO_ENDPOINTS,
     INET_ERROR_IDLE_TIMEOUT,
-    INET_ERROR_UNEXPECTED_EVENT,
     INET_ERROR_INVALID_IPV6_PKT,
     INET_ERROR_INTERFACE_INIT_FAILURE,
     INET_ERROR_TCP_USER_TIMEOUT,
@@ -84,17 +72,16 @@ static int32_t sContext[] =
 static void CheckInetErrorStr(nlTestSuite * inSuite, void * inContext)
 {
     // Register the layer error formatter
-
     Inet::RegisterLayerErrorFormatter();
 
     // For each defined error...
-    for (int err : sContext)
+    for (const auto & err : kTestElements)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 
         // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err);
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err.AsInteger());
         NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
@@ -131,7 +118,7 @@ int TestInetErrorStr(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
+    nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));
 }

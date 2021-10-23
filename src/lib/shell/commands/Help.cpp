@@ -27,10 +27,10 @@
 namespace chip {
 namespace Shell {
 
-int PrintCommandHelp(shell_command_t * command, void * arg)
+CHIP_ERROR PrintCommandHelp(shell_command_t * command, void * arg)
 {
     streamer_printf(streamer_get(), "  %-15s %s\r\n", command->cmd_name, command->cmd_help);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Shell

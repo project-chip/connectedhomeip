@@ -4,54 +4,51 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+
 #include <controller/CHIPCluster.h>
-#include <core/CHIPCallback.h>
+#include <lib/core/CHIPCallback.h>
 #include <lib/support/Span.h>
 
 namespace chip {
 namespace Controller {
 
 {{#chip_client_clusters}}
-constexpr ClusterId k{{asCamelCased name false}}ClusterId = {{asHex code 4}};
-{{/chip_client_clusters}}
-
-{{#chip_client_clusters}}
-class DLL_EXPORT {{asCamelCased name false}}Cluster : public ClusterBase
+class DLL_EXPORT {{asUpperCamelCase name}}Cluster : public ClusterBase
 {
 public:
-    {{asCamelCased name false}}Cluster() : ClusterBase(k{{asCamelCased name false}}ClusterId) {}
-    ~{{asCamelCased name false}}Cluster() {}
-    {{#chip_server_cluster_commands}}
+    {{asUpperCamelCase name}}Cluster() : ClusterBase(app::Clusters::{{asUpperCamelCase name}}::Id) {}
+    ~{{asUpperCamelCase name}}Cluster() {}
+    {{#chip_cluster_commands}}
     {{#first}}
 
     // Cluster Commands
     {{/first}}
-    CHIP_ERROR {{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
-    {{/chip_server_cluster_commands}}
+    CHIP_ERROR {{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+    {{/chip_cluster_commands}}
 
     // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     {{#chip_server_cluster_attributes}}
-    CHIP_ERROR ReadAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
-    {{#if (isWritableAttribute)}}
-    CHIP_ERROR WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value);
+    {{#if isWritableAttribute}}
+    CHIP_ERROR WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value);
     {{/if}}
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
-    {{#if (isReportableAttribute)}}
-    CHIP_ERROR ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}});
-    CHIP_ERROR ReportAttribute{{asCamelCased name false}}(Callback::Cancelable * onReportCallback);
+    {{#if isReportableAttribute}}
+    CHIP_ERROR SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onReportCallback);
     {{/if}}
     {{/chip_server_cluster_attributes}}
-    {{#chip_server_cluster_commands}}
+    {{#chip_cluster_commands}}
     {{#first}}
 
 private:
     {{/first}}
-    static constexpr CommandId k{{asCamelCased name false}}CommandId = {{asHex code 2}};
-    {{/chip_server_cluster_commands}}
+    {{/chip_cluster_commands}}
 };
 
 {{/chip_client_clusters}}

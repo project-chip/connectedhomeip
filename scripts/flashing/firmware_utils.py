@@ -448,8 +448,8 @@ class Flasher:
             with open(args.output, 'w') as script_file:
                 script_file.write(script)
             os.chmod(args.output, (stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR
-                                 | stat.S_IXGRP | stat.S_IRGRP
-                                 | stat.S_IXOTH | stat.S_IROTH))
+                                   | stat.S_IXGRP | stat.S_IRGRP
+                                   | stat.S_IXOTH | stat.S_IROTH))
         except OSError as exception:
             print(exception, sys.stderr)
             return 1

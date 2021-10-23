@@ -25,88 +25,29 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <support/TimeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/TimeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <esp_timer.h>
 
 namespace chip {
 namespace System {
-namespace Platform {
-namespace Layer {
+namespace Clock {
 
-uint64_t GetClock_Monotonic(void)
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
+
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return (uint64_t)::esp_timer_get_time();
+    return Clock::Microseconds64(::esp_timer_get_time());
 }
 
-uint64_t GetClock_MonotonicMS(void)
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return (uint64_t)::esp_timer_get_time() / 1000;
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
-uint64_t GetClock_MonotonicHiRes(void)
-{
-    return (uint64_t)::esp_timer_get_time();
-}
-
-Error GetClock_RealTime(uint64_t & curTime)
-{
-    struct timeval tv;
-    int res = gettimeofday(&tv, NULL);
-    if (res != 0)
-    {
-        return MapErrorPOSIX(errno);
-    }
-    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
-    {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    curTime = (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
-    return CHIP_SYSTEM_NO_ERROR;
-}
-
-Error GetClock_RealTimeMS(uint64_t & curTime)
-{
-    struct timeval tv;
-    int res = gettimeofday(&tv, NULL);
-    if (res != 0)
-    {
-        return MapErrorPOSIX(errno);
-    }
-    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
-    {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    curTime = (tv.tv_sec * UINT64_C(1000)) + (tv.tv_usec / 1000);
-    return CHIP_SYSTEM_NO_ERROR;
-}
-
-Error SetClock_RealTime(uint64_t newCurTime)
-{
-    struct timeval tv;
-    tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
-    tv.tv_usec = static_cast<long>(newCurTime % UINT64_C(1000000));
-    int res    = settimeofday(&tv, NULL);
-    if (res != 0)
-    {
-        return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
-    }
-#if CHIP_PROGRESS_LOGGING
-    {
-        uint16_t year;
-        uint8_t month, dayOfMonth, hour, minute, second;
-        SecondsSinceEpochToCalendarTime(tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
-        ChipLogProgress(DeviceLayer,
-                        "Real time clock set to %ld (%04" PRId16 "/%02" PRId8 "/%02" PRId8 " %02" PRId8 ":%02" PRId8 ":%02" PRId8
-                        " UTC)",
-                        tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
-    }
-#endif // CHIP_PROGRESS_LOGGING
-    return CHIP_SYSTEM_NO_ERROR;
-}
-
-} // namespace Layer
-} // namespace Platform
+} // namespace Clock
 } // namespace System
 } // namespace chip

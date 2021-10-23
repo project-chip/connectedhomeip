@@ -19,8 +19,7 @@
  * @file - This file contains point validity test vectors.
  */
 
-#ifndef _SPAKE2P_POINT_VALID_TEST_VECTORS_H_
-#define _SPAKE2P_POINT_VALID_TEST_VECTORS_H_
+#pragma once
 
 namespace chip {
 namespace Crypto {
@@ -491,5 +490,3 @@ static const struct spake2p_point_valid_tv * point_valid_tvs[] = {
 
 } // namespace Crypto
 } // namespace chip
-
-#endif

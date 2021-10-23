@@ -53,7 +53,7 @@
  *
  * An application or module that incorporates chip can define a project configuration
  * file to override standard chip configuration with application-specific values.
- * The chipProjectConfig.h file is typically located outside the Openchip source tree,
+ * The chipProjectConfig.h file is typically located outside the CHIP source tree,
  * alongside the source code for the application.
  */
 #ifdef CHIP_PROJECT_CONFIG_INCLUDE
@@ -64,8 +64,8 @@
  *
  * A platform configuration file contains overrides to standard chip configuration
  * that are specific to the platform or OS on which chip is running.  It is typically
- * provided as apart of an adaptation layer that adapts Openchip to the target
- * environment.  This adaptation layer may be included in the Openchip source tree
+ * provided as apart of an adaptation layer that adapts CHIP to the target
+ * environment.  This adaptation layer may be included in the CHIP source tree
  * itself or implemented externally.
  */
 #ifdef CHIP_PLATFORM_CONFIG_INCLUDE
@@ -73,63 +73,6 @@
 #endif
 
 // Profile-specific Configuration Headers
-/**
- *  @def CHIP_CONFIG_ERROR_TYPE
- *
- *  @brief
- *    This defines the data type used to represent errors for chip.
- *
- */
-#ifndef CHIP_CONFIG_ERROR_TYPE
-#include <stdint.h>
-
-#define CHIP_CONFIG_ERROR_TYPE int32_t
-#endif // CHIP_CONFIG_ERROR_TYPE
-
-/**
- *  @def CHIP_CONFIG_NO_ERROR
- *
- *  @brief
- *    This defines the chip error code for no error or success.
- *
- */
-#ifndef CHIP_CONFIG_NO_ERROR
-#define CHIP_CONFIG_NO_ERROR 0
-#endif // CHIP_CONFIG_NO_ERROR
-
-/**
- *  @def CHIP_CONFIG_ERROR_MIN
- *
- *  @brief
- *    This defines the base or minimum chip error number range.
- *
- */
-#ifndef CHIP_CONFIG_ERROR_MIN
-#define CHIP_CONFIG_ERROR_MIN 4000
-#endif // CHIP_CONFIG_ERROR_MIN
-
-/**
- *  @def CHIP_CONFIG_ERROR_MAX
- *
- *  @brief
- *    This defines the top or maximum chip error number range.
- *
- */
-#ifndef CHIP_CONFIG_ERROR_MAX
-#define CHIP_CONFIG_ERROR_MAX 4999
-#endif // CHIP_CONFIG_ERROR_MAX
-
-/**
- *  @def _CHIP_CONFIG_ERROR
- *
- *  @brief
- *    This defines a mapping function for chip errors that allows
- *    mapping such errors into a platform- or system-specific manner.
- *
- */
-#ifndef _CHIP_CONFIG_ERROR
-#define _CHIP_CONFIG_ERROR(e) (CHIP_ERROR_MIN + (e))
-#endif // _CHIP_CONFIG_ERROR
 
 /**
  *  @def CHIP_CONFIG_USE_OPENSSL_ECC
@@ -921,6 +864,28 @@
 #endif
 
 /**
+ *  @def CHIP_CONFIG_SHA256_CONTEXT_SIZE
+ *
+ *  @brief
+ *    Size of the statically allocated context for SHA256 operations in CryptoPAL
+ *
+ *    The default size is based on the Worst software implementation, OpenSSL. A
+ *    static assert will tell us if we are wrong, since `typedef SHA_LONG unsigned
+ *    int` is default.
+ *      SHA_LONG h[8];
+ *      SHA_LONG Nl, Nh;
+ *      SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
+ *      unsigned int num, md_len;
+ *
+ *    We also have to account for possibly some custom extensions on some targets,
+ *    especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
+ *
+ */
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t))
+#endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+
+/**
  *  @name chip key export protocol configuration.
  *
  *  @brief
@@ -1394,8 +1359,19 @@
  *
  */
 #ifndef CHIP_PORT
-#define CHIP_PORT 11097
+#define CHIP_PORT 5540
 #endif // CHIP_PORT
+
+/**
+ *  @def CHIP_UDC_PORT
+ *
+ *  @brief
+ *    chip TCP/UDP port for unsecured user-directed-commissioning traffic.
+ *
+ */
+#ifndef CHIP_UDC_PORT
+#define CHIP_UDC_PORT CHIP_PORT + 10
+#endif // CHIP_UDC_PORT
 
 /**
  *  @def CHIP_UNSECURED_PORT
@@ -1433,14 +1409,21 @@
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
 
 /**
- *  @def CHIP_CONFIG_ENABLE_DNS_RESOLVER
+ *  @def CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
  *
  *  @brief
- *    Enable support for resolving hostnames with a DNS resolver.
+ *    Shared secret to use for unit tests or when CHIP_CONFIG_SECURITY_TEST_MODE is enabled.
+ *
+ *    This parameter is 32 bytes to maximize entropy passed to the CryptoContext::InitWithSecret KDF,
+ *    and can be initialized either as a raw string or array of bytes. The default test secret of
+ *    "Test secret for key derivation." results in the following encryption keys:
+ *
+ *              5E DE D2 44 E5 53 2B 3C DC 23 40 9D BA D0 52 D2
+ *              A9 E0 11 B1 73 7C 6D 4B 70 E4 C0 A2 FE 66 04 76
  */
-#ifndef CHIP_CONFIG_ENABLE_DNS_RESOLVER
-#define CHIP_CONFIG_ENABLE_DNS_RESOLVER (INET_CONFIG_ENABLE_DNS_RESOLVER)
-#endif // CHIP_CONFIG_ENABLE_DNS_RESOLVER
+#ifndef CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
+#define CHIP_CONFIG_TEST_SHARED_SECRET_VALUE "Test secret for key derivation."
+#endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
 
 /**
  *  @def CHIP_CONFIG_RESOLVE_IPADDR_LITERAL
@@ -1507,17 +1490,6 @@
 #ifndef CHIP_CONFIG_DEBUG_CERT_VALIDATION
 #define CHIP_CONFIG_DEBUG_CERT_VALIDATION 1
 #endif // CHIP_CONFIG_DEBUG_CERT_VALIDATION
-
-/**
- *  @def CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
- *
- *  @brief
- *    EC curve to be used to generate chip operational device certificate.
- *
- */
-#ifndef CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
-#define CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime256v1)
-#endif // CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
 
 /**
  *  @def CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_BEFORE
@@ -1620,42 +1592,6 @@
 #ifndef CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER "GlobalMCTR"
 #endif // CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
- *
- *  @brief
- *    Default ECDH curve to be used when initiating a CASE session, if not overridden by the application.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
-#if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_secp224r1)
-#elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime256v1)
-#elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime192v1)
-#else
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_secp160r1)
-#endif
-#endif // CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
- *
- *  @brief
- *    Default set of ECDH curves allowed to be used in a CASE session (initiating or responding), if not overridden by the
- * application.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
-#if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1 || CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES                                                                                    \
-    (chip::Profiles::Security::kChipCurveSet_secp224r1 | chip::Profiles::Security::kChipCurveSet_prime256v1)
-#else
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES (chip::Profiles::Security::kChipCurveSet_All)
-#endif
-#endif // CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
 
 /**
  * @def CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE
@@ -1906,17 +1842,6 @@
 #endif
 
 /**
- *  @def CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of errors at function exit via the
- *    ChipLogFunctError() macro.
- */
-#ifndef CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-#define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 0
-#endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
-/**
  *  @def CHIP_CONFIG_ENABLE_CONDITION_LOGGING
  *
  *  @brief
@@ -1982,6 +1907,37 @@
 #ifndef CHIP_CONFIG_TEST
 #define CHIP_CONFIG_TEST 0
 #endif // CHIP_CONFIG_TEST
+
+/**
+ *  @def CHIP_CONFIG_ERROR_SOURCE
+ *
+ *  If asserted (1), then CHIP_ERROR constants will include the source location of their expansion.
+ */
+#ifndef CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_CONFIG_ERROR_SOURCE 0
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+/**
+ *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+ *
+ *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
+ *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ */
+#ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+/**
+ *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+ *
+ *  If 0, then ChipError::Format() returns an integer (ChipError::StorageType).
+ *  If 1, then ChipError::Format() returns a const char *, from chip::ErrorStr().
+ *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
+ */
+
+#ifndef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+#define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 0
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 
 /**
  *  @def CHIP_CONFIG_SHORT_ERROR_STR
@@ -2111,8 +2067,8 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE)                                                                         \
-    ((CODE) == chip::System::MapErrorPOSIX(EHOSTUNREACH) || (CODE) == chip::System::MapErrorPOSIX(ENETUNREACH) ||                  \
-     (CODE) == chip::System::MapErrorPOSIX(EADDRNOTAVAIL) || (CODE) == chip::System::MapErrorPOSIX(EPIPE))
+    ((CODE) == CHIP_ERROR_POSIX(EHOSTUNREACH) || (CODE) == CHIP_ERROR_POSIX(ENETUNREACH) ||                                        \
+     (CODE) == CHIP_ERROR_POSIX(EADDRNOTAVAIL) || (CODE) == CHIP_ERROR_POSIX(EPIPE))
 #else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -2325,6 +2281,18 @@
 #endif // CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
 
 /**
+ * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP unauthenticated
+ * states. The entries in the pool are automatically rotated by LRU. The size
+ * of the pool limits how many PASE and CASE pairing sessions can be processed
+ * simultaneously.
+ */
+#ifndef CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE 4
+#endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+
+/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP
@@ -2419,3 +2387,200 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_COMMISSIONING_HINT_INDEX_PRESS_RESET_SECONDS_WITH_POWER 10
 #define CHIP_COMMISSIONING_HINT_INDEX_PRESS_RESET_UNTIL_BLINK_WITH_POWER 11
 #endif
+
+/**
+ * @def CHIP_CONFIG_MDNS_CACHE_SIZE
+ *
+ * @brief
+ *      Define the size of the MDNS cache
+ *
+ *      If CHIP_CONFIG_MDNS_CACHE_SIZE is 0, the builtin cache is not used.
+ *
+ */
+#ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
+#define CHIP_CONFIG_MDNS_CACHE_SIZE 20
+#endif
+/**
+ *  @name Interaction Model object pool configuration.
+ *
+ *  @brief
+ *    The following definitions sets the maximum number of corresponding interaction model object pool size.
+ *
+ *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *      * #CHIP_IM_MAX_NUM_COMMAND_SENDER
+ *      * #CHIP_IM_MAX_NUM_READ_HANDLER
+ *      * #CHIP_IM_MAX_NUM_READ_CLIENT
+ *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
+ *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *
+ *  @{
+ */
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *
+ * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
+ */
+#ifndef CHIP_IM_MAX_NUM_COMMAND_HANDLER
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_SENDER
+ *
+ * @brief Defines the maximum number of CommandSender, limits the number of active command transactions on client.
+ */
+#ifndef CHIP_IM_MAX_NUM_COMMAND_SENDER
+#define CHIP_IM_MAX_NUM_COMMAND_SENDER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_READ_HANDLER
+ *
+ * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
+ */
+#ifndef CHIP_IM_MAX_NUM_READ_HANDLER
+#define CHIP_IM_MAX_NUM_READ_HANDLER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_READ_CLIENT
+ *
+ * @brief Defines the maximum number of ReadClient, limits the number of active read transactions on client.
+ */
+#ifndef CHIP_IM_MAX_NUM_READ_CLIENT
+#define CHIP_IM_MAX_NUM_READ_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_REPORTS_IN_FLIGHT
+ *
+ * @brief Defines the maximum number of Reports, limits the traffic of read and subscription transactions.
+ */
+#ifndef CHIP_IM_MAX_REPORTS_IN_FLIGHT
+#define CHIP_IM_MAX_REPORTS_IN_FLIGHT 4
+#endif
+
+/**
+ * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *
+ * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
+ */
+#ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *
+ * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
+ */
+#ifndef CHIP_IM_MAX_NUM_WRITE_HANDLER
+#define CHIP_IM_MAX_NUM_WRITE_HANDLER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *
+ * @brief Defines the maximum number of WriteClient, limits the number of active write transactions on client.
+ */
+#ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
+#define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+ *
+ * @brief Defines the object pool for allocating attribute path for subscription in device controller.
+ */
+#ifndef CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+#define CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE CHIP_IM_MAX_NUM_READ_CLIENT
+#endif
+
+/**
+ * @def CHIP_CONFIG_LAMBDA_EVENT_SIZE
+ *
+ * @brief The maximum size of the lambda which can be post into system event queue.
+ */
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (16)
+#endif
+
+/**
+ * @def CHIP_CONFIG_LAMBDA_EVENT_ALIGN
+ *
+ * @brief The maximum alignment of the lambda which can be post into system event queue.
+ */
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_ALIGN
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (sizeof(void *))
+#endif
+
+/**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *
+ * @brief If true, VerifyOrDie() calls with no message will use an
+ *        automatically generated message that makes it clear what failed.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
+ *
+ * @brief Number of devices a controller can be simultaneously connected to
+ */
+#ifndef CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
+#define CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES 64
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ *
+ * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
+ *
+ * Binds to number of GroupState entries to support per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 1
+#endif
+
+// TODO: Need to cap number of KeySets
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+ *
+ * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
+ *
+ * Binds to number of GroupMapping entries per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous Group iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 2
+#endif
+
+/**
+ * @def CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+ *
+ * @brief Enable or disable attribute read with complex type.
+ *
+ */
+#ifndef CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+#define CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ 1
+#endif
+
+/**
+ * @}
+ */

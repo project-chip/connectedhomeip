@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <app/common/gen/af-structs.h>
+#include <app/AttributeAccessInterface.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <string>
 #include <vector>
 
@@ -28,9 +28,5 @@ class MediaInputManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<EmberAfMediaInputInfo> proxyGetInputList();
-    bool proxySelectInputRequest(uint8_t input);
-    bool proxyShowInputStatusRequest();
-    bool proxyHideInputStatusRequest();
-    bool proxyRenameInputRequest(uint8_t input, std::string name);
+    CHIP_ERROR proxyGetInputList(chip::app::AttributeValueEncoder & aEncoder);
 };

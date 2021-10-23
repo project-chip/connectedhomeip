@@ -34,17 +34,8 @@ struct ChipDeviceEvent;
 } // namespace chip
 
 // ==================== Platform Adaptations ====================
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
-#define CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE int
-#define CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
-
-#define CHIP_SYSTEM_CONFIG_ERROR_TYPE uint32_t
-#define CHIP_SYSTEM_CONFIG_NO_ERROR (0)
-
-#define CHIP_SYSTEM_CONFIG_ERROR_MIN 0
-#define CHIP_SYSTEM_CONFIG_ERROR_MAX 999
-#define _CHIP_SYSTEM_CONFIG_ERROR(e) (CHIP_SYSTEM_CONFIG_ERROR_MIN + (e))
+#define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
 
 // ========== Platform-specific Configuration Overrides =========
 

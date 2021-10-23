@@ -41,13 +41,11 @@
  *
  */
 
-//#include <core/CHIPConfig.h>
-#include <support/CHIPMem.h>
+//#include <lib/core/CHIPConfig.h>
+#include <lib/support/CHIPMem.h>
 
-#include "FreeRTOS.h"
+#include "heap_4_silabs.h"
 #include "task.h"
-
-#include "sl_malloc.h"
 
 #include <atomic>
 #include <cstdio>
@@ -109,7 +107,7 @@ void * MemoryAlloc(size_t size)
 {
     void * ptr;
     VERIFY_INITIALIZED();
-    ptr = sl_malloc(size);
+    ptr = pvPortMalloc(size);
     trackAlloc(ptr, size);
     return ptr;
 }
@@ -118,16 +116,16 @@ void * MemoryAlloc(size_t size, bool isLongTermAlloc)
 {
     void * ptr;
     VERIFY_INITIALIZED();
-    ptr = sl_malloc(size);
+    ptr = pvPortMalloc(size);
     trackAlloc(ptr, size);
     return ptr;
 }
 
 void * MemoryCalloc(size_t num, size_t size)
 {
-    void * ptr;
     VERIFY_INITIALIZED();
-    ptr = sl_calloc(num, size);
+
+    void * ptr = pvPortCalloc(num, size);
     trackAlloc(ptr, size * num);
     return ptr;
 }
@@ -135,14 +133,16 @@ void * MemoryCalloc(size_t num, size_t size)
 void * MemoryRealloc(void * p, size_t size)
 {
     VERIFY_INITIALIZED();
-    return sl_realloc(p, size);
+
+    p = pvPortRealloc(p, size);
+    return p;
 }
 
 void MemoryFree(void * p)
 {
     VERIFY_INITIALIZED();
     trackFree(p, 0);
-    sl_free(p);
+    vPortFree(p);
 }
 
 bool MemoryInternalCheckPointer(const void * p, size_t min_size)
@@ -153,45 +153,7 @@ bool MemoryInternalCheckPointer(const void * p, size_t min_size)
 } // namespace Platform
 } // namespace chip
 
-extern "C" void * pvPortMalloc(size_t xWantedSize)
-{
-    void * pvReturn;
-
-    vTaskSuspendAll();
-    {
-        pvReturn = sl_malloc(xWantedSize);
-        trackAlloc(pvReturn, xWantedSize);
-    }
-    (void) xTaskResumeAll();
-
-#if (configUSE_MALLOC_FAILED_HOOK == 1)
-    {
-        if (pvReturn == NULL)
-        {
-            extern void vApplicationMallocFailedHook(void);
-            vApplicationMallocFailedHook();
-        }
-    }
-#endif
-
-    return pvReturn;
-}
-
-extern "C" void vPortFree(void * pv)
-{
-    if (pv)
-    {
-        vTaskSuspendAll();
-        {
-            trackFree(pv, 0);
-            sl_free(pv);
-        }
-        (void) xTaskResumeAll();
-    }
-}
-
 extern "C" __WEAK void memMonitoringTrackAlloc(void * ptr, size_t size) {}
-
 extern "C" __WEAK void memMonitoringTrackFree(void * ptr, size_t size) {}
 
 #endif // CHIP_CONFIG_MEMORY_MGMT_PLATFORM

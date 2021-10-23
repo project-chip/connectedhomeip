@@ -22,11 +22,14 @@
 #include "AppEvent.h"
 #include <app/server/Server.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include "FreeRTOS.h"
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 
@@ -42,6 +45,7 @@
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 static TaskHandle_t sAppTaskHandle;
@@ -79,7 +83,6 @@ int AppTask::StartAppTask()
 
 int AppTask::Init()
 {
-    int ret = CHIP_ERROR_MAX;
     LED_Params ledParams;
     Button_Params buttionParams;
     ConnectivityManager::ThreadPollingConfig pollingConfig;
@@ -89,7 +92,7 @@ int AppTask::Init()
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
-    ret = PlatformMgr().InitChipStack();
+    CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().InitChipStack() failed");
@@ -143,7 +146,10 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
-    InitServer();
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
@@ -329,13 +335,13 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             // Enable BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
-                if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+                if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
                 {
                     PLAT_LOG("Enabled BLE Advertisement");
                 }
                 else
                 {
-                    PLAT_LOG("OpenDefaultPairingWindow() failed");
+                    PLAT_LOG("OpenBasicCommissioningWindow() failed");
                 }
             }
         }

@@ -29,7 +29,7 @@
 
 #include <nlfaultinjection.hpp>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <system/SystemFaultInjection.h>
 

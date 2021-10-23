@@ -70,39 +70,44 @@ CHIPDeviceController * InitializeCHIP(void)
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
         storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        [controller startup:storage];
+        [controller startup:storage vendorId:0 nocSigner:nil];
     });
 
     return controller;
 }
 
-CHIPDevice * CHIPGetPairedDevice(void)
+BOOL CHIPGetConnectedDevice(CHIPDeviceConnectionCallback completionHandler)
 {
     CHIPDeviceController * controller = InitializeCHIP();
 
-    CHIPDevice * device = nil;
     uint64_t deviceId = CHIPGetNextAvailableDeviceID();
     if (deviceId > 1) {
         // Let's use the last device that was paired
         deviceId--;
-        NSError * error;
-        device = [controller getPairedDevice:deviceId error:&error];
+        return [controller getConnectedDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
     }
 
-    return device;
+    return NO;
 }
 
-CHIPDevice * CHIPGetPairedDeviceWithID(uint64_t deviceId)
+BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallback completionHandler)
+{
+    CHIPDeviceController * controller = InitializeCHIP();
+
+    return [controller getConnectedDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+}
+
+BOOL CHIPIsDevicePaired(uint64_t deviceId)
 {
     CHIPDeviceController * controller = InitializeCHIP();
 
     NSError * error;
-    CHIPDevice * device = [controller getPairedDevice:deviceId error:&error];
+    bool paired = [controller isDevicePaired:deviceId error:&error];
     if (error.code != CHIPSuccess) {
-        NSLog(@"Got back error retrieve device with deviceId %llu", deviceId);
-        return nil;
+        NSLog(@"Error retrieving device info for deviceId %llu", deviceId);
+        paired = NO;
     }
-    return device;
+    return paired;
 }
 
 void CHIPUnpairDeviceWithID(uint64_t deviceId)

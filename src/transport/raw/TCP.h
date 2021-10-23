@@ -28,12 +28,12 @@
 #include <new>
 #include <utility>
 
-#include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
 #include <inet/TCPEndPoint.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
@@ -74,10 +74,10 @@ public:
     }
 
 private:
-    Inet::InetLayer * mLayer         = nullptr;                   ///< Associated inet layer
-    Inet::IPAddressType mAddressType = Inet::kIPAddressType_IPv6; ///< type of listening socket
-    uint16_t mListenPort             = CHIP_PORT;                 ///< TCP listen port
-    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;     ///< Interface to listen on
+    Inet::InetLayer * mLayer         = nullptr;                    ///< Associated inet layer
+    Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
+    uint16_t mListenPort             = CHIP_PORT;                  ///< TCP listen port
+    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;      ///< Interface to listen on
 };
 
 /**
@@ -232,15 +232,15 @@ private:
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct
-    static INET_ERROR OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle && buffer);
+    static CHIP_ERROR OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle && buffer);
 
     // Callback handler for TCPEndPoint. Called when a connection has been completed.
     // @see TCPEndpoint::OnConnectCompleteFunct
-    static void OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR err);
+    static void OnConnectionComplete(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
 
     // Callback handler for TCPEndPoint. Called when a connection has been closed.
     // @see TCPEndpoint::OnConnectionClosedFunct
-    static void OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err);
+    static void OnConnectionClosed(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
 
     // Callback handler for TCPEndPoint. Callend when a peer closes the connection.
     // @see TCPEndpoint::OnPeerCloseFunct
@@ -253,11 +253,11 @@ private:
 
     // Called on accept error
     // @see TCPEndpoint::OnAcceptErrorFunct
-    static void OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err);
+    static void OnAcceptError(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
 
-    Inet::TCPEndPoint * mListenSocket = nullptr;                                     ///< TCP socket used by the transport
-    Inet::IPAddressType mEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type
-    State mState                      = State::kNotReady;                            ///< State of the TCP transport
+    Inet::TCPEndPoint * mListenSocket = nullptr;                       ///< TCP socket used by the transport
+    Inet::IPAddressType mEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
+    State mState                      = State::kNotReady;              ///< State of the TCP transport
 
     // Number of active and 'pending connection' endpoints
     size_t mUsedEndPointCount = 0;

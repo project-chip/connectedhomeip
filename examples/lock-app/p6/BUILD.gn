@@ -1,0 +1,100 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/p6.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${p6_sdk_build_root}/p6_executable.gni")
+import("${p6_sdk_build_root}/p6_sdk.gni")
+
+assert(current_os == "freertos")
+
+p6_project_dir = "${chip_root}/examples/lock-app/p6"
+examples_plat_dir = "${chip_root}/examples/platform/p6"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+
+  # PIN code for PASE session establishment.
+  setup_pin_code = 20202021
+}
+
+p6_sdk_sources("lock_app_sdk_sources") {
+  include_dirs = [
+    "${chip_root}/src/platform/P6",
+    "${p6_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
+
+  defines = [
+    "BOARD_ID=${p6_board}",
+    "P6_LOG_ENABLED=1",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setup_pin_code}",
+  ]
+
+  sources = [ "${p6_project_dir}/include/CHIPProjectConfig.h" ]
+
+  public_configs = [ "${chip_root}/third_party/p6:p6_sdk_config" ]
+}
+
+p6_executable("lock_app") {
+  include_dirs = []
+  defines = []
+  output_name = "chip-p6-lock-example.out"
+
+  public_deps = [
+    ":lock_app_sdk_sources",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  include_dirs += [
+    "include",
+    "${examples_plat_dir}",
+    "${p6_project_dir}/include",
+  ]
+
+  sources = [
+    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/init_p6Platform.cpp",
+    "${p6_project_dir}/include/CHIPProjectConfig.h",
+    "src/AppTask.cpp",
+    "src/BoltLockManager.cpp",
+    "src/ButtonHandler.cpp",
+    "src/ZclCallbacks.cpp",
+    "src/main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  if (chip_print_memory_usage) {
+    ldflags = [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+}
+
+group("p6") {
+  deps = [ ":lock_app" ]
+}
+
+group("default") {
+  deps = [ ":p6" ]
+}

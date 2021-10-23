@@ -24,10 +24,10 @@
 
 #pragma once
 
+#include <lib/support/BitFlags.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
-#include <support/BitFlags.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 namespace chip {
 namespace bdx {
@@ -150,7 +150,7 @@ struct TransferInit : public BdxMessage
     const uint8_t * FileDesignator = nullptr;
     uint16_t FileDesLength         = 0; ///< Length of file designator string (not including null-terminator)
     const uint8_t * Metadata       = nullptr;
-    uint16_t MetadataLength        = 0;
+    size_t MetadataLength          = 0;
 
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
@@ -184,7 +184,7 @@ struct SendAccept : public BdxMessage
     // WARNING: there is no guarantee at any point that this pointer will point to valid memory. The Buffer field should be used to
     // hold a reference to the PacketBuffer containing the data in order to ensure the data is not freed.
     const uint8_t * Metadata = nullptr;
-    uint16_t MetadataLength  = 0;
+    size_t MetadataLength    = 0;
 
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
@@ -218,7 +218,7 @@ struct ReceiveAccept : public BdxMessage
     // WARNING: there is no guarantee at any point that this pointer will point to valid memory. The Buffer field should be used to
     // hold a reference to the PacketBuffer containing the data in order to ensure the data is not freed.
     const uint8_t * Metadata = nullptr;
-    uint16_t MetadataLength  = 0;
+    size_t MetadataLength    = 0;
 
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;
@@ -267,7 +267,7 @@ struct DataBlock : public BdxMessage
     // WARNING: there is no guarantee at any point that this pointer will point to valid memory. The Buffer field should be used to
     // hold a reference to the PacketBuffer containing the data in order to ensure the data is not freed.
     const uint8_t * Data = nullptr;
-    uint16_t DataLength  = 0;
+    size_t DataLength    = 0;
 
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     System::PacketBufferHandle Buffer;

@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

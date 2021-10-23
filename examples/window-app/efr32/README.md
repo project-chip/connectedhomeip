@@ -70,9 +70,14 @@ Silicon Labs platform.
         915MHz@19dBm
     -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
 
-    MG21 boards:
+    MG21 boards: Currently not supported due to RAM limitation.
 
     -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+
+    MG24 boards :
+
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Build the example application:
 
@@ -175,10 +180,11 @@ combination with JLinkRTTClient as follows:
 ## Running the Complete Example
 
 -   It is assumed here that you already have an OpenThread border router
-    configured and running. If not, see the following guide
-    [OpenThread Border Router](https://openthread.io/guides/border-router) for
-    more information on how to setup a border router. Take note that the RCP
-    code is available directly through
+    configured and running. If not see the following guide
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    for more information on how to setup a border router on a raspberryPi.
+
+    Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 
@@ -217,7 +223,7 @@ combination with JLinkRTTClient as follows:
         -   _Blinking slowly_ ; The window cover is half-open, either by tilt, or lift
         -   _Blinking quickly_ ; The window cover is being automatically open or closed
 
-    **Push Button 0** Increase seither tilt or lift, and factory reset
+    **Push Button 0** Increase either tilt or lift, and factory reset
 
         -   Pressed and release: The lift/tilt increases by 10%
 
@@ -234,7 +240,9 @@ combination with JLinkRTTClient as follows:
 
     **Push Button0 and Button1** Switch between lift and tilt
 
-        - Pressing both buttons at the same time switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 suport both (default)
+        - Pressing and release both buttons at the same time: switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 support both (default)
+
+        - Pressing and hold both buttons at the same time: Cycles between window covering 1, and window covering 2.
 
 *   Once the device is provisioned, it will join the Thread network is
     established, look for the RTT log
@@ -255,10 +263,6 @@ combination with JLinkRTTClient as follows:
         [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
     ```
 
-    Keep The global unicast address; It is to be used to reach the Device with
-    the chip-tool. The device will be promoted to Router shortly after [DL]
-    Device Role: ROUTER
-
     (you can verify that the device is on the thread network with the command
     `router table` using a serial terminal (screen / minicom etc.) on the board
     running the window-app example. You can also get the address list with the
@@ -270,7 +274,7 @@ combination with JLinkRTTClient as follows:
     The
     [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
     can now be used to send ZCL commands to the window covering device. For
-    instance, to set the window covering lift by percentantage:
+    instance, to set the window covering lift by percentage:
 
         $ sudo chip-device-ctrl
 

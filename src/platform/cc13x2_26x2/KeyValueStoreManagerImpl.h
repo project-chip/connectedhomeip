@@ -34,16 +34,11 @@ class KeyValueStoreManagerImpl final : public KeyValueStoreManager
     friend class KeyValueStoreManager;
 
 public:
-    // NOTE: Currently this platform does not support partial and offset reads
-    //       these will return CHIP_ERROR_NOT_IMPLEMENTED.
-    CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0) const;
 
-    CHIP_ERROR _Delete(const char * key) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _Delete(const char * key);
 
-    CHIP_ERROR _Put(const char * key, const void * value, size_t value_size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:
     // ===== Members for internal use by the following friends.

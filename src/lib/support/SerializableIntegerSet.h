@@ -31,8 +31,8 @@
 
 #pragma once
 
-#include <support/CodeUtils.h>
-#include <support/Span.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 

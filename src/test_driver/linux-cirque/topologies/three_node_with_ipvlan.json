@@ -1,0 +1,23 @@
+{
+    "device0": {
+        "type": "CHIP-00",
+        "base_image": "connectedhomeip/chip-cirque-device-base",
+        "docker_network": "IpvLan",
+        "capability": ["Interactive", "Mount"],
+        "mount_pairs": [["{chip_repo}", "{chip_repo}"]]
+    },
+    "device1": {
+        "type": "CHIP-01",
+        "base_image": "connectedhomeip/chip-cirque-device-base",
+        "docker_network": "IpvLan",
+        "capability": ["Interactive", "Mount"],
+        "mount_pairs": [["{chip_repo}", "{chip_repo}"]]
+    },
+    "device2": {
+        "type": "CHIP-02",
+        "base_image": "connectedhomeip/chip-cirque-device-base",
+        "docker_network": "IpvLan",
+        "capability": ["Interactive", "Mount"],
+        "mount_pairs": [["{chip_repo}", "{chip_repo}"]]
+    }
+}

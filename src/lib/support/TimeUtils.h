@@ -54,9 +54,14 @@ enum
     kSecondsPerWeek         = kSecondsPerDay * kDaysPerWeek,
     kSecondsPerStandardYear = kSecondsPerDay * kDaysPerStandardYear,
 
-    kMillisecondPerSecond = 1000,
+    kMillisecondsPerSecond = 1000,
 
-    kMicrosecondsPerSecond = 1000000
+    kMicrosecondsPerSecond      = 1000000,
+    kMicrosecondsPerMillisecond = 1000,
+
+    kNanosecondsPerSecond      = 1000000000,
+    kNanosecondsPerMillisecond = 1000000,
+    kNanosecondsPerMicrosecond = 1000,
 };
 
 enum
@@ -80,13 +85,13 @@ enum
 enum
 {
     // First year of the standard unix epoch.
-    kEpochYear = 1970,
+    kUnixEpochYear = 1970,
 
     // Last fully-representable year that can be stored in an unsigned 32-bit seconds-since-epoch value.
-    kMaxYearInSecondsSinceEpoch32 = 2105,
+    kMaxYearInSecondsSinceUnixEpoch32 = 2105,
 
     // Last fully-representable year that can be stored in an unsigned 32-bit days-since-epoch value.
-    kMaxYearInDaysSinceEpoch32 = 28276
+    kMaxYearInDaysSinceUnixEpoch32 = 28276
 };
 
 /* CHIP Epoch time.
@@ -111,13 +116,13 @@ extern uint8_t DaysInMonth(uint16_t year, uint8_t month);
 extern uint8_t FirstWeekdayOfYear(uint16_t year);
 extern void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t & month, uint8_t & dayOfMonth);
 extern void CalendarDateToOrdinalDate(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint16_t & dayOfYear);
-extern bool CalendarDateToDaysSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint32_t & daysSinceEpoch);
-extern bool DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
+extern bool CalendarDateToDaysSinceUnixEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint32_t & daysSinceEpoch);
+extern bool DaysSinceUnixEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
 extern bool AdjustCalendarDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, int32_t relativeDays);
-extern bool CalendarTimeToSecondsSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute,
-                                            uint8_t second, uint32_t & secondsSinceEpoch);
-extern void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
-                                            uint8_t & hour, uint8_t & minute, uint8_t & second);
+extern bool CalendarTimeToSecondsSinceUnixEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute,
+                                                uint8_t second, uint32_t & secondsSinceEpoch);
+extern void SecondsSinceUnixEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
+                                                uint8_t & hour, uint8_t & minute, uint8_t & second);
 
 /**
  *  @brief Convert a calendar date and time to the number of seconds since CHIP Epoch (2020-01-01 00:00:00 UTC).
@@ -180,7 +185,7 @@ extern bool UnixEpochToChipEpochTime(uint32_t unixEpochTime, uint32_t & chipEpoc
  */
 inline uint32_t secondsToMilliseconds(uint32_t seconds)
 {
-    return (seconds * kMillisecondPerSecond);
+    return (seconds * kMillisecondsPerSecond);
 }
 
 } // namespace chip

@@ -1,17 +1,11 @@
-# Configuring nRF Connect SDK examples
+# Configuring nRF Connect examples
 
-The nRF Connect SDK example applications all come with a default configuration
-for building. Check the information on this page if you want to modify the
+The nRF Connect example applications all come with a default configuration for
+building. Check the information on this page if you want to modify the
 application configuration or add new functionalities to build your own
 application based on the provided example. This page also contains information
 about the configuration structure, which can be useful to better understand the
 building process.
-
-This guide can be used with the following examples:
-
--   [CHIP nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
--   [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
--   [CHIP nRF Connect Pigweed Example Application](../../examples/pigweed-app/nrfconnect/README.md)
 
 <hr>
 
@@ -113,7 +107,7 @@ them default values for any application.
 
 The application configuration is specified using Kconfig configuration files
 (`*.conf`), where available Kconfig options can be used and their default values
-overrided. Typically, there are many files having impact on the final
+overridden. Typically, there are many files having impact on the final
 configuration shape.
 
 There is no need to modify all these files separately. See the following list

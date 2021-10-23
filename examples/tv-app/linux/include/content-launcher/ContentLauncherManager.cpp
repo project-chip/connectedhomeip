@@ -18,16 +18,19 @@
 
 #include "ContentLauncherManager.h"
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
 
 #include <app/Command.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include <map>
 
@@ -48,31 +51,33 @@ exit:
     return err;
 }
 
-vector<chip::ByteSpan> ContentLauncherManager::proxyGetAcceptsHeader()
+CHIP_ERROR ContentLauncherManager::proxyGetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
-    vector<chip::ByteSpan> acceptedHeader;
-    char headerExample[]  = "exampleHeader";
-    int maximumVectorSize = 1;
+    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // TODO: Insert code here
+        char headerExample[]  = "exampleHeader";
+        int maximumVectorSize = 1;
 
-    for (uint16_t i = 0; i < maximumVectorSize; ++i)
-    {
-        acceptedHeader.push_back(chip::ByteSpan(chip::Uint8::from_char(headerExample), sizeof(headerExample)));
-    }
-    return acceptedHeader;
+        for (uint16_t i = 0; i < maximumVectorSize; ++i)
+        {
+            ReturnErrorOnFailure(encoder.Encode(chip::ByteSpan(chip::Uint8::from_char(headerExample), sizeof(headerExample) - 1)));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
-vector<EmberAfContentLaunchStreamingType> ContentLauncherManager::proxyGetSupportedStreamingTypes()
+CHIP_ERROR ContentLauncherManager::proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
-    vector<EmberAfContentLaunchStreamingType> supportedStreamingTypes;
-    supportedStreamingTypes.push_back(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH);
-    supportedStreamingTypes.push_back(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS);
-    return supportedStreamingTypes;
+    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // TODO: Insert code here
+        ReturnErrorOnFailure(encoder.Encode(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH));
+        ReturnErrorOnFailure(encoder.Encode(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS));
+        return CHIP_NO_ERROR;
+    });
 }
 
-ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<EmberAfContentLaunchParamater> parameterList,
-                                                                        bool autoplay, string data)
+ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                                        string data)
 {
     // TODO: Insert code here
     ContentLaunchResponse response;
@@ -81,7 +86,7 @@ ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<Emb
     return response;
 }
 ContentLaunchResponse ContentLauncherManager::proxyLaunchUrlRequest(string contentUrl, string displayString,
-                                                                    EmberAfContentLaunchBrandingInformation brandingInformation)
+                                                                    ContentLaunchBrandingInformation brandingInformation)
 {
     // TODO: Insert code here
     ContentLaunchResponse response;
@@ -98,26 +103,34 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
+        ChipLogError(Zcl, "Failed to send %s. Error:%d", responseName, static_cast<int>(status));
     }
 }
 
-bool emberAfContentLaunchClusterLaunchContentCallback(chip::app::Command * command, unsigned char autoplay, unsigned char * data)
+bool emberAfContentLauncherClusterLaunchContentCallback(
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
+    auto & autoplay = commandData.autoPlay;
+    auto & data     = commandData.data;
 
-    string dataString(reinterpret_cast<char *>(data));
-    list<EmberAfContentLaunchParamater> parameterList;
+    string dataString(data.data(), data.size());
+    list<ContentLaunchParamater> parameterList;
     ContentLaunchResponse response = ContentLauncherManager().proxyLaunchContentRequest(parameterList, autoplay, dataString);
     sendResponse("LaunchContent", response, ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID);
     return true;
 }
 
-bool emberAfContentLaunchClusterLaunchURLCallback(chip::app::Command * command, unsigned char * contentUrl,
-                                                  unsigned char * displayString)
+bool emberAfContentLauncherClusterLaunchURLCallback(
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
-    string contentUrlString(reinterpret_cast<char *>(contentUrl));
-    string displayStringString(reinterpret_cast<char *>(displayString));
-    EmberAfContentLaunchBrandingInformation brandingInformation;
+    auto & contentUrl    = commandData.contentURL;
+    auto & displayString = commandData.displayString;
+
+    string contentUrlString(contentUrl.data(), contentUrl.size());
+    string displayStringString(displayString.data(), displayString.size());
+    ContentLaunchBrandingInformation brandingInformation;
     ContentLaunchResponse response =
         ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);
     sendResponse("LaunchURL", response, ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID);

@@ -28,10 +28,10 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-void CommissioningTimerFunction(System::Layer * layer, void * aAppState, System::Error aError)
+void HandleArmFailSafe(System::Layer * layer, void * aAppState)
 {
     DeviceControlServer * server = reinterpret_cast<DeviceControlServer *>(aAppState);
-    server->CommissioningFailedTimerComplete(aError);
+    server->CommissioningFailedTimerComplete();
 }
 
 DeviceControlServer DeviceControlServer::sInstance;
@@ -41,45 +41,47 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
-void DeviceControlServer::CommissioningFailedTimerComplete(System::Error aError)
+void DeviceControlServer::CommissioningFailedTimerComplete()
 {
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;
-    PlatformMgr().PostEvent(&event);
+    CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post commissioning complete: %" CHIP_ERROR_FORMAT, status.Format());
+    }
 }
 
-CHIP_ERROR DeviceControlServer::ArmFailSafe(uint16_t expiryLengthSeconds)
+CHIP_ERROR DeviceControlServer::ArmFailSafe(System::Clock::Timeout expiryLength)
 {
-    uint32_t timerMs = expiryLengthSeconds * 1000;
-    SystemLayer.StartTimer(timerMs, CommissioningTimerFunction, this);
+    DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::DisarmFailSafe()
 {
-    // TODO
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::CommissioningComplete()
 {
-    SystemLayer.CancelTimer(CommissioningTimerFunction, this);
+    VerifyOrReturnError(CHIP_NO_ERROR == DisarmFailSafe(), CHIP_ERROR_INTERNAL);
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.status = CHIP_NO_ERROR;
-    PlatformMgr().PostEvent(&event);
-    return CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb)
+CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = ConfigurationMgr().StoreRegulatoryLocation(location);
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().StoreCountryCode(countryCode, strlen(countryCode));
+    err = ConfigurationMgr().StoreCountryCode(countryCode.data(), countryCode.size());
     SuccessOrExit(err);
 
     err = ConfigurationMgr().StoreBreadcrumb(breadcrumb);

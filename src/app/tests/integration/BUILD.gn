@@ -53,6 +53,8 @@ executable("chip-im-responder") {
     "${chip_root}/src/system",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   output_dir = root_out_dir
 }
 

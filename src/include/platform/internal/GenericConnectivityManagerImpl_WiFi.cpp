@@ -24,9 +24,9 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_CPP
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_CPP
 
+#include <lib/support/CodeUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

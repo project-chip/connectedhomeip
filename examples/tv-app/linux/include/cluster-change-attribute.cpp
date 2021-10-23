@@ -16,11 +16,13 @@
  *    limitations under the License.
  */
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/util/af.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace ::chip::app::Clusters;
 
 enum TvCommand
 {
@@ -44,19 +46,19 @@ void runTvCommand(TvCommand command)
     }
 }
 
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterAfPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                         uint16_t size, uint8_t * value)
 {
-    if (clusterId == ZCL_ON_OFF_CLUSTER_ID && attributeId == ZCL_ON_OFF_ATTRIBUTE_ID)
+    if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Received on/off command for cluster id: %d", clusterId);
+        ChipLogProgress(Zcl, "Received on/off command for cluster id: " ChipLogFormatMEI, ChipLogValueMEI(OnOff::Id));
 
-        if (endpoint == 0)
+        if (attributePath.mEndpointId == 0)
         {
             ChipLogProgress(Zcl, "Execute POWER_TOGGLE");
             runTvCommand(PowerToggle);
         }
-        else if (endpoint == 1)
+        else if (attributePath.mEndpointId == 1)
         {
             ChipLogProgress(Zcl, "Execute MUTE_TOGGLE");
             runTvCommand(MuteToggle);

@@ -18,22 +18,15 @@
 
 #pragma once
 
-#include <app/common/gen/af-structs.h>
-#include <core/CHIPError.h>
+#include <app/AttributeAccessInterface.h>
+#include <lib/core/CHIPError.h>
 
 #include <string>
 #include <vector>
-
-struct ApplicationLaunchResponse
-{
-    EmberAfApplicationLauncherStatus status;
-    std::string data;
-};
 
 class ApplicationLauncherManager
 {
 public:
     CHIP_ERROR Init();
-    ApplicationLaunchResponse proxyApplicationLaunchRequest(EmberAfApplicationLauncherApp application, std::string data);
-    std::vector<uint16_t> proxyGetApplicationList();
+    CHIP_ERROR proxyGetApplicationList(chip::app::AttributeValueEncoder & aEncoder);
 };

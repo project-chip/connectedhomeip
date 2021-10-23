@@ -19,8 +19,7 @@
  * @file - This file contains read / write field element test vectors.
  */
 
-#ifndef _SPAKE2P_FE_RW_TEST_VECTORS_H_
-#define _SPAKE2P_FE_RW_TEST_VECTORS_H_
+#pragma once
 
 namespace chip {
 namespace Crypto {
@@ -120,5 +119,3 @@ static const struct spake2p_fe_rw_tv * fe_rw_tvs[] = { &chiptest_53ea71b7cccd_te
 
 } // namespace Crypto
 } // namespace chip
-
-#endif

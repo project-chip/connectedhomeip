@@ -1,13 +1,13 @@
 {{pad '/*' 78 '-'}}*\
-{{pad (concat "| Cluster " (asCamelCased name false)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{pad (concat "| Cluster " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
 {{pad "|" 79 '-'}}|
 {{pad "| Commands: " 70 ' '}}{{pad "| " 9 ' '}}|
-{{#chip_server_cluster_commands}}
-{{pad (concat "| * " (asCamelCased name false)) 70 ' '}}{{pad (concat "|   " (asHex code 2)) 9 ' '}}|
-{{/chip_server_cluster_commands}}
+{{#chip_cluster_commands}}
+{{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "|   " (asHex code 2)) 9 ' '}}|
+{{/chip_cluster_commands}}
 {{pad "|" 79 '-'}}|
 {{pad "| Attributes: " 70 ' '}}{{pad "| " 9 ' '}}|
 {{#chip_server_cluster_attributes}}
-{{pad (concat "| * " (asCamelCased name false)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
 {{/chip_server_cluster_attributes}}
 {{pad '\*' 78 '-'}}*/

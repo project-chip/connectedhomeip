@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <app/common/gen/af-structs.h>
+#include <app/AttributeAccessInterface.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <string>
 #include <vector>
 
@@ -27,8 +27,5 @@ class TvChannelManager
 {
 public:
     CHIP_ERROR Init();
-    EmberAfTvChannelInfo proxyChangeChannelRequest(std::string match);
-    bool proxyChangeChannelByNumberRequest(uint16_t majorNumer, uint16_t minorNumber);
-    bool proxySkipChannelRequest(uint16_t count);
-    std::vector<EmberAfTvChannelInfo> proxyGetTvChannelList();
+    CHIP_ERROR proxyGetTvChannelList(chip::app::AttributeValueEncoder & aEncoder);
 };

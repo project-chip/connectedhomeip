@@ -18,14 +18,13 @@
 
 #include "commands/common/Commands.h"
 
-#include "commands/clusters/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
-#include "commands/reporting/Commands.h"
-#include "commands/tests/Commands.h"
 
-#include <protocols/secure_channel/PASESession.h>
+#include <zap-generated/cluster/Commands.h>
+#include <zap-generated/reporting/Commands.h>
+#include <zap-generated/test/Commands.h>
 
 // ================================================================================
 // Main Code
@@ -40,5 +39,5 @@ int main(int argc, char * argv[])
     registerCommandsTests(commands);
     registerClusters(commands);
 
-    return commands.Run(chip::kTestControllerNodeId, chip::kTestDeviceNodeId, argc, argv);
+    return commands.Run(argc, argv);
 }

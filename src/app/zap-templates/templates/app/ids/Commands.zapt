@@ -1,0 +1,34 @@
+{{> header}}
+
+#pragma once
+
+#include <app/util/basic-types.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+// Matter does not have global commands
+
+{{#zcl_clusters}}
+
+{{#zcl_commands}}
+{{#first}}
+namespace {{asUpperCamelCase parent.label}} {
+namespace Commands {
+
+{{/first}}
+namespace {{asUpperCamelCase label}} {
+static constexpr CommandId Id = {{asMEI manufacturerCode code}};
+} // namespace {{asUpperCamelCase label}}
+
+{{#last}}
+} // namespace Commands
+} // namespace {{asUpperCamelCase parent.label}}
+{{/last}}
+{{/zcl_commands}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

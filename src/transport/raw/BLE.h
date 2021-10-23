@@ -30,8 +30,8 @@
 
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
-#include <core/CHIPCore.h>
-#include <support/DLLUtil.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/Base.h>
 
@@ -91,6 +91,8 @@ public:
 
     CHIP_ERROR SetEndPoint(Ble::BLEEndPoint * endPoint) override;
 
+    Ble::BLEEndPoint * GetEndPoint() { return mBleEndPoint; }
+
 private:
     void ClearState();
 
@@ -107,14 +109,14 @@ private:
     // Those functions are BLEConnectionDelegate callbacks used when the connection
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.
     void OnBleConnectionComplete(Ble::BLEEndPoint * endPoint) override;
-    void OnBleConnectionError(BLE_ERROR err) override;
+    void OnBleConnectionError(CHIP_ERROR err) override;
 
     void ClearPendingPackets();
 
     // Those functions are BLEEndPoint callbacks
     void OnEndPointMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBufferHandle && buffer) override;
-    void OnEndPointConnectComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err) override;
-    void OnEndPointConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err) override;
+    void OnEndPointConnectComplete(Ble::BLEEndPoint * endPoint, CHIP_ERROR err) override;
+    void OnEndPointConnectionClosed(Ble::BLEEndPoint * endPoint, CHIP_ERROR err) override;
 
     Ble::BleLayer * mBleLayer       = nullptr;          ///< Associated ble layer
     State mState                    = State::kNotReady; ///< State of the BLE transport

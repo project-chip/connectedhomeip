@@ -31,11 +31,11 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 
@@ -58,7 +58,7 @@ namespace Debug {
 static void DumpHandler(DumpWriter aWriter, const char * aIndent, const TLVReader & aReader, size_t aDepth)
 {
     const TLVType type     = aReader.GetType();
-    const uint64_t tag     = aReader.GetTag();
+    const Tag tag          = aReader.GetTag();
     const uint32_t len     = aReader.GetLength();
     const uint8_t * strbuf = nullptr;
     CHIP_ERROR err         = CHIP_NO_ERROR;

@@ -17,6 +17,7 @@
  */
 
 #include "Command.h"
+#include "platform/PlatformManager.h"
 
 #include <netdb.h>
 #include <sstream>
@@ -24,12 +25,12 @@
 #include <sys/types.h>
 
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/BytesToHex.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 bool Command::InitArguments(int argc, char ** argv)
 {
@@ -86,6 +87,7 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
 bool Command::InitArgument(size_t argIndex, char * argValue)
 {
     bool isValidArgument = false;
+    bool isHexNotation   = strncmp(argValue, "0x", 2) == 0 || strncmp(argValue, "0X", 2) == 0;
 
     Argument arg = mArgs.at(argIndex);
     switch (arg.type)
@@ -96,10 +98,17 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
-    case ArgumentType::CharString: {
+    case ArgumentType::String: {
         const char ** value = reinterpret_cast<const char **>(arg.value);
         *value              = argValue;
         isValidArgument     = true;
+        break;
+    }
+
+    case ArgumentType::CharString: {
+        auto * value    = static_cast<chip::Span<const char> *>(arg.value);
+        *value          = chip::Span<const char>(argValue, strlen(argValue));
+        isValidArgument = true;
         break;
     }
 
@@ -156,12 +165,14 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
+    case ArgumentType::Boolean:
     case ArgumentType::Number_uint8: {
         uint8_t * value = reinterpret_cast<uint8_t *>(arg.value);
 
         // stringstream treats uint8_t as char, which is not what we want here.
         uint16_t tmpValue;
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> tmpValue;
         if (chip::CanCastTo<uint8_t>(tmpValue))
         {
@@ -180,7 +191,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint16: {
         uint16_t * value = reinterpret_cast<uint16_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
@@ -191,7 +203,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint32: {
         uint32_t * value = reinterpret_cast<uint32_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
@@ -202,7 +215,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint64: {
         uint64_t * value = reinterpret_cast<uint64_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
@@ -216,7 +230,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
         // stringstream treats int8_t as char, which is not what we want here.
         int16_t tmpValue;
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> tmpValue;
         if (chip::CanCastTo<int8_t>(tmpValue))
         {
@@ -235,7 +250,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int16: {
         int16_t * value = reinterpret_cast<int16_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         int64_t min     = arg.min;
@@ -246,7 +262,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int32: {
         int32_t * value = reinterpret_cast<int32_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         int64_t min     = arg.min;
@@ -257,7 +274,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int64: {
         int64_t * value = reinterpret_cast<int64_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         int64_t min     = arg.min;
@@ -293,6 +311,17 @@ size_t Command::AddArgument(const char * name, const char * value)
 }
 
 size_t Command::AddArgument(const char * name, char ** value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::CharString;
+    arg.name  = name;
+    arg.value = reinterpret_cast<void *>(value);
+
+    mArgs.emplace_back(arg);
+    return mArgs.size();
+}
+
+size_t Command::AddArgument(const char * name, chip::CharSpan * value)
 {
     Argument arg;
     arg.type  = ArgumentType::CharString;
@@ -374,24 +403,4 @@ const char * Command::GetAttribute(void) const
     }
 
     return nullptr;
-}
-
-void Command::UpdateWaitForResponse(bool value)
-{
-    {
-        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-        mWaitingForResponse = value;
-    }
-    cvWaitingForResponse.notify_all();
-}
-
-void Command::WaitForResponse(uint16_t duration)
-{
-    std::chrono::seconds waitingForResponseTimeout(duration);
-    std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
-    auto waitingUntil = std::chrono::system_clock::now() + waitingForResponseTimeout;
-    if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
-    {
-        ChipLogError(chipTool, "No response from device");
-    }
 }

@@ -97,6 +97,12 @@ menu "CHIP Core"
             help
                 Link the application against CHIP interactive shell.
 
+        config DISABLE_IPV4
+            bool "Disable IPv4 functionality in the CHIP stack"
+            default "n"
+            help
+                Matter spec is based on IPv6 communication only. Enabling this option may save some flash/ram.
+
         # TODO: add log level selection
 
     endmenu # "General Options"
@@ -361,6 +367,18 @@ menu "CHIP Device Layer"
             help
                 The size (in bytes) of the service directory cache.  This limits the maximum size of the directory
                 that can be returned in response to a service directory query.
+        
+        config ENABLE_EXTENDED_DISCOVERY
+            bool "Enable Extended discovery Support"
+            default n
+            help
+                Enables support for Extended Discovery.
+
+        config ENABLE_COMMISSIONABLE_DEVICE_TYPE
+            bool "Enable Device type in commissionable node discovery."
+            default n
+            help
+                Enables or Disables the support for Commissionable Device Type.
 
     endmenu
 
@@ -385,7 +403,7 @@ menu "CHIP Device Layer"
         config DEFAULT_DEVICE_PRODUCT_REVISION
             int "Default Device Product Revision"
             range 0 65535
-            default 1
+            default 0
             help
                 The default device product revision.
 
@@ -402,6 +420,12 @@ menu "CHIP Device Layer"
             default ""
             help
                 A string identifying the firmware revision running on the device.
+
+        config DEVICE_TYPE
+            int "Default Device type"
+            default 0
+            help
+                The default device type.
 
     endmenu
 
@@ -488,7 +512,7 @@ menu "CHIP Device Layer"
 
         config WIFI_AP_IDLE_TIMEOUT
             int "WiFi AP Idle Timeout (ms)"
-            range 0 65535
+            range 0 600000
             default 120000
             help
                 The amount of time (in milliseconds) after which the CHIP platform will deactivate the soft-AP
@@ -497,10 +521,12 @@ menu "CHIP Device Layer"
     endmenu
 
     menu "BLE Options"
+        visible if BT_ENABLED
 
         config ENABLE_CHIPOBLE
             bool "Enable CHIP-over-BLE (CHIPoBLE) Support"
             default y
+            depends on BT_ENABLED
             help
                 Enables support for sending and receiving CHIP messages over a BLE connection.
 
@@ -554,7 +580,7 @@ menu "CHIP Device Layer"
 
         config CHIPOBLE_SINGLE_CONNECTION
             bool "Single Connection Mode"
-            default n
+            default y
             depends on ENABLE_CHIPOBLE
             help
                 Limit support for CHIP-over-BLE (WoBLE) to a single inbound connection.
@@ -731,7 +757,7 @@ menu "CHIP Device Layer"
             help
                 The IP address and port of the server to which the device should establish a service tunnel.
                 The supplied address must be a dot-notation IP address--not a host name.  The port number is
-                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:11097).
+                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:5540).
 
         config LOG_PROVISIONING_HASH
             bool "Enable Provisioning Hash Logging"

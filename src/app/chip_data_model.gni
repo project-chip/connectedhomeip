@@ -53,6 +53,8 @@ template("chip_data_model") {
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
                              invoker.use_default_im_dispatch
 
+  _use_tests_apis = defined(invoker.use_tests_apis) && invoker.use_tests_apis
+
   _use_default_client_callbacks =
       defined(invoker.use_default_client_callbacks) &&
       invoker.use_default_client_callbacks
@@ -81,7 +83,7 @@ template("chip_data_model") {
       "${_app_root}/clusters/ias-zone-client/ias-zone-client.h",
       "${_app_root}/clusters/ias-zone-server/ias-zone-server-tokens.h",
       "${_app_root}/clusters/ias-zone-server/ias-zone-server.h",
-      "${_app_root}/clusters/identify/identify.h",
+      "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/messaging-client/messaging-client.h",
       "${_app_root}/clusters/messaging-server/messaging-server.h",
@@ -89,14 +91,10 @@ template("chip_data_model") {
       "${_app_root}/clusters/on-off-server/on-off-server.h",
       "${_app_root}/clusters/scenes/scenes-tokens.h",
       "${_app_root}/clusters/scenes/scenes.h",
-      "${_app_root}/clusters/temperature-measurement-server/temperature-measurement-server.h",
       "${_app_root}/clusters/zll-level-control-server/zll-level-control-server.h",
       "${_app_root}/clusters/zll-on-off-server/zll-on-off-server.h",
       "${_app_root}/clusters/zll-scenes-server/zll-scenes-server.h",
       "${_app_root}/encoder-common.cpp",
-      "${_app_root}/reporting/reporting-default-configuration.cpp",
-      "${_app_root}/reporting/reporting-tokens.h",
-      "${_app_root}/reporting/reporting.cpp",
       "${_app_root}/reporting/reporting.h",
       "${_app_root}/util/DataModelHandler.cpp",
       "${_app_root}/util/af-event.cpp",
@@ -110,10 +108,12 @@ template("chip_data_model") {
       "${_app_root}/util/client-api.cpp",
       "${_app_root}/util/ember-compatibility-functions.cpp",
       "${_app_root}/util/ember-print.cpp",
+      "${_app_root}/util/error-mapping.cpp",
       "${_app_root}/util/message.cpp",
       "${_app_root}/util/process-cluster-message.cpp",
       "${_app_root}/util/process-global-message.cpp",
       "${_app_root}/util/util.cpp",
+      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
 
     if (defined(invoker.cluster_sources)) {
@@ -153,17 +153,25 @@ template("chip_data_model") {
         "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
         "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
         "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
-        "${invoker.zap_pregenerated_dir}/chip-zcl-zpro-codec-api.h",
-        "${invoker.zap_pregenerated_dir}/encoder.cpp",
       ]
 
       if (_use_default_client_callbacks) {
-        sources += [ "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp" ]
+        sources += [
+          "${_app_root}/util/im-client-callbacks.cpp",
+          "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp",
+        ]
       }
 
       if (_use_default_im_dispatch) {
         sources +=
             [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
+      }
+
+      if (_use_tests_apis) {
+        sources += [
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.cpp",
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h",
+        ]
       }
     }
 
@@ -173,6 +181,7 @@ template("chip_data_model") {
 
     public_deps += [
       "${chip_root}/src/app",
+      "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
@@ -182,6 +191,12 @@ template("chip_data_model") {
     if (defined(invoker.is_server)) {
       public_deps += [ "${chip_root}/src/app/server" ]
     }
+
+    if (!defined(cflags)) {
+      cflags = []
+    }
+
+    cflags += [ "-Wconversion" ]
 
     if (!defined(public_configs)) {
       public_configs = []

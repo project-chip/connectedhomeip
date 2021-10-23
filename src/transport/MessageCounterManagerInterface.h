@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <transport/PeerConnectionState.h>
-#include <transport/SecureSessionHandle.h>
+#include <transport/SecureSession.h>
+#include <transport/SessionHandle.h>
 
 namespace chip {
 namespace Transport {
@@ -31,14 +31,14 @@ public:
     /**
      * Start sync if the sync procedure is not started yet.
      */
-    virtual CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) = 0;
+    virtual CHIP_ERROR StartSync(SessionHandle session, Transport::SecureSession * state) = 0;
 
     /**
      * Called when have received a message but session message counter is not synced.  It will queue the message and start sync if
      * the sync procedure is not started yet.
      */
-    virtual CHIP_ERROR QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SecureSessionHandle session,
-                                                        Transport::PeerConnectionState * state,
+    virtual CHIP_ERROR QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SessionHandle session,
+                                                        Transport::SecureSession * state,
                                                         const Transport::PeerAddress & peerAddress,
                                                         System::PacketBufferHandle && msgBuf) = 0;
 };

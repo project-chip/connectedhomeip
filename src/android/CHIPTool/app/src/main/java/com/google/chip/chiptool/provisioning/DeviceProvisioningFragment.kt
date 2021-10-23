@@ -49,20 +49,24 @@ class DeviceProvisioningFragment : Fragment() {
 
   private val networkType: ProvisionNetworkType
     get() = requireNotNull(
-        ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
+      ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
     )
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
   override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
   ): View {
     deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
     return inflater.inflate(R.layout.single_fragment_container, container, false).apply {
       if (savedInstanceState == null) {
-        startConnectingToDevice()
+        if (deviceInfo.ipAddress != null) {
+          pairDeviceWithAddress()
+        } else {
+          startConnectingToDevice()
+        }
       }
     }
   }
@@ -73,27 +77,44 @@ class DeviceProvisioningFragment : Fragment() {
     scope.cancel()
   }
 
+  private fun pairDeviceWithAddress() {
+    // IANA CHIP port
+    val port = 5540
+    val id = DeviceIdUtil.getNextAvailableId(requireContext())
+    val deviceController = ChipClient.getDeviceController(requireContext())
+    DeviceIdUtil.setNextAvailableId(requireContext(), id + 1)
+    deviceController.setCompletionListener(ConnectionCallback())
+    deviceController.pairDeviceWithAddress(
+      id,
+      deviceInfo.ipAddress,
+      port,
+      deviceInfo.discriminator,
+      deviceInfo.setupPinCode,
+      null
+    )
+  }
+
   private fun startConnectingToDevice() {
     if (gatt != null) {
       return
     }
 
     scope.launch {
-      val deviceController = ChipClient.getDeviceController()
+      val deviceController = ChipClient.getDeviceController(requireContext())
       val bluetoothManager = BluetoothManager()
 
       showMessage(
-          R.string.rendezvous_over_ble_scanning_text,
-          deviceInfo.discriminator.toString()
+        R.string.rendezvous_over_ble_scanning_text,
+        deviceInfo.discriminator.toString()
       )
-      val device = bluetoothManager.getBluetoothDevice(deviceInfo.discriminator) ?: run {
+      val device = bluetoothManager.getBluetoothDevice(requireContext(), deviceInfo.discriminator) ?: run {
         showMessage(R.string.rendezvous_over_ble_scanning_failed_text)
         return@launch
       }
 
       showMessage(
-          R.string.rendezvous_over_ble_connecting_text,
-          device.name ?: device.address.toString()
+        R.string.rendezvous_over_ble_connecting_text,
+        device.name ?: device.address.toString()
       )
       gatt = bluetoothManager.connect(requireContext(), device)
 
@@ -101,7 +122,8 @@ class DeviceProvisioningFragment : Fragment() {
       deviceController.setCompletionListener(ConnectionCallback())
 
       val deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
-      deviceController.pairDevice(gatt, deviceId, deviceInfo.setupPinCode)
+      val connId = bluetoothManager.connectionId
+      deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
   }
@@ -109,8 +131,10 @@ class DeviceProvisioningFragment : Fragment() {
   private fun showMessage(msgResId: Int, stringArgs: String? = null) {
     requireActivity().runOnUiThread {
       val context = requireContext()
-      Toast.makeText(context, context.getString(msgResId, stringArgs), Toast.LENGTH_SHORT)
-          .show()
+      val msg = context.getString(msgResId, stringArgs)
+      Log.i(TAG, "showMessage:$msg")
+      Toast.makeText(context, msg, Toast.LENGTH_SHORT)
+        .show()
     }
   }
 
@@ -120,13 +144,19 @@ class DeviceProvisioningFragment : Fragment() {
     }
 
     override fun onStatusUpdate(status: Int) {
-      Log.d(TAG, "Pairing status update: $status");
+      Log.d(TAG, "Pairing status update: $status")
     }
 
     override fun onPairingComplete(code: Int) {
       Log.d(TAG, "onPairingComplete: $code")
+      
+      if (deviceInfo.ipAddress != null) {
+        FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
+          ?.onCommissioningComplete(0)
+        return
+      }
 
-      if (code == 0) {
+      if (code == STATUS_PAIRING_SUCCESS) {
         childFragmentManager.beginTransaction()
             .add(R.id.fragment_container, EnterNetworkFragment.newInstance(networkType))
             .commit()
@@ -135,21 +165,12 @@ class DeviceProvisioningFragment : Fragment() {
       }
     }
 
-    override fun onPairingDeleted(code: Int) {
-      Log.d(TAG, "onPairingDeleted: $code")
+    override fun onOpCSRGenerationComplete(csr: ByteArray) {
+      Log.d(TAG, String(csr))
     }
 
-    override fun onNetworkCommissioningComplete(code: Int) {
-      Log.d(TAG, "onNetworkCommissioningComplete: $code")
-
-      if (code == 0) {
-        showMessage(R.string.rendezvous_over_ble_commissioning_success_text)
-      } else {
-        showMessage(R.string.rendezvous_over_ble_commissioning_failure_text)
-      }
-
-      FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
-          ?.onCommissioningComplete(code)
+    override fun onPairingDeleted(code: Int) {
+      Log.d(TAG, "onPairingDeleted: $code")
     }
 
     override fun onCloseBleComplete() {
@@ -171,11 +192,11 @@ class DeviceProvisioningFragment : Fragment() {
     private const val TAG = "DeviceProvisioningFragment"
     private const val ARG_DEVICE_INFO = "device_info"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
-    private const val STATUS_NETWORK_PROVISIONING_SUCCESS = 2
+    private const val STATUS_PAIRING_SUCCESS = 0
 
     fun newInstance(
-        deviceInfo: CHIPDeviceInfo,
-        networkType: ProvisionNetworkType
+      deviceInfo: CHIPDeviceInfo,
+      networkType: ProvisionNetworkType
     ): DeviceProvisioningFragment {
       return DeviceProvisioningFragment().apply {
         arguments = Bundle(2).apply {

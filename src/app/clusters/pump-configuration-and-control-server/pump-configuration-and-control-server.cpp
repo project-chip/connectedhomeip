@@ -17,22 +17,21 @@
 
 #include <app/util/af.h>
 
+#include <app/ConcreteAttributePath.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
-
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/enums.h>
 
 using namespace chip;
 
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
+    emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
     // TODO
 }
 
-void emberAfPumpConfigurationAndControlClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
+void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
+    emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
+                        attributePath.mAttributeId);
     // TODO
 }

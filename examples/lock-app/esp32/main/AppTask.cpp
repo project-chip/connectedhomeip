@@ -21,16 +21,16 @@
 #include "Button.h"
 #include "LEDWidget.h"
 #include "esp_log.h"
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/af-enums.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CodeUtils.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -53,41 +53,32 @@ Button lockButton;
 BaseType_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sHaveBLEConnections      = false;
-bool sHaveServiceConnectivity = false;
+bool sHaveBLEConnections = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 } // namespace
 
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::System;
 
 AppTask AppTask::sAppTask;
 
-int AppTask::StartAppTask()
+CHIP_ERROR AppTask::StartAppTask()
 {
-    int err = CHIP_ERROR_MAX;
-
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
         ESP_LOGE(TAG, "Failed to allocate app event queue");
-        return 0;
+        return APP_ERROR_EVENT_QUEUE_FAILED;
     }
 
     // Start App task.
     sAppTaskHandle = xTaskCreate(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, NULL);
-    if (sAppTaskHandle)
-    {
-        err = CHIP_NO_ERROR;
-    }
-
-    return err;
+    return sAppTaskHandle ? CHIP_NO_ERROR : APP_ERROR_CREATE_TASK_FAILED;
 }
 
-int AppTask::Init()
+CHIP_ERROR AppTask::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
@@ -95,7 +86,7 @@ int AppTask::Init()
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
-    err            = BoltLockMgr().Init();
+    CHIP_ERROR err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGI(TAG, "BoltLockMgr().Init() failed");
@@ -122,14 +113,13 @@ int AppTask::Init()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
-    int err;
     AppEvent event;
-    uint64_t mLastChangeTimeUS = 0;
+    Clock::MonotonicMicroseconds mLastChangeTimeUS = 0;
 
-    err = sAppTask.Init();
+    CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGI(TAG, "AppTask.Init() failed due to %d", err);
+        ESP_LOGI(TAG, "AppTask.Init() failed due to %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
 
@@ -150,8 +140,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -168,13 +157,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            // Consider the system to be "fully connected" if it has service
-            // connectivity
-            if (sHaveServiceConnectivity)
-            {
-                sStatusLED.Set(true);
-            }
-            else if (sHaveBLEConnections)
+            if (sHaveBLEConnections)
             {
                 sStatusLED.Blink(100, 100);
             }
@@ -187,10 +170,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sLockLED.Animate();
 
-        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
-        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
+        Clock::MonotonicMicroseconds nowUS            = SystemClock().GetMonotonicMicroseconds();
+        Clock::MonotonicMicroseconds nextChangeTimeUS = mLastChangeTimeUS + (5 * 1000 * 1000UL);
 
-        if (nowUS > nextChangeTimeUS)
+        if (nextChangeTimeUS < nowUS)
         {
             mLastChangeTimeUS = nowUS;
         }
@@ -216,7 +199,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     BoltLockManager::Action_t action;
     int32_t actor;
-    int err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
@@ -237,7 +220,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = CHIP_ERROR_MAX;
+        err = APP_ERROR_UNHANDLED_EVENT;
     }
 
     if (err == CHIP_NO_ERROR)

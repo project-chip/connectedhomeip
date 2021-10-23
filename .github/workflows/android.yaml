@@ -19,28 +19,22 @@ on:
     pull_request:
 
 concurrency:
-    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
-  
+
 jobs:
     android:
         name: Build Android
         timeout-minutes: 60
 
-        strategy:
-            matrix:
-                type: [arm, arm64, x64]
-
         env:
-            BUILD_TYPE: android_${{ matrix.type }}
-            TARGET_CPU: ${{ matrix.type }}
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-android:latest
+            image: connectedhomeip/chip-build-android:0.5.18
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -54,19 +48,17 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build libs
-              timeout-minutes: 2
+            - name: Build android examples
               run: |
-                  ./scripts/examples/android_app.sh
-            - name: Build App
-              timeout-minutes: 5
+                ./scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-*' build"
+            - name: Run Android build rule tests
               run: |
-                  yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses
-                  cd src/android/CHIPTool
-                  ./gradlew build
+                ./scripts/run_in_build_env.sh \
+                  "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test.tests"

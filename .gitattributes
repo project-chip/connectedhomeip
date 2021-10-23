@@ -1,0 +1,8 @@
+# Mark all files in generated folders as auto-generated to hide them in diffs
+**/gen/** linguist-generated
+# Same for files in zap-generated folders
+**/zap-generated/** linguist-generated
+# And some specific generated files
+src/controller/python/chip/clusters/CHIPClusters.cpp linguist-generated
+src/controller/python/chip/clusters/CHIPClusters.py linguist-generated
+src/darwin/Framework/CHIPTests/CHIPClustersTests.m linguist-generated

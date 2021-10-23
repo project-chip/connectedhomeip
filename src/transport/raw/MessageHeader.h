@@ -28,11 +28,14 @@
 
 #include <type_traits>
 
-#include <core/CHIPError.h>
-#include <core/Optional.h>
-#include <core/PeerId.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/GroupId.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
-#include <support/BitFlags.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -41,15 +44,16 @@ static constexpr size_t kMaxTagLen = 16;
 
 static constexpr size_t kMaxAppMessageLen = 1200;
 
+static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
+
 typedef int PacketHeaderFlags;
 
 namespace Header {
 
-enum class EncryptionType
+enum class SessionType
 {
-    kAESCCMTagLen8  = 0,
-    kAESCCMTagLen12 = 1,
-    kAESCCMTagLen16 = 2,
+    kUnicastSession = 0,
+    kGroupSession   = 1,
 };
 
 /**
@@ -71,33 +75,45 @@ enum class ExFlagValues : uint8_t
     kExchangeFlag_VendorIdPresent = 0x10,
 };
 
-enum class FlagValues : uint16_t
+// Message flags 8-bit value of the form
+//  |  4 bits | 1 | 1 | 2 bits |
+//  +---------+-------+--------|
+//  | version | - | S | DSIZ
+//                  |   |
+//                  |   +---------------- Destination Id field
+//                  +-------------------- Source node Id present
+
+enum class MsgFlagValues : uint8_t
 {
-    /// Header flag specifying that a destination node id is included in the header.
-    kDestinationNodeIdPresent = 0x0100,
-
     /// Header flag specifying that a source node id is included in the header.
-    kSourceNodeIdPresent = 0x0200,
-
-    /// Header flag specifying that it is a control message for secure session.
-    kSecureSessionControlMessage = 0x0800,
-
-    /// Header flag specifying that it is a encrypted message.
-    kSecure = 0x0001,
+    kSourceNodeIdPresent       = 0b00000100,
+    kDestinationNodeIdPresent  = 0b00000001,
+    kDestinationGroupIdPresent = 0b00000010,
+    kDSIZReserved              = 0b00000011,
 
 };
 
-using Flags   = BitFlags<FlagValues>;
-using ExFlags = BitFlags<ExFlagValues>;
+// Security flags 8-bit value of the form
+//  | 1 | 1 | 1  | 3 | 2 bits |
+//  +------------+---+--------|
+//  | P | C | MX | - | SessionType
+//
+// With :
+// P  = Privacy flag
+// C  = Control Msg flag
+// MX = Message Extension
 
-// Header is a 16-bit value of the form
-//  |  4 bit  | 4 bit |8 bit Security Flags|
-//  +---------+-------+--------------------|
-//  | version | Flags | P | C |Reserved| E |
-//                      |   |            +---Encrypted
-//                      |   +----------------Control message (TODO: Implement this)
-//                      +--------------------Privacy enhancements (TODO: Implement this)
-static constexpr uint16_t kFlagsMask = 0x0F01;
+enum class SecFlagValues : uint8_t
+{
+    kPrivacyFlag      = 0b10000000,
+    kControlMsgFlag   = 0b01000000,
+    kMsgExtensionFlag = 0b00100000,
+};
+
+using MsgFlags = BitFlags<MsgFlagValues>;
+using SecFlags = BitFlags<SecFlagValues>;
+
+using ExFlags = BitFlags<ExFlagValues>;
 
 } // namespace Header
 
@@ -111,12 +127,12 @@ class PacketHeader
 {
 public:
     /**
-     * Gets the message id set in the header.
+     * Gets the message counter set in the header.
      *
      * Message IDs are expecte to monotonically increase by one for each mesage
      * that has been sent.
      */
-    uint32_t GetMessageId() const { return mMessageId; }
+    uint32_t GetMessageCounter() const { return mMessageCounter; }
 
     /**
      * Gets the source node id in the current message.
@@ -132,79 +148,130 @@ public:
      */
     const Optional<NodeId> & GetDestinationNodeId() const { return mDestinationNodeId; }
 
-    uint16_t GetEncryptionKeyID() const { return mEncryptionKeyID; }
+    /**
+     * Gets the destination group id in the current message.
+     *
+     * NOTE: the destination group id is optional and may be missing.
+     */
+    const Optional<GroupId> & GetDestinationGroupId() const { return mDestinationGroupId; }
 
-    Header::Flags & GetFlags() { return mFlags; }
-    const Header::Flags & GetFlags() const { return mFlags; }
+    uint16_t GetSessionId() const { return mSessionId; }
+    Header::SessionType GetSessionType() const { return mSessionType; }
+
+    bool IsGroupSession() const { return mSessionType == Header::SessionType::kGroupSession; }
+    bool IsUnicastSession() const { return mSessionType == Header::SessionType::kUnicastSession; }
+
+    bool IsSessionTypeValid() const
+    {
+        switch (mSessionType)
+        {
+        case Header::SessionType::kUnicastSession:
+            return true;
+        case Header::SessionType::kGroupSession:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool IsEncrypted() const { return !((mSessionId == kMsgUnicastSessionIdUnsecured) && IsUnicastSession()); }
+
+    uint16_t MICTagLength() const { return (IsEncrypted()) ? chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES : 0; }
 
     /** Check if it's a secure session control message. */
-    bool IsSecureSessionControlMsg() const { return mFlags.Has(Header::FlagValues::kSecureSessionControlMessage); }
-
-    Header::EncryptionType GetEncryptionType() const { return mEncryptionType; }
+    bool IsSecureSessionControlMsg() const { return mSecFlags.Has(Header::SecFlagValues::kControlMsgFlag); }
 
     PacketHeader & SetSecureSessionControlMsg(bool value)
     {
-        mFlags.Set(Header::FlagValues::kSecureSessionControlMessage, value);
+        mSecFlags.Set(Header::SecFlagValues::kControlMsgFlag, value);
         return *this;
     }
 
     PacketHeader & SetSourceNodeId(NodeId id)
     {
         mSourceNodeId.SetValue(id);
-        mFlags.Set(Header::FlagValues::kSourceNodeIdPresent);
+        mMsgFlags.Set(Header::MsgFlagValues::kSourceNodeIdPresent);
         return *this;
     }
 
     PacketHeader & SetSourceNodeId(Optional<NodeId> id)
     {
         mSourceNodeId = id;
-        mFlags.Set(Header::FlagValues::kSourceNodeIdPresent, id.HasValue());
+        mMsgFlags.Set(Header::MsgFlagValues::kSourceNodeIdPresent, id.HasValue());
         return *this;
     }
 
     PacketHeader & ClearSourceNodeId()
     {
         mSourceNodeId.ClearValue();
-        mFlags.Clear(Header::FlagValues::kSourceNodeIdPresent);
+        mMsgFlags.Clear(Header::MsgFlagValues::kSourceNodeIdPresent);
         return *this;
     }
 
     PacketHeader & SetDestinationNodeId(NodeId id)
     {
         mDestinationNodeId.SetValue(id);
-        mFlags.Set(Header::FlagValues::kDestinationNodeIdPresent);
+        mMsgFlags.Set(Header::MsgFlagValues::kDestinationNodeIdPresent);
         return *this;
     }
 
     PacketHeader & SetDestinationNodeId(Optional<NodeId> id)
     {
         mDestinationNodeId = id;
-        mFlags.Set(Header::FlagValues::kDestinationNodeIdPresent, id.HasValue());
+        mMsgFlags.Set(Header::MsgFlagValues::kDestinationNodeIdPresent, id.HasValue());
         return *this;
     }
 
     PacketHeader & ClearDestinationNodeId()
     {
         mDestinationNodeId.ClearValue();
-        mFlags.Clear(Header::FlagValues::kDestinationNodeIdPresent);
+        mMsgFlags.Clear(Header::MsgFlagValues::kDestinationNodeIdPresent);
         return *this;
     }
 
-    PacketHeader & SetEncryptionKeyID(uint16_t id)
+    PacketHeader & SetDestinationGroupId(GroupId id)
     {
-        mEncryptionKeyID = id;
+        mDestinationGroupId.SetValue(id);
+        mMsgFlags.Set(Header::MsgFlagValues::kDestinationGroupIdPresent);
         return *this;
     }
 
-    PacketHeader & SetMessageId(uint32_t id)
+    PacketHeader & SetDestinationGroupId(Optional<GroupId> id)
     {
-        mMessageId = id;
+        mDestinationGroupId = id;
+        mMsgFlags.Set(Header::MsgFlagValues::kDestinationGroupIdPresent, id.HasValue());
         return *this;
     }
 
-    PacketHeader & SetEncryptionType(Header::EncryptionType type)
+    PacketHeader & ClearDestinationGroupId()
     {
-        mEncryptionType = type;
+        mDestinationGroupId.ClearValue();
+        mMsgFlags.Clear(Header::MsgFlagValues::kDestinationGroupIdPresent);
+        return *this;
+    }
+
+    PacketHeader & SetSessionType(Header::SessionType type)
+    {
+        mSessionType = type;
+        return *this;
+    }
+
+    PacketHeader & SetSessionId(uint16_t id)
+    {
+        mSessionId = id;
+        return *this;
+    }
+
+    PacketHeader & SetMessageCounter(uint32_t id)
+    {
+        mMessageCounter = id;
+        return *this;
+    }
+
+    PacketHeader & SetUnsecured()
+    {
+        mSessionId   = kMsgUnicastSessionIdUnsecured;
+        mSessionType = Header::SessionType::kUnicastSession;
         return *this;
     }
 
@@ -289,26 +356,27 @@ public:
     }
 
 private:
-    /// Represents the current encode/decode header version
-    static constexpr int kHeaderVersion = 2;
+    /// Represents the current encode/decode header version (4 bits)
+    static constexpr uint8_t kMsgHeaderVersion = 0x00;
 
     /// Value expected to be incremented for each message sent.
-    uint32_t mMessageId = 0;
+    uint32_t mMessageCounter = 0;
 
     /// What node the message originated from
     Optional<NodeId> mSourceNodeId;
 
     /// Intended recipient of the message.
     Optional<NodeId> mDestinationNodeId;
+    Optional<GroupId> mDestinationGroupId;
 
-    /// Encryption Key ID
-    uint16_t mEncryptionKeyID = 0;
+    /// Session ID
+    uint16_t mSessionId = kMsgUnicastSessionIdUnsecured;
 
-    /// Message flags read from the message.
-    Header::Flags mFlags;
+    Header::SessionType mSessionType = Header::SessionType::kUnicastSession;
 
-    /// Represents encryption type used for encrypting current packet
-    Header::EncryptionType mEncryptionType = Header::EncryptionType::kAESCCMTagLen16;
+    /// Flags read from the message.
+    Header::MsgFlags mMsgFlags;
+    Header::SecFlags mSecFlags;
 };
 
 /**
@@ -340,8 +408,7 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     bool HasMessageType(MessageType type) const
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) && HasMessageType(static_cast<uint8_t>(type));
+        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) && HasMessageType(to_underlying(type));
     }
 
     /**
@@ -349,7 +416,7 @@ public:
      *
      * NOTE: the Acknowledged Message Counter is optional and may be missing.
      */
-    const Optional<uint32_t> & GetAckId() const { return mAckId; }
+    const Optional<uint32_t> & GetAckMessageCounter() const { return mAckMessageCounter; }
 
     /**
      * Set the message type for this header.  This requires setting the protocol
@@ -372,8 +439,7 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     PayloadHeader & SetMessageType(MessageType type)
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        SetMessageType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(type));
+        SetMessageType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(type));
         return *this;
     }
 
@@ -391,17 +457,17 @@ public:
         return *this;
     }
 
-    PayloadHeader & SetAckId(uint32_t id)
+    PayloadHeader & SetAckMessageCounter(uint32_t id)
     {
-        mAckId.SetValue(id);
+        mAckMessageCounter.SetValue(id);
         mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_AckMsg);
         return *this;
     }
 
     /** Set the AckMsg flag bit. */
-    PayloadHeader & SetAckId(Optional<uint32_t> id)
+    PayloadHeader & SetAckMessageCounter(Optional<uint32_t> id)
     {
-        mAckId = id;
+        mAckMessageCounter = id;
         mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_AckMsg, id.HasValue());
         return *this;
     }
@@ -540,7 +606,7 @@ private:
     Header::ExFlags mExchangeFlags;
 
     /// Message counter of a previous message that is being acknowledged by the current message
-    Optional<uint32_t> mAckId;
+    Optional<uint32_t> mAckMessageCounter;
 };
 
 /** Handles encoding/decoding of CHIP message headers */
@@ -550,12 +616,11 @@ public:
     const uint8_t * GetTag() const { return &mTag[0]; }
 
     /** Set the message auth tag for this header. */
-    MessageAuthenticationCode & SetTag(PacketHeader * header, Header::EncryptionType encType, uint8_t * tag, size_t len)
+    MessageAuthenticationCode & SetTag(PacketHeader * header, uint8_t * tag, size_t len)
     {
-        const size_t tagLen = TagLenForEncryptionType(encType);
+        const size_t tagLen = chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
         if (tagLen > 0 && tagLen <= kMaxTagLen && len == tagLen)
         {
-            header->SetEncryptionType(encType);
             memcpy(&mTag, tag, tagLen);
         }
 
@@ -593,8 +658,6 @@ public:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
     CHIP_ERROR Encode(const PacketHeader & packetHeader, uint8_t * data, uint16_t size, uint16_t * encode_size) const;
-
-    static uint16_t TagLenForEncryptionType(Header::EncryptionType encType);
 
 private:
     /// Message authentication tag generated at encryption of the message.

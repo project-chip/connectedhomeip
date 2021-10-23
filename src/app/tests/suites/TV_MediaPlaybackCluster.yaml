@@ -1,0 +1,109 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Media Playback Cluster Tests
+
+config:
+    cluster: "Media Playback"
+    endpoint: 3
+
+tests:
+    - label: "Media Playback Play Command"
+      command: "MediaPlay"
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Pause Command"
+      command: "MediaPause"
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Stop Command"
+      command: "MediaStop"
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Start Over Command"
+      command: "MediaStartOver"
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Previous Command"
+      command: "MediaPrevious"
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Next Command"
+      command: "MediaNext"
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Rewind Command"
+      command: "MediaRewind"
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Fast Forward Command"
+      command: "MediaFastForward"
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Skip Forward Command"
+      command: "MediaSkipForward"
+      arguments:
+          values:
+              - name: "deltaPositionMilliseconds"
+                value: 100
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Skip Backward Command"
+      command: "MediaSkipBackward"
+      arguments:
+          values:
+              - name: "deltaPositionMilliseconds"
+                value: 100
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0
+
+    - label: "Media Playback Seek Command"
+      command: "MediaSeek"
+      arguments:
+          values:
+              - name: "position"
+                value: 100
+      response:
+          values:
+              - name: "mediaPlaybackStatus"
+                value: 0

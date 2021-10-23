@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {

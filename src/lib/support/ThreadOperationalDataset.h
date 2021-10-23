@@ -21,9 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <core/CHIPCore.h>
-#include <platform/internal/DeviceNetworkInfo.h>
-#include <support/Span.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Thread {

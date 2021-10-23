@@ -139,7 +139,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     void HandleWriteEvent(volatile sl_bt_msg_t * evt);
     void HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt);
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
-    void HandleTxConfirmationEvent(volatile sl_bt_msg_t * evt);
+    void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
     void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle, uint8_t bondingHandle);

@@ -1,0 +1,110 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Window Covering [TC-WNCV-3.2] DownOrClose Verification with server as DUT
+
+# TODO: WindowCovering tests TC-WNCV-3.2 finalize featuremap conditional dependencies
+
+config:
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    ### Step 1x -> Initialize Position
+    ### MANDATORY Command
+    - label: "1a: TH adjusts the the DUT to a non-closed position"
+      command: "UpOrOpen"
+
+    ### Depends on the FeatureMap
+    - label:
+          "1b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      response:
+          constraints:
+              type: uint16
+
+    ### Depends on the FeatureMap
+    - label:
+          "1b: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      response:
+          constraints:
+              type: uint16
+
+    ### Step 2x -> Check Command instant effect
+    ### MANDATORY Command
+    - label: "2a: TH sends DownOrClose command to DUT"
+      command: "DownOrClose"
+
+    ### Depends on the FeatureMap
+    - label:
+          "2b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
+          from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "TargetPositionLiftPercent100ths"
+      response:
+          constraints:
+              type: uint16
+
+    ### Depends on the FeatureMap
+    - label:
+          "2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
+          from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "TargetPositionTiltPercent100ths"
+      response:
+          constraints:
+              type: uint16
+
+    ### Depends on a sleep/wait command how to do this with a real device
+    - label: "2d: Wait for the movement to finish"
+      disabled: true
+
+    ### Step 3x -> Check longer period effect
+    ### MANDATORY reads
+    - label: "3a: TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          value: 0
+
+    ### Depends on the FeatureMap
+    - label:
+          "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      response:
+          constraints:
+              type: uint16
+
+    ### Depends on the FeatureMap
+    - label:
+          "3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      response:
+          constraints:
+              type: uint16

@@ -2,7 +2,7 @@ ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=910c9ce5ba8ea30155b50b9d12f03ece7123a0c2
+ARG NCS_REVISION=ffcf07fe4586634a6793a48e5444a7196e7ebac6
 
 # ==================================================
 # nRF Connect SDK dependencies
@@ -12,7 +12,7 @@ ARG NCS_REVISION=910c9ce5ba8ea30155b50b9d12f03ece7123a0c2
 WORKDIR /opt/NordicSemiconductor/nRF5_tools/install
 RUN set -x \
     && apt-get update \
-    && apt-get install --no-install-recommends -fy device-tree-compiler \
+    && apt-get install --no-install-recommends -fy device-tree-compiler ccache \
     && curl https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64.tar.gz \
     | tar zxvf - \
     && cd .. \
@@ -27,11 +27,15 @@ RUN set -x \
 
 WORKDIR /opt/NordicSemiconductor/nrfconnect
 RUN set -x \
+    # python3-yaml package conflicts with nRF Python requirements
+    && (apt remove -fy python3-yaml && apt autoremove || exit 0) \
     && python3 -m pip install -U --no-cache-dir pip setuptools wheel cmake west \
-    && west init -m https://github.com/nrfconnect/sdk-nrf --mr "$NCS_REVISION" \
+    && west init -m https://github.com/nrfconnect/sdk-nrf \
+    && git -C nrf fetch origin "$NCS_REVISION" \
+    && git -C nrf checkout FETCH_HEAD \
     && west config update.narrow true \
     && west config update.fetch smart \
-    && west update -o=--depth=1 \
+    && west update -o=--depth=1 -n -f smart \
     && python3 -m pip install --no-cache-dir -r zephyr/scripts/requirements.txt \
     && python3 -m pip install --no-cache-dir -r nrf/scripts/requirements.txt \
     && python3 -m pip install --no-cache-dir -r bootloader/mcuboot/scripts/requirements.txt \

@@ -64,9 +64,6 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
-    bool _HaveIPv4InternetConnectivity(void);
-    bool _HaveIPv6InternetConnectivity(void);
-    bool _HaveServiceConnectivity(void);
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
@@ -77,21 +74,6 @@ private:
 
     static ConnectivityManagerImpl sInstance;
 };
-
-inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
-{
-    return false;
-}
-
-inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
-{
-    return false;
-}
-
-inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
-{
-    return _HaveServiceConnectivityViaThread();
-}
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.

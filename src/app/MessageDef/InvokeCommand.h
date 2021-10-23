@@ -23,14 +23,15 @@
 
 #pragma once
 
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "Builder.h"
-#include "CommandDataElement.h"
+#include "CommandDataIB.h"
 #include "CommandList.h"
 #include "Parser.h"
 

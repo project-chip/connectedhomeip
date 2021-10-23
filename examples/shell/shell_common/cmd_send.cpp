@@ -27,7 +27,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
@@ -39,8 +39,6 @@ using namespace Shell;
 using namespace Logging;
 
 namespace {
-
-Messaging::ExchangeContext * gExchangeCtx = nullptr;
 
 class SendArguments
 {
@@ -100,27 +98,23 @@ private:
 class MockAppDelegate : public Messaging::ExchangeDelegate
 {
 public:
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && buffer) override
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
     {
-        uint32_t respTime    = System::Timer::GetCurrentEpoch();
-        uint32_t transitTime = respTime - gSendArguments.GetLastSendTime();
+        uint64_t respTime    = System::SystemClock().GetMonotonicMilliseconds();
+        uint64_t transitTime = respTime - gSendArguments.GetLastSendTime();
         streamer_t * sout    = streamer_get();
 
         streamer_printf(sout, "Response received: len=%u time=%.3fms\n", buffer->DataLength(),
                         static_cast<double>(transitTime) / 1000);
 
-        gExchangeCtx->Close();
-        gExchangeCtx = nullptr;
+        return CHIP_NO_ERROR;
     }
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override
     {
         streamer_t * sout = streamer_get();
         streamer_printf(sout, "No response received\n");
-
-        gExchangeCtx->Close();
-        gExchangeCtx = nullptr;
     }
 } gMockAppDelegate;
 
@@ -132,17 +126,9 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     System::PacketBufferHandle payloadBuf;
     uint32_t payloadSize = gSendArguments.GetPayloadSize();
 
-    // Discard any existing exchange context. Effectively we can only have one exchange with
-    // a single node at any one time.
-    if (gExchangeCtx != nullptr)
-    {
-        gExchangeCtx->Abort();
-        gExchangeCtx = nullptr;
-    }
-
     // Create a new exchange context.
-    gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
-    VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    auto * ec = gExchangeManager.NewContext(SessionHandle(kTestDeviceNodeId, 1, 1, gFabricIndex), &gMockAppDelegate);
+    VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     payloadBuf = MessagePacketBuffer::New(payloadSize);
     VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -159,26 +145,24 @@ CHIP_ERROR SendMessage(streamer_t * stream)
         sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
     }
 
-    gExchangeCtx->SetResponseTimeout(kResponseTimeOut);
+    ec->SetResponseTimeout(kResponseTimeOut);
     sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
 
-    gSendArguments.SetLastSendTime(System::Timer::GetCurrentEpoch());
+    gSendArguments.SetLastSendTime(System::SystemClock().GetMonotonicMilliseconds());
 
     streamer_printf(stream, "\nSend CHIP message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
 
-    err = gExchangeCtx->SendMessage(Protocols::Id(VendorId::Common, gSendArguments.GetProtocolId()),
-                                    gSendArguments.GetMessageType(), std::move(payloadBuf), sendFlags);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        gExchangeCtx->Abort();
-        gExchangeCtx = nullptr;
-    }
+    err = ec->SendMessage(Protocols::Id(VendorId::Common, gSendArguments.GetProtocolId()), gSendArguments.GetMessageType(),
+                          std::move(payloadBuf), sendFlags);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        if (ec != nullptr)
+        {
+            ec->Close();
+        }
         streamer_printf(stream, "Send CHIP message failed, err: %s\n", ErrorStr(err));
     }
 
@@ -196,14 +180,14 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator,
-                                     gAdminId);
+    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, CryptoContext::SessionRole::kInitiator,
+                                     gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Establish secure session failed, err: %s\n", ErrorStr(err));
-        gSendArguments.SetLastSendTime(System::Timer::GetCurrentEpoch());
+        gSendArguments.SetLastSendTime(System::SystemClock().GetMonotonicMilliseconds());
     }
     else
     {
@@ -217,18 +201,13 @@ void ProcessCommand(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::AdminPairingTable admins;
     Transport::PeerAddress peerAddress;
-    Transport::AdminPairingInfo * adminInfo = nullptr;
 
     if (!chip::Inet::IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid CHIP Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-
-    adminInfo = admins.AssignAdminId(gAdminId, kTestControllerNodeId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
@@ -247,8 +226,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gSendArguments.GetPort());
 
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -256,8 +234,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
 
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 
@@ -311,10 +288,9 @@ void PrintUsage(streamer_t * stream)
     streamer_printf(stream, "  -s  <size>      application payload size in bytes\n");
 }
 
-int cmd_send(int argc, char ** argv)
+CHIP_ERROR cmd_send(int argc, char ** argv)
 {
     streamer_t * sout = streamer_get();
-    int ret           = 0;
     int optIndex      = 0;
 
     gSendArguments.Reset();
@@ -325,7 +301,7 @@ int cmd_send(int argc, char ** argv)
         {
         case 'h':
             PrintUsage(sout);
-            return 0;
+            return CHIP_NO_ERROR;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         case 'u':
             gSendArguments.SetUsingTCP(false);
@@ -338,7 +314,7 @@ int cmd_send(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -P\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -349,7 +325,7 @@ int cmd_send(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -T\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -360,7 +336,7 @@ int cmd_send(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -p\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -371,7 +347,7 @@ int cmd_send(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -s\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -382,7 +358,7 @@ int cmd_send(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -r\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -398,12 +374,12 @@ int cmd_send(int argc, char ** argv)
                 }
                 else
                 {
-                    ret = -1;
+                    return CHIP_ERROR_INVALID_ARGUMENT;
                 }
             }
             break;
         default:
-            ret = -1;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         optIndex++;
@@ -412,16 +388,13 @@ int cmd_send(int argc, char ** argv)
     if (optIndex >= argc)
     {
         streamer_printf(sout, "Missing IP address\n");
-        ret = -1;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (ret == 0)
-    {
-        streamer_printf(sout, "IP address: %s\n", argv[optIndex]);
-        ProcessCommand(sout, argv[optIndex]);
-    }
+    streamer_printf(sout, "IP address: %s\n", argv[optIndex]);
+    ProcessCommand(sout, argv[optIndex]);
 
-    return ret;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace

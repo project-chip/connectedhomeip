@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -46,7 +48,6 @@ CHIP_ERROR EventPath::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -150,7 +151,6 @@ CHIP_ERROR EventPath::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -176,14 +176,13 @@ CHIP_ERROR EventPath::Parser::GetEventId(chip::EventId * const apEventId) const
     return GetUnsignedInteger(kCsTag_EventId, apEventId);
 }
 
-CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
+CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);
     SuccessOrExit(mError);
 
 exit:
-    ChipLogFunctError(mError);
     return mError;
 }
 
@@ -200,48 +199,40 @@ CHIP_ERROR EventPath::Builder::Init(chip::TLV::TLVWriter * const apWriter, const
 EventPath::Builder & EventPath::Builder::NodeId(const uint64_t aNodeId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_NodeId), aNodeId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_NodeId), aNodeId);
+    }
     return *this;
 }
 
 EventPath::Builder & EventPath::Builder::EndpointId(const chip::EndpointId aEndpointId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
+    }
     return *this;
 }
 
 EventPath::Builder & EventPath::Builder::ClusterId(const chip::ClusterId aClusterId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
+    }
     return *this;
 }
 
 EventPath::Builder & EventPath::Builder::EventId(const chip::EventId aEventId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventId), aEventId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventId), aEventId);
+    }
     return *this;
 }
 

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <support/BufferWriter.h>
+#include <lib/support/BufferWriter.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

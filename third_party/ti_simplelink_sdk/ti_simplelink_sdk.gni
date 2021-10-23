@@ -272,9 +272,6 @@ template("ti_simplelink_sdk") {
     sources = [
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/alarm.c",
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/alarm_micro.c",
-      "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/crypto/aes_alt.c",
-      "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/crypto/ecjpake_alt.c",
-      "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/crypto/sha256_alt.c",
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/diag.c",
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/entropy.c",
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/misc.c",

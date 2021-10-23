@@ -23,15 +23,16 @@
 
 #pragma once
 
-#include "AttributeStatusElement.h"
+#include "AttributeStatusIB.h"
 #include "ListBuilder.h"
 #include "ListParser.h"
 
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -44,7 +45,7 @@ public:
      *
      *  @return A reference to AttributeStatus::Builder
      */
-    AttributeStatusElement::Builder & CreateAttributeStatusBuilder();
+    AttributeStatusIB::Builder & CreateAttributeStatusBuilder();
 
     /**
      *  @brief Mark the end of this AttributeStatusList
@@ -54,7 +55,7 @@ public:
     AttributeStatusList::Builder & EndOfAttributeStatusList();
 
 private:
-    AttributeStatusElement::Builder mAttributeStatusBuilder;
+    AttributeStatusIB::Builder mAttributeStatusBuilder;
 };
 
 class Parser : public ListParser

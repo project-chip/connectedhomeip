@@ -1,0 +1,131 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Window Covering [TC-WNCV-2.1] Attributes with server as DUT
+
+config:
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    ### MANDATORY Attributes
+    ### Attribute[  0]: Type
+    - label: "read the RO mandatory attribute default: Type"
+      command: "readAttribute"
+      attribute: "Type"
+      response:
+          value: 0
+
+    - label: "write a value into the RO mandatory attribute: Type"
+      disabled: true # TODO : follow chip-tool error messaging capabilities to write or not into read only attribute
+      command: "writeAttribute"
+      attribute: "Type"
+      arguments:
+          value: 7
+      response:
+          error: 1
+
+    - label: "reads back the RO mandatory attribute: Type"
+      command: "readAttribute"
+      attribute: "Type"
+      response:
+          value: 0
+
+    ### Attribute[  7]: ConfigStatus
+    - label: "read the RO mandatory attribute default: ConfigStatus"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      response:
+          value: 3
+
+    - label: "write a value into the RO mandatory attribute: ConfigStatus"
+      disabled: true # TODO : follow chip-tool error messaging capabilities to write or not into read only attribute
+      command: "writeAttribute"
+      attribute: "ConfigStatus"
+      arguments:
+          value: 7
+      response:
+          error: 1
+
+    - label: "reads back the RO mandatory attribute: ConfigStatus"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      response:
+          value: 3
+
+    ### Attribute[ 10]: OperationalStatus
+    - label: "read the RO mandatory attribute default: OperationalStatus"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          value: 0
+
+    - label: "write a value into the RO mandatory attribute: OperationalStatus"
+      disabled: true # TODO : follow chip-tool error messaging capabilities to write or not into read only attribute
+      command: "writeAttribute"
+      attribute: "OperationalStatus"
+      arguments:
+          value: 7
+      response:
+          error: 1
+
+    - label: "reads back the RO mandatory attribute: OperationalStatus"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          value: 0
+
+    ### Attribute[ 13]: EndProductType
+    - label: "read the RO mandatory attribute default: EndProductType"
+      command: "readAttribute"
+      attribute: "EndProductType"
+      response:
+          value: 0
+
+    - label: "write a value into the RO mandatory attribute: EndProductType"
+      disabled: true # TODO : follow chip-tool error messaging capabilities to write or not into read only attribute
+      command: "writeAttribute"
+      attribute: "EndProductType"
+      arguments:
+          value: 7
+      response:
+          error: 1
+
+    - label: "reads back the RO mandatory attribute: EndProductType"
+      command: "readAttribute"
+      attribute: "EndProductType"
+      response:
+          value: 0
+
+    ### Attribute[ 23]: Mode
+    - label: "read the RW mandatory attribute default: Mode"
+      command: "readAttribute"
+      attribute: "Mode"
+      response:
+          value: 0
+
+    - label: "write a value into the RW mandatory attribute:: Mode"
+      disabled: false
+      command: "writeAttribute"
+      attribute: "Mode"
+      arguments:
+          value: 7
+      response:
+          error: 0
+
+    - label: "reads back the RW mandatory attribute: Mode"
+      command: "readAttribute"
+      attribute: "Mode"
+      response:
+          value: 7

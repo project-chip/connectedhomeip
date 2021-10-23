@@ -25,7 +25,7 @@
 #include <memory>
 
 #include <ble/CHIPBleServiceData.h>
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <system/SystemLayer.h>
 
@@ -63,7 +63,7 @@ public:
     ~ChipDeviceScanner();
 
     /// Initiate a scan for devices, with the given timeout
-    CHIP_ERROR StartScan(unsigned timeoutMs);
+    CHIP_ERROR StartScan(System::Clock::Timeout timeout);
 
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
@@ -75,7 +75,7 @@ public:
     static std::unique_ptr<ChipDeviceScanner> Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
 
 private:
-    static void TimerExpiredCallback(chip::System::Layer * layer, void * appState, chip::System::Error error);
+    static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
     static int MainLoopStartScan(ChipDeviceScanner * self);
     static int MainLoopStopScan(ChipDeviceScanner * self);
     static void SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self);

@@ -28,6 +28,8 @@
 #include "InvokeCommand.h"
 #include "MessageDefHelper.h"
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -45,7 +47,6 @@ CHIP_ERROR InvokeCommand::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -66,7 +67,7 @@ CHIP_ERROR InvokeCommand::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        const uint64_t tag = reader.GetTag();
+        const Tag tag = reader.GetTag();
 
         if (chip::TLV::ContextTag(kCsTag_CommandList) == tag)
         {
@@ -105,7 +106,6 @@ CHIP_ERROR InvokeCommand::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -141,7 +141,6 @@ CommandList::Builder & InvokeCommand::Builder::CreateCommandListBuilder()
     VerifyOrExit(CHIP_NO_ERROR == mError, mCommandListBuilder.ResetError(mError));
 
     mError = mCommandListBuilder.Init(mpWriter, kCsTag_CommandList);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mCommandListBuilder would be un-/partial initialized and cannot be used to write anything

@@ -26,6 +26,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -43,7 +45,6 @@ CHIP_ERROR ReadRequest::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -65,7 +66,7 @@ CHIP_ERROR ReadRequest::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        const uint64_t tag = reader.GetTag();
+        const Tag tag = reader.GetTag();
 
         if (chip::TLV::ContextTag(kCsTag_AttributePathList) == tag)
         {
@@ -155,7 +156,6 @@ CHIP_ERROR ReadRequest::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -235,7 +235,6 @@ AttributePathList::Builder & ReadRequest::Builder::CreateAttributePathListBuilde
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathListBuilder.ResetError(mError));
 
     mError = mAttributePathListBuilder.Init(mpWriter, kCsTag_AttributePathList);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mAttributePathListBuilder would be un-/partial initialized and cannot be used to write anything
@@ -248,7 +247,6 @@ EventPathList::Builder & ReadRequest::Builder::CreateEventPathListBuilder()
     VerifyOrExit(CHIP_NO_ERROR == mError, mEventPathListBuilder.ResetError(mError));
 
     mError = mEventPathListBuilder.Init(mpWriter, kCsTag_EventPathList);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mEventPathListBuilder would be un-/partial initialized and cannot be used to write anything
@@ -261,7 +259,6 @@ AttributeDataVersionList::Builder & ReadRequest::Builder::CreateAttributeDataVer
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataVersionListBuilder.ResetError(mError));
 
     mError = mAttributeDataVersionListBuilder.Init(mpWriter, kCsTag_AttributeDataVersionList);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mAttributeDataVersionListBuilder would be un-/partial initialized and cannot be used to write anything
@@ -271,12 +268,10 @@ exit:
 ReadRequest::Builder & ReadRequest::Builder::EventNumber(const uint64_t aEventNumber)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventNumber), aEventNumber);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventNumber), aEventNumber);
+    }
     return *this;
 }
 

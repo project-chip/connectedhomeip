@@ -32,10 +32,10 @@
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
 #endif
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
 #include <inipp/inipp.h>
+#include <lib/core/CHIPCore.h>
 #include <string>
 
 class EndpointConfigurationStorage

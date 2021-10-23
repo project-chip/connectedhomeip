@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -46,7 +48,6 @@ CHIP_ERROR EventDataElement::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -210,7 +211,6 @@ EventDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) 
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -390,7 +390,6 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -450,7 +449,6 @@ CHIP_ERROR EventDataElement::Parser::GetData(chip::TLV::TLVReader * const apRead
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_Data), *apReader);
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -463,84 +461,74 @@ CHIP_ERROR EventDataElement::Builder::Init(chip::TLV::TLVWriter * const apWriter
 EventPath::Builder & EventDataElement::Builder::CreateEventPathBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mEventPathBuilder.ResetError(mError));
-
-    mError = mEventPathBuilder.Init(mpWriter, kCsTag_EventPath);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mEventPathBuilder.Init(mpWriter, kCsTag_EventPath);
+    }
+    else
+    {
+        mEventPathBuilder.ResetError(mError);
+    }
     return mEventPathBuilder;
 }
 
 EventDataElement::Builder EventDataElement::Builder::PriorityLevel(const uint8_t aPriorityLevel)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_PriorityLevel), aPriorityLevel);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_PriorityLevel), aPriorityLevel);
+    }
     return *this;
 }
 
 EventDataElement::Builder EventDataElement::Builder::Number(const uint64_t aNumber)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_Number), aNumber);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_Number), aNumber);
+    }
     return *this;
 }
 
 EventDataElement::Builder EventDataElement::Builder::UTCTimestamp(const uint64_t aUTCTimestamp)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_UTCTimestamp), aUTCTimestamp);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_UTCTimestamp), aUTCTimestamp);
+    }
     return *this;
 }
 
 EventDataElement::Builder EventDataElement::Builder::SystemTimestamp(const uint64_t aSystemTimestamp)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_SystemTimestamp), aSystemTimestamp);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_SystemTimestamp), aSystemTimestamp);
+    }
     return *this;
 }
 
 EventDataElement::Builder EventDataElement::Builder::DeltaUTCTimestamp(const uint64_t aDeltaUTCTimestamp)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DeltaUTCTimestamp), aDeltaUTCTimestamp);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DeltaUTCTimestamp), aDeltaUTCTimestamp);
+    }
     return *this;
 }
 
 EventDataElement::Builder EventDataElement::Builder::DeltaSystemTimestamp(const uint64_t aDeltaSystemTimestamp)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DeltaSystemTimestamp), aDeltaSystemTimestamp);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DeltaSystemTimestamp), aDeltaSystemTimestamp);
+    }
     return *this;
 }
 

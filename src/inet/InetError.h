@@ -32,63 +32,12 @@
 
 #include <inet/InetConfig.h>
 
+#include <lib/core/CHIPError.h>
 #include <system/SystemError.h>
 
+#define CHIP_INET_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kInet, (e))
+
 // clang-format off
-
-/**
- *  The basic type for all InetLayer errors.
- *
- *  This is defined to a platform- or system-specific type.
- *
- */
-typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
-
-/**
- *  @def INET_ERROR_MIN
- *
- *  @brief
- *    This defines the base or minimum InetLayer error number
- *    range. This value may be configured via #INET_CONFIG_ERROR_MIN.
- *
- */
-#define INET_ERROR_MIN                  INET_CONFIG_ERROR_MIN
-
-/**
- *  @def INET_ERROR_MAX
- *
- *  @brief
- *    This defines the top or maximum InetLayer error number
- *    range. This value may be configured via #INET_CONFIG_ERROR_MAX.
- *
- */
-#define INET_ERROR_MAX                  INET_CONFIG_ERROR_MAX
-
-/**
- *  @def _INET_ERROR(e)
- *
- *  @brief
- *    This defines a mapping function for InetLayer errors that allows
- *    mapping such errors into a platform- or system-specific
- *    range. This function may be configured via
- *    #_INET_CONFIG_ERROR(e).
- *
- *  @param[in]  e  The InetLayer error to map.
- *
- *  @return The mapped InetLayer error.
- *
- */
-#define _INET_ERROR(e)                  _INET_CONFIG_ERROR(e)
-
-/**
- *  @def INET_NO_ERROR
- *
- *  @brief
- *    This defines the InetLayer error code for success or no
- *    error. This value may be configured via #INET_CONFIG_NO_ERROR.
- *
- */
-#define INET_NO_ERROR                   INET_CONFIG_NO_ERROR
 
 /**
  *  @name Error Definitions
@@ -104,16 +53,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    the expected type or scope.
  *
  */
-#define INET_ERROR_WRONG_ADDRESS_TYPE                       _INET_ERROR(0)
-
-/**
- *  @def INET_ERROR_CONNECTION_ABORTED
- *
- *  @brief
- *    A connection has been aborted.
- *
- */
-#define INET_ERROR_CONNECTION_ABORTED                       _INET_ERROR(1)
+#define INET_ERROR_WRONG_ADDRESS_TYPE                       CHIP_INET_ERROR(0x01)
 
 /**
  *  @def INET_ERROR_PEER_DISCONNECTED
@@ -122,63 +62,14 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    A remote connection peer disconnected.
  *
  */
-#define INET_ERROR_PEER_DISCONNECTED                        _INET_ERROR(2)
+#define INET_ERROR_PEER_DISCONNECTED                        CHIP_INET_ERROR(0x02)
 
-/**
- *  @def INET_ERROR_INCORRECT_STATE
- *
- *  @brief
- *    An unexpected state was encountered.
- *
- */
-#define INET_ERROR_INCORRECT_STATE                          _INET_ERROR(3)
-
-/**
- *  @def INET_ERROR_MESSAGE_TOO_LONG
- *
- *  @brief
- *    A message is too long.
- *
- */
-#define INET_ERROR_MESSAGE_TOO_LONG                         _INET_ERROR(4)
-
-/**
- *  @def INET_ERROR_NO_CONNECTION_HANDLER
- *
- *  @brief
- *    No callback has been registered for handling an incoming TCP
- *    connection.
- *
- */
-#define INET_ERROR_NO_CONNECTION_HANDLER                    _INET_ERROR(5)
-
-/**
- *  @def INET_ERROR_NO_MEMORY
- *
- *  @brief
- *    A request for memory could not be fulfilled.
- *
- */
-#define INET_ERROR_NO_MEMORY                                _INET_ERROR(6)
-
-/**
- *  @def INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED
- *
- *  @brief
- *    Fewer message bytes were sent than requested.
- *
- */
-#define INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED               _INET_ERROR(7)
-
-/**
- *  @def INET_ERROR_INBOUND_MESSAGE_TOO_BIG
- *
- *  @brief
- *    More message data is pending than available buffer space
- *    available to copy it.
- *
- */
-#define INET_ERROR_INBOUND_MESSAGE_TOO_BIG                  _INET_ERROR(8)
+// unused                                                   CHIP_INET_ERROR(0x03)
+// unused                                                   CHIP_INET_ERROR(0x04)
+// unused                                                   CHIP_INET_ERROR(0x05)
+// unused                                                   CHIP_INET_ERROR(0x06)
+// unused                                                   CHIP_INET_ERROR(0x07)
+// unused                                                   CHIP_INET_ERROR(0x08)
 
 /**
  *  @def INET_ERROR_HOST_NOT_FOUND
@@ -187,7 +78,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    A requested host name could not be resolved to an address.
  *
  */
-#define INET_ERROR_HOST_NOT_FOUND                           _INET_ERROR(9)
+#define INET_ERROR_HOST_NOT_FOUND                           CHIP_INET_ERROR(0x09)
 
 /**
  *  @def INET_ERROR_DNS_TRY_AGAIN
@@ -197,7 +88,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    again later.
  *
  */
-#define INET_ERROR_DNS_TRY_AGAIN                            _INET_ERROR(10)
+#define INET_ERROR_DNS_TRY_AGAIN                            CHIP_INET_ERROR(0x0a)
 
 /**
  *  @def INET_ERROR_DNS_NO_RECOVERY
@@ -206,16 +97,9 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    A name server returned an unrecoverable error.
  *
  */
-#define INET_ERROR_DNS_NO_RECOVERY                          _INET_ERROR(11)
+#define INET_ERROR_DNS_NO_RECOVERY                          CHIP_INET_ERROR(0x0b)
 
-/**
- *  @def INET_ERROR_BAD_ARGS
- *
- *  @brief
- *    An invalid argument or arguments were supplied.
- *
- */
-#define INET_ERROR_BAD_ARGS                                 _INET_ERROR(12)
+// unused                                                   CHIP_INET_ERROR(0x0c)
 
 /**
  *  @def INET_ERROR_WRONG_PROTOCOL_TYPE
@@ -224,7 +108,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    An incorrect or unexpected protocol type was encountered.
  *
  */
-#define INET_ERROR_WRONG_PROTOCOL_TYPE                      _INET_ERROR(13)
+#define INET_ERROR_WRONG_PROTOCOL_TYPE                      CHIP_INET_ERROR(0x0d)
 
 /**
  *  @def INET_ERROR_UNKNOWN_INTERFACE
@@ -233,16 +117,9 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    An unknown interface identifier was encountered.
  *
  */
-#define INET_ERROR_UNKNOWN_INTERFACE                        _INET_ERROR(14)
+#define INET_ERROR_UNKNOWN_INTERFACE                        CHIP_INET_ERROR(0x0e)
 
-/**
- *  @def INET_ERROR_NOT_IMPLEMENTED
- *
- *  @brief
- *    A requested function or feature is not implemented.
- *
- */
-#define INET_ERROR_NOT_IMPLEMENTED                          _INET_ERROR(15)
+// unused                                                   CHIP_INET_ERROR(0x0f)
 
 /**
  *  @def INET_ERROR_ADDRESS_NOT_FOUND
@@ -251,7 +128,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    A requested address type, class, or scope cannot be found.
  *
  */
-#define INET_ERROR_ADDRESS_NOT_FOUND                        _INET_ERROR(16)
+#define INET_ERROR_ADDRESS_NOT_FOUND                        CHIP_INET_ERROR(0x10)
 
 /**
  *  @def INET_ERROR_HOST_NAME_TOO_LONG
@@ -260,7 +137,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    A requested host name is too long.
  *
  */
-#define INET_ERROR_HOST_NAME_TOO_LONG                       _INET_ERROR(17)
+#define INET_ERROR_HOST_NAME_TOO_LONG                       CHIP_INET_ERROR(0x11)
 
 /**
  *  @def INET_ERROR_INVALID_HOST_NAME
@@ -269,25 +146,10 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    A requested host name and port is invalid.
  *
  */
-#define INET_ERROR_INVALID_HOST_NAME                        _INET_ERROR(18)
+#define INET_ERROR_INVALID_HOST_NAME                        CHIP_INET_ERROR(0x12)
 
-/**
- *  @def INET_ERROR_NOT_SUPPORTED
- *
- *  @brief
- *    A requested function or feature is not supported.
- *
- */
-#define INET_ERROR_NOT_SUPPORTED                            _INET_ERROR(19)
-
-/**
- *  @def INET_ERROR_NO_ENDPOINTS
- *
- *  @brief
- *    No endpoint of the specified type is available.
- *
- */
-#define INET_ERROR_NO_ENDPOINTS                             _INET_ERROR(20)
+// unused                                                   CHIP_INET_ERROR(0x13)
+// unused                                                   CHIP_INET_ERROR(0x14)
 
 /**
  *  @def INET_ERROR_IDLE_TIMEOUT
@@ -296,16 +158,9 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    A TCP connection timed out due to inactivity.
  *
  */
-#define INET_ERROR_IDLE_TIMEOUT                             _INET_ERROR(21)
+#define INET_ERROR_IDLE_TIMEOUT                             CHIP_INET_ERROR(0x15)
 
-/**
- *  @def INET_ERROR_UNEXPECTED_EVENT
- *
- *  @brief
- *    An unexpected event occurred or was handled.
- *
- */
-#define INET_ERROR_UNEXPECTED_EVENT                         _INET_ERROR(22)
+// unused                                                   CHIP_INET_ERROR(0x16)
 
 /**
  *  @def INET_ERROR_INVALID_IPV6_PKT
@@ -314,7 +169,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    An IPv6 packet is invalid.
  *
  */
-#define INET_ERROR_INVALID_IPV6_PKT                         _INET_ERROR(23)
+#define INET_ERROR_INVALID_IPV6_PKT                         CHIP_INET_ERROR(0x17)
 
 /**
  *  @def INET_ERROR_INTERFACE_INIT_FAILURE
@@ -323,7 +178,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    Failure to initialize an interface.
  *
  */
-#define INET_ERROR_INTERFACE_INIT_FAILURE                   _INET_ERROR(24)
+#define INET_ERROR_INTERFACE_INIT_FAILURE                   CHIP_INET_ERROR(0x18)
 
 /**
  *  @def INET_ERROR_TCP_USER_TIMEOUT
@@ -333,7 +188,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    acknowledgment for transmitted packet.
  *
  */
-#define INET_ERROR_TCP_USER_TIMEOUT                         _INET_ERROR(25)
+#define INET_ERROR_TCP_USER_TIMEOUT                         CHIP_INET_ERROR(0x19)
 
 /**
  *  @def INET_ERROR_TCP_CONNECT_TIMEOUT
@@ -344,7 +199,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    of an error.
  *
  */
-#define INET_ERROR_TCP_CONNECT_TIMEOUT                      _INET_ERROR(26)
+#define INET_ERROR_TCP_CONNECT_TIMEOUT                      CHIP_INET_ERROR(0x1a)
 
 /**
  *  @def INET_ERROR_INCOMPATIBLE_IP_ADDRESS_TYPE
@@ -354,7 +209,7 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
  *    IP address type.
  *
  */
-#define INET_ERROR_INCOMPATIBLE_IP_ADDRESS_TYPE             _INET_ERROR(27)
+#define INET_ERROR_INCOMPATIBLE_IP_ADDRESS_TYPE             CHIP_INET_ERROR(0x1b)
 
 //                        !!!!! IMPORTANT !!!!!
 //
@@ -372,7 +227,7 @@ namespace chip {
 namespace Inet {
 
 extern void RegisterLayerErrorFormatter();
-extern bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err);
+extern bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 } // namespace Inet
 } // namespace chip

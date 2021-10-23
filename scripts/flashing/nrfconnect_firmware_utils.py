@@ -47,7 +47,6 @@ operations:
                         Do not reset device after flashing
 """
 
-import errno
 import os
 import sys
 
@@ -132,7 +131,6 @@ class Flasher(firmware_utils.Flasher):
     def reset(self):
         """Reset the device."""
         return self.run_tool('nrfjprog', ['--pinresetenable'], name='Enable pin reset')
-        return self.run_tool('nrfjprog', ['--pinreset'], name='Apply pin reset')
 
     def actions(self):
         """Perform actions on the device according to self.option."""
@@ -158,13 +156,16 @@ class Flasher(firmware_utils.Flasher):
 
         return self
 
-### Mobly integration
-class Nrf5Platform:
-  def __init__(self, flasher_args):
-      self.flasher = Flasher(**flasher_args)
+# Mobly integration
 
-  def flash(self):
-      self.flasher.flash_command([os.getcwd()])
+
+class Nrf5Platform:
+    def __init__(self, flasher_args):
+        self.flasher = Flasher(**flasher_args)
+
+    def flash(self):
+        self.flasher.flash_command([os.getcwd()])
+
 
 def verify_platform_args(platform_args):
     required_args = ['application']
@@ -172,11 +173,13 @@ def verify_platform_args(platform_args):
         if not r in platform_args:
             raise ValueError("Required argument %s missing" % r)
 
+
 def create_platform(platform_args):
     verify_platform_args(platform_args[0])
     return Nrf5Platform(platform_args[0])
 
-### End of Mobly integration
+# End of Mobly integration
+
 
 if __name__ == '__main__':
     sys.exit(Flasher().flash_command(sys.argv))

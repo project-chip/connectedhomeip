@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <support/ScopedBuffer.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

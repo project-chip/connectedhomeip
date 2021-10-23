@@ -3,13 +3,15 @@
 #include <cstdint>
 #include <cinttypes>
 
-#include "app/common/gen/af-structs.h"
-#include "app/common/gen/cluster-id.h"
-#include "app/common/gen/command-id.h"
-#include "callback.h"
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 #include "app/util/util.h"
-
 #include <app/InteractionModelEngine.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/TypeTraits.h>
 
 // Currently we need some work to keep compatible with ember lib.
 #include <app/util/ember-compatibility-functions.h>
@@ -17,70 +19,72 @@
 namespace chip {
 namespace app {
 
+namespace {
+void ReportCommandUnsupported(Command * aCommandObj, const ConcreteCommandPath & aCommandPath)
+{
+    aCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+    ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+}
+} // anonymous namespace
+
 // Cluster specific command parsing
 
-namespace clusters {
+namespace Clusters {
 
 {{#all_user_clusters}}
 {{#if (user_cluster_has_enabled_command name side)}}
-namespace {{asCamelCased name false}} {
+namespace {{asUpperCamelCase name}} {
 
-void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void Dispatch{{asUpperCamelCase side}}Command({{#if (isServer side)}}CommandHandler{{else}}CommandSender{{/if}} * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
+    {{#chip_available_cluster_commands}}
+    {{#first}}
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
     // Any error value TLVUnpackError means we have received an illegal value.
     // The following variables are used for all commands to save code size.
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    {{#unless (isServer parent.side)}}
     CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
     uint32_t validArgumentCount = 0;
     uint32_t expectArgumentCount = 0;
     uint32_t currentDecodeTagId = 0;
+    {{/unless}}
     bool wasHandled = false;
-    {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
-    {{else}}
-    {{/if}}
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
-        {{#all_user_cluster_commands}}
-        {{#unless mfgCode}}
-        {{#if (isStrEqual clusterName parent.name)}}
-        {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
-        case ZCL_{{asDelimitedMacro name}}_COMMAND_ID: {
+    {{/first}}
+        case Commands::{{asUpperCamelCase name}}::Id: {
         {{> im_command_handler_cluster_commands}}
             break;
         }
-        {{/if}}
-        {{/if}}
-        {{/unless}}
-        {{/all_user_cluster_commands}}
+    {{#last}}
         default: {
             // Unrecognized command ID, error status will apply.
-            chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                       0, // GroupId
-                                                       ZCL_{{asDelimitedMacro define}}_ID,
-                                                       aCommandId,
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
-            apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_{{asDelimitedMacro define}}_ID);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
     }
 
-    if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
+    if (CHIP_NO_ERROR != TLVError {{#unless (isServer parent.side)}}|| CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount{{/unless}} || !wasHandled)
     {
-      chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                       0, // GroupId
-                                                       ZCL_{{asDelimitedMacro define}}_ID,
-                                                       aCommandId,
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
-      apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest, Protocols::SecureChannel::Id,
-        Protocols::InteractionModel::ProtocolCode::InvalidCommand);
-      ChipLogProgress(Zcl, "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32, validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+      apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+      {{#if (isServer parent.side)}}
+      ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+      {{else}}
+      ChipLogProgress(Zcl, "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32, validArgumentCount, expectArgumentCount, TLVError.Format(), TLVUnpackError.Format(), currentDecodeTagId);
+      // A command with no arguments would never write currentDecodeTagId.  If
+      // progress logging is also disabled, it would look unused.  Silence that
+      // warning.
+      UNUSED_VAR(currentDecodeTagId);
+      {{/if}}
     }
+    {{/last}}
+    {{else}}
+    ReportCommandUnsupported(apCommandObj, aCommandPath);
+    {{/chip_available_cluster_commands}}
 }
 
 }
@@ -88,40 +92,60 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
 {{/if}}
 {{/all_user_clusters}}
 
-} // namespace clusters
+} // namespace Clusters
 
-void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                             chip::TLV::TLVReader & aReader, Command * apCommandObj)
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
-    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
-                  aCommandId, aEndPointId);
-    Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
-    TLV::TLVType dataTlvType;
-    SuccessOrExit(aReader.EnterContainer(dataTlvType));
-    switch (aClusterId)
+    Compatibility::SetupEmberAfObjects(apCommandObj, aCommandPath);
+
+    switch (aCommandPath.mClusterId)
     {
-    {{#all_user_clusters}}
+    {{#chip_server_clusters}}
     {{#if (user_cluster_has_enabled_command name side)}}
-    case ZCL_{{asDelimitedMacro define}}_ID :
-        clusters::{{asCamelCased name false}}::Dispatch{{asCamelCased side false}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
+    case Clusters::{{asUpperCamelCase name}}::Id:
+        Clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandPath, aReader);
         break;
     {{/if}}
-    {{/all_user_clusters}}
+    {{/chip_server_clusters}}
     default:
-        // Unrecognized cluster ID, error status will apply.
-        chip::app::CommandPathParams returnStatusParam = { aEndPointId,
-                                                       0, // GroupId
-                                                       aClusterId,
-                                                       aCommandId,
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-                                    Protocols::InteractionModel::ProtocolCode::InvalidCommand);
-        ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
+        ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
+        apCommandObj->AddStatus(
+          aCommandPath,
+          Protocols::InteractionModel::Status::UnsupportedCluster
+        );
         break;
     }
-exit:
+
     Compatibility::ResetEmberAfObjects();
+}
+
+void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandSender * apCommandObj)
+{
+    Compatibility::SetupEmberAfObjects(apCommandObj, aCommandPath);
+
+    TLV::TLVType dataTlvType;
+    SuccessOrExit(aReader.EnterContainer(dataTlvType));
+    switch (aCommandPath.mClusterId)
+    {
+    {{#chip_client_clusters}}
+    {{#if (user_cluster_has_enabled_command name side)}}
+    case Clusters::{{asUpperCamelCase name}}::Id:
+        Clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandPath, aReader);
+        break;
+    {{/if}}
+    {{/chip_client_clusters}}
+    default:
+        ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
+        apCommandObj->AddStatus(
+          aCommandPath,
+          Protocols::InteractionModel::Status::UnsupportedCluster
+        );
+        break;
+    }
+
+exit:
     aReader.ExitContainer(dataTlvType);
+    Compatibility::ResetEmberAfObjects();
 }
 
 } // namespace app

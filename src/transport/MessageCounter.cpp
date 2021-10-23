@@ -22,12 +22,15 @@
 
 #include <transport/MessageCounter.h>
 
+#include <crypto/RandUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/RandUtils.h>
 
 namespace chip {
 
-GlobalUnencryptedMessageCounter::GlobalUnencryptedMessageCounter() : value(GetRandU32()) {}
+void GlobalUnencryptedMessageCounter::Init()
+{
+    value = Crypto::GetRandU32();
+}
 
 CHIP_ERROR GlobalEncryptedMessageCounter::Init()
 {

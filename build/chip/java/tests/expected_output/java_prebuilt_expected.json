@@ -1,0 +1,10 @@
+{
+    "deps_info": {
+        "name": "java_prebuilt.json",
+        "jar_path": "python/lib/build/chip/java/tests/prebuilt_jar.jar",
+        "deps_configs": [
+            "python/gen/build/chip/java/tests/child_prebuilt.json"
+        ],
+        "deps_jars": ["python/lib/build/chip/java/tests/child_jar.jar"]
+    }
+}

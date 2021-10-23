@@ -1,0 +1,486 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
+# Generating ameba-amebad-all-clusters
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-androidstudio-chip-tool
+gn gen --check --fail-on-unused-args {out}/android-androidstudio-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-arm-chip-tool
+gn gen --check --fail-on-unused-args {out}/android-arm-chip-tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-arm64-chip-test
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-test '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-arm64-chip-tool
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-x64-chip-tool
+gn gen --check --fail-on-unused-args {out}/android-x64-chip-tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-x86-chip-tool
+gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating efr32-brd4161a-light
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
+
+# Generating efr32-brd4161a-light-rpc
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-rpc
+
+# Generating efr32-brd4161a-lock
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
+
+# Generating efr32-brd4161a-window-covering
+gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
+
+# Generating esp32-c3devkit-all-clusters
+mkdir -p {out}/esp32-c3devkit-all-clusters
+
+cp examples/all-clusters-app/esp32/sdkconfig_c3devkit.defaults {out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all-clusters reconfigure'
+
+# Generating esp32-devkitc-all-clusters
+mkdir -p {out}/esp32-devkitc-all-clusters
+
+cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-clusters/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters reconfigure'
+
+# Generating esp32-devkitc-all-clusters-ipv6only
+mkdir -p {out}/esp32-devkitc-all-clusters-ipv6only
+
+cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only reconfigure'
+
+# Generating esp32-devkitc-bridge
+mkdir -p {out}/esp32-devkitc-bridge
+
+cp examples/bridge-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-bridge/sdkconfig.defaults
+
+rm -f examples/bridge-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
+idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge reconfigure'
+
+# Generating esp32-devkitc-lock
+mkdir -p {out}/esp32-devkitc-lock
+
+cp examples/lock-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-lock/sdkconfig.defaults
+
+rm -f examples/lock-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
+idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock reconfigure'
+
+# Generating esp32-devkitc-shell
+mkdir -p {out}/esp32-devkitc-shell
+
+cp examples/shell/esp32/sdkconfig.defaults {out}/esp32-devkitc-shell/sdkconfig.defaults
+
+rm -f examples/shell/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-shell/sdkconfig.defaults
+idf.py -C examples/shell/esp32 -B {out}/esp32-devkitc-shell reconfigure'
+
+# Generating esp32-devkitc-temperature-measurement
+mkdir -p {out}/esp32-devkitc-temperature-measurement
+
+cp examples/temperature-measurement-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement reconfigure'
+
+# Generating esp32-m5stack-all-clusters
+mkdir -p {out}/esp32-m5stack-all-clusters
+
+cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stack-all-clusters/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters reconfigure'
+
+# Generating esp32-m5stack-all-clusters-ipv6only
+mkdir -p {out}/esp32-m5stack-all-clusters-ipv6only
+
+cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only reconfigure'
+
+# Generating infineon-p6-lock
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
+
+# Generating nrf-nrf52840-light
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
+
+# Generating nrf-nrf52840-lock
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
+
+# Generating nrf-nrf52840-pump
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-pump -b nrf52840dk_nrf52840 {root}/examples/pump-app/nrfconnect'
+
+# Generating nrf-nrf52840-pump-controller
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-pump-controller -b nrf52840dk_nrf52840 {root}/examples/pump-controller-app/nrfconnect'
+
+# Generating nrf-nrf52840-shell
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
+
+# Generating nrf-nrf5340-light
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
+
+# Generating nrf-nrf5340-lock
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
+
+# Generating nrf-nrf5340-pump
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-pump -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-app/nrfconnect'
+
+# Generating nrf-nrf5340-pump-controller
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-pump-controller -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-controller-app/nrfconnect'
+
+# Generating nrf-nrf5340-shell
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
+
+# Generating qpg-qpg6100-lock
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
+
+# Generating telink-tlsr9518adk80d-light
+bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
+
+# Generating tizen-arm-light
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
+
+# Building ameba-amebad-all-clusters
+ninja -C {out}/ameba-amebad-all-clusters
+
+# Building APP android-androidstudio-chip-tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-chip-tool -PmatterSdkSourceBuild=true assembleDebug
+
+# Building JNI android-arm-chip-tool
+ninja -C {out}/android-arm-chip-tool
+
+# Prepare Native libs android-arm-chip-tool
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a
+
+cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libSetupPayloadParser.so
+
+cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libCHIPController.so
+
+cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
+
+cp {out}/android-arm-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+
+cp {out}/android-arm-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-arm-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
+# Building APP android-arm-chip-tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tool assembleDebug
+
+# Building JNI android-arm64-chip-test
+ninja -C {out}/android-arm64-chip-test
+
+# Prepare Native libs android-arm64-chip-test
+mkdir -p {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a
+
+cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
+
+cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libCHIPController.so {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libCHIPController.so
+
+cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+
+cp {out}/android-arm64-chip-test/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTest/app/libs/CHIPController.jar
+
+cp {out}/android-arm64-chip-test/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTest/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-arm64-chip-test/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTest/app/libs/AndroidPlatform.jar
+
+# Building APP android-arm64-chip-test
+{root}/src/android/CHIPTest/gradlew -p {root}/src/android/CHIPTest -PmatterBuildSrcDir={out}/android-arm64-chip-test -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-test assembleDebug
+
+# Building JNI android-arm64-chip-tool
+ninja -C {out}/android-arm64-chip-tool
+
+# Prepare Native libs android-arm64-chip-tool
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a
+
+cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
+
+cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libCHIPController.so
+
+cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
+# Building APP android-arm64-chip-tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tool assembleDebug
+
+# Building JNI android-x64-chip-tool
+ninja -C {out}/android-x64-chip-tool
+
+# Prepare Native libs android-x64-chip-tool
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64
+
+cp {out}/android-x64-chip-tool/lib/jni/x86_64/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libSetupPayloadParser.so
+
+cp {out}/android-x64-chip-tool/lib/jni/x86_64/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libCHIPController.so
+
+cp {out}/android-x64-chip-tool/lib/jni/x86_64/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libc++_shared.so
+
+cp {out}/android-x64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+
+cp {out}/android-x64-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-x64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
+# Building APP android-x64-chip-tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tool assembleDebug
+
+# Building JNI android-x86-chip-tool
+ninja -C {out}/android-x86-chip-tool
+
+# Prepare Native libs android-x86-chip-tool
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/x86
+
+cp {out}/android-x86-chip-tool/lib/jni/x86/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libSetupPayloadParser.so
+
+cp {out}/android-x86-chip-tool/lib/jni/x86/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libCHIPController.so
+
+cp {out}/android-x86-chip-tool/lib/jni/x86/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libc++_shared.so
+
+cp {out}/android-x86-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+
+cp {out}/android-x86-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
+# Building APP android-x86-chip-tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
+
+# Building efr32-brd4161a-light
+ninja -C {out}/efr32-brd4161a-light
+
+# Building efr32-brd4161a-light-rpc
+ninja -C {out}/efr32-brd4161a-light-rpc
+
+# Building efr32-brd4161a-lock
+ninja -C {out}/efr32-brd4161a-lock
+
+# Building efr32-brd4161a-window-covering
+ninja -C {out}/efr32-brd4161a-window-covering
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+# Building esp32-c3devkit-all-clusters
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all-clusters build'
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+# Building esp32-devkitc-all-clusters
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters build'
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+# Building esp32-devkitc-all-clusters-ipv6only
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only build'
+
+rm -f examples/bridge-app/esp32/sdkconfig
+
+# Building esp32-devkitc-bridge
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
+idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge build'
+
+rm -f examples/lock-app/esp32/sdkconfig
+
+# Building esp32-devkitc-lock
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
+idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock build'
+
+rm -f examples/shell/esp32/sdkconfig
+
+# Building esp32-devkitc-shell
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-shell/sdkconfig.defaults
+idf.py -C examples/shell/esp32 -B {out}/esp32-devkitc-shell build'
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
+
+# Building esp32-devkitc-temperature-measurement
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement build'
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+# Building esp32-m5stack-all-clusters
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters build'
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+# Building esp32-m5stack-all-clusters-ipv6only
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only build'
+
+# Building infineon-p6-lock
+ninja -C {out}/infineon-p6-lock
+
+# Building nrf-nrf52840-light
+ninja -C {out}/nrf-nrf52840-light
+
+# Building nrf-nrf52840-lock
+ninja -C {out}/nrf-nrf52840-lock
+
+# Building nrf-nrf52840-pump
+ninja -C {out}/nrf-nrf52840-pump
+
+# Building nrf-nrf52840-pump-controller
+ninja -C {out}/nrf-nrf52840-pump-controller
+
+# Building nrf-nrf52840-shell
+ninja -C {out}/nrf-nrf52840-shell
+
+# Building nrf-nrf5340-light
+ninja -C {out}/nrf-nrf5340-light
+
+# Building nrf-nrf5340-lock
+ninja -C {out}/nrf-nrf5340-lock
+
+# Building nrf-nrf5340-pump
+ninja -C {out}/nrf-nrf5340-pump
+
+# Building nrf-nrf5340-pump-controller
+ninja -C {out}/nrf-nrf5340-pump-controller
+
+# Building nrf-nrf5340-shell
+ninja -C {out}/nrf-nrf5340-shell
+
+# Building qpg-qpg6100-lock
+ninja -C {out}/qpg-qpg6100-lock
+
+# Building telink-tlsr9518adk80d-light
+ninja -C {out}/telink-tlsr9518adk80d-light
+
+# Building tizen-arm-light
+ninja -C {out}/tizen-arm-light

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,27 +22,24 @@ shared_library("jni") {
   output_name = "libCHIPController"
 
   sources = [
-    "AndroidBleApplicationDelegate.cpp",
-    "AndroidBleApplicationDelegate.h",
-    "AndroidBleConnectionDelegate.cpp",
-    "AndroidBleConnectionDelegate.h",
-    "AndroidBlePlatformDelegate.cpp",
-    "AndroidBlePlatformDelegate.h",
+    "AndroidCallbacks-JNI.cpp",
+    "AndroidCallbacks.cpp",
+    "AndroidCallbacks.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
-    "AndroidKeyValueStoreManagerImpl.cpp",
-    "AndroidKeyValueStoreManagerImpl.h",
     "CHIPDeviceController-JNI.cpp",
-    "CHIPJNIError.h",
-    "JniReferences.cpp",
-    "JniReferences.h",
-    "JniTypeWrappers.h",
+    "zap-generated/CHIPClusters-JNI.cpp",
   ]
 
   deps = [
     "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/inet",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/platform/android",
   ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 }
@@ -50,21 +47,32 @@ shared_library("jni") {
 android_library("java") {
   output_name = "CHIPController.jar"
 
+  deps = [
+    ":android",
+    "${chip_root}/third_party/android_deps:annotation",
+  ]
+
   data_deps = [
     ":jni",
     "${chip_root}/build/chip/java:shared_cpplib",
   ]
 
   sources = [
-    "src/chip/devicecontroller/AndroidChipStack.java",
+    "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
-    "src/chip/devicecontroller/KeyValueStoreManager.java",
+    "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
+    "src/chip/devicecontroller/PaseVerifierParams.java",
+    "zap-generated/chip/devicecontroller/ChipClusters.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
 
   # TODO: add classpath support (we likely need to add something like
   #  ..../platforms/android-21/android.jar to access BLE items)
+}
+
+java_prebuilt("android") {
+  jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
 }

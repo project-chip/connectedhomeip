@@ -20,7 +20,7 @@ if (efr32_family == "efr32mg12") {
   arm_cpu = "cortex-m4"
   arm_float_abi = "softfp"
   arm_fpu = "fpv4-sp-d16"
-} else if (efr32_family == "efr32mg21") {
+} else if (efr32_family == "efr32mg21" || efr32_family == "efr32mg24") {
   arm_arch = "armv8-m.main+dsp"
   arm_abi = "aapcs"
   arm_cpu = "cortex-m33"

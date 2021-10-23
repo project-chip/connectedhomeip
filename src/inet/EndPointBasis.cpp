@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,20 +30,56 @@
 namespace chip {
 namespace Inet {
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+
 void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 {
     InitInetLayerBasis(aInetLayer, aAppState);
+    mLwIPEndPointType = LwIPEndPointType::Unknown;
+}
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    mLwIPEndPointType = kLwIPEndPointType_Unknown;
+void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
+{
+    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || (mVoid != nullptr))
+    {
+        DeferredRelease(static_cast<System::LayerLwIP *>(Layer().SystemLayer()), aTactic);
+    }
+    else
+    {
+        Release();
+    }
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    mSocket = INET_INVALID_SOCKET_FD;
-    mPendingIO.Clear();
-    mRequestIO.Clear();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
+{
+    InitInetLayerBasis(aInetLayer, aAppState);
+    mSocket = kInvalidSocketFd;
 }
+
+void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
+{
+    Release();
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
+{
+    InitInetLayerBasis(aInetLayer, aAppState);
+}
+
+void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
+{
+    Release();
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 } // namespace Inet
 } // namespace chip

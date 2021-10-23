@@ -38,25 +38,74 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
-bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * commandObj, unsigned char *)
+using namespace chip;
+using namespace chip::app::Clusters::TvChannel;
+
+::TvChannelInfo tvChannelClusterChangeChannel(std::string match);
+bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumer, uint16_t minorNumber);
+bool tvChannelClusterSkipChannel(uint16_t count);
+
+void sendResponse(app::CommandHandler * command, ::TvChannelInfo channelInfo)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TV_CHANNEL_CLUSTER_ID,
+                                         ZCL_CHANGE_CHANNEL_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    TLV::TLVWriter * writer          = nullptr;
+    SuccessOrExit(err = command->PrepareCommand(cmdParams));
+    VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // TODO: Enable this once struct as param is supported
+    // SuccessOrExit(err = writer->Put(TLV::ContextTag(0), channelInfo));
+    // EmberAfTvChannelErrorType. errorType
+    // SuccessOrExit(err = writer->Put(TLV::ContextTag(1), errorType));
+    SuccessOrExit(err = command->FinishCommand());
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to send ChangeChannel. Error:%s", ErrorStr(err));
+    }
+}
+
+bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                  const Commands::ChangeChannel::DecodableType & commandData)
+{
+    auto & match = commandData.match;
+
+    std::string matchString(match.data(), match.size());
+    // TODO: Enable this once struct as param is supported
+    // TvChannelInfo channelInfo = tvChannelClusterChangeChannel(matchString);
+    // sendResponse(command, channelInfo);
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    return true;
+}
+
+bool emberAfTvChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command,
+                                                          const app::ConcreteCommandPath & commandPath,
+                                                          const Commands::ChangeChannelByNumber::DecodableType & commandData)
+{
+    auto & majorNumber = commandData.majorNumber;
+    auto & minorNumber = commandData.minorNumber;
+
+    bool success         = tvChannelClusterChangeChannelByNumber(majorNumber, minorNumber);
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * commandObj, unsigned short, unsigned short)
+bool emberAfTvChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                const Commands::SkipChannel::DecodableType & commandData)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-bool emberAfTvChannelClusterSkipChannelCallback(chip::app::Command * commandObj, unsigned short)
-{
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    auto & count = commandData.count;
+
+    bool success         = tvChannelClusterSkipChannel(count);
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }

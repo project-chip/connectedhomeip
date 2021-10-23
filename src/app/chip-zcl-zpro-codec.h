@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <support/BufferWriter.h>
+#include <lib/support/BufferWriter.h>
 
 typedef uint16_t EmberApsOption;
 

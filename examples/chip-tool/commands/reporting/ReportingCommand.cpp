@@ -19,42 +19,46 @@
 #include "ReportingCommand.h"
 
 #include "../common/Commands.h"
-#include "gen/CHIPClientCallbacks.h"
-#include "gen/CHIPClusters.h"
+#include <zap-generated/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClusters.h>
 
 using namespace ::chip;
 
-namespace {
-constexpr uint16_t kWaitDurationInSeconds = UINT16_MAX;
-} // namespace
-
-CHIP_ERROR ReportingCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR ReportingCommand::RunCommand()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::BasicCluster cluster;
-
-    //
-    // Set this to true first BEFORE we send commands to ensure we don't
-    // end up in a situation where the response comes back faster than we can
-    // set the variable to true, which will cause it to block indefinitely.
-    //
-    UpdateWaitForResponse(true);
-
-    {
-        chip::DeviceLayer::StackLock lock;
-
-        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
-
-        AddReportCallbacks(mEndPointId);
-        cluster.Associate(mDevice, mEndPointId);
-
-        err = cluster.MfgSpecificPing(nullptr, nullptr);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
-    }
-
-    WaitForResponse(kWaitDurationInSeconds);
+    CHIP_ERROR err = mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %s", mNodeId, ErrorStr(err)));
 
 exit:
     return err;
+}
+
+void ReportingCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+{
+    ReportingCommand * command = reinterpret_cast<ReportingCommand *>(context);
+    VerifyOrReturn(command != nullptr,
+                   ChipLogError(chipTool, "Device connected, but cannot send the command, as the context is null"));
+
+    chip::Controller::BasicCluster cluster;
+    cluster.Associate(device, command->mEndPointId);
+
+    command->AddReportCallbacks(command->mNodeId, command->mEndPointId);
+
+    CHIP_ERROR err = cluster.MfgSpecificPing(nullptr, nullptr);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err));
+        command->SetCommandExitStatus(err);
+    }
+}
+
+void ReportingCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR err)
+{
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %s", deviceId, ErrorStr(err));
+
+    ReportingCommand * command = reinterpret_cast<ReportingCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ReportingCommand context is null"));
+    command->SetCommandExitStatus(err);
 }

@@ -24,9 +24,9 @@
 
 #pragma once
 
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeMessageDispatch.h>
-#include <support/CodeUtils.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 namespace Messaging {
@@ -38,24 +38,24 @@ public:
 
     virtual ~ApplicationExchangeDispatch() {}
 
-    CHIP_ERROR Init(SecureSessionMgr * sessionMgr)
+    CHIP_ERROR Init(SessionManager * sessionManager)
     {
-        ReturnErrorCodeIf(sessionMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mSessionMgr = sessionMgr;
+        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mSessionManager = sessionManager;
         return ExchangeMessageDispatch::Init();
     }
 
-    CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
+    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
                               EncryptedPacketBufferHandle & preparedMessage) override;
-    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & message) const override;
+    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & message) const override;
 
-    SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
+    SessionManager * GetSessionManager() const { return mSessionManager; }
 
 protected:
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
 
 private:
-    SecureSessionMgr * mSessionMgr = nullptr;
+    SessionManager * mSessionManager = nullptr;
 };
 
 } // namespace Messaging

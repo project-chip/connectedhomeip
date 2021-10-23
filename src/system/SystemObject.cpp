@@ -25,17 +25,13 @@
 // Include module header
 #include <system/SystemObject.h>
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 // Include local headers
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemLayer.h>
 
 // Include local headers
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
 
 namespace chip {
 namespace System {
@@ -51,7 +47,13 @@ DLL_EXPORT void Object::Release()
 
     if (oldCount == 1)
     {
-        this->mSystemLayer = nullptr;
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        std::lock_guard<std::mutex> lock(*mMutexRef);
+        this->mPrev->mNext = this->mNext;
+        if (this->mNext)
+            this->mNext->mPrev = this->mPrev;
+        delete this;
+#endif
         __sync_synchronize();
     }
     else if (oldCount == 0)
@@ -60,30 +62,27 @@ DLL_EXPORT void Object::Release()
     }
 }
 
-DLL_EXPORT bool Object::TryCreate(Layer & aLayer, size_t aOctets)
+DLL_EXPORT bool Object::TryCreate(size_t aOctets)
 {
-    bool lReturn = false;
-
-    if (__sync_bool_compare_and_swap(&this->mSystemLayer, nullptr, &aLayer))
+    if (!__sync_bool_compare_and_swap(&this->mRefCount, 0, 1))
     {
-        this->mRefCount = 0;
-        this->AppState  = nullptr;
-        memset(reinterpret_cast<char *>(this) + sizeof(*this), 0, aOctets - sizeof(*this));
-
-        this->Retain();
-        lReturn = true;
+        return false; // object already in use
     }
 
-    return lReturn;
+    this->AppState = nullptr;
+    memset(reinterpret_cast<char *>(this) + sizeof(*this), 0, aOctets - sizeof(*this));
+
+    return true;
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-void Object::DeferredRelease(Object::ReleaseDeferralErrorTactic aTactic)
+void Object::DeferredRelease(LayerLwIP * aSystemLayer, Object::ReleaseDeferralErrorTactic aTactic)
 {
-    Layer & lSystemLayer = *this->mSystemLayer;
-    Error lError         = lSystemLayer.PostEvent(*this, chip::System::kEvent_ReleaseObj, 0);
+    VerifyOrReturn(aSystemLayer != nullptr, ChipLogError(chipSystemLayer, "aSystemLayer is nullptr"));
 
-    if (lError != CHIP_SYSTEM_NO_ERROR)
+    CHIP_ERROR lError = aSystemLayer->ScheduleLambda([this] { this->Release(); });
+
+    if (lError != CHIP_NO_ERROR)
     {
         switch (aTactic)
         {
@@ -95,8 +94,8 @@ void Object::DeferredRelease(Object::ReleaseDeferralErrorTactic aTactic)
             break;
 
         case kReleaseDeferralErrorTactic_Die:
-            VerifyOrDieWithMsg(false, chipSystemLayer, "Object::DeferredRelease %p->PostEvent failed err(%d)", &lSystemLayer,
-                               static_cast<int>(lError));
+            VerifyOrDieWithMsg(false, chipSystemLayer, "Object::DeferredRelease %p->PostEvent failed err(%" CHIP_ERROR_FORMAT ")",
+                               aSystemLayer, lError.Format());
             break;
         }
     }

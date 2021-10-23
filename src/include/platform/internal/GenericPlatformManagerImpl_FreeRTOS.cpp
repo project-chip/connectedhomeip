@@ -98,15 +98,19 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_UnlockChipStack(void)
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-    if (mChipEventQueue != NULL)
+    if (mChipEventQueue == NULL)
     {
-        if (!xQueueSend(mChipEventQueue, event, 1))
-        {
-            ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
-        }
+        return CHIP_ERROR_INTERNAL;
     }
+    BaseType_t status = xQueueSend(mChipEventQueue, event, 1);
+    if (status != pdTRUE)
+    {
+        ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
+        return CHIP_ERROR(chip::ChipError::Range::kOS, status);
+    }
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -138,8 +142,8 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
 
                 // Call into the system layer to dispatch the callback functions for all timers
                 // that have expired.
-                err = SystemLayer.HandlePlatformTimer();
-                if (err != CHIP_SYSTEM_NO_ERROR)
+                err = static_cast<System::LayerImplLwIP &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
+                if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(DeviceLayer, "Error handling CHIP timers: %s", ErrorStr(err));
                 }
@@ -205,11 +209,11 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * ar
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
     mChipTimerActive = true;
     vTaskSetTimeOutState(&mNextTimerBaseTime);
-    mNextTimerDurationTicks = pdMS_TO_TICKS(aMilliseconds);
+    mNextTimerDurationTicks = pdMS_TO_TICKS(System::Clock::Milliseconds64(delay).count());
 
     // If the platform timer is being updated by a thread other than the event loop thread,
     // trigger the event loop thread to recalculate its wait time by posting a no-op event
@@ -218,7 +222,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(uint3
     {
         ChipDeviceEvent event;
         event.Type = DeviceEventType::kNoOp;
-        Impl()->PostEvent(&event);
+        ReturnErrorOnFailure(Impl()->PostEvent(&event));
     }
 
     return CHIP_NO_ERROR;

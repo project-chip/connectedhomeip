@@ -45,7 +45,7 @@
 // for pulling in defines dealing with EITHER server or client
 #include <app/util/af-main.h>
 
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 
 // the EM260 host needs to include the config file
 #ifdef EZSP_HOST
@@ -60,8 +60,9 @@ bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd)
     // or identify cluster (see device enabled attr of basic cluster)
     if (!emberAfIsDeviceEnabled(cmd->apsFrame->destinationEndpoint) && cmd->apsFrame->clusterId != ZCL_IDENTIFY_CLUSTER_ID)
     {
-        emberAfCorePrintln("%pd, dropping ep 0x%x clus 0x%2x cmd 0x%x", "disable", cmd->apsFrame->destinationEndpoint,
-                           cmd->apsFrame->clusterId, cmd->commandId);
+        emberAfCorePrintln("%pd, dropping ep 0x%x clus " ChipLogFormatMEI " cmd " ChipLogFormatMEI, "disable",
+                           cmd->apsFrame->destinationEndpoint, ChipLogValueMEI(cmd->apsFrame->clusterId),
+                           ChipLogValueMEI(cmd->commandId));
         emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_FAILURE);
         return true;
     }
@@ -83,14 +84,14 @@ bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd)
 
 #ifdef ZCL_USING_OTA_BOOTLOAD_CLUSTER_CLIENT
     if (cmd->apsFrame->clusterId == ZCL_OTA_BOOTLOAD_CLUSTER_ID && cmd->direction == ZCL_DIRECTION_SERVER_TO_CLIENT &&
-        emberAfOtaClientIncomingMessageRawCallback(cmd))
+        emberAfOtaRequestorIncomingMessageRawCallback(cmd))
     {
         return true;
     }
 #endif
 #ifdef ZCL_USING_OTA_BOOTLOAD_CLUSTER_SERVER
     if (cmd->apsFrame->clusterId == ZCL_OTA_BOOTLOAD_CLUSTER_ID && cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER &&
-        emberAfOtaServerIncomingMessageRawCallback(cmd))
+        emberAfOtaProviderIncomingMessageRawCallback(cmd))
     {
         return true;
     }

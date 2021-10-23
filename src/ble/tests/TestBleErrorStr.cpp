@@ -37,8 +37,8 @@
 #include <string.h>
 
 #include <ble/BleError.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -47,26 +47,19 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static int32_t sContext[] =
+static const CHIP_ERROR kTestElements[] =
 {
-    BLE_ERROR_BAD_ARGS,
-    BLE_ERROR_INCORRECT_STATE,
-    BLE_ERROR_NO_ENDPOINTS,
     BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK,
     BLE_ERROR_CENTRAL_UNSUBSCRIBED,
     BLE_ERROR_GATT_SUBSCRIBE_FAILED,
     BLE_ERROR_GATT_UNSUBSCRIBE_FAILED,
     BLE_ERROR_GATT_WRITE_FAILED,
     BLE_ERROR_GATT_INDICATE_FAILED,
-    BLE_ERROR_NOT_IMPLEMENTED,
     BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT,
     BLE_ERROR_REMOTE_DEVICE_DISCONNECTED,
     BLE_ERROR_APP_CLOSED_CONNECTION,
-    BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG,
     BLE_ERROR_NOT_CHIP_DEVICE,
     BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS,
-    BLE_ERROR_NO_MEMORY,
-    BLE_ERROR_MESSAGE_INCOMPLETE,
     BLE_ERROR_INVALID_FRAGMENT_SIZE,
     BLE_ERROR_START_TIMER_FAILED,
     BLE_ERROR_CONNECT_TIMED_OUT,
@@ -80,11 +73,8 @@ static int32_t sContext[] =
     BLE_ERROR_INVALID_BTP_HEADER_FLAGS,
     BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER,
     BLE_ERROR_REASSEMBLER_INCORRECT_STATE,
-    BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG
 };
 // clang-format on
-
-static const size_t kTestElements = sizeof(sContext) / sizeof(sContext[0]);
 
 static void CheckBleErrorStr(nlTestSuite * inSuite, void * inContext)
 {
@@ -93,14 +83,13 @@ static void CheckBleErrorStr(nlTestSuite * inSuite, void * inContext)
     Ble::RegisterLayerErrorFormatter();
 
     // For each defined error...
-    for (size_t i = 0; i < kTestElements; i++)
+    for (const auto & err : kTestElements)
     {
-        int32_t err         = sContext[i];
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 
         // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err);
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err.AsInteger());
         NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != NULL));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
@@ -137,7 +126,7 @@ int TestBleErrorStr(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
+    nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);
 }

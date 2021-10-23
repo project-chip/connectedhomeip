@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <controller/AbstractMdnsDiscoveryController.h>
-#include <mdns/Resolver.h>
+#include <controller/AbstractDnssdDiscoveryController.h>
+#include <lib/dnssd/Resolver.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 
@@ -34,19 +34,25 @@ namespace Controller {
  *      Directed Commissioning requests, Commissionable Node advertisement and
  *      Commissioning of the node
  */
-class DLL_EXPORT CommissionableNodeController : public AbstractMdnsDiscoveryController
+class DLL_EXPORT CommissionableNodeController : public AbstractDnssdDiscoveryController
 {
 public:
-    CommissionableNodeController(){};
+    CommissionableNodeController(chip::Dnssd::Resolver * resolver = &chip::Dnssd::Resolver::Instance()) :
+        AbstractDnssdDiscoveryController(resolver){};
     virtual ~CommissionableNodeController() {}
 
-    CHIP_ERROR DiscoverCommissionersLongDiscriminator(uint16_t long_discriminator);
+    CHIP_ERROR DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter = Dnssd::DiscoveryFilter());
 
-    CHIP_ERROR DiscoverCommissioners();
+    /**
+     * @return
+     *   Pointer to DiscoveredNodeData at index idx in the list of commissioners discovered
+     *   by the CHIPCommissionableNodeController, if the node is a valid node.
+     *   Otherwise, returns nullptr
+     *   See Resolver.h IsValid()
+     */
+    const Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
 
-    const Mdns::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
-
-    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override
+    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
     {
         ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolved");
     }
@@ -57,10 +63,10 @@ public:
     }
 
 protected:
-    Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mDiscoveredCommissioners; }
+    DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mDiscoveredCommissioners); }
 
 private:
-    Mdns::DiscoveredNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES];
+    Dnssd::DiscoveredNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES];
 };
 
 } // namespace Controller

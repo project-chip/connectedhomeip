@@ -21,8 +21,8 @@
 #include "controller/ExampleOperationalCredentialsIssuer.h"
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
-#include <support/Span.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <atomic>
 #include <condition_variable>
@@ -31,7 +31,6 @@
 #include <vector>
 
 class Command;
-class PersistentStorage;
 
 template <typename T, typename... Args>
 std::unique_ptr<Command> make_unique(Args &&... args)
@@ -58,6 +57,8 @@ enum ArgumentType
     Number_int16,
     Number_int32,
     Number_int64,
+    Boolean,
+    String,
     CharString,
     OctetString,
     Attribute,
@@ -76,37 +77,14 @@ struct Argument
 class Command
 {
 public:
-    using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
-    using ChipDeviceController   = ::chip::Controller::DeviceController;
-    using ChipSerializedDevice   = ::chip::Controller::SerializedDevice;
-    using ChipDevice             = ::chip::Controller::Device;
-    using PeerAddress            = ::chip::Transport::PeerAddress;
-    using IPAddress              = ::chip::Inet::IPAddress;
-    using PacketBufferHandle     = ::chip::System::PacketBufferHandle;
-    using NodeId                 = ::chip::NodeId;
-
     struct AddressWithInterface
     {
         ::chip::Inet::IPAddress address;
         ::chip::Inet::InterfaceId interfaceId;
     };
 
-    /**
-     * @brief
-     *   Encapsulates key objects in the CHIP stack that need continued
-     *   access, so wrapping it in here makes it nice and compactly encapsulated.
-     */
-    struct ExecutionContext
-    {
-        ChipDeviceCommissioner * commissioner;
-        chip::Controller::ExampleOperationalCredentialsIssuer * opCredsIssuer;
-        PersistentStorage * storage;
-    };
-
     Command(const char * commandName) : mName(commandName) {}
     virtual ~Command() {}
-
-    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = &execContext; }
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
@@ -128,7 +106,12 @@ public:
      * Add an octet string command argument
      */
     size_t AddArgument(const char * name, chip::ByteSpan * value);
+    size_t AddArgument(const char * name, chip::Span<const char> * value);
     size_t AddArgument(const char * name, AddressWithInterface * out);
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out)
+    {
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Boolean);
+    }
     size_t AddArgument(const char * name, int64_t min, uint64_t max, int8_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int8);
@@ -162,32 +145,19 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64);
     }
 
-    virtual CHIP_ERROR Run(NodeId localId, NodeId remoteId) = 0;
-
-    bool GetCommandExitStatus() const { return mCommandExitStatus; }
-    void SetCommandExitStatus(bool status)
+    template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, T * out)
     {
-        mCommandExitStatus = status;
-        UpdateWaitForResponse(false);
+        return AddArgument(name, min, max, reinterpret_cast<std::underlying_type_t<T> *>(out));
     }
 
-    void UpdateWaitForResponse(bool value);
-    void WaitForResponse(uint16_t duration);
-
-protected:
-    ExecutionContext * GetExecContext() { return mExecContext; }
-    ExecutionContext * mExecContext;
+    virtual CHIP_ERROR Run() = 0;
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out);
 
-    bool mCommandExitStatus = false;
-    const char * mName      = nullptr;
+    const char * mName = nullptr;
     std::vector<Argument> mArgs;
-
-    std::condition_variable cvWaitingForResponse;
-    std::mutex cvWaitingForResponseMutex;
-    bool mWaitingForResponse{ false };
 };

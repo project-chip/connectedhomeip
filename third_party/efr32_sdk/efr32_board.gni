@@ -31,6 +31,8 @@ assert(efr32_board != "", "efr32_board must be specified")
 # - BRD4166A / SLTB004A    / Thunderboard Sense 2 / 2.4GHz@10dBm
 # - BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm, 868MHz@19dBm
 # - BRD4180A / SLWSTK6006A / MG21 Module / 2.4GHz@20dBm
+# - BRD4186A / SLWSTK6006A  / MG24 / Wireless Starter Kit / 2.4GHz@10dBm
+# - BRD4187A / SLWSTK6006A  / MG24 / Wireless Starter Kit / 2.4GHz@20dBm
 
 board_defines = []
 
@@ -55,10 +57,16 @@ if (efr32_board == "BRD4304A") {
   efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P433F1024GM68"
 } else if (efr32_board == "BRD4180A") {
+  assert(
+      false,
+      "The board ${efr32_board} not currentlt supported due to RAM limitation")
   efr32_family = "efr32mg21"
   efr32_mcu = "EFR32MG21A020F1024IM32"
+} else if (efr32_board == "BRD4186A" || efr32_board == "BRD4187A") {
+  efr32_family = "efr32mg24"
+  efr32_mcu = "EFR32MG24A010F1536GM48"
 } else {
   print(
-      "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4166A, BRD4170A or BRD4180A)")
+      "Please provide a valid value for EFR32_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186A, BRD4187A)")
   assert(false, "The board ${efr32_board} is unsupported as for now.")
 }

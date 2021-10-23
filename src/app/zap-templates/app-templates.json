@@ -5,6 +5,7 @@
         "partials/helper.js",
         "common/ListHelper.js",
         "common/StringHelper.js",
+        "common/ChipTypesHelper.js",
         "templates/app/helper.js",
         "templates/chip/helper.js"
     ],
@@ -29,6 +30,11 @@
     ],
     "templates": [
         {
+            "path": "templates/app/callbacks/PluginApplicationCallbacks.zapt",
+            "name": "Matter Application Callbacks header",
+            "output": "PluginApplicationCallbacks.h"
+        },
+        {
             "path": "templates/app/attribute-size-src.zapt",
             "name": "ZCL attribute-size",
             "output": "attribute-size.cpp"
@@ -37,21 +43,6 @@
             "path": "templates/app/callback-stub-src.zapt",
             "name": "ZCL callback-stub source",
             "output": "callback-stub.cpp"
-        },
-        {
-            "path": "templates/app/callback.zapt",
-            "name": "ZCL callback header",
-            "output": "callback.h"
-        },
-        {
-            "path": "templates/app/chip-zcl-zpro-codec-api.zapt",
-            "name": "CHIP ZCL API Header",
-            "output": "chip-zcl-zpro-codec-api.h"
-        },
-        {
-            "path": "templates/app/encoder-src.zapt",
-            "name": "CHIP ZCL API",
-            "output": "encoder.cpp"
         },
         {
             "path": "templates/app/endpoint_config.zapt",

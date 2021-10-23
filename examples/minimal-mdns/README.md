@@ -39,7 +39,7 @@ which is likely to list a lot of answers.
 You can customize the queries run:
 
 ```sh
-/out/minimal_mdns/minimal-mdns-client -4 -q chip-mdns-demo._chip._tcp.local
+/out/minimal_mdns/minimal-mdns-client -4 -q chip-mdns-demo._matter._tcp.local
 ```
 
 see
@@ -85,46 +85,46 @@ discovery.
 
 ### Advertising to test client listings
 
-#### Simulated uncommisioned node
+#### Simulated uncommissioned node
 
 ```sh
-dns-sd -R DD200C20D25AE5F7 _chipc._udp,S052,L0840,V123 . 11111 D=0840 VP=123+456
+dns-sd -R DD200C20D25AE5F7 _matterc._udp,S52,L840,V123 . 11111 D=840 VP=123+456
 ```
 
 Will create the following records
 
 ```
-_chipc._udp.local.                   PTR   DD200C20D25AE5F7._chipc._udp.local.
-S052._sub._chipc._udp.local.         PTR   DD200C20D25AE5F7._chipc._udp.local.
-L0840._sub._chipc._udp.local.        PTR   DD200C20D25AE5F7._chipc._udp.local.
-V123._sub._chipc._udp.local.         PTR   DD200C20D25AE5F7._chipc._udp.local.
-DD200C20D25AE5F7._chipc._udp.local.  TXT   "D=0840" "VP=123+456"
-DD200C20D25AE5F7._chipc._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
+_matterc._udp.local.                   PTR   DD200C20D25AE5F7._matterc._udp.local.
+S52._sub._matterc._udp.local.          PTR   DD200C20D25AE5F7._matterc._udp.local.
+L840._sub._matterc._udp.local.         PTR   DD200C20D25AE5F7._matterc._udp.local.
+V123._sub._matterc._udp.local.         PTR   DD200C20D25AE5F7._matterc._udp.local.
+DD200C20D25AE5F7._matterc._udp.local.  TXT   "D=840" "VP=123+456"
+DD200C20D25AE5F7._matterc._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
 B75AFB458ECD.local.                  AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f30
 ```
 
-#### Simulated commisioning node
+#### Simulated commissioning node
 
 ```sh
-dns-sd -R DD200C20D25AE5F7 _chipd._udp,S052,L0840,V123 . 11111 D=0840 VP=123+456 PH=3
+dns-sd -R DD200C20D25AE5F7 _matterd._udp,S52,L840,V123 . 11111 D=840 VP=123+456 PH=3
 ```
 
 Will create the following records:
 
 ```
-_chipd._udp.local.              PTR   DD200C20D25AE5F7._chipd._udp.local.
-S052._sub._chipd._udp.local.    PTR   DD200C20D25AE5F7._chipd._udp.local.
-V123._sub._chipd._udp.local.    PTR   DD200C20D25AE5F7._chipd._udp.local.
-D0840._sub._chipd._udp.local.   PTR   DD200C20D25AE5F7._chipd._udp.local.
-DD200C20D25AE5F7._chipd._udp.local.  TXT   "D=0840" "VP=123+456" "PH=3"
-DD200C20D25AE5F7._chipd._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
-B75AFB458ECD.local.             AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f30
+_matterd._udp.local.                   PTR   DD200C20D25AE5F7._matterd._udp.local.
+S52._sub._matterd._udp.local.          PTR   DD200C20D25AE5F7._matterd._udp.local.
+V123._sub._matterd._udp.local.         PTR   DD200C20D25AE5F7._matterd._udp.local.
+D840._sub._matterd._udp.local.         PTR   DD200C20D25AE5F7._matterd._udp.local.
+DD200C20D25AE5F7._matterd._udp.local.  TXT   "D=840" "VP=123+456" "PH=3"
+DD200C20D25AE5F7._matterd._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
+B75AFB458ECD.local.                    AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f30
 ```
 
-#### Simulated commisioned node
+#### Simulated commissioned node
 
 ```sh
-dns-sd -R 2906C908D115D362-8FC7772401CD0696 _chip._tcp . 22222
+dns-sd -R 2906C908D115D362-8FC7772401CD0696 _matter._tcp . 22222
 ```
 
 ### Discovery commands
@@ -132,20 +132,20 @@ dns-sd -R 2906C908D115D362-8FC7772401CD0696 _chip._tcp . 22222
 Nodes:
 
 ```sh
-dns-sd -B _chipc._udp          # Nodes awaiting commisioning
-dns-sd -B _chipc._udp,S052     # Nodes awaiting commisioning with short discriminator 052
-dns-sd -B _chipc._udp,L0840    # Nodes awaiting commisioning with long discriminator 0840
-dns-sd -B _chipc._udp,V123     # Nodes awaiting commisioning with vendor id 123
+dns-sd -B _matterc._udp         # Nodes awaiting commissioning
+dns-sd -B _matterc._udp,S52     # Nodes awaiting commissioning with short discriminator 52
+dns-sd -B _matterc._udp,L840    # Nodes awaiting commissioning with long discriminator 840
+dns-sd -B _matterc._udp,V123    # Nodes awaiting commissioning with vendor id 123
 
-dns-sd -B _chipd._udp          # Commisionable nodes
-dns-sd -B _chipd._udp,S052     # Commisionable nodes with short discriminator 052
-dns-sd -B _chipd._udp,L0840    # Commisionable nodes with long discriminator 0840
-dns-sd -B _chipd._udp,V123     # Commisionable nodes with vendor id 123
+dns-sd -B _matterd._udp         # Commissionable nodes
+dns-sd -B _matterd._udp,S52     # Commissionable nodes with short discriminator 52
+dns-sd -B _matterd._udp,L840    # Commissionable nodes with long discriminator 840
+dns-sd -B _matterd._udp,V123    # Commissionable nodes with vendor id 123
 ```
 
 IP Address:
 
 ```sh
-dns-sd -L 2906C908D115D362-8FC7772401CD0696 _chip._tcp  # find server address
-dns-sd -Gv6 B75AFB458ECD.local                          # get IPv6 address
+dns-sd -L 2906C908D115D362-8FC7772401CD0696 _matter._tcp  # find server address
+dns-sd -Gv6 B75AFB458ECD.local                            # get IPv6 address
 ```

@@ -1,0 +1,5 @@
+chip.rpc.TestSuiteStart.suite_name max_size:128
+chip.rpc.TestStep.suite_name max_size:128
+chip.rpc.TestCaseResult.suite_name max_size:128
+chip.rpc.TestCaseResult.test_case_name max_size:128
+chip.rpc.TestSuiteResults.suite_name max_size:128

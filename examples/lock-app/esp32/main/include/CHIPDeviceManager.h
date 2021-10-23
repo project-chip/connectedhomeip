@@ -27,11 +27,11 @@
 #ifndef CHIP_LOCK_DEVICEMANAGER_H_
 #define CHIP_LOCK_DEVICEMANAGER_H_
 
-#include <core/CHIPCore.h>
-#include <core/CHIPError.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -73,7 +73,7 @@ public:
      * @param value              pointer to the new value
      */
     virtual void PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+                                             uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
     {}
     virtual ~CHIPDeviceManagerCallbacks() {}
 };

@@ -25,20 +25,21 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <support/TimeUtils.h>
+#include <lib/support/TimeUtils.h>
 
 #include "FreeRTOS.h"
 
 namespace chip {
 namespace System {
-namespace Platform {
-namespace Layer {
+namespace Clock {
+
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
 
 namespace {
 
 constexpr uint32_t kTicksOverflowShift = (configUSE_16_BIT_TICKS) ? 16 : 32;
-
-uint64_t sBootTimeUS = 0;
 
 #ifdef __CORTEX_M
 BaseType_t sNumOfOverflows;
@@ -89,56 +90,16 @@ uint64_t FreeRTOSTicksSinceBoot(void)
     return static_cast<uint64_t>(timeOut.xTimeOnEntering) + (static_cast<uint64_t>(timeOut.xOverflowCount) << kTicksOverflowShift);
 }
 
-uint64_t GetClock_Monotonic(void)
+Clock::Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return (FreeRTOSTicksSinceBoot() * kMicrosecondsPerSecond) / configTICK_RATE_HZ;
+    return Clock::Microseconds64((FreeRTOSTicksSinceBoot() * kMicrosecondsPerSecond) / configTICK_RATE_HZ);
 }
 
-uint64_t GetClock_MonotonicMS(void)
+Clock::Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return (FreeRTOSTicksSinceBoot() * kMillisecondPerSecond) / configTICK_RATE_HZ;
+    return Clock::Milliseconds64((FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ);
 }
 
-uint64_t GetClock_MonotonicHiRes(void)
-{
-    return GetClock_Monotonic();
-}
-
-Error GetClock_RealTime(uint64_t & curTime)
-{
-    if (sBootTimeUS == 0)
-    {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    curTime = sBootTimeUS + GetClock_Monotonic();
-    return CHIP_SYSTEM_NO_ERROR;
-}
-
-Error GetClock_RealTimeMS(uint64_t & curTime)
-{
-    if (sBootTimeUS == 0)
-    {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    curTime = (sBootTimeUS + GetClock_Monotonic()) / 1000;
-    return CHIP_SYSTEM_NO_ERROR;
-}
-
-Error SetClock_RealTime(uint64_t newCurTime)
-{
-    uint64_t timeSinceBootUS = GetClock_Monotonic();
-    if (newCurTime > timeSinceBootUS)
-    {
-        sBootTimeUS = newCurTime - timeSinceBootUS;
-    }
-    else
-    {
-        sBootTimeUS = 0;
-    }
-    return CHIP_SYSTEM_NO_ERROR;
-}
-
-} // namespace Layer
-} // namespace Platform
+} // namespace Clock
 } // namespace System
 } // namespace chip

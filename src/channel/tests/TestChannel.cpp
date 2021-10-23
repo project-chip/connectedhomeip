@@ -23,16 +23,18 @@
 
 #include "TestMessagingLayer.h"
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/Protocols.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -51,30 +53,17 @@ using TestContext = chip::Test::MessagingContext;
 
 TestContext sContext;
 
-class LoopbackTransport : public Transport::Base
-{
-public:
-    /// Transports are required to have a constructor that takes exactly one argument
-    CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
-    {
-        HandleMessageReceived(header, address, std::move(msgBuf));
-        return CHIP_NO_ERROR;
-    }
-
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-};
-
-TransportMgr<LoopbackTransport> gTransportMgr;
+TransportMgr<Test::LoopbackTransport> gTransportMgr;
+chip::Test::IOContext gIOContext;
 
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && buffer) override
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
+        return CHIP_NO_ERROR;
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
@@ -124,11 +113,14 @@ void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
     ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
+    // Need to sort out what this test should really be testing and how; sending
+    // two messages in a row on an exchange is not something that really
+    // happens.
+
     // send a good packet
     ec1->SendMessage(0x0001, 0x0001, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
-    ec1->Close();
     channelHandle.Release();
 #endif
 }
@@ -165,16 +157,15 @@ nlTestSuite sSuite =
  */
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportMgr.Init("LOOPBACK") == CHIP_NO_ERROR, FAILURE);
 
-    err = gTransportMgr.Init("LOOPBACK");
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
+    auto * ctx = static_cast<TestContext *>(aContext);
+    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
-    err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite, &gTransportMgr);
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -183,6 +174,7 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    gIOContext.Shutdown();
     chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
@@ -199,3 +191,5 @@ int TestChannel()
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestChannel)

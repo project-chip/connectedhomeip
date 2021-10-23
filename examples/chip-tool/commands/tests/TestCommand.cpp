@@ -18,31 +18,129 @@
 
 #include "TestCommand.h"
 
-constexpr uint16_t kWaitDurationInSeconds = 30;
-
-CHIP_ERROR TestCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR TestCommand::RunCommand()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+}
 
-    //
-    // Set this to true first BEFORE we send commands to ensure we don't
-    // end up in a situation where the response comes back faster than we can
-    // set the variable to true, which will cause it to block indefinitely.
-    //
-    UpdateWaitForResponse(true);
+void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+{
+    ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
+    command->mDevice = device;
+    command->NextTest();
+}
 
+void TestCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+{
+    ChipLogProgress(chipTool, " **** Test Setup: Device Connection Failure [deviceId=%" PRIu64 ". Error %" CHIP_ERROR_FORMAT "\n]",
+                    deviceId, error.Format());
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
+    command->SetCommandExitStatus(error);
+}
+
+void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * context)
+{
+    auto * command = static_cast<TestCommand *>(context);
+    command->NextTest();
+}
+
+CHIP_ERROR TestCommand::Wait(chip::System::Clock::Timeout duration)
+{
+    return chip::DeviceLayer::SystemLayer().StartTimer(duration, OnWaitForMsFn, this);
+}
+
+CHIP_ERROR TestCommand::Log(const char * message)
+{
+    ChipLogDetail(chipTool, "%s", message);
+    WaitForMs(0);
+    return CHIP_NO_ERROR;
+}
+
+void TestCommand::Exit(std::string message)
+{
+    ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
+    SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+}
+
+void TestCommand::ThrowFailureResponse()
+{
+    Exit("Expecting success response but got a failure response");
+}
+
+void TestCommand::ThrowSuccessResponse()
+{
+    Exit("Expecting failure response but got a success response");
+}
+
+bool TestCommand::CheckConstraintType(const char * itemName, const char * current, const char * expected)
+{
+    ChipLogError(chipTool, "Warning: %s type checking is not implemented yet. Expected type: '%s'", itemName, expected);
+    return true;
+}
+
+bool TestCommand::CheckConstraintFormat(const char * itemName, const char * current, const char * expected)
+{
+    ChipLogError(chipTool, "Warning: %s format checking is not implemented yet. Expected format: '%s'", itemName, expected);
+    return true;
+}
+
+bool TestCommand::CheckConstraintMinLength(const char * itemName, uint64_t current, uint64_t expected)
+{
+    if (current < expected)
     {
-        chip::DeviceLayer::StackLock lock;
-
-        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
-        ReturnErrorOnFailure(err);
-
-        err = NextTest();
-        ReturnErrorOnFailure(err);
+        Exit(std::string(itemName) + " length < minLength: " + std::to_string(current) + " < " + std::to_string(expected));
+        return false;
     }
 
-    WaitForResponse(kWaitDurationInSeconds);
+    return true;
+}
 
-    VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
-    return CHIP_NO_ERROR;
+bool TestCommand::CheckConstraintMaxLength(const char * itemName, uint64_t current, uint64_t expected)
+{
+    if (current > expected)
+    {
+        Exit(std::string(itemName) + " length > minLength: " + std::to_string(current) + " > " + std::to_string(expected));
+        return false;
+    }
+
+    return true;
+}
+
+bool TestCommand::CheckValueAsList(const char * itemName, uint64_t current, uint64_t expected)
+{
+    if (current != expected)
+    {
+        Exit(std::string(itemName) + " count mismatch: " + std::to_string(current) + " != " + std::to_string(expected));
+        return false;
+    }
+
+    return true;
+}
+
+bool TestCommand::CheckValueAsString(const char * itemName, const chip::ByteSpan current, const char * expected)
+{
+    const chip::ByteSpan expectedArgument = chip::ByteSpan(chip::Uint8::from_const_char(expected), strlen(expected));
+
+    if (!current.data_equal(expectedArgument))
+    {
+        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
+        return false;
+    }
+
+    return true;
+}
+
+bool TestCommand::CheckValueAsString(const char * itemName, const chip::CharSpan current, const char * expected)
+{
+    const chip::CharSpan expectedArgument(expected, strlen(expected));
+    if (!current.data_equal(expectedArgument))
+    {
+        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
+        return false;
+    }
+
+    return true;
 }

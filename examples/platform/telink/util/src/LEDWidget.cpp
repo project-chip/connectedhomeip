@@ -20,14 +20,12 @@
 
 #include <zephyr.h>
 
-#define LED_PORT DT_LABEL(DT_NODELABEL(gpiob))
-
 const struct device * LEDWidget::mPort = NULL;
 
-void LEDWidget::InitGpio()
+void LEDWidget::InitGpio(const device * port)
 {
-    mPort = device_get_binding(LED_PORT);
-    __ASSERT(mPort != NULL, "Fail to bind with LED port\n");
+    mPort = port;
+    __ASSERT(device_is_ready(mPort), "%s is not ready\n", mPort->name);
 }
 
 void LEDWidget::Init(gpio_pin_t gpioNum)

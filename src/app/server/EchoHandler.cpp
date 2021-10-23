@@ -22,8 +22,8 @@
 
 #include <app/server/EchoHandler.h>
 
+#include <lib/support/ErrorStr.h>
 #include <protocols/echo/Echo.h>
-#include <support/ErrorStr.h>
 
 namespace {
 

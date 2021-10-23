@@ -24,8 +24,12 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace chip {
 namespace TLV {
+
+typedef uint64_t Tag;
 
 enum TLVCommonProfiles
 {
@@ -48,7 +52,7 @@ enum TLVTagFields
     kProfileNumShift  = 32,
     kTagNumMask       = 0x00000000FFFFFFFFULL,
     kSpecialTagMarker = 0xFFFFFFFF00000000ULL,
-    kContextTagMaxNum = 256
+    kContextTagMaxNum = UINT8_MAX
 };
 
 // TODO: Move to private namespace
@@ -86,7 +90,7 @@ enum
  * @param[in]   tagNum          The profile-specific tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline uint64_t ProfileTag(uint32_t profileId, uint32_t tagNum)
+inline constexpr Tag ProfileTag(uint32_t profileId, uint32_t tagNum)
 {
     return ((static_cast<uint64_t>(profileId)) << kProfileIdShift) | tagNum;
 }
@@ -99,7 +103,7 @@ inline uint64_t ProfileTag(uint32_t profileId, uint32_t tagNum)
  * @param[in]   tagNum          The profile-specific tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline uint64_t ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum)
+inline Tag ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum)
 {
     return ((static_cast<uint64_t>(vendorId)) << kVendorIdShift) | ((static_cast<uint64_t>(profileNum)) << kProfileNumShift) |
         tagNum;
@@ -111,7 +115,7 @@ inline uint64_t ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagN
  * @param[in]   tagNum          The context-specific tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline uint64_t ContextTag(uint8_t tagNum)
+inline constexpr Tag ContextTag(uint8_t tagNum)
 {
     return kSpecialTagMarker | tagNum;
 }
@@ -122,7 +126,7 @@ inline uint64_t ContextTag(uint8_t tagNum)
  * @param[in]   tagNum          The common profile tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline uint64_t CommonTag(uint32_t tagNum)
+inline Tag CommonTag(uint32_t tagNum)
 {
     return ProfileTag(kCommonProfileId, tagNum);
 }
@@ -146,7 +150,7 @@ enum
  * @param[in]   tag             The API representation of a profile-specific TLV tag.
  * @return                      The profile id.
  */
-inline uint32_t ProfileIdFromTag(uint64_t tag)
+inline uint32_t ProfileIdFromTag(Tag tag)
 {
     return static_cast<uint32_t>((tag & kProfileIdMask) >> kProfileIdShift);
 }
@@ -159,7 +163,7 @@ inline uint32_t ProfileIdFromTag(uint64_t tag)
  * @param[in]   tag             The API representation of a profile-specific TLV tag.
  * @return                      The associated profile number.
  */
-inline uint16_t ProfileNumFromTag(uint64_t tag)
+inline uint16_t ProfileNumFromTag(Tag tag)
 {
     return static_cast<uint16_t>((tag & kProfileIdMask) >> kProfileIdShift);
 }
@@ -175,7 +179,7 @@ inline uint16_t ProfileNumFromTag(uint64_t tag)
  * @param[in]   tag             The API representation of a profile-specific or context-specific TLV tag.
  * @return                      The associated tag number.
  */
-inline uint32_t TagNumFromTag(uint64_t tag)
+inline uint32_t TagNumFromTag(Tag tag)
 {
     return static_cast<uint32_t>(tag & kTagNumMask);
 }
@@ -188,7 +192,7 @@ inline uint32_t TagNumFromTag(uint64_t tag)
  * @param[in]   tag             The API representation of a profile-specific TLV tag.
  * @return                      The associated vendor id.
  */
-inline uint16_t VendorIdFromTag(uint64_t tag)
+inline uint16_t VendorIdFromTag(Tag tag)
 {
     return static_cast<uint16_t>((tag & kProfileIdMask) >> kVendorIdShift);
 }
@@ -196,7 +200,7 @@ inline uint16_t VendorIdFromTag(uint64_t tag)
 /**
  * Returns true of the supplied tag is a profile-specific tag.
  */
-inline bool IsProfileTag(uint64_t tag)
+inline bool IsProfileTag(Tag tag)
 {
     return (tag & kProfileIdMask) != kSpecialTagMarker;
 }
@@ -204,13 +208,13 @@ inline bool IsProfileTag(uint64_t tag)
 /**
  * Returns true if the supplied tag is a context-specific tag.
  */
-inline bool IsContextTag(uint64_t tag)
+inline bool IsContextTag(Tag tag)
 {
-    return (tag & kProfileIdMask) == kSpecialTagMarker && TagNumFromTag(tag) < kContextTagMaxNum;
+    return (tag & kProfileIdMask) == kSpecialTagMarker && TagNumFromTag(tag) <= kContextTagMaxNum;
 }
 
 // TODO: move to private namespace
-inline bool IsSpecialTag(uint64_t tag)
+inline bool IsSpecialTag(Tag tag)
 {
     return (tag & kProfileIdMask) == kSpecialTagMarker;
 }

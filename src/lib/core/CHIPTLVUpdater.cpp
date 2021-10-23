@@ -23,10 +23,10 @@
  *
  */
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace TLV {

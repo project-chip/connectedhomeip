@@ -38,9 +38,7 @@
 #include <CHIPVersion.h>
 
 #include <inet/InetArgParser.h>
-#include <support/CodeUtils.h>
-
-#include <system/SystemTimer.h>
+#include <lib/support/CodeUtils.h>
 
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"
@@ -94,7 +92,6 @@ static const uint32_t kExpectedTxSizeDefault = kExpectedRxSizeDefault;
 
 static const uint32_t kOptFlagsDefault = (kOptFlagUseIPv6 | kOptFlagUseUDPIP);
 
-static RawEndPoint * sRawIPEndPoint       = nullptr;
 static TCPEndPoint * sTCPIPEndPoint       = nullptr; // Used for connect/send/receive
 static TCPEndPoint * sTCPIPListenEndPoint = nullptr; // Used for accept/listen
 static UDPEndPoint * sUDPIPEndPoint       = nullptr;
@@ -123,7 +120,6 @@ static OptionDef         sToolOptionDefs[] =
 #endif // INET_CONFIG_ENABLE_IPV4
     { "ipv6",                      kNoArgument,        kToolOptIPv6Only               },
     { "listen",                    kNoArgument,        kToolOptListen                 },
-    { "raw",                       kNoArgument,        kToolOptRawIP                  },
     { "send-size",                 kArgumentRequired,  kToolOptSendSize               },
     { "tcp",                       kNoArgument,        kToolOptTCPIP                  },
     { "udp",                       kNoArgument,        kToolOptUDPIP                  },
@@ -156,9 +152,6 @@ static const char *      sToolOptionHelp =
     "\n"
     "  -s, --send-size <size>\n"
     "       Send size bytes of user data (default: 59 bytes)\n"
-    "\n"
-    "  -r, --raw\n"
-    "       Use raw IP (default).\n"
     "\n"
     "  -t, --tcp\n"
     "       Use TCP over IP.\n"
@@ -236,7 +229,7 @@ static void HandleSignal(int aSignal)
 int main(int argc, char * argv[])
 {
     bool lSuccessful = true;
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     InitTestInetCommon();
 
@@ -269,7 +262,7 @@ int main(int argc, char * argv[])
     if (gInterfaceName != nullptr)
     {
         lStatus = InterfaceNameToId(gInterfaceName, gInterfaceId);
-        if (lStatus != INET_NO_ERROR)
+        if (lStatus != CHIP_NO_ERROR)
         {
             PrintArgError("%s: unknown network interface %s\n", kToolName, gInterfaceName);
             lSuccessful = false;
@@ -281,14 +274,11 @@ int main(int argc, char * argv[])
 
     while (Common::IsTesting(sTestState.mStatus))
     {
-        struct timeval sleepTime;
         bool lSucceeded = true;
         bool lFailed    = false;
 
-        sleepTime.tv_sec  = 0;
-        sleepTime.tv_usec = 10000;
-
-        ServiceNetwork(sleepTime);
+        constexpr uint32_t kSleepTimeMilliseconds = 10;
+        ServiceNetwork(kSleepTimeMilliseconds);
 
         CheckSucceededOrFailed(sTestState, lSucceeded, lFailed);
 
@@ -386,27 +376,8 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
         gInterfaceName = aValue;
         break;
 
-    case kToolOptRawIP:
-        if (gOptFlags & kOptFlagUseUDPIP)
-        {
-            PrintArgError("%s: the use of --raw is exclusive with --udp. Please select only one of the two options.\n", aProgram);
-            retval = false;
-        }
-        else if (gOptFlags & kOptFlagUseTCPIP)
-        {
-            PrintArgError("%s: the use of --raw is exclusive with --tcp. Please select only one of the two options.\n", aProgram);
-            retval = false;
-        }
-        gOptFlags |= kOptFlagUseRawIP;
-        break;
-
     case kToolOptTCPIP:
-        if (gOptFlags & kOptFlagUseRawIP)
-        {
-            PrintArgError("%s: the use of --tcp is exclusive with --raw. Please select only one of the two options.\n", aProgram);
-            retval = false;
-        }
-        else if (gOptFlags & kOptFlagUseUDPIP)
+        if (gOptFlags & kOptFlagUseUDPIP)
         {
             PrintArgError("%s: the use of --tcp is exclusive with --udp. Please select only one of the two options.\n", aProgram);
             retval = false;
@@ -423,12 +394,7 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
         break;
 
     case kToolOptUDPIP:
-        if (gOptFlags & kOptFlagUseRawIP)
-        {
-            PrintArgError("%s: the use of --udp is exclusive with --raw. Please select only one of the two options.\n", aProgram);
-            retval = false;
-        }
-        else if (gOptFlags & kOptFlagUseTCPIP)
+        if (gOptFlags & kOptFlagUseTCPIP)
         {
             PrintArgError("%s: the use of --udp is exclusive with --tcp. Please select only one of the two options.\n", aProgram);
             retval = false;
@@ -447,19 +413,19 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
 
 bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
 {
-    bool retval = true;
-
     if (Common::IsSender())
     {
         if (argc == 0)
         {
             PrintArgError("%s: Please specify a destination address.\n", aProgram);
-            retval = false;
-            goto exit;
+            return false;
         }
 
-        retval = IPAddress::FromString(argv[0], sDestinationAddress);
-        VerifyOrExit(retval == true, PrintArgError("%s: Please specify a valid destination address: %s\n", aProgram, argv[0]));
+        if (!IPAddress::FromString(argv[0], sDestinationAddress))
+        {
+            PrintArgError("%s: Please specify a valid destination address: %s\n", aProgram, argv[0]);
+            return false;
+        }
 
         sDestinationString = argv[0];
 
@@ -470,13 +436,12 @@ bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
     if (argc > 0)
     {
         PrintArgError("%s: unexpected argument: %s\n", aProgram, argv[0]);
-        retval = false;
-        goto exit;
+        return false;
     }
 
     // If no IP version or transport flags were specified, use the defaults.
 
-    if (!(gOptFlags & (kOptFlagUseIPv4 | kOptFlagUseIPv6 | kOptFlagUseRawIP | kOptFlagUseTCPIP | kOptFlagUseUDPIP)))
+    if (!(gOptFlags & (kOptFlagUseIPv4 | kOptFlagUseIPv6 | kOptFlagUseTCPIP | kOptFlagUseUDPIP)))
     {
         gOptFlags |= kOptFlagsDefault;
     }
@@ -493,48 +458,41 @@ bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
         sTestState.mStats.mTransmit.mExpected = kExpectedTxSizeDefault;
     }
 
-exit:
-    return (retval);
+    return true;
 }
 
 static void PrintReceivedStats(const TransferStats & aStats)
 {
-    printf("%u/%u received\n", aStats.mReceive.mActual, aStats.mReceive.mExpected);
+    printf("%" PRIu32 "/%" PRIu32 "received\n", aStats.mReceive.mActual, aStats.mReceive.mExpected);
 }
 
 static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBuffer, uint8_t aFirstValue)
 {
-    const bool lStatsByPacket = true;
-    bool lStatus              = true;
+    constexpr bool lStatsByPacket = true;
 
-    lStatus = Common::HandleDataReceived(aBuffer, sTestState.mStats, !lStatsByPacket, aCheckBuffer, aFirstValue);
-    VerifyOrExit(lStatus == true, );
+    if (!Common::HandleDataReceived(aBuffer, sTestState.mStats, !lStatsByPacket, aCheckBuffer, aFirstValue))
+    {
+        return false;
+    }
 
     PrintReceivedStats(sTestState.mStats);
 
-exit:
-    return (lStatus);
+    return true;
 }
 
 static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBuffer)
 {
-    const uint8_t lFirstValue = 0;
-    bool lStatus              = true;
-
-    lStatus = HandleDataReceived(aBuffer, aCheckBuffer, lFirstValue);
-    VerifyOrExit(lStatus == true, );
-
-exit:
-    return (lStatus);
+    constexpr uint8_t lFirstValue = 0;
+    return HandleDataReceived(aBuffer, aCheckBuffer, lFirstValue);
 }
 
 // TCP Endpoint Callbacks
 
-void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, INET_ERROR aError)
+void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 {
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
-    if (aError == INET_NO_ERROR)
+    if (aError == CHIP_NO_ERROR)
     {
         IPAddress lPeerAddress;
         uint16_t lPeerPort;
@@ -566,15 +524,15 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, INET_ERROR aError)
 
         gSendIntervalExpired = false;
         gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         SetStatusFailed(sTestState.mStatus);
     }
 }
 
-static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError)
+static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 {
-    if (aError == INET_NO_ERROR)
+    if (aError == CHIP_NO_ERROR)
     {
         printf("TCP connection closed\n");
     }
@@ -595,7 +553,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError
 
 static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len) {}
 
-static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle && aBuffer)
+static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle && aBuffer)
 {
     const uint32_t lFirstValueReceived = sTestState.mStats.mReceive.mActual;
     const uint8_t lFirstValue          = uint8_t(lFirstValueReceived);
@@ -604,15 +562,15 @@ static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
     uint16_t lPeerPort;
     char lPeerAddressBuffer[INET6_ADDRSTRLEN];
     bool lCheckPassed;
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     // Check that we did not lose information in our narrowing cast.
-    VerifyOrExit(lFirstValue == lFirstValueReceived, lStatus = INET_ERROR_UNEXPECTED_EVENT);
+    VerifyOrExit(lFirstValue == lFirstValueReceived, lStatus = CHIP_ERROR_UNEXPECTED_EVENT);
 
-    VerifyOrExit(aEndPoint != nullptr, lStatus = INET_ERROR_BAD_ARGS);
-    VerifyOrExit(!aBuffer.IsNull(), lStatus = INET_ERROR_BAD_ARGS);
+    VerifyOrExit(aEndPoint != nullptr, lStatus = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!aBuffer.IsNull(), lStatus = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (aEndPoint->State != TCPEndPoint::kState_Connected)
+    if (aEndPoint->mState != TCPEndPoint::State::kConnected)
     {
         lStatus = aEndPoint->SetReceivedDataForTesting(std::move(aBuffer));
         INET_FAIL_ERROR(lStatus, "TCPEndPoint::PutBackReceivedData failed");
@@ -628,20 +586,20 @@ static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
            static_cast<size_t>(aBuffer->DataLength()));
 
     lCheckPassed = HandleDataReceived(aBuffer, lCheckBuffer, lFirstValue);
-    VerifyOrExit(lCheckPassed == true, lStatus = INET_ERROR_UNEXPECTED_EVENT);
+    VerifyOrExit(lCheckPassed == true, lStatus = CHIP_ERROR_UNEXPECTED_EVENT);
 
     lStatus = aEndPoint->AckReceive(aBuffer->TotalLength());
     INET_FAIL_ERROR(lStatus, "TCPEndPoint::AckReceive failed");
 
 exit:
-    if (lStatus != INET_NO_ERROR)
+    if (lStatus != CHIP_NO_ERROR)
     {
         SetStatusFailed(sTestState.mStatus);
     }
     return lStatus;
 }
 
-static void HandleTCPAcceptError(TCPEndPoint * aEndPoint, INET_ERROR aError)
+static void HandleTCPAcceptError(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 {
     printf("TCP accept error: %s\n", ErrorStr(aError));
 
@@ -663,59 +621,6 @@ static void HandleTCPConnectionReceived(TCPEndPoint * aListenEndPoint, TCPEndPoi
     aConnectEndPoint->OnDataReceived     = HandleTCPDataReceived;
 
     sTCPIPEndPoint = aConnectEndPoint;
-}
-
-// Raw Endpoint Callbacks
-
-static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
-{
-    const bool lCheckBuffer   = true;
-    const bool lStatsByPacket = true;
-    IPAddressType lAddressType;
-    bool lStatus;
-
-    VerifyOrExit(aEndPoint != nullptr, lStatus = false);
-    VerifyOrExit(!aBuffer.IsNull(), lStatus = false);
-    VerifyOrExit(aPacketInfo != nullptr, lStatus = false);
-
-    Common::HandleRawMessageReceived(aEndPoint, aBuffer, aPacketInfo);
-
-    lAddressType = aPacketInfo->DestAddress.Type();
-
-    if (lAddressType == kIPAddressType_IPv4)
-    {
-        const uint16_t kIPv4HeaderSize = 20;
-
-        aBuffer->ConsumeHead(kIPv4HeaderSize);
-
-        lStatus = Common::HandleICMPv4DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
-    }
-    else if (lAddressType == kIPAddressType_IPv6)
-    {
-        lStatus = Common::HandleICMPv6DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
-    }
-    else
-    {
-        lStatus = false;
-    }
-
-    if (lStatus)
-    {
-        PrintReceivedStats(sTestState.mStats);
-    }
-
-exit:
-    if (!lStatus)
-    {
-        SetStatusFailed(sTestState.mStatus);
-    }
-}
-
-static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
-{
-    Common::HandleRawReceiveError(aEndPoint, aError, aPacketInfo);
-
-    SetStatusFailed(sTestState.mStatus);
 }
 
 // UDP Endpoint Callbacks
@@ -740,7 +645,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -751,11 +656,7 @@ static bool IsTransportReadyForSend()
 {
     bool lStatus = false;
 
-    if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
-    {
-        lStatus = (sRawIPEndPoint != nullptr);
-    }
-    else if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
+    if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
     {
         lStatus = (sUDPIPEndPoint != nullptr);
     }
@@ -765,10 +666,10 @@ static bool IsTransportReadyForSend()
         {
             if (sTCPIPEndPoint->PendingSendLength() == 0)
             {
-                switch (sTCPIPEndPoint->State)
+                switch (sTCPIPEndPoint->mState)
                 {
-                case TCPEndPoint::kState_Connected:
-                case TCPEndPoint::kState_ReceiveShutdown:
+                case TCPEndPoint::State::kConnected:
+                case TCPEndPoint::State::kReceiveShutdown:
                     lStatus = true;
                     break;
 
@@ -782,9 +683,9 @@ static bool IsTransportReadyForSend()
     return (lStatus);
 }
 
-static INET_ERROR PrepareTransportForSend()
+static CHIP_ERROR PrepareTransportForSend()
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     if (gOptFlags & kOptFlagUseTCPIP)
     {
@@ -806,74 +707,44 @@ static INET_ERROR PrepareTransportForSend()
     return (lStatus);
 }
 
-static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
+static CHIP_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
     PacketBufferHandle lBuffer;
-    INET_ERROR lStatus = INET_NO_ERROR;
 
-    if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
+    if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
     {
-        // For ICMP (v4 or v6), we'll send n aSize or smaller
-        // datagrams (with overhead for the ICMP header), each
-        // patterned from zero to aSize - 1, following the ICMP
-        // header.
+        const uint8_t lFirstValue = 0;
 
-        if ((gOptFlags & kOptFlagUseIPv6) == (kOptFlagUseIPv6))
-        {
-            lBuffer = Common::MakeICMPv6DataBuffer(aSize);
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
-        }
-#if INET_CONFIG_ENABLE_IPV4
-        else if ((gOptFlags & kOptFlagUseIPv4) == (kOptFlagUseIPv4))
-        {
-            lBuffer = Common::MakeICMPv4DataBuffer(aSize);
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
-        }
-#endif // INET_CONFIG_ENABLE_IPV4
+        // For UDP, we'll send n aSize or smaller datagrams, each
+        // patterned from zero to aSize - 1.
 
-        lStatus = sRawIPEndPoint->SendTo(aAddress, std::move(lBuffer));
-        SuccessOrExit(lStatus);
+        lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
+        VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+        ReturnErrorOnFailure(sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer)));
     }
-    else
+    else if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
     {
-        if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
-        {
-            const uint8_t lFirstValue = 0;
+        const uint32_t lFirstValue = sTestState.mStats.mTransmit.mActual;
+        VerifyOrReturnError(lFirstValue < 256u, CHIP_ERROR_UNEXPECTED_EVENT);
 
-            // For UDP, we'll send n aSize or smaller datagrams, each
-            // patterned from zero to aSize - 1.
+        // For TCP, we'll send one byte stream of
+        // sTestState.mStats.mTransmit.mExpected in n aSize or
+        // smaller transactions, patterned from zero to
+        // sTestState.mStats.mTransmit.mExpected - 1.
 
-            lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
+        lBuffer = Common::MakeDataBuffer(aSize, uint8_t(lFirstValue));
+        VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
-            lStatus = sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer));
-            SuccessOrExit(lStatus);
-        }
-        else if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
-        {
-            const uint32_t lFirstValue = sTestState.mStats.mTransmit.mActual;
-            VerifyOrExit(lFirstValue < 256u, lStatus = INET_ERROR_UNEXPECTED_EVENT);
-
-            // For TCP, we'll send one byte stream of
-            // sTestState.mStats.mTransmit.mExpected in n aSize or
-            // smaller transactions, patterned from zero to
-            // sTestState.mStats.mTransmit.mExpected - 1.
-
-            lBuffer = Common::MakeDataBuffer(aSize, uint8_t(lFirstValue));
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
-
-            lStatus = sTCPIPEndPoint->Send(std::move(lBuffer));
-            SuccessOrExit(lStatus);
-        }
+        ReturnErrorOnFailure(sTCPIPEndPoint->Send(std::move(lBuffer)));
     }
 
-exit:
-    return (lStatus);
+    return CHIP_NO_ERROR;
 }
 
 void DriveSend()
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     if (!Common::IsSender())
         goto exit;
@@ -889,7 +760,7 @@ void DriveSend()
     else
     {
         gSendIntervalExpired = false;
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         if (sTestState.mStats.mTransmit.mActual < sTestState.mStats.mTransmit.mExpected)
         {
@@ -904,13 +775,13 @@ void DriveSend()
 
             sTestState.mStats.mTransmit.mActual += lSendSize;
 
-            printf("%u/%u transmitted to %s\n", sTestState.mStats.mTransmit.mActual, sTestState.mStats.mTransmit.mExpected,
-                   sDestinationString);
+            printf("%" PRIu32 "/%" PRIu32 "transmitted to %s\n", sTestState.mStats.mTransmit.mActual,
+                   sTestState.mStats.mTransmit.mExpected, sDestinationString);
         }
     }
 
 exit:
-    if (lStatus != INET_NO_ERROR)
+    if (lStatus != CHIP_NO_ERROR)
     {
         SetStatusFailed(sTestState.mStatus);
     }
@@ -918,11 +789,9 @@ exit:
 
 static void StartTest()
 {
-    IPAddressType lIPAddressType = kIPAddressType_IPv6;
-    IPProtocol lIPProtocol       = kIPProtocol_ICMPv6;
-    IPVersion lIPVersion         = kIPVersion_6;
+    IPAddressType lIPAddressType = IPAddressType::kIPv6;
     IPAddress lAddress           = chip::Inet::IPAddress::Any;
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     if (!gNetworkOptions.LocalIPv6Addr.empty())
         lAddress = gNetworkOptions.LocalIPv6Addr[0];
@@ -930,9 +799,7 @@ static void StartTest()
 #if INET_CONFIG_ENABLE_IPV4
     if (gOptFlags & kOptFlagUseIPv4)
     {
-        lIPAddressType = kIPAddressType_IPv4;
-        lIPProtocol    = kIPProtocol_ICMPv4;
-        lIPVersion     = kIPVersion_4;
+        lIPAddressType = IPAddressType::kIPv4;
         if (!gNetworkOptions.LocalIPv6Addr.empty())
             lAddress = gNetworkOptions.LocalIPv4Addr[0];
         else
@@ -942,7 +809,7 @@ static void StartTest()
 
     // clang-format off
     printf("Using %sIP%s, device interface: %s (w/%c LwIP)\n",
-           ((gOptFlags & kOptFlagUseRawIP) ? "" : ((gOptFlags & kOptFlagUseTCPIP) ? "TCP/" : "UDP/")),
+           ((gOptFlags & kOptFlagUseTCPIP) ? "TCP/" : "UDP/"),
            ((gOptFlags & kOptFlagUseIPv4) ? "v4" : "v6"),
            ((gInterfaceName) ? gInterfaceName : "<none>"),
            (CHIP_SYSTEM_CONFIG_USE_LWIP ? '\0' : 'o'));
@@ -950,18 +817,7 @@ static void StartTest()
 
     // Allocate the endpoints for sending or receiving.
 
-    if (gOptFlags & kOptFlagUseRawIP)
-    {
-        lStatus = gInet.NewRawEndPoint(lIPVersion, lIPProtocol, &sRawIPEndPoint);
-        INET_FAIL_ERROR(lStatus, "InetLayer::NewRawEndPoint failed");
-
-        if (IsInterfaceIdPresent(gInterfaceId))
-        {
-            lStatus = sRawIPEndPoint->BindInterface(lIPAddressType, gInterfaceId);
-            INET_FAIL_ERROR(lStatus, "RawEndPoint::BindInterface failed");
-        }
-    }
-    else if (gOptFlags & kOptFlagUseUDPIP)
+    if (gOptFlags & kOptFlagUseUDPIP)
     {
         lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
@@ -975,21 +831,7 @@ static void StartTest()
 
     if (Common::IsReceiver())
     {
-        if (gOptFlags & kOptFlagUseRawIP)
-        {
-            lStatus = sRawIPEndPoint->Bind(lIPAddressType, lAddress);
-            INET_FAIL_ERROR(lStatus, "RawEndPoint::Bind failed");
-
-            if (gOptFlags & kOptFlagUseIPv6)
-            {
-                lStatus = sRawIPEndPoint->SetICMPFilter(kICMPv6_FilterTypes, gICMPv6Types);
-                INET_FAIL_ERROR(lStatus, "RawEndPoint::SetICMPFilter failed");
-            }
-
-            lStatus = sRawIPEndPoint->Listen(HandleRawMessageReceived, HandleRawReceiveError);
-            INET_FAIL_ERROR(lStatus, "RawEndPoint::Listen failed");
-        }
-        else if (gOptFlags & kOptFlagUseUDPIP)
+        if (gOptFlags & kOptFlagUseUDPIP)
         {
             lStatus = sUDPIPEndPoint->Bind(lIPAddressType, IPAddress::Any, kUDPPort);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::Bind failed");
@@ -1024,17 +866,12 @@ static void StartTest()
 
 static void CleanupTest()
 {
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     gSendIntervalExpired = false;
     gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
 
     // Release the resources associated with the allocated end points.
-
-    if (sRawIPEndPoint != nullptr)
-    {
-        sRawIPEndPoint->Free();
-    }
 
     if (sTCPIPEndPoint != nullptr)
     {

@@ -22,11 +22,14 @@
 
 #include <app/util/af.h>
 
-#include <app/Command.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/binding-table.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::Binding;
 
 EmberStatus prepareBinding(EmberBindingTableEntry & binding, NodeId nodeId, GroupId groupId, EndpointId endpointId,
                            ClusterId clusterId)
@@ -88,9 +91,14 @@ EmberStatus getUnusedBindingIndex(uint8_t * bindingIndex)
     return EMBER_NOT_FOUND;
 }
 
-bool emberAfBindingClusterBindCallback(chip::app::Command * commandObj, NodeId nodeId, GroupId groupId, EndpointId endpointId,
-                                       ClusterId clusterId)
+bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                       const Commands::Bind::DecodableType & commandData)
 {
+    auto & nodeId     = commandData.nodeId;
+    auto & groupId    = commandData.groupId;
+    auto & endpointId = commandData.endpointId;
+    auto & clusterId  = commandData.clusterId;
+
     ChipLogDetail(Zcl, "RX: BindCallback");
 
     EmberBindingTableEntry bindingEntry;
@@ -118,9 +126,14 @@ bool emberAfBindingClusterBindCallback(chip::app::Command * commandObj, NodeId n
     return true;
 }
 
-bool emberAfBindingClusterUnbindCallback(chip::app::Command * commandObj, NodeId nodeId, GroupId groupId, EndpointId endpointId,
-                                         ClusterId clusterId)
+bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                         const Commands::Unbind::DecodableType & commandData)
 {
+    auto & nodeId     = commandData.nodeId;
+    auto & groupId    = commandData.groupId;
+    auto & endpointId = commandData.endpointId;
+    auto & clusterId  = commandData.clusterId;
+
     ChipLogDetail(Zcl, "RX: UnbindCallback");
 
     EmberBindingTableEntry bindingEntry;

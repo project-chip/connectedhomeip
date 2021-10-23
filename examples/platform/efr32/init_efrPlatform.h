@@ -22,9 +22,6 @@
 extern "C" {
 #endif
 
-#include "board_features.h"
-#include "hal-config-board.h"
-
 void init_efrPlatform(void);
 
 #ifdef __cplusplus

@@ -19,10 +19,15 @@
 #pragma once
 
 #include "AppEvent.h"
+#include "LEDWidget.h"
 #include "LightingManager.h"
 #include "Rpc.h"
 
 #include <platform/CHIPDeviceLayer.h>
+
+#ifdef CONFIG_MCUMGR_SMP_BT
+#include "DFUOverSMP.h"
+#endif
 
 #include <cstdint>
 
@@ -38,7 +43,7 @@ public:
     void UpdateClusterState();
 
 private:
-    friend class chip::rpc::Button;
+    friend class chip::rpc::NrfButton;
     friend AppTask & GetAppTask(void);
 
     int Init();
@@ -50,18 +55,23 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
+    static void UpdateStatusLED();
+    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);
     static void LightingActionEventHandler(AppEvent * aEvent);
     static void StartBLEAdvertisementHandler(AppEvent * aEvent);
 
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static void ButtonEventHandler(uint32_t button_state, uint32_t has_changed);
     static void TimerEventHandler(k_timer * timer);
 
-    static int SoftwareUpdateConfirmationHandler(uint32_t offset, uint32_t size, void * arg);
+#ifdef CONFIG_MCUMGR_SMP_BT
+    static void RequestSMPAdvertisingStart(void);
+#endif
 
     void StartTimer(uint32_t aTimeoutInMs);
 
@@ -74,9 +84,8 @@ private:
         kFunction_Invalid
     };
 
-    Function_t mFunction        = kFunction_NoneSelected;
-    bool mFunctionTimerActive   = false;
-    bool mSoftwareUpdateEnabled = false;
+    Function_t mFunction      = kFunction_NoneSelected;
+    bool mFunctionTimerActive = false;
     static AppTask sAppTask;
 };
 

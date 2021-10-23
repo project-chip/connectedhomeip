@@ -48,7 +48,7 @@ bool ChannelContext::MatchNodeId(NodeId nodeId)
     case ChannelState::kPreparing:
         return nodeId == GetPrepareVars().mBuilder.GetPeerNodeId();
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
+        auto state = mExchangeManager->GetSessionManager()->GetSecureSession(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
         return nodeId == state->GetPeerNodeId();
@@ -73,7 +73,7 @@ bool ChannelContext::MatchTransport(Transport::Type transport)
         }
         return false;
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
+        auto state = mExchangeManager->GetSessionManager()->GetSecureSession(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
         return transport == state->GetPeerAddress().GetTransportType();
@@ -121,7 +121,7 @@ bool ChannelContext::IsCasePairing()
     return mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kCasePairing;
 }
 
-bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMgr * ssm)
+bool ChannelContext::MatchesSession(SessionHandle session, SessionManager * sessionManager)
 {
     switch (mState)
     {
@@ -129,9 +129,9 @@ bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMg
         switch (GetPrepareVars().mState)
         {
         case PrepareState::kCasePairing: {
-            auto state = ssm->GetPeerConnectionState(session);
+            auto state = sessionManager->GetSecureSession(session);
             return (state->GetPeerNodeId() == GetPrepareVars().mBuilder.GetPeerNodeId() &&
-                    state->GetPeerKeyID() == GetPrepareVars().mBuilder.GetPeerKeyID());
+                    state->GetPeerSessionId() == GetPrepareVars().mBuilder.GetPeerSessionId());
         }
         default:
             return false;
@@ -181,13 +181,14 @@ void ChannelContext::EnterAddressResolve()
     // The HandleNodeIdResolve may already have been called, recheck the state here before set up the timer
     if (mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kAddressResolving)
     {
-        System::Layer * layer = mExchangeManager->GetSessionMgr()->SystemLayer();
-        layer->StartTimer(CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS, AddressResolveTimeout, this);
+        System::Layer * layer = mExchangeManager->GetSessionManager()->SystemLayer();
+        layer->StartTimer(System::Clock::Milliseconds32(CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS), AddressResolveTimeout,
+                          this);
         Retain(); // Keep the pointer in the timer
     }
 }
 
-void ChannelContext::AddressResolveTimeout(System::Layer * aLayer, void * aAppState, System::Error aError)
+void ChannelContext::AddressResolveTimeout(System::Layer * aLayer, void * aAppState)
 {
     ChannelContext * me = static_cast<ChannelContext *>(aAppState);
     me->AddressResolveTimeout();
@@ -206,7 +207,7 @@ void ChannelContext::AddressResolveTimeout()
     EnterFailedState(CHIP_ERROR_PEER_NODE_NOT_FOUND);
 }
 
-void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Mdns::MdnsService & address)
+void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Dnssd::DnssdService & address)
 {
     switch (mState)
     {
@@ -258,14 +259,25 @@ void ChannelContext::EnterCasePairingState()
     auto & prepare              = GetPrepareVars();
     prepare.mCasePairingSession = Platform::New<CASESession>();
 
-    ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), prepare.mCasePairingSession);
-    VerifyOrReturn(ctxt != nullptr);
-
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
-    CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, &prepare.mBuilder.GetOperationalCredentialSet(),
-                                                                   prepare.mBuilder.GetPeerNodeId(),
+
+    auto session = mExchangeManager->GetSessionManager()->CreateUnauthenticatedSession(addr);
+    if (!session.HasValue())
+    {
+        ExitCasePairingState();
+        ExitPreparingState();
+        EnterFailedState(CHIP_ERROR_NO_MEMORY);
+        return;
+    }
+
+    ExchangeContext * ctxt = mExchangeManager->NewContext(session.Value(), prepare.mCasePairingSession);
+    VerifyOrReturn(ctxt != nullptr);
+
+    FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    VerifyOrReturn(fabric != nullptr);
+    CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, fabric, prepare.mBuilder.GetPeerNodeId(),
                                                                    mExchangeManager->GetNextKeyId(), ctxt, this);
     if (err != CHIP_NO_ERROR)
     {
@@ -312,7 +324,7 @@ void ChannelContext::OnSessionEstablished()
     }
 }
 
-void ChannelContext::OnNewConnection(SecureSessionHandle session)
+void ChannelContext::OnNewConnection(SessionHandle session)
 {
     if (mState != ChannelState::kPreparing)
         return;
@@ -323,14 +335,14 @@ void ChannelContext::OnNewConnection(SecureSessionHandle session)
     EnterReadyState(session);
 }
 
-void ChannelContext::EnterReadyState(SecureSessionHandle session)
+void ChannelContext::EnterReadyState(SessionHandle session)
 {
     mState = ChannelState::kReady;
     mStateVars.Set<ReadyVars>(session);
     mChannelManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnEstablished(); });
 }
 
-void ChannelContext::OnConnectionExpired(SecureSessionHandle session)
+void ChannelContext::OnConnectionExpired(SessionHandle session)
 {
     if (mState != ChannelState::kReady)
         return;

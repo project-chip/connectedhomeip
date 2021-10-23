@@ -26,11 +26,13 @@
 #include "AttributeDataElement.h"
 #include "ListBuilder.h"
 #include "ListParser.h"
+
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -65,6 +67,8 @@ public:
      *  @return A reference to AttributeDataElement::Builder
      */
     AttributeDataElement::Builder & CreateAttributeDataElementBuilder();
+
+    AttributeDataElement::Builder & GetAttributeDataElementBuilder();
 
     /**
      *  @brief Mark the end of this AttributeDataList

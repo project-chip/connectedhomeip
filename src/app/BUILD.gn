@@ -14,6 +14,8 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("common_flags.gni")
 
 declare_args() {
@@ -22,12 +24,11 @@ declare_args() {
       is_debug && (current_os == "linux" || current_os == "mac")
 }
 
-config("app_config") {
-  if (chip_enable_schema_check) {
-    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=1" ]
-  } else {
-    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=0" ]
-  }
+buildconfig_header("app_buildconfig") {
+  header = "AppBuildConfig.h"
+  header_dir = "app"
+
+  defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}" ]
 }
 
 static_library("app") {
@@ -50,18 +51,18 @@ static_library("app") {
     "MessageDef/AttributePath.h",
     "MessageDef/AttributePathList.cpp",
     "MessageDef/AttributePathList.h",
-    "MessageDef/AttributeStatusElement.cpp",
-    "MessageDef/AttributeStatusElement.h",
+    "MessageDef/AttributeStatusIB.cpp",
+    "MessageDef/AttributeStatusIB.h",
     "MessageDef/AttributeStatusList.cpp",
     "MessageDef/AttributeStatusList.h",
     "MessageDef/Builder.cpp",
     "MessageDef/Builder.h",
-    "MessageDef/CommandDataElement.cpp",
-    "MessageDef/CommandDataElement.h",
+    "MessageDef/CommandDataIB.cpp",
+    "MessageDef/CommandDataIB.h",
     "MessageDef/CommandList.cpp",
     "MessageDef/CommandList.h",
-    "MessageDef/CommandPath.cpp",
-    "MessageDef/CommandPath.h",
+    "MessageDef/CommandPathIB.cpp",
+    "MessageDef/CommandPathIB.h",
     "MessageDef/EventDataElement.cpp",
     "MessageDef/EventDataElement.h",
     "MessageDef/EventList.cpp",
@@ -84,12 +85,18 @@ static_library("app") {
     "MessageDef/ReadRequest.h",
     "MessageDef/ReportData.cpp",
     "MessageDef/ReportData.h",
-    "MessageDef/StatusElement.cpp",
-    "MessageDef/StatusElement.h",
+    "MessageDef/StatusIB.cpp",
+    "MessageDef/StatusIB.h",
+    "MessageDef/StatusResponse.cpp",
+    "MessageDef/SubscribeRequest.cpp",
+    "MessageDef/SubscribeResponse.cpp",
+    "MessageDef/TimedRequest.cpp",
     "MessageDef/WriteRequest.cpp",
     "MessageDef/WriteResponse.cpp",
     "ReadClient.cpp",
     "ReadHandler.cpp",
+    "WriteClient.cpp",
+    "WriteHandler.cpp",
     "decoder.cpp",
     "encoder-common.cpp",
     "reporting/Engine.cpp",
@@ -99,23 +106,20 @@ static_library("app") {
   if (chip_ip_commissioning) {
     defines = [
       "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=1",
-      "CONFIG_RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE=1",
       "CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY=1",
-      "CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING=1",
     ]
   }
 
   public_deps = [
+    ":app_buildconfig",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
 
   cflags = [ "-Wconversion" ]
 
-  public_configs = [
-    ":app_config",
-    "${chip_root}/src:includes",
-  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }

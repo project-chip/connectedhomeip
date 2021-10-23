@@ -16,8 +16,8 @@
  */
 
 #include "chip-zcl-zpro-codec.h"
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding::LittleEndian;
 
@@ -28,9 +28,9 @@ uint16_t doEncodeApsFrame(BufferWriter & buf, chip::ClusterId clusterId, chip::E
 
     uint8_t control_byte = 0;
     buf.Put(control_byte) // Put in a control byte
-        .Put16(clusterId)
-        .Put8(sourceEndpoint)
-        .Put8(destinationEndpoint)
+        .Put32(clusterId)
+        .Put16(sourceEndpoint)
+        .Put16(destinationEndpoint)
         .EndianPut(options, sizeof(EmberApsOption))
         .Put16(groupId)
         .Put8(sequence)

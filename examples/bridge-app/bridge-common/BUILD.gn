@@ -19,7 +19,7 @@ import("${chip_root}/src/app/chip_data_model.gni")
 chip_data_model("bridge-common") {
   zap_file = "bridge-app.zap"
 
-  zap_pregenerated_dir = "gen"
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/bridge-app/zap-generated"
   is_server = true
 
   # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!

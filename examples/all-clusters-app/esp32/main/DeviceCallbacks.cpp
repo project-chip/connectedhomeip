@@ -30,14 +30,14 @@
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/Command.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
-#include <lib/mdns/Advertiser.h>
-#include <support/CodeUtils.h>
+#include <lib/dnssd/Advertiser.h>
+#include <lib/support/CodeUtils.h>
 
 static const char * TAG = "app-devicecallbacks";
 
@@ -60,6 +60,19 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kSessionEstablished:
         OnSessionEstablished(event);
         break;
+
+    case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        ESP_LOGI(TAG, "CHIPoBLE connection established");
+        break;
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        ESP_LOGI(TAG, "CHIPoBLE disconnected");
+        break;
+
+    case DeviceEventType::kCommissioningComplete:
+        ESP_LOGI(TAG, "Commissioning complete");
+        break;
+
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
@@ -68,7 +81,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // will not trigger a 'internet connectivity change' as there is no internet
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
-            chip::app::Mdns::StartServer();
+            chip::app::DnssdServer::Instance().StartServer();
         }
         break;
     }
@@ -77,7 +90,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 }
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+                                                  uint8_t type, uint16_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);
@@ -95,7 +108,11 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
-
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+    case ZCL_COLOR_CONTROL_CLUSTER_ID:
+        OnColorControlAttributeChangeCallback(endpointId, attributeId, value);
+        break;
+#endif
     default:
         ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
         break;
@@ -110,7 +127,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
-        chip::app::Mdns::StartServer();
+        chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -120,7 +137,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
-        chip::app::Mdns::StartServer();
+        chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
@@ -164,13 +181,43 @@ exit:
     return;
 }
 
-void IdentifyTimerHandler(Layer * systemLayer, void * appState, Error error)
+// Currently we only support ColorControl cluster for ESP32C3_DEVKITM which has an on-board RGB-LED
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    VerifyOrExit(attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID ||
+                     attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                 ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04x", attributeId));
+    VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    if (endpointId == 1)
+    {
+        uint8_t hue, saturation;
+        if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+        {
+            hue = *value;
+            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                       &saturation, sizeof(uint8_t));
+        }
+        else
+        {
+            saturation = *value;
+            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
+                                       sizeof(uint8_t));
+        }
+        statusLED1.SetColor(hue, saturation);
+    }
+exit:
+    return;
+}
+#endif
+
+void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 {
     statusLED1.Animate();
 
     if (identifyTimerCount)
     {
-        SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
+        systemLayer->StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, appState);
         // Decrement the timer count.
         identifyTimerCount--;
     }
@@ -188,8 +235,8 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
     // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
     identifyTimerCount = (*value) * 4;
 
-    SystemLayer.CancelTimer(IdentifyTimerHandler, this);
-    SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
+    DeviceLayer::SystemLayer().CancelTimer(IdentifyTimerHandler, this);
+    DeviceLayer::SystemLayer().StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, this);
 
 exit:
     return;

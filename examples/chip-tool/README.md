@@ -1,10 +1,9 @@
-# CHIP Client Example
+# Matter Client Example
 
-An example application that uses CHIP to send messages to a CHIP server.
+An example application that uses Matter to send messages to a Matter server.
 
 ---
 
--   [CHIP Client Example](#chip-client-example)
 -   [Building the Example Application](#building-the-example-application)
 -   [Using the Client to Request an Echo](#using-the-client-to-request-an-echo)
 
@@ -12,54 +11,99 @@ An example application that uses CHIP to send messages to a CHIP server.
 
 ## Building the Example Application
 
-Building the example application is quite straightforward.
+See [the build guide](../../docs/guides/BUILDING.md#prerequisites) for general
+background on build prerequisites.
 
-### gn
+Building the example application is quite straightforward. It can either be done
+as part of an overall "build everything" build:
 
 ```
-cd examples/chip-tool
-git submodule update --init
-source third_party/connectedhomeip/scripts/activate.sh
-gn gen out/debug
-ninja -C out/debug
+./gn_build.sh
 ```
 
--   After the application is built, it can be found in the build directory as
-    `out/debug/chip-tool`
+which puts the binary at `out/debug/standalone/chip-tool` or directly via:
 
-## Using the Client to Pair a device
+```
+scripts/examples/gn_build_example.sh examples/chip-tool SOME-PATH/
+```
 
-In order to send commands to a device, it must be paired with the client.
+which puts the binary at `SOME-PATH/chip-tool`.
 
-#### Pair a device
+## Using the Client to commission a device
 
-To initiate a client pairing request to a device, run the built executable and
-choose the pairing mode.
+In order to send commands to a device, it must be commissioned with the client.
+chip-tool currently only supports commissioning and remembering one device at a
+time. The configuration state is stored in `/tmp/chip_tool_config.ini`; deleting
+this and other `.ini` files in `/tmp` can sometimes resolve issues due to stale
+configuration.
 
-##### Pair a device configured to bypass Rendezvous
+#### Commission a device
 
-The command below pair a device with the provided IP address and port of the
-server to talk to.
+To initiate a client commissioning request to a device, run the built executable
+and choose the pairing mode.
 
-    $ chip-tool pairing bypass 192.168.0.30 11097
+##### Commission a device configured to bypass Rendezvous
 
-#### Pair a device over BLE
+The command below commissions a device with the provided IP address and port of
+the server to talk to.
+
+    $ chip-tool pairing bypass ${NODE_ID_TO_ASSIGN} 192.168.0.30 5540
+
+#### Commission a device over BLE
 
 Run the built executable and pass it the discriminator and pairing code of the
-remote device.
+remote device, as well as the network credentials to use.
 
 The command below uses the default values hard-coded into the debug versions of
-the ESP32 all-clusters-app:
+the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
-    $ chip-tool pairing ble 20202021 3840
+    $ chip-tool pairing ble-wifi ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} 0 20202021 3840
 
-### Unpair a device
+where:
+
+-   \${NODE_ID_TO_ASSIGN} (which must be a decimal number or a 0x-prefixed hex
+    number) is the node id to assign to the node being commissioned.
+-   \${SSID} is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX
+    where the bytes of the SSID are encoded as two-digit hex numbers.
+-   \${PASSWORD} is the Wi-Fi password, again either as a string or as hex data
+-   The 0 is the fabric id, until more complete support for multiple fabrics is
+    implemented in our commissioning process.
+
+For example:
+
+    $ chip-tool pairing ble-wifi 0x11 xyz secret 0 20202021 3840
+
+or equivalently:
+
+    $ chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 0 20202021 3840
+
+#### Pair a device over IP
+
+The command below will discover devices and try to pair with the first one it
+discovers using the provided setup code.
+
+    $ chip-tool pairing onnetwork ${NODE_ID_TO_ASSIGN} 20202021
+
+The command below will discover devices with long discriminator 3840 and try to
+pair with the first one it discovers using the provided setup code.
+
+    $ chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840
+
+The command below will discover devices based on the given QR code (which
+devices log when they start up) and try to pair with the first one it discovers.
+
+    $ chip-tool pairing qrcode ${NODE_ID_TO_ASSIGN} MT:#######
+
+In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`
+(which must be a decimal number or a 0x-prefixed hex number).
+
+### Forget the currently-commissioned device
 
     $ chip-tool pairing unpair
 
-## Using the Client to Send CHIP Commands
+## Using the Client to Send Matter Commands
 
-To use the Client to send a CHIP commands, run the built executable and pass it
+To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name as well as an endpoint id.
 
 The endpoint id must be between 1 and 240.
@@ -121,6 +165,10 @@ with the target cluster name and the target command name
 
     $ chip-tool onoff on
 
+### Run a test suite against a paired peer device
+
+    $ chip-tool tests Test_TC_OO_1_1
+
 ## Using the Client for Setup Payload
 
 ### How to parse a setup code
@@ -140,7 +188,7 @@ and the `parse-setup-payload` command
 
 #### Manual Setup Code
 
-    $ chip-tool payload parse-setup-payload :#####"
+    $ chip-tool payload parse-setup-payload "#####"
 
 # Using the Client for Additional Data Payload
 

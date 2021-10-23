@@ -23,34 +23,49 @@
 #include "AppConfig.h"
 #include "LightingManager.h"
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/util/af-types.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
+using namespace ::chip::app::Clusters;
 
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
-    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
-    {
-        EFR32_LOG("Unknown cluster ID: %d", clusterId);
-        return;
-    }
+    ClusterId clusterId     = attributePath.mClusterId;
+    AttributeId attributeId = attributePath.mAttributeId;
+    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
-        EFR32_LOG("Unknown attribute ID: %d", attributeId);
-        return;
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
     }
+    else if (clusterId == LevelControl::Id)
+    {
+        ChipLogProgress(Zcl,
+                        "Level Control attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+                        ChipLogValueMEI(attributeId), type, *value, size);
 
-    if (*value)
-    {
-        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::ON_ACTION);
+        // WIP Apply attribute change to Light
     }
-    else
+    else if (clusterId == ColorControl::Id)
     {
-        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::OFF_ACTION);
+        ChipLogProgress(Zcl,
+                        "Color Control attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+                        ChipLogValueMEI(attributeId), type, *value, size);
+
+        // WIP Apply attribute change to Light
+    }
+    else if (clusterId == OnOffSwitchConfiguration::Id)
+    {
+        ChipLogProgress(Zcl,
+                        "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16
+                        ", length %" PRIu16,
+                        ChipLogValueMEI(attributeId), type, *value, size);
+
+        // WIP Apply attribute change to Light
     }
 }
 

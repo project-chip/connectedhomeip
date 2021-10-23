@@ -39,8 +39,11 @@
 
 #pragma once
 
-#include <app/Command.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
+#include <app/data-model/DecodableList.h>
 #include <app/util/af-types.h>
+#include <lib/support/Span.h>
 #include <stdint.h>
 
 EmberAfStatus emberAfScenesSetSceneCountAttribute(chip::EndpointId endpoint, uint8_t newCount);
@@ -80,10 +83,12 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 #define emberAfPluginScenesServerDecrNumSceneEntriesInUse() (--emberAfPluginScenesServerEntriesInUse)
 #endif // Use tokens
 
-bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, const EmberAfClusterCommand * cmd,
-                                            chip::GroupId groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                            uint8_t * extensionFieldSets);
-bool emberAfPluginScenesServerParseViewScene(chip::app::Command * commandObj, const EmberAfClusterCommand * cmd,
+bool emberAfPluginScenesServerParseAddScene(
+    chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, chip::GroupId groupId, uint8_t sceneId,
+    uint16_t transitionTime, const chip::CharSpan & sceneName,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::DecodableType> &
+        extensionFieldSets);
+bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
                                              chip::GroupId groupId, uint8_t sceneId);
 
 /** @brief Scenes Cluster Recall Saved Scene

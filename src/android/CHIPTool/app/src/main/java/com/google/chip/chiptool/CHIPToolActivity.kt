@@ -26,19 +26,22 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import chip.setuppayload.SetupPayload
+import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
+import com.google.chip.chiptool.clusterclient.ClusterInteractionFragment
+import com.google.chip.chiptool.clusterclient.MultiAdminClientFragment
+import com.google.chip.chiptool.clusterclient.OpCredClientFragment
+import com.google.chip.chiptool.clusterclient.BasicClientFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
-import com.google.chip.chiptool.echoclient.EchoClientFragment
+import com.google.chip.chiptool.clusterclient.SensorClientFragment
+import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
-import com.google.chip.chiptool.setuppayloadscanner.QrCodeInfo
-import chip.devicecontroller.KeyValueStoreManager
-import chip.setuppayload.SetupPayload
-import chip.setuppayload.SetupPayloadParser
 
 class CHIPToolActivity :
     AppCompatActivity(),
@@ -51,8 +54,6 @@ class CHIPToolActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.top_activity)
-
-    KeyValueStoreManager.initialize(this);
 
     if (savedInstanceState == null) {
       val fragment = SelectActionFragment.newInstance()
@@ -84,11 +85,14 @@ class CHIPToolActivity :
   }
 
   override fun onCommissioningComplete(code: Int) {
-    if (code == 0) {
-      showFragment(OnOffClientFragment.newInstance(), false)
-    } else {
-      showFragment(SelectActionFragment.newInstance(), false)
+    runOnUiThread {
+      Toast.makeText(
+          this,
+          getString(R.string.commissioning_completed, code),
+          Toast.LENGTH_SHORT).show()
     }
+    ChipClient.getDeviceController(this).close()
+    showFragment(SelectActionFragment.newInstance(), false)
   }
 
   override fun handleScanQrCodeClicked() {
@@ -105,12 +109,32 @@ class CHIPToolActivity :
     showFragment(BarcodeFragment.newInstance(), false)
   }
 
-  override fun handleEchoClientClicked() {
-    showFragment(EchoClientFragment.newInstance())
+  override fun onShowDeviceAddressInput() {
+    showFragment(AddressCommissioningFragment.newInstance(), false)
+  }
+
+  override fun handleClusterInteractionClicked() {
+    showFragment(ClusterInteractionFragment.newInstance())
   }
 
   override fun handleOnOffClicked() {
     showFragment(OnOffClientFragment.newInstance())
+  }
+
+  override fun handleSensorClicked() {
+    showFragment(SensorClientFragment.newInstance())
+  }
+
+  override fun handleMultiAdminClicked() {
+    showFragment(MultiAdminClientFragment.newInstance())
+  }
+
+  override fun handleOpCredClicked() {
+    showFragment(OpCredClientFragment.newInstance())
+  }
+
+  override fun handleBasicClicked() {
+    showFragment(BasicClientFragment.newInstance())
   }
 
   override fun handleAttestationTestClicked() {
@@ -160,14 +184,7 @@ class CHIPToolActivity :
       return
     }
 
-    val deviceInfo = CHIPDeviceInfo(
-        setupPayload.version,
-        setupPayload.vendorId,
-        setupPayload.productId,
-        setupPayload.discriminator,
-        setupPayload.setupPinCode,
-        setupPayload.optionalQRCodeInfo.mapValues { (_, info) -> QrCodeInfo(info.tag, info.type, info.data, info.int32) }
-    )
+    val deviceInfo = CHIPDeviceInfo.fromSetupPayload(setupPayload)
 
     val buttons = arrayOf(
         getString(R.string.nfc_tag_action_show),
@@ -190,6 +207,7 @@ class CHIPToolActivity :
 
   companion object {
     private const val TAG = "CHIPToolActivity"
+    private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
 
     var REQUEST_CODE_COMMISSIONING = 0xB003

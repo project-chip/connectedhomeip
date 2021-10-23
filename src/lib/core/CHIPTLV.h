@@ -27,15 +27,18 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <core/CHIPTLVTags.h>
-#include <core/CHIPTLVTypes.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLVTags.h>
+#include <lib/core/CHIPTLVTypes.h>
 
-#include <support/DLLUtil.h>
-#include <support/Span.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
+#include <type_traits>
 
 /**
  * @namespace chip::TLV
@@ -112,7 +115,29 @@ public:
      * @param[in]   dataLen The length of the TLV data to be parsed.
      *
      */
-    void Init(const uint8_t * data, uint32_t dataLen);
+    void Init(const uint8_t * data, size_t dataLen);
+
+    /**
+     * Initializes a TLVReader object to read from a single input buffer
+     * represented as a span.
+     *
+     * @param[in]   data    A byte span to read from
+     *
+     */
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Initializes a TLVReader object to read from a single input buffer
+     * represented as byte array.
+     *
+     * @param[in]   data    A byte buffer to read from
+     *
+     */
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
 
     /**
      * Initializes a TLVReader object to read from a TLVBackingStore.
@@ -163,10 +188,36 @@ public:
     CHIP_ERROR Next();
 
     /**
+     * Advances the TLVReader object to the next TLV element to be read, asserting the tag of
+     * the new element.
+     *
+     * The Next(Tag expectedTag) method is a convenience method that has the
+     * same behavior as Next(), but also verifies that the tag of the new TLV element matches
+     * the supplied argument.
+     *
+     * @param[in] expectedTag               The expected tag for the next element.
+     *
+     * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element.
+     * @retval #CHIP_END_OF_TLV            If no further elements are available.
+     * @retval #CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
+     *                                      If the tag associated with the new element does not match the
+     *                                      value of the @p expectedTag argument.
+     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+     * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
+     *                                      If the reader encountered an invalid or unsupported TLV
+     *                                      element type.
+     * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
+     * @retval other                        Other CHIP or platform error codes returned by the configured
+     *                                      TLVBackingStore.
+     *
+     */
+    CHIP_ERROR Next(Tag expectedTag);
+
+    /**
      * Advances the TLVReader object to the next TLV element to be read, asserting the type and tag of
      * the new element.
      *
-     * The Next(TLVType expectedType, uint64_t expectedTag) method is a convenience method that has the
+     * The Next(TLVType expectedType, Tag expectedTag) method is a convenience method that has the
      * same behavior as Next(), but also verifies that the type and tag of the new TLV element match
      * the supplied arguments.
      *
@@ -189,7 +240,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR Next(TLVType expectedType, uint64_t expectedTag);
+    CHIP_ERROR Next(TLVType expectedType, Tag expectedTag);
 
     /**
      * Returns the type of the current TLV element.
@@ -214,7 +265,7 @@ public:
      * @return      An unsigned integer containing information about the tag associated with the current
      *              TLV element.
      */
-    uint64_t GetTag() const { return mElemTag; }
+    Tag GetTag() const { return mElemTag; }
 
     /**
      * Returns the length of data associated with current TLV element.
@@ -404,6 +455,60 @@ public:
     CHIP_ERROR Get(float & v);
 
     /**
+     * Get the value of the current element as a ByteSpan
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV bytes array, or
+     *                                      the reader is not positioned on an element.
+     *
+     */
+    CHIP_ERROR Get(ByteSpan & v);
+
+    /**
+     * Get the value of the current element as a CharSpan
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV character string, or
+     *                                      the reader is not positioned on an element.
+     *
+     */
+    CHIP_ERROR Get(CharSpan & v);
+
+    /**
+     * Get the value of the current element as an enum value, if it's an integer
+     * value that fits in the enum type.
+     *
+     * @param[out] v Receives the value associated with current TLV element.
+     */
+    template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+    CHIP_ERROR Get(T & v)
+    {
+        std::underlying_type_t<T> val;
+        ReturnErrorOnFailure(Get(val));
+        v = static_cast<T>(val);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Get the value of the current element as a BitFlags value, if it's an integer
+     * value that fits in the BitFlags type.
+     *
+     * @param[out] v Receives the value associated with current TLV element.
+     */
+    template <typename T>
+    CHIP_ERROR Get(BitFlags<T> & v)
+    {
+        std::underlying_type_t<T> val;
+        ReturnErrorOnFailure(Get(val));
+        v.SetRaw(val);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      * Get the value of the current byte or UTF8 string element.
      *
      * To determine the required input buffer size, call the GetLength() method before calling GetBytes().
@@ -424,7 +529,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize);
+    CHIP_ERROR GetBytes(uint8_t * buf, size_t bufSize);
 
     /**
      * Allocates and returns a buffer containing the value of the current byte or UTF8 string.
@@ -473,7 +578,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetString(char * buf, uint32_t bufSize);
+    CHIP_ERROR GetString(char * buf, size_t bufSize);
 
     /**
      * Allocates and returns a buffer containing the null-terminated value of the current byte or UTF8
@@ -755,7 +860,7 @@ public:
      * @retval #CHIP_END_OF_TLV            If the given tag cannot be found
      * @retval other                       Other CHIP or platform error codes
      */
-    CHIP_ERROR FindElementWithTag(const uint64_t tagInApiForm, TLVReader & destReader) const;
+    CHIP_ERROR FindElementWithTag(Tag tagInApiForm, TLVReader & destReader) const;
 
     /**
      * The profile id to be used for profile tags encoded in implicit form.
@@ -779,7 +884,7 @@ public:
     void * AppData;
 
 protected:
-    uint64_t mElemTag;
+    Tag mElemTag;
     uint64_t mElemLenOrVal;
     TLVBackingStore * mBackingStore;
     const uint8_t * mReadPoint;
@@ -801,11 +906,80 @@ protected:
     CHIP_ERROR SkipData();
     CHIP_ERROR SkipToEndOfContainer();
     CHIP_ERROR VerifyElement();
-    uint64_t ReadTag(TLVTagControl tagControl, const uint8_t *& p);
+    Tag ReadTag(TLVTagControl tagControl, const uint8_t *& p);
     CHIP_ERROR EnsureData(CHIP_ERROR noDataErr);
     CHIP_ERROR ReadData(uint8_t * buf, uint32_t len);
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
     TLVElementType ElementType() const;
+};
+
+/**
+ * A TLVReader that is guaranteed to be backed by a single contiguous buffer.
+ * This allows it to expose some additional methods that allow consumers to
+ * directly access the data in that buffer in a safe way that is guaranteed to
+ * work as long as the reader object stays in scope.
+ */
+class ContiguousBufferTLVReader : public TLVReader
+{
+public:
+    ContiguousBufferTLVReader() : TLVReader() {}
+
+    /**
+     * Init with input buffer as ptr + length pair.
+     */
+    void Init(const uint8_t * data, size_t dataLen) { TLVReader::Init(data, dataLen); }
+
+    /**
+     * Init with input buffer as ByteSpan.
+     */
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Init with input buffer as byte array.
+     */
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
+
+    /**
+     * Allow opening a container, with a new ContiguousBufferTLVReader reading
+     * that container.  See TLVReader::OpenContainer for details.
+     */
+    CHIP_ERROR OpenContainer(ContiguousBufferTLVReader & containerReader);
+
+    /**
+     * Get the value of the current UTF8 string as a Span<const char> pointing
+     * into the TLV data.  Consumers may need to copy the data elsewhere as
+     * needed (e.g. before releasing the reader and its backing buffer if they
+     * plan to use the data after that point).
+     *
+     * @param[out] data                     A Span<const char> representing the string data.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV UTF8 string, or
+     *                                      the reader is not positioned on an element.
+     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
+     *
+     */
+    CHIP_ERROR GetStringView(Span<const char> & data);
+
+    /**
+     * Get the value of the current octet string as a ByteSpan pointing into the
+     * TLV data.  Consumers may need to copy the data elsewhere as needed
+     * (e.g. before releasing the reader and its backing buffer if they plan to
+     * use the data after that point).
+     *
+     * @param[out] data                     A ByteSpan representing the string data.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV octet string, or
+     *                                      the reader is not positioned on an element.
+     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
+     *
+     */
+    CHIP_ERROR GetByteView(ByteSpan & data);
 };
 
 /**
@@ -835,7 +1009,27 @@ public:
      * @param[in]   maxLen  The maximum number of bytes that should be written to the output buffer.
      *
      */
-    void Init(uint8_t * buf, uint32_t maxLen);
+    void Init(uint8_t * buf, size_t maxLen);
+
+    /**
+     * Initializes a TLVWriter object to write into a single output buffer
+     * represented by a MutableSpan.  See documentation for the two-arg Init()
+     * form for details.
+     *
+     */
+    void Init(const MutableByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Initializes a TLVWriter object to write into a single output buffer
+     * represented by a fixed-size byte array.  See documentation for the
+     * two-arg Init() form for details.
+     *
+     */
+    template <size_t N>
+    void Init(uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
 
     /**
      * Initializes a TLVWriter object to write into memory provided by a TLVBackingStore.
@@ -893,7 +1087,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR Put(uint64_t tag, int8_t v);
+    CHIP_ERROR Put(Tag tag, int8_t v);
 
     /**
      * Encodes a TLV signed integer value.
@@ -925,37 +1119,37 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR Put(uint64_t tag, int8_t v, bool preserveSize);
+    CHIP_ERROR Put(Tag tag, int8_t v, bool preserveSize);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, int8_t v)
      */
-    CHIP_ERROR Put(uint64_t tag, int16_t v);
+    CHIP_ERROR Put(Tag tag, int16_t v);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, int8_t v, bool preserveSize)
      */
-    CHIP_ERROR Put(uint64_t tag, int16_t v, bool preserveSize);
+    CHIP_ERROR Put(Tag tag, int16_t v, bool preserveSize);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, int8_t v)
      */
-    CHIP_ERROR Put(uint64_t tag, int32_t v);
+    CHIP_ERROR Put(Tag tag, int32_t v);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, int8_t v, bool preserveSize)
      */
-    CHIP_ERROR Put(uint64_t tag, int32_t v, bool preserveSize);
+    CHIP_ERROR Put(Tag tag, int32_t v, bool preserveSize);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, int8_t v)
      */
-    CHIP_ERROR Put(uint64_t tag, int64_t v);
+    CHIP_ERROR Put(Tag tag, int64_t v);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, int8_t v, bool preserveSize)
      */
-    CHIP_ERROR Put(uint64_t tag, int64_t v, bool preserveSize);
+    CHIP_ERROR Put(Tag tag, int64_t v, bool preserveSize);
 
     /**
      * Encodes a TLV unsigned integer value.
@@ -983,7 +1177,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR Put(uint64_t tag, uint8_t v);
+    CHIP_ERROR Put(Tag tag, uint8_t v);
 
     /**
      * Encodes a TLV unsigned integer value.
@@ -1015,37 +1209,37 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR Put(uint64_t tag, uint8_t v, bool preserveSize);
+    CHIP_ERROR Put(Tag tag, uint8_t v, bool preserveSize);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v)
      */
-    CHIP_ERROR Put(uint64_t tag, uint16_t v);
+    CHIP_ERROR Put(Tag tag, uint16_t v);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v, bool preserveSize)
      */
-    CHIP_ERROR Put(uint64_t tag, uint16_t v, bool preserveSize);
+    CHIP_ERROR Put(Tag tag, uint16_t v, bool preserveSize);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v)
      */
-    CHIP_ERROR Put(uint64_t tag, uint32_t v);
+    CHIP_ERROR Put(Tag tag, uint32_t v);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v, bool preserveSize)
      */
-    CHIP_ERROR Put(uint64_t tag, uint32_t v, bool preserveSize);
+    CHIP_ERROR Put(Tag tag, uint32_t v, bool preserveSize);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v)
      */
-    CHIP_ERROR Put(uint64_t tag, uint64_t v);
+    CHIP_ERROR Put(Tag tag, uint64_t v);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v, bool preserveSize)
      */
-    CHIP_ERROR Put(uint64_t tag, uint64_t v, bool preserveSize);
+    CHIP_ERROR Put(Tag tag, uint64_t v, bool preserveSize);
 
     /**
      * Encodes a TLV floating point value.
@@ -1073,12 +1267,12 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR Put(uint64_t tag, double v);
+    CHIP_ERROR Put(Tag tag, double v);
 
     /**
-     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, double v)
      */
-    CHIP_ERROR Put(uint64_t tag, float v);
+    CHIP_ERROR Put(Tag tag, float v);
 
     /**
      * Encodes a TLV byte string value using ByteSpan class.
@@ -1106,7 +1300,26 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR Put(uint64_t tag, ByteSpan data);
+    CHIP_ERROR Put(Tag tag, ByteSpan data);
+
+    /**
+     * static_cast to enumerations' underlying type when data is an enumeration.
+     */
+    template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+    CHIP_ERROR Put(Tag tag, T data)
+    {
+        return Put(tag, to_underlying(data));
+    }
+
+    /**
+     *
+     * Encodes an unsigned integer with bits corresponding to the flags set when data is a BitFlags
+     */
+    template <typename T>
+    CHIP_ERROR Put(Tag tag, BitFlags<T> data)
+    {
+        return Put(tag, data.Raw());
+    }
 
     /**
      * Encodes a TLV boolean value.
@@ -1134,7 +1347,19 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR PutBoolean(uint64_t tag, bool v);
+    CHIP_ERROR PutBoolean(Tag tag, bool v);
+
+    /**
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, bool v)
+     */
+    CHIP_ERROR Put(Tag tag, bool v)
+    {
+        /*
+         * In TLV, boolean values are encoded as standalone tags without actual values, so we have a seperate
+         * PutBoolean method.
+         */
+        return PutBoolean(tag, v);
+    }
 
     /**
      * Encodes a TLV byte string value.
@@ -1163,7 +1388,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR PutBytes(uint64_t tag, const uint8_t * buf, uint32_t len);
+    CHIP_ERROR PutBytes(Tag tag, const uint8_t * buf, uint32_t len);
 
     /**
      * Encodes a TLV UTF8 string value.
@@ -1191,7 +1416,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR PutString(uint64_t tag, const char * buf);
+    CHIP_ERROR PutString(Tag tag, const char * buf);
 
     /**
      * Encodes a TLV UTF8 string value.
@@ -1220,7 +1445,35 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR PutString(uint64_t tag, const char * buf, uint32_t len);
+    CHIP_ERROR PutString(Tag tag, const char * buf, uint32_t len);
+
+    /**
+     * Encodes a TLV UTF8 string value that's passed in as a Span.
+     *
+     * @param[in]   tag             The TLV tag to be encoded with the value, or @p AnonymousTag if the
+     *                              value should be encoded without a tag.  Tag values should be
+     *                              constructed with one of the tag definition functions ProfileTag(),
+     *                              ContextTag() or CommonTag().
+     * @param[in]   str             A Span containing a pointer and a length of the string to be encoded.
+     *
+     * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
+     *                              If a container writer has been opened on the current writer and not
+     *                              yet closed.
+     * @retval #CHIP_ERROR_INVALID_TLV_TAG
+     *                              If the specified tag value is invalid or inappropriate in the context
+     *                              in which the value is being written.
+     * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
+     *                              If writing the value would exceed the limit on the maximum number of
+     *                              bytes specified when the writer was initialized.
+     * @retval #CHIP_ERROR_NO_MEMORY
+     *                              If an attempt to allocate an output buffer failed due to lack of
+     *                              memory.
+     * @retval other                Other CHIP or platform-specific errors returned by the configured
+     *                              TLVBackingStore.
+     *
+     */
+    CHIP_ERROR PutString(Tag tag, Span<const char> str);
 
     /**
      * @brief
@@ -1266,7 +1519,7 @@ public:
      *               `WriteElementHead` or `GetNewBuffer` -- failed, their
      *               error is immediately forwarded up the call stack.
      */
-    CHIP_ERROR PutStringF(uint64_t tag, const char * fmt, ...);
+    CHIP_ERROR PutStringF(Tag tag, const char * fmt, ...);
 
     /**
      * @brief
@@ -1312,7 +1565,7 @@ public:
      *               `WriteElementHead` or `GetNewBuffer` -- failed, their
      *               error is immediately forwarded up the call stack.
      */
-    CHIP_ERROR VPutStringF(uint64_t tag, const char * fmt, va_list ap);
+    CHIP_ERROR VPutStringF(Tag tag, const char * fmt, va_list ap);
 
     /**
      * Encodes a TLV null value.
@@ -1339,7 +1592,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR PutNull(uint64_t tag);
+    CHIP_ERROR PutNull(Tag tag);
 
     /**
      * Copies a TLV element from a reader object into the writer.
@@ -1433,7 +1686,7 @@ public:
      *                              function associated with the reader object.
      *
      */
-    CHIP_ERROR CopyElement(uint64_t tag, TLVReader & reader);
+    CHIP_ERROR CopyElement(Tag tag, TLVReader & reader);
 
     /**
      * Begins encoding a new TLV container element.
@@ -1476,7 +1729,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR StartContainer(uint64_t tag, TLVType containerType, TLVType & outerContainerType);
+    CHIP_ERROR StartContainer(Tag tag, TLVType containerType, TLVType & outerContainerType);
 
     /**
      * Completes the encoding of a TLV container element.
@@ -1564,7 +1817,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR OpenContainer(uint64_t tag, TLVType containerType, TLVWriter & containerWriter);
+    CHIP_ERROR OpenContainer(Tag tag, TLVType containerType, TLVWriter & containerWriter);
 
     /**
      * Completes the writing of a TLV container after a call to OpenContainer().
@@ -1640,7 +1893,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR PutPreEncodedContainer(uint64_t tag, TLVType containerType, const uint8_t * data, uint32_t dataLen);
+    CHIP_ERROR PutPreEncodedContainer(Tag tag, TLVType containerType, const uint8_t * data, uint32_t dataLen);
 
     /**
      * Copies a TLV container element from TLVReader object
@@ -1737,7 +1990,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR CopyContainer(uint64_t tag, TLVReader & container);
+    CHIP_ERROR CopyContainer(Tag tag, TLVReader & container);
 
     /**
      * Encodes a TLV container element that contains member elements from a pre-encoded container
@@ -1781,7 +2034,7 @@ public:
      *                                  TLVBackingStore.
      *
      */
-    CHIP_ERROR CopyContainer(uint64_t tag, const uint8_t * encodedContainer, uint16_t encodedContainerLen);
+    CHIP_ERROR CopyContainer(Tag tag, const uint8_t * encodedContainer, uint16_t encodedContainerLen);
 
     /**
      * Returns the type of container within which the TLVWriter is currently writing.
@@ -1872,8 +2125,8 @@ protected:
 #if CONFIG_HAVE_VCBPRINTF
     static void CHIPTLVWriterPutcharCB(uint8_t c, void * appState);
 #endif
-    CHIP_ERROR WriteElementHead(TLVElementType elemType, uint64_t tag, uint64_t lenOrVal);
-    CHIP_ERROR WriteElementWithData(TLVType type, uint64_t tag, const uint8_t * data, uint32_t dataLen);
+    CHIP_ERROR WriteElementHead(TLVElementType elemType, Tag tag, uint64_t lenOrVal);
+    CHIP_ERROR WriteElementWithData(TLVType type, Tag tag, const uint8_t * data, uint32_t dataLen);
     CHIP_ERROR WriteData(const uint8_t * p, uint32_t len);
 };
 
@@ -2174,13 +2427,16 @@ public:
     CHIP_ERROR Get(uint64_t & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(float & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(double & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(ByteSpan & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(CharSpan & v) { return mUpdaterReader.Get(v); }
+
     CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize) { return mUpdaterReader.GetBytes(buf, bufSize); }
     CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t & dataLen) { return mUpdaterReader.DupBytes(buf, dataLen); }
     CHIP_ERROR GetString(char * buf, uint32_t bufSize) { return mUpdaterReader.GetString(buf, bufSize); }
     CHIP_ERROR DupString(char *& buf) { return mUpdaterReader.DupString(buf); }
 
     TLVType GetType() const { return mUpdaterReader.GetType(); }
-    uint64_t GetTag() const { return mUpdaterReader.GetTag(); }
+    Tag GetTag() const { return mUpdaterReader.GetTag(); }
     uint32_t GetLength() const { return mUpdaterReader.GetLength(); }
     CHIP_ERROR GetDataPtr(const uint8_t *& data) { return mUpdaterReader.GetDataPtr(data); }
     CHIP_ERROR VerifyEndOfContainer() { return mUpdaterReader.VerifyEndOfContainer(); }
@@ -2189,32 +2445,32 @@ public:
     uint32_t GetRemainingLength() const { return mUpdaterReader.GetRemainingLength(); }
 
     // Writer methods
-    CHIP_ERROR Put(uint64_t tag, int8_t v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR Put(uint64_t tag, int16_t v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR Put(uint64_t tag, int32_t v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR Put(uint64_t tag, int64_t v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR Put(uint64_t tag, uint8_t v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR Put(uint64_t tag, uint16_t v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR Put(uint64_t tag, uint32_t v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR Put(uint64_t tag, uint64_t v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR Put(uint64_t tag, int8_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
-    CHIP_ERROR Put(uint64_t tag, int16_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
-    CHIP_ERROR Put(uint64_t tag, int32_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
-    CHIP_ERROR Put(uint64_t tag, int64_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
-    CHIP_ERROR Put(uint64_t tag, uint8_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
-    CHIP_ERROR Put(uint64_t tag, uint16_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
-    CHIP_ERROR Put(uint64_t tag, uint32_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
-    CHIP_ERROR Put(uint64_t tag, uint64_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
-    CHIP_ERROR Put(uint64_t tag, float v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR Put(uint64_t tag, double v) { return mUpdaterWriter.Put(tag, v); }
-    CHIP_ERROR PutBoolean(uint64_t tag, bool v) { return mUpdaterWriter.PutBoolean(tag, v); }
-    CHIP_ERROR PutNull(uint64_t tag) { return mUpdaterWriter.PutNull(tag); }
-    CHIP_ERROR PutBytes(uint64_t tag, const uint8_t * buf, uint32_t len) { return mUpdaterWriter.PutBytes(tag, buf, len); }
-    CHIP_ERROR PutString(uint64_t tag, const char * buf) { return mUpdaterWriter.PutString(tag, buf); }
-    CHIP_ERROR PutString(uint64_t tag, const char * buf, uint32_t len) { return mUpdaterWriter.PutString(tag, buf, len); }
+    CHIP_ERROR Put(Tag tag, int8_t v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR Put(Tag tag, int16_t v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR Put(Tag tag, int32_t v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR Put(Tag tag, int64_t v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR Put(Tag tag, uint8_t v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR Put(Tag tag, uint16_t v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR Put(Tag tag, uint32_t v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR Put(Tag tag, uint64_t v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR Put(Tag tag, int8_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
+    CHIP_ERROR Put(Tag tag, int16_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
+    CHIP_ERROR Put(Tag tag, int32_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
+    CHIP_ERROR Put(Tag tag, int64_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
+    CHIP_ERROR Put(Tag tag, uint8_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
+    CHIP_ERROR Put(Tag tag, uint16_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
+    CHIP_ERROR Put(Tag tag, uint32_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
+    CHIP_ERROR Put(Tag tag, uint64_t v, bool preserveSize) { return mUpdaterWriter.Put(tag, v, preserveSize); }
+    CHIP_ERROR Put(Tag tag, float v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR Put(Tag tag, double v) { return mUpdaterWriter.Put(tag, v); }
+    CHIP_ERROR PutBoolean(Tag tag, bool v) { return mUpdaterWriter.PutBoolean(tag, v); }
+    CHIP_ERROR PutNull(Tag tag) { return mUpdaterWriter.PutNull(tag); }
+    CHIP_ERROR PutBytes(Tag tag, const uint8_t * buf, uint32_t len) { return mUpdaterWriter.PutBytes(tag, buf, len); }
+    CHIP_ERROR PutString(Tag tag, const char * buf) { return mUpdaterWriter.PutString(tag, buf); }
+    CHIP_ERROR PutString(Tag tag, const char * buf, uint32_t len) { return mUpdaterWriter.PutString(tag, buf, len); }
     CHIP_ERROR CopyElement(TLVReader & reader) { return mUpdaterWriter.CopyElement(reader); }
-    CHIP_ERROR CopyElement(uint64_t tag, TLVReader & reader) { return mUpdaterWriter.CopyElement(tag, reader); }
-    CHIP_ERROR StartContainer(uint64_t tag, TLVType containerType, TLVType & outerContainerType)
+    CHIP_ERROR CopyElement(Tag tag, TLVReader & reader) { return mUpdaterWriter.CopyElement(tag, reader); }
+    CHIP_ERROR StartContainer(Tag tag, TLVType containerType, TLVType & outerContainerType)
     {
         return mUpdaterWriter.StartContainer(tag, containerType, outerContainerType);
     }

@@ -35,11 +35,11 @@ static CHIP_ERROR ConfigGetVendorId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetVendorId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "VendorId:        ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetVendorId(value16));
     streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
@@ -49,11 +49,11 @@ static CHIP_ERROR ConfigGetProductId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetProductId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "ProductId:       ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductId(value16));
     streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
@@ -63,26 +63,12 @@ static CHIP_ERROR ConfigGetProductRevision(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetProductRevision(value16));
     if (printHeader)
     {
         streamer_printf(sout, "ProductRevision: ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductRevision(value16));
     streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR ConfigGetDeviceId(bool printHeader)
-{
-    streamer_t * sout = streamer_get();
-    uint64_t value64;
-
-    if (printHeader)
-    {
-        streamer_printf(sout, "DeviceId:        ");
-    }
-    ReturnErrorOnFailure(ConfigurationMgr().GetDeviceId(value64));
-    streamer_printf(sout, "%" PRIu64 " (0x" ChipLogFormatX64 ")\r\n", value64, ChipLogValueX64(value64));
     return CHIP_NO_ERROR;
 }
 
@@ -91,12 +77,12 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
     streamer_t * sout = streamer_get();
     uint32_t setupPinCode;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetSetupPinCode(setupPinCode));
     if (printHeader)
     {
         streamer_printf(sout, "PinCode:         ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupPinCode(setupPinCode));
-    streamer_printf(sout, "%09u\r\n", setupPinCode);
+    streamer_printf(sout, "%08u\r\n", setupPinCode);
     return CHIP_NO_ERROR;
 }
 
@@ -105,85 +91,90 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t setupDiscriminator;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetSetupDiscriminator(setupDiscriminator));
     if (printHeader)
     {
         streamer_printf(sout, "Discriminator:   ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupDiscriminator(setupDiscriminator));
     streamer_printf(sout, "%03x\r\n", setupDiscriminator & 0xFFF);
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR ConfigGetFabricId(bool printHeader)
+static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
 {
-    streamer_t * sout = streamer_get();
-    uint64_t value64;
+    CHIP_ERROR error;
+    streamer_t * sout           = streamer_get();
+    uint16_t setupDiscriminator = strtoull(argv, NULL, 10);
 
-    if (printHeader)
-    {
-        streamer_printf(sout, "FabricId:        ");
-    }
-    ReturnErrorOnFailure(ConfigurationMgr().GetFabricId(value64));
-    streamer_printf(sout, "%" PRIu64 " (0x" ChipLogFormatX64 ")\r\n", value64, ChipLogValueX64(value64));
-    return CHIP_NO_ERROR;
-}
+    VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < 0xFFF, CHIP_ERROR_INVALID_ARGUMENT);
 
-static int PrintAllConfigs()
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    error = ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
 
-    error |= ConfigGetVendorId(true);
-    error |= ConfigGetProductId(true);
-    error |= ConfigGetProductRevision(true);
-
-    error |= ConfigGetFabricId(true);
-    error |= ConfigGetSetupPinCode(true);
-    error |= ConfigGetSetupDiscriminator(true);
-
-    error |= ConfigGetDeviceId(true);
-
-    return (error) ? CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND : CHIP_NO_ERROR;
-}
-
-static int ConfigHandler(int argc, char ** argv)
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    if (argc == 0)
+    if (error == CHIP_NO_ERROR)
     {
-        return PrintAllConfigs();
-    }
-
-    if (strcmp(argv[0], "vendorid") == 0)
-    {
-        return ConfigGetVendorId(false);
-    }
-    else if (strcmp(argv[0], "productid") == 0)
-    {
-        return error = ConfigGetProductId(false);
-    }
-    else if (strcmp(argv[0], "productrev") == 0)
-    {
-        return error = ConfigGetProductRevision(false);
-    }
-    else if (strcmp(argv[0], "deviceid") == 0)
-    {
-        return error = ConfigGetDeviceId(false);
-    }
-    else if (strcmp(argv[0], "pincode") == 0)
-    {
-        return error = ConfigGetSetupPinCode(false);
-    }
-    else if (strcmp(argv[0], "discriminator") == 0)
-    {
-        return error = ConfigGetSetupDiscriminator(false);
-    }
-    else if (strcmp(argv[0], "fabricid") == 0)
-    {
-        return error = ConfigGetFabricId(false);
+        streamer_printf(sout, "Setup discriminator set to: %d\r\n", setupDiscriminator);
     }
     else
     {
+        streamer_printf(sout, "Setup discriminator setting failed with code: %d\r\n", error);
+    }
+
+    return error;
+}
+
+static CHIP_ERROR PrintAllConfigs()
+{
+    ReturnErrorOnFailure(ConfigGetVendorId(true));
+    ReturnErrorOnFailure(ConfigGetProductId(true));
+    ReturnErrorOnFailure(ConfigGetProductRevision(true));
+
+    ReturnErrorOnFailure(ConfigGetSetupPinCode(true));
+    ReturnErrorOnFailure(ConfigGetSetupDiscriminator(true));
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR ConfigHandler(int argc, char ** argv)
+{
+    switch (argc)
+    {
+    case 0:
+        return PrintAllConfigs();
+    case 1:
+        if (strcmp(argv[0], "vendorid") == 0)
+        {
+            return ConfigGetVendorId(false);
+        }
+        else if (strcmp(argv[0], "productid") == 0)
+        {
+            return ConfigGetProductId(false);
+        }
+        else if (strcmp(argv[0], "productrev") == 0)
+        {
+            return ConfigGetProductRevision(false);
+        }
+        else if (strcmp(argv[0], "pincode") == 0)
+        {
+            return ConfigGetSetupPinCode(false);
+        }
+        else if (strcmp(argv[0], "discriminator") == 0)
+        {
+            return ConfigGetSetupDiscriminator(false);
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    case 2:
+        if (strcmp(argv[0], "discriminator") == 0)
+        {
+            return ConfigSetSetupDiscriminator(argv[1]);
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
@@ -192,7 +183,8 @@ void RegisterConfigCommands()
 {
 
     static const shell_command_t sDeviceComand = { &ConfigHandler, "config",
-                                                   "Dump device configuration. Usage: config [param_name]" };
+                                                   "Manage device configuration. Usage to dump value: config [param_name] and "
+                                                   "to set some values (discriminator): config [param_name] [param_value]." };
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);

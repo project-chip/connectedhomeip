@@ -35,20 +35,17 @@ class DLL_EXPORT SessionEstablishmentDelegate
 {
 public:
     /**
-     * @brief
      *   Called when session establishment fails with an error
-     *
-     * @param error error code
-     *
-     * TODO: Rename function as per issue: https://github.com/project-chip/connectedhomeip/issues/4468
      */
     virtual void OnSessionEstablishmentError(CHIP_ERROR error) {}
 
     /**
-     * @brief
+     *   Called on start of session establishment process
+     */
+    virtual void OnSessionEstablishmentStarted() {}
+
+    /**
      *   Called when the new secure session has been established
-     *
-     * TODO: Rename function as per issue: https://github.com/project-chip/connectedhomeip/issues/4468
      */
     virtual void OnSessionEstablished() {}
 

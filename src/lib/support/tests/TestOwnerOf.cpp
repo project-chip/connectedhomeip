@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <support/OwnerOf.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/OwnerOf.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

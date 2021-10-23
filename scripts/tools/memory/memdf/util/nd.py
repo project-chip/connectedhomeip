@@ -15,9 +15,9 @@
 #
 """Nested dictionary utilities."""
 
-from typing import (Any, Mapping, MutableMapping, Optional)
+from typing import Any, Mapping, MutableMapping, Optional, Sequence
 
-Key = list
+Key = Sequence
 
 
 def get(nd: Optional[Mapping], keys: Key, default: Any = None) -> Any:
@@ -46,10 +46,25 @@ def put(nd: MutableMapping, keys: Key, value: Any) -> None:
     nd[key] = value
 
 
+def store(nd: MutableMapping, keys: Key, value: Any, empty: Any, add) -> None:
+    """Store a value in a nested dictionary where the leaves are containers."""
+    while True:
+        key = keys[0]
+        keys = keys[1:]
+        if not keys:
+            break
+        if key not in nd:
+            nd[key] = {}
+        nd = nd[key]
+    if key not in nd:
+        nd[key] = empty
+    add(nd[key], value)
+
+
 def update(nd: MutableMapping, src: Mapping) -> None:
     """Update a nested dictionary."""
     for k, v in src.items():
-        if k not in nd:
+        if k not in nd or nd[k] is None:
             nd[k] = v
         elif isinstance(nd[k], dict) and isinstance(v, dict):
             update(nd[k], v)
@@ -61,4 +76,4 @@ def update(nd: MutableMapping, src: Mapping) -> None:
         elif type(nd[k]) == type(v):
             nd[k] = v
         else:
-            raise TypeError("type mismatch")
+            raise TypeError(f"type mismatch {k},{v} was {nd[k]}")

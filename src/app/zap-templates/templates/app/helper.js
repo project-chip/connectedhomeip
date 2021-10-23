@@ -16,102 +16,22 @@
  */
 
 // Import helpers from zap core
-const zapPath       = '../../../../../third_party/zap/repo/src-electron/';
-const templateUtil  = require(zapPath + 'generator/template-util.js')
-const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
-const zclHelper     = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery      = require(zapPath + 'db/query-zcl.js')
-const cHelper       = require(zapPath + 'generator/helper-c.js')
+const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
+const templateUtil = require(zapPath + 'generator/template-util.js')
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const zclQuery     = require(zapPath + 'db/query-zcl.js')
+const cHelper      = require(zapPath + 'generator/helper-c.js')
+const string       = require(zapPath + 'util/string.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 
-/**
- * Check if the cluster (name) has any enabled manufacturer commands. This works only inside
- * cluster block helpers.
- *
- * @param {*} name : Cluster name
- * @param {*} side : Cluster side
- * @param {*} options
- * @returns True if cluster has enabled commands otherwise false
- */
-function user_cluster_has_enabled_manufacturer_command(name, side, options)
-{
-  return queryEndpoint.selectEndPointTypeIds(this.global.db, this.global.sessionId)
-      .then((endpointTypes) => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(this.global.db, endpointTypes))
-      .then((endpointsAndClusters) => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(
-                this.global.db, endpointsAndClusters))
-      .then((endpointCommands) => {
-        return !!endpointCommands.find(cmd => cmd.mfgCode && zclHelper.isStrEqual(name, cmd.clusterName)
-                && zclHelper.isCommandAvailable(side, cmd.incoming, cmd.outgoing, cmd.commandSource, cmd.name));
-      })
-}
-
-function asValueIfNotPresent(type, isArray)
-{
-  if (StringHelper.isString(type) || isArray) {
-    return 'NULL';
-  }
-
-  function fn(pkgId)
-  {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      switch (zclType) {
-      case 'uint8_t':
-        return 'UINT8_MAX';
-      case 'uint16_t':
-        return 'UINT16_MAX';
-      case 'uint32_t':
-        return 'UINT32_MAX';
-      default:
-        error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
-        throw error;
-      }
-    })
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
-  return templateUtil.templatePromise(this.global, promise)
-}
-
-// TODO Expose the readTypeLength as an additional member field of {{asUnderlyingZclType}} instead
-//      of having to call this method separately.
-function asReadTypeLength(type)
-{
-  const db = this.global.db;
-
-  if (StringHelper.isShortString(type)) {
-    return '1u';
-  }
-
-  if (StringHelper.isLongString(type)) {
-    return '2u';
-  }
-
-  function fn(pkgId)
-  {
-    const defaultResolver = zclQuery.selectAtomicType(db, pkgId, type);
-
-    const enumResolver = zclHelper.isEnum(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectEnumByName(db, type, pkgId).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
-    });
-
-    const bitmapResolver = zclHelper.isBitmap(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectBitmapByName(db, pkgId, type).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
-    });
-
-    const typeResolver = Promise.all([ defaultResolver, enumResolver, bitmapResolver ]);
-    return typeResolver.then(types => (types.find(type => type)).size);
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
-  return templateUtil.templatePromise(this.global, promise)
-}
+// This list of attributes is taken from section '11.2. Global Attributes' of the
+// Data Model specification.
+const kGlobalAttributes = [
+  0xfffc, // ClusterRevision
+  0xfffd, // FeatureMap
+];
 
 // TODO Expose the readType as an additional member field of {{asUnderlyingZclType}} instead
 //      of having to call this method separately.
@@ -131,19 +51,26 @@ function asReadType(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return 'Int8u';
       case 'int8_t':
+        return 'Int8s';
       case 'uint8_t':
         return 'Int8u';
       case 'int16_t':
+        return 'Int16s';
       case 'uint16_t':
         return 'Int16u';
       case 'int24_t':
+        return 'Int24s';
       case 'uint24_t':
         return 'Int24u';
       case 'int32_t':
+        return 'Int32s';
       case 'uint32_t':
         return 'Int32u';
       case 'int64_t':
+        return 'Int64s';
       case 'uint64_t':
         return 'Int64u';
       default:
@@ -153,40 +80,11 @@ function asReadType(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise)
-}
-
-/**
- * Returns CHIP specific type for ZCL framework
- * This function is flawed since it relies on the
- * type label for CHIP type conversion. CHIP specific XML should have the
- * correct type directly embedded inside.
- *
- * @param {*} label : The xml label of the type.
- * @param {*} type : The xml type to be converted
- */
-function asChipUnderlyingType(label, type)
-{
-
-  if (zclHelper.isStrEqual(label, "endpoint")) {
-    return 'chip::EndpointId';
-  } else if (zclHelper.isStrEqual(label, "endpointId")) {
-    return 'chip::EndpointId';
-  } else if (zclHelper.isStrEqual(type, "CLUSTER_ID")) {
-    return 'chip::ClusterId';
-  } else if (zclHelper.isStrEqual(type, "ATTRIBUTE_ID")) {
-    return 'chip::AttributeId';
-  } else if (zclHelper.isStrEqual(label, "groupId")) {
-    return 'chip::GroupId';
-  } else if (zclHelper.isStrEqual(label, "commandId")) {
-    return 'chip::CommandId';
-  } else if (type == 'OCTET_STRING') {
-    return 'chip::ByteSpan';
-  } else {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options);
-  }
 }
 
 //  Endpoint-config specific helpers
@@ -195,9 +93,24 @@ function asChipUnderlyingType(label, type)
 // These helpers only works within the endpoint_config iterator
 
 // List of all cluster with generated functions
-var endpointClusterWithInit =
-    [ 'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control', 'Color Control', 'IAS Zone' ];
-var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock' ];
+var endpointClusterWithInit = [
+  'Basic',
+  'Identify',
+  'Groups',
+  'Scenes',
+  'Occupancy Sensing',
+  'On/Off',
+  'Level Control',
+  'Color Control',
+  'IAS Zone',
+  'Pump Configuration and Control',
+  'Ethernet Network Diagnostics',
+  'Software Diagnostics',
+  'Thread Network Diagnostics',
+  'General Diagnostics',
+  'WiFi Network Diagnostics',
+];
+var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
@@ -225,7 +138,7 @@ function chip_endpoint_generated_functions()
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
@@ -237,7 +150,7 @@ function chip_endpoint_generated_functions()
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
@@ -319,6 +232,8 @@ function asPrintFormat(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '%d';
       case 'int8_t':
         return '%" PRId8 "';
       case 'uint8_t':
@@ -345,31 +260,217 @@ function asPrintFormat(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function isFirstElement(index)
+function asTypeLiteralSuffix(type)
 {
-  return index == 0;
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
+      case 'int32_t':
+        return 'L';
+      case 'int64_t':
+        return 'LL';
+      case 'uint16_t':
+        return 'U';
+      case 'uint32_t':
+        return 'UL';
+      case 'uint64_t':
+        return 'ULL';
+      default:
+        return '';
+      }
+    })
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
+  return templateUtil.templatePromise(this.global, promise)
 }
 
-function isStrEndsWith(str, substr)
+function hasSpecificAttributes(options)
 {
-  return str.endsWith(substr);
+  return this.count > kGlobalAttributes.length;
+}
+
+function asLowerCamelCase(label)
+{
+  let str = string.toCamelCase(label, true);
+  // Check for the case when were:
+  // 1. A single word (that's the regexp at the beginning, which matches the
+  //    word-splitting regexp in string.toCamelCase).
+  // 2. Starting with multiple capital letters in a row.
+  // 3. But not _all_ capital letters (which we purposefully
+  //    convert to all-lowercase).
+  //
+  // and if all those conditions hold, preserve the leading capital letters by
+  // uppercasing the first one, which got lowercased.
+  if (!/ |_|-|\//.test(label) && label.length > 1 && label.substring(0, 2).toUpperCase() == label.substring(0, 2)
+      && label.toUpperCase() != label) {
+    str = str[0].toUpperCase() + str.substring(1);
+  }
+  return str.replace(/[\.:]/g, '');
+}
+
+function asUpperCamelCase(label)
+{
+  let str = string.toCamelCase(label, false);
+  return str.replace(/[\.:]/g, '');
+}
+
+function asMEI(prefix, suffix)
+{
+  return cHelper.asHex((prefix << 16) + suffix, 8);
+}
+
+/*
+ * @brief
+ *
+ * This function converts a given ZAP type to a Cluster Object
+ * type used by the Matter SDK.
+ *
+ * Args:
+ *
+ * type:            ZAP type specified in the XML
+ * isDecodable:     Whether to emit an Encodable or Decodable cluster
+ *                  object type.
+ *
+ * These types can be found in src/app/data-model/.
+ *
+ */
+async function zapTypeToClusterObjectType(type, isDecodable, options)
+{
+  let passByReference = false;
+  async function fn(pkgId)
+  {
+    const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
+    const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+    if (await typeChecker('isEnum')) {
+      return ns + type;
+    }
+
+    if (await typeChecker('isBitmap')) {
+      return 'chip::BitFlags<' + ns + type + '>';
+    }
+
+    if (await typeChecker('isStruct')) {
+      passByReference = true;
+      return ns + 'Structs::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
+    }
+
+    return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
+  }
+
+  let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+    passByReference = true;
+    let listType    = isDecodable ? "DecodableList" : "List";
+    // If we did not have a namespace provided, we can assume we're inside
+    // chip::app.
+    let listNamespace = options.hash.ns ? "chip::app::" : ""
+    promise           = promise.then(typeStr => `${listNamespace}DataModel::${listType}<${typeStr}>`);
+  }
+  if (options.hash.isArgument && passByReference) {
+    promise = promise.then(typeStr => `const ${typeStr} &`);
+  }
+  return templateUtil.templatePromise(this.global, promise)
+}
+
+function zapTypeToEncodableClusterObjectType(type, options)
+{
+  return zapTypeToClusterObjectType.call(this, type, false, options)
+}
+
+function zapTypeToDecodableClusterObjectType(type, options)
+{
+  return zapTypeToClusterObjectType.call(this, type, true, options)
+}
+
+function zapTypeToPythonClusterObjectType(type, options)
+{
+  if (StringHelper.isCharString(type)) {
+    return 'str';
+  }
+
+  if (StringHelper.isOctetString(type)) {
+    return 'bytes';
+  }
+
+  if ([ 'single', 'double' ].includes(type.toLowerCase())) {
+    return 'float';
+  }
+
+  if (type.toLowerCase() == 'boolean') {
+    return 'bool'
+  }
+
+  // #10748: asUnderlyingZclType will emit wrong types for int{48|56|64}(u), so we process all int values here.
+  if (type.toLowerCase().match(/^int\d+$/)) {
+    return 'int'
+  }
+
+  if (type.toLowerCase().match(/^int\d+u$/)) {
+    return 'uint'
+  }
+
+  async function fn(pkgId)
+  {
+    const ns          = asUpperCamelCase(options.hash.ns);
+    const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+    if (await typeChecker('isEnum')) {
+      return ns + '.Enums.' + type;
+    }
+
+    if (await typeChecker('isBitmap')) {
+      return 'int';
+    }
+
+    if (await typeChecker('isStruct')) {
+      return ns + '.Structs.' + type;
+    }
+
+    resolvedType = await zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
+    {
+      basicType = ChipTypesHelper.asBasicType(resolvedType);
+      if (basicType.match(/^int\d+_t$/)) {
+        return 'int'
+      }
+      if (basicType.match(/^uint\d+_t$/)) {
+        return 'uint'
+      }
+    }
+
+    throw "Unhandled type " + resolvedType + " (from " + type + ")"
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  return templateUtil.templatePromise(this.global, promise)
 }
 
 //
 // Module exports
 //
-exports.asPrintFormat                                 = asPrintFormat;
-exports.asReadType                                    = asReadType;
-exports.asReadTypeLength                              = asReadTypeLength;
-exports.asValueIfNotPresent                           = asValueIfNotPresent;
-exports.asChipUnderlyingType                          = asChipUnderlyingType;
-exports.isFirstElement                                = isFirstElement;
-exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled_manufacturer_command;
-exports.chip_endpoint_generated_functions             = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_list
-exports.isSigned                                      = ChipTypesHelper.isSigned;
-exports.isStrEndsWith                                 = isStrEndsWith;
+exports.asPrintFormat                       = asPrintFormat;
+exports.asReadType                          = asReadType;
+exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
+exports.asTypeLiteralSuffix                 = asTypeLiteralSuffix;
+exports.asLowerCamelCase                    = asLowerCamelCase;
+exports.asUpperCamelCase                    = asUpperCamelCase;
+exports.hasSpecificAttributes               = hasSpecificAttributes;
+exports.asMEI                               = asMEI;
+exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
+exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
+exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;

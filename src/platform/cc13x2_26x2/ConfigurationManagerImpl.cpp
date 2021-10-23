@@ -29,11 +29,11 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
@@ -58,34 +58,34 @@ using namespace ::chip::DeviceLayer::Internal;
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
-CHIP_ERROR ConfigurationManagerImpl::_Init()
+CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     bool failSafeArmed;
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (_GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
         ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        _InitiateFactoryReset();
+        InitiateFactoryReset();
     }
     err = CHIP_NO_ERROR;
 
     return err;
 }
 
-bool ConfigurationManagerImpl::_CanFactoryReset()
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     // TODO: query the application to determine if factory reset is allowed.
     return true;
 }
 
-void ConfigurationManagerImpl::_InitiateFactoryReset()
+void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     CC13X2_26X2Config::Key configKey{ { kCC13X2_26X2ChipCounters_Sysid, key } };
 
@@ -97,7 +97,7 @@ CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     CC13X2_26X2Config::Key configKey{ { kCC13X2_26X2ChipCounters_Sysid, key } };
     return WriteConfigValue(configKey, value);

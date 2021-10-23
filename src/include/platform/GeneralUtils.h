@@ -21,17 +21,17 @@
  *          General utility functions available on all platforms.
  */
 
+#pragma once
+
 #include <inet/Inet.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-extern CHIP_ERROR ParseCompilerDateStr(const char * dateStr, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
-extern CHIP_ERROR Parse24HourTimeStr(const char * timeStr, uint8_t & hour, uint8_t & minute, uint8_t & second);
 extern const char * CharacterizeIPv6Address(const chip::Inet::IPAddress & ipAddr);
 extern const char * CharacterizeIPv6Prefix(const chip::Inet::IPPrefix & inPrefix);
 extern void RegisterDeviceLayerErrorFormatter();
-extern bool FormatDeviceLayerError(char * buf, uint16_t bufSize, int32_t err);
+extern bool FormatDeviceLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 } // namespace DeviceLayer
 } // namespace chip

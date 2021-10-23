@@ -18,12 +18,13 @@
 package com.google.chip.chiptool.provisioning
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import chip.devicecontroller.ChipDeviceControllerException
+import chip.devicecontroller.ChipClusters.NetworkCommissioningCluster
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.util.DeviceIdUtil
@@ -32,27 +33,38 @@ import kotlinx.android.synthetic.main.enter_thread_network_fragment.channelEd
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.masterKeyEd
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.panIdEd
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.xpanIdEd
-import kotlinx.android.synthetic.main.enter_wifi_network_fragment.*
-import kotlinx.android.synthetic.main.enter_wifi_network_fragment.view.*
+import kotlinx.android.synthetic.main.enter_wifi_network_fragment.pwdEd
+import kotlinx.android.synthetic.main.enter_wifi_network_fragment.ssidEd
+import kotlinx.android.synthetic.main.enter_wifi_network_fragment.view.saveNetworkBtn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * Fragment to collect Wi-Fi network information from user and send it to device being provisioned.
  */
 class EnterNetworkFragment : Fragment() {
 
+  private val scope = CoroutineScope(Dispatchers.Main + Job())
+
   private val networkType: ProvisionNetworkType
     get() = requireNotNull(
-        ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
+      ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
     )
 
   override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
   ): View? {
     val layoutRes = when (networkType) {
       ProvisionNetworkType.WIFI -> R.layout.enter_wifi_network_fragment
       ProvisionNetworkType.THREAD -> R.layout.enter_thread_network_fragment
+    }
+
+    if (USE_HARDCODED_WIFI) {
+      scope.launch { saveHardcodedWifiNetwork() }
     }
 
     return inflater.inflate(layoutRes, container, false).apply {
@@ -62,25 +74,89 @@ class EnterNetworkFragment : Fragment() {
 
   private fun onSaveNetworkClicked() {
     if (networkType == ProvisionNetworkType.WIFI) {
-      saveWifiNetwork()
+      scope.launch { saveWifiNetwork() }
     } else {
-      saveThreadNetwork()
+      scope.launch { saveThreadNetwork() }
     }
   }
 
-  private fun saveWifiNetwork() {
-    val ssid = ssidEd.text
-    val pwd = pwdEd.text
+  private suspend fun saveHardcodedWifiNetwork() {
+    addAndEnableWifiNetwork(HARDCODED_WIFI_SSID, HARDCODED_WIFI_PASSWORD)
+  }
+
+  private suspend fun saveWifiNetwork() {
+    val ssid = ssidEd?.text
+    val pwd = pwdEd?.text
 
     if (ssid.isNullOrBlank() || pwd.isNullOrBlank()) {
       Toast.makeText(requireContext(), "Ssid and password required.", Toast.LENGTH_SHORT).show()
       return
     }
 
-    // Do something with the credentials
+    addAndEnableWifiNetwork(ssid.toString(), pwd.toString())
   }
 
-  private fun saveThreadNetwork() {
+  private suspend fun addAndEnableWifiNetwork(ssid: String, password: String) {
+    // Uses UTF-8 as default
+    val ssidBytes = ssid.toByteArray()
+    val pwdBytes = password.toByteArray()
+
+    val devicePtr =
+      ChipClient.getConnectedDevicePointer(requireContext(), DeviceIdUtil.getLastDeviceId(requireContext()))
+    val cluster = NetworkCommissioningCluster(devicePtr, /* endpointId = */ 0)
+
+    val enableNetworkCallback = object :
+      NetworkCommissioningCluster.EnableNetworkResponseCallback {
+      override fun onSuccess(errorCode: Int, debugText: String) {
+        Log.v(TAG, "EnableNetwork for $ssid succeeded, proceeding to OnOff")
+
+        requireActivity().runOnUiThread {
+          Toast.makeText(
+            requireContext(),
+            R.string.rendezvous_over_ble_commissioning_success_text,
+            Toast.LENGTH_SHORT
+          ).show()
+        }
+
+        FragmentUtil.getHost(
+          this@EnterNetworkFragment,
+          DeviceProvisioningFragment.Callback::class.java
+        )?.onCommissioningComplete(0)
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "EnableNetwork for $ssid failed", ex)
+        // TODO: consolidate error codes
+        FragmentUtil.getHost(
+          this@EnterNetworkFragment,
+          DeviceProvisioningFragment.Callback::class.java
+        )?.onCommissioningComplete(-1)
+      }
+    }
+
+    cluster.addWiFiNetwork(object :
+                             NetworkCommissioningCluster.AddWiFiNetworkResponseCallback {
+      override fun onSuccess(errorCode: Int, debugText: String) {
+        Log.v(TAG, "AddWifiNetwork for $ssid succeeded")
+        cluster.enableNetwork(
+          enableNetworkCallback,
+          ssidBytes,
+          /* breadcrumb = */ 0L,
+          ENABLE_NETWORK_TIMEOUT
+        )
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "AddWifiNetwork for $ssid failed", ex)
+        FragmentUtil.getHost(
+          this@EnterNetworkFragment,
+          DeviceProvisioningFragment.Callback::class.java
+        )?.onCommissioningComplete(-1)
+      }
+    }, ssidBytes, pwdBytes, /* breadcrumb = */ 0L, ADD_NETWORK_TIMEOUT)
+  }
+
+  private suspend fun saveThreadNetwork() {
     val channelStr = channelEd.text
     val panIdStr = panIdEd.text
 
@@ -116,27 +192,78 @@ class EnterNetworkFragment : Fragment() {
       return
     }
 
-    try {
-      ChipClient.getDeviceController().enableThreadNetwork(
-          DeviceIdUtil.getLastDeviceId(requireContext()),
-          MakeThreadOperationalDataset(
-            channelStr.toString().toInt(),
-            panIdStr.toString().toInt(16),
-            xpanIdStr.hexToByteArray(),
-            masterKeyStr.hexToByteArray()
-          ))
-    } catch (e: ChipDeviceControllerException) {
-      Toast.makeText(requireContext(), R.string.rendezvous_over_ble_commissioning_failure_text, Toast.LENGTH_SHORT).show()
-      FragmentUtil.getHost(this, DeviceProvisioningFragment.Callback::class.java)
-          ?.onCommissioningComplete(e.errorCode)
+    val devicePtr =
+      ChipClient.getConnectedDevicePointer(requireContext(), DeviceIdUtil.getLastDeviceId(requireContext()))
+    val cluster = NetworkCommissioningCluster(devicePtr, /* endpointId = */ 0)
+
+    val operationalDataset = makeThreadOperationalDataset(
+      channelStr.toString().toInt(),
+      panIdStr.toString().toInt(16),
+      xpanIdStr.hexToByteArray(),
+      masterKeyStr.hexToByteArray()
+    )
+
+    val enableNetworkCallback = object :
+      NetworkCommissioningCluster.EnableNetworkResponseCallback {
+      override fun onSuccess(errorCode: Int, debugText: String) {
+        Log.v(TAG, "EnableNetwork for $panIdStr succeeded, proceeding to OnOff")
+
+        requireActivity().runOnUiThread {
+          Toast.makeText(
+            requireContext(),
+            R.string.rendezvous_over_ble_commissioning_success_text,
+            Toast.LENGTH_SHORT
+          ).show()
+        }
+
+        FragmentUtil.getHost(
+          this@EnterNetworkFragment,
+          DeviceProvisioningFragment.Callback::class.java
+        )?.onCommissioningComplete(0)
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "EnableNetwork for $panIdStr failed", ex)
+        // TODO: consolidate error codes
+        FragmentUtil.getHost(
+          this@EnterNetworkFragment,
+          DeviceProvisioningFragment.Callback::class.java
+        )?.onCommissioningComplete(-1)
+      }
     }
+
+    cluster.addThreadNetwork(object :
+                             NetworkCommissioningCluster.AddThreadNetworkResponseCallback {
+      override fun onSuccess(errorCode: Int, debugText: String) {
+        Log.v(TAG, "AddThreadNetwork for $panIdStr succeeded")
+        println(xpanIdStr.toByteArray())
+        for( b in xpanIdStr.toByteArray()) {
+          println("> $b")
+        }
+        cluster.enableNetwork(
+          enableNetworkCallback,
+          xpanIdStr.hexToByteArray(),
+          /* breadcrumb = */ 0L,
+          ENABLE_NETWORK_TIMEOUT
+        )
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "AddThreadNetwork for $panIdStr failed", ex)
+        FragmentUtil.getHost(
+          this@EnterNetworkFragment,
+          DeviceProvisioningFragment.Callback::class.java
+        )?.onCommissioningComplete(-1)
+      }
+    }, operationalDataset, /* breadcrumb = */ 0L, ADD_NETWORK_TIMEOUT)
   }
 
-  private fun MakeThreadOperationalDataset(
-      channel: Int,
-      panId: Int,
-      xpanId: ByteArray,
-      masterKey: ByteArray): ByteArray {
+  private fun makeThreadOperationalDataset(
+    channel: Int,
+    panId: Int,
+    xpanId: ByteArray,
+    masterKey: ByteArray
+  ): ByteArray {
     // channel
     var dataset = byteArrayOf(TYPE_CHANNEL.toByte(), NUM_CHANNEL_BYTES.toByte())
     dataset += 0x00.toByte() // Channel Page 0.
@@ -163,20 +290,28 @@ class EnterNetworkFragment : Fragment() {
   }
 
   private fun String.hexToByteArray(): ByteArray {
-    return chunked(2).map{ byteStr -> byteStr.toUByte(16).toByte()}.toByteArray()
+    return chunked(2).map { byteStr -> byteStr.toUByte(16).toByte() }.toByteArray()
   }
 
   companion object {
     private const val TAG = "EnterNetworkFragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
+
+    // TODO(#5035): remove hardcoded option when delayed commands work.
+    private const val USE_HARDCODED_WIFI = false
+    private const val HARDCODED_WIFI_SSID = ""
+    private const val HARDCODED_WIFI_PASSWORD = ""
+    private const val ADD_NETWORK_TIMEOUT = 10000L
+    private const val ENABLE_NETWORK_TIMEOUT = 10000L
+
     private const val NUM_CHANNEL_BYTES = 3
     private const val NUM_PANID_BYTES = 2
     private const val NUM_XPANID_BYTES = 8
     private const val NUM_MASTER_KEY_BYTES = 16
-    private const val TYPE_CHANNEL = 0; // Type of Thread Channel TLV.
-    private const val TYPE_PANID = 1; // Type of Thread PAN ID TLV.
-    private const val TYPE_XPANID = 2; // Type of Thread Extended PAN ID TLV.
-    private const val TYPE_MASTER_KEY = 5; // Type of Thread Network Master Key TLV.
+    private const val TYPE_CHANNEL = 0 // Type of Thread Channel TLV.
+    private const val TYPE_PANID = 1 // Type of Thread PAN ID TLV.
+    private const val TYPE_XPANID = 2 // Type of Thread Extended PAN ID TLV.
+    private const val TYPE_MASTER_KEY = 5 // Type of Thread Network Master Key TLV.
 
     fun newInstance(provisionNetworkType: ProvisionNetworkType): EnterNetworkFragment {
       return EnterNetworkFragment().apply {

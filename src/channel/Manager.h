@@ -21,9 +21,9 @@
 
 #include <channel/Channel.h>
 #include <channel/ChannelContext.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
 #include <messaging/ExchangeMgr.h>
-#include <support/DLLUtil.h>
-#include <support/Pool.h>
 
 namespace chip {
 namespace Messaging {
@@ -58,10 +58,10 @@ public:
         });
     }
 
-    void OnNewConnection(SecureSessionHandle session, ExchangeManager * mgr) override
+    void OnNewConnection(SessionHandle session, ExchangeManager * mgr) override
     {
         mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-            if (context->MatchesSession(session, mgr->GetSessionMgr()))
+            if (context->MatchesSession(session, mgr->GetSessionManager()))
             {
                 context->OnNewConnection(session);
                 return false;
@@ -70,10 +70,10 @@ public:
         });
     }
 
-    void OnConnectionExpired(SecureSessionHandle session, ExchangeManager * mgr) override
+    void OnConnectionExpired(SessionHandle session, ExchangeManager * mgr) override
     {
         mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-            if (context->MatchesSession(session, mgr->GetSessionMgr()))
+            if (context->MatchesSession(session, mgr->GetSessionManager()))
             {
                 context->OnConnectionExpired(session);
                 return false;

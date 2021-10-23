@@ -36,6 +36,7 @@ shared_library("ChipDeviceCtrl") {
   include_dirs = [ "." ]
 
   sources = [
+    "ChipCommissionableNodeController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
     "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
@@ -44,6 +45,7 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-StorageDelegate.cpp",
     "ChipDeviceController-StorageDelegate.h",
     "chip/clusters/CHIPClusters.cpp",
+    "chip/clusters/command.cpp",
     "chip/discovery/NodeResolution.cpp",
     "chip/interaction_model/Delegate.cpp",
     "chip/interaction_model/Delegate.h",
@@ -52,6 +54,7 @@ shared_library("ChipDeviceCtrl") {
     "chip/internal/CommissionerImpl.cpp",
     "chip/logging/LoggingRedirect.cpp",
     "chip/native/StackInit.cpp",
+    "chip/setup_payload/Generator.cpp",
     "chip/setup_payload/Parser.cpp",
   ]
 
@@ -71,10 +74,11 @@ shared_library("ChipDeviceCtrl") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
@@ -95,6 +99,7 @@ pw_python_action("python") {
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
+        "chip/ChipCommissionableNodeCtrl.py",
         "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipDeviceCtrl.py",
         "chip/ChipStack.py",
@@ -107,12 +112,17 @@ pw_python_action("python") {
         "chip/ble/scan_devices.py",
         "chip/ble/types.py",
         "chip/clusters/CHIPClusters.py",
+        "chip/clusters/ClusterObjects.py",
+        "chip/clusters/Command.py",
+        "chip/clusters/Objects.py",
+        "chip/clusters/TestObjects.py",
         "chip/clusters/__init__.py",
         "chip/configuration/__init__.py",
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
         "chip/discovery/types.py",
         "chip/exceptions/__init__.py",
+        "chip/interaction_model/__init__.py",
         "chip/interaction_model/delegate.py",
         "chip/internal/__init__.py",
         "chip/internal/commissioner.py",

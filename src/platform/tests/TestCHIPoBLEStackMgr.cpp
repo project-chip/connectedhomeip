@@ -17,10 +17,10 @@
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 #include <assert.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <memory>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
 
 #include "platform/PlatformManager.h"
 #include "platform/internal/BLEManager.h"

@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 #include <system/SystemLayer.h>
 
@@ -40,4 +40,4 @@
 #define CHIP_CORE_IDENTITY "chip-core"
 #define CHIP_CORE_PREFIX CHIP_CORE_IDENTITY ": "
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>

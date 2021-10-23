@@ -37,9 +37,9 @@
 #include <string.h>
 
 #include <inet/InetError.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -48,16 +48,15 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static int32_t sContext[] =
+static const CHIP_ERROR kTestElements[] =
 {
-    CHIP_SYSTEM_ERROR_NOT_IMPLEMENTED,
-    CHIP_SYSTEM_ERROR_NOT_SUPPORTED,
-    CHIP_SYSTEM_ERROR_BAD_ARGS,
-    CHIP_SYSTEM_ERROR_UNEXPECTED_STATE,
-    CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT,
-    CHIP_SYSTEM_ERROR_NO_MEMORY,
-    CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED,
-    CHIP_SYSTEM_ERROR_ACCESS_DENIED
+    CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+    CHIP_ERROR_INVALID_ARGUMENT,
+    CHIP_ERROR_INCORRECT_STATE,
+    CHIP_ERROR_UNEXPECTED_EVENT,
+    CHIP_ERROR_NO_MEMORY,
+    CHIP_ERROR_REAL_TIME_NOT_SYNCED,
+    CHIP_ERROR_ACCESS_DENIED
 };
 // clang-format on
 
@@ -65,16 +64,16 @@ static void CheckSystemErrorStr(nlTestSuite * inSuite, void * inContext)
 {
     // Register the layer error formatter
 
-    System::RegisterLayerErrorFormatter();
+    RegisterCHIPLayerErrorFormatter();
 
     // For each defined error...
-    for (int err : sContext)
+    for (const auto & err : kTestElements)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 
         // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err);
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err.AsInteger());
         NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
@@ -111,7 +110,7 @@ int TestSystemErrorStr(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
+    nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));
 }

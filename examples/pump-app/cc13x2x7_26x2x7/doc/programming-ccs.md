@@ -106,7 +106,7 @@ file) in the `Load Program` dialog. Click `OK` to begin loading the target.
 
 ![CCS step 9](images/ccs-12.jpg)
 
-- After loacating the source file for `main.cpp` we can step through the code
+- After locating the source file for `main.cpp` we can step through the code
 as it executes.
 
 ![CCS step 9](images/ccs-13.jpg)

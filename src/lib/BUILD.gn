@@ -13,14 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
-declare_args() {
-  chip_build_libshell = false
-}
-
-config("includes") {
-  include_dirs = [ "." ]
-}
+import("lib.gni")
 
 static_library("lib") {
   public_deps = [
@@ -31,7 +24,7 @@ static_library("lib") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",

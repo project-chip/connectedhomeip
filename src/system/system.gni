@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,9 +39,20 @@ declare_args() {
                                     (current_os == "mac" || current_os == "ios")
 }
 
+declare_args() {
+  # Event loop type.
+  if (chip_system_config_use_lwip) {
+    chip_system_config_event_loop = "LwIP"
+  } else {
+    chip_system_config_event_loop = "Select"
+  }
+}
+
 if (chip_system_config_locking == "") {
   if (current_os == "freertos") {
     chip_system_config_locking = "freertos"
+  } else if (current_os == "mbed") {
+    chip_system_config_locking = "mbed"
   } else if (chip_system_config_use_dispatch == false) {
     chip_system_config_locking = "posix"
   } else {
@@ -49,10 +60,12 @@ if (chip_system_config_locking == "") {
   }
 }
 
-assert(chip_system_config_locking == "posix" ||
-           chip_system_config_locking == "freertos" ||
-           chip_system_config_locking == "none",
-       "Please select a valid mutex implementation: posix, freertos, none")
+assert(
+    chip_system_config_locking == "posix" ||
+        chip_system_config_locking == "freertos" ||
+        chip_system_config_locking == "none" ||
+        chip_system_config_locking == "mbed",
+    "Please select a valid mutex implementation: posix, freertos, mbed, none")
 
 assert(
     chip_system_config_clock == "clock_gettime" ||

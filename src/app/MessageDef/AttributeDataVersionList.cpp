@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -82,7 +84,6 @@ CHIP_ERROR AttributeDataVersionList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -109,7 +110,6 @@ bool AttributeDataVersionList::Parser::IsElementValid(void)
     }
 
 exit:
-    ChipLogFunctError(err);
 
     return result;
 }
@@ -137,24 +137,20 @@ CHIP_ERROR AttributeDataVersionList::Parser::GetVersion(chip::DataVersion * cons
 AttributeDataVersionList::Builder & AttributeDataVersionList::Builder::AddVersion(const uint64_t aVersion)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::AnonymousTag, aVersion);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::AnonymousTag, aVersion);
+    }
     return *this;
 }
 
 AttributeDataVersionList::Builder & AttributeDataVersionList::Builder::AddNull(void)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->PutNull(chip::TLV::AnonymousTag);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->PutNull(chip::TLV::AnonymousTag);
+    }
     return *this;
 }
 

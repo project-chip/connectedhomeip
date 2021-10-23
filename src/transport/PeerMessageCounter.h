@@ -24,7 +24,7 @@
 #include <array>
 #include <bitset>
 
-#include <support/Span.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Transport {
@@ -58,7 +58,7 @@ public:
 
     void SyncStarting(FixedByteSpan<kChallengeSize> challenge)
     {
-        assert(mStatus == Status::NotSynced);
+        VerifyOrDie(mStatus == Status::NotSynced);
         mStatus = Status::SyncInProcess;
         new (&mSyncInProcess) SyncInProcess();
         ::memcpy(mSyncInProcess.mChallenge.data(), challenge.data(), kChallengeSize);
@@ -97,15 +97,42 @@ public:
             uint32_t offset = mSynced.mMaxCounter - counter;
             if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
-                return CHIP_ERROR_INVALID_ARGUMENT; // outside valid range
+                return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW; // outside valid range
             }
             if (mSynced.mWindow.test(offset))
             {
-                return CHIP_ERROR_INVALID_ARGUMENT; // duplicated, in window
+                return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
             }
         }
 
         return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR VerifyOrTrustFirst(uint32_t counter)
+    {
+        switch (mStatus)
+        {
+        case Status::NotSynced:
+            // Trust and set the counter when not synced
+            SetCounter(counter);
+            return CHIP_NO_ERROR;
+        case Status::Synced: {
+            CHIP_ERROR err = Verify(counter);
+            if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW)
+            {
+                // According to chip spec, when global unencrypted message
+                // counter is out of window, the peer may have reset and is
+                // using another randomize initial value. Trust the new
+                // counter here.
+                SetCounter(counter);
+                err = CHIP_NO_ERROR;
+            }
+            return err;
+        }
+        default:
+            VerifyOrDie(false);
+            return CHIP_ERROR_INTERNAL;
+        }
     }
 
     /**

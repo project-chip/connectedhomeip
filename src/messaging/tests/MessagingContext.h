@@ -16,13 +16,11 @@
  */
 #pragma once
 
-#include <credentials/CHIPOperationalCredentials.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <transport/AdminPairingTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
@@ -33,16 +31,18 @@ namespace Test {
  * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
  *        two secure sessions, connected with each other. Exchanges can be created for each secure session.
  */
-class MessagingContext : public IOContext
+class MessagingContext
 {
 public:
     MessagingContext() :
-        mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingPeerToLocal(GetLocalKeyId(), GetPeerKeyId()),
-        mPairingLocalToPeer(GetPeerKeyId(), GetLocalKeyId())
+        mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
+        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingAliceToBob(GetBobKeyId(), GetAliceKeyId()),
+        mPairingBobToAlice(GetAliceKeyId(), GetBobKeyId())
     {}
+    ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
     /// Initialize the underlying layers and test suite pointer
-    CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport);
+    CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport, IOContext * io);
 
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
@@ -50,56 +50,60 @@ public:
     static Inet::IPAddress GetAddress()
     {
         Inet::IPAddress addr;
-        Inet::IPAddress::FromString("127.0.0.1", addr);
+        Inet::IPAddress::FromString("::1", addr);
         return addr;
     }
-    NodeId GetSourceNodeId() const { return mSourceNodeId; }
-    NodeId GetDestinationNodeId() const { return mDestinationNodeId; }
+    NodeId GetBobNodeId() const { return mBobNodeId; }
+    NodeId GetAliceNodeId() const { return mAliceNodeId; }
 
-    void SetSourceNodeId(NodeId nodeId) { mSourceNodeId = nodeId; }
-    void SetDestinationNodeId(NodeId nodeId) { mDestinationNodeId = nodeId; }
+    void SetBobNodeId(NodeId nodeId) { mBobNodeId = nodeId; }
+    void SetAliceNodeId(NodeId nodeId) { mAliceNodeId = nodeId; }
 
-    uint16_t GetLocalKeyId() const { return mLocalKeyId; }
-    uint16_t GetPeerKeyId() const { return mPeerKeyId; }
+    uint16_t GetBobKeyId() const { return mBobKeyId; }
+    uint16_t GetAliceKeyId() const { return mAliceKeyId; }
 
-    void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
-    void SetPeerKeyId(uint16_t id) { mPeerKeyId = id; }
+    void SetBobKeyId(uint16_t id) { mBobKeyId = id; }
+    void SetAliceKeyId(uint16_t id) { mAliceKeyId = id; }
 
-    uint16_t GetAdminId() const { return mSrcAdminId; }
-    void SetAdminId(Transport::AdminId id)
+    FabricIndex GetFabricIndex() const { return mSrcFabricIndex; }
+    void SetFabricIndex(FabricIndex id)
     {
-        mSrcAdminId  = id;
-        mDestAdminId = id;
+        mSrcFabricIndex  = id;
+        mDestFabricIndex = id;
     }
 
-    SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
+    SessionManager & GetSecureSessionManager() { return mSessionManager; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
 
-    SecureSessionHandle GetSessionLocalToPeer();
-    SecureSessionHandle GetSessionPeerToLocal();
+    SessionHandle GetSessionBobToAlice();
+    SessionHandle GetSessionAliceToBob();
 
-    Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
-    Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
 
-    Credentials::OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
+    Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate);
+
+    System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
 
 private:
-    SecureSessionMgr mSecureSessionMgr;
+    bool mInitialized;
+    SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
+    IOContext * mIOContext;
 
-    NodeId mSourceNodeId      = 123654;
-    NodeId mDestinationNodeId = 111222333;
-    uint16_t mLocalKeyId      = 1;
-    uint16_t mPeerKeyId       = 2;
-    Optional<Transport::PeerAddress> mPeer;
-    SecurePairingUsingTestSecret mPairingPeerToLocal;
-    SecurePairingUsingTestSecret mPairingLocalToPeer;
-    Transport::AdminPairingTable mAdmins;
-    Transport::AdminId mSrcAdminId  = 0;
-    Transport::AdminId mDestAdminId = 1;
-    Credentials::OperationalCredentialSet mOperationalCredentialSet;
+    NodeId mBobNodeId    = 123654;
+    NodeId mAliceNodeId  = 111222333;
+    uint16_t mBobKeyId   = 1;
+    uint16_t mAliceKeyId = 2;
+    Transport::PeerAddress mAliceAddress;
+    Transport::PeerAddress mBobAddress;
+    SecurePairingUsingTestSecret mPairingAliceToBob;
+    SecurePairingUsingTestSecret mPairingBobToAlice;
+    FabricIndex mSrcFabricIndex  = 0;
+    FabricIndex mDestFabricIndex = 0;
 };
 
 } // namespace Test

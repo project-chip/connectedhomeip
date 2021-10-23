@@ -22,14 +22,13 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/Server.h>
-#include <mdns/minimal/core/QName.h>
+#include <lib/dnssd/minimal_mdns/QueryBuilder.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
+#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 
 #include "AllInterfaceListener.h"
 #include "PacketReporter.h"
@@ -310,6 +309,7 @@ int main(int argc, char ** args)
 
     mdns::Minimal::Server<20> mdnsServer;
     ReportDelegate reporter;
+    CHIP_ERROR err;
 
     mdnsServer.SetDelegate(&reporter);
 
@@ -317,7 +317,7 @@ int main(int argc, char ** args)
 
         MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
 
-        CHIP_ERROR err = mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort);
+        err = mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort);
         if (err != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces: %s\n", chip::ErrorStr(err));
@@ -327,22 +327,16 @@ int main(int argc, char ** args)
 
     BroadcastPacket(&mdnsServer);
 
-    System::Timer * timer = nullptr;
-
-    if (DeviceLayer::SystemLayer.NewTimer(timer) == CHIP_NO_ERROR)
+    err = DeviceLayer::SystemLayer().StartTimer(
+        gOptions.runtimeMs,
+        [](System::Layer *, void *) {
+            DeviceLayer::PlatformMgr().StopEventLoopTask();
+            DeviceLayer::PlatformMgr().Shutdown();
+        },
+        nullptr);
+    if (err != CHIP_NO_ERROR)
     {
-        timer->Start(
-            gOptions.runtimeMs,
-            [](System::Layer *, void *, System::Error err) {
-                DeviceLayer::PlatformMgr().StopEventLoopTask();
-                DeviceLayer::PlatformMgr().Shutdown();
-            },
-            nullptr);
-    }
-    else
-    {
-
-        printf("Failed to create the shutdown timer. Kill with ^C.\n");
+        printf("Failed to create the shutdown timer. Kill with ^C. %" CHIP_ERROR_FORMAT "\n", err.Format());
     }
 
     DeviceLayer::PlatformMgr().RunEventLoop();

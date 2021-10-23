@@ -20,42 +20,61 @@
 
 #include <cstring>
 
-#include <app/Command.h>
-#include <app/common/gen/att-storage.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/att-storage.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
-#include <gen/callback.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::NetworkCommissioning;
 
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, ByteSpan operationalDataset,
-                                                                uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(app::CommandHandler * commandObj,
+                                                                const app::ConcreteCommandPath & commandPath,
+                                                                const Commands::AddThreadNetwork::DecodableType & commandData)
 {
-    EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(
+    auto & operationalDataset = commandData.operationalDataset;
+    auto & breadcrumb         = commandData.breadcrumb;
+    auto & timeoutMs          = commandData.timeoutMs;
+
+    EmberAfNetworkCommissioningError err = app::Clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(
         nullptr, emberAfCurrentEndpoint(), operationalDataset, breadcrumb, timeoutMs);
     emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
                                                                                              : EMBER_ZCL_STATUS_FAILURE);
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, ByteSpan ssid, ByteSpan credentials,
-                                                              uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath,
+                                                              const Commands::AddWiFiNetwork::DecodableType & commandData)
 {
-    EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(
+    auto & ssid        = commandData.ssid;
+    auto & credentials = commandData.credentials;
+    auto & breadcrumb  = commandData.breadcrumb;
+    auto & timeoutMs   = commandData.timeoutMs;
+
+    EmberAfNetworkCommissioningError err = app::Clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(
         nullptr, emberAfCurrentEndpoint(), ssid, credentials, breadcrumb, timeoutMs);
     emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
                                                                                              : EMBER_ZCL_STATUS_FAILURE);
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, ByteSpan networkID,
-                                                             uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterEnableNetworkCallback(app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath,
+                                                             const Commands::EnableNetwork::DecodableType & commandData)
 {
-    EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(
+    auto & networkID  = commandData.networkID;
+    auto & breadcrumb = commandData.breadcrumb;
+    auto & timeoutMs  = commandData.timeoutMs;
+
+    EmberAfNetworkCommissioningError err = app::Clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(
         nullptr, emberAfCurrentEndpoint(), networkID, breadcrumb, timeoutMs);
     emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
                                                                                              : EMBER_ZCL_STATUS_FAILURE);
@@ -65,37 +84,43 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command 
 // TODO: The following commands needed to be implemented.
 // These commands are not implemented thus not handled yet, return false so ember will return a error.
 
-bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command * commandObj, ByteSpan networkID,
-                                                              uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterDisableNetworkCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath,
+                                                              const Commands::DisableNetwork::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::Command * commandObj,
-                                                                                 uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::GetLastNetworkCommissioningResult::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command * commandObj, ByteSpan NetworkID,
-                                                             uint64_t Breadcrumb, uint32_t TimeoutMs)
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath,
+                                                             const Commands::RemoveNetwork::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, ByteSpan ssid, uint64_t breadcrumb,
-                                                            uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(app::CommandHandler * commandObj,
+                                                            const app::ConcreteCommandPath & commandPath,
+                                                            const Commands::ScanNetworks::DecodableType & commandData)
 {
     return false;
 }
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj, ByteSpan operationalDataset,
-                                                                   uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(app::CommandHandler * commandObj,
+                                                                   const app::ConcreteCommandPath & commandPath,
+                                                                   const Commands::UpdateThreadNetwork::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Command * commandObj, ByteSpan ssid,
-                                                                 ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(app::CommandHandler * commandObj,
+                                                                 const app::ConcreteCommandPath & commandPath,
+                                                                 const Commands::UpdateWiFiNetwork::DecodableType & commandData)
 {
     return false;
 }

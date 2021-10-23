@@ -31,12 +31,11 @@
  *        * UDP network transport
  *        * Raw network transport
  *
- *      For BSD/POSIX Sockets, event readiness notification is handled
- *      via file descriptors and a traditional poll / select
- *      implementation on the platform adaptation.
+ *      For BSD/POSIX Sockets (CHIP_SYSTEM_CONFIG_USE_SOCKETS), event readiness
+ *      notification is handled via file descriptors, using a System::Layer API.
  *
- *      For LwIP, event readiness notification is handle via events /
- *      messages and platform- and system-specific hooks for the event
+ *      For LwIP (CHIP_SYSTEM_CONFIG_USE_LWIP), event readiness notification is handled
+ *      via events / messages and platform- and system-specific hooks for the event
  *      / message system.
  *
  */
@@ -50,10 +49,8 @@
 
 #include <platform/LockTracker.h>
 
-#include <system/SystemTimer.h>
-
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <errno.h>
 #include <stddef.h>
@@ -84,10 +81,6 @@ namespace Inet {
 
 void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
 {
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    DNSResolver::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumDNSResolvers],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumDNSResolvers]);
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumTCPEps],
                                      aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumTCPEps]);
@@ -96,10 +89,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
     UDPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumUDPEps],
                                      aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumUDPEps]);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    RawEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumRawEps],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumRawEps]);
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 }
 
 /**
@@ -112,8 +101,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  */
 InetLayer::InetLayer()
 {
-    State = kState_NotInitialized;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sInetEventHandlerDelegate.IsInitialized())
         sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
@@ -121,17 +108,17 @@ InetLayer::InetLayer()
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-chip::System::LwIPEventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
+chip::System::LayerLwIP::EventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-INET_ERROR InetLayer::InitQueueLimiter(void)
+CHIP_ERROR InetLayer::InitQueueLimiter(void)
 {
     mDroppableEvents = 0;
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 bool InetLayer::CanEnqueueDroppableEvent(void)
@@ -154,7 +141,7 @@ void InetLayer::DroppableEventDequeued(void)
 
 #elif CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
-INET_ERROR InetLayer::InitQueueLimiter(void)
+CHIP_ERROR InetLayer::InitQueueLimiter(void)
 {
     const unsigned portBASE_TYPE maximum = INET_CONFIG_MAX_DROPPABLE_EVENTS;
     const unsigned portBASE_TYPE initial = INET_CONFIG_MAX_DROPPABLE_EVENTS;
@@ -166,9 +153,9 @@ INET_ERROR InetLayer::InitQueueLimiter(void)
 #endif
 
     if (mDroppableEvents != NULL)
-        return INET_NO_ERROR;
+        return CHIP_NO_ERROR;
     else
-        return INET_ERROR_NO_MEMORY;
+        return CHIP_ERROR_NO_MEMORY;
 }
 
 bool InetLayer::CanEnqueueDroppableEvent(void)
@@ -187,13 +174,13 @@ void InetLayer::DroppableEventDequeued(void)
 
 #else // !CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
-INET_ERROR InetLayer::InitQueueLimiter(void)
+CHIP_ERROR InetLayer::InitQueueLimiter(void)
 {
     if (sem_init(&mDroppableEvents, 0, INET_CONFIG_MAX_DROPPABLE_EVENTS) != 0)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 bool InetLayer::CanEnqueueDroppableEvent(void)
@@ -228,13 +215,6 @@ void InetLayer::DroppableEventDequeued(void)
  *  LwIP-based adaptations, this will typically be a pointer to the
  *  event queue associated with the InetLayer instance.
  *
- *  Platforms may choose to assert
- *  #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS in their
- *  platform-specific configuration header and enable the
- *  Platform::InetLayer::WillInit and Platform::InetLayer::DidInit
- *  hooks to effect platform-specific customizations or data extensions
- *  to InetLayer.
- *
  *  @param[in]  aSystemLayer  A required instance of the chip System Layer
  *                            already successfully initialized.
  *
@@ -242,24 +222,20 @@ void InetLayer::DroppableEventDequeued(void)
  *                        back to the caller via any platform-specific hook
  *                        functions.
  *
- *  @retval   #INET_ERROR_INCORRECT_STATE        If the InetLayer is in an
+ *  @retval   #CHIP_ERROR_INCORRECT_STATE        If the InetLayer is in an
  *                                               incorrect state.
- *  @retval   #INET_ERROR_NO_MEMORY              If the InetLayer runs out
+ *  @retval   #CHIP_ERROR_NO_MEMORY              If the InetLayer runs out
  *                                               of resource for this
  *                                               request for a new timer.
  *  @retval   other Platform-specific errors indicating the reason for
  *            initialization failure.
- *  @retval   #INET_NO_ERROR                     On success.
+ *  @retval   #CHIP_NO_ERROR                     On success.
  *
  */
-INET_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
+CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 {
-    INET_ERROR err = INET_NO_ERROR;
-
     Inet::RegisterLayerErrorFormatter();
-
-    if (State != kState_NotInitialized)
-        return INET_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     // Platform-specific initialization may elect to set this data
     // member. Ensure it is set to a sane default value before
@@ -267,119 +243,58 @@ INET_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     mPlatformData = nullptr;
 
-    err = Platform::InetLayer::WillInit(this, aContext);
-    SuccessOrExit(err);
-
     mSystemLayer = &aSystemLayer;
     mContext     = aContext;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    err = InitQueueLimiter();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(InitQueueLimiter());
 
-    mSystemLayer->AddEventHandlerDelegate(sInetEventHandlerDelegate);
+    static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    State = kState_Initialized;
+    mLayerState.SetInitialized();
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-    err = mAsyncDNSResolver.Init(this);
-    SuccessOrExit(err);
-
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-exit:
-    Platform::InetLayer::DidInit(this, mContext, err);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 /**
  *  This is the InetLayer explicit deinitializer and should be called
  *  prior to disposing of an instantiated InetLayer instance.
  *
- *  Platforms may choose to assert
- *  #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS in their
- *  platform-specific configuration header and enable the
- *  Platform::InetLayer::WillShutdown and
- *  Platform::InetLayer::DidShutdown hooks to effect clean-up of
- *  platform-specific customizations or data extensions to InetLayer.
- *
- *  @return #INET_NO_ERROR on success; otherwise, a specific error indicating
+ *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating
  *          the reason for shutdown failure.
  *
  */
-INET_ERROR InetLayer::Shutdown()
+CHIP_ERROR InetLayer::Shutdown()
 {
-    INET_ERROR err;
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
 
-    err = Platform::InetLayer::WillShutdown(this, mContext);
-    SuccessOrExit(err);
-
-    if (State == kState_Initialized)
-    {
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-        // Cancel all DNS resolution requests owned by this instance.
-        for (size_t i = 0; i < DNSResolver::sPool.Size(); i++)
-        {
-            DNSResolver * lResolver = DNSResolver::sPool.Get(*mSystemLayer, i);
-            if ((lResolver != nullptr) && lResolver->IsCreatedByInetLayer(*this))
-            {
-                lResolver->Cancel();
-            }
-        }
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-        err = mAsyncDNSResolver.Shutdown();
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        // Close all raw endpoints owned by this Inet layer instance.
-        for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
-        {
-            RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Close();
-            }
-        }
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        // Abort all TCP endpoints owned by this instance.
-        for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
+    // Abort all TCP endpoints owned by this instance.
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
         {
-            TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Abort();
-            }
+            lEndPoint->Abort();
         }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        // Close all UDP endpoints owned by this instance.
-        for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
+    // Close all UDP endpoints owned by this instance.
+    UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
+        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
         {
-            UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Close();
-            }
+            lEndPoint->Close();
         }
+        return true;
+    });
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-    }
 
-    State = kState_NotInitialized;
-
-exit:
-    Platform::InetLayer::DidShutdown(this, mContext, err);
-
+    mLayerState.SetShutdown();
+    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return err;
 }
 
@@ -413,17 +328,15 @@ bool InetLayer::IsIdleTimerRunning()
 {
     bool timerRunning = false;
 
-    // see if there are any TCP connections with the idle timer check in use.
-    for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-    {
-        TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-
+    // See if there are any TCP connections with the idle timer check in use.
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if ((lEndPoint != nullptr) && (lEndPoint->mIdleTimeout != 0))
         {
             timerRunning = true;
-            break;
+            return false;
         }
-    }
+        return true;
+    });
 
     return timerRunning;
 }
@@ -437,21 +350,21 @@ bool InetLayer::IsIdleTimerRunning()
  *
  *  @param[out]   llAddr  The link local IPv6 address for the link.
  *
- *  @retval    #INET_ERROR_NOT_IMPLEMENTED      If IPv6 is not supported.
- *  @retval    #INET_ERROR_BAD_ARGS             If the link local address
+ *  @retval    #CHIP_ERROR_NOT_IMPLEMENTED      If IPv6 is not supported.
+ *  @retval    #CHIP_ERROR_INVALID_ARGUMENT     If the link local address
  *                                              is NULL.
  *  @retval    #INET_ERROR_ADDRESS_NOT_FOUND    If the link does not have
  *                                              any address configured.
- *  @retval    #INET_NO_ERROR                   On success.
+ *  @retval    #CHIP_NO_ERROR                   On success.
  *
  */
-INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
+CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
 {
-    VerifyOrReturnError(llAddr != nullptr, INET_ERROR_BAD_ARGS);
+    VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !LWIP_IPV6
-    return INET_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif //! LWIP_IPV6
 
     for (struct netif * intf = netif_list; intf != NULL; intf = intf->next)
@@ -462,8 +375,8 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
         {
             if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
             {
-                (*llAddr) = IPAddress::FromIPv6(*netif_ip6_addr(intf, j));
-                return INET_NO_ERROR;
+                (*llAddr) = IPAddress(*netif_ip6_addr(intf, j));
+                return CHIP_NO_ERROR;
             }
         }
         if (link != NULL)
@@ -491,7 +404,7 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
                 struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
                 if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
                 {
-                    (*llAddr) = IPAddress::FromIPv6((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
+                    (*llAddr) = IPAddress((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
                     break;
                 }
             }
@@ -507,55 +420,11 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
     in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
     VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
 
-    *llAddr = IPAddress::FromIPv6(*ip6_addr);
+    *llAddr = IPAddress(*ip6_addr);
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-/**
- *  Creates a new RawEndPoint object for a specific IP version and protocol.
- *
- *  @note
- *    This function gets a free RawEndPoint object from a pre-allocated pool
- *    and also calls the explicit initializer on the new object.
- *
- *  @param[in]      ipVer          IPv4 or IPv6.
- *
- *  @param[in]      ipProto        A protocol within the IP family (e.g., ICMPv4 or ICMPv6).
- *
- *  @param[in,out]  retEndPoint    A pointer to a pointer of the RawEndPoint object that is
- *                                 a return parameter upon completion of the object creation.
- *                                 *retEndPoint is NULL if creation fails.
- *
- *  @retval  #INET_ERROR_INCORRECT_STATE  If the InetLayer object is not initialized.
- *  @retval  #INET_ERROR_NO_ENDPOINTS     If the InetLayer RawEndPoint pool is full and no new
- *                                        endpoints can be created.
- *  @retval  #INET_NO_ERROR               On success.
- *
- */
-INET_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint)
-{
-    assertChipStackLockedByCurrentThread();
-
-    *retEndPoint = nullptr;
-
-    VerifyOrReturnError(State == kState_Initialized, INET_ERROR_INCORRECT_STATE);
-
-    *retEndPoint = RawEndPoint::sPool.TryCreate(*mSystemLayer);
-    if (*retEndPoint == nullptr)
-    {
-        ChipLogError(Inet, "%s endpoint pool FULL", "Raw");
-        return INET_ERROR_NO_ENDPOINTS;
-    }
-
-    (*retEndPoint)->Inet::RawEndPoint::Init(this, ipVer, ipProto);
-    SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumRawEps);
-
-    return INET_NO_ERROR;
-}
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 /**
@@ -569,31 +438,31 @@ INET_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEnd
  *                                 a return parameter upon completion of the object creation.
  *                                 *retEndPoint is NULL if creation fails.
  *
- *  @retval  #INET_ERROR_INCORRECT_STATE  If the InetLayer object is not initialized.
- *  @retval  #INET_ERROR_NO_ENDPOINTS     If the InetLayer TCPEndPoint pool is full and no new
- *                                        endpoints can be created.
- *  @retval  #INET_NO_ERROR               On success.
+ *  @retval  #CHIP_ERROR_INCORRECT_STATE    If the InetLayer object is not initialized.
+ *  @retval  #CHIP_ERROR_ENDPOINT_POOL_FULL If the InetLayer TCPEndPoint pool is full and no new
+ *                                          endpoints can be created.
+ *  @retval  #CHIP_NO_ERROR                 On success.
  *
  */
-INET_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
+CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 {
     assertChipStackLockedByCurrentThread();
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = TCPEndPoint::sPool.TryCreate(*mSystemLayer);
+    *retEndPoint = TCPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
-        return INET_ERROR_NO_ENDPOINTS;
+        return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
     (*retEndPoint)->Init(this);
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTCPEps);
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
@@ -609,316 +478,33 @@ INET_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
  *                                 a return parameter upon completion of the object creation.
  *                                 *retEndPoint is NULL if creation fails.
  *
- *  @retval  #INET_ERROR_INCORRECT_STATE  If the InetLayer object is not initialized.
- *  @retval  #INET_ERROR_NO_ENDPOINTS     If the InetLayer UDPEndPoint pool is full and no new
- *                                        endpoints can be created.
- *  @retval  #INET_NO_ERROR               On success.
+ *  @retval  #CHIP_ERROR_INCORRECT_STATE    If the InetLayer object is not initialized.
+ *  @retval  #CHIP_ERROR_ENDPOINT_POOL_FULL If the InetLayer UDPEndPoint pool is full and no new
+ *                                          endpoints can be created.
+ *  @retval  #CHIP_NO_ERROR                 On success.
  *
  */
-INET_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
+CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 {
     assertChipStackLockedByCurrentThread();
 
     *retEndPoint = nullptr;
 
-    VerifyOrReturnError(State == kState_Initialized, INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = UDPEndPoint::sPool.TryCreate(*mSystemLayer);
+    *retEndPoint = UDPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
-        return INET_ERROR_NO_ENDPOINTS;
+        return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
     (*retEndPoint)->Init(this);
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumUDPEps);
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-/**
- *  Perform an IP address resolution of a specified hostname.
- *
- *  @note
- *    This is an asynchronous operation and the result will be communicated back
- *    via the OnComplete() callback.
- *
- *  @param[in]  hostName    A pointer to a NULL-terminated C string representing
- *                          the host name to be queried.
- *
- *  @param[in]  maxAddrs    The maximum number of addresses to store in the DNS
- *                          table.
- *
- *  @param[in]  addrArray   A pointer to the DNS table.
- *
- *  @param[in]  onComplete  A pointer to the callback function when a DNS
- *                          request is complete.
- *
- *  @param[in]  appState    A pointer to the application state to be passed to
- *                          onComplete when a DNS request is complete.
- *
- *  @retval #INET_NO_ERROR                   if a DNS request is handled
- *                                           successfully.
- *  @retval #INET_ERROR_NO_MEMORY            if the Inet layer resolver pool
- *                                           is full.
- *  @retval #INET_ERROR_HOST_NAME_TOO_LONG   if a requested host name is too
- *                                           long.
- *  @retval #INET_ERROR_HOST_NOT_FOUND       if a request host name could not be
- *                                           resolved to an address.
- *  @retval #INET_ERROR_DNS_TRY_AGAIN        if a name server returned a
- *                                           temporary failure indication;
- *                                           try again later.
- *  @retval #INET_ERROR_DNS_NO_RECOVERY      if a name server returned an
- *                                           unrecoverable error.
- *  @retval #INET_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
- *                                           the underlying platform.
- *  @retval other POSIX network or OS error returned by the underlying DNS
- *          resolver implementation.
- *
- */
-INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint8_t maxAddrs, IPAddress * addrArray,
-                                         DNSResolveCompleteFunct onComplete, void * appState)
-{
-    size_t hostNameLength = strlen(hostName);
-    if (hostNameLength > UINT16_MAX)
-    {
-        return INET_ERROR_HOST_NAME_TOO_LONG;
-    }
-    return ResolveHostAddress(hostName, static_cast<uint16_t>(hostNameLength), maxAddrs, addrArray, onComplete, appState);
-}
-
-/**
- *  Perform an IP address resolution of a specified hostname.
- *
- *  @param[in]  hostName    A pointer to a non NULL-terminated C string representing the host name
- *                          to be queried.
- *
- *  @param[in]  hostNameLen The string length of host name.
- *
- *  @param[in]  maxAddrs    The maximum number of addresses to store in the DNS
- *                          table.
- *
- *  @param[in]  addrArray   A pointer to the DNS table.
- *
- *  @param[in]  onComplete  A pointer to the callback function when a DNS
- *                          request is complete.
- *
- *  @param[in]  appState    A pointer to the application state to be passed to
- *                          onComplete when a DNS request is complete.
- *
- *  @retval #INET_NO_ERROR                   if a DNS request is handled
- *                                           successfully.
- *  @retval #INET_ERROR_NO_MEMORY            if the Inet layer resolver pool
- *                                           is full.
- *  @retval #INET_ERROR_HOST_NAME_TOO_LONG   if a requested host name is too
- *                                           long.
- *  @retval #INET_ERROR_HOST_NOT_FOUND       if a request host name could not be
- *                                           resolved to an address.
- *  @retval #INET_ERROR_DNS_TRY_AGAIN        if a name server returned a
- *                                           temporary failure indication;
- *                                           try again later.
- *  @retval #INET_ERROR_DNS_NO_RECOVERY      if a name server returned an
- *                                           unrecoverable error.
- *  @retval #INET_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
- *                                           the underlying platform.
- *  @retval other POSIX network or OS error returned by the underlying DNS
- *          resolver implementation.
- *
- */
-INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t maxAddrs, IPAddress * addrArray,
-                                         DNSResolveCompleteFunct onComplete, void * appState)
-{
-    return ResolveHostAddress(hostName, hostNameLen, kDNSOption_Default, maxAddrs, addrArray, onComplete, appState);
-}
-
-/**
- *  Perform an IP address resolution of a specified hostname.
- *
- *  @param[in]  hostName    A pointer to a non NULL-terminated C string representing the host name
- *                          to be queried.
- *
- *  @param[in]  hostNameLen The string length of host name.
- *
- *  @param[in]  options     An integer value controlling how host name resolution is performed.
- *
- *                          Value should be one of the address family values from the
- *                          #DNSOptions enumeration:
- *
- *                          #kDNSOption_AddrFamily_Any
- *                          #kDNSOption_AddrFamily_IPv4Only
- *                          #kDNSOption_AddrFamily_IPv6Only
- *                          #kDNSOption_AddrFamily_IPv4Preferred
- *                          #kDNSOption_AddrFamily_IPv6Preferred
- *
- *  @param[in]  maxAddrs    The maximum number of addresses to store in the DNS
- *                          table.
- *
- *  @param[in]  addrArray   A pointer to the DNS table.
- *
- *  @param[in]  onComplete  A pointer to the callback function when a DNS
- *                          request is complete.
- *
- *  @param[in]  appState    A pointer to the application state to be passed to
- *                          onComplete when a DNS request is complete.
- *
- *  @retval #INET_NO_ERROR                   if a DNS request is handled
- *                                           successfully.
- *  @retval #INET_ERROR_NO_MEMORY            if the Inet layer resolver pool
- *                                           is full.
- *  @retval #INET_ERROR_HOST_NAME_TOO_LONG   if a requested host name is too
- *                                           long.
- *  @retval #INET_ERROR_HOST_NOT_FOUND       if a request host name could not be
- *                                           resolved to an address.
- *  @retval #INET_ERROR_DNS_TRY_AGAIN        if a name server returned a
- *                                           temporary failure indication;
- *                                           try again later.
- *  @retval #INET_ERROR_DNS_NO_RECOVERY      if a name server returned an
- *                                           unrecoverable error.
- *  @retval #INET_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
- *                                           the underlying platform.
- *  @retval other POSIX network or OS error returned by the underlying DNS
- *          resolver implementation.
- *
- */
-INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
-                                         IPAddress * addrArray, DNSResolveCompleteFunct onComplete, void * appState)
-{
-    assertChipStackLockedByCurrentThread();
-
-    INET_ERROR err         = INET_NO_ERROR;
-    DNSResolver * resolver = nullptr;
-
-    VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
-
-    INET_FAULT_INJECT(FaultInjection::kFault_DNSResolverNew, return INET_ERROR_NO_MEMORY);
-
-    // Store context information and set the resolver state.
-    VerifyOrExit(hostNameLen <= NL_DNS_HOSTNAME_MAX_LEN, err = INET_ERROR_HOST_NAME_TOO_LONG);
-    VerifyOrExit(maxAddrs > 0, err = INET_ERROR_NO_MEMORY);
-
-    resolver = DNSResolver::sPool.TryCreate(*mSystemLayer);
-    if (resolver != nullptr)
-    {
-        resolver->InitInetLayerBasis(*this);
-    }
-    else
-    {
-        ChipLogError(Inet, "%s resolver pool FULL", "DNS");
-        ExitNow(err = INET_ERROR_NO_MEMORY);
-    }
-
-    // Short-circuit full address resolution if the supplied host name is a text-form
-    // IP address...
-    if (IPAddress::FromString(hostName, hostNameLen, *addrArray))
-    {
-        uint8_t addrTypeOption = (options & kDNSOption_AddrFamily_Mask);
-        IPAddressType addrType = addrArray->Type();
-
-        if ((addrTypeOption == kDNSOption_AddrFamily_IPv6Only && addrType != kIPAddressType_IPv6)
-#if INET_CONFIG_ENABLE_IPV4
-            || (addrTypeOption == kDNSOption_AddrFamily_IPv4Only && addrType != kIPAddressType_IPv4)
-#endif
-        )
-        {
-            err = INET_ERROR_INCOMPATIBLE_IP_ADDRESS_TYPE;
-        }
-
-        if (onComplete)
-        {
-            onComplete(appState, err, (err == INET_NO_ERROR) ? 1 : 0, addrArray);
-        }
-
-        resolver->Release();
-        resolver = nullptr;
-
-        ExitNow(err = INET_NO_ERROR);
-    }
-
-    // After this point, the resolver will be released by:
-    // - mAsyncDNSResolver (in case of ASYNC_DNS_SOCKETS)
-    // - resolver->Resolve() (in case of synchronous resolving)
-    // - the event handlers (in case of LwIP)
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-    err =
-        mAsyncDNSResolver.PrepareDNSResolver(*resolver, hostName, hostNameLen, options, maxAddrs, addrArray, onComplete, appState);
-    SuccessOrExit(err);
-
-    mAsyncDNSResolver.EnqueueRequest(*resolver);
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-#if !INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    err = resolver->Resolve(hostName, hostNameLen, options, maxAddrs, addrArray, onComplete, appState);
-#endif // !INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-exit:
-
-    return err;
-}
-
-/**
- *  Cancel any outstanding DNS query (for a matching completion callback and
- *  application state) that may still be active.
- *
- *  @note
- *    This situation can arise if the application initiates a connection
- *    to a peer using a hostname and then aborts/closes the connection
- *    before the hostname resolution completes.
- *
- *  @param[in]    onComplete   A pointer to the callback function when a DNS
- *                             request is complete.
- *
- *  @param[in]    appState     A pointer to an application state object to be passed
- *                             to the callback function as argument.
- *
- */
-void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, void * appState)
-{
-    assertChipStackLockedByCurrentThread();
-
-    if (State != kState_Initialized)
-        return;
-
-    for (size_t i = 0; i < DNSResolver::sPool.Size(); i++)
-    {
-        DNSResolver * lResolver = DNSResolver::sPool.Get(*mSystemLayer, i);
-
-        if (lResolver == nullptr)
-        {
-            continue;
-        }
-
-        if (!lResolver->IsCreatedByInetLayer(*this))
-        {
-            continue;
-        }
-
-        if (lResolver->OnComplete != onComplete)
-        {
-            continue;
-        }
-
-        if (lResolver->AppState != appState)
-        {
-            continue;
-        }
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-        if (lResolver->mState == DNSResolver::kState_Canceled)
-        {
-            continue;
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
-        lResolver->Cancel();
-        break;
-    }
-}
-
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 /**
  *  Get the interface identifier for the specified IP address. If the
@@ -933,10 +519,10 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
  *
  *  @param[out]   intfId    A reference to the InterfaceId object.
  *
- *  @return  #INET_NO_ERROR unconditionally.
+ *  @return  #CHIP_NO_ERROR unconditionally.
  *
  */
-INET_ERROR InetLayer::GetInterfaceFromAddr(const IPAddress & addr, InterfaceId & intfId)
+CHIP_ERROR InetLayer::GetInterfaceFromAddr(const IPAddress & addr, InterfaceId & intfId)
 {
     InterfaceAddressIterator addrIter;
 
@@ -946,13 +532,13 @@ INET_ERROR InetLayer::GetInterfaceFromAddr(const IPAddress & addr, InterfaceId &
         if (addr == curAddr)
         {
             intfId = addrIter.GetInterface();
-            return INET_NO_ERROR;
+            return CHIP_NO_ERROR;
         }
     }
 
     intfId = INET_NULL_INTERFACEID;
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -989,23 +575,18 @@ bool InetLayer::MatchLocalIPv6Subnet(const IPAddress & addr)
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError)
+void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState)
 {
     InetLayer & lInetLayer = *reinterpret_cast<InetLayer *>(aAppState);
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
-    for (size_t i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
-    {
-        TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*aSystemLayer, i);
-
-        if (lEndPoint == nullptr)
-            continue;
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if (!lEndPoint->IsCreatedByInetLayer(lInetLayer))
-            continue;
+            return true;
         if (!lEndPoint->IsConnected())
-            continue;
+            return true;
         if (lEndPoint->mIdleTimeout == 0)
-            continue;
+            return true;
 
         if (lEndPoint->mRemainingIdleTime == 0)
         {
@@ -1015,29 +596,31 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
         {
             --lEndPoint->mRemainingIdleTime;
         }
-    }
+
+        return true;
+    });
 
     if (lTimerRequired)
     {
-        aSystemLayer->StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, HandleTCPInactivityTimer, &lInetLayer);
+        aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleTCPInactivityTimer,
+                                 &lInetLayer);
     }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType,
-                                                    uintptr_t aArgument)
+CHIP_ERROR InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType, uintptr_t aArgument)
 {
     assertChipStackLockedByCurrentThread();
 
-    VerifyOrReturnError(INET_IsInetEvent(aEventType), CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
+    VerifyOrReturnError(INET_IsInetEvent(aEventType), CHIP_ERROR_UNEXPECTED_EVENT);
 
     // Dispatch the event according to its type.
     switch (aEventType)
     {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     case kInetEvent_TCPConnectComplete:
-        static_cast<TCPEndPoint &>(aTarget).HandleConnectComplete(static_cast<INET_ERROR>(aArgument));
+        static_cast<TCPEndPoint &>(aTarget).HandleConnectComplete(static_cast<CHIP_ERROR>(aArgument));
         break;
 
     case kInetEvent_TCPConnectionReceived:
@@ -1054,16 +637,9 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
         break;
 
     case kInetEvent_TCPError:
-        static_cast<TCPEndPoint &>(aTarget).HandleError(static_cast<INET_ERROR>(aArgument));
+        static_cast<TCPEndPoint &>(aTarget).HandleError(static_cast<CHIP_ERROR>(aArgument));
         break;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    case kInetEvent_RawDataReceived:
-        static_cast<RawEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
-        break;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     case kInetEvent_UDPDataReceived:
@@ -1072,14 +648,8 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
         break;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    case kInetEvent_DNSResolveComplete:
-        static_cast<DNSResolver &>(aTarget).HandleResolveComplete();
-        break;
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
     default:
-        return CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT;
+        return CHIP_ERROR_UNEXPECTED_EVENT;
     }
 
     // If the event was droppable, record the fact that it has been dequeued.
@@ -1091,172 +661,10 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
         lInetLayer.DroppableEventDequeued();
     }
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-/**
- *  Prepare the sets of file descriptors for @p select() to work with.
- *
- *  @param[out]    nfds       The range of file descriptors in the file
- *                            descriptor set.
- *
- *  @param[in]     readfds    A pointer to the set of readable file descriptors.
- *
- *  @param[in]     writefds   A pointer to the set of writable file descriptors.
- *
- *  @param[in]     exceptfds  A pointer to the set of file descriptors with errors.
- *
- * @param[in]      sleepTimeTV A pointer to a structure specifying how long the select should sleep
- *
- */
-void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval & sleepTimeTV)
-{
-    assertChipStackLockedByCurrentThread();
-
-    if (State != kState_Initialized)
-        return;
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
-    {
-        RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
-    }
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-    {
-        TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
-    }
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
-    {
-        UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
-    }
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-}
-
-/**
- *  Handle I/O from a select call. This method registers the pending I/O
- *  event in each active endpoint and then invokes the respective I/O
- *  handling functions for those endpoints.
- *
- *  @note
- *    It is important to set the pending I/O fields for all endpoints
- *    *before* making any callbacks. This avoids the case where an
- *    endpoint is closed and then re-opened within the callback for
- *    another endpoint. When this happens the new endpoint is likely
- *    to be assigned the same file descriptor as the old endpoint.
- *    However, any pending I/O for that file descriptor number represents
- *    I/O related to the old incarnation of the endpoint, not the current
- *    one. Saving the pending I/O state in each endpoint before acting
- *    on it allows the endpoint code to clear the I/O flags in the event
- *    of a close, thus avoiding any confusion.
- *
- *  @param[in]    selectRes    The return value of the select call.
- *
- *  @param[in]    readfds      A pointer to the set of read file descriptors.
- *
- *  @param[in]    writefds     A pointer to the set of write file descriptors.
- *
- *  @param[in]    exceptfds    A pointer to the set of file descriptors with
- *                             errors.
- *
- */
-void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * writefds, fd_set * exceptfds)
-{
-    assertChipStackLockedByCurrentThread();
-
-    if (State != kState_Initialized)
-        return;
-
-    if (selectRes < 0)
-        return;
-
-    if (selectRes > 0)
-    {
-        // Set the pending I/O field for each active endpoint based on the value returned by select.
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
-        {
-            RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
-            }
-        }
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-        {
-            TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
-            }
-        }
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
-        {
-            UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
-            }
-        }
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-        // Now call each active endpoint to handle its pending I/O.
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
-        {
-            RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->HandlePendingIO();
-            }
-        }
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-        {
-            TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->HandlePendingIO();
-            }
-        }
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
-        {
-            UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->HandlePendingIO();
-            }
-        }
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-    }
-}
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  *  Reset the members of the IPPacketInfo object.
@@ -1270,111 +678,6 @@ void IPPacketInfo::Clear()
     SrcPort     = 0;
     DestPort    = 0;
 }
-
-#if !INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
-
-// MARK: InetLayer platform- and system-specific functions for InetLayer
-//       construction and destruction.
-
-namespace Platform {
-namespace InetLayer {
-
-/**
- * This is a platform-specific InetLayer pre-initialization hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          initialized.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @return #INET_NO_ERROR on success; otherwise, a specific error indicating
- *         the reason for initialization failure. Returning non-successful
- *         status will abort initialization.
- *
- */
-DLL_EXPORT INET_ERROR WillInit(Inet::InetLayer * aLayer, void * aContext)
-{
-    (void) aLayer;
-    (void) aContext;
-
-    return INET_NO_ERROR;
-}
-
-/**
- * This is a platform-specific InetLayer post-initialization hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          initialized.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @param[in]     anError   The overall status being returned via the
- *                          InetLayer \::Init method.
- *
- */
-DLL_EXPORT void DidInit(Inet::InetLayer * aLayer, void * aContext, INET_ERROR anError)
-{
-    (void) aLayer;
-    (void) aContext;
-    (void) anError;
-}
-
-/**
- * This is a platform-specific InetLayer pre-shutdown hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          shutdown.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @return #INET_NO_ERROR on success; otherwise, a specific error indicating
- *         the reason for shutdown failure. Returning non-successful
- *         status will abort shutdown.
- *
- */
-DLL_EXPORT INET_ERROR WillShutdown(Inet::InetLayer * aLayer, void * aContext)
-{
-    (void) aLayer;
-    (void) aContext;
-
-    return INET_NO_ERROR;
-}
-
-/**
- * This is a platform-specific InetLayer post-shutdown hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          shutdown.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @param[in]     anError   The overall status being returned via the
- *                          InetLayer \::Shutdown method.
- *
- */
-DLL_EXPORT void DidShutdown(Inet::InetLayer * aLayer, void * aContext, INET_ERROR anError)
-{
-    (void) aLayer;
-    (void) aContext;
-    (void) anError;
-}
-
-} // namespace InetLayer
-} // namespace Platform
-
-#endif // !INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
 
 } // namespace Inet
 } // namespace chip

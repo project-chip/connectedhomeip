@@ -18,18 +18,25 @@
 
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
+#import "CHIPKeypair.h"
 #import "CHIPLogging.h"
 #import "CHIPOperationalCredentialsDelegate.h"
+#import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "CHIPSetupPayload.h"
-#import "gen/CHIPClustersObjc.h"
+#import <zap-generated/CHIPClustersObjc.h>
+
+#import "CHIPDeviceConnectionBridge.h"
 
 #include <platform/CHIPDeviceBuildConfig.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
+#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
-#include <support/CHIPMem.h>
 
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
@@ -42,11 +49,10 @@ static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
 static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
+static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
 static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 @interface CHIPDeviceController ()
-
-@property (nonatomic, readonly, strong, nonnull) NSRecursiveLock * lock;
 
 // queue used to serialize all work performed by the CHIPDeviceController
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
@@ -55,10 +61,12 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
+@property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) chip::NodeId localDeviceId;
 @property (readonly) uint16_t listenPort;
 @end
 
+// TODO Replace Shared Controller with a Controller Factory Singleton
 @implementation CHIPDeviceController
 
 + (CHIPDeviceController *)sharedController
@@ -104,16 +112,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 - (BOOL)isRunning
 {
-    __block BOOL commissionerInitialized;
-    dispatch_sync(_chipWorkQueue, ^{
-        commissionerInitialized = [self _isRunning];
-    });
-    return commissionerInitialized;
-}
-
-- (BOOL)_isRunning
-{
-    return _cppCommissioner != nullptr;
+    return self.cppCommissioner != nullptr;
 }
 
 - (BOOL)shutdown
@@ -134,12 +133,19 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 }
 
 - (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       vendorId:(uint16_t)vendorId
+      nocSigner:(id<CHIPKeypair>)nocSigner
 {
     chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
     __block BOOL commissionerInitialized = NO;
+    if ([self isRunning]) {
+        CHIP_LOG_DEBUG("Ignoring duplicate call to startup, Controller already started...");
+        return YES;
+    }
+
     dispatch_sync(_chipWorkQueue, ^{
-        if ([self _isRunning]) {
+        if ([self isRunning]) {
             commissionerInitialized = YES;
             return;
         }
@@ -148,7 +154,13 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
 
-        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge);
+        // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
+        std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge;
+        if (nocSigner != nil) {
+            _keypairBridge.Init(nocSigner);
+            nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
+        }
+        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge, std::move(nativeBridge));
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
@@ -161,22 +173,56 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             return;
         }
 
+        chip::Controller::FactoryInitParams params;
+        chip::Controller::SetupParams commissionerParams;
+
         if (_listenPort) {
-            errorCode = _cppCommissioner->SetUdpListenPort(_listenPort);
-            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
-                return;
-            }
+            params.listenPort = _listenPort;
         }
 
-        chip::Controller::CommissionerInitParams params;
+        // Initialize device attestation verifier
+        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
 
         params.storageDelegate = _persistentStorageDelegateBridge;
-        params.mDeviceAddressUpdateDelegate = _pairingDelegateBridge;
-        params.pairingDelegate = _pairingDelegateBridge;
+        commissionerParams.deviceAddressUpdateDelegate = _pairingDelegateBridge;
+        commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
-        params.operationalCredentialsDelegate = _operationalCredentialsDelegate;
+        commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
-        errorCode = _cppCommissioner->Init(_localDeviceId, params);
+        chip::Crypto::P256Keypair ephemeralKey;
+        errorCode = ephemeralKey.Initialize();
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        NSMutableData * nocBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
+        chip::MutableByteSpan noc((uint8_t *) [nocBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
+
+        NSMutableData * rcacBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
+        chip::MutableByteSpan rcac((uint8_t *) [rcacBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
+
+        chip::MutableByteSpan icac;
+
+        errorCode = _operationalCredentialsDelegate->GenerateNOCChainAfterValidation(
+            _localDeviceId, 0, ephemeralKey.Pubkey(), rcac, icac, noc);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        commissionerParams.ephemeralKeypair = &ephemeralKey;
+        commissionerParams.controllerRCAC = rcac;
+        commissionerParams.controllerICAC = icac;
+        commissionerParams.controllerNOC = noc;
+        commissionerParams.controllerVendorId = vendorId;
+
+        // TODO Replace Shared Controller with a Controller Factory Singleton
+        auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
+        errorCode = factory.Init(params);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        errorCode = factory.SetupCommissioner(commissionerParams, *_cppCommissioner);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }
@@ -215,15 +261,25 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
+          csrNonce:(nullable NSData *)csrNonce
              error:(NSError * __autoreleasing *)error
 {
-    __block BOOL success;
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    __block BOOL success = NO;
+    if (![self isRunning]) {
+        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return success;
+    }
     dispatch_sync(_chipWorkQueue, ^{
         chip::RendezvousParameters params
             = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
-        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
-        if ([self _isRunning]) {
+        if (csrNonce != nil) {
+            params = params.SetCSRNonce(chip::ByteSpan((const uint8_t *) csrNonce.bytes, csrNonce.length));
+        }
+
+        if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = self.cppCommissioner->PairDevice(deviceID, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
@@ -239,7 +295,12 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
-    __block BOOL success;
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    __block BOOL success = NO;
+    if (![self isRunning]) {
+        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return success;
+    }
     dispatch_sync(_chipWorkQueue, ^{
         chip::Inet::IPAddress addr;
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
@@ -249,9 +310,8 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
                                                 .SetSetupPINCode(setupPINCode)
                                                 .SetDiscriminator(discriminator)
                                                 .SetPeerAddress(peerAddress);
-        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-
-        if ([self _isRunning]) {
+        if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = self.cppCommissioner->PairDevice(deviceID, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
@@ -265,14 +325,19 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
                              port:(uint16_t)port
                             error:(NSError * __autoreleasing *)error
 {
-    __block BOOL success;
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    __block BOOL success = NO;
+    if (![self isRunning]) {
+        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return success;
+    }
     dispatch_sync(_chipWorkQueue, ^{
-        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
         chip::Controller::SerializedDevice serializedTestDevice;
         chip::Inet::IPAddress addr;
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
 
-        if ([self _isRunning]) {
+        if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = _cppCommissioner->PairTestDeviceWithoutSecurity(
                 deviceID, chip::Transport::PeerAddress::UDP(addr, port), serializedTestDevice);
         }
@@ -294,7 +359,8 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     if (setupPayload) {
         uint16_t discriminator = setupPayload.discriminator.unsignedShortValue;
         uint32_t setupPINCode = setupPayload.setUpPINCode.unsignedIntValue;
-        didSucceed = [self pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:error];
+        _operationalCredentialsDelegate->SetDeviceID(deviceID);
+        didSucceed = [self pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode csrNonce:nil error:error];
     } else {
         CHIP_LOG_ERROR("Failed to create CHIPSetupPayload for pairing with error %@", *error);
     }
@@ -303,11 +369,14 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
-    __block BOOL success;
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    __block BOOL success = NO;
+    if (![self isRunning]) {
+        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return success;
+    }
     dispatch_sync(_chipWorkQueue, ^{
-        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-
-        if ([self _isRunning]) {
+        if ([self isRunning]) {
             errorCode = self.cppCommissioner->UnpairDevice(deviceID);
         }
         success = ![self checkForError:errorCode logMsg:kErrorUnpairDevice error:error];
@@ -318,11 +387,15 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
-    __block BOOL success;
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    __block BOOL success = NO;
+    if (![self isRunning]) {
+        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return success;
+    }
     dispatch_sync(_chipWorkQueue, ^{
-        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-
-        if ([self _isRunning]) {
+        if ([self isRunning]) {
+            _operationalCredentialsDelegate->ResetDeviceID();
             errorCode = self.cppCommissioner->StopPairing(deviceID);
         }
         success = ![self checkForError:errorCode logMsg:kErrorStopPairing error:error];
@@ -331,25 +404,51 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return success;
 }
 
-- (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
+- (BOOL)isDevicePaired:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
-    __block CHIPDevice * chipDevice = nil;
+    __block BOOL paired = NO;
+    if (![self isRunning]) {
+        [self checkForError:CHIP_ERROR_INCORRECT_STATE logMsg:kErrorNotRunning error:error];
+        return paired;
+    }
     dispatch_sync(_chipWorkQueue, ^{
-        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-        chip::Controller::Device * device = nullptr;
-
-        if ([self _isRunning]) {
-            errorCode = self.cppCommissioner->GetDevice(deviceID, &device);
+        if ([self isRunning]) {
+            paired = self.cppCommissioner->DoesDevicePairingExist(chip::PeerId().SetNodeId(deviceID));
         }
-
-        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:error]) {
-            return;
-        }
-
-        chipDevice = [[CHIPDevice alloc] initWithDevice:device];
     });
 
-    return chipDevice;
+    return paired;
+}
+
+- (BOOL)getConnectedDevice:(uint64_t)deviceID
+                     queue:(dispatch_queue_t)queue
+         completionHandler:(CHIPDeviceConnectionCallback)completionHandler
+{
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    if (![self isRunning]) {
+        NSError * error;
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:&error];
+        dispatch_async(queue, ^{
+            completionHandler(nil, error);
+        });
+        return NO;
+    }
+
+    dispatch_async(_chipWorkQueue, ^{
+        if ([self isRunning]) {
+            CHIPDeviceConnectionBridge * connectionBridge = new CHIPDeviceConnectionBridge(completionHandler, queue);
+            errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
+        }
+
+        NSError * error;
+        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:&error]) {
+            // Errors are propagated to the caller through completionHandler.
+            // No extra error handling is needed here.
+            return;
+        }
+    });
+
+    return YES;
 }
 
 - (void)setListenPort:(uint16_t)port
@@ -359,22 +458,15 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 - (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId
 {
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    if (![self isRunning]) {
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
+        return;
+    }
     dispatch_sync(_chipWorkQueue, ^{
-        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-        chip::Controller::Device * device = nullptr;
-
-        if ([self _isRunning]) {
-            errorCode = self.cppCommissioner->GetDevice(deviceID, &device);
-        }
-
-        if (errorCode != CHIP_NO_ERROR) {
-            return;
-        }
-
-        errorCode = self.cppCommissioner->UpdateDevice(device, fabricId);
-
-        if (errorCode != CHIP_NO_ERROR) {
-            return;
+        if ([self isRunning]) {
+            errorCode = self.cppCommissioner->UpdateDevice(deviceID);
+            CHIP_LOG_ERROR("Update device address returned: %s", chip::ErrorStr(errorCode));
         }
     });
 }
@@ -434,7 +526,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         return NO;
     }
 
-    CHIP_LOG_ERROR("Error(%d): %@, %@", errorCode, [CHIPError errorForCHIPErrorCode:errorCode], logMsg);
+    CHIP_LOG_ERROR("Error(%s): %s", chip::ErrorStr(errorCode), [logMsg UTF8String]);
     if (error) {
         *error = [CHIPError errorForCHIPErrorCode:errorCode];
     }

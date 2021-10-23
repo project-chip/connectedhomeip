@@ -22,16 +22,13 @@
 
 #include <app/util/DataModelHandler.h>
 
-#if __has_include("gen/endpoint_config.h")
+#if __has_include(<zap-generated/endpoint_config.h>)
 #define USE_ZAP_CONFIG 1
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #endif
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#ifdef EMBER_AF_PLUGIN_REPORTING_SERVER
-void emberAfPluginReportingStackStatusCallback(EmberStatus status);
-#endif
 #ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
 void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status);
 #endif
@@ -45,13 +42,10 @@ void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
     emberAfEndpointConfigure();
     emberAfInit(exchangeManager);
 
-#if defined(EMBER_AF_PLUGIN_REPORTING_SERVER) || defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
+#if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
     EmberStatus status = EMBER_NETWORK_UP;
 #endif
 
-#ifdef EMBER_AF_PLUGIN_REPORTING_SERVER
-    emberAfPluginReportingStackStatusCallback(status);
-#endif
 #ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
     emberAfPluginIasZoneServerStackStatusCallback(status);
 #endif

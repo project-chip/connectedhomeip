@@ -22,16 +22,13 @@
  *  on the state of CHIP, Inet and System resources
  */
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 // Include local headers
 #include <system/SystemTimer.h>
 
 // Include module header
 #include <system/SystemStats.h>
 
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #include <string.h>
 
@@ -48,20 +45,13 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
     "SystemLayer_NumPacketBufs",
 #endif
     "SystemLayer_NumTimersInUse",
-#if INET_CONFIG_NUM_RAW_ENDPOINTS
-    "InetLayer_NumRawEpsInUse",
-#endif
 #if INET_CONFIG_NUM_TCP_ENDPOINTS
     "InetLayer_NumTCPEpsInUse",
 #endif
 #if INET_CONFIG_NUM_UDP_ENDPOINTS
     "InetLayer_NumUDPEpsInUse",
 #endif
-#if INET_CONFIG_NUM_DNS_RESOLVERS
-    "InetLayer_NumDNSResolversInUse",
-#endif
-    "ExchangeMgr_NumContextsInUse",   "ExchangeMgr_NumUMHandlersInUse",
-    "ExchangeMgr_NumBindings",        "MessageLayer_NumConnectionsInUse",
+    "ExchangeMgr_NumContextsInUse", "ExchangeMgr_NumUMHandlersInUse", "ExchangeMgr_NumBindings", "MessageLayer_NumConnectionsInUse",
 };
 
 count_t sResourcesInUse[kNumEntries];
@@ -87,8 +77,10 @@ void UpdateSnapshot(Snapshot & aSnapshot)
     memcpy(&aSnapshot.mResourcesInUse, &sResourcesInUse, sizeof(aSnapshot.mResourcesInUse));
     memcpy(&aSnapshot.mHighWatermarks, &sHighWatermarks, sizeof(aSnapshot.mHighWatermarks));
 
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
     chip::System::Timer::GetStatistics(aSnapshot.mResourcesInUse[kSystemLayer_NumTimers],
                                        aSnapshot.mHighWatermarks[kSystemLayer_NumTimers]);
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 }
@@ -114,6 +106,14 @@ bool Difference(Snapshot & result, Snapshot & after, Snapshot & before)
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
+
+// To use LwIP 1.x, some additional definitions are required here.
+#if LWIP_VERSION_MAJOR < 2
+#ifndef MEMP_STATS_GET
+#define MEMP_STATS_GET(FIELD, INDEX) (lwip_stats.memp[INDEX].FIELD)
+#endif // !defined(MEMP_STATS_GET)
+#endif // LWIP_VERSION_MAJOR
+
 void UpdateLwipPbufCounts(void)
 {
 #if LWIP_PBUF_FROM_CUSTOM_POOLS

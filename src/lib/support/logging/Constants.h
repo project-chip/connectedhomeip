@@ -54,6 +54,9 @@ enum LogModule
     kLogModule_SetupPayload,
     kLogModule_AppServer,
     kLogModule_Discovery,
+    kLogModule_InteractionModel,
+    kLogModule_Test,
+    kLogModule_OperationalDeviceProxy,
 
     kLogModule_Max
 };

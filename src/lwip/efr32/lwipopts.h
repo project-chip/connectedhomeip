@@ -71,7 +71,9 @@
 #define MEMP_NUM_NETCONN (0)
 
 #define LWIP_IPV4 0
+
 #define LWIP_IPV6 1
+#define LWIP_IPV6_ROUTE_TABLE_SUPPORT 1
 #define LWIP_ARP (0)
 #define LWIP_DNS (0)
 #define LWIP_ICMP (0)

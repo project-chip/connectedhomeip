@@ -44,7 +44,6 @@ from .ChipBleUtility import (
     BleDisconnectEventStruct,
     BleRxEventStruct,
     BleSubscribeEventStruct,
-    BleDeviceIdentificationInfo,
     ParseServiceData,
 )
 
@@ -106,20 +105,22 @@ def _VoidPtrToCBUUID(ptr, len):
 
     return ptr
 
+
 class LoopCondition:
-    def __init__(self, op, timelimit, arg = None):
+    def __init__(self, op, timelimit, arg=None):
         self.op = op
         self.due = time.time() + timelimit
         self.arg = arg
-    
+
     def TimeLimitExceeded(self):
         return time.time() > self.due
+
 
 class BlePeripheral:
     def __init__(self, peripheral, advData):
         self.peripheral = peripheral
         self.advData = dict(advData)
-    
+
     def __eq__(self, another):
         return self.peripheral == another.peripheral
 
@@ -135,6 +136,7 @@ class BlePeripheral:
             if str(i).lower() == str(CHIP_SERVICE_SHORT).lower():
                 return ParseServiceData(bytes(servDataDict[i]))
         return None
+
 
 class CoreBluetoothManager(ChipBleBase):
     def __init__(self, devCtrl, logger=None):
@@ -161,9 +163,11 @@ class CoreBluetoothManager(ChipBleBase):
 
         self.ready_condition = False
         self.loop_condition = (
-            False  # indicates whether the cmd requirement has been met in the runloop.
+            # indicates whether the cmd requirement has been met in the runloop.
+            False
         )
-        self.connect_state = False  # reflects whether or not there is a connection.
+        # reflects whether or not there is a connection.
+        self.connect_state = False
         self.send_condition = False
         self.subscribe_condition = False
 
@@ -217,11 +221,12 @@ class CoreBluetoothManager(ChipBleBase):
         self.hookFuncPtr = hookFunctionType(hookFunc)
         pyos_inputhook_ptr = c_void_p.in_dll(pythonapi, "PyOS_InputHook")
         # save the original so that on del we can revert it back to the way it was.
-        self.orig_input_hook = cast(pyos_inputhook_ptr.value, PYFUNCTYPE(c_int))
+        self.orig_input_hook = cast(
+            pyos_inputhook_ptr.value, PYFUNCTYPE(c_int))
         # set the new hook. readLine will call this periodically as it polls for input.
         pyos_inputhook_ptr.value = cast(self.hookFuncPtr, c_void_p).value
 
-    def shouldLoop(self, cond:LoopCondition):
+    def shouldLoop(self, cond: LoopCondition):
         """ Used by runLoopUntil to determine whether it should exit the runloop. """
 
         if cond.TimeLimitExceeded():
@@ -249,7 +254,7 @@ class CoreBluetoothManager(ChipBleBase):
 
         return True
 
-    def runLoopUntil(self, cond:LoopCondition):
+    def runLoopUntil(self, cond: LoopCondition):
         """Helper function to drive OSX runloop until an expected event is received or
         the timeout expires."""
         runLoop = NSRunLoop.currentRunLoop()
@@ -277,7 +282,8 @@ class CoreBluetoothManager(ChipBleBase):
                     self.logger.info("adding to scan list:")
                     self.logger.info("")
                     self.logger.info(
-                        "{0:<16}= {1:<80}".format("Name", str(peripheral._.name))
+                        "{0:<16}= {1:<80}".format(
+                            "Name", str(peripheral._.name))
                     )
                     self.logger.info(
                         "{0:<16}= {1:<80}".format(
@@ -285,17 +291,23 @@ class CoreBluetoothManager(ChipBleBase):
                         )
                     )
                     self.logger.info("{0:<16}= {1:<80}".format("RSSI", rssi))
-                    devIdInfo = BlePeripheral(peripheral, data).getPeripheralDevIdInfo()
+                    devIdInfo = BlePeripheral(
+                        peripheral, data).getPeripheralDevIdInfo()
                     if devIdInfo:
-                        self.logger.info("{0:<16}= {1}".format("Pairing State", devIdInfo.pairingState))
-                        self.logger.info("{0:<16}= {1}".format("Discriminator", devIdInfo.discriminator))
-                        self.logger.info("{0:<16}= {1}".format("Vendor Id", devIdInfo.vendorId))
-                        self.logger.info("{0:<16}= {1}".format("Product Id", devIdInfo.productId))
+                        self.logger.info("{0:<16}= {1}".format(
+                            "Pairing State", devIdInfo.pairingState))
+                        self.logger.info("{0:<16}= {1}".format(
+                            "Discriminator", devIdInfo.discriminator))
+                        self.logger.info("{0:<16}= {1}".format(
+                            "Vendor Id", devIdInfo.vendorId))
+                        self.logger.info("{0:<16}= {1}".format(
+                            "Product Id", devIdInfo.productId))
                     self.logger.info("ADV data: " + repr(data))
                     self.logger.info("")
 
                 self.peripheral_list.append(peripheral)
-                self.peripheral_adv_list.append(BlePeripheral(peripheral, data))
+                self.peripheral_adv_list.append(
+                    BlePeripheral(peripheral, data))
         else:
             if (peripheral._.name == self.bg_peripheral_name) or (str(devIdInfo.discriminator) == self.bg_peripheral_name):
                 if len(self.peripheral_list) == 0:
@@ -372,7 +384,8 @@ class CoreBluetoothManager(ChipBleBase):
             self.connect_state = True
 
         else:
-            self.logger.error("ERROR: failed to discover characteristics for service.")
+            self.logger.error(
+                "ERROR: failed to discover characteristics for service.")
             self.connect_state = False
 
         self.loop_condition = True
@@ -461,7 +474,8 @@ class CoreBluetoothManager(ChipBleBase):
                 eventStruct = BleSubscribeEventStruct.fromBleSubscribeEvent(ev)
                 return cast(pointer(eventStruct), c_void_p).value
             elif isinstance(ev, BleDisconnectEvent):
-                eventStruct = BleDisconnectEventStruct.fromBleDisconnectEvent(ev)
+                eventStruct = BleDisconnectEventStruct.fromBleDisconnectEvent(
+                    ev)
                 return cast(pointer(eventStruct), c_void_p).value
 
         return None

@@ -1,0 +1,49 @@
+{{#if (chip_has_client_clusters)}}
+{{> header}}
+
+#include <zap-generated/tests/CHIPClustersTest.h>
+
+#include <app/InteractionModelEngine.h>
+#include <app/util/basic-types.h>
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <zap-generated/CHIPClientCallbacks.h>
+
+using namespace chip::app::Clusters;
+using namespace chip::System;
+using namespace chip::Encoding::LittleEndian;
+
+namespace chip {
+namespace Controller {
+
+{{#chip_client_clusters}}
+
+{{#chip_server_cluster_attributes}}
+{{#unless isWritableAttribute}}
+{{#unless isList}}
+{{#unless isStruct}}
+CHIP_ERROR {{asUpperCamelCase parent.name}}ClusterTest::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} {{asLowerCamelCase name}})
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId         = mDevice->GetDeviceId();
+    attributePath.mEndpointId     = mEndpoint;
+    attributePath.mClusterId      = mClusterId;
+    attributePath.mFieldId        = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, {{asLowerCamelCase name}}));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+{{/unless}}
+{{/unless}}
+{{/unless}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
+} // namespace Controller
+} // namespace chip
+{{/if}}

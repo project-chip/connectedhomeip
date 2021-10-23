@@ -26,13 +26,14 @@
 
 #include <array>
 
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
-#include <support/DLLUtil.h>
-#include <support/Pool.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 
 namespace chip {
@@ -49,7 +50,7 @@ static constexpr int16_t kAnyMessageType = -1;
  *    It works on be behalf of higher layers, creating ExchangeContexts and
  *    handling the registration/unregistration of unsolicited message handlers.
  */
-class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate, public TransportMgrDelegate
+class DLL_EXPORT ExchangeManager : public SessionManagerDelegate
 {
     friend class ExchangeContext;
 
@@ -64,14 +65,14 @@ public:
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
      *
-     *  @param[in]    sessionMgr    A pointer to the SecureSessionMgr object.
+     *  @param[in]    sessionManager    A pointer to the SessionManager object.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(SessionManager * sessionManager);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -99,7 +100,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(SecureSessionHandle session, ExchangeDelegate * delegate);
+    ExchangeContext * NewContext(SessionHandle session, ExchangeDelegate * delegate);
 
     void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
 
@@ -138,9 +139,8 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(MessageType msgType, ExchangeDelegate * delegate)
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return RegisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(),
-                                                        static_cast<uint8_t>(msgType), delegate);
+                                                        to_underlying(msgType), delegate);
     }
 
     /**
@@ -173,9 +173,8 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(MessageType msgType)
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return UnregisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(),
-                                                          static_cast<uint8_t>(msgType));
+                                                          to_underlying(msgType));
     }
 
     /**
@@ -185,15 +184,19 @@ public:
      */
     void CloseAllContextsForDelegate(const ExchangeDelegate * delegate);
 
+    // TODO Store more than one delegate and add API to query delegates to check if incoming messages are for them.
+    // Do the same for the UMHs as well
     void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
 
-    SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
+    SessionManager * GetSessionManager() const { return mSessionManager; }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
-    Transport::AdminId GetAdminId() { return mAdminId; }
+    FabricIndex GetFabricIndex() { return mFabricIndex; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
+
+    size_t GetNumActiveExchanges() { return mContextPool.Allocated(); }
 
 private:
     enum class State
@@ -228,12 +231,12 @@ private:
     State mState;
 
     ExchangeMgrDelegate * mDelegate;
-    SecureSessionMgr * mSessionMgr;
+    SessionManager * mSessionManager;
     ReliableMessageMgr mReliableMessageMgr;
 
     ApplicationExchangeDispatch mDefaultExchangeDispatch;
 
-    Transport::AdminId mAdminId = 0;
+    FabricIndex mFabricIndex = 0;
 
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
 
@@ -242,21 +245,17 @@ private:
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source) override;
 
-    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
-                           SecureSessionMgr * msgLayer) override;
+    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SessionHandle session,
+                           const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
+                           System::PacketBufferHandle && msgBuf) override;
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    void OnNewConnection(SessionHandle session) override;
 #if CHIP_CONFIG_TEST
 public: // Allow OnConnectionExpired to be called directly from tests.
 #endif  // CHIP_CONFIG_TEST
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
-
-    // TransportMgrDelegate interface for rendezvous sessions
-private:
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void OnConnectionExpired(SessionHandle session) override;
 };
 
 } // namespace Messaging

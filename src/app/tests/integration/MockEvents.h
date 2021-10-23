@@ -27,7 +27,7 @@
 
 #include <app/EventLoggingDelegate.h>
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -50,28 +50,28 @@ class MockEventGenerator
 public:
     static MockEventGenerator * GetInstance(void);
     virtual CHIP_ERROR Init(chip::Messaging::ExchangeManager * apExchangeMgr, EventGenerator * apEventGenerator,
-                            int aDelayBetweenEvents, bool aWraparound) = 0;
-    virtual void SetEventGeneratorStop()                               = 0;
-    virtual bool IsEventGeneratorStopped()                             = 0;
-    virtual ~MockEventGenerator()                                      = default;
+                            uint32_t aDelayBetweenEvents, bool aWraparound) = 0;
+    virtual void SetEventGeneratorStop()                                    = 0;
+    virtual bool IsEventGeneratorStopped()                                  = 0;
+    virtual ~MockEventGenerator()                                           = default;
 };
 
 class MockEventGeneratorImpl : public MockEventGenerator
 {
 public:
     MockEventGeneratorImpl(void);
-    CHIP_ERROR Init(chip::Messaging::ExchangeManager * apExchangeMgr, EventGenerator * apEventGenerator, int aDelayBetweenEvents,
-                    bool aWraparound);
+    CHIP_ERROR Init(chip::Messaging::ExchangeManager * apExchangeMgr, EventGenerator * apEventGenerator,
+                    uint32_t aDelayBetweenEvents, bool aWraparound);
     void SetEventGeneratorStop();
     bool IsEventGeneratorStopped();
 
 private:
-    static void HandleNextEvent(chip::System::Layer * apSystemLayer, void * apAppState, chip::System::Error aErr);
+    static void HandleNextEvent(chip::System::Layer * apSystemLayer, void * apAppState);
     chip::Messaging::ExchangeManager * mpExchangeMgr;
-    int mTimeBetweenEvents; //< delay, in miliseconds, between events.
-    bool mEventWraparound;  //< does the event generator run indefinitely, or does it stop after iterating through its states
+    uint32_t mTimeBetweenEvents; //< delay, in miliseconds, between events.
+    bool mEventWraparound;       //< does the event generator run indefinitely, or does it stop after iterating through its states
     EventGenerator * mpEventGenerator; //< the event generator to use
-    int32_t mEventsLeft;
+    size_t mEventsLeft;
 };
 
 enum LivenessDeviceStatus
@@ -90,7 +90,8 @@ class LivenessEventGenerator : public EventGenerator
 public:
     LivenessEventGenerator(void);
     void Generate(void);
-    chip::EventNumber LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId, LivenessDeviceStatus aStatus);
+    chip::EventNumber LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId, LivenessDeviceStatus aStatus,
+                                  chip::EventId aEventId, chip::app::PriorityLevel aPriorityLevel);
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter);
 
 private:

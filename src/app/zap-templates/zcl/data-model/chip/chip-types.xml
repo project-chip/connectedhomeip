@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <atomic>
+    <type id="0x00" description="No data"                 name="no_data"            size="0"                  />
+    <!-- Base Data Types -->
+    <type id="0x10" description="Boolean"                  name="boolean"           size="1"  discrete="true" />
+    <type id="0x18" description="8-bit bitmap"             name="bitmap8"           size="1"  discrete="true" />
+    <type id="0x19" description="16-bit bitmap"            name="bitmap16"          size="2"  discrete="true" />
+    <type id="0x1A" description="24-bit bitmap"            name="bitmap24"          size="3"  discrete="true" />
+    <type id="0x1B" description="32-bit bitmap"            name="bitmap32"          size="4"  discrete="true" />
+    <type id="0x1F" description="64-bit bitmap"            name="bitmap64"          size="8"  discrete="true" />
+    <type id="0x20" description="Unsigned 8-bit integer"   name="int8u"             size="1"  analog="true"   />
+    <type id="0x21" description="Unsigned 16-bit integer"  name="int16u"            size="2"  analog="true"   />
+    <type id="0x22" description="Unsigned 24-bit integer"  name="int24u"            size="3"  analog="true"   />
+    <type id="0x23" description="Unsigned 32-bit integer"  name="int32u"            size="4"  analog="true"   />
+    <type id="0x24" description="Unsigned 40-bit integer"  name="int40u"            size="5"  analog="true"   />
+    <type id="0x25" description="Unsigned 48-bit integer"  name="int48u"            size="6"  analog="true"   />
+    <type id="0x26" description="Unsigned 56-bit integer"  name="int56u"            size="7"  analog="true"   />
+    <type id="0x27" description="Unsigned 64-bit integer"  name="int64u"            size="8"  analog="true"   />
+    <type id="0x28" description="Signed 8-bit integer"     name="int8s"             size="1"  analog="true"   />
+    <type id="0x29" description="Signed 16-bit integer"    name="int16s"            size="2"  analog="true"   />
+    <type id="0x2A" description="Signed 24-bit integer"    name="int24s"            size="3"  analog="true"   />
+    <type id="0x2B" description="Signed 32-bit integer"    name="int32s"            size="4"  analog="true"   />
+    <type id="0x2C" description="Signed 40-bit integer"    name="int40s"            size="5"  analog="true"   />
+    <type id="0x2D" description="Signed 48-bit integer"    name="int48s"            size="6"  analog="true"   />
+    <type id="0x2E" description="Signed 56-bit integer"    name="int56s"            size="7"  analog="true"   />
+    <type id="0x2F" description="Signed 64-bit integer"    name="int64s"            size="8"  analog="true"   />
+    <type id="0x30" description="8-bit enumeration"        name="enum8"             size="1"  discrete="true" />
+    <type id="0x31" description="16-bit enumeration"       name="enum16"            size="2"  discrete="true" />
+    <type id="0x39" description="Single precision"         name="single"            size="4"  analog="true"   />
+    <type id="0x3A" description="Double precision"         name="double"            size="8"  analog="true"   />
+    <type id="0x41" description="Octet String"             name="octet_string"                composite="true"/>
+    <type id="0x43" description="Long Octet String"        name="long_octet_string"           composite="true"/>
+    <type id="0x48" description="List"                     name="array"                       composite="true"/>
+    <type id="0x4C" description="Structure"                name="struct"                      composite="true"/>
+    <!-- Derived Data Types -->
+    <type id="0x42" description="Character String"         name="char_string"                 composite="true"/>
+    <type id="0x44" description="Long Character String"    name="long_char_string"            composite="true"/>
+    <type id="0xE0" description="Time of day"              name="tod"               size="4"  analog="true"   />
+    <type id="0xE1" description="Date"                     name="date"              size="4"  analog="true"   />
+    <type id="0xE2" description="UTC Time"                 name="utc"               size="4"  analog="true"   />
+    <type id="0xE3" description="Epoch Microseconds"       name="epoch_us"          size="8"  analog="true"   />
+    <type id="0xE4" description="Epoch Seconds"            name="epoch_s"           size="4"  analog="true"   />
+    <type id="0xE5" description="System Time Microseconds" name="systime_us"        size="8"  analog="true"   />
+    <type id="0xE6" description="Percentage units 1%"      name="percent"           size="1"  analog="true"   />
+    <type id="0xE7" description="Percentage units 0.01%"   name="percent100ths"     size="2"  analog="true"   />
+    <type id="0xE8" description="Cluster ID"               name="cluster_id"        size="4"  discrete="true" />
+    <type id="0xE9" description="Attribute ID"             name="attrib_id"         size="4"  discrete="true" />
+    <type id="0xEA" description="Field ID"                 name="field_id"          size="4"  discrete="true" />
+    <type id="0xEB" description="Event ID"                 name="event_id"          size="4"  discrete="true" />
+    <type id="0xEC" description="Command ID"               name="command_id"        size="4"  discrete="true" />
+    <type id="0xED" description="Action ID"                name="action_id"         size="1"  discrete="true" />
+    <type id="0xEF" description="Transaction ID"           name="trans_id"          size="4"  discrete="true" />
+    <type id="0xF0" description="Node ID"                  name="node_id"           size="8"  discrete="true" />
+    <type id="0xF1" description="Vendor ID"                name="vendor_id"         size="2"  discrete="true" />
+    <type id="0xF2" description="Device Type ID"           name="devtype_id"        size="4"  discrete="true" />
+    <type id="0xF3" description="Fabric ID"                name="fabric_id"         size="8"  discrete="true" />
+    <type id="0xF4" description="Group ID"                 name="group_id"          size="2"  discrete="true" />
+    <type id="0xF5" description="Status Code"              name="status"            size="2"  discrete="true" />
+    <type id="0xF6" description="Data Version"             name="data_ver"          size="4"  discrete="true" />
+    <type id="0xF7" description="Event Number"             name="event_no"          size="8"  discrete="true" />
+    <type id="0xF8" description="Endpoint Number"          name="endpoint_no"       size="2"  discrete="true" />
+    <type id="0xF9" description="Fabric Index"             name="fabric_idx"        size="1"  discrete="true" />
+    <type id="0xFA" description="IP Address"               name="ipadr"                       composite="true"/>
+    <type id="0xFB" description="IPv4 Address"             name="ipv4adr"           size="4"  composite="true"/>
+    <type id="0xFC" description="IPv6 Address"             name="ipv6adr"           size="16" composite="true"/>
+    <type id="0xFD" description="IPv6 Prefix"              name="ipv6pre"                     composite="true"/>
+    <type id="0xFE" description="Hardware Address"         name="hwadr"                       composite="true"/>
+    <type id="0xFF" description="Unknown"                  name="unknown"           size="0"                  />
+  </atomic>
+</configurator>

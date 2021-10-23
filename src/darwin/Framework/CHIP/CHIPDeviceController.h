@@ -26,8 +26,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSError * _Nullable error);
+
 @protocol CHIPDevicePairingDelegate;
 @protocol CHIPPersistentStorageDelegate;
+@protocol CHIPKeypair;
 
 @interface CHIPDeviceController : NSObject
 
@@ -36,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
+          csrNonce:(nullable NSData *)csrNonce
              error:(NSError * __autoreleasing *)error;
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -60,7 +64,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId;
 
-- (nullable CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (BOOL)isDevicePaired:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (BOOL)getConnectedDevice:(uint64_t)deviceID
+                     queue:(dispatch_queue_t)queue
+         completionHandler:(CHIPDeviceConnectionCallback)completionHandler;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -89,8 +96,12 @@ NS_ASSUME_NONNULL_BEGIN
  * check if the stack needs to be started up.
  *
  * @param[in] storageDelegate The delegate for persistent storage
+ * @param[in] vendorId The vendor ID of the commissioner application
+ * @param[in] nocSigner The CHIPKeypair that is used to generate and sign Node Operational Credentials
  */
-- (BOOL)startup:(nullable id<CHIPPersistentStorageDelegate>)storageDelegate;
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       vendorId:(uint16_t)vendorId
+      nocSigner:(nullable id<CHIPKeypair>)nocSigner;
 
 /**
  * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.

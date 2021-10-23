@@ -14,7 +14,7 @@
 
 """chip_mobly"""
 
-import setuptools # type: ignore
+import setuptools  # type: ignore
 
 setuptools.setup(
     name='chip_mobly',

@@ -26,8 +26,9 @@ class PigweedEchoTest(base_test.BaseTestClass):
         object is created from this.'''
         self.ads = self.register_controller(pigweed_device)
         self.dut = self.ads[0]
-        self.dut.platform.flash() # Flashes the image passed in the configuration yml.
-        time.sleep(1) # give the device time to boot and register rpcs
+        # Flashes the image passed in the configuration yml.
+        self.dut.platform.flash()
+        time.sleep(1)  # give the device time to boot and register rpcs
 
     def test_hello(self):
         ''' Tests EchoService.Echo '''

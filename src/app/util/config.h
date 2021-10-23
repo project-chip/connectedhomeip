@@ -74,16 +74,16 @@
 #ifdef ZA_GENERATED_HEADER
 #include ZA_GENERATED_HEADER
 #else
-#include "gen/gen_config.h"
+#include <zap-generated/gen_config.h>
 #endif
 
 #ifdef ATTRIBUTE_STORAGE_CONFIGURATION
 #include ATTRIBUTE_STORAGE_CONFIGURATION
 #else
-#include "gen/endpoint_config.h"
+#include <zap-generated/endpoint_config.h>
 #endif
 
-#include "gen/gen_tokens.h" // For GENERATED_TOKEN_LOADER/SAVER macros
+#include <zap-generated/gen_tokens.h> // For GENERATED_TOKEN_LOADER/SAVER macros
 
 // *******************************************************************
 // pre-defined Devices

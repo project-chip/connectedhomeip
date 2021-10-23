@@ -21,8 +21,6 @@ jobs:
     shuffle_names:
         name: Shuffle names
         runs-on: ubuntu-latest
-        container:
-            image: connectedhomeip/chip-build:latest
 
         steps:
             - name: Checkout

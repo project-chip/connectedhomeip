@@ -16,53 +16,27 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/util/af-types.h>
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
-
 #include "LightingManager.h"
-
 #include <AppMain.h>
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #if defined(PW_RPC_ENABLED)
 #include "Rpc.h"
 #endif // PW_RPC_ENABLED
 
-#include <cassert>
-#include <iostream>
-
 using namespace chip;
-using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters;
 
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
-    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
+    if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
-        return;
-    }
-
-    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
-    {
-        ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
-        return;
-    }
-
-    if (*value)
-    {
-        LightingMgr().InitiateAction(LightingManager::ON_ACTION);
-    }
-    else
-    {
-        LightingMgr().InitiateAction(LightingManager::OFF_ACTION);
+        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
     }
 }
 
@@ -88,8 +62,13 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    if (ChipLinuxAppInit(argc, argv) != 0)
+    {
+        return -1;
+    }
+
     LightingMgr().Init();
     ChipLinuxAppMainLoop();
+
     return 0;
 }

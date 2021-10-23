@@ -23,8 +23,8 @@
 
 #include <stddef.h>
 
-#include <core/CHIPCore.h>
-#include <support/ErrorStr.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 
 namespace chip {
 
@@ -50,573 +50,608 @@ void RegisterCHIPLayerErrorFormatter()
  * @return false                    If the supplied error was not a CHIP error.
  *
  */
-bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < CHIP_ERROR_MIN || err > CHIP_ERROR_MAX)
+    if (!err.IsPart(ChipError::SdkPart::kCore))
     {
         return false;
     }
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (err)
+    switch (err.AsInteger())
     {
-    case CHIP_ERROR_TOO_MANY_CONNECTIONS:
+    case CHIP_ERROR_TOO_MANY_CONNECTIONS.AsInteger():
         desc = "Too many connections";
         break;
-    case CHIP_ERROR_SENDING_BLOCKED:
+    case CHIP_ERROR_SENDING_BLOCKED.AsInteger():
         desc = "Sending blocked";
         break;
-    case CHIP_ERROR_CONNECTION_ABORTED:
+    case CHIP_ERROR_CONNECTION_ABORTED.AsInteger():
         desc = "Connection aborted";
         break;
-    case CHIP_ERROR_INCORRECT_STATE:
+    case CHIP_ERROR_INCORRECT_STATE.AsInteger():
         desc = "Incorrect state";
         break;
-    case CHIP_ERROR_MESSAGE_TOO_LONG:
+    case CHIP_ERROR_MESSAGE_TOO_LONG.AsInteger():
         desc = "Message too long";
         break;
-    case CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION:
+    case CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION.AsInteger():
         desc = "Unsupported exchange version";
         break;
-    case CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS:
+    case CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS.AsInteger():
         desc = "Too many unsolicited message handlers";
         break;
-    case CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER:
+    case CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER.AsInteger():
         desc = "No unsolicited message handler";
         break;
-    case CHIP_ERROR_NO_CONNECTION_HANDLER:
+    case CHIP_ERROR_NO_CONNECTION_HANDLER.AsInteger():
         desc = "No connection handler";
         break;
-    case CHIP_ERROR_TOO_MANY_PEER_NODES:
+    case CHIP_ERROR_TOO_MANY_PEER_NODES.AsInteger():
         desc = "Too many peer nodes";
         break;
-    case CHIP_ERROR_NO_MEMORY:
+    case CHIP_ERROR_SENTINEL.AsInteger():
+        desc = "Internal sentinel";
+        break;
+    case CHIP_ERROR_NO_MEMORY.AsInteger():
         desc = "No memory";
         break;
-    case CHIP_ERROR_NO_MESSAGE_HANDLER:
+    case CHIP_ERROR_NO_MESSAGE_HANDLER.AsInteger():
         desc = "No message handler";
         break;
-    case CHIP_ERROR_MESSAGE_INCOMPLETE:
+    case CHIP_ERROR_MESSAGE_INCOMPLETE.AsInteger():
         desc = "Message incomplete";
         break;
-    case CHIP_ERROR_DATA_NOT_ALIGNED:
+    case CHIP_ERROR_DATA_NOT_ALIGNED.AsInteger():
         desc = "Data not aligned";
         break;
-    case CHIP_ERROR_UNKNOWN_KEY_TYPE:
+    case CHIP_ERROR_UNKNOWN_KEY_TYPE.AsInteger():
         desc = "Unknown key type";
         break;
-    case CHIP_ERROR_KEY_NOT_FOUND:
+    case CHIP_ERROR_KEY_NOT_FOUND.AsInteger():
         desc = "Key not found";
         break;
-    case CHIP_ERROR_WRONG_ENCRYPTION_TYPE:
+    case CHIP_ERROR_WRONG_ENCRYPTION_TYPE.AsInteger():
         desc = "Wrong encryption type";
         break;
-    case CHIP_ERROR_TOO_MANY_KEYS:
+    case CHIP_ERROR_TOO_MANY_KEYS.AsInteger():
         desc = "Too many keys";
         break;
-    case CHIP_ERROR_INTEGRITY_CHECK_FAILED:
+    case CHIP_ERROR_INTEGRITY_CHECK_FAILED.AsInteger():
         desc = "Integrity check failed";
         break;
-    case CHIP_ERROR_INVALID_SIGNATURE:
+    case CHIP_ERROR_INVALID_SIGNATURE.AsInteger():
         desc = "Invalid signature";
         break;
-    case CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION:
+    case CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION.AsInteger():
         desc = "Unsupported message version";
         break;
-    case CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE:
+    case CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE.AsInteger():
         desc = "Unsupported encryption type";
         break;
-    case CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE:
+    case CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE.AsInteger():
         desc = "Unsupported signature type";
         break;
-    case CHIP_ERROR_INVALID_MESSAGE_LENGTH:
+    case CHIP_ERROR_INVALID_MESSAGE_LENGTH.AsInteger():
         desc = "Invalid message length";
         break;
-    case CHIP_ERROR_BUFFER_TOO_SMALL:
+    case CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger():
         desc = "Buffer too small";
         break;
-    case CHIP_ERROR_DUPLICATE_KEY_ID:
+    case CHIP_ERROR_DUPLICATE_KEY_ID.AsInteger():
         desc = "Duplicate key id";
         break;
-    case CHIP_ERROR_WRONG_KEY_TYPE:
+    case CHIP_ERROR_WRONG_KEY_TYPE.AsInteger():
         desc = "Wrong key type";
         break;
-    case CHIP_ERROR_WELL_UNINITIALIZED:
+    case CHIP_ERROR_WELL_UNINITIALIZED.AsInteger():
         desc = "Well uninitialized";
         break;
-    case CHIP_ERROR_WELL_EMPTY:
+    case CHIP_ERROR_WELL_EMPTY.AsInteger():
         desc = "Well empty";
         break;
-    case CHIP_ERROR_INVALID_STRING_LENGTH:
+    case CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger():
         desc = "Invalid string length";
         break;
-    case CHIP_ERROR_INVALID_LIST_LENGTH:
+    case CHIP_ERROR_INVALID_LIST_LENGTH.AsInteger():
         desc = "invalid list length";
         break;
-    case CHIP_ERROR_INVALID_INTEGRITY_TYPE:
+    case CHIP_ERROR_INVALID_INTEGRITY_TYPE.AsInteger():
         desc = "Invalid integrity type";
         break;
-    case CHIP_END_OF_TLV:
+    case CHIP_END_OF_TLV.AsInteger():
         desc = "End of TLV";
         break;
-    case CHIP_ERROR_TLV_UNDERRUN:
+    case CHIP_ERROR_TLV_UNDERRUN.AsInteger():
         desc = "TLV underrun";
         break;
-    case CHIP_ERROR_INVALID_TLV_ELEMENT:
+    case CHIP_ERROR_INVALID_TLV_ELEMENT.AsInteger():
         desc = "Invalid TLV element";
         break;
-    case CHIP_ERROR_INVALID_TLV_TAG:
+    case CHIP_ERROR_INVALID_TLV_TAG.AsInteger():
         desc = "Invalid TLV tag";
         break;
-    case CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG:
+    case CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG.AsInteger():
         desc = "Unknown implicit TLV tag";
         break;
-    case CHIP_ERROR_WRONG_TLV_TYPE:
+    case CHIP_ERROR_WRONG_TLV_TYPE.AsInteger():
         desc = "Wrong TLV type";
         break;
-    case CHIP_ERROR_TLV_CONTAINER_OPEN:
+    case CHIP_ERROR_TLV_CONTAINER_OPEN.AsInteger():
         desc = "TLV container open";
         break;
-    case CHIP_ERROR_INVALID_TRANSFER_MODE:
+    case CHIP_ERROR_INVALID_TRANSFER_MODE.AsInteger():
         desc = "Invalid transfer mode";
         break;
-    case CHIP_ERROR_INVALID_PROFILE_ID:
+    case CHIP_ERROR_INVALID_PROFILE_ID.AsInteger():
         desc = "Invalid profile id";
         break;
-    case CHIP_ERROR_INVALID_MESSAGE_TYPE:
+    case CHIP_ERROR_INVALID_MESSAGE_TYPE.AsInteger():
         desc = "Invalid message type";
         break;
-    case CHIP_ERROR_UNEXPECTED_TLV_ELEMENT:
+    case CHIP_ERROR_UNEXPECTED_TLV_ELEMENT.AsInteger():
         desc = "Unexpected TLV element";
         break;
-    case CHIP_ERROR_STATUS_REPORT_RECEIVED:
+    case CHIP_ERROR_STATUS_REPORT_RECEIVED.AsInteger():
         desc = "Status Report received from peer";
         break;
-    case CHIP_ERROR_NOT_IMPLEMENTED:
+    case CHIP_ERROR_NOT_IMPLEMENTED.AsInteger():
         desc = "Not Implemented";
         break;
-    case CHIP_ERROR_INVALID_ADDRESS:
+    case CHIP_ERROR_INVALID_ADDRESS.AsInteger():
         desc = "Invalid address";
         break;
-    case CHIP_ERROR_INVALID_ARGUMENT:
+    case CHIP_ERROR_INVALID_ARGUMENT.AsInteger():
         desc = "Invalid argument";
         break;
-    case CHIP_ERROR_TLV_TAG_NOT_FOUND:
+    case CHIP_ERROR_TLV_TAG_NOT_FOUND.AsInteger():
         desc = "TLV tag not found";
         break;
-
-    case CHIP_ERROR_INVALID_PATH_LIST:
+    case CHIP_ERROR_INVALID_PATH_LIST.AsInteger():
         desc = "Invalid TLV path list";
         break;
-    case CHIP_ERROR_INVALID_DATA_LIST:
+    case CHIP_ERROR_INVALID_DATA_LIST.AsInteger():
         desc = "Invalid TLV data list";
         break;
-    case CHIP_ERROR_TRANSACTION_CANCELED:
+    case CHIP_ERROR_TRANSACTION_CANCELED.AsInteger():
         desc = "Transaction canceled";
         break;
-    case CHIP_ERROR_LISTENER_ALREADY_STARTED:
+    case CHIP_ERROR_LISTENER_ALREADY_STARTED.AsInteger():
         desc = "Listener already started";
         break;
-    case CHIP_ERROR_LISTENER_ALREADY_STOPPED:
+    case CHIP_ERROR_LISTENER_ALREADY_STOPPED.AsInteger():
         desc = "Listener already stopped";
         break;
-    case CHIP_ERROR_UNKNOWN_TOPIC:
+    case CHIP_ERROR_UNKNOWN_TOPIC.AsInteger():
         desc = "Unknown Topic";
         break;
-    case CHIP_ERROR_TIMEOUT:
+    case CHIP_ERROR_TIMEOUT.AsInteger():
         desc = "Timeout";
         break;
-    case CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR:
+    case CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR.AsInteger():
         desc = "Invalid device descriptor";
         break;
-    case CHIP_ERROR_UNSUPPORTED_DEVICE_DESCRIPTOR_VERSION:
+    case CHIP_ERROR_UNSUPPORTED_DEVICE_DESCRIPTOR_VERSION.AsInteger():
         desc = "Unsupported device descriptor version";
         break;
-    case CHIP_END_OF_INPUT:
+    case CHIP_END_OF_INPUT.AsInteger():
         desc = "End of input";
         break;
-    case CHIP_ERROR_RATE_LIMIT_EXCEEDED:
+    case CHIP_ERROR_RATE_LIMIT_EXCEEDED.AsInteger():
         desc = "Rate limit exceeded";
         break;
-    case CHIP_ERROR_SECURITY_MANAGER_BUSY:
+    case CHIP_ERROR_SECURITY_MANAGER_BUSY.AsInteger():
         desc = "Security manager busy";
         break;
-    case CHIP_ERROR_INVALID_PASE_PARAMETER:
+    case CHIP_ERROR_INVALID_PASE_PARAMETER.AsInteger():
         desc = "Invalid PASE parameter";
         break;
-    case CHIP_ERROR_PASE_SUPPORTS_ONLY_CONFIG1:
+    case CHIP_ERROR_PASE_SUPPORTS_ONLY_CONFIG1.AsInteger():
         desc = "PASE supports only Config1";
         break;
-    case CHIP_ERROR_NO_COMMON_PASE_CONFIGURATIONS:
+    case CHIP_ERROR_NO_COMMON_PASE_CONFIGURATIONS.AsInteger():
         desc = "No supported PASE configurations in common";
         break;
-    case CHIP_ERROR_INVALID_PASE_CONFIGURATION:
+    case CHIP_ERROR_INVALID_PASE_CONFIGURATION.AsInteger():
         desc = "Invalid PASE configuration";
         break;
-    case CHIP_ERROR_KEY_CONFIRMATION_FAILED:
+    case CHIP_ERROR_KEY_CONFIRMATION_FAILED.AsInteger():
         desc = "Key confirmation failed";
         break;
-    case CHIP_ERROR_INVALID_USE_OF_SESSION_KEY:
+    case CHIP_ERROR_INVALID_USE_OF_SESSION_KEY.AsInteger():
         desc = "Invalid use of session key";
         break;
-    case CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY:
+    case CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY.AsInteger():
         desc = "Connection closed unexpectedly";
         break;
-    case CHIP_ERROR_MISSING_TLV_ELEMENT:
+    case CHIP_ERROR_MISSING_TLV_ELEMENT.AsInteger():
         desc = "Missing TLV element";
         break;
-    case CHIP_ERROR_RANDOM_DATA_UNAVAILABLE:
+    case CHIP_ERROR_RANDOM_DATA_UNAVAILABLE.AsInteger():
         desc = "Random data unavailable";
         break;
-    case CHIP_ERROR_UNSUPPORTED_HOST_PORT_ELEMENT:
+    case CHIP_ERROR_UNSUPPORTED_HOST_PORT_ELEMENT.AsInteger():
         desc = "Unsupported type in host/port list";
         break;
-    case CHIP_ERROR_INVALID_HOST_SUFFIX_INDEX:
+    case CHIP_ERROR_INVALID_HOST_SUFFIX_INDEX.AsInteger():
         desc = "Invalid suffix index in host/port list";
         break;
-    case CHIP_ERROR_HOST_PORT_LIST_EMPTY:
+    case CHIP_ERROR_HOST_PORT_LIST_EMPTY.AsInteger():
         desc = "Host/port empty";
         break;
-    case CHIP_ERROR_UNSUPPORTED_AUTH_MODE:
+    case CHIP_ERROR_UNSUPPORTED_AUTH_MODE.AsInteger():
         desc = "Unsupported authentication mode";
         break;
-    case CHIP_ERROR_INVALID_SERVICE_EP:
+    case CHIP_ERROR_INVALID_SERVICE_EP.AsInteger():
         desc = "Invalid service endpoint";
         break;
-    case CHIP_ERROR_INVALID_DIRECTORY_ENTRY_TYPE:
+    case CHIP_ERROR_INVALID_DIRECTORY_ENTRY_TYPE.AsInteger():
         desc = "Invalid directory entry type";
         break;
-    case CHIP_ERROR_FORCED_RESET:
+    case CHIP_ERROR_FORCED_RESET.AsInteger():
         desc = "Service manager forced reset";
         break;
-    case CHIP_ERROR_NO_ENDPOINT:
+    case CHIP_ERROR_NO_ENDPOINT.AsInteger():
         desc = "No endpoint was available to send the message";
         break;
-    case CHIP_ERROR_INVALID_DESTINATION_NODE_ID:
+    case CHIP_ERROR_INVALID_DESTINATION_NODE_ID.AsInteger():
         desc = "Invalid destination node id";
         break;
-    case CHIP_ERROR_NOT_CONNECTED:
+    case CHIP_ERROR_NOT_CONNECTED.AsInteger():
         desc = "Not connected";
         break;
-    case CHIP_ERROR_NO_SW_UPDATE_AVAILABLE:
+    case CHIP_ERROR_NO_SW_UPDATE_AVAILABLE.AsInteger():
         desc = "No SW update available";
         break;
-    case CHIP_ERROR_CA_CERT_NOT_FOUND:
+    case CHIP_ERROR_CA_CERT_NOT_FOUND.AsInteger():
         desc = "CA certificate not found";
         break;
-    case CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED:
+    case CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED.AsInteger():
         desc = "Certificate path length constraint exceeded";
         break;
-    case CHIP_ERROR_CERT_PATH_TOO_LONG:
+    case CHIP_ERROR_CERT_PATH_TOO_LONG.AsInteger():
         desc = "Certificate path too long";
         break;
-    case CHIP_ERROR_CERT_USAGE_NOT_ALLOWED:
+    case CHIP_ERROR_CERT_USAGE_NOT_ALLOWED.AsInteger():
         desc = "Requested certificate usage is not allowed";
         break;
-    case CHIP_ERROR_CERT_EXPIRED:
+    case CHIP_ERROR_CERT_EXPIRED.AsInteger():
         desc = "Certificate expired";
         break;
-    case CHIP_ERROR_CERT_NOT_VALID_YET:
+    case CHIP_ERROR_CERT_NOT_VALID_YET.AsInteger():
         desc = "Certificate not yet valid";
         break;
-    case CHIP_ERROR_UNSUPPORTED_CERT_FORMAT:
+    case CHIP_ERROR_UNSUPPORTED_CERT_FORMAT.AsInteger():
         desc = "Unsupported certificate format";
         break;
-    case CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE:
+    case CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE.AsInteger():
         desc = "Unsupported elliptic curve";
         break;
-    case CHIP_CERT_NOT_USED:
+    case CHIP_CERT_NOT_USED.AsInteger():
         desc = "Certificate was not used in chain validation";
         break;
-    case CHIP_ERROR_CERT_NOT_FOUND:
+    case CHIP_ERROR_CERT_NOT_FOUND.AsInteger():
         desc = "Certificate not found";
         break;
-    case CHIP_ERROR_INVALID_CASE_PARAMETER:
+    case CHIP_ERROR_INVALID_CASE_PARAMETER.AsInteger():
         desc = "Invalid CASE parameter";
         break;
-    case CHIP_ERROR_UNSUPPORTED_CASE_CONFIGURATION:
+    case CHIP_ERROR_UNSUPPORTED_CASE_CONFIGURATION.AsInteger():
         desc = "Unsupported CASE configuration";
         break;
-    case CHIP_ERROR_CERT_LOAD_FAILED:
+    case CHIP_ERROR_CERT_LOAD_FAILED.AsInteger():
         desc = "Unable to load certificate";
         break;
-    case CHIP_ERROR_CERT_NOT_TRUSTED:
+    case CHIP_ERROR_CERT_NOT_TRUSTED.AsInteger():
         desc = "Certificate not trusted";
         break;
-    case CHIP_ERROR_INVALID_ACCESS_TOKEN:
+    case CHIP_ERROR_INVALID_ACCESS_TOKEN.AsInteger():
         desc = "Invalid access token";
         break;
-    case CHIP_ERROR_WRONG_CERT_SUBJECT:
+    case CHIP_ERROR_WRONG_CERT_SUBJECT.AsInteger():
         desc = "Wrong certificate subject";
         break;
-    case CHIP_ERROR_INVALID_PROVISIONING_BUNDLE:
+    case CHIP_ERROR_INVALID_PROVISIONING_BUNDLE.AsInteger():
         desc = "Invalid provisioning bundle";
         break;
-    case CHIP_ERROR_PROVISIONING_BUNDLE_DECRYPTION_ERROR:
+    case CHIP_ERROR_PROVISIONING_BUNDLE_DECRYPTION_ERROR.AsInteger():
         desc = "Provisioning bundle decryption error";
         break;
-    case CHIP_ERROR_PASE_RECONFIGURE_REQUIRED:
+    case CHIP_ERROR_PASE_RECONFIGURE_REQUIRED.AsInteger():
         desc = "PASE reconfiguration required";
         break;
-    case CHIP_ERROR_WRONG_NODE_ID:
+    case CHIP_ERROR_WRONG_NODE_ID.AsInteger():
         desc = "Wrong node ID";
         break;
-    case CHIP_ERROR_CONN_ACCEPTED_ON_WRONG_PORT:
+    case CHIP_ERROR_CONN_ACCEPTED_ON_WRONG_PORT.AsInteger():
         desc = "Connection accepted on wrong port";
         break;
-    case CHIP_ERROR_CALLBACK_REPLACED:
+    case CHIP_ERROR_CALLBACK_REPLACED.AsInteger():
         desc = "Application callback replaced";
         break;
-    case CHIP_ERROR_NO_CASE_AUTH_DELEGATE:
+    case CHIP_ERROR_NO_CASE_AUTH_DELEGATE.AsInteger():
         desc = "No CASE auth delegate set";
         break;
-    case CHIP_ERROR_DEVICE_LOCATE_TIMEOUT:
+    case CHIP_ERROR_DEVICE_LOCATE_TIMEOUT.AsInteger():
         desc = "Timeout attempting to locate device";
         break;
-    case CHIP_ERROR_DEVICE_CONNECT_TIMEOUT:
+    case CHIP_ERROR_DEVICE_CONNECT_TIMEOUT.AsInteger():
         desc = "Timeout connecting to device";
         break;
-    case CHIP_ERROR_DEVICE_AUTH_TIMEOUT:
+    case CHIP_ERROR_DEVICE_AUTH_TIMEOUT.AsInteger():
         desc = "Timeout authenticating device";
         break;
-    case CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED:
+    case CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED.AsInteger():
         desc = "Message not acknowledged after max retries";
         break;
-    case CHIP_ERROR_RETRANS_TABLE_FULL:
+    case CHIP_ERROR_RETRANS_TABLE_FULL.AsInteger():
         desc = "Retransmit Table is already full";
         break;
-    case CHIP_ERROR_INVALID_ACK_ID:
-        desc = "Invalid Acknowledgment Id";
+    case CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER.AsInteger():
+        desc = "Invalid acknowledged message counter";
         break;
-    case CHIP_ERROR_SEND_THROTTLED:
+    case CHIP_ERROR_SEND_THROTTLED.AsInteger():
         desc = "Sending to peer is throttled on this Exchange";
         break;
-    case CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE:
+    case CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE.AsInteger():
         desc = "Message version not supported by current exchange context";
         break;
-    case CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE:
+    case CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.AsInteger():
         desc = "Required feature not supported by this configuration";
         break;
-    case CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR:
+    case CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR.AsInteger():
         desc = "Unsolicited msg with originator bit clear";
         break;
-    case CHIP_ERROR_INVALID_FABRIC_ID:
+    case CHIP_ERROR_INVALID_FABRIC_ID.AsInteger():
         desc = "Invalid Fabric Id";
         break;
-    case CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED:
+    case CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED.AsInteger():
         desc = "DRBG entropy source failed to generate entropy data";
         break;
-    case CHIP_ERROR_NO_TAKE_AUTH_DELEGATE:
+    case CHIP_ERROR_NO_TAKE_AUTH_DELEGATE.AsInteger():
         desc = "No TAKE auth delegate set";
         break;
-    case CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED:
+    case CHIP_ERROR_TAKE_RECONFIGURE_REQUIRED.AsInteger():
         desc = "TAKE requires a reconfigure";
         break;
-    case CHIP_ERROR_TAKE_REAUTH_POSSIBLE:
+    case CHIP_ERROR_TAKE_REAUTH_POSSIBLE.AsInteger():
         desc = "TAKE can do a reauthentication";
         break;
-    case CHIP_ERROR_INVALID_TAKE_PARAMETER:
+    case CHIP_ERROR_INVALID_TAKE_PARAMETER.AsInteger():
         desc = "TAKE received an invalid parameter";
         break;
-    case CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION:
+    case CHIP_ERROR_UNSUPPORTED_TAKE_CONFIGURATION.AsInteger():
         desc = "TAKE Unsupported configuration";
         break;
-    case CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED:
+    case CHIP_ERROR_TAKE_TOKEN_IDENTIFICATION_FAILED.AsInteger():
         desc = "TAKE token identification failed";
         break;
-    case CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE:
+    case CHIP_ERROR_INVALID_TOKENPAIRINGBUNDLE.AsInteger():
         desc = "Invalid Token Pairing Bundle";
         break;
-    case CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION:
+    case CHIP_ERROR_UNSUPPORTED_TOKENPAIRINGBUNDLE_VERSION.AsInteger():
         desc = "Unsupported Token Pairing Bundle version";
         break;
-    case CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER:
+    case CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER.AsInteger():
         desc = "Key not found error code received from peer";
         break;
-    case CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER:
+    case CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER.AsInteger():
         desc = "Wrong encryption type error code received from peer";
         break;
-    case CHIP_ERROR_UNKNOWN_KEY_TYPE_FROM_PEER:
+    case CHIP_ERROR_UNKNOWN_KEY_TYPE_FROM_PEER.AsInteger():
         desc = "Unknown key type error code received from peer";
         break;
-    case CHIP_ERROR_INVALID_USE_OF_SESSION_KEY_FROM_PEER:
+    case CHIP_ERROR_INVALID_USE_OF_SESSION_KEY_FROM_PEER.AsInteger():
         desc = "Invalid use of session key error code received from peer";
         break;
-    case CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE_FROM_PEER:
+    case CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE_FROM_PEER.AsInteger():
         desc = "Unsupported encryption type error code received from peer";
         break;
-    case CHIP_ERROR_INTERNAL_KEY_ERROR_FROM_PEER:
+    case CHIP_ERROR_INTERNAL_KEY_ERROR_FROM_PEER.AsInteger():
         desc = "Internal key error code received from peer";
         break;
-    case CHIP_ERROR_INVALID_KEY_ID:
+    case CHIP_ERROR_INVALID_KEY_ID.AsInteger():
         desc = "Invalid key identifier";
         break;
-    case CHIP_ERROR_INVALID_TIME:
+    case CHIP_ERROR_INVALID_TIME.AsInteger():
         desc = "Valid time value is not available";
         break;
-    case CHIP_ERROR_LOCKING_FAILURE:
+    case CHIP_ERROR_LOCKING_FAILURE.AsInteger():
         desc = "Failure to lock/unlock OS-provided lock";
         break;
-    case CHIP_ERROR_UNSUPPORTED_PASSCODE_CONFIG:
+    case CHIP_ERROR_UNSUPPORTED_PASSCODE_CONFIG.AsInteger():
         desc = "Unsupported passcode encryption configuration";
         break;
-    case CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED:
+    case CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED.AsInteger():
         desc = "Passcode authentication failed";
         break;
-    case CHIP_ERROR_PASSCODE_FINGERPRINT_FAILED:
+    case CHIP_ERROR_PASSCODE_FINGERPRINT_FAILED.AsInteger():
         desc = "Passcode fingerprint failed";
         break;
-    case CHIP_ERROR_SERIALIZATION_ELEMENT_NULL:
+    case CHIP_ERROR_SERIALIZATION_ELEMENT_NULL.AsInteger():
         desc = "Element requested is null";
         break;
-    case CHIP_ERROR_WRONG_CERT_SIGNATURE_ALGORITHM:
+    case CHIP_ERROR_WRONG_CERT_SIGNATURE_ALGORITHM.AsInteger():
         desc = "Certificate not signed with required signature algorithm";
         break;
-    case CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM:
+    case CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM.AsInteger():
         desc = "CHIP signature not signed with required signature algorithm";
         break;
-    case CHIP_ERROR_SCHEMA_MISMATCH:
+    case CHIP_ERROR_SCHEMA_MISMATCH.AsInteger():
         desc = "Schema mismatch";
         break;
-    case CHIP_ERROR_INVALID_INTEGER_VALUE:
+    case CHIP_ERROR_INVALID_INTEGER_VALUE.AsInteger():
         desc = "Invalid integer value";
         break;
-    case CHIP_ERROR_CASE_RECONFIG_REQUIRED:
+    case CHIP_ERROR_CASE_RECONFIG_REQUIRED.AsInteger():
         desc = "CASE reconfiguration required";
         break;
-    case CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS:
+    case CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS.AsInteger():
         desc = "Too many CASE reconfigurations were received";
         break;
-    case CHIP_ERROR_BAD_REQUEST:
+    case CHIP_ERROR_BAD_REQUEST.AsInteger():
         desc = "Request cannot be processed or fulfilled";
         break;
-    case CHIP_ERROR_INVALID_MESSAGE_FLAG:
+    case CHIP_ERROR_INVALID_MESSAGE_FLAG.AsInteger():
         desc = "Invalid message flag";
         break;
-    case CHIP_ERROR_KEY_EXPORT_RECONFIGURE_REQUIRED:
+    case CHIP_ERROR_KEY_EXPORT_RECONFIGURE_REQUIRED.AsInteger():
         desc = "Key export protocol required to reconfigure";
         break;
-    case CHIP_ERROR_NO_COMMON_KEY_EXPORT_CONFIGURATIONS:
+    case CHIP_ERROR_NO_COMMON_KEY_EXPORT_CONFIGURATIONS.AsInteger():
         desc = "No supported key export protocol configurations in common";
         break;
-    case CHIP_ERROR_INVALID_KEY_EXPORT_CONFIGURATION:
+    case CHIP_ERROR_INVALID_KEY_EXPORT_CONFIGURATION.AsInteger():
         desc = "Invalid key export protocol configuration";
         break;
-    case CHIP_ERROR_NO_KEY_EXPORT_DELEGATE:
+    case CHIP_ERROR_NO_KEY_EXPORT_DELEGATE.AsInteger():
         desc = "No key export protocol delegate set";
         break;
-    case CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_REQUEST:
+    case CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_REQUEST.AsInteger():
         desc = "Unauthorized key export request";
         break;
-    case CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_RESPONSE:
+    case CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_RESPONSE.AsInteger():
         desc = "Unauthorized key export response";
         break;
-    case CHIP_ERROR_EXPORTED_KEY_AUTHENTICATION_FAILED:
+    case CHIP_ERROR_EXPORTED_KEY_AUTHENTICATION_FAILED.AsInteger():
         desc = "Exported key authentication failed";
         break;
-    case CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES:
+    case CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES.AsInteger():
         desc = "Too many shared session end nodes";
         break;
-    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT:
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT.AsInteger():
         desc = "Malformed Interaction Model Attribute DataElement";
         break;
-    case CHIP_ERROR_WRONG_CERT_TYPE:
+    case CHIP_ERROR_WRONG_CERT_TYPE.AsInteger():
         desc = "Wrong certificate type";
         break;
-    case CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED:
+    case CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED.AsInteger():
         desc = "Default event handler not called";
         break;
-    case CHIP_ERROR_PERSISTED_STORAGE_FAILED:
+    case CHIP_ERROR_PERSISTED_STORAGE_FAILED.AsInteger():
         desc = "Persisted storage failed";
         break;
-    case CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND:
+    case CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND.AsInteger():
         desc = "Value not found in the persisted storage";
         break;
-    case CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED:
+    case CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED.AsInteger():
         desc = "String context already registered";
         break;
-    case CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED:
+    case CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED.AsInteger():
         desc = "String context not registered";
         break;
-    case CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION:
+    case CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION.AsInteger():
         desc = "Incompatible data schema version";
         break;
-    case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION:
+    case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION.AsInteger():
         desc = "Update Required Version mismatch";
         break;
-    case CHIP_ERROR_ACCESS_DENIED:
+    case CHIP_ERROR_ACCESS_DENIED.AsInteger():
         desc = "The CHIP message is not granted access";
         break;
-    case CHIP_ERROR_UNKNOWN_RESOURCE_ID:
+    case CHIP_ERROR_UNKNOWN_RESOURCE_ID.AsInteger():
         desc = "Unknown resource ID";
         break;
-    case CHIP_ERROR_VERSION_MISMATCH:
+    case CHIP_ERROR_VERSION_MISMATCH.AsInteger():
         desc = "Version mismatch";
         break;
-    case CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE:
+    case CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE.AsInteger():
         desc = "Legacy device doesn't support standalone Thread network creation";
         break;
-    case CHIP_ERROR_INCONSISTENT_CONDITIONALITY:
+    case CHIP_ERROR_INCONSISTENT_CONDITIONALITY.AsInteger():
         desc = "The Trait Instance is already being updated with a different conditionality";
         break;
-    case CHIP_ERROR_LOCAL_DATA_INCONSISTENT:
+    case CHIP_ERROR_LOCAL_DATA_INCONSISTENT.AsInteger():
         desc = "The local data does not match any known version of the Trait Instance";
         break;
-    case CHIP_EVENT_ID_FOUND:
+    case CHIP_EVENT_ID_FOUND.AsInteger():
         desc = "Event ID matching criteria was found";
         break;
-    case CHIP_ERROR_INTERNAL:
+    case CHIP_ERROR_INTERNAL.AsInteger():
         desc = "Internal error";
         break;
-    case CHIP_ERROR_OPEN_FAILED:
+    case CHIP_ERROR_OPEN_FAILED.AsInteger():
         desc = "Open file failed";
         break;
-    case CHIP_ERROR_READ_FAILED:
+    case CHIP_ERROR_READ_FAILED.AsInteger():
         desc = "Read from file failed";
         break;
-    case CHIP_ERROR_WRITE_FAILED:
+    case CHIP_ERROR_WRITE_FAILED.AsInteger():
         desc = "Write to file failed";
         break;
-    case CHIP_ERROR_DECODE_FAILED:
+    case CHIP_ERROR_DECODE_FAILED.AsInteger():
         desc = "Decoding failed";
         break;
-    case CHIP_ERROR_SESSION_KEY_SUSPENDED:
+    case CHIP_ERROR_SESSION_KEY_SUSPENDED.AsInteger():
         desc = "Session key suspended";
         break;
-    case CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN:
+    case CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN.AsInteger():
         desc = "Unsupported wireless regulatory domain";
         break;
-    case CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION:
+    case CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION.AsInteger():
         desc = "Unsupported wireless operating location";
         break;
-    case CHIP_ERROR_MDNS_COLLISSION:
+    case CHIP_ERROR_MDNS_COLLISSION.AsInteger():
         desc = "mDNS collission";
         break;
-    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH:
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH.AsInteger():
         desc = "Malformed Interacton Model Attribute Path";
         break;
-    case CHIP_ERROR_IM_MALFORMED_EVENT_PATH:
+    case CHIP_ERROR_IM_MALFORMED_EVENT_PATH.AsInteger():
         desc = "Malformed Interacton Model Event Path";
         break;
-    case CHIP_ERROR_IM_MALFORMED_COMMAND_PATH:
+    case CHIP_ERROR_IM_MALFORMED_COMMAND_PATH.AsInteger():
         desc = "Malformed Interacton Model Command Path";
         break;
-    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT:
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT.AsInteger():
         desc = "Malformed Interacton Model Attribute DataElement";
         break;
-    case CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT:
+    case CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT.AsInteger():
         desc = "Malformed Interacton Model Attribute DataElement";
         break;
-    case CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT:
+    case CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT.AsInteger():
         desc = "Malformed Interacton Model Event DataElement";
         break;
-    case CHIP_ERROR_IM_MALFORMED_STATUS_CODE:
+    case CHIP_ERROR_IM_MALFORMED_STATUS_CODE.AsInteger():
         desc = "Malformed Interacton Model Status Code";
         break;
-    case CHIP_ERROR_PEER_NODE_NOT_FOUND:
+    case CHIP_ERROR_PEER_NODE_NOT_FOUND.AsInteger():
         desc = "Unable to find the peer node";
+        break;
+    case CHIP_ERROR_HSM.AsInteger():
+        desc = "Hardware security module";
+        break;
+    case CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED.AsInteger():
+        desc = "Intermediate CA not required";
+        break;
+    case CHIP_ERROR_REAL_TIME_NOT_SYNCED.AsInteger():
+        desc = "Real time not synchronized";
+        break;
+    case CHIP_ERROR_UNEXPECTED_EVENT.AsInteger():
+        desc = "Unexpected event";
+        break;
+    case CHIP_ERROR_ENDPOINT_POOL_FULL.AsInteger():
+        desc = "Endpoint pool full";
+        break;
+    case CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG.AsInteger():
+        desc = "Inbound message too big";
+        break;
+    case CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG.AsInteger():
+        desc = "Outbound message too big";
+        break;
+    case CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED.AsInteger():
+        desc = "Duplicate message received";
+        break;
+    case CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW.AsInteger():
+        desc = "Message id out of window";
+        break;
+    case CHIP_ERROR_REBOOT_SIGNAL_RECEIVED.AsInteger():
+        desc = "Termination signal is received";
+        break;
+    case CHIP_ERROR_IM_STATUS_CODE_RECEIVED.AsInteger():
+        desc = "Interaction Model Error";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

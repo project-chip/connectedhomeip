@@ -8,7 +8,7 @@ You can build and program
 (RCP) firmware onto Nordic Semiconductor's
 [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle).
 Once programmed, the dongle can be used for
-[configuring Thread network on a Linux machine](linux_thread_connectivity.md).
+[configuring Thread network on a Linux machine](./openthread_border_router_pi.md).
 
 ## Building and programming the RCP firmware onto an nRF52840 Dongle
 

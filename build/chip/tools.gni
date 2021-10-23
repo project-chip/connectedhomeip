@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
 declare_args() {
   # Build CHIP tools.
-  chip_build_tools = current_os != "freertos" && current_os != "android"
+  chip_build_tools = current_os != "freertos" && current_os != "android" &&
+                     chip_device_platform != "fake"
 }

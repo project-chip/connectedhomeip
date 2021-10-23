@@ -31,28 +31,28 @@
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Shell {
 
-static int ExitHandler(int argc, char ** argv)
+static CHIP_ERROR ExitHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "Goodbye\r\n");
     exit(0);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-static int HelpHandler(int argc, char ** argv)
+static CHIP_ERROR HelpHandler(int argc, char ** argv)
 {
     Engine::Root().ForEachCommand(PrintCommandHelp, nullptr);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-static int VersionHandler(int argc, char ** argv)
+static CHIP_ERROR VersionHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "CHIP %s\r\n", CHIP_VERSION_STRING);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 void RegisterMetaCommands()

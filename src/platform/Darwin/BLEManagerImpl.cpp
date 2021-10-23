@@ -24,10 +24,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/BleApplicationDelegate.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
 #include <platform/Darwin/BlePlatformDelegate.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <new>
 
@@ -52,7 +52,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     BleApplicationDelegateImpl * appDelegate   = new BleApplicationDelegateImpl();
     BleConnectionDelegateImpl * connDelegate   = new BleConnectionDelegateImpl();
     BlePlatformDelegateImpl * platformDelegate = new BlePlatformDelegateImpl();
-    err                                        = BleLayer::Init(platformDelegate, connDelegate, appDelegate, &SystemLayer);
+    err = BleLayer::Init(platformDelegate, connDelegate, appDelegate, &DeviceLayer::SystemLayer());
     return err;
 }
 

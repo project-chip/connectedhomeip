@@ -20,8 +20,6 @@
 #include "AppTask.h"
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip::System::Platform::Layer;
-
 void LEDWidget::Init(gpio_num_t gpioNum)
 {
     mLastChangeTimeUS = 0;
@@ -63,11 +61,11 @@ void LEDWidget::Animate()
 {
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
-        int64_t nowUS            = GetClock_MonotonicHiRes();
-        int64_t stateDurUS       = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
-        int64_t nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
+        chip::System::Clock::MonotonicMicroseconds nowUS            = chip::System::SystemClock().GetMonotonicMicroseconds();
+        chip::System::Clock::MonotonicMicroseconds stateDurUS       = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
+        chip::System::Clock::MonotonicMicroseconds nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
 
-        if (nowUS > nextChangeTimeUS)
+        if (nextChangeTimeUS < nowUS)
         {
             DoSet(!mState);
             mLastChangeTimeUS = nowUS;

@@ -40,6 +40,7 @@ android_library("java") {
   ]
 
   sources = [
+    "src/chip/setuppayload/DiscoveryCapability.java",
     "src/chip/setuppayload/OptionalQRCodeInfo.java",
     "src/chip/setuppayload/SetupPayload.java",
     "src/chip/setuppayload/SetupPayloadParser.java",

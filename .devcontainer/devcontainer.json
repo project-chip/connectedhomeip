@@ -4,7 +4,11 @@
         "--cap-add=SYS_PTRACE",
         "--security-opt",
         "seccomp=unconfined",
-        "--network=host"
+        "--network=host",
+        "-v",
+        "/dev/bus/usb:/dev/bus/usb:ro",
+        "--device-cgroup-rule=a 189:* rmw",
+        "--add-host=host.docker.internal:host-gateway"
     ],
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
@@ -12,8 +16,7 @@
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
-            //  "BUILD_VERSION": "$(cat integrations/docker/images/chip-build/version)" // trying to get this to work
-            "BUILD_VERSION": "latest"
+            "BUILD_VERSION": "0.5.18"
         }
     },
     "remoteUser": "vscode",
@@ -33,7 +36,8 @@
         "redhat.vscode-yaml",
         "christian-kohler.path-intellisense",
         "knisterpeter.vscode-github",
-        "npclaudiu.vscode-gn"
+        "npclaudiu.vscode-gn",
+        "marus25.cortex-debug"
     ],
     // Use 'settings' to set *default* container specific settings.json values on container create.
     // You can edit these settings after create using File > Preferences > Settings > Remote.

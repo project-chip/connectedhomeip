@@ -101,6 +101,7 @@ COMPONENT_ADD_INCLUDEDIRS +=   $(REL_OUTPUT_DIR)/src/include \
 COMPONENT_OWNBUILDTARGET 	 = 1
 COMPONENT_OWNCLEANTARGET 	 = 1
 
+is_debug ?= true
 
 # ==================================================
 # Build Rules
@@ -134,6 +135,7 @@ ifeq ($(is_debug),false)
 endif
 	if [[ "$(CONFIG_ENABLE_PW_RPC)" = "y" ]]; then                        \
 	  echo "chip_build_pw_rpc_lib = true" >> $(OUTPUT_DIR)/args.gn       ;\
+	  echo "remove_default_configs = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]" >> $(OUTPUT_DIR)/args.gn		;\
 	  echo "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"" >> $(OUTPUT_DIR)/args.gn     ;\
 	  echo "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"" >> $(OUTPUT_DIR)/args.gn ;\
 	  echo "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"" >> $(OUTPUT_DIR)/args.gn      ;\
@@ -144,6 +146,9 @@ endif
 	fi
 	if [[ "$(CONFIG_USE_MINIMAL_MDNS)" = "n" ]]; then \
 	  echo "chip_mdns = platform" >> $(OUTPUT_DIR)/args.gn ;\
+	fi
+	if [[ "$(CONFIG_DISABLE_IPV4)" = "y" ]]; then \
+	  echo "chip_inet_config_enable_ipv4 = false" >> $(OUTPUT_DIR)/args.gn ;\
 	fi
 	echo "Written file $(OUTPUT_DIR)/args.gn"
 	cd $(CHIP_ROOT) && PW_ENVSETUP_QUIET=1 . scripts/activate.sh && cd $(COMPONENT_PATH) && gn gen --check --fail-on-unused-args $(OUTPUT_DIR)

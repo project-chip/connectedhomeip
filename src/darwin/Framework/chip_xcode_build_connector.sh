@@ -72,6 +72,25 @@ for define in "${defines[@]}"; do
 done
 target_defines=[${target_defines:1}]
 
+declare target_cpu=
+case $PLATFORM_PREFERRED_ARCH in
+    i386)
+        target_cpu=x86
+        ;;
+    x86_64)
+        target_cpu=x64
+        ;;
+    armv7)
+        target_cpu=arm
+        ;;
+    arm64)
+        target_cpu=arm64
+        ;;
+    *)
+        echo >&2
+        ;;
+esac
+
 declare target_cflags='"-target","'"$PLATFORM_PREFERRED_ARCH"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"'
 
 read -r -a archs <<<"$ARCHS"
@@ -93,7 +112,7 @@ declare -a args=(
     'chip_device_project_config_include=""'
     'chip_inet_project_config_include=""'
     'chip_system_project_config_include=""'
-    'target_cpu="'"$PLATFORM_PREFERRED_ARCH"'"'
+    'target_cpu="'"$target_cpu"'"'
     'target_defines='"$target_defines"
     'target_cflags=['"$target_cflags"']'
 )

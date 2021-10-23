@@ -19,12 +19,20 @@ import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
+declare_args() {
+  # Use a separate eventloop for CHIP tasks
+  config_use_separate_eventloop = true
+}
+
 executable("chip-tool") {
   sources = [
     "commands/clusters/ModelCommand.cpp",
+    "commands/common/CHIPCommand.cpp",
+    "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
     "commands/discover/DiscoverCommand.cpp",
+    "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
@@ -35,6 +43,8 @@ executable("chip-tool") {
     "main.cpp",
   ]
 
+  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
+
   deps = [
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
@@ -43,6 +53,11 @@ executable("chip-tool") {
   ]
 
   cflags = [ "-Wconversion" ]
+
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/chip-tool",
+  ]
 
   output_dir = root_out_dir
 }

@@ -37,7 +37,6 @@ efr32_sdk("sdk") {
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   defines = [
@@ -45,7 +44,6 @@ efr32_sdk("sdk") {
     "HAL_VCOM_ENABLE=1",
     "EFR32_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
-    "SL_HEAP_SIZE=(10 * 1024)",
   ]
 }
 
@@ -57,6 +55,7 @@ efr32_executable("pigweed_app") {
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/PigweedLogger.cpp",
+    "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
     "src/main.cpp",
@@ -74,11 +73,7 @@ efr32_executable("pigweed_app") {
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
 
-  if (efr32_family == "efr32mg12") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
-  } else if (efr32_family == "efr32mg21") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
-  }
+  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
 
   inputs = [ ldscript ]
 

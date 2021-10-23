@@ -25,15 +25,15 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <app-common/zap-generated/enums.h>
 #include <ifaddrs.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <netpacket/packet.h>
-
-#include <core/CHIPVendorIdentifiers.hpp>
 #include <platform/ConfigurationManager.h>
 #include <platform/Linux/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -44,9 +44,10 @@ using namespace ::chip::DeviceLayer::Internal;
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
-CHIP_ERROR ConfigurationManagerImpl::_Init()
+CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
+    uint32_t rebootCount;
     bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
@@ -58,14 +59,41 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
     SuccessOrExit(err);
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
+    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
     SuccessOrExit(err);
 
+    if (ConfigValueExists(kCounterKey_RebootCount))
+    {
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+
+        err = StoreRebootCount(rebootCount + 1);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
+
+    if (!ConfigValueExists(kCounterKey_TotalOperationalHours))
+    {
+        err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
+    }
+
+    if (!ConfigValueExists(kCounterKey_BootReason))
+    {
+        err = StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        SuccessOrExit(err);
+    }
+
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (_GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
         ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        _InitiateFactoryReset();
+        InitiateFactoryReset();
     }
 
     err = CHIP_NO_ERROR;
@@ -74,7 +102,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     struct ifaddrs * addresses = NULL;
     CHIP_ERROR error           = CHIP_NO_ERROR;
@@ -101,18 +129,18 @@ exit:
     return error;
 }
 
-bool ConfigurationManagerImpl::_CanFactoryReset()
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     // TODO(#742): query the application to determine if factory reset is allowed.
     return true;
 }
 
-void ConfigurationManagerImpl::_InitiateFactoryReset()
+void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
 
@@ -124,7 +152,7 @@ CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
@@ -179,7 +207,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to factory reset configurations: %s", ErrorStr(err));
+    }
+
+    err = FactoryResetCounters();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to factory reset counters: %s", ErrorStr(err));
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -192,6 +226,36 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting (not implemented)");
     // TODO(#742): restart CHIP exe
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReasons(uint32_t & bootReasons)
+{
+    return ReadConfigValue(kCounterKey_BootReason, bootReasons);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReasons(uint32_t bootReasons)
+{
+    return WriteConfigValue(kCounterKey_BootReason, bootReasons);
 }
 
 } // namespace DeviceLayer

@@ -23,9 +23,9 @@
 
 #include <protocols/bdx/BdxMessages.h>
 
-#include <support/BufferReader.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
 
 #include <limits>
 #include <utility>

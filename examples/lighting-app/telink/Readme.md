@@ -5,25 +5,33 @@
 1. Pull docker image from repository:
 
     ```
-    $ docker pull alexkolosovtelinksemi/chip-build-telink:latest
+    $ docker pull connectedhomeip/chip-build-telink:latest
     ```
 
 1. Run docker container:
 
     ```
-    $ docker run -it -v ${CHIP_BASE}:/root/chip alexkolosovtelinksemi/chip-build-telink:latest
+    $ docker run -it -v ${CHIP_BASE}:/root/chip connectedhomeip/chip-build-telink:latest
     ```
 
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
-    attention that OUTPUT_DIR should conatins ABSOLUTE path to output dir**
+    attention that OUTPUT_DIR should contains ABSOLUTE path to output dir**
+
+1. Bootstrap the build environment:
+
+    ```
+    source ./scripts/bootstrap.sh
+    ```
 
 1. Run build script:
+
     ```
-    cd /root/chip/scripts/examples && ./telink_example.sh
+    ./scripts/build/build_examples.py --target telink-tlsr9518adk80d-light build
     ```
+
 1. Exit docker container and collect build artifacts. Firmware binary would be
    located in
-   **\${CHIP_BASE}/examples/lighting-app/telink/build/tlsr9518adk80d/zephyr/zephyr.bin**
+   **\${CHIP_BASE}/out/telink-tlsr9518adk80d-light/zephyr/zephyr.bin**
 
 ## Flash
 
@@ -71,7 +79,7 @@ $ BORDER_ROUTING=0 NETWORK_MANAGER=1 ./script/setup
 
 ### Setup IPv6
 
-Pay attention that border router shoud be configured as IPv6 access point.
+Pay attention that border router should be configured as IPv6 access point.
 
 1. To do so perform the following command:
     ```
@@ -86,7 +94,7 @@ Pay attention that border router shoud be configured as IPv6 access point.
 ### Config network
 
 Use [Web GUI](https://openthread.io/guides/border-router/web-gui) to config
-Thread network **tlsr9518adk80d** board supports only static comissioning with
+Thread network **tlsr9518adk80d** board supports only static commissioning with
 predefined Thread credentials shown in table below:
 
 | Item                   |              Value               |
@@ -115,11 +123,11 @@ To get output from device, connect UART to following pins:
 
 The following buttons are available on **tlsr9518adk80d** board:
 
-| Name     | Function         | Description                                                                                           |
-| :------- | :--------------- | :---------------------------------------------------------------------------------------------------- |
-| Button 1 | Factory reset    | Perform factory reset to forget currently commissioned Thread network and back to uncommisioned state |
-| Button 2 | Lighting control | Manually triggers the lighting state                                                                  |
-| Button 3 | Thread start     | Comission thread with static credentials and enables the Thread on device                             |
+| Name     | Function         | Description                                                                                            |
+| :------- | :--------------- | :----------------------------------------------------------------------------------------------------- |
+| Button 1 | Factory reset    | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
+| Button 2 | Lighting control | Manually triggers the lighting state                                                                   |
+| Button 3 | Thread start     | Commission thread with static credentials and enables the Thread on device                             |
 
 ### LEDs
 
@@ -128,7 +136,7 @@ following states:
 
 | State                       | Description                                                                  |
 | :-------------------------- | :--------------------------------------------------------------------------- |
-| Blinks with short pulses    | Device is not commisioned to Thread, Thred is disabled                       |
+| Blinks with short pulses    | Device is not commissioned to Thread, Thread is disabled                     |
 | Blinls with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
 | Blinks with whde pulses     | Device commissioned and joined to thread network as CHILD                    |
 
@@ -139,7 +147,7 @@ following states:
 1. With your client device (PC, Laptop etc.) connect to BorderRouterAP WiFi
 2. Press Button 3 on **tlsr9518adk80d** board and wait till it joins to Thread
    network
-3. Find ajusted IPv6 address in UART output of **tlsr9518adk80d**
+3. Find adjusted IPv6 address in UART output of **tlsr9518adk80d**
 4. Perform following command on your client device:
     ```
     ping -6 ${IP_ADDRESS_OF_CHIP_DEVICE}
@@ -155,13 +163,14 @@ following states:
 1. Pair with device
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool pairing bypass ${IP_ADDRESS_OF_CHIP_DEVICE} 11097
+    ${CHIP_TOOL_DIR}/chip-tool pairing bypass ${NODE_ID_TO_ASSIGN} ${IP_ADDRESS_OF_CHIP_DEVICE} 5540
     ```
 
     here:
 
+    - \${NODE_ID_TO_ASSIGN} is the node id to assign to the lightbulb
     - `${IP_ADDRESS_OF_CHIP_DEVICE}` is IPv6 address of CHIP device
-    - **11097** is standart CHIP TCP port
+    - **5540** is the standard CHIP TCP port
 
 1. Switch on the light:
 

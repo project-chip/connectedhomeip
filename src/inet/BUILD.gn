@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,9 +36,6 @@ buildconfig_header("inet_buildconfig") {
   defines = [
     "INET_CONFIG_TEST=${chip_build_tests}",
     "INET_CONFIG_ENABLE_IPV4=${chip_inet_config_enable_ipv4}",
-    "INET_CONFIG_ENABLE_DNS_RESOLVER=${chip_inet_config_enable_dns_resolver}",
-    "INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS=${chip_inet_config_enable_async_dns_sockets}",
-    "INET_CONFIG_ENABLE_RAW_ENDPOINT=${chip_inet_config_enable_raw_endpoint}",
     "INET_CONFIG_ENABLE_TCP_ENDPOINT=${chip_inet_config_enable_tcp_endpoint}",
     "INET_CONFIG_ENABLE_UDP_ENDPOINT=${chip_inet_config_enable_udp_endpoint}",
     "HAVE_LWIP_RAW_BIND_NETIF=true",
@@ -89,10 +86,8 @@ static_library("inet") {
     "InetInterface.h",
     "InetLayer.cpp",
     "InetLayer.h",
-    "InetLayerBasis.cpp",
     "InetLayerBasis.h",
     "InetLayerEvents.h",
-    "InetUtils.cpp",
     "arpa-inet-compatibility.h",
   ]
 
@@ -104,15 +99,8 @@ static_library("inet") {
     "${nlio_root}:nlio",
   ]
 
-  if (chip_with_lwip) {
+  if (chip_system_config_use_lwip) {
     public_deps += [ "${chip_root}/src/lwip" ]
-  }
-
-  if (chip_inet_config_enable_raw_endpoint) {
-    sources += [
-      "RawEndPoint.cpp",
-      "RawEndPoint.h",
-    ]
   }
 
   if (chip_inet_config_enable_tcp_endpoint) {
@@ -126,20 +114,6 @@ static_library("inet") {
     sources += [
       "UDPEndPoint.cpp",
       "UDPEndPoint.h",
-    ]
-  }
-
-  if (chip_inet_config_enable_dns_resolver) {
-    sources += [
-      "DNSResolver.cpp",
-      "DNSResolver.h",
-    ]
-  }
-
-  if (chip_inet_config_enable_async_dns_sockets) {
-    sources += [
-      "AsyncDNSResolverSockets.cpp",
-      "AsyncDNSResolverSockets.h",
     ]
   }
 

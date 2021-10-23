@@ -18,10 +18,9 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #include <algorithm>
-#include <cassert>
 #include <new>
 #include <type_traits>
 #include <typeinfo>
@@ -29,64 +28,103 @@
 
 namespace chip {
 
-namespace Internal {
+namespace VariantInternal {
 
-template <typename... Ts>
+template <std::size_t Index, typename... Ts>
 struct VariantCurry;
 
-template <typename T, typename... Ts>
-struct VariantCurry<T, Ts...>
+template <std::size_t Index, typename T, typename... Ts>
+struct VariantCurry<Index, T, Ts...>
 {
     inline static void Destroy(std::size_t id, void * data)
     {
-        if (id == T::VariantId)
+        if (id == Index)
             reinterpret_cast<T *>(data)->~T();
         else
-            VariantCurry<Ts...>::Destroy(id, data);
+            VariantCurry<Index + 1, Ts...>::Destroy(id, data);
     }
 
     inline static void Move(std::size_t that_t, void * that_v, void * this_v)
     {
-        if (that_t == T::VariantId)
+        if (that_t == Index)
             new (this_v) T(std::move(*reinterpret_cast<T *>(that_v)));
         else
-            VariantCurry<Ts...>::Move(that_t, that_v, this_v);
+            VariantCurry<Index + 1, Ts...>::Move(that_t, that_v, this_v);
     }
 
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v)
     {
-        if (that_t == T::VariantId)
+        if (that_t == Index)
+        {
             new (this_v) T(*reinterpret_cast<const T *>(that_v));
+        }
         else
-            VariantCurry<Ts...>::Copy(that_t, that_v, this_v);
+        {
+            VariantCurry<Index + 1, Ts...>::Copy(that_t, that_v, this_v);
+        }
+    }
+
+    inline static bool Equal(std::size_t type_t, const void * that_v, const void * this_v)
+    {
+        if (type_t == Index)
+        {
+            return *reinterpret_cast<const T *>(this_v) == *reinterpret_cast<const T *>(that_v);
+        }
+        else
+        {
+            return VariantCurry<Index + 1, Ts...>::Equal(type_t, that_v, this_v);
+        }
     }
 };
 
-template <>
-struct VariantCurry<>
+template <std::size_t Index>
+struct VariantCurry<Index>
 {
     inline static void Destroy(std::size_t id, void * data) {}
     inline static void Move(std::size_t that_t, void * that_v, void * this_v) {}
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v) {}
+    inline static bool Equal(std::size_t type_t, const void * that_v, const void * this_v)
+    {
+        VerifyOrDie(false);
+        return false;
+    }
 };
 
-} // namespace Internal
+template <typename T, typename TupleType>
+class TupleIndexOfType
+{
+private:
+    template <std::size_t Index>
+    static constexpr
+        typename std::enable_if<std::is_same<T, typename std::tuple_element<Index, TupleType>::type>::value, std::size_t>::type
+        calculate()
+    {
+        return Index;
+    }
+
+    template <std::size_t Index>
+    static constexpr
+        typename std::enable_if<!std::is_same<T, typename std::tuple_element<Index, TupleType>::type>::value, std::size_t>::type
+        calculate()
+    {
+        return calculate<Index + 1>();
+    }
+
+public:
+    static constexpr std::size_t value = calculate<0>();
+};
+
+} // namespace VariantInternal
 
 /**
  * @brief
  *   Represents a type-safe union. An instance of Variant at any given time either holds a value of one of its
- *   alternative types, or no value. Each type must define a unique value of a static field named VariantId.
+ *   alternative types, or no value.
  *
  *   Example:
- *     struct Type1
- *     {
- *         static constexpr const std::size_t VariantId = 1;
- *     };
+ *     struct Type1 {};
  *
- *     struct Type2
- *     {
- *         static constexpr const std::size_t VariantId = 2;
- *     };
+ *     struct Type2 {};
  *
  *     Variant<Type1, Type2> v;
  *     v.Set<Type1>(); // v contains Type1
@@ -101,7 +139,7 @@ private:
     static constexpr std::size_t kInvalidType = SIZE_MAX;
 
     using Data  = typename std::aligned_storage<kDataSize, kDataAlign>::type;
-    using Curry = Internal::VariantCurry<Ts...>;
+    using Curry = VariantInternal::VariantCurry<0, Ts...>;
 
     std::size_t mTypeId;
     Data mData;
@@ -136,10 +174,15 @@ public:
         return *this;
     }
 
+    bool operator==(const Variant & other) const
+    {
+        return GetType() == other.GetType() && (!Valid() || Curry::Equal(mTypeId, &other.mData, &mData));
+    }
+
     template <typename T>
     bool Is() const
     {
-        return (mTypeId == T::VariantId);
+        return (mTypeId == VariantInternal::TupleIndexOfType<T, std::tuple<Ts...>>::value);
     }
 
     std::size_t GetType() const { return mTypeId; }
@@ -151,20 +194,20 @@ public:
     {
         Curry::Destroy(mTypeId, &mData);
         new (&mData) T(std::forward<Args>(args)...);
-        mTypeId = T::VariantId;
+        mTypeId = VariantInternal::TupleIndexOfType<T, std::tuple<Ts...>>::value;
     }
 
     template <typename T>
     T & Get()
     {
-        VerifyOrDie(mTypeId == T::VariantId);
+        VerifyOrDie((mTypeId == VariantInternal::TupleIndexOfType<T, std::tuple<Ts...>>::value));
         return *reinterpret_cast<T *>(&mData);
     }
 
     template <typename T>
     const T & Get() const
     {
-        VerifyOrDie(mTypeId == T::VariantId);
+        VerifyOrDie((mTypeId == VariantInternal::TupleIndexOfType<T, std::tuple<Ts...>>::value));
         return *reinterpret_cast<const T *>(&mData);
     }
 

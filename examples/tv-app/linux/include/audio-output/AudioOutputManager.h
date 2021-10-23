@@ -18,15 +18,13 @@
 
 #pragma once
 
-#include <app/common/gen/af-structs.h>
+#include <app/AttributeAccessInterface.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <vector>
 class AudioOutputManager
 {
 public:
     CHIP_ERROR Init();
-    bool proxySelectOutputRequest(uint8_t index);
-    bool proxyRenameOutputRequest(uint8_t index, uint8_t * name);
-    std::vector<EmberAfAudioOutputInfo> proxyGetListOfAudioOutputInfo();
+    CHIP_ERROR proxyGetListOfAudioOutputInfo(chip::app::AttributeValueEncoder & aEncoder);
 };

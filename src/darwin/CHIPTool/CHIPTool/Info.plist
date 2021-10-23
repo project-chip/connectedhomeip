@@ -26,7 +26,7 @@
 	<string>Used to connect to the peripheral</string>
 	<key>NSBonjourServices</key>
 	<array>
-		<string>_chip._tcp</string>
+		<string>_matter._tcp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Used to scan QR code</string>

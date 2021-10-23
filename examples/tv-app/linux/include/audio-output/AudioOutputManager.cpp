@@ -18,15 +18,11 @@
 
 #include "AudioOutputManager.h"
 
-#include <app/Command.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include <map>
 #include <string>
@@ -44,48 +40,32 @@ CHIP_ERROR AudioOutputManager::Init()
     return err;
 }
 
-vector<EmberAfAudioOutputInfo> AudioOutputManager::proxyGetListOfAudioOutputInfo()
+CHIP_ERROR AudioOutputManager::proxyGetListOfAudioOutputInfo(chip::app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
-    vector<EmberAfAudioOutputInfo> audioOutputInfos;
-    int maximumVectorSize = 3;
-    char name[]           = "exampleName";
+    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // TODO: Insert code here
+        int maximumVectorSize = 3;
+        char name[]           = "exampleName";
 
-    for (int i = 0; i < maximumVectorSize; ++i)
-    {
-        EmberAfAudioOutputInfo audioOutputInfo;
-        audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
-        audioOutputInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
-        audioOutputInfo.index      = static_cast<uint8_t>(1 + i);
-        audioOutputInfos.push_back(audioOutputInfo);
-    }
-
-    return audioOutputInfos;
+        for (int i = 0; i < maximumVectorSize; ++i)
+        {
+            chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::Type audioOutputInfo;
+            audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
+            audioOutputInfo.name       = chip::CharSpan(name, sizeof(name) - 1);
+            audioOutputInfo.index      = static_cast<uint8_t>(1 + i);
+            ReturnErrorOnFailure(encoder.Encode(audioOutputInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
-bool AudioOutputManager::proxySelectOutputRequest(uint8_t index)
-{
-    // TODO: Insert code here
-    return true;
-}
-bool AudioOutputManager::proxyRenameOutputRequest(uint8_t index, uint8_t * name)
+bool audioOutputClusterSelectOutput(uint8_t index)
 {
     // TODO: Insert code here
     return true;
 }
-
-bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * command, unsigned char index, uint8_t * name)
+bool audioOutputClusterRenameOutput(uint8_t index, const chip::CharSpan & name)
 {
-    bool success         = AudioOutputManager().proxyRenameOutputRequest(index, name);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-
-bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::Command * command, unsigned char index)
-{
-    bool success         = AudioOutputManager().proxySelectOutputRequest(index);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
+    // TODO: Insert code here
     return true;
 }

@@ -1,12 +1,33 @@
 {{> header}}
+
+{{#if (chip_has_client_clusters)}}
 #include "CHIPClusters.h"
 
 #include <cstdint>
 
-#include "chip-zcl-zpro-codec-api.h"
-#include <lib/support/Span.h>
+
+#include <app/InteractionModelEngine.h>
+#include <app/chip-zcl-zpro-codec.h>
+#include <app/util/basic-types.h>
+#include <app/CommandSender.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <controller/CommandSenderAllocator.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
+
+using namespace app::Clusters;
+using namespace System;
+using namespace Encoding::LittleEndian;
+
 namespace Controller {
 
 // TODO(#4502): onCompletion is not used by IM for now.
@@ -15,12 +36,11 @@ namespace Controller {
 
 {{#chip_client_clusters}}
 
-// {{asCamelCased name false}} Cluster Commands
-{{#chip_server_cluster_commands}}
-CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
+// {{asUpperCamelCase name}} Cluster Commands
+{{#chip_cluster_commands}}
+CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}})
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
 
@@ -30,80 +50,118 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
-                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    CommandSenderHandle sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-{{#chip_server_cluster_command_arguments}}
+{{#chip_cluster_command_arguments_with_structs_expanded}}
 {{#first}}
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
-    // {{asCamelCased label}}: {{asCamelCased type}}
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
+    // {{asLowerCamelCase label}}: {{asLowerCamelCase type}}
+{{#if (isCharString type)}}
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}.data()));
+{{else}}
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
+{{/if}}
 {{else}}
     // Command takes no arguments.
-{{/chip_server_cluster_command_arguments}}
+{{/chip_cluster_command_arguments_with_structs_expanded}}
 
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    err = mDevice->SendCommands(sender);
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
 
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object now.
+    sender.release();
 exit:
-    // On error, we are responsible to close the sender.
-    if (err != CHIP_NO_ERROR && sender != nullptr)
-    {
-        sender->Shutdown();
-    }
     return err;
 }
 
-{{/chip_server_cluster_commands}}
-// {{asCamelCased name false}} Cluster Attributes
-CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased name false}}ClusterDiscoverAttributes(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-}
+{{/chip_cluster_commands}}
+// {{asUpperCamelCase name}} Cluster Attributes
 {{#chip_server_cluster_attributes}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = {{asHex code 8}};
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,{{#if isList}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter{{else}}BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>{{/if}});
 }
 
-{{#if (isWritableAttribute)}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
+{{#if isWritableAttribute}}
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(seqNum, mEndpoint, value);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId         = mDevice->GetDeviceId();
+    attributePath.mEndpointId     = mEndpoint;
+    attributePath.mClusterId      = mClusterId;
+    attributePath.mFieldId        = {{ asHex code 8 }};
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 {{/if}}
-{{#if (isReportableAttribute)}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
+{{#if isReportableAttribute}}
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(seqNum, mEndpoint, minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReportAttribute{{asCamelCased name false}}(Callback::Cancelable * onReportCallback)
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReportAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onReportCallback)
 {
-    return RequestAttributeReporting({{asHex code 4}}, onReportCallback);
+    return RequestAttributeReporting({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id, onReportCallback, BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>);
 }
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
+
+{{#chip_cluster_commands}}
+{{#*inline "requestType"}}chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type{{/inline}}
+{{#*inline "responseType"}}chip::app::{{#if hasSpecificResponse}}Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase response.name}}::DecodableType{{else}}DataModel::NullObjectType{{/if}}{{/inline}}
+template CHIP_ERROR ClusterBase::InvokeCommand<{{>requestType}}, {{>responseType}}>(const {{>requestType}} &, void *, CommandResponseSuccessCallback<{{>responseType}}>, CommandResponseFailureCallback);
+{{/chip_cluster_commands}}
 {{/chip_client_clusters}}
+
+template <typename RequestDataT, typename ResponseDataT>
+CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
+                         CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
+
+    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
+        successCb(context, responseData);
+    };
+
+    auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+        failureCb(context, app::ToEmberAfStatus(aIMStatus));
+    };
+
+    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                               requestData, onSuccessCb, onFailureCb);
+};
 
 } // namespace Controller
 } // namespace chip
+{{/if}}

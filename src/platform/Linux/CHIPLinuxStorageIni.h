@@ -26,8 +26,8 @@
 #pragma once
 
 #include <inipp/inipp.h>
+#include <lib/support/ScopedBuffer.h>
 #include <platform/PersistedStorage.h>
-#include <support/ScopedBuffer.h>
 
 namespace chip {
 namespace DeviceLayer {

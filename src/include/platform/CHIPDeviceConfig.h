@@ -28,7 +28,7 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 #endif
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 /* Include a project-specific configuration file, if defined.
  *
@@ -178,7 +178,7 @@
  * persistent storage (e.g. by a factory provisioning process).
  */
 #ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION 1
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION 0
 #endif
 
 /**
@@ -196,7 +196,7 @@
  * A monothonic number identifying the firmware revision running on the device.
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION 1
+#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION 0
 #endif
 
 /**
@@ -297,7 +297,7 @@
  * Enable support for a WiFi AP interface.
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 1
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 #endif
 
 /**
@@ -588,77 +588,6 @@
 #define CHIP_DEVICE_CONFIG_SERVICE_PROVISIONING_REQUEST_TIMEOUT 10000
 #endif
 
-// -------------------- Just-In-Time Provisioning Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
- *
- * Enable just-in-time provisioning functionality in the chip Device Layer.
- *
- * When enabled, device creates and uses its ephemeral operational credentials:
- *   - operational device id
- *   - operational device self-signed certificate
- *   - operational device private key
- * When enabled, device also implements certificate provisioning protocol and uses it to obtain
- * service assigned certificate from the Certification Authority Service.
- *
- * Then, device uses these credentials to authenticate and communicate to other chip nodes.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-#define CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING 0
-#endif
-
-// -------------------- Service Discovery Configuration -----------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_MDNS
- *
- * Enable support to use MDNS for service advertising and discovery in CHIP.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_MDNS
-#define CHIP_DEVICE_CONFIG_ENABLE_MDNS 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
- *
- * Enable MDNS commissionable node advertising when not yet provisioned.
- *
- * This should be 1 for WiFi SoftAP devices, ethernet devices, and (probably) bridge devices
- *
- * This should be 0 for Thread/BLE devices and WiFi/BLE devices
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
-#define CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
- *
- * Maximum number of CHIP Commissioners or Commissionable Nodes that can be discovered
- */
-#ifndef CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
-#define CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES 10
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
- *
- * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
- *
- * Amount of services available for advertising using SRP.
- */
-#ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
-#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES 3
-#endif
-
 // -------------------- Thread Configuration --------------------
 
 /**
@@ -750,6 +679,42 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 #define CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+ *
+ * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
+ *
+ * Amount of services available for advertising using SRP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_DEVICE_ADMINS + 1)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+ *
+ * Enable support to Commissionable Discovery for Thread devices.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+ *
+ * Enable support to DNS client usage for resolving and browsing services in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
 #endif
 
 // -------------------- Trait Manager Configuration --------------------
@@ -1085,17 +1050,89 @@
 #define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME __TIME__
 #endif
 
-// -------------------- Device DNS-SD Advertising Configuration --------------------
+// -------------------- Device DNS-SD Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+ *
+ * Enable support to use DNS-SD for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+#define CHIP_DEVICE_CONFIG_ENABLE_DNSSD 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
+ *
+ * Enable MDNS commissionable node advertising when not yet provisioned.
+ *
+ * This should be 1 for WiFi SoftAP devices, ethernet devices, and (probably) bridge devices
+ *
+ * This should be 0 for Thread/BLE devices and WiFi/BLE devices
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 0
+#else
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 1
+#endif
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
+ *
+ * Time in seconds that a factory new device will advertise commissionable node discovery.
+ *
+ * Only valid when CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY==1
+ */
+#ifndef CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS 15 * 60
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
+ *
+ * Maximum number of CHIP Commissioners or Commissionable Nodes that can be discovered
+ */
+#ifndef CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
+#define CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES 10
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
  *
  * Enable or disable whether this device advertises as a commissioner.
  *
+ * Depends upon CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE set to 1
+ *
  * For Video Players, this value will be 1
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+ *
+ * Enable including commissioner code (CHIPDeviceController.cpp) in the commissionee (Server.cpp) code.
+ *
+ * For Video Players, this value will be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+ *
+ * Enable or disable whether this device will attempt to
+ * discover commissioners and send Uder Directed Commissioning
+ * messages to them.
+ *
+ * For Video Player Clients, this value will be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT 0
 #endif
 
 /**
@@ -1107,6 +1144,18 @@
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 0
 #endif
+
+/**
+ * CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS
+ *
+ * Default time in seconds that a device will advertise commissionable node discovery
+ * after commissioning mode ends. This value can be overridden by the user.
+ *
+ * Only valid when CCHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY==1
+ */
+#define CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED 0
+#define CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT -1
+#define CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE

@@ -23,15 +23,16 @@
 
 #pragma once
 
-#include "CommandDataElement.h"
+#include "CommandDataIB.h"
 #include "ListBuilder.h"
 #include "ListParser.h"
 
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -61,16 +62,16 @@ class Builder : public ListBuilder
 {
 public:
     /**
-     *  @brief Initialize a CommandDataElement::Builder for writing into the TLV stream
+     *  @brief Initialize a CommandDataIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to CommandDataElement::Builder
+     *  @return A reference to CommandDataIB::Builder
      */
-    CommandDataElement::Builder & CreateCommandDataElementBuilder();
+    CommandDataIB::Builder & CreateCommandDataIBBuilder();
 
     /**
-     *  @return A reference to CommandDataElement::Builder
+     *  @return A reference to CommandDataIB::Builder
      */
-    CommandDataElement::Builder & GetCommandDataElementBuilder() { return mCommandDataElementBuilder; };
+    CommandDataIB::Builder & GetCommandDataIBBuilder() { return mCommandDataIBBuilder; };
 
     /**
      *  @brief Mark the end of this CommandList
@@ -80,7 +81,7 @@ public:
     CommandList::Builder & EndOfCommandList();
 
 private:
-    CommandDataElement::Builder mCommandDataElementBuilder;
+    CommandDataIB::Builder mCommandDataIBBuilder;
 };
 }; // namespace CommandList
 }; // namespace app

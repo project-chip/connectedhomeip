@@ -18,9 +18,10 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
 #include <controller/CHIPDeviceController.h>
 #include <inipp/inipp.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 class PersistentStorage : public chip::PersistentStorageDelegate
 {
@@ -34,6 +35,12 @@ public:
 
     uint16_t GetListenPort();
     chip::Logging::LogCategory GetLoggingLevel();
+
+    // Return the stored local node id, or the default one if nothing is stored.
+    chip::NodeId GetLocalNodeId();
+
+    // Store local node id.
+    CHIP_ERROR SetLocalNodeId(chip::NodeId nodeId);
 
 private:
     CHIP_ERROR CommitConfig();

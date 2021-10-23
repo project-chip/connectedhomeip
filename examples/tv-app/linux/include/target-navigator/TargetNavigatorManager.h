@@ -17,22 +17,15 @@
 
 #pragma once
 
-#include <app/common/gen/af-structs.h>
+#include <app/AttributeAccessInterface.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <string>
 #include <vector>
-
-struct TargetNavigatorLaunchResponse
-{
-    EmberAfApplicationLauncherStatus status;
-    std::string data;
-};
 
 class TargetNavigatorManager
 {
 public:
     CHIP_ERROR Init();
-    TargetNavigatorLaunchResponse proxyNavigateTargetRequest(uint8_t target, std::string data);
-    std::vector<EmberAfNavigateTargetTargetInfo> proxyGetTargetInfoList();
+    CHIP_ERROR proxyGetTargetInfoList(chip::app::AttributeValueEncoder & aEncoder);
 };

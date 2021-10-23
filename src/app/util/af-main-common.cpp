@@ -95,7 +95,7 @@
 //#include "app/framework/security/af-security.h"
 //#include "app/framework/security/crypto-state.h"
 #include "app/util/common.h"
-#include "gen/callback.h"
+#include <app-common/zap-generated/callback.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/config.h>
@@ -206,7 +206,7 @@ static EmberStatus send(const MessageSendDestination & destination, EmberApsFram
                         uint8_t * message, bool broadcast, EmberNodeId alias, uint8_t sequence, EmberAfMessageSentFunction callback)
 {
     EmberStatus status;
-    uint8_t index;
+    uint16_t index;
     uint8_t messageSentIndex;
     uint8_t messageTag = INVALID_MESSAGE_TAG;
 
@@ -245,7 +245,7 @@ static EmberStatus send(const MessageSendDestination & destination, EmberApsFram
     else
     {
         index = emberAfIndexFromEndpoint(apsFrame->sourceEndpoint);
-        if (index == 0xFF)
+        if (index == 0xFFFF)
         {
             return EMBER_INVALID_ENDPOINT;
         }
@@ -284,7 +284,7 @@ static EmberStatus send(const MessageSendDestination & destination, EmberApsFram
 
     if (messageLength <= EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH)
     {
-        status = emAfSend(destination, apsFrame, (uint8_t) messageLength, message, &messageTag, alias, sequence);
+        status = emAfSend(destination, apsFrame, messageLength, message, &messageTag, alias, sequence);
     }
     else
     {
@@ -550,13 +550,13 @@ void emAfPrintStatus(const char * task, EmberStatus status)
 
 static void printMessage(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * messageContents)
 {
-    emberAfAppPrint("Cluster: 0x%2X, %d bytes,", apsFrame->clusterId, messageLength);
+    emberAfAppPrint("Cluster: " ChipLogFormatMEI ", %d bytes,", ChipLogValueMEI(apsFrame->clusterId), messageLength);
     if (messageLength >= 3)
     {
         emberAfAppPrint(" ZCL %p Cmd ID: %d", (messageContents[0] & ZCL_CLUSTER_SPECIFIC_COMMAND ? "Cluster" : "Global"),
                         messageContents[2]);
     }
-    emberAfAppPrintln("");
+    emberAfAppPrintln("%s", "");
 }
 
 void emAfMessageSentHandler(const MessageSendDestination & destination, EmberApsFrame * apsFrame, EmberStatus status,
@@ -612,8 +612,8 @@ void emAfFragmentationMessageSentHandler(const MessageSendDestination & destinat
 }
 #endif // EMBER_AF_PLUGIN_FRAGMENTATION
 
-EmberStatus emAfSend(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint8_t messageLength, uint8_t * message,
-                     uint8_t * messageTag, EmberNodeId alias, uint8_t sequence)
+EmberStatus emAfSend(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+                     uint8_t * message, uint8_t * messageTag, EmberNodeId alias, uint8_t sequence)
 {
     // TODO: There's an impedance mismatch here in a few ways:
     // 1) The caller expects to get a messageTag out that will identify this

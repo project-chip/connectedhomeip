@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
-#include <support/DLLUtil.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 

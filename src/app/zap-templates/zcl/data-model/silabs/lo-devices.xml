@@ -84,26 +84,6 @@ limitations under the License.
         <requireCommand>OnWithTimedOff</requireCommand>
       </include>
       <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="false"/>
-      <include cluster="ZLL Commissioning" client="false" server="true" clientLocked="true" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
-      </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true"/>
       <include cluster="Occupancy Sensing" client="true" server="false" clientLocked="false" serverLocked="true"/>
     </clusters>
@@ -189,26 +169,6 @@ limitations under the License.
         <requireCommand>MoveWithOnOff</requireCommand>
         <requireCommand>StepWithOnOff</requireCommand>
         <requireCommand>StopWithOnOff</requireCommand>
-      </include>
-      <include cluster="ZLL Commissioning" client="false" server="true" clientLocked="true" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
       </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true"/>
       <include cluster="Occupancy Sensing" client="true" server="false" clientLocked="false" serverLocked="true"/>
@@ -347,26 +307,6 @@ limitations under the License.
         <requireCommand>EnhancedMoveToHueAndSaturation</requireCommand>
         <requireCommand>ColorLoopSet</requireCommand>
         <requireCommand>StopMoveStep</requireCommand>
-      </include>
-      <include cluster="ZLL Commissioning" client="false" server="true" clientLocked="true" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
       </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true"/>
       <include cluster="Occupancy Sensing" client="true" server="false" clientLocked="false" serverLocked="true"/>
@@ -672,26 +612,6 @@ limitations under the License.
       </include>
       <include cluster="Illuminance Level Sensing" client="true" server="true" clientLocked="false" serverLocked="false">
       </include>
-      <include cluster="ZLL Commissioning" client="false" server="true" clientLocked="false" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
-      </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true">
       </include>
       <include cluster="Illuminance Measurement" client="true" server="false" clientLocked="false" serverLocked="true">
@@ -791,26 +711,6 @@ limitations under the License.
         <requireCommand>StopWithOnOff</requireCommand>
       </include>
       <include cluster="Illuminance Level Sensing" client="true" server="true" clientLocked="false" serverLocked="false">
-      </include>
-      <include cluster="ZLL Commissioning" client="false" server="true" clientLocked="true" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
       </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true">
       </include>
@@ -1124,26 +1024,6 @@ limitations under the License.
         <requireCommand>MoveColorTemperature</requireCommand>
         <requireCommand>StepColorTemperature</requireCommand>
       </include>
-      <include cluster="ZLL Commissioning" client="false" server="true" clientLocked="true" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
-      </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true"/>
     </clusters>
   </deviceType>
@@ -1289,26 +1169,6 @@ limitations under the License.
         <requireCommand>MoveColorTemperature</requireCommand>
         <requireCommand>StepColorTemperature</requireCommand>
       </include>
-      <include cluster="ZLL Commissioning" client="false" server="true" clientLocked="false" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
-      </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true"/>
     </clusters>
   </deviceType>
@@ -1388,26 +1248,6 @@ limitations under the License.
       </include>
       <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true">
       </include>
-      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="false" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
-      </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true"/>
     </clusters>
   </deviceType>
@@ -1450,26 +1290,6 @@ limitations under the License.
       </include>
       <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true">
       </include>
-      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="false" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
-      </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true"/>
     </clusters>
   </deviceType>
@@ -1507,26 +1327,6 @@ limitations under the License.
       <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true">
       </include>
       <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true">
-      </include>
-      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="false" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
       </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true"/>
     </clusters>
@@ -1567,26 +1367,6 @@ limitations under the License.
       <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true">
       </include>
       <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true">
-      </include>
-      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="false" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
       </include>
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true"/>
     </clusters>
@@ -1629,26 +1409,6 @@ limitations under the License.
       <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true">
       </include>
       <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true">
-      </include>
-      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="false" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
       </include>
       <include cluster="Over the Air Bootloading" client="true" server="true" clientLocked="false" serverLocked="false"/>
       <include cluster="Illuminance Measurement" client="true" server="false" clientLocked="false" serverLocked="true">
@@ -1699,26 +1459,6 @@ limitations under the License.
       <include cluster="Over the Air Bootloading" client="true" server="false" clientLocked="false" serverLocked="true">
       </include>
       <include cluster="Color Control" client="true" server="false" clientLocked="false" serverLocked="true">
-      </include>
-      <include cluster="ZLL Commissioning" client="true" server="true" clientLocked="false" serverLocked="false">
-        <requireCommand>ScanRequest</requireCommand>
-        <requireCommand>DeviceInformationRequest</requireCommand>
-        <requireCommand>IdentifyRequest</requireCommand>
-        <requireCommand>ResetToFactoryNewRequest</requireCommand>
-        <requireCommand>NetworkStartRequest</requireCommand>
-        <requireCommand>NetworkJoinRouterRequest</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceRequest</requireCommand>
-        <requireCommand>NetworkUpdateRequest</requireCommand>
-        <requireCommand>GetGroupIdentifiersRequest</requireCommand>
-        <requireCommand>GetEndpointListRequest</requireCommand>
-        <requireCommand>ScanResponse</requireCommand>
-        <requireCommand>DeviceInformationResponse</requireCommand>
-        <requireCommand>NetworkStartResponse</requireCommand>
-        <requireCommand>NetworkJoinRouterResponse</requireCommand>
-        <requireCommand>NetworkJoinEndDeviceResponse</requireCommand>
-        <requireCommand>EndpointInformation</requireCommand>
-        <requireCommand>GetGroupIdentifiersResponse</requireCommand>
-        <requireCommand>GetEndpointListResponse</requireCommand>
       </include>
     </clusters>
   </deviceType>
