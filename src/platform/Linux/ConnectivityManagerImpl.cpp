@@ -225,8 +225,8 @@ char ConnectivityManagerImpl::sWiFiIfName[];
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    mWiFiStationMode                = kWiFiStationMode_Disabled;
-    mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
+    mWiFiStationMode              = kWiFiStationMode_Disabled;
+    mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
 #endif
 
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
@@ -311,14 +311,14 @@ exit:
     return err;
 }
 
-uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS()
+System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiStationReconnectInterval()
 {
-    return mWiFiStationReconnectIntervalMS;
+    return mWiFiStationReconnectInterval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectIntervalMS(uint32_t val)
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectInterval(System::Clock::Timeout val)
 {
-    mWiFiStationReconnectIntervalMS = val;
+    mWiFiStationReconnectInterval = val;
 
     return CHIP_NO_ERROR;
 }
@@ -436,7 +436,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP()
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP");
-        mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
+        mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
@@ -450,7 +450,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
-        mLastAPDemandTime = 0;
+        mLastAPDemandTime = System::Clock::Zero;
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
@@ -465,14 +465,14 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
     {
         if (mWiFiAPState == kWiFiAPState_Active)
         {
-            mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
+            mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
         }
     }
 }
 
-void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
+void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
-    mWiFiAPIdleTimeoutMS = val;
+    mWiFiAPIdleTimeout = val;
     DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
@@ -689,8 +689,6 @@ void ConnectivityManagerImpl::DriveAPState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     WiFiAPState targetState;
-    uint64_t now;
-    uint32_t apTimeout;
 
     // If the AP interface is not under application control...
     if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
@@ -722,18 +720,19 @@ void ConnectivityManagerImpl::DriveAPState()
         // has been demand for the AP within the idle timeout period.
         else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
         {
-            now = System::SystemClock().GetMonotonicMilliseconds();
+            System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
-            if (mLastAPDemandTime != 0 && now < (mLastAPDemandTime + mWiFiAPIdleTimeoutMS))
+            if (mLastAPDemandTime != System::Clock::Zero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
             {
                 targetState = kWiFiAPState_Active;
 
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
-                apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(apTimeout), DriveAPState, NULL);
+                System::Clock::Timeout apTimeout = (mLastAPDemandTime + mWiFiAPIdleTimeout) - now;
+                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
                 SuccessOrExit(err);
-                ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
+                ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s",
+                                std::chrono::duration_cast<System::Clock::Seconds32>(apTimeout).count());
             }
             else
             {
