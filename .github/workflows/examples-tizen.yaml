@@ -28,7 +28,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-tizen:0.5.20
+            image: connectedhomeip/chip-build-tizen:0.5.21
             options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
