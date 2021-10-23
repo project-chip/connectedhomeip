@@ -1288,6 +1288,8 @@ public:
     CHIP_ERROR Test(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TestAddArguments(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t arg1,
                                 uint8_t arg2);
+    CHIP_ERROR TestEnumsRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::VendorId arg1, uint8_t arg2);
     CHIP_ERROR TestListInt8UArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint8_t arg1);
     CHIP_ERROR TestListInt8UReverseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1326,6 +1328,7 @@ public:
     CHIP_ERROR ReadAttributeLongCharString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeEpochUs(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeEpochS(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1370,6 +1373,8 @@ public:
                                      uint64_t value);
     CHIP_ERROR WriteAttributeEpochS(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                     uint32_t value);
+    CHIP_ERROR WriteAttributeVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      chip::VendorId value);
     CHIP_ERROR WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          bool value);
 

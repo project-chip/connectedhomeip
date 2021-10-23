@@ -20,7 +20,7 @@
 
   {{else}}
     {{container}}{{#unless ignore}}.{{asLowerCamelCase label}}{{/unless}} =
-    {{#if_is_enum type}}
+    {{#if_chip_enum type}}
       static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
     {{else if (isCharString type)}}
       chip::Span<const char>("{{definedValue}}", strlen("{{definedValue}}"));
@@ -32,6 +32,6 @@
       {{else}}
       {{definedValue}}{{asTypeLiteralSuffix type}};
       {{/if_is_bitmap}}
-    {{/if_is_enum}}
+    {{/if_chip_enum}}
   {{/if_is_struct}}
 {{/if}}
