@@ -413,7 +413,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
             }
         }
 
-        static void CallbackFn(void * context, const app::DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list)
+        static void CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
         {
             chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;

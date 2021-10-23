@@ -28,7 +28,7 @@
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 #endif
-constexpr size_t kResponseTimeOut = 1000;
+constexpr chip::System::Clock::Timeout kResponseTimeOut = chip::System::Clock::Seconds16(1);
 
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
 extern chip::Messaging::ExchangeManager gExchangeManager;

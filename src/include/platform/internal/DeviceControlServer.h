@@ -34,7 +34,7 @@ class DeviceControlServer final
 public:
     // ===== Members for internal use by other Device Layer components.
 
-    CHIP_ERROR ArmFailSafe(uint16_t expiryLengthSeconds);
+    CHIP_ERROR ArmFailSafe(System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
     CHIP_ERROR CommissioningComplete();
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);

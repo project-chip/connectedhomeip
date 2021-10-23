@@ -247,6 +247,4754 @@ private:
     void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
+class Test_TC_CC_2_1 : public TestCommand
+{
+public:
+    Test_TC_CC_2_1() : TestCommand("Test_TC_CC_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_CC_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_CC_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Reads mandatory attribute: CurrentHue\n");
+            err = TestReadsMandatoryAttributeCurrentHue_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Validate constraints of attribute: current hue\n");
+            err = TestValidateConstraintsOfAttributeCurrentHue_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Write the default value to mandatory attribute: CurrentHue\n");
+            err = TestWriteTheDefaultValueToMandatoryAttributeCurrentHue_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads back mandatory attribute: CurrentHue\n");
+            err = TestReadsBackMandatoryAttributeCurrentHue_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads mandatory attribute: CurrentSaturation\n");
+            err = TestReadsMandatoryAttributeCurrentSaturation_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Validate constraints of attribute: CurrentSaturation\n");
+            err = TestValidateConstraintsOfAttributeCurrentSaturation_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Write the default value to mandatory attribute: CurrentSaturation\n");
+            err = TestWriteTheDefaultValueToMandatoryAttributeCurrentSaturation_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Reads back mandatory attribute: CurrentSaturation\n");
+            err = TestReadsBackMandatoryAttributeCurrentSaturation_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read the mandatory attribute: CurrentX\n");
+            err = TestReadTheMandatoryAttributeCurrentX_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Validate constraints of attribute: CurrentX\n");
+            err = TestValidateConstraintsOfAttributeCurrentX_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Write the default value to mandatory attribute: CurrentX\n");
+            err = TestWriteTheDefaultValueToMandatoryAttributeCurrentX_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Reads back mandatory attribute: CurrentX\n");
+            err = TestReadsBackMandatoryAttributeCurrentX_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Read the mandatory attribute: CurrentY\n");
+            err = TestReadTheMandatoryAttributeCurrentY_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Validate constraints of attribute: CurrentY\n");
+            err = TestValidateConstraintsOfAttributeCurrentY_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Write the default values to mandatory attribute: CurrentY\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeCurrentY_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Reads back mandatory attribute: CurrentY\n");
+            err = TestReadsBackMandatoryAttributeCurrentY_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Validate constraints of attribute: ColorTemperatureMireds\n");
+            err = TestValidateConstraintsOfAttributeColorTemperatureMireds_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Validate constraints of attribute: ColorMode\n");
+            err = TestValidateConstraintsOfAttributeColorMode_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Read the mandatory attribute: Options\n");
+            err = TestReadTheMandatoryAttributeOptions_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Validate constraints of attribute: Options\n");
+            err = TestValidateConstraintsOfAttributeOptions_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Write the default values to mandatory attribute: Options\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeOptions_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Reads back mandatory attribute: Options\n");
+            err = TestReadsBackMandatoryAttributeOptions_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Read the mandatory attribute: EnhancedCurrentHue\n");
+            err = TestReadTheMandatoryAttributeEnhancedCurrentHue_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Validate constraints of attribute: EnhancedCurrentHue\n");
+            err = TestValidateConstraintsOfAttributeEnhancedCurrentHue_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 24 : Write the default values to mandatory attribute: EnhancedCurrentHue\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeEnhancedCurrentHue_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : Reads back mandatory attribute: EnhancedCurrentHue\n");
+            err = TestReadsBackMandatoryAttributeEnhancedCurrentHue_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Validate constraints of attribute: EnhancedColorMode\n");
+            err = TestValidateConstraintsOfAttributeEnhancedColorMode_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : Read the mandatory attribute: ColorLoopActive\n");
+            err = TestReadTheMandatoryAttributeColorLoopActive_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : Validate constraints of attribute: ColorLoopActive\n");
+            err = TestValidateConstraintsOfAttributeColorLoopActive_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : Write the default values to mandatory attribute: ColorLoopActive\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeColorLoopActive_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : Reads back mandatory attribute: ColorLoopActive\n");
+            err = TestReadsBackMandatoryAttributeColorLoopActive_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : Read the mandatory attribute: ColorLoopDirection\n");
+            err = TestReadTheMandatoryAttributeColorLoopDirection_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : Validate constraints of attribute: ColorLoopDirection\n");
+            err = TestValidateConstraintsOfAttributeColorLoopDirection_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 33 : Write the default values to mandatory attribute: ColorLoopDirection\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeColorLoopDirection_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : Reads back mandatory attribute: ColorLoopDirection\n");
+            err = TestReadsBackMandatoryAttributeColorLoopDirection_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : Read the mandatory attribute: ColorLoopTime\n");
+            err = TestReadTheMandatoryAttributeColorLoopTime_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool, " ***** Test Step 36 : Validate constraints of attribute: ColorLoopTime\n");
+            err = TestValidateConstraintsOfAttributeColorLoopTime_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : Write the default values to mandatory attribute: ColorLoopTime\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeColorLoopTime_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool, " ***** Test Step 38 : Reads back mandatory attribute: ColorLoopTime\n");
+            err = TestReadsBackMandatoryAttributeColorLoopTime_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : Read the mandatory attribute: ColorLoopStartEnhancedHue\n");
+            err = TestReadTheMandatoryAttributeColorLoopStartEnhancedHue_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : Validate constraints of attribute: ColorLoopStartEnhancedHue\n");
+            err = TestValidateConstraintsOfAttributeColorLoopStartEnhancedHue_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 41 : Write the default values to mandatory attribute: ColorLoopStartEnhancedHue\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeColorLoopStartEnhancedHue_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : Reads back mandatory attribute: ColorLoopStartEnhancedHue\n");
+            err = TestReadsBackMandatoryAttributeColorLoopStartEnhancedHue_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool, " ***** Test Step 43 : Read the mandatory attribute: ColorLoopStoredEnhancedHue\n");
+            err = TestReadTheMandatoryAttributeColorLoopStoredEnhancedHue_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : Validate constraints of attribute: ColorLoopStoredEnhancedHue\n");
+            err = TestValidateConstraintsOfAttributeColorLoopStoredEnhancedHue_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 45 : Write the default values to mandatory attribute: ColorLoopStoredEnhancedHue\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeColorLoopStoredEnhancedHue_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : Reads back mandatory attribute: ColorLoopStoredEnhancedHue\n");
+            err = TestReadsBackMandatoryAttributeColorLoopStoredEnhancedHue_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : Read the mandatory attribute: ColorCapabilities\n");
+            err = TestReadTheMandatoryAttributeColorCapabilities_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool, " ***** Test Step 48 : Validate constraints of attribute: ColorCapabilities\n");
+            err = TestValidateConstraintsOfAttributeColorCapabilities_48();
+            break;
+        case 49:
+            ChipLogProgress(chipTool, " ***** Test Step 49 : Write the default values to mandatory attribute: ColorCapabilities\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeColorCapabilities_49();
+            break;
+        case 50:
+            ChipLogProgress(chipTool, " ***** Test Step 50 : Reads back mandatory attribute: ColorCapabilities\n");
+            err = TestReadsBackMandatoryAttributeColorCapabilities_50();
+            break;
+        case 51:
+            ChipLogProgress(chipTool, " ***** Test Step 51 : Read the mandatory attribute: ColorTempPhysicalMinMireds\n");
+            err = TestReadTheMandatoryAttributeColorTempPhysicalMinMireds_51();
+            break;
+        case 52:
+            ChipLogProgress(chipTool, " ***** Test Step 52 : Validate constraints of attribute: ColorTempPhysicalMinMireds\n");
+            err = TestValidateConstraintsOfAttributeColorTempPhysicalMinMireds_52();
+            break;
+        case 53:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 53 : Write the default values to mandatory  attribute: ColorTempPhysicalMinMireds\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeColorTempPhysicalMinMireds_53();
+            break;
+        case 54:
+            ChipLogProgress(chipTool, " ***** Test Step 54 : Reads back mandatory attribute: ColorTempPhysicalMinMireds\n");
+            err = TestReadsBackMandatoryAttributeColorTempPhysicalMinMireds_54();
+            break;
+        case 55:
+            ChipLogProgress(chipTool, " ***** Test Step 55 : Read the mandatory attribute: ColorTempPhysicalMaxMireds\n");
+            err = TestReadTheMandatoryAttributeColorTempPhysicalMaxMireds_55();
+            break;
+        case 56:
+            ChipLogProgress(chipTool, " ***** Test Step 56 : Validate constraints of attribute: ColorTempPhysicalMaxMireds\n");
+            err = TestValidateConstraintsOfAttributeColorTempPhysicalMaxMireds_56();
+            break;
+        case 57:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 57 : Write the default values to mandatory attribute: ColorTempPhysicalMaxMireds\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeColorTempPhysicalMaxMireds_57();
+            break;
+        case 58:
+            ChipLogProgress(chipTool, " ***** Test Step 58 : Reads back mandatory attribute: ColorTempPhysicalMaxMireds\n");
+            err = TestReadsBackMandatoryAttributeColorTempPhysicalMaxMireds_58();
+            break;
+        case 59:
+            ChipLogProgress(chipTool, " ***** Test Step 59 : Read the optional attribute: CoupleColorTempToLevelMinMireds\n");
+            err = TestReadTheOptionalAttributeCoupleColorTempToLevelMinMireds_59();
+            break;
+        case 60:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 60 : Write the default values to optional attribute: CoupleColorTempToLevelMinMireds\n");
+            err = TestWriteTheDefaultValuesToOptionalAttributeCoupleColorTempToLevelMinMireds_60();
+            break;
+        case 61:
+            ChipLogProgress(chipTool, " ***** Test Step 61 : Reads back optional attribute: CoupleColorTempToLevelMinMireds\n");
+            err = TestReadsBackOptionalAttributeCoupleColorTempToLevelMinMireds_61();
+            break;
+        case 62:
+            ChipLogProgress(chipTool, " ***** Test Step 62 : Read the optional attribute: StartUpColorTemperatureMireds\n");
+            err = TestReadTheOptionalAttributeStartUpColorTemperatureMireds_62();
+            break;
+        case 63:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 63 : Write the default values to optional attribute: StartUpColorTemperatureMireds\n");
+            err = TestWriteTheDefaultValuesToOptionalAttributeStartUpColorTemperatureMireds_63();
+            break;
+        case 64:
+            ChipLogProgress(chipTool, " ***** Test Step 64 : Reads back optional attribute: StartUpColorTemperatureMireds\n");
+            err = TestReadsBackOptionalAttributeStartUpColorTemperatureMireds_64();
+            break;
+        case 65:
+            ChipLogProgress(chipTool, " ***** Test Step 65 : Read the Optional attribute: RemainingTime\n");
+            err = TestReadTheOptionalAttributeRemainingTime_65();
+            break;
+        case 66:
+            ChipLogProgress(chipTool, " ***** Test Step 66 : Validate constraints of attribute: RemainingTime\n");
+            err = TestValidateConstraintsOfAttributeRemainingTime_66();
+            break;
+        case 67:
+            ChipLogProgress(chipTool, " ***** Test Step 67 : Write the default values to optional attribute: RemainingTime\n");
+            err = TestWriteTheDefaultValuesToOptionalAttributeRemainingTime_67();
+            break;
+        case 68:
+            ChipLogProgress(chipTool, " ***** Test Step 68 : Reads back optional attribute: RemainingTime\n");
+            err = TestReadsBackOptionalAttributeRemainingTime_68();
+            break;
+        case 69:
+            ChipLogProgress(chipTool, " ***** Test Step 69 : Read the optional attribute: DriftCompensation\n");
+            err = TestReadTheOptionalAttributeDriftCompensation_69();
+            break;
+        case 70:
+            ChipLogProgress(chipTool, " ***** Test Step 70 : Write the default values to optional attribute: DriftCompensation\n");
+            err = TestWriteTheDefaultValuesToOptionalAttributeDriftCompensation_70();
+            break;
+        case 71:
+            ChipLogProgress(chipTool, " ***** Test Step 71 : Reads back optional attribute: DriftCompensation\n");
+            err = TestReadsBackOptionalAttributeDriftCompensation_71();
+            break;
+        case 72:
+            ChipLogProgress(chipTool, " ***** Test Step 72 : Read the optional attribute: CompensationText\n");
+            err = TestReadTheOptionalAttributeCompensationText_72();
+            break;
+        case 73:
+            ChipLogProgress(chipTool, " ***** Test Step 73 : Read the mandatory attribute: NumberOfPrimaries\n");
+            err = TestReadTheMandatoryAttributeNumberOfPrimaries_73();
+            break;
+        case 74:
+            ChipLogProgress(chipTool, " ***** Test Step 74 : Write the default mandatory attribute: NumberOfPrimaries\n");
+            err = TestWriteTheDefaultMandatoryAttributeNumberOfPrimaries_74();
+            break;
+        case 75:
+            ChipLogProgress(chipTool, " ***** Test Step 75 : Read back the mandatory attribute: NumberOfPrimaries\n");
+            err = TestReadBackTheMandatoryAttributeNumberOfPrimaries_75();
+            break;
+        case 76:
+            ChipLogProgress(chipTool, " ***** Test Step 76 : Read the mandatory attribute: Primary1X\n");
+            err = TestReadTheMandatoryAttributePrimary1X_76();
+            break;
+        case 77:
+            ChipLogProgress(chipTool, " ***** Test Step 77 : Write the default mandatory attribute: Primary1X\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary1X_77();
+            break;
+        case 78:
+            ChipLogProgress(chipTool, " ***** Test Step 78 : Read back the mandatory attribute: Primary1X\n");
+            err = TestReadBackTheMandatoryAttributePrimary1X_78();
+            break;
+        case 79:
+            ChipLogProgress(chipTool, " ***** Test Step 79 : Read the mandatory attribute: Primary1Y\n");
+            err = TestReadTheMandatoryAttributePrimary1Y_79();
+            break;
+        case 80:
+            ChipLogProgress(chipTool, " ***** Test Step 80 : Write the default mandatory attribute: Primary1Y\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary1Y_80();
+            break;
+        case 81:
+            ChipLogProgress(chipTool, " ***** Test Step 81 : Read back the mandatory attribute: Primary1Y\n");
+            err = TestReadBackTheMandatoryAttributePrimary1Y_81();
+            break;
+        case 82:
+            ChipLogProgress(chipTool, " ***** Test Step 82 : Read the mandatory attribute: Primary1Intensity\n");
+            err = TestReadTheMandatoryAttributePrimary1Intensity_82();
+            break;
+        case 83:
+            ChipLogProgress(chipTool, " ***** Test Step 83 : Read the mandatory attribute: Primary2X\n");
+            err = TestReadTheMandatoryAttributePrimary2X_83();
+            break;
+        case 84:
+            ChipLogProgress(chipTool, " ***** Test Step 84 : Write the default mandatory attribute: Primary2X\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary2X_84();
+            break;
+        case 85:
+            ChipLogProgress(chipTool, " ***** Test Step 85 : Read back the mandatory attribute: Primary2X\n");
+            err = TestReadBackTheMandatoryAttributePrimary2X_85();
+            break;
+        case 86:
+            ChipLogProgress(chipTool, " ***** Test Step 86 : Read the mandatory attribute: Primary2Y\n");
+            err = TestReadTheMandatoryAttributePrimary2Y_86();
+            break;
+        case 87:
+            ChipLogProgress(chipTool, " ***** Test Step 87 : Write the default mandatory attribute: Primary2Y\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary2Y_87();
+            break;
+        case 88:
+            ChipLogProgress(chipTool, " ***** Test Step 88 : Read back the mandatory attribute: Primary2Y\n");
+            err = TestReadBackTheMandatoryAttributePrimary2Y_88();
+            break;
+        case 89:
+            ChipLogProgress(chipTool, " ***** Test Step 89 : Validate constraints of attribute: Primary2Intensity\n");
+            err = TestValidateConstraintsOfAttributePrimary2Intensity_89();
+            break;
+        case 90:
+            ChipLogProgress(chipTool, " ***** Test Step 90 : Read the mandatory attribute: Primary3X\n");
+            err = TestReadTheMandatoryAttributePrimary3X_90();
+            break;
+        case 91:
+            ChipLogProgress(chipTool, " ***** Test Step 91 : Write the default mandatory attribute: Primary3X\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary3X_91();
+            break;
+        case 92:
+            ChipLogProgress(chipTool, " ***** Test Step 92 : Read back the mandatory attribute: Primary3X\n");
+            err = TestReadBackTheMandatoryAttributePrimary3X_92();
+            break;
+        case 93:
+            ChipLogProgress(chipTool, " ***** Test Step 93 : Read the mandatory attribute: Primary3Y\n");
+            err = TestReadTheMandatoryAttributePrimary3Y_93();
+            break;
+        case 94:
+            ChipLogProgress(chipTool, " ***** Test Step 94 : Write the default mandatory attribute: Primary3Y\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary3Y_94();
+            break;
+        case 95:
+            ChipLogProgress(chipTool, " ***** Test Step 95 : Read back the mandatory attribute: Primary3Y\n");
+            err = TestReadBackTheMandatoryAttributePrimary3Y_95();
+            break;
+        case 96:
+            ChipLogProgress(chipTool, " ***** Test Step 96 : Read the mandatory attribute: Primary3Intensity\n");
+            err = TestReadTheMandatoryAttributePrimary3Intensity_96();
+            break;
+        case 97:
+            ChipLogProgress(chipTool, " ***** Test Step 97 : Read the mandatory attribute: Primary4X\n");
+            err = TestReadTheMandatoryAttributePrimary4X_97();
+            break;
+        case 98:
+            ChipLogProgress(chipTool, " ***** Test Step 98 : Write the default mandatory attribute: Primary4X\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary4X_98();
+            break;
+        case 99:
+            ChipLogProgress(chipTool, " ***** Test Step 99 : Read back the mandatory attribute: Primary4X\n");
+            err = TestReadBackTheMandatoryAttributePrimary4X_99();
+            break;
+        case 100:
+            ChipLogProgress(chipTool, " ***** Test Step 100 : Read the mandatory attribute: Primary4Y\n");
+            err = TestReadTheMandatoryAttributePrimary4Y_100();
+            break;
+        case 101:
+            ChipLogProgress(chipTool, " ***** Test Step 101 : Write the default mandatory attribute: Primary4Y\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary4Y_101();
+            break;
+        case 102:
+            ChipLogProgress(chipTool, " ***** Test Step 102 : Read back the mandatory attribute: Primary4Y\n");
+            err = TestReadBackTheMandatoryAttributePrimary4Y_102();
+            break;
+        case 103:
+            ChipLogProgress(chipTool, " ***** Test Step 103 : Read the mandatory attribute: Primary4Intensity\n");
+            err = TestReadTheMandatoryAttributePrimary4Intensity_103();
+            break;
+        case 104:
+            ChipLogProgress(chipTool, " ***** Test Step 104 : Read the mandatory attribute: Primary5X\n");
+            err = TestReadTheMandatoryAttributePrimary5X_104();
+            break;
+        case 105:
+            ChipLogProgress(chipTool, " ***** Test Step 105 : Write the default mandatory attribute: Primary5X\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary5X_105();
+            break;
+        case 106:
+            ChipLogProgress(chipTool, " ***** Test Step 106 : Read back the mandatory attribute: Primary5X\n");
+            err = TestReadBackTheMandatoryAttributePrimary5X_106();
+            break;
+        case 107:
+            ChipLogProgress(chipTool, " ***** Test Step 107 : Read the mandatory attribute: Primary5Y\n");
+            err = TestReadTheMandatoryAttributePrimary5Y_107();
+            break;
+        case 108:
+            ChipLogProgress(chipTool, " ***** Test Step 108 : Write the default mandatory attribute: Primary5Y\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary5Y_108();
+            break;
+        case 109:
+            ChipLogProgress(chipTool, " ***** Test Step 109 : Read back the mandatory attribute: Primary5Y\n");
+            err = TestReadBackTheMandatoryAttributePrimary5Y_109();
+            break;
+        case 110:
+            ChipLogProgress(chipTool, " ***** Test Step 110 : Read the mandatory attribute: Primary5Intensity\n");
+            err = TestReadTheMandatoryAttributePrimary5Intensity_110();
+            break;
+        case 111:
+            ChipLogProgress(chipTool, " ***** Test Step 111 : Read the mandatory attribute: Primary6X\n");
+            err = TestReadTheMandatoryAttributePrimary6X_111();
+            break;
+        case 112:
+            ChipLogProgress(chipTool, " ***** Test Step 112 : Write the default mandatory attribute: Primary6X\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary6X_112();
+            break;
+        case 113:
+            ChipLogProgress(chipTool, " ***** Test Step 113 : Read back the mandatory attribute: Primary6X\n");
+            err = TestReadBackTheMandatoryAttributePrimary6X_113();
+            break;
+        case 114:
+            ChipLogProgress(chipTool, " ***** Test Step 114 : Read the mandatory attribute: Primary6Y\n");
+            err = TestReadTheMandatoryAttributePrimary6Y_114();
+            break;
+        case 115:
+            ChipLogProgress(chipTool, " ***** Test Step 115 : Write the default mandatory attribute: Primary6Y\n");
+            err = TestWriteTheDefaultMandatoryAttributePrimary6Y_115();
+            break;
+        case 116:
+            ChipLogProgress(chipTool, " ***** Test Step 116 : Read back the mandatory attribute: Primary6Y\n");
+            err = TestReadBackTheMandatoryAttributePrimary6Y_116();
+            break;
+        case 117:
+            ChipLogProgress(chipTool, " ***** Test Step 117 : Read the mandatory attribute: Primary6Intensity\n");
+            err = TestReadTheMandatoryAttributePrimary6Intensity_117();
+            break;
+        case 118:
+            ChipLogProgress(chipTool, " ***** Test Step 118 : Read the optional attribute: WhitePointX\n");
+            err = TestReadTheOptionalAttributeWhitePointX_118();
+            break;
+        case 119:
+            ChipLogProgress(chipTool, " ***** Test Step 119 : Write the default optional attribute: WhitePointX\n");
+            err = TestWriteTheDefaultOptionalAttributeWhitePointX_119();
+            break;
+        case 120:
+            ChipLogProgress(chipTool, " ***** Test Step 120 : Read back the optional attribute: WhitePointX\n");
+            err = TestReadBackTheOptionalAttributeWhitePointX_120();
+            break;
+        case 121:
+            ChipLogProgress(chipTool, " ***** Test Step 121 : Read the optional attribute: WhitePointY\n");
+            err = TestReadTheOptionalAttributeWhitePointY_121();
+            break;
+        case 122:
+            ChipLogProgress(chipTool, " ***** Test Step 122 : Write the default optional attribute: WhitePointY\n");
+            err = TestWriteTheDefaultOptionalAttributeWhitePointY_122();
+            break;
+        case 123:
+            ChipLogProgress(chipTool, " ***** Test Step 123 : Read back the optional attribute: WhitePointY\n");
+            err = TestReadBackTheOptionalAttributeWhitePointY_123();
+            break;
+        case 124:
+            ChipLogProgress(chipTool, " ***** Test Step 124 : Read the optional attribute: ColorPointRX\n");
+            err = TestReadTheOptionalAttributeColorPointRX_124();
+            break;
+        case 125:
+            ChipLogProgress(chipTool, " ***** Test Step 125 : Write the default optional attribute: ColorPointRX\n");
+            err = TestWriteTheDefaultOptionalAttributeColorPointRX_125();
+            break;
+        case 126:
+            ChipLogProgress(chipTool, " ***** Test Step 126 : Read back the optional attribute: ColorPointRX\n");
+            err = TestReadBackTheOptionalAttributeColorPointRX_126();
+            break;
+        case 127:
+            ChipLogProgress(chipTool, " ***** Test Step 127 : Read the optional attribute: ColorPointRY\n");
+            err = TestReadTheOptionalAttributeColorPointRY_127();
+            break;
+        case 128:
+            ChipLogProgress(chipTool, " ***** Test Step 128 : Write the default optional attribute: ColorPointRY\n");
+            err = TestWriteTheDefaultOptionalAttributeColorPointRY_128();
+            break;
+        case 129:
+            ChipLogProgress(chipTool, " ***** Test Step 129 : Read back the optional attribute: ColorPointRY\n");
+            err = TestReadBackTheOptionalAttributeColorPointRY_129();
+            break;
+        case 130:
+            ChipLogProgress(chipTool, " ***** Test Step 130 : Read the optional attribute: ColorPointRIntensity\n");
+            err = TestReadTheOptionalAttributeColorPointRIntensity_130();
+            break;
+        case 131:
+            ChipLogProgress(chipTool, " ***** Test Step 131 : Read the optional attribute: ColorPointGX\n");
+            err = TestReadTheOptionalAttributeColorPointGX_131();
+            break;
+        case 132:
+            ChipLogProgress(chipTool, " ***** Test Step 132 : Write the default optional attribute: ColorPointGX\n");
+            err = TestWriteTheDefaultOptionalAttributeColorPointGX_132();
+            break;
+        case 133:
+            ChipLogProgress(chipTool, " ***** Test Step 133 : Read back the optional attribute: ColorPointGX\n");
+            err = TestReadBackTheOptionalAttributeColorPointGX_133();
+            break;
+        case 134:
+            ChipLogProgress(chipTool, " ***** Test Step 134 : Read the optional attribute: ColorPointGY\n");
+            err = TestReadTheOptionalAttributeColorPointGY_134();
+            break;
+        case 135:
+            ChipLogProgress(chipTool, " ***** Test Step 135 : Write the default optional attribute: ColorPointGY\n");
+            err = TestWriteTheDefaultOptionalAttributeColorPointGY_135();
+            break;
+        case 136:
+            ChipLogProgress(chipTool, " ***** Test Step 136 : Read back the optional attribute: ColorPointGY\n");
+            err = TestReadBackTheOptionalAttributeColorPointGY_136();
+            break;
+        case 137:
+            ChipLogProgress(chipTool, " ***** Test Step 137 : Read the optional attribute: ColorPointGIntensity\n");
+            err = TestReadTheOptionalAttributeColorPointGIntensity_137();
+            break;
+        case 138:
+            ChipLogProgress(chipTool, " ***** Test Step 138 : Read the optional attribute: ColorPointBX\n");
+            err = TestReadTheOptionalAttributeColorPointBX_138();
+            break;
+        case 139:
+            ChipLogProgress(chipTool, " ***** Test Step 139 : Write the default optional attribute: ColorPointBX\n");
+            err = TestWriteTheDefaultOptionalAttributeColorPointBX_139();
+            break;
+        case 140:
+            ChipLogProgress(chipTool, " ***** Test Step 140 : Read back the optional attribute: ColorPointBX\n");
+            err = TestReadBackTheOptionalAttributeColorPointBX_140();
+            break;
+        case 141:
+            ChipLogProgress(chipTool, " ***** Test Step 141 : Read the optional attribute: ColorPointBY\n");
+            err = TestReadTheOptionalAttributeColorPointBY_141();
+            break;
+        case 142:
+            ChipLogProgress(chipTool, " ***** Test Step 142 : Write the default optional attribute: ColorPointBY\n");
+            err = TestWriteTheDefaultOptionalAttributeColorPointBY_142();
+            break;
+        case 143:
+            ChipLogProgress(chipTool, " ***** Test Step 143 : Read back the optional attribute: ColorPointBY\n");
+            err = TestReadBackTheOptionalAttributeColorPointBY_143();
+            break;
+        case 144:
+            ChipLogProgress(chipTool, " ***** Test Step 144 : Read the optional attribute: ColorPointBIntensity\n");
+            err = TestReadTheOptionalAttributeColorPointBIntensity_144();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 145;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentHue)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentHue)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentHue)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentHue)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentSaturation)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentSaturation)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentSaturation)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentSaturation)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t currentX)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t currentX)> mOnSuccessCallback_9{ OnSuccessCallback_9, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t currentX)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_11{ OnFailureCallback_11, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t currentX)> mOnSuccessCallback_11{ OnSuccessCallback_11, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_12{ OnFailureCallback_12, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t currentY)> mOnSuccessCallback_12{ OnSuccessCallback_12, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t currentY)> mOnSuccessCallback_13{ OnSuccessCallback_13, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_14{ OnFailureCallback_14, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t currentY)> mOnSuccessCallback_14{ OnSuccessCallback_14, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_15{ OnFailureCallback_15, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t currentY)> mOnSuccessCallback_15{ OnSuccessCallback_15, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_16{ OnFailureCallback_16, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorTemperature)> mOnSuccessCallback_16{ OnSuccessCallback_16,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_17{ OnFailureCallback_17, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorMode)> mOnSuccessCallback_17{ OnSuccessCallback_17, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_18{ OnFailureCallback_18, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorControlOptions)> mOnSuccessCallback_18{ OnSuccessCallback_18,
+                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_19{ OnFailureCallback_19, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorControlOptions)> mOnSuccessCallback_19{ OnSuccessCallback_19,
+                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_20{ OnFailureCallback_20, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorControlOptions)> mOnSuccessCallback_20{ OnSuccessCallback_20,
+                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_21{ OnFailureCallback_21, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorControlOptions)> mOnSuccessCallback_21{ OnSuccessCallback_21,
+                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_22{ OnFailureCallback_22, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t enhancedCurrentHue)> mOnSuccessCallback_22{ OnSuccessCallback_22,
+                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_23{ OnFailureCallback_23, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t enhancedCurrentHue)> mOnSuccessCallback_23{ OnSuccessCallback_23,
+                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_24{ OnFailureCallback_24, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t enhancedCurrentHue)> mOnSuccessCallback_24{ OnSuccessCallback_24,
+                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_25{ OnFailureCallback_25, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t enhancedCurrentHue)> mOnSuccessCallback_25{ OnSuccessCallback_25,
+                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_26{ OnFailureCallback_26, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t enhancedColorMode)> mOnSuccessCallback_26{ OnSuccessCallback_26,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_27{ OnFailureCallback_27, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_27{ OnSuccessCallback_27, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_28{ OnFailureCallback_28, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_28{ OnSuccessCallback_28, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_29{ OnFailureCallback_29, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_29{ OnSuccessCallback_29, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_30{ OnFailureCallback_30, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_30{ OnSuccessCallback_30, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_31{ OnFailureCallback_31, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_31{ OnSuccessCallback_31,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_32{ OnFailureCallback_32, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_32{ OnSuccessCallback_32,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_33{ OnFailureCallback_33, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_33{ OnSuccessCallback_33,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_34{ OnFailureCallback_34, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_34{ OnSuccessCallback_34,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_35{ OnFailureCallback_35, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopTime)> mOnSuccessCallback_35{ OnSuccessCallback_35, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_36{ OnFailureCallback_36, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopTime)> mOnSuccessCallback_36{ OnSuccessCallback_36, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_37{ OnFailureCallback_37, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopTime)> mOnSuccessCallback_37{ OnSuccessCallback_37, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_38{ OnFailureCallback_38, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopTime)> mOnSuccessCallback_38{ OnSuccessCallback_38, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_39{ OnFailureCallback_39, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStartEnhancedHue)> mOnSuccessCallback_39{
+        OnSuccessCallback_39, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_40{ OnFailureCallback_40, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStartEnhancedHue)> mOnSuccessCallback_40{
+        OnSuccessCallback_40, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_41{ OnFailureCallback_41, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStartEnhancedHue)> mOnSuccessCallback_41{
+        OnSuccessCallback_41, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_42{ OnFailureCallback_42, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStartEnhancedHue)> mOnSuccessCallback_42{
+        OnSuccessCallback_42, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_43{ OnFailureCallback_43, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStoredEnhancedHue)> mOnSuccessCallback_43{
+        OnSuccessCallback_43, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_44{ OnFailureCallback_44, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStoredEnhancedHue)> mOnSuccessCallback_44{
+        OnSuccessCallback_44, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_45{ OnFailureCallback_45, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStoredEnhancedHue)> mOnSuccessCallback_45{
+        OnSuccessCallback_45, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_46{ OnFailureCallback_46, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStoredEnhancedHue)> mOnSuccessCallback_46{
+        OnSuccessCallback_46, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_47{ OnFailureCallback_47, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorCapabilities)> mOnSuccessCallback_47{ OnSuccessCallback_47,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_48{ OnFailureCallback_48, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorCapabilities)> mOnSuccessCallback_48{ OnSuccessCallback_48,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_49{ OnFailureCallback_49, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorCapabilities)> mOnSuccessCallback_49{ OnSuccessCallback_49,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_50{ OnFailureCallback_50, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorCapabilities)> mOnSuccessCallback_50{ OnSuccessCallback_50,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_51{ OnFailureCallback_51, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorTempPhysicalMin)> mOnSuccessCallback_51{ OnSuccessCallback_51,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_52{ OnFailureCallback_52, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorTempPhysicalMin)> mOnSuccessCallback_52{ OnSuccessCallback_52,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_53{ OnFailureCallback_53, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorTempPhysicalMin)> mOnSuccessCallback_53{ OnSuccessCallback_53,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_54{ OnFailureCallback_54, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorTempPhysicalMin)> mOnSuccessCallback_54{ OnSuccessCallback_54,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_55{ OnFailureCallback_55, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorTempPhysicalMax)> mOnSuccessCallback_55{ OnSuccessCallback_55,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_56{ OnFailureCallback_56, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorTempPhysicalMax)> mOnSuccessCallback_56{ OnSuccessCallback_56,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_57{ OnFailureCallback_57, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorTempPhysicalMax)> mOnSuccessCallback_57{ OnSuccessCallback_57,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_58{ OnFailureCallback_58, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorTempPhysicalMax)> mOnSuccessCallback_58{ OnSuccessCallback_58,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_59{ OnFailureCallback_59, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t coupleColorTempToLevelMinMireds)> mOnSuccessCallback_59{
+        OnSuccessCallback_59, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_60{ OnFailureCallback_60, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t coupleColorTempToLevelMinMireds)> mOnSuccessCallback_60{
+        OnSuccessCallback_60, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_61{ OnFailureCallback_61, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t coupleColorTempToLevelMinMireds)> mOnSuccessCallback_61{
+        OnSuccessCallback_61, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_62{ OnFailureCallback_62, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t startUpColorTemperatureMireds)> mOnSuccessCallback_62{
+        OnSuccessCallback_62, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_63{ OnFailureCallback_63, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t startUpColorTemperatureMireds)> mOnSuccessCallback_63{
+        OnSuccessCallback_63, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_64{ OnFailureCallback_64, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t startUpColorTemperatureMireds)> mOnSuccessCallback_64{
+        OnSuccessCallback_64, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_65{ OnFailureCallback_65, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t remainingTime)> mOnSuccessCallback_65{ OnSuccessCallback_65, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_66{ OnFailureCallback_66, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t remainingTime)> mOnSuccessCallback_66{ OnSuccessCallback_66, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_67{ OnFailureCallback_67, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t remainingTime)> mOnSuccessCallback_67{ OnSuccessCallback_67, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_68{ OnFailureCallback_68, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t remainingTime)> mOnSuccessCallback_68{ OnSuccessCallback_68, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_69{ OnFailureCallback_69, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t driftCompensation)> mOnSuccessCallback_69{ OnSuccessCallback_69,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_70{ OnFailureCallback_70, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t driftCompensation)> mOnSuccessCallback_70{ OnSuccessCallback_70,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_71{ OnFailureCallback_71, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t driftCompensation)> mOnSuccessCallback_71{ OnSuccessCallback_71,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_72{ OnFailureCallback_72, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan compensationText)> mOnSuccessCallback_72{ OnSuccessCallback_72,
+                                                                                                               this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_73{ OnFailureCallback_73, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t numberOfPrimaries)> mOnSuccessCallback_73{ OnSuccessCallback_73,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_74{ OnFailureCallback_74, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t numberOfPrimaries)> mOnSuccessCallback_74{ OnSuccessCallback_74,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_75{ OnFailureCallback_75, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t numberOfPrimaries)> mOnSuccessCallback_75{ OnSuccessCallback_75,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_76{ OnFailureCallback_76, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary1X)> mOnSuccessCallback_76{ OnSuccessCallback_76, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_77{ OnFailureCallback_77, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary1X)> mOnSuccessCallback_77{ OnSuccessCallback_77, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_78{ OnFailureCallback_78, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary1X)> mOnSuccessCallback_78{ OnSuccessCallback_78, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_79{ OnFailureCallback_79, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary1Y)> mOnSuccessCallback_79{ OnSuccessCallback_79, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_80{ OnFailureCallback_80, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary1Y)> mOnSuccessCallback_80{ OnSuccessCallback_80, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_81{ OnFailureCallback_81, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary1Y)> mOnSuccessCallback_81{ OnSuccessCallback_81, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_82{ OnFailureCallback_82, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t primary1Intensity)> mOnSuccessCallback_82{ OnSuccessCallback_82,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_83{ OnFailureCallback_83, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary2X)> mOnSuccessCallback_83{ OnSuccessCallback_83, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_84{ OnFailureCallback_84, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary2X)> mOnSuccessCallback_84{ OnSuccessCallback_84, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_85{ OnFailureCallback_85, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary2X)> mOnSuccessCallback_85{ OnSuccessCallback_85, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_86{ OnFailureCallback_86, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary2Y)> mOnSuccessCallback_86{ OnSuccessCallback_86, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_87{ OnFailureCallback_87, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary2Y)> mOnSuccessCallback_87{ OnSuccessCallback_87, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_88{ OnFailureCallback_88, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary2Y)> mOnSuccessCallback_88{ OnSuccessCallback_88, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_89{ OnFailureCallback_89, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t primary2Intensity)> mOnSuccessCallback_89{ OnSuccessCallback_89,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_90{ OnFailureCallback_90, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary3X)> mOnSuccessCallback_90{ OnSuccessCallback_90, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_91{ OnFailureCallback_91, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary3X)> mOnSuccessCallback_91{ OnSuccessCallback_91, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_92{ OnFailureCallback_92, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary3X)> mOnSuccessCallback_92{ OnSuccessCallback_92, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_93{ OnFailureCallback_93, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary3Y)> mOnSuccessCallback_93{ OnSuccessCallback_93, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_94{ OnFailureCallback_94, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary3Y)> mOnSuccessCallback_94{ OnSuccessCallback_94, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_95{ OnFailureCallback_95, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary3Y)> mOnSuccessCallback_95{ OnSuccessCallback_95, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_96{ OnFailureCallback_96, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t primary3Intensity)> mOnSuccessCallback_96{ OnSuccessCallback_96,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_97{ OnFailureCallback_97, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary4X)> mOnSuccessCallback_97{ OnSuccessCallback_97, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_98{ OnFailureCallback_98, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary4X)> mOnSuccessCallback_98{ OnSuccessCallback_98, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_99{ OnFailureCallback_99, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary4X)> mOnSuccessCallback_99{ OnSuccessCallback_99, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_100{ OnFailureCallback_100, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary4Y)> mOnSuccessCallback_100{ OnSuccessCallback_100, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_101{ OnFailureCallback_101, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary4Y)> mOnSuccessCallback_101{ OnSuccessCallback_101, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_102{ OnFailureCallback_102, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary4Y)> mOnSuccessCallback_102{ OnSuccessCallback_102, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_103{ OnFailureCallback_103, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t primary4Intensity)> mOnSuccessCallback_103{ OnSuccessCallback_103,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_104{ OnFailureCallback_104, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary5X)> mOnSuccessCallback_104{ OnSuccessCallback_104, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_105{ OnFailureCallback_105, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary5X)> mOnSuccessCallback_105{ OnSuccessCallback_105, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_106{ OnFailureCallback_106, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary5X)> mOnSuccessCallback_106{ OnSuccessCallback_106, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_107{ OnFailureCallback_107, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary5Y)> mOnSuccessCallback_107{ OnSuccessCallback_107, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_108{ OnFailureCallback_108, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary5Y)> mOnSuccessCallback_108{ OnSuccessCallback_108, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_109{ OnFailureCallback_109, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary5Y)> mOnSuccessCallback_109{ OnSuccessCallback_109, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_110{ OnFailureCallback_110, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t primary5Intensity)> mOnSuccessCallback_110{ OnSuccessCallback_110,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_111{ OnFailureCallback_111, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary6X)> mOnSuccessCallback_111{ OnSuccessCallback_111, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_112{ OnFailureCallback_112, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary6X)> mOnSuccessCallback_112{ OnSuccessCallback_112, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_113{ OnFailureCallback_113, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary6X)> mOnSuccessCallback_113{ OnSuccessCallback_113, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_114{ OnFailureCallback_114, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary6Y)> mOnSuccessCallback_114{ OnSuccessCallback_114, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_115{ OnFailureCallback_115, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary6Y)> mOnSuccessCallback_115{ OnSuccessCallback_115, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_116{ OnFailureCallback_116, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t primary6Y)> mOnSuccessCallback_116{ OnSuccessCallback_116, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_117{ OnFailureCallback_117, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t primary6Intensity)> mOnSuccessCallback_117{ OnSuccessCallback_117,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_118{ OnFailureCallback_118, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t whitePointX)> mOnSuccessCallback_118{ OnSuccessCallback_118, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_119{ OnFailureCallback_119, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t whitePointX)> mOnSuccessCallback_119{ OnSuccessCallback_119, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_120{ OnFailureCallback_120, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t whitePointX)> mOnSuccessCallback_120{ OnSuccessCallback_120, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_121{ OnFailureCallback_121, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t whitePointY)> mOnSuccessCallback_121{ OnSuccessCallback_121, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_122{ OnFailureCallback_122, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t whitePointY)> mOnSuccessCallback_122{ OnSuccessCallback_122, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_123{ OnFailureCallback_123, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t whitePointY)> mOnSuccessCallback_123{ OnSuccessCallback_123, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_124{ OnFailureCallback_124, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointRX)> mOnSuccessCallback_124{ OnSuccessCallback_124, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_125{ OnFailureCallback_125, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointRX)> mOnSuccessCallback_125{ OnSuccessCallback_125, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_126{ OnFailureCallback_126, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointRX)> mOnSuccessCallback_126{ OnSuccessCallback_126, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_127{ OnFailureCallback_127, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointRY)> mOnSuccessCallback_127{ OnSuccessCallback_127, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_128{ OnFailureCallback_128, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointRY)> mOnSuccessCallback_128{ OnSuccessCallback_128, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_129{ OnFailureCallback_129, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointRY)> mOnSuccessCallback_129{ OnSuccessCallback_129, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_130{ OnFailureCallback_130, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorPointRIntensity)> mOnSuccessCallback_130{ OnSuccessCallback_130,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_131{ OnFailureCallback_131, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointGX)> mOnSuccessCallback_131{ OnSuccessCallback_131, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_132{ OnFailureCallback_132, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointGX)> mOnSuccessCallback_132{ OnSuccessCallback_132, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_133{ OnFailureCallback_133, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointGX)> mOnSuccessCallback_133{ OnSuccessCallback_133, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_134{ OnFailureCallback_134, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointGY)> mOnSuccessCallback_134{ OnSuccessCallback_134, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_135{ OnFailureCallback_135, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointGY)> mOnSuccessCallback_135{ OnSuccessCallback_135, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_136{ OnFailureCallback_136, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointGY)> mOnSuccessCallback_136{ OnSuccessCallback_136, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_137{ OnFailureCallback_137, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorPointGIntensity)> mOnSuccessCallback_137{ OnSuccessCallback_137,
+                                                                                                             this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_138{ OnFailureCallback_138, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointBX)> mOnSuccessCallback_138{ OnSuccessCallback_138, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_139{ OnFailureCallback_139, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointBX)> mOnSuccessCallback_139{ OnSuccessCallback_139, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_140{ OnFailureCallback_140, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointBX)> mOnSuccessCallback_140{ OnSuccessCallback_140, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_141{ OnFailureCallback_141, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointBY)> mOnSuccessCallback_141{ OnSuccessCallback_141, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_142{ OnFailureCallback_142, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointBY)> mOnSuccessCallback_142{ OnSuccessCallback_142, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_143{ OnFailureCallback_143, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorPointBY)> mOnSuccessCallback_143{ OnSuccessCallback_143, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_144{ OnFailureCallback_144, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorPointBIntensity)> mOnSuccessCallback_144{ OnSuccessCallback_144,
+                                                                                                             this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t currentHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_0(currentHue);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t currentHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_1(currentHue);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t currentHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_2(currentHue);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t currentHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_3(currentHue);
+    }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t currentSaturation)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_4(currentSaturation);
+    }
+
+    static void OnFailureCallback_5(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, uint8_t currentSaturation)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_5(currentSaturation);
+    }
+
+    static void OnFailureCallback_6(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint8_t currentSaturation)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_6(currentSaturation);
+    }
+
+    static void OnFailureCallback_7(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context, uint8_t currentSaturation)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_7(currentSaturation);
+    }
+
+    static void OnFailureCallback_8(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint16_t currentX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_8(currentX);
+    }
+
+    static void OnFailureCallback_9(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context, uint16_t currentX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_9(currentX);
+    }
+
+    static void OnFailureCallback_10(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint16_t currentX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_10(currentX);
+    }
+
+    static void OnFailureCallback_11(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_11(status);
+    }
+
+    static void OnSuccessCallback_11(void * context, uint16_t currentX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_11(currentX);
+    }
+
+    static void OnFailureCallback_12(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context, uint16_t currentY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_12(currentY);
+    }
+
+    static void OnFailureCallback_13(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, uint16_t currentY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_13(currentY);
+    }
+
+    static void OnFailureCallback_14(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_14(status);
+    }
+
+    static void OnSuccessCallback_14(void * context, uint16_t currentY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_14(currentY);
+    }
+
+    static void OnFailureCallback_15(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_15(status);
+    }
+
+    static void OnSuccessCallback_15(void * context, uint16_t currentY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_15(currentY);
+    }
+
+    static void OnFailureCallback_16(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_16(status);
+    }
+
+    static void OnSuccessCallback_16(void * context, uint16_t colorTemperature)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_16(colorTemperature);
+    }
+
+    static void OnFailureCallback_17(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_17(status);
+    }
+
+    static void OnSuccessCallback_17(void * context, uint8_t colorMode)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_17(colorMode);
+    }
+
+    static void OnFailureCallback_18(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_18(status);
+    }
+
+    static void OnSuccessCallback_18(void * context, uint8_t colorControlOptions)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_18(colorControlOptions);
+    }
+
+    static void OnFailureCallback_19(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_19(status);
+    }
+
+    static void OnSuccessCallback_19(void * context, uint8_t colorControlOptions)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_19(colorControlOptions);
+    }
+
+    static void OnFailureCallback_20(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_20(status);
+    }
+
+    static void OnSuccessCallback_20(void * context, uint8_t colorControlOptions)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_20(colorControlOptions);
+    }
+
+    static void OnFailureCallback_21(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_21(status);
+    }
+
+    static void OnSuccessCallback_21(void * context, uint8_t colorControlOptions)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_21(colorControlOptions);
+    }
+
+    static void OnFailureCallback_22(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_22(status);
+    }
+
+    static void OnSuccessCallback_22(void * context, uint16_t enhancedCurrentHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_22(enhancedCurrentHue);
+    }
+
+    static void OnFailureCallback_23(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_23(status);
+    }
+
+    static void OnSuccessCallback_23(void * context, uint16_t enhancedCurrentHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_23(enhancedCurrentHue);
+    }
+
+    static void OnFailureCallback_24(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_24(status);
+    }
+
+    static void OnSuccessCallback_24(void * context, uint16_t enhancedCurrentHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_24(enhancedCurrentHue);
+    }
+
+    static void OnFailureCallback_25(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_25(status);
+    }
+
+    static void OnSuccessCallback_25(void * context, uint16_t enhancedCurrentHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_25(enhancedCurrentHue);
+    }
+
+    static void OnFailureCallback_26(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_26(status);
+    }
+
+    static void OnSuccessCallback_26(void * context, uint8_t enhancedColorMode)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_26(enhancedColorMode);
+    }
+
+    static void OnFailureCallback_27(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_27(status);
+    }
+
+    static void OnSuccessCallback_27(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_27(colorLoopActive);
+    }
+
+    static void OnFailureCallback_28(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_28(status);
+    }
+
+    static void OnSuccessCallback_28(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_28(colorLoopActive);
+    }
+
+    static void OnFailureCallback_29(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_29(status);
+    }
+
+    static void OnSuccessCallback_29(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_29(colorLoopActive);
+    }
+
+    static void OnFailureCallback_30(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_30(status);
+    }
+
+    static void OnSuccessCallback_30(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_30(colorLoopActive);
+    }
+
+    static void OnFailureCallback_31(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_31(status);
+    }
+
+    static void OnSuccessCallback_31(void * context, uint8_t colorLoopDirection)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_31(colorLoopDirection);
+    }
+
+    static void OnFailureCallback_32(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_32(status);
+    }
+
+    static void OnSuccessCallback_32(void * context, uint8_t colorLoopDirection)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_32(colorLoopDirection);
+    }
+
+    static void OnFailureCallback_33(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_33(status);
+    }
+
+    static void OnSuccessCallback_33(void * context, uint8_t colorLoopDirection)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_33(colorLoopDirection);
+    }
+
+    static void OnFailureCallback_34(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_34(status);
+    }
+
+    static void OnSuccessCallback_34(void * context, uint8_t colorLoopDirection)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_34(colorLoopDirection);
+    }
+
+    static void OnFailureCallback_35(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_35(status);
+    }
+
+    static void OnSuccessCallback_35(void * context, uint16_t colorLoopTime)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_35(colorLoopTime);
+    }
+
+    static void OnFailureCallback_36(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_36(status);
+    }
+
+    static void OnSuccessCallback_36(void * context, uint16_t colorLoopTime)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_36(colorLoopTime);
+    }
+
+    static void OnFailureCallback_37(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_37(status);
+    }
+
+    static void OnSuccessCallback_37(void * context, uint16_t colorLoopTime)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_37(colorLoopTime);
+    }
+
+    static void OnFailureCallback_38(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_38(status);
+    }
+
+    static void OnSuccessCallback_38(void * context, uint16_t colorLoopTime)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_38(colorLoopTime);
+    }
+
+    static void OnFailureCallback_39(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_39(status);
+    }
+
+    static void OnSuccessCallback_39(void * context, uint16_t colorLoopStartEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_39(colorLoopStartEnhancedHue);
+    }
+
+    static void OnFailureCallback_40(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_40(status);
+    }
+
+    static void OnSuccessCallback_40(void * context, uint16_t colorLoopStartEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_40(colorLoopStartEnhancedHue);
+    }
+
+    static void OnFailureCallback_41(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_41(status);
+    }
+
+    static void OnSuccessCallback_41(void * context, uint16_t colorLoopStartEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_41(colorLoopStartEnhancedHue);
+    }
+
+    static void OnFailureCallback_42(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_42(status);
+    }
+
+    static void OnSuccessCallback_42(void * context, uint16_t colorLoopStartEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_42(colorLoopStartEnhancedHue);
+    }
+
+    static void OnFailureCallback_43(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_43(status);
+    }
+
+    static void OnSuccessCallback_43(void * context, uint16_t colorLoopStoredEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_43(colorLoopStoredEnhancedHue);
+    }
+
+    static void OnFailureCallback_44(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_44(status);
+    }
+
+    static void OnSuccessCallback_44(void * context, uint16_t colorLoopStoredEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_44(colorLoopStoredEnhancedHue);
+    }
+
+    static void OnFailureCallback_45(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_45(status);
+    }
+
+    static void OnSuccessCallback_45(void * context, uint16_t colorLoopStoredEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_45(colorLoopStoredEnhancedHue);
+    }
+
+    static void OnFailureCallback_46(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_46(status);
+    }
+
+    static void OnSuccessCallback_46(void * context, uint16_t colorLoopStoredEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_46(colorLoopStoredEnhancedHue);
+    }
+
+    static void OnFailureCallback_47(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_47(status);
+    }
+
+    static void OnSuccessCallback_47(void * context, uint16_t colorCapabilities)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_47(colorCapabilities);
+    }
+
+    static void OnFailureCallback_48(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_48(status);
+    }
+
+    static void OnSuccessCallback_48(void * context, uint16_t colorCapabilities)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_48(colorCapabilities);
+    }
+
+    static void OnFailureCallback_49(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_49(status);
+    }
+
+    static void OnSuccessCallback_49(void * context, uint16_t colorCapabilities)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_49(colorCapabilities);
+    }
+
+    static void OnFailureCallback_50(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_50(status);
+    }
+
+    static void OnSuccessCallback_50(void * context, uint16_t colorCapabilities)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_50(colorCapabilities);
+    }
+
+    static void OnFailureCallback_51(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_51(status);
+    }
+
+    static void OnSuccessCallback_51(void * context, uint16_t colorTempPhysicalMin)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_51(colorTempPhysicalMin);
+    }
+
+    static void OnFailureCallback_52(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_52(status);
+    }
+
+    static void OnSuccessCallback_52(void * context, uint16_t colorTempPhysicalMin)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_52(colorTempPhysicalMin);
+    }
+
+    static void OnFailureCallback_53(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_53(status);
+    }
+
+    static void OnSuccessCallback_53(void * context, uint16_t colorTempPhysicalMin)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_53(colorTempPhysicalMin);
+    }
+
+    static void OnFailureCallback_54(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_54(status);
+    }
+
+    static void OnSuccessCallback_54(void * context, uint16_t colorTempPhysicalMin)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_54(colorTempPhysicalMin);
+    }
+
+    static void OnFailureCallback_55(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_55(status);
+    }
+
+    static void OnSuccessCallback_55(void * context, uint16_t colorTempPhysicalMax)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_55(colorTempPhysicalMax);
+    }
+
+    static void OnFailureCallback_56(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_56(status);
+    }
+
+    static void OnSuccessCallback_56(void * context, uint16_t colorTempPhysicalMax)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_56(colorTempPhysicalMax);
+    }
+
+    static void OnFailureCallback_57(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_57(status);
+    }
+
+    static void OnSuccessCallback_57(void * context, uint16_t colorTempPhysicalMax)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_57(colorTempPhysicalMax);
+    }
+
+    static void OnFailureCallback_58(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_58(status);
+    }
+
+    static void OnSuccessCallback_58(void * context, uint16_t colorTempPhysicalMax)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_58(colorTempPhysicalMax);
+    }
+
+    static void OnFailureCallback_59(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_59(status);
+    }
+
+    static void OnSuccessCallback_59(void * context, uint16_t coupleColorTempToLevelMinMireds)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_59(coupleColorTempToLevelMinMireds);
+    }
+
+    static void OnFailureCallback_60(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_60(status);
+    }
+
+    static void OnSuccessCallback_60(void * context, uint16_t coupleColorTempToLevelMinMireds)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_60(coupleColorTempToLevelMinMireds);
+    }
+
+    static void OnFailureCallback_61(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_61(status);
+    }
+
+    static void OnSuccessCallback_61(void * context, uint16_t coupleColorTempToLevelMinMireds)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_61(coupleColorTempToLevelMinMireds);
+    }
+
+    static void OnFailureCallback_62(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_62(status);
+    }
+
+    static void OnSuccessCallback_62(void * context, uint16_t startUpColorTemperatureMireds)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_62(startUpColorTemperatureMireds);
+    }
+
+    static void OnFailureCallback_63(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_63(status);
+    }
+
+    static void OnSuccessCallback_63(void * context, uint16_t startUpColorTemperatureMireds)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_63(startUpColorTemperatureMireds);
+    }
+
+    static void OnFailureCallback_64(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_64(status);
+    }
+
+    static void OnSuccessCallback_64(void * context, uint16_t startUpColorTemperatureMireds)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_64(startUpColorTemperatureMireds);
+    }
+
+    static void OnFailureCallback_65(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_65(status);
+    }
+
+    static void OnSuccessCallback_65(void * context, uint16_t remainingTime)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_65(remainingTime);
+    }
+
+    static void OnFailureCallback_66(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_66(status);
+    }
+
+    static void OnSuccessCallback_66(void * context, uint16_t remainingTime)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_66(remainingTime);
+    }
+
+    static void OnFailureCallback_67(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_67(status);
+    }
+
+    static void OnSuccessCallback_67(void * context, uint16_t remainingTime)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_67(remainingTime);
+    }
+
+    static void OnFailureCallback_68(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_68(status);
+    }
+
+    static void OnSuccessCallback_68(void * context, uint16_t remainingTime)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_68(remainingTime);
+    }
+
+    static void OnFailureCallback_69(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_69(status);
+    }
+
+    static void OnSuccessCallback_69(void * context, uint8_t driftCompensation)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_69(driftCompensation);
+    }
+
+    static void OnFailureCallback_70(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_70(status);
+    }
+
+    static void OnSuccessCallback_70(void * context, uint8_t driftCompensation)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_70(driftCompensation);
+    }
+
+    static void OnFailureCallback_71(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_71(status);
+    }
+
+    static void OnSuccessCallback_71(void * context, uint8_t driftCompensation)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_71(driftCompensation);
+    }
+
+    static void OnFailureCallback_72(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_72(status);
+    }
+
+    static void OnSuccessCallback_72(void * context, chip::CharSpan compensationText)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_72(compensationText);
+    }
+
+    static void OnFailureCallback_73(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_73(status);
+    }
+
+    static void OnSuccessCallback_73(void * context, uint8_t numberOfPrimaries)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_73(numberOfPrimaries);
+    }
+
+    static void OnFailureCallback_74(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_74(status);
+    }
+
+    static void OnSuccessCallback_74(void * context, uint8_t numberOfPrimaries)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_74(numberOfPrimaries);
+    }
+
+    static void OnFailureCallback_75(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_75(status);
+    }
+
+    static void OnSuccessCallback_75(void * context, uint8_t numberOfPrimaries)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_75(numberOfPrimaries);
+    }
+
+    static void OnFailureCallback_76(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_76(status);
+    }
+
+    static void OnSuccessCallback_76(void * context, uint16_t primary1X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_76(primary1X);
+    }
+
+    static void OnFailureCallback_77(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_77(status);
+    }
+
+    static void OnSuccessCallback_77(void * context, uint16_t primary1X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_77(primary1X);
+    }
+
+    static void OnFailureCallback_78(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_78(status);
+    }
+
+    static void OnSuccessCallback_78(void * context, uint16_t primary1X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_78(primary1X);
+    }
+
+    static void OnFailureCallback_79(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_79(status);
+    }
+
+    static void OnSuccessCallback_79(void * context, uint16_t primary1Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_79(primary1Y);
+    }
+
+    static void OnFailureCallback_80(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_80(status);
+    }
+
+    static void OnSuccessCallback_80(void * context, uint16_t primary1Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_80(primary1Y);
+    }
+
+    static void OnFailureCallback_81(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_81(status);
+    }
+
+    static void OnSuccessCallback_81(void * context, uint16_t primary1Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_81(primary1Y);
+    }
+
+    static void OnFailureCallback_82(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_82(status);
+    }
+
+    static void OnSuccessCallback_82(void * context, uint8_t primary1Intensity)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_82(primary1Intensity);
+    }
+
+    static void OnFailureCallback_83(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_83(status);
+    }
+
+    static void OnSuccessCallback_83(void * context, uint16_t primary2X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_83(primary2X);
+    }
+
+    static void OnFailureCallback_84(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_84(status);
+    }
+
+    static void OnSuccessCallback_84(void * context, uint16_t primary2X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_84(primary2X);
+    }
+
+    static void OnFailureCallback_85(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_85(status);
+    }
+
+    static void OnSuccessCallback_85(void * context, uint16_t primary2X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_85(primary2X);
+    }
+
+    static void OnFailureCallback_86(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_86(status);
+    }
+
+    static void OnSuccessCallback_86(void * context, uint16_t primary2Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_86(primary2Y);
+    }
+
+    static void OnFailureCallback_87(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_87(status);
+    }
+
+    static void OnSuccessCallback_87(void * context, uint16_t primary2Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_87(primary2Y);
+    }
+
+    static void OnFailureCallback_88(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_88(status);
+    }
+
+    static void OnSuccessCallback_88(void * context, uint16_t primary2Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_88(primary2Y);
+    }
+
+    static void OnFailureCallback_89(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_89(status);
+    }
+
+    static void OnSuccessCallback_89(void * context, uint8_t primary2Intensity)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_89(primary2Intensity);
+    }
+
+    static void OnFailureCallback_90(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_90(status);
+    }
+
+    static void OnSuccessCallback_90(void * context, uint16_t primary3X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_90(primary3X);
+    }
+
+    static void OnFailureCallback_91(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_91(status);
+    }
+
+    static void OnSuccessCallback_91(void * context, uint16_t primary3X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_91(primary3X);
+    }
+
+    static void OnFailureCallback_92(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_92(status);
+    }
+
+    static void OnSuccessCallback_92(void * context, uint16_t primary3X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_92(primary3X);
+    }
+
+    static void OnFailureCallback_93(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_93(status);
+    }
+
+    static void OnSuccessCallback_93(void * context, uint16_t primary3Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_93(primary3Y);
+    }
+
+    static void OnFailureCallback_94(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_94(status);
+    }
+
+    static void OnSuccessCallback_94(void * context, uint16_t primary3Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_94(primary3Y);
+    }
+
+    static void OnFailureCallback_95(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_95(status);
+    }
+
+    static void OnSuccessCallback_95(void * context, uint16_t primary3Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_95(primary3Y);
+    }
+
+    static void OnFailureCallback_96(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_96(status);
+    }
+
+    static void OnSuccessCallback_96(void * context, uint8_t primary3Intensity)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_96(primary3Intensity);
+    }
+
+    static void OnFailureCallback_97(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_97(status);
+    }
+
+    static void OnSuccessCallback_97(void * context, uint16_t primary4X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_97(primary4X);
+    }
+
+    static void OnFailureCallback_98(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_98(status);
+    }
+
+    static void OnSuccessCallback_98(void * context, uint16_t primary4X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_98(primary4X);
+    }
+
+    static void OnFailureCallback_99(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_99(status);
+    }
+
+    static void OnSuccessCallback_99(void * context, uint16_t primary4X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_99(primary4X);
+    }
+
+    static void OnFailureCallback_100(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_100(status);
+    }
+
+    static void OnSuccessCallback_100(void * context, uint16_t primary4Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_100(primary4Y);
+    }
+
+    static void OnFailureCallback_101(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_101(status);
+    }
+
+    static void OnSuccessCallback_101(void * context, uint16_t primary4Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_101(primary4Y);
+    }
+
+    static void OnFailureCallback_102(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_102(status);
+    }
+
+    static void OnSuccessCallback_102(void * context, uint16_t primary4Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_102(primary4Y);
+    }
+
+    static void OnFailureCallback_103(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_103(status);
+    }
+
+    static void OnSuccessCallback_103(void * context, uint8_t primary4Intensity)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_103(primary4Intensity);
+    }
+
+    static void OnFailureCallback_104(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_104(status);
+    }
+
+    static void OnSuccessCallback_104(void * context, uint16_t primary5X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_104(primary5X);
+    }
+
+    static void OnFailureCallback_105(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_105(status);
+    }
+
+    static void OnSuccessCallback_105(void * context, uint16_t primary5X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_105(primary5X);
+    }
+
+    static void OnFailureCallback_106(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_106(status);
+    }
+
+    static void OnSuccessCallback_106(void * context, uint16_t primary5X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_106(primary5X);
+    }
+
+    static void OnFailureCallback_107(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_107(status);
+    }
+
+    static void OnSuccessCallback_107(void * context, uint16_t primary5Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_107(primary5Y);
+    }
+
+    static void OnFailureCallback_108(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_108(status);
+    }
+
+    static void OnSuccessCallback_108(void * context, uint16_t primary5Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_108(primary5Y);
+    }
+
+    static void OnFailureCallback_109(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_109(status);
+    }
+
+    static void OnSuccessCallback_109(void * context, uint16_t primary5Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_109(primary5Y);
+    }
+
+    static void OnFailureCallback_110(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_110(status);
+    }
+
+    static void OnSuccessCallback_110(void * context, uint8_t primary5Intensity)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_110(primary5Intensity);
+    }
+
+    static void OnFailureCallback_111(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_111(status);
+    }
+
+    static void OnSuccessCallback_111(void * context, uint16_t primary6X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_111(primary6X);
+    }
+
+    static void OnFailureCallback_112(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_112(status);
+    }
+
+    static void OnSuccessCallback_112(void * context, uint16_t primary6X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_112(primary6X);
+    }
+
+    static void OnFailureCallback_113(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_113(status);
+    }
+
+    static void OnSuccessCallback_113(void * context, uint16_t primary6X)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_113(primary6X);
+    }
+
+    static void OnFailureCallback_114(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_114(status);
+    }
+
+    static void OnSuccessCallback_114(void * context, uint16_t primary6Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_114(primary6Y);
+    }
+
+    static void OnFailureCallback_115(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_115(status);
+    }
+
+    static void OnSuccessCallback_115(void * context, uint16_t primary6Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_115(primary6Y);
+    }
+
+    static void OnFailureCallback_116(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_116(status);
+    }
+
+    static void OnSuccessCallback_116(void * context, uint16_t primary6Y)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_116(primary6Y);
+    }
+
+    static void OnFailureCallback_117(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_117(status);
+    }
+
+    static void OnSuccessCallback_117(void * context, uint8_t primary6Intensity)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_117(primary6Intensity);
+    }
+
+    static void OnFailureCallback_118(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_118(status);
+    }
+
+    static void OnSuccessCallback_118(void * context, uint16_t whitePointX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_118(whitePointX);
+    }
+
+    static void OnFailureCallback_119(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_119(status);
+    }
+
+    static void OnSuccessCallback_119(void * context, uint16_t whitePointX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_119(whitePointX);
+    }
+
+    static void OnFailureCallback_120(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_120(status);
+    }
+
+    static void OnSuccessCallback_120(void * context, uint16_t whitePointX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_120(whitePointX);
+    }
+
+    static void OnFailureCallback_121(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_121(status);
+    }
+
+    static void OnSuccessCallback_121(void * context, uint16_t whitePointY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_121(whitePointY);
+    }
+
+    static void OnFailureCallback_122(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_122(status);
+    }
+
+    static void OnSuccessCallback_122(void * context, uint16_t whitePointY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_122(whitePointY);
+    }
+
+    static void OnFailureCallback_123(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_123(status);
+    }
+
+    static void OnSuccessCallback_123(void * context, uint16_t whitePointY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_123(whitePointY);
+    }
+
+    static void OnFailureCallback_124(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_124(status);
+    }
+
+    static void OnSuccessCallback_124(void * context, uint16_t colorPointRX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_124(colorPointRX);
+    }
+
+    static void OnFailureCallback_125(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_125(status);
+    }
+
+    static void OnSuccessCallback_125(void * context, uint16_t colorPointRX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_125(colorPointRX);
+    }
+
+    static void OnFailureCallback_126(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_126(status);
+    }
+
+    static void OnSuccessCallback_126(void * context, uint16_t colorPointRX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_126(colorPointRX);
+    }
+
+    static void OnFailureCallback_127(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_127(status);
+    }
+
+    static void OnSuccessCallback_127(void * context, uint16_t colorPointRY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_127(colorPointRY);
+    }
+
+    static void OnFailureCallback_128(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_128(status);
+    }
+
+    static void OnSuccessCallback_128(void * context, uint16_t colorPointRY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_128(colorPointRY);
+    }
+
+    static void OnFailureCallback_129(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_129(status);
+    }
+
+    static void OnSuccessCallback_129(void * context, uint16_t colorPointRY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_129(colorPointRY);
+    }
+
+    static void OnFailureCallback_130(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_130(status);
+    }
+
+    static void OnSuccessCallback_130(void * context, uint8_t colorPointRIntensity)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_130(colorPointRIntensity);
+    }
+
+    static void OnFailureCallback_131(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_131(status);
+    }
+
+    static void OnSuccessCallback_131(void * context, uint16_t colorPointGX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_131(colorPointGX);
+    }
+
+    static void OnFailureCallback_132(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_132(status);
+    }
+
+    static void OnSuccessCallback_132(void * context, uint16_t colorPointGX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_132(colorPointGX);
+    }
+
+    static void OnFailureCallback_133(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_133(status);
+    }
+
+    static void OnSuccessCallback_133(void * context, uint16_t colorPointGX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_133(colorPointGX);
+    }
+
+    static void OnFailureCallback_134(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_134(status);
+    }
+
+    static void OnSuccessCallback_134(void * context, uint16_t colorPointGY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_134(colorPointGY);
+    }
+
+    static void OnFailureCallback_135(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_135(status);
+    }
+
+    static void OnSuccessCallback_135(void * context, uint16_t colorPointGY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_135(colorPointGY);
+    }
+
+    static void OnFailureCallback_136(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_136(status);
+    }
+
+    static void OnSuccessCallback_136(void * context, uint16_t colorPointGY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_136(colorPointGY);
+    }
+
+    static void OnFailureCallback_137(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_137(status);
+    }
+
+    static void OnSuccessCallback_137(void * context, uint8_t colorPointGIntensity)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_137(colorPointGIntensity);
+    }
+
+    static void OnFailureCallback_138(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_138(status);
+    }
+
+    static void OnSuccessCallback_138(void * context, uint16_t colorPointBX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_138(colorPointBX);
+    }
+
+    static void OnFailureCallback_139(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_139(status);
+    }
+
+    static void OnSuccessCallback_139(void * context, uint16_t colorPointBX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_139(colorPointBX);
+    }
+
+    static void OnFailureCallback_140(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_140(status);
+    }
+
+    static void OnSuccessCallback_140(void * context, uint16_t colorPointBX)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_140(colorPointBX);
+    }
+
+    static void OnFailureCallback_141(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_141(status);
+    }
+
+    static void OnSuccessCallback_141(void * context, uint16_t colorPointBY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_141(colorPointBY);
+    }
+
+    static void OnFailureCallback_142(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_142(status);
+    }
+
+    static void OnSuccessCallback_142(void * context, uint16_t colorPointBY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_142(colorPointBY);
+    }
+
+    static void OnFailureCallback_143(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_143(status);
+    }
+
+    static void OnSuccessCallback_143(void * context, uint16_t colorPointBY)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_143(colorPointBY);
+    }
+
+    static void OnFailureCallback_144(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnFailureResponse_144(status);
+    }
+
+    static void OnSuccessCallback_144(void * context, uint8_t colorPointBIntensity)
+    {
+        (static_cast<Test_TC_CC_2_1 *>(context))->OnSuccessResponse_144(colorPointBIntensity);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadsMandatoryAttributeCurrentHue_0()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentHue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t currentHue)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentHue", currentHue, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeCurrentHue_1()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentHue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t currentHue)
+    {
+        VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", currentHue, 254));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValueToMandatoryAttributeCurrentHue_2()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t currentHueArgument = 0;
+
+        return cluster.WriteAttributeCurrentHue(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), currentHueArgument);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_2(uint8_t currentHue) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeCurrentHue_3()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentHue(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t currentHue)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentHue", currentHue, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsMandatoryAttributeCurrentSaturation_4()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentSaturation(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t currentSaturation)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentSaturation", currentSaturation, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeCurrentSaturation_5()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentSaturation(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint8_t currentSaturation)
+    {
+        VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", currentSaturation, 254));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValueToMandatoryAttributeCurrentSaturation_6()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t currentSaturationArgument = 0;
+
+        return cluster.WriteAttributeCurrentSaturation(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel(),
+                                                       currentSaturationArgument);
+    }
+
+    void OnFailureResponse_6(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_6(uint8_t currentSaturation) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeCurrentSaturation_7()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentSaturation(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(uint8_t currentSaturation)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentSaturation", currentSaturation, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeCurrentX_8()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentX(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint16_t currentX)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("currentX", currentX, 24939U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeCurrentX_9()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentX(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(uint16_t currentX)
+    {
+        VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", currentX, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValueToMandatoryAttributeCurrentX_10()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t currentXArgument = 24939U;
+
+        return cluster.WriteAttributeCurrentX(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel(), currentXArgument);
+    }
+
+    void OnFailureResponse_10(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_10(uint16_t currentX) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeCurrentX_11()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentX(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11(uint16_t currentX)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("currentX", currentX, 24939U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeCurrentY_12()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentY(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
+    }
+
+    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(uint16_t currentY)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("currentY", currentY, 24701U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeCurrentY_13()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentY(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
+    }
+
+    void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(uint16_t currentY)
+    {
+        VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", currentY, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeCurrentY_14()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t currentYArgument = 24701U;
+
+        return cluster.WriteAttributeCurrentY(mOnSuccessCallback_14.Cancel(), mOnFailureCallback_14.Cancel(), currentYArgument);
+    }
+
+    void OnFailureResponse_14(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_14(uint16_t currentY) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeCurrentY_15()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentY(mOnSuccessCallback_15.Cancel(), mOnFailureCallback_15.Cancel());
+    }
+
+    void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15(uint16_t currentY)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("currentY", currentY, 24701U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorTemperatureMireds_16()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorTemperature(mOnSuccessCallback_16.Cancel(), mOnFailureCallback_16.Cancel());
+    }
+
+    void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_16(uint16_t colorTemperature)
+    {
+        VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", colorTemperature, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorMode_17()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorMode(mOnSuccessCallback_17.Cancel(), mOnFailureCallback_17.Cancel());
+    }
+
+    void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_17(uint8_t colorMode)
+    {
+        VerifyOrReturn(CheckConstraintType("colorMode", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("colorMode", colorMode, 2));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeOptions_18()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorControlOptions(mOnSuccessCallback_18.Cancel(), mOnFailureCallback_18.Cancel());
+    }
+
+    void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_18(uint8_t colorControlOptions)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorControlOptions", colorControlOptions, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeOptions_19()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorControlOptions(mOnSuccessCallback_19.Cancel(), mOnFailureCallback_19.Cancel());
+    }
+
+    void OnFailureResponse_19(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_19(uint8_t colorControlOptions)
+    {
+        VerifyOrReturn(CheckConstraintType("colorControlOptions", "", "map8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeOptions_20()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t colorControlOptionsArgument = 0;
+
+        return cluster.WriteAttributeColorControlOptions(mOnSuccessCallback_20.Cancel(), mOnFailureCallback_20.Cancel(),
+                                                         colorControlOptionsArgument);
+    }
+
+    void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20(uint8_t colorControlOptions) { NextTest(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeOptions_21()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorControlOptions(mOnSuccessCallback_21.Cancel(), mOnFailureCallback_21.Cancel());
+    }
+
+    void OnFailureResponse_21(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_21(uint8_t colorControlOptions)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorControlOptions", colorControlOptions, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeEnhancedCurrentHue_22()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeEnhancedCurrentHue(mOnSuccessCallback_22.Cancel(), mOnFailureCallback_22.Cancel());
+    }
+
+    void OnFailureResponse_22(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_22(uint16_t enhancedCurrentHue)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("enhancedCurrentHue", enhancedCurrentHue, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeEnhancedCurrentHue_23()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeEnhancedCurrentHue(mOnSuccessCallback_23.Cancel(), mOnFailureCallback_23.Cancel());
+    }
+
+    void OnFailureResponse_23(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_23(uint16_t enhancedCurrentHue)
+    {
+        VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeEnhancedCurrentHue_24()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t enhancedCurrentHueArgument = 0U;
+
+        return cluster.WriteAttributeEnhancedCurrentHue(mOnSuccessCallback_24.Cancel(), mOnFailureCallback_24.Cancel(),
+                                                        enhancedCurrentHueArgument);
+    }
+
+    void OnFailureResponse_24(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_24(uint16_t enhancedCurrentHue) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeEnhancedCurrentHue_25()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeEnhancedCurrentHue(mOnSuccessCallback_25.Cancel(), mOnFailureCallback_25.Cancel());
+    }
+
+    void OnFailureResponse_25(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_25(uint16_t enhancedCurrentHue)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("enhancedCurrentHue", enhancedCurrentHue, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeEnhancedColorMode_26()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeEnhancedColorMode(mOnSuccessCallback_26.Cancel(), mOnFailureCallback_26.Cancel());
+    }
+
+    void OnFailureResponse_26(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_26(uint8_t enhancedColorMode)
+    {
+        VerifyOrReturn(CheckConstraintType("enhancedColorMode", "", "enum8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeColorLoopActive_27()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_27.Cancel(), mOnFailureCallback_27.Cancel());
+    }
+
+    void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_27(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopActive_28()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_28.Cancel(), mOnFailureCallback_28.Cancel());
+    }
+
+    void OnFailureResponse_28(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_28(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckConstraintType("colorLoopActive", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopActive_29()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t colorLoopActiveArgument = 0;
+
+        return cluster.WriteAttributeColorLoopActive(mOnSuccessCallback_29.Cancel(), mOnFailureCallback_29.Cancel(),
+                                                     colorLoopActiveArgument);
+    }
+
+    void OnFailureResponse_29(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_29(uint8_t colorLoopActive) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopActive_30()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_30.Cancel(), mOnFailureCallback_30.Cancel());
+    }
+
+    void OnFailureResponse_30(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_30(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeColorLoopDirection_31()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_31.Cancel(), mOnFailureCallback_31.Cancel());
+    }
+
+    void OnFailureResponse_31(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_31(uint8_t colorLoopDirection)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopDirection", colorLoopDirection, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopDirection_32()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_32.Cancel(), mOnFailureCallback_32.Cancel());
+    }
+
+    void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_32(uint8_t colorLoopDirection)
+    {
+        VerifyOrReturn(CheckConstraintType("colorLoopDirection", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopDirection_33()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t colorLoopDirectionArgument = 0;
+
+        return cluster.WriteAttributeColorLoopDirection(mOnSuccessCallback_33.Cancel(), mOnFailureCallback_33.Cancel(),
+                                                        colorLoopDirectionArgument);
+    }
+
+    void OnFailureResponse_33(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_33(uint8_t colorLoopDirection) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopDirection_34()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_34.Cancel(), mOnFailureCallback_34.Cancel());
+    }
+
+    void OnFailureResponse_34(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_34(uint8_t colorLoopDirection)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopDirection", colorLoopDirection, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeColorLoopTime_35()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_35.Cancel(), mOnFailureCallback_35.Cancel());
+    }
+
+    void OnFailureResponse_35(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_35(uint16_t colorLoopTime)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopTime", colorLoopTime, 25U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopTime_36()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_36.Cancel(), mOnFailureCallback_36.Cancel());
+    }
+
+    void OnFailureResponse_36(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_36(uint16_t colorLoopTime)
+    {
+        VerifyOrReturn(CheckConstraintType("colorLoopTime", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopTime_37()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorLoopTimeArgument = 25U;
+
+        return cluster.WriteAttributeColorLoopTime(mOnSuccessCallback_37.Cancel(), mOnFailureCallback_37.Cancel(),
+                                                   colorLoopTimeArgument);
+    }
+
+    void OnFailureResponse_37(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_37(uint16_t colorLoopTime) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopTime_38()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_38.Cancel(), mOnFailureCallback_38.Cancel());
+    }
+
+    void OnFailureResponse_38(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_38(uint16_t colorLoopTime)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopTime", colorLoopTime, 25U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeColorLoopStartEnhancedHue_39()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_39.Cancel(), mOnFailureCallback_39.Cancel());
+    }
+
+    void OnFailureResponse_39(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_39(uint16_t colorLoopStartEnhancedHue)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopStartEnhancedHue", colorLoopStartEnhancedHue, 8960U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopStartEnhancedHue_40()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_40.Cancel(), mOnFailureCallback_40.Cancel());
+    }
+
+    void OnFailureResponse_40(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_40(uint16_t colorLoopStartEnhancedHue)
+    {
+        VerifyOrReturn(CheckConstraintType("colorLoopStartEnhancedHue", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopStartEnhancedHue_41()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorLoopStartEnhancedHueArgument = 8960U;
+
+        return cluster.WriteAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_41.Cancel(), mOnFailureCallback_41.Cancel(),
+                                                               colorLoopStartEnhancedHueArgument);
+    }
+
+    void OnFailureResponse_41(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_41(uint16_t colorLoopStartEnhancedHue) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopStartEnhancedHue_42()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_42.Cancel(), mOnFailureCallback_42.Cancel());
+    }
+
+    void OnFailureResponse_42(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_42(uint16_t colorLoopStartEnhancedHue)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopStartEnhancedHue", colorLoopStartEnhancedHue, 8960U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeColorLoopStoredEnhancedHue_43()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopStoredEnhancedHue(mOnSuccessCallback_43.Cancel(), mOnFailureCallback_43.Cancel());
+    }
+
+    void OnFailureResponse_43(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_43(uint16_t colorLoopStoredEnhancedHue)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopStoredEnhancedHue", colorLoopStoredEnhancedHue, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopStoredEnhancedHue_44()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopStoredEnhancedHue(mOnSuccessCallback_44.Cancel(), mOnFailureCallback_44.Cancel());
+    }
+
+    void OnFailureResponse_44(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_44(uint16_t colorLoopStoredEnhancedHue)
+    {
+        VerifyOrReturn(CheckConstraintType("colorLoopStoredEnhancedHue", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopStoredEnhancedHue_45()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorLoopStoredEnhancedHueArgument = 0U;
+
+        return cluster.WriteAttributeColorLoopStoredEnhancedHue(mOnSuccessCallback_45.Cancel(), mOnFailureCallback_45.Cancel(),
+                                                                colorLoopStoredEnhancedHueArgument);
+    }
+
+    void OnFailureResponse_45(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_45(uint16_t colorLoopStoredEnhancedHue) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopStoredEnhancedHue_46()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopStoredEnhancedHue(mOnSuccessCallback_46.Cancel(), mOnFailureCallback_46.Cancel());
+    }
+
+    void OnFailureResponse_46(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_46(uint16_t colorLoopStoredEnhancedHue)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopStoredEnhancedHue", colorLoopStoredEnhancedHue, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeColorCapabilities_47()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorCapabilities(mOnSuccessCallback_47.Cancel(), mOnFailureCallback_47.Cancel());
+    }
+
+    void OnFailureResponse_47(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_47(uint16_t colorCapabilities)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorCapabilities", colorCapabilities, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorCapabilities_48()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorCapabilities(mOnSuccessCallback_48.Cancel(), mOnFailureCallback_48.Cancel());
+    }
+
+    void OnFailureResponse_48(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_48(uint16_t colorCapabilities)
+    {
+        VerifyOrReturn(CheckConstraintType("colorCapabilities", "", "map16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorCapabilities", colorCapabilities, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorCapabilities_49()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorCapabilitiesArgument = 0U;
+
+        return cluster.WriteAttributeColorCapabilities(mOnSuccessCallback_49.Cancel(), mOnFailureCallback_49.Cancel(),
+                                                       colorCapabilitiesArgument);
+    }
+
+    void OnFailureResponse_49(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_49(uint16_t colorCapabilities) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeColorCapabilities_50()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorCapabilities(mOnSuccessCallback_50.Cancel(), mOnFailureCallback_50.Cancel());
+    }
+
+    void OnFailureResponse_50(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_50(uint16_t colorCapabilities)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorCapabilities", colorCapabilities, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeColorTempPhysicalMinMireds_51()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorTempPhysicalMin(mOnSuccessCallback_51.Cancel(), mOnFailureCallback_51.Cancel());
+    }
+
+    void OnFailureResponse_51(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_51(uint16_t colorTempPhysicalMin)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorTempPhysicalMin", colorTempPhysicalMin, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorTempPhysicalMinMireds_52()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorTempPhysicalMin(mOnSuccessCallback_52.Cancel(), mOnFailureCallback_52.Cancel());
+    }
+
+    void OnFailureResponse_52(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_52(uint16_t colorTempPhysicalMin)
+    {
+        VerifyOrReturn(CheckConstraintType("colorTempPhysicalMin", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMin", colorTempPhysicalMin, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorTempPhysicalMinMireds_53()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorTempPhysicalMinArgument = 0U;
+
+        return cluster.WriteAttributeColorTempPhysicalMin(mOnSuccessCallback_53.Cancel(), mOnFailureCallback_53.Cancel(),
+                                                          colorTempPhysicalMinArgument);
+    }
+
+    void OnFailureResponse_53(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_53(uint16_t colorTempPhysicalMin) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeColorTempPhysicalMinMireds_54()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorTempPhysicalMin(mOnSuccessCallback_54.Cancel(), mOnFailureCallback_54.Cancel());
+    }
+
+    void OnFailureResponse_54(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_54(uint16_t colorTempPhysicalMin)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorTempPhysicalMin", colorTempPhysicalMin, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeColorTempPhysicalMaxMireds_55()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorTempPhysicalMax(mOnSuccessCallback_55.Cancel(), mOnFailureCallback_55.Cancel());
+    }
+
+    void OnFailureResponse_55(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_55(uint16_t colorTempPhysicalMax)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorTempPhysicalMax", colorTempPhysicalMax, 65279U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeColorTempPhysicalMaxMireds_56()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorTempPhysicalMax(mOnSuccessCallback_56.Cancel(), mOnFailureCallback_56.Cancel());
+    }
+
+    void OnFailureResponse_56(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_56(uint16_t colorTempPhysicalMax)
+    {
+        VerifyOrReturn(CheckConstraintType("colorTempPhysicalMax", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMax", colorTempPhysicalMax, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorTempPhysicalMaxMireds_57()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorTempPhysicalMaxArgument = 65279U;
+
+        return cluster.WriteAttributeColorTempPhysicalMax(mOnSuccessCallback_57.Cancel(), mOnFailureCallback_57.Cancel(),
+                                                          colorTempPhysicalMaxArgument);
+    }
+
+    void OnFailureResponse_57(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_57(uint16_t colorTempPhysicalMax) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeColorTempPhysicalMaxMireds_58()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorTempPhysicalMax(mOnSuccessCallback_58.Cancel(), mOnFailureCallback_58.Cancel());
+    }
+
+    void OnFailureResponse_58(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_58(uint16_t colorTempPhysicalMax)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorTempPhysicalMax", colorTempPhysicalMax, 65279U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeCoupleColorTempToLevelMinMireds_59()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCoupleColorTempToLevelMinMireds(mOnSuccessCallback_59.Cancel(), mOnFailureCallback_59.Cancel());
+    }
+
+    void OnFailureResponse_59(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_59(uint16_t coupleColorTempToLevelMinMireds)
+    {
+        VerifyOrReturn(CheckConstraintType("coupleColorTempToLevelMinMireds", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeCoupleColorTempToLevelMinMireds_60()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t coupleColorTempToLevelMinMiredsArgument = 0U;
+
+        return cluster.WriteAttributeCoupleColorTempToLevelMinMireds(mOnSuccessCallback_60.Cancel(), mOnFailureCallback_60.Cancel(),
+                                                                     coupleColorTempToLevelMinMiredsArgument);
+    }
+
+    void OnFailureResponse_60(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_60(uint16_t coupleColorTempToLevelMinMireds) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackOptionalAttributeCoupleColorTempToLevelMinMireds_61()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCoupleColorTempToLevelMinMireds(mOnSuccessCallback_61.Cancel(), mOnFailureCallback_61.Cancel());
+    }
+
+    void OnFailureResponse_61(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_61(uint16_t coupleColorTempToLevelMinMireds)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("coupleColorTempToLevelMinMireds", coupleColorTempToLevelMinMireds, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeStartUpColorTemperatureMireds_62()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeStartUpColorTemperatureMireds(mOnSuccessCallback_62.Cancel(), mOnFailureCallback_62.Cancel());
+    }
+
+    void OnFailureResponse_62(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_62(uint16_t startUpColorTemperatureMireds)
+    {
+        VerifyOrReturn(CheckConstraintType("startUpColorTemperatureMireds", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeStartUpColorTemperatureMireds_63()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t startUpColorTemperatureMiredsArgument = 0U;
+
+        return cluster.WriteAttributeStartUpColorTemperatureMireds(mOnSuccessCallback_63.Cancel(), mOnFailureCallback_63.Cancel(),
+                                                                   startUpColorTemperatureMiredsArgument);
+    }
+
+    void OnFailureResponse_63(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_63(uint16_t startUpColorTemperatureMireds) { NextTest(); }
+
+    CHIP_ERROR TestReadsBackOptionalAttributeStartUpColorTemperatureMireds_64()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeStartUpColorTemperatureMireds(mOnSuccessCallback_64.Cancel(), mOnFailureCallback_64.Cancel());
+    }
+
+    void OnFailureResponse_64(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_64(uint16_t startUpColorTemperatureMireds)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeRemainingTime_65()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeRemainingTime(mOnSuccessCallback_65.Cancel(), mOnFailureCallback_65.Cancel());
+    }
+
+    void OnFailureResponse_65(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_65(uint16_t remainingTime)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("remainingTime", remainingTime, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributeRemainingTime_66()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeRemainingTime(mOnSuccessCallback_66.Cancel(), mOnFailureCallback_66.Cancel());
+    }
+
+    void OnFailureResponse_66(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_66(uint16_t remainingTime)
+    {
+        VerifyOrReturn(CheckConstraintType("remainingTime", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("remainingTime", remainingTime, 254));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeRemainingTime_67()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t remainingTimeArgument = 0U;
+
+        return cluster.WriteAttributeRemainingTime(mOnSuccessCallback_67.Cancel(), mOnFailureCallback_67.Cancel(),
+                                                   remainingTimeArgument);
+    }
+
+    void OnFailureResponse_67(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_67(uint16_t remainingTime) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackOptionalAttributeRemainingTime_68()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeRemainingTime(mOnSuccessCallback_68.Cancel(), mOnFailureCallback_68.Cancel());
+    }
+
+    void OnFailureResponse_68(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_68(uint16_t remainingTime)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("remainingTime", remainingTime, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeDriftCompensation_69()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeDriftCompensation(mOnSuccessCallback_69.Cancel(), mOnFailureCallback_69.Cancel());
+    }
+
+    void OnFailureResponse_69(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_69(uint8_t driftCompensation)
+    {
+        VerifyOrReturn(CheckConstraintType("driftCompensation", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("driftCompensation", driftCompensation, 4));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeDriftCompensation_70()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t driftCompensationArgument = 0;
+
+        return cluster.WriteAttributeDriftCompensation(mOnSuccessCallback_70.Cancel(), mOnFailureCallback_70.Cancel(),
+                                                       driftCompensationArgument);
+    }
+
+    void OnFailureResponse_70(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_70(uint8_t driftCompensation) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackOptionalAttributeDriftCompensation_71()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeDriftCompensation(mOnSuccessCallback_71.Cancel(), mOnFailureCallback_71.Cancel());
+    }
+
+    void OnFailureResponse_71(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_71(uint8_t driftCompensation)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("driftCompensation", driftCompensation, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeCompensationText_72()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCompensationText(mOnSuccessCallback_72.Cancel(), mOnFailureCallback_72.Cancel());
+    }
+
+    void OnFailureResponse_72(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_72(chip::CharSpan compensationText)
+    {
+        VerifyOrReturn(CheckConstraintType("compensationText", "", "string"));
+        VerifyOrReturn(CheckConstraintMaxLength("compensationText", compensationText.size(), 254));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeNumberOfPrimaries_73()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeNumberOfPrimaries(mOnSuccessCallback_73.Cancel(), mOnFailureCallback_73.Cancel());
+    }
+
+    void OnFailureResponse_73(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_73(uint8_t numberOfPrimaries)
+    {
+        VerifyOrReturn(CheckConstraintType("numberOfPrimaries", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("numberOfPrimaries", numberOfPrimaries, 6));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributeNumberOfPrimaries_74()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t numberOfPrimariesArgument = 0;
+
+        return cluster.WriteAttributeNumberOfPrimaries(mOnSuccessCallback_74.Cancel(), mOnFailureCallback_74.Cancel(),
+                                                       numberOfPrimariesArgument);
+    }
+
+    void OnFailureResponse_74(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_74(uint8_t numberOfPrimaries) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributeNumberOfPrimaries_75()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeNumberOfPrimaries(mOnSuccessCallback_75.Cancel(), mOnFailureCallback_75.Cancel());
+    }
+
+    void OnFailureResponse_75(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_75(uint8_t numberOfPrimaries)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("numberOfPrimaries", numberOfPrimaries, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary1X_76()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary1X(mOnSuccessCallback_76.Cancel(), mOnFailureCallback_76.Cancel());
+    }
+
+    void OnFailureResponse_76(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_76(uint16_t primary1X)
+    {
+        VerifyOrReturn(CheckConstraintType("primary1X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1X", primary1X, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary1X_77()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary1XArgument = 0U;
+
+        return cluster.WriteAttributePrimary1X(mOnSuccessCallback_77.Cancel(), mOnFailureCallback_77.Cancel(), primary1XArgument);
+    }
+
+    void OnFailureResponse_77(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_77(uint16_t primary1X) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary1X_78()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary1X(mOnSuccessCallback_78.Cancel(), mOnFailureCallback_78.Cancel());
+    }
+
+    void OnFailureResponse_78(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_78(uint16_t primary1X)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary1X", primary1X, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary1Y_79()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary1Y(mOnSuccessCallback_79.Cancel(), mOnFailureCallback_79.Cancel());
+    }
+
+    void OnFailureResponse_79(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_79(uint16_t primary1Y)
+    {
+        VerifyOrReturn(CheckConstraintType("primary1Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1Y", primary1Y, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary1Y_80()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary1YArgument = 0U;
+
+        return cluster.WriteAttributePrimary1Y(mOnSuccessCallback_80.Cancel(), mOnFailureCallback_80.Cancel(), primary1YArgument);
+    }
+
+    void OnFailureResponse_80(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_80(uint16_t primary1Y) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary1Y_81()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary1Y(mOnSuccessCallback_81.Cancel(), mOnFailureCallback_81.Cancel());
+    }
+
+    void OnFailureResponse_81(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_81(uint16_t primary1Y)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary1Y", primary1Y, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary1Intensity_82()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary1Intensity(mOnSuccessCallback_82.Cancel(), mOnFailureCallback_82.Cancel());
+    }
+
+    void OnFailureResponse_82(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_82(uint8_t primary1Intensity)
+    {
+        VerifyOrReturn(CheckConstraintType("primary1Intensity", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary2X_83()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary2X(mOnSuccessCallback_83.Cancel(), mOnFailureCallback_83.Cancel());
+    }
+
+    void OnFailureResponse_83(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_83(uint16_t primary2X)
+    {
+        VerifyOrReturn(CheckConstraintType("primary2X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2X", primary2X, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary2X_84()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary2XArgument = 0U;
+
+        return cluster.WriteAttributePrimary2X(mOnSuccessCallback_84.Cancel(), mOnFailureCallback_84.Cancel(), primary2XArgument);
+    }
+
+    void OnFailureResponse_84(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_84(uint16_t primary2X) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary2X_85()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary2X(mOnSuccessCallback_85.Cancel(), mOnFailureCallback_85.Cancel());
+    }
+
+    void OnFailureResponse_85(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_85(uint16_t primary2X)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary2X", primary2X, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary2Y_86()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary2Y(mOnSuccessCallback_86.Cancel(), mOnFailureCallback_86.Cancel());
+    }
+
+    void OnFailureResponse_86(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_86(uint16_t primary2Y)
+    {
+        VerifyOrReturn(CheckConstraintType("primary2Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2Y", primary2Y, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary2Y_87()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary2YArgument = 0U;
+
+        return cluster.WriteAttributePrimary2Y(mOnSuccessCallback_87.Cancel(), mOnFailureCallback_87.Cancel(), primary2YArgument);
+    }
+
+    void OnFailureResponse_87(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_87(uint16_t primary2Y) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary2Y_88()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary2Y(mOnSuccessCallback_88.Cancel(), mOnFailureCallback_88.Cancel());
+    }
+
+    void OnFailureResponse_88(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_88(uint16_t primary2Y)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary2Y", primary2Y, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestValidateConstraintsOfAttributePrimary2Intensity_89()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary2Intensity(mOnSuccessCallback_89.Cancel(), mOnFailureCallback_89.Cancel());
+    }
+
+    void OnFailureResponse_89(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_89(uint8_t primary2Intensity)
+    {
+        VerifyOrReturn(CheckConstraintType("primary2Intensity", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary3X_90()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary3X(mOnSuccessCallback_90.Cancel(), mOnFailureCallback_90.Cancel());
+    }
+
+    void OnFailureResponse_90(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_90(uint16_t primary3X)
+    {
+        VerifyOrReturn(CheckConstraintType("primary3X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3X", primary3X, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary3X_91()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary3XArgument = 0U;
+
+        return cluster.WriteAttributePrimary3X(mOnSuccessCallback_91.Cancel(), mOnFailureCallback_91.Cancel(), primary3XArgument);
+    }
+
+    void OnFailureResponse_91(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_91(uint16_t primary3X) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary3X_92()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary3X(mOnSuccessCallback_92.Cancel(), mOnFailureCallback_92.Cancel());
+    }
+
+    void OnFailureResponse_92(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_92(uint16_t primary3X)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary3X", primary3X, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary3Y_93()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary3Y(mOnSuccessCallback_93.Cancel(), mOnFailureCallback_93.Cancel());
+    }
+
+    void OnFailureResponse_93(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_93(uint16_t primary3Y)
+    {
+        VerifyOrReturn(CheckConstraintType("primary3Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3Y", primary3Y, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary3Y_94()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary3YArgument = 0U;
+
+        return cluster.WriteAttributePrimary3Y(mOnSuccessCallback_94.Cancel(), mOnFailureCallback_94.Cancel(), primary3YArgument);
+    }
+
+    void OnFailureResponse_94(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_94(uint16_t primary3Y) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary3Y_95()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary3Y(mOnSuccessCallback_95.Cancel(), mOnFailureCallback_95.Cancel());
+    }
+
+    void OnFailureResponse_95(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_95(uint16_t primary3Y)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary3Y", primary3Y, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary3Intensity_96()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary3Intensity(mOnSuccessCallback_96.Cancel(), mOnFailureCallback_96.Cancel());
+    }
+
+    void OnFailureResponse_96(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_96(uint8_t primary3Intensity)
+    {
+        VerifyOrReturn(CheckConstraintType("primary3Intensity", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary4X_97()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary4X(mOnSuccessCallback_97.Cancel(), mOnFailureCallback_97.Cancel());
+    }
+
+    void OnFailureResponse_97(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_97(uint16_t primary4X)
+    {
+        VerifyOrReturn(CheckConstraintType("primary4X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4X", primary4X, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary4X_98()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary4XArgument = 0U;
+
+        return cluster.WriteAttributePrimary4X(mOnSuccessCallback_98.Cancel(), mOnFailureCallback_98.Cancel(), primary4XArgument);
+    }
+
+    void OnFailureResponse_98(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_98(uint16_t primary4X) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary4X_99()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary4X(mOnSuccessCallback_99.Cancel(), mOnFailureCallback_99.Cancel());
+    }
+
+    void OnFailureResponse_99(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_99(uint16_t primary4X)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary4X", primary4X, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary4Y_100()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary4Y(mOnSuccessCallback_100.Cancel(), mOnFailureCallback_100.Cancel());
+    }
+
+    void OnFailureResponse_100(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_100(uint16_t primary4Y)
+    {
+        VerifyOrReturn(CheckConstraintType("primary4Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4Y", primary4Y, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary4Y_101()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary4YArgument = 0U;
+
+        return cluster.WriteAttributePrimary4Y(mOnSuccessCallback_101.Cancel(), mOnFailureCallback_101.Cancel(), primary4YArgument);
+    }
+
+    void OnFailureResponse_101(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_101(uint16_t primary4Y) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary4Y_102()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary4Y(mOnSuccessCallback_102.Cancel(), mOnFailureCallback_102.Cancel());
+    }
+
+    void OnFailureResponse_102(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_102(uint16_t primary4Y)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary4Y", primary4Y, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary4Intensity_103()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary4Intensity(mOnSuccessCallback_103.Cancel(), mOnFailureCallback_103.Cancel());
+    }
+
+    void OnFailureResponse_103(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_103(uint8_t primary4Intensity)
+    {
+        VerifyOrReturn(CheckConstraintType("primary4Intensity", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary5X_104()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary5X(mOnSuccessCallback_104.Cancel(), mOnFailureCallback_104.Cancel());
+    }
+
+    void OnFailureResponse_104(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_104(uint16_t primary5X)
+    {
+        VerifyOrReturn(CheckConstraintType("primary5X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5X", primary5X, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary5X_105()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary5XArgument = 0U;
+
+        return cluster.WriteAttributePrimary5X(mOnSuccessCallback_105.Cancel(), mOnFailureCallback_105.Cancel(), primary5XArgument);
+    }
+
+    void OnFailureResponse_105(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_105(uint16_t primary5X) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary5X_106()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary5X(mOnSuccessCallback_106.Cancel(), mOnFailureCallback_106.Cancel());
+    }
+
+    void OnFailureResponse_106(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_106(uint16_t primary5X)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary5X", primary5X, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary5Y_107()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary5Y(mOnSuccessCallback_107.Cancel(), mOnFailureCallback_107.Cancel());
+    }
+
+    void OnFailureResponse_107(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_107(uint16_t primary5Y)
+    {
+        VerifyOrReturn(CheckConstraintType("primary5Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5Y", primary5Y, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary5Y_108()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary5YArgument = 0U;
+
+        return cluster.WriteAttributePrimary5Y(mOnSuccessCallback_108.Cancel(), mOnFailureCallback_108.Cancel(), primary5YArgument);
+    }
+
+    void OnFailureResponse_108(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_108(uint16_t primary5Y) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary5Y_109()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary5Y(mOnSuccessCallback_109.Cancel(), mOnFailureCallback_109.Cancel());
+    }
+
+    void OnFailureResponse_109(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_109(uint16_t primary5Y)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary5Y", primary5Y, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary5Intensity_110()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary5Intensity(mOnSuccessCallback_110.Cancel(), mOnFailureCallback_110.Cancel());
+    }
+
+    void OnFailureResponse_110(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_110(uint8_t primary5Intensity)
+    {
+        VerifyOrReturn(CheckConstraintType("primary5Intensity", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary6X_111()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary6X(mOnSuccessCallback_111.Cancel(), mOnFailureCallback_111.Cancel());
+    }
+
+    void OnFailureResponse_111(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_111(uint16_t primary6X)
+    {
+        VerifyOrReturn(CheckConstraintType("primary6X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6X", primary6X, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary6X_112()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary6XArgument = 0U;
+
+        return cluster.WriteAttributePrimary6X(mOnSuccessCallback_112.Cancel(), mOnFailureCallback_112.Cancel(), primary6XArgument);
+    }
+
+    void OnFailureResponse_112(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_112(uint16_t primary6X) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary6X_113()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary6X(mOnSuccessCallback_113.Cancel(), mOnFailureCallback_113.Cancel());
+    }
+
+    void OnFailureResponse_113(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_113(uint16_t primary6X)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary6X", primary6X, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary6Y_114()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary6Y(mOnSuccessCallback_114.Cancel(), mOnFailureCallback_114.Cancel());
+    }
+
+    void OnFailureResponse_114(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_114(uint16_t primary6Y)
+    {
+        VerifyOrReturn(CheckConstraintType("primary6Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6Y", primary6Y, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary6Y_115()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t primary6YArgument = 0U;
+
+        return cluster.WriteAttributePrimary6Y(mOnSuccessCallback_115.Cancel(), mOnFailureCallback_115.Cancel(), primary6YArgument);
+    }
+
+    void OnFailureResponse_115(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_115(uint16_t primary6Y) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadBackTheMandatoryAttributePrimary6Y_116()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary6Y(mOnSuccessCallback_116.Cancel(), mOnFailureCallback_116.Cancel());
+    }
+
+    void OnFailureResponse_116(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_116(uint16_t primary6Y)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("primary6Y", primary6Y, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributePrimary6Intensity_117()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributePrimary6Intensity(mOnSuccessCallback_117.Cancel(), mOnFailureCallback_117.Cancel());
+    }
+
+    void OnFailureResponse_117(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_117(uint8_t primary6Intensity)
+    {
+        VerifyOrReturn(CheckConstraintType("primary6Intensity", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeWhitePointX_118()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeWhitePointX(mOnSuccessCallback_118.Cancel(), mOnFailureCallback_118.Cancel());
+    }
+
+    void OnFailureResponse_118(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_118(uint16_t whitePointX)
+    {
+        VerifyOrReturn(CheckConstraintType("whitePointX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointX", whitePointX, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultOptionalAttributeWhitePointX_119()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t whitePointXArgument = 0U;
+
+        return cluster.WriteAttributeWhitePointX(mOnSuccessCallback_119.Cancel(), mOnFailureCallback_119.Cancel(),
+                                                 whitePointXArgument);
+    }
+
+    void OnFailureResponse_119(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_119(uint16_t whitePointX) { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheOptionalAttributeWhitePointX_120()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeWhitePointX(mOnSuccessCallback_120.Cancel(), mOnFailureCallback_120.Cancel());
+    }
+
+    void OnFailureResponse_120(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_120(uint16_t whitePointX)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("whitePointX", whitePointX, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeWhitePointY_121()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeWhitePointY(mOnSuccessCallback_121.Cancel(), mOnFailureCallback_121.Cancel());
+    }
+
+    void OnFailureResponse_121(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_121(uint16_t whitePointY)
+    {
+        VerifyOrReturn(CheckConstraintType("whitePointY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointY", whitePointY, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultOptionalAttributeWhitePointY_122()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t whitePointYArgument = 0U;
+
+        return cluster.WriteAttributeWhitePointY(mOnSuccessCallback_122.Cancel(), mOnFailureCallback_122.Cancel(),
+                                                 whitePointYArgument);
+    }
+
+    void OnFailureResponse_122(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_122(uint16_t whitePointY) { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheOptionalAttributeWhitePointY_123()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeWhitePointY(mOnSuccessCallback_123.Cancel(), mOnFailureCallback_123.Cancel());
+    }
+
+    void OnFailureResponse_123(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_123(uint16_t whitePointY)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("whitePointY", whitePointY, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeColorPointRX_124()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointRX(mOnSuccessCallback_124.Cancel(), mOnFailureCallback_124.Cancel());
+    }
+
+    void OnFailureResponse_124(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_124(uint16_t colorPointRX)
+    {
+        VerifyOrReturn(CheckConstraintType("colorPointRX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRX", colorPointRX, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointRX_125()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorPointRXArgument = 0U;
+
+        return cluster.WriteAttributeColorPointRX(mOnSuccessCallback_125.Cancel(), mOnFailureCallback_125.Cancel(),
+                                                  colorPointRXArgument);
+    }
+
+    void OnFailureResponse_125(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_125(uint16_t colorPointRX) { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheOptionalAttributeColorPointRX_126()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointRX(mOnSuccessCallback_126.Cancel(), mOnFailureCallback_126.Cancel());
+    }
+
+    void OnFailureResponse_126(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_126(uint16_t colorPointRX)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorPointRX", colorPointRX, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeColorPointRY_127()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointRY(mOnSuccessCallback_127.Cancel(), mOnFailureCallback_127.Cancel());
+    }
+
+    void OnFailureResponse_127(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_127(uint16_t colorPointRY)
+    {
+        VerifyOrReturn(CheckConstraintType("colorPointRY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRY", colorPointRY, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointRY_128()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorPointRYArgument = 0U;
+
+        return cluster.WriteAttributeColorPointRY(mOnSuccessCallback_128.Cancel(), mOnFailureCallback_128.Cancel(),
+                                                  colorPointRYArgument);
+    }
+
+    void OnFailureResponse_128(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_128(uint16_t colorPointRY) { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheOptionalAttributeColorPointRY_129()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointRY(mOnSuccessCallback_129.Cancel(), mOnFailureCallback_129.Cancel());
+    }
+
+    void OnFailureResponse_129(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_129(uint16_t colorPointRY)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorPointRY", colorPointRY, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeColorPointRIntensity_130()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointRIntensity(mOnSuccessCallback_130.Cancel(), mOnFailureCallback_130.Cancel());
+    }
+
+    void OnFailureResponse_130(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_130(uint8_t colorPointRIntensity)
+    {
+        VerifyOrReturn(CheckConstraintType("colorPointRIntensity", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeColorPointGX_131()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointGX(mOnSuccessCallback_131.Cancel(), mOnFailureCallback_131.Cancel());
+    }
+
+    void OnFailureResponse_131(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_131(uint16_t colorPointGX)
+    {
+        VerifyOrReturn(CheckConstraintType("colorPointGX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGX", colorPointGX, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointGX_132()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorPointGXArgument = 0U;
+
+        return cluster.WriteAttributeColorPointGX(mOnSuccessCallback_132.Cancel(), mOnFailureCallback_132.Cancel(),
+                                                  colorPointGXArgument);
+    }
+
+    void OnFailureResponse_132(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_132(uint16_t colorPointGX) { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheOptionalAttributeColorPointGX_133()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointGX(mOnSuccessCallback_133.Cancel(), mOnFailureCallback_133.Cancel());
+    }
+
+    void OnFailureResponse_133(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_133(uint16_t colorPointGX)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorPointGX", colorPointGX, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeColorPointGY_134()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointGY(mOnSuccessCallback_134.Cancel(), mOnFailureCallback_134.Cancel());
+    }
+
+    void OnFailureResponse_134(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_134(uint16_t colorPointGY)
+    {
+        VerifyOrReturn(CheckConstraintType("colorPointGY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGY", colorPointGY, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointGY_135()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorPointGYArgument = 0U;
+
+        return cluster.WriteAttributeColorPointGY(mOnSuccessCallback_135.Cancel(), mOnFailureCallback_135.Cancel(),
+                                                  colorPointGYArgument);
+    }
+
+    void OnFailureResponse_135(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_135(uint16_t colorPointGY) { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheOptionalAttributeColorPointGY_136()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointGY(mOnSuccessCallback_136.Cancel(), mOnFailureCallback_136.Cancel());
+    }
+
+    void OnFailureResponse_136(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_136(uint16_t colorPointGY)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorPointGY", colorPointGY, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeColorPointGIntensity_137()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointGIntensity(mOnSuccessCallback_137.Cancel(), mOnFailureCallback_137.Cancel());
+    }
+
+    void OnFailureResponse_137(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_137(uint8_t colorPointGIntensity)
+    {
+        VerifyOrReturn(CheckConstraintType("colorPointGIntensity", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeColorPointBX_138()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointBX(mOnSuccessCallback_138.Cancel(), mOnFailureCallback_138.Cancel());
+    }
+
+    void OnFailureResponse_138(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_138(uint16_t colorPointBX)
+    {
+        VerifyOrReturn(CheckConstraintType("colorPointBX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBX", colorPointBX, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointBX_139()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorPointBXArgument = 0U;
+
+        return cluster.WriteAttributeColorPointBX(mOnSuccessCallback_139.Cancel(), mOnFailureCallback_139.Cancel(),
+                                                  colorPointBXArgument);
+    }
+
+    void OnFailureResponse_139(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_139(uint16_t colorPointBX) { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheOptionalAttributeColorPointBX_140()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointBX(mOnSuccessCallback_140.Cancel(), mOnFailureCallback_140.Cancel());
+    }
+
+    void OnFailureResponse_140(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_140(uint16_t colorPointBX)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorPointBX", colorPointBX, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeColorPointBY_141()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointBY(mOnSuccessCallback_141.Cancel(), mOnFailureCallback_141.Cancel());
+    }
+
+    void OnFailureResponse_141(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_141(uint16_t colorPointBY)
+    {
+        VerifyOrReturn(CheckConstraintType("colorPointBY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBY", colorPointBY, 65279));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointBY_142()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t colorPointBYArgument = 0U;
+
+        return cluster.WriteAttributeColorPointBY(mOnSuccessCallback_142.Cancel(), mOnFailureCallback_142.Cancel(),
+                                                  colorPointBYArgument);
+    }
+
+    void OnFailureResponse_142(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_142(uint16_t colorPointBY) { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheOptionalAttributeColorPointBY_143()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointBY(mOnSuccessCallback_143.Cancel(), mOnFailureCallback_143.Cancel());
+    }
+
+    void OnFailureResponse_143(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_143(uint16_t colorPointBY)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorPointBY", colorPointBY, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeColorPointBIntensity_144()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorPointBIntensity(mOnSuccessCallback_144.Cancel(), mOnFailureCallback_144.Cancel());
+    }
+
+    void OnFailureResponse_144(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_144(uint8_t colorPointBIntensity)
+    {
+        VerifyOrReturn(CheckConstraintType("colorPointBIntensity", "", "uint8"));
+        NextTest();
+    }
+};
+
 class Test_TC_CC_3_1 : public TestCommand
 {
 public:
@@ -7270,7 +12018,7 @@ private:
 
     void OnSuccessResponse_0(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 4U));
         NextTest();
     }
 
@@ -7301,7 +12049,7 @@ private:
 
     void OnSuccessResponse_2(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 3U));
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 4U));
         NextTest();
     }
 
@@ -17355,7 +22103,7 @@ private:
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        chip::ByteSpan locationArgument = chip::ByteSpan(chip::Uint8::from_const_char("us"), strlen("us"));
+        chip::CharSpan locationArgument = chip::CharSpan("us", strlen("us"));
 
         return cluster.WriteAttributeLocation(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), locationArgument);
     }
@@ -17385,7 +22133,7 @@ private:
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        chip::ByteSpan locationArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        chip::CharSpan locationArgument = chip::CharSpan("", strlen(""));
 
         return cluster.WriteAttributeLocation(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel(), locationArgument);
     }
@@ -17799,6 +22547,7 @@ void registerCommandsTests(Commands & commands)
     commands_list clusterCommands = {
         make_unique<Test_TC_BI_1_1>(),
         make_unique<Test_TC_CC_1_1>(),
+        make_unique<Test_TC_CC_2_1>(),
         make_unique<Test_TC_CC_3_1>(),
         make_unique<Test_TC_CC_3_2>(),
         make_unique<Test_TC_CC_3_3>(),

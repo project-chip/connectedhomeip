@@ -95,6 +95,8 @@ SemaphoreHandle_t semaphoreHandle = NULL;
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
+constexpr System::Clock::Timeout BLEManagerImpl::kAdvertiseTimeout;
+constexpr System::Clock::Timeout BLEManagerImpl::kFastAdvertiseTimeout;
 
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
     { .type = BLE_GATT_SVC_TYPE_PRIMARY,
@@ -171,11 +173,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (val)
     {
-        mAdvertiseStartTime = System::SystemClock().GetMonotonicMilliseconds();
-        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kAdvertiseTimeout),
-                                                                   HandleAdvertisementTimer, this));
-        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kFastAdvertiseTimeout),
-                                                                   HandleFastAdvertisementTimer, this));
+        mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
 
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
@@ -194,7 +194,7 @@ void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void 
 
 void BLEManagerImpl::HandleAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
     if (currentTimestamp - mAdvertiseStartTime >= kAdvertiseTimeout)
     {
@@ -210,7 +210,7 @@ void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, v
 
 void BLEManagerImpl::HandleFastAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
     if (currentTimestamp - mAdvertiseStartTime >= kFastAdvertiseTimeout)
     {
