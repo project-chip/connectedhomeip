@@ -37,7 +37,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
               with:
-                  token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
+                  # token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
                   ref: ${{ github.head_ref }}
                   submodules: true
             - name: Use Node.js 14.x
