@@ -1728,6 +1728,18 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(app::ReadClient * 
     return CHIP_NO_ERROR;
 }
 
+void DeviceControllerInteractionModelDelegate::OnResponse(const app::WriteClient * apWriteClient,
+                                                          const app::ConcreteAttributePath & aPath, app::StatusIB attributeStatus)
+{
+    IMWriteResponseCallback(apWriteClient, attributeStatus.mStatus);
+}
+void DeviceControllerInteractionModelDelegate::OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
+{
+    IMWriteResponseCallback(apWriteClient, Protocols::InteractionModel::Status::Failure);
+}
+
+void DeviceControllerInteractionModelDelegate::OnDone(app::WriteClient * apWriteClient) {}
+
 CHIP_ERROR DeviceControllerInteractionModelDelegate::SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient)
 {
 #if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)

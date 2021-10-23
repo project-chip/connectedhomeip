@@ -219,6 +219,8 @@ public:
      */
     WriteClient * operator->() const { return mpWriteClient; }
 
+    WriteClient * Get() const { return mpWriteClient; }
+
     /**
      *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
      * should not use this object after calling this function.

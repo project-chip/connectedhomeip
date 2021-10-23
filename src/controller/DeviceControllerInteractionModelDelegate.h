@@ -4,6 +4,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelDelegate.h>
+#include <app/WriteClient.h>
 
 namespace chip {
 namespace Controller {
@@ -15,13 +16,19 @@ namespace Controller {
  * TODO:(#8967) Implementation of CommandSender::Callback should be removed after switching to ClusterObjects.
  */
 class DeviceControllerInteractionModelDelegate : public chip::app::InteractionModelDelegate,
-                                                 public chip::app::CommandSender::Callback
+                                                 public chip::app::CommandSender::Callback,
+                                                 public chip::app::WriteClient::Callback
 {
 public:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData) override;
     void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aInteractionModelStatus,
                  CHIP_ERROR aProtocolError) override;
     void OnDone(app::CommandSender * apCommandSender) override;
+
+    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath,
+                    app::StatusIB attributeStatus) override;
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override;
+    void OnDone(app::WriteClient * apWriteClient) override;
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::Status status) override;

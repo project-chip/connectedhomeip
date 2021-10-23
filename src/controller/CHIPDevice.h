@@ -139,6 +139,9 @@ public:
                                              uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
                                              Callback::Cancelable * onFailureCallback);
 
+    CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
+                                         Callback::Cancelable * onFailureCallback);
+
     /**
      * @brief
      *   Send the command in internal command sender.
@@ -386,9 +389,9 @@ public:
     // on the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
     // type-safe.
     // TODO: Implement interaction model delegate in the application.
-    void AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
+    void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
                               Callback::Cancelable * onFailureCallback);
-    void CancelIMResponseHandler(app::CommandSender * commandObj);
+    void CancelIMResponseHandler(void * commandObj);
 
     void OperationalCertProvisioned();
     bool IsOperationalCertProvisioned() const { return mDeviceOperationalCertProvisioned; }
