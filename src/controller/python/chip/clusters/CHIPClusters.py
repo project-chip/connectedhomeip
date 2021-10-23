@@ -3190,6 +3190,14 @@ class ChipClusters:
                     "arg2": "int",
                 },
             },
+            0x0000000E: {
+                "commandId": 0x0000000E,
+                "commandName": "TestEnumsRequest",
+                "args": {
+                    "arg1": "int",
+                    "arg2": "int",
+                },
+            },
             0x0000000A: {
                 "commandId": 0x0000000A,
                 "commandName": "TestListInt8UArgumentRequest",
@@ -3386,6 +3394,12 @@ class ChipClusters:
             0x00000021: {
                 "attributeName": "EpochS",
                 "attributeId": 0x00000021,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000022: {
+                "attributeName": "VendorId",
+                "attributeId": 0x00000022,
                 "type": "int",
                 "writable": True,
             },
@@ -5153,6 +5167,11 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid, arg1, arg2
         )
 
+    def ClusterTestCluster_CommandTestEnumsRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int, arg2: int):
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestEnumsRequest(
+            device, ZCLendpoint, ZCLgroupid, arg1, arg2
+        )
+
     def ClusterTestCluster_CommandTestListInt8UArgumentRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest(
             device, ZCLendpoint, ZCLgroupid, arg1
@@ -6448,6 +6467,12 @@ class ChipClusters:
 
     def ClusterTestCluster_WriteAttributeEpochS(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_EpochS(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_VendorId(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId(device, ZCLendpoint, ZCLgroupid, value)
 
     def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
@@ -8944,6 +8969,10 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestEnumsRequest
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestEnumsRequest.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestEnumsRequest.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestListInt8UArgumentRequest
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
@@ -9152,6 +9181,14 @@ class ChipClusters:
         self._chipLib.chip_ime_WriteAttribute_TestCluster_EpochS.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
         self._chipLib.chip_ime_WriteAttribute_TestCluster_EpochS.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute VendorId
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_VendorId.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_VendorId.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute VendorId
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Unsupported
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

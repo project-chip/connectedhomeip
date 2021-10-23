@@ -23550,6 +23550,37 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestSimpleArgumentRequest
+namespace TestEnumsResponse {
+enum class Fields
+{
+    kArg1 = 0,
+    kArg2 = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestEnumsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    chip::VendorId arg1;
+    SimpleEnum arg2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestEnumsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    chip::VendorId arg1;
+    SimpleEnum arg2;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestEnumsResponse
 namespace TestStructArrayArgumentRequest {
 enum class Fields
 {
@@ -23789,6 +23820,37 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestListInt8UReverseRequest
+namespace TestEnumsRequest {
+enum class Fields
+{
+    kArg1 = 0,
+    kArg2 = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestEnumsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    chip::VendorId arg1;
+    SimpleEnum arg2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestEnumsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    chip::VendorId arg1;
+    SimpleEnum arg2;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestEnumsRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -24032,6 +24094,16 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::EpochS::Id; }
 };
 } // namespace EpochS
+namespace VendorId {
+struct TypeInfo
+{
+    using Type          = chip::VendorId;
+    using DecodableType = chip::VendorId;
+
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
+};
+} // namespace VendorId
 namespace Unsupported {
 struct TypeInfo
 {

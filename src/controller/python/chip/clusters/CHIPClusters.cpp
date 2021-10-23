@@ -6761,6 +6761,15 @@ chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestAddArguments
     cluster.Associate(device, ZCLendpointId);
     return cluster.TestAddArguments(nullptr, nullptr, arg1, arg2).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestEnumsRequest(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                 chip::VendorId arg1, uint8_t arg2)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TestEnumsRequest(nullptr, nullptr, arg1, arg2).AsInteger();
+}
 chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest(chip::Controller::Device * device,
                                                                                              chip::EndpointId ZCLendpointId,
                                                                                              chip::GroupId, uint8_t arg1)
@@ -7272,6 +7281,25 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_EpochS(chip::Co
     chip::Controller::TestClusterCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.WriteAttributeEpochS(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_VendorId(chip::Controller::Device * device,
+                                                                         chip::EndpointId ZCLendpointId,
+                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeVendorId(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_VendorId(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                          chip::VendorId value)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeVendorId(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_Unsupported(chip::Controller::Device * device,
                                                                             chip::EndpointId ZCLendpointId,

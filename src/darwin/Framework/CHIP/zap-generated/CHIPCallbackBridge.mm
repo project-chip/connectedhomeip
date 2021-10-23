@@ -1300,6 +1300,14 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(v
     });
 };
 
+void CHIPTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(void * context, chip::VendorId arg1, uint8_t arg2)
+{
+    DispatchSuccess(context, @ {
+        @"arg1" : [NSNumber numberWithUnsignedShort:arg1],
+        @"arg2" : [NSNumber numberWithUnsignedChar:arg2],
+    });
+};
+
 void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
     void * context, /* TYPE WARNING: array array defaults to */ uint8_t * arg1)
 {

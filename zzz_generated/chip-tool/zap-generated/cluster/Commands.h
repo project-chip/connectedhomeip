@@ -1879,6 +1879,18 @@ static void OnTestClusterTestAddArgumentsResponseSuccess(
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 };
 
+static void
+OnTestClusterTestEnumsResponseSuccess(void * context,
+                                      const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received TestEnumsResponse:");
+    ChipLogProgress(Zcl, "  arg1: %" PRIu16 "", data.arg1);
+    ChipLogProgress(Zcl, "  arg2: %" PRIu8 "", data.arg2);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+};
+
 static void OnTestClusterTestListInt8UReverseResponseSuccess(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data)
 {
@@ -18724,6 +18736,7 @@ private:
 | Commands:                                                           |        |
 | * Test                                                              |   0x00 |
 | * TestAddArguments                                                  |   0x04 |
+| * TestEnumsRequest                                                  |   0x0E |
 | * TestListInt8UArgumentRequest                                      |   0x0A |
 | * TestListInt8UReverseRequest                                       |   0x0D |
 | * TestListStructArgumentRequest                                     |   0x09 |
@@ -18757,6 +18770,7 @@ private:
 | * LongCharString                                                    | 0x001F |
 | * EpochUs                                                           | 0x0020 |
 | * EpochS                                                            | 0x0021 |
+| * VendorId                                                          | 0x0022 |
 | * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -18806,6 +18820,32 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type mRequest;
+};
+
+/*
+ * Command TestEnumsRequest
+ */
+class TestClusterTestEnumsRequest : public ModelCommand
+{
+public:
+    TestClusterTestEnumsRequest() : ModelCommand("test-enums-request")
+    {
+        AddArgument("Arg1", 0, UINT16_MAX, &mRequest.arg1);
+        AddArgument("Arg2", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.arg2)> *>(&mRequest.arg2));
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnTestClusterTestEnumsResponseSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type mRequest;
 };
 
 /*
@@ -20480,6 +20520,73 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint32_t mValue;
+};
+
+/*
+ * Attribute VendorId
+ */
+class ReadTestClusterVendorId : public ModelCommand
+{
+public:
+    ReadTestClusterVendorId() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "vendor-id");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterVendorId()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeVendorId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterVendorId : public ModelCommand
+{
+public:
+    WriteTestClusterVendorId() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "vendor-id");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterVendorId()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeVendorId(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::VendorId mValue;
 };
 
 /*
@@ -26972,6 +27079,7 @@ void registerClusterTestCluster(Commands & commands)
     commands_list clusterCommands = {
         make_unique<TestClusterTest>(),                          //
         make_unique<TestClusterTestAddArguments>(),              //
+        make_unique<TestClusterTestEnumsRequest>(),              //
         make_unique<TestClusterTestListInt8UArgumentRequest>(),  //
         make_unique<TestClusterTestListInt8UReverseRequest>(),   //
         make_unique<TestClusterTestListStructArgumentRequest>(), //
@@ -27024,6 +27132,8 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterEpochUs>(),                  //
         make_unique<ReadTestClusterEpochS>(),                    //
         make_unique<WriteTestClusterEpochS>(),                   //
+        make_unique<ReadTestClusterVendorId>(),                  //
+        make_unique<WriteTestClusterVendorId>(),                 //
         make_unique<ReadTestClusterUnsupported>(),               //
         make_unique<WriteTestClusterUnsupported>(),              //
         make_unique<ReadTestClusterClusterRevision>(),           //
