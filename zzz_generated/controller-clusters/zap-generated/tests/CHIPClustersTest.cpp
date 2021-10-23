@@ -44,10 +44,6 @@ CHIP_ERROR AccountLoginClusterTest::WriteAttributeClusterRevision(Callback::Canc
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::AccountLogin::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::AccountLogin::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR AdministratorCommissioningClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint16_t value)
@@ -60,11 +56,6 @@ CHIP_ERROR AdministratorCommissioningClusterTest::WriteAttributeClusterRevision(
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::AdministratorCommissioning::Attributes::ClusterRevision::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -75,11 +66,6 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeVendorName(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, ApplicationBasic::Attributes::VendorName::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
-    const chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeVendorId(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -90,11 +76,6 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeVendorId(Callback::Cancela
         chip::app::AttributePathParams(mEndpoint, mClusterId, ApplicationBasic::Attributes::VendorId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
-    const chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationName(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback,
                                                                       chip::CharSpan value)
@@ -106,11 +87,6 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationName(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, ApplicationBasic::Attributes::ApplicationName::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
-    const chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeProductId(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -121,11 +97,6 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeProductId(Callback::Cancel
         chip::app::AttributePathParams(mEndpoint, mClusterId, ApplicationBasic::Attributes::ProductId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
-    const chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationId(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -136,11 +107,6 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationId(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ApplicationBasic::Attributes::ApplicationId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo>(
-    const chip::app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -151,11 +117,6 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeCatalogVendorId(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, ApplicationBasic::Attributes::CatalogVendorId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo>(
-    const chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationStatus(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -166,11 +127,6 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationStatus(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, ApplicationBasic::Attributes::ApplicationStatus::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
-    const chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -182,10 +138,6 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeClusterRevision(Callback::
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationLauncherClusterTest::WriteAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -196,11 +148,6 @@ CHIP_ERROR ApplicationLauncherClusterTest::WriteAttributeCatalogVendorId(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, ApplicationLauncher::Attributes::CatalogVendorId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
-    const chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationLauncherClusterTest::WriteAttributeApplicationId(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -211,11 +158,6 @@ CHIP_ERROR ApplicationLauncherClusterTest::WriteAttributeApplicationId(Callback:
         chip::app::AttributePathParams(mEndpoint, mClusterId, ApplicationLauncher::Attributes::ApplicationId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
-    const chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ApplicationLauncherClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -227,10 +169,6 @@ CHIP_ERROR ApplicationLauncherClusterTest::WriteAttributeClusterRevision(Callbac
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR AudioOutputClusterTest::WriteAttributeCurrentAudioOutput(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -241,11 +179,6 @@ CHIP_ERROR AudioOutputClusterTest::WriteAttributeCurrentAudioOutput(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, AudioOutput::Attributes::CurrentAudioOutput::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::AudioOutput::Attributes::CurrentAudioOutput::TypeInfo>(
-    const chip::app::Clusters::AudioOutput::Attributes::CurrentAudioOutput::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR AudioOutputClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -257,10 +190,6 @@ CHIP_ERROR AudioOutputClusterTest::WriteAttributeClusterRevision(Callback::Cance
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::AudioOutput::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::AudioOutput::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierMovingState(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -271,11 +200,6 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierMovingState(Callback:
         chip::app::AttributePathParams(mEndpoint, mClusterId, BarrierControl::Attributes::BarrierMovingState::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BarrierControl::Attributes::BarrierMovingState::TypeInfo>(
-    const chip::app::Clusters::BarrierControl::Attributes::BarrierMovingState::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierSafetyStatus(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -286,11 +210,6 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierSafetyStatus(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, BarrierControl::Attributes::BarrierSafetyStatus::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BarrierControl::Attributes::BarrierSafetyStatus::TypeInfo>(
-    const chip::app::Clusters::BarrierControl::Attributes::BarrierSafetyStatus::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierCapabilities(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -301,11 +220,6 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierCapabilities(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, BarrierControl::Attributes::BarrierCapabilities::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BarrierControl::Attributes::BarrierCapabilities::TypeInfo>(
-    const chip::app::Clusters::BarrierControl::Attributes::BarrierCapabilities::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierPosition(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -316,11 +230,6 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierPosition(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, BarrierControl::Attributes::BarrierPosition::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BarrierControl::Attributes::BarrierPosition::TypeInfo>(
-    const chip::app::Clusters::BarrierControl::Attributes::BarrierPosition::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BarrierControlClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -332,10 +241,6 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeClusterRevision(Callback::Ca
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BarrierControl::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::BarrierControl::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeInteractionModelVersion(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -346,11 +251,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeInteractionModelVersion(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::InteractionModelVersion::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::InteractionModelVersion::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::InteractionModelVersion::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -361,11 +261,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onS
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::VendorName::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::VendorName::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::VendorName::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeVendorID(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -376,11 +271,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeVendorID(Callback::Cancelable * onSuc
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::VendorID::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeProductName(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -391,11 +281,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductName(Callback::Cancelable * on
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::ProductName::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::ProductName::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::ProductName::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeProductID(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -406,11 +291,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductID(Callback::Cancelable * onSu
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::ProductID::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -421,11 +301,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeHardwareVersion(Callback::Cancelable 
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::HardwareVersion::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::HardwareVersion::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::HardwareVersion::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -436,11 +311,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeHardwareVersionString(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::HardwareVersionString::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::HardwareVersionString::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::HardwareVersionString::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -451,11 +321,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeSoftwareVersion(Callback::Cancelable 
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::SoftwareVersion::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -466,11 +331,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeSoftwareVersionString(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::SoftwareVersionString::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersionString::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::SoftwareVersionString::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -481,11 +341,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeManufacturingDate(Callback::Cancelabl
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::ManufacturingDate::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::ManufacturingDate::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::ManufacturingDate::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributePartNumber(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -496,11 +351,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributePartNumber(Callback::Cancelable * onS
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::PartNumber::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::PartNumber::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::PartNumber::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeProductURL(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -511,11 +361,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductURL(Callback::Cancelable * onS
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::ProductURL::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::ProductURL::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::ProductURL::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -526,11 +371,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductLabel(Callback::Cancelable * o
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::ProductLabel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::ProductLabel::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::ProductLabel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -541,11 +381,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeSerialNumber(Callback::Cancelable * o
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::SerialNumber::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::SerialNumber::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::SerialNumber::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeReachable(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -556,11 +391,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeReachable(Callback::Cancelable * onSu
         chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::Reachable::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::Reachable::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::Reachable::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -572,10 +402,6 @@ CHIP_ERROR BasicClusterTest::WriteAttributeClusterRevision(Callback::Cancelable 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BinaryInputBasicClusterTest::WriteAttributeStatusFlags(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -586,11 +412,6 @@ CHIP_ERROR BinaryInputBasicClusterTest::WriteAttributeStatusFlags(Callback::Canc
         chip::app::AttributePathParams(mEndpoint, mClusterId, BinaryInputBasic::Attributes::StatusFlags::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
-    const chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BinaryInputBasicClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -601,10 +422,6 @@ CHIP_ERROR BinaryInputBasicClusterTest::WriteAttributeClusterRevision(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, BinaryInputBasic::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BindingClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -617,10 +434,6 @@ CHIP_ERROR BindingClusterTest::WriteAttributeClusterRevision(Callback::Cancelabl
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Binding::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::Binding::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BooleanStateClusterTest::WriteAttributeStateValue(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -631,11 +444,6 @@ CHIP_ERROR BooleanStateClusterTest::WriteAttributeStateValue(Callback::Cancelabl
         chip::app::AttributePathParams(mEndpoint, mClusterId, BooleanState::Attributes::StateValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(
-    const chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BooleanStateClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -647,10 +455,6 @@ CHIP_ERROR BooleanStateClusterTest::WriteAttributeClusterRevision(Callback::Canc
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -661,11 +465,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeVendorName(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::VendorName::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorName::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorName::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeVendorID(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -676,11 +475,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeVendorID(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::VendorID::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorID::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorID::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductName(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -691,11 +485,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductName(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::ProductName::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductName::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductName::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -706,11 +495,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeHardwareVersion(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::HardwareVersion::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersion::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersion::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               chip::CharSpan value)
@@ -722,12 +506,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeHardwareVersionString(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::HardwareVersionString::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -738,11 +516,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSoftwareVersion(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::SoftwareVersion::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersion::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersion::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               chip::CharSpan value)
@@ -754,12 +527,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSoftwareVersionString(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::SoftwareVersionString::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
                                                                           chip::CharSpan value)
@@ -771,11 +538,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeManufacturingDate(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::ManufacturingDate::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributePartNumber(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -786,11 +548,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributePartNumber(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::PartNumber::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::PartNumber::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::PartNumber::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductURL(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -801,11 +558,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductURL(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::ProductURL::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductURL::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductURL::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -816,11 +568,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductLabel(Callback::C
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::ProductLabel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -831,11 +578,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSerialNumber(Callback::C
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::SerialNumber::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeReachable(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -846,11 +588,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeReachable(Callback::Canc
         chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::Reachable::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::Reachable::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::Reachable::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -862,10 +599,6 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeClusterRevision(Callback
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -876,11 +609,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentHue(Callback::Cancelabl
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::CurrentHue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -891,11 +619,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentSaturation(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::CurrentSaturation::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -906,11 +629,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeRemainingTime(Callback::Cancel
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::RemainingTime::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -921,11 +639,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentX(Callback::Cancelable 
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::CurrentX::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -936,11 +649,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentY(Callback::Cancelable 
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::CurrentY::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeDriftCompensation(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -951,11 +659,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeDriftCompensation(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::DriftCompensation::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeCompensationText(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -966,11 +669,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCompensationText(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::CompensationText::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -981,11 +679,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorTemperature(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorTemperature::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorMode(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -996,11 +689,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorMode(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorMode::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorMode::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorMode::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeNumberOfPrimaries(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1011,11 +699,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeNumberOfPrimaries(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::NumberOfPrimaries::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary1X(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1026,11 +709,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary1X(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary1X::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary1X::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary1Y(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1041,11 +719,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary1Y(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary1Y::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary1Y::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary1Intensity(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1056,11 +729,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary1Intensity(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary1Intensity::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Intensity::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary1Intensity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary2X(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1071,11 +739,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary2X(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary2X::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary2X::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary2Y(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1086,11 +749,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary2Y(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary2Y::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary2Y::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary2Intensity(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1101,11 +759,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary2Intensity(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary2Intensity::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Intensity::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary2Intensity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary3X(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1116,11 +769,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary3X(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary3X::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary3X::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary3Y(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1131,11 +779,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary3Y(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary3Y::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary3Y::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary3Intensity(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1146,11 +789,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary3Intensity(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary3Intensity::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Intensity::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary3Intensity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary4X(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1161,11 +799,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary4X(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary4X::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary4X::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary4Y(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1176,11 +809,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary4Y(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary4Y::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary4Y::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary4Intensity(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1191,11 +819,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary4Intensity(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary4Intensity::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Intensity::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary4Intensity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary5X(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1206,11 +829,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary5X(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary5X::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary5X::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary5Y(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1221,11 +839,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary5Y(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary5Y::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary5Y::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary5Intensity(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1236,11 +849,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary5Intensity(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary5Intensity::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Intensity::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary5Intensity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary6X(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1251,11 +859,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary6X(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary6X::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary6X::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary6Y(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1266,11 +869,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary6Y(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary6Y::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary6Y::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary6Intensity(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1281,11 +879,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary6Intensity(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::Primary6Intensity::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Intensity::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::Primary6Intensity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeEnhancedCurrentHue(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1296,11 +889,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeEnhancedCurrentHue(Callback::C
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::EnhancedCurrentHue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeEnhancedColorMode(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1311,11 +899,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeEnhancedColorMode(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::EnhancedColorMode::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedColorMode::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::EnhancedColorMode::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopActive(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1326,11 +909,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopActive(Callback::Canc
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorLoopActive::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopDirection(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1341,11 +919,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopDirection(Callback::C
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorLoopDirection::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopTime(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1356,11 +929,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopTime(Callback::Cancel
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorLoopTime::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopStartEnhancedHue(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint16_t value)
@@ -1372,11 +940,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopStartEnhancedHue(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorLoopStartEnhancedHue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopStoredEnhancedHue(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint16_t value)
@@ -1388,12 +951,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopStoredEnhancedHue(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorCapabilities(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1404,11 +961,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorCapabilities(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorCapabilities::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorTempPhysicalMin(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1419,11 +971,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorTempPhysicalMin(Callback:
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorTempPhysicalMin::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeColorTempPhysicalMax(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1434,11 +981,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorTempPhysicalMax(Callback:
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorTempPhysicalMax::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeCoupleColorTempToLevelMinMireds(Callback::Cancelable * onSuccessCallback,
                                                                                   Callback::Cancelable * onFailureCallback,
                                                                                   uint16_t value)
@@ -1451,12 +993,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCoupleColorTempToLevelMinMired
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1467,10 +1003,6 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeClusterRevision(Callback::Canc
         chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ContentLauncherClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -1483,10 +1015,6 @@ CHIP_ERROR ContentLauncherClusterTest::WriteAttributeClusterRevision(Callback::C
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ContentLauncher::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::ContentLauncher::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR DescriptorClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1498,10 +1026,6 @@ CHIP_ERROR DescriptorClusterTest::WriteAttributeClusterRevision(Callback::Cancel
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Descriptor::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::Descriptor::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR DoorLockClusterTest::WriteAttributeLockState(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1512,11 +1036,6 @@ CHIP_ERROR DoorLockClusterTest::WriteAttributeLockState(Callback::Cancelable * o
         chip::app::AttributePathParams(mEndpoint, mClusterId, DoorLock::Attributes::LockState::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-    const chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR DoorLockClusterTest::WriteAttributeLockType(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1527,11 +1046,6 @@ CHIP_ERROR DoorLockClusterTest::WriteAttributeLockType(Callback::Cancelable * on
         chip::app::AttributePathParams(mEndpoint, mClusterId, DoorLock::Attributes::LockType::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::DoorLock::Attributes::LockType::TypeInfo>(
-    const chip::app::Clusters::DoorLock::Attributes::LockType::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR DoorLockClusterTest::WriteAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -1542,11 +1056,6 @@ CHIP_ERROR DoorLockClusterTest::WriteAttributeActuatorEnabled(Callback::Cancelab
         chip::app::AttributePathParams(mEndpoint, mClusterId, DoorLock::Attributes::ActuatorEnabled::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::DoorLock::Attributes::ActuatorEnabled::TypeInfo>(
-    const chip::app::Clusters::DoorLock::Attributes::ActuatorEnabled::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR DoorLockClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1558,10 +1067,6 @@ CHIP_ERROR DoorLockClusterTest::WriteAttributeClusterRevision(Callback::Cancelab
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::DoorLock::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::DoorLock::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeMeasurementType(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -1572,11 +1077,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeMeasurementType(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::MeasurementType::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::MeasurementType::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::MeasurementType::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeTotalActivePower(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback, int32_t value)
 {
@@ -1587,11 +1087,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeTotalActivePower(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::TotalActivePower::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::TotalActivePower::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::TotalActivePower::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsVoltage(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1602,11 +1097,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsVoltage(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::RmsVoltage::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltage::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltage::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsVoltageMin(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1617,11 +1107,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsVoltageMin(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::RmsVoltageMin::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMin::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMin::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsVoltageMax(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1632,11 +1117,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsVoltageMax(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::RmsVoltageMax::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMax::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMax::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsCurrent(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1647,11 +1127,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsCurrent(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::RmsCurrent::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrent::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrent::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsCurrentMin(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1662,11 +1137,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsCurrentMin(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::RmsCurrentMin::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMin::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMin::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsCurrentMax(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1677,11 +1147,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsCurrentMax(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::RmsCurrentMax::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMax::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMax::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeActivePower(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -1692,11 +1157,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeActivePower(Callback:
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::ActivePower::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePower::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePower::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeActivePowerMin(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -1707,11 +1167,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeActivePowerMin(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::ActivePowerMin::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMin::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMin::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeActivePowerMax(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -1722,11 +1177,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeActivePowerMax(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ElectricalMeasurement::Attributes::ActivePowerMax::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMax::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMax::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1738,10 +1188,6 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeClusterRevision(Callb
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePHYRate(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -1752,11 +1198,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePHYRate(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::PHYRate::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeFullDuplex(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -1767,11 +1208,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeFullDuplex(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::FullDuplex::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePacketRxCount(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint64_t value)
@@ -1783,12 +1219,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePacketRxCount(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PacketRxCount::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PacketRxCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePacketTxCount(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint64_t value)
@@ -1800,12 +1230,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePacketTxCount(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PacketTxCount::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PacketTxCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeTxErrCount(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -1816,11 +1240,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeTxErrCount(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::TxErrCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TxErrCount::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TxErrCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeCollisionCount(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                uint64_t value)
@@ -1832,12 +1251,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeCollisionCount(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::CollisionCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::CollisionCount::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::CollisionCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint64_t value)
@@ -1849,12 +1262,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::OverrunCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::OverrunCount::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::OverrunCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeCarrierDetect(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -1865,12 +1272,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeCarrierDetect(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeTimeSinceReset(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                uint64_t value)
@@ -1882,12 +1283,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeTimeSinceReset(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TimeSinceReset::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TimeSinceReset::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint16_t value)
@@ -1900,11 +1295,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR FixedLabelClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1916,10 +1306,6 @@ CHIP_ERROR FixedLabelClusterTest::WriteAttributeClusterRevision(Callback::Cancel
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::FixedLabel::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::FixedLabel::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -1930,11 +1316,6 @@ CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMeasuredValue(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, FlowMeasurement::Attributes::MeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
-    const chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -1945,11 +1326,6 @@ CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMinMeasuredValue(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, FlowMeasurement::Attributes::MinMeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-    const chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -1960,11 +1336,6 @@ CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, FlowMeasurement::Attributes::MaxMeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-    const chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -1975,10 +1346,6 @@ CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeClusterRevision(Callback::C
         chip::app::AttributePathParams(mEndpoint, mClusterId, FlowMeasurement::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::FlowMeasurement::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR GeneralCommissioningClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -1991,10 +1358,6 @@ CHIP_ERROR GeneralCommissioningClusterTest::WriteAttributeClusterRevision(Callba
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::GeneralCommissioning::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeRebootCount(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2005,11 +1368,6 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeRebootCount(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, GeneralDiagnostics::Attributes::RebootCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::RebootCount::TypeInfo>(
-    const chip::app::Clusters::GeneralDiagnostics::Attributes::RebootCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeUpTime(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -2020,11 +1378,6 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeUpTime(Callback::Cancela
         chip::app::AttributePathParams(mEndpoint, mClusterId, GeneralDiagnostics::Attributes::UpTime::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::UpTime::TypeInfo>(
-    const chip::app::Clusters::GeneralDiagnostics::Attributes::UpTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeTotalOperationalHours(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint32_t value)
@@ -2036,12 +1389,6 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeTotalOperationalHours(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, GeneralDiagnostics::Attributes::TotalOperationalHours::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::TotalOperationalHours::TypeInfo>(
-    const chip::app::Clusters::GeneralDiagnostics::Attributes::TotalOperationalHours::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeBootReasons(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2052,11 +1399,6 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeBootReasons(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, GeneralDiagnostics::Attributes::BootReasons::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::BootReasons::TypeInfo>(
-    const chip::app::Clusters::GeneralDiagnostics::Attributes::BootReasons::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2067,10 +1409,6 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, GeneralDiagnostics::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::GeneralDiagnostics::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR GroupKeyManagementClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -2083,10 +1421,6 @@ CHIP_ERROR GroupKeyManagementClusterTest::WriteAttributeClusterRevision(Callback
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::GroupKeyManagement::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR GroupsClusterTest::WriteAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2097,11 +1431,6 @@ CHIP_ERROR GroupsClusterTest::WriteAttributeNameSupport(Callback::Cancelable * o
         chip::app::AttributePathParams(mEndpoint, mClusterId, Groups::Attributes::NameSupport::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Groups::Attributes::NameSupport::TypeInfo>(
-    const chip::app::Clusters::Groups::Attributes::NameSupport::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR GroupsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2113,10 +1442,6 @@ CHIP_ERROR GroupsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Groups::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::Groups::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR IdentifyClusterTest::WriteAttributeIdentifyType(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2127,11 +1452,6 @@ CHIP_ERROR IdentifyClusterTest::WriteAttributeIdentifyType(Callback::Cancelable 
         chip::app::AttributePathParams(mEndpoint, mClusterId, Identify::Attributes::IdentifyType::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Identify::Attributes::IdentifyType::TypeInfo>(
-    const chip::app::Clusters::Identify::Attributes::IdentifyType::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR IdentifyClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2142,10 +1462,6 @@ CHIP_ERROR IdentifyClusterTest::WriteAttributeClusterRevision(Callback::Cancelab
         chip::app::AttributePathParams(mEndpoint, mClusterId, Identify::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Identify::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::Identify::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR KeypadInputClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -2158,10 +1474,6 @@ CHIP_ERROR KeypadInputClusterTest::WriteAttributeClusterRevision(Callback::Cance
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlClusterTest::WriteAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2172,11 +1484,6 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeCurrentLevel(Callback::Cancela
         chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::CurrentLevel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlClusterTest::WriteAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2187,11 +1494,6 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeRemainingTime(Callback::Cancel
         chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::RemainingTime::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlClusterTest::WriteAttributeMinLevel(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2202,11 +1504,6 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeMinLevel(Callback::Cancelable 
         chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::MinLevel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlClusterTest::WriteAttributeMaxLevel(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2217,11 +1514,6 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeMaxLevel(Callback::Cancelable 
         chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::MaxLevel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlClusterTest::WriteAttributeCurrentFrequency(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2232,11 +1524,6 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeCurrentFrequency(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::CurrentFrequency::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlClusterTest::WriteAttributeMinFrequency(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2247,11 +1534,6 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeMinFrequency(Callback::Cancela
         chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::MinFrequency::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlClusterTest::WriteAttributeMaxFrequency(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2262,11 +1544,6 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeMaxFrequency(Callback::Cancela
         chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::MaxFrequency::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2277,10 +1554,6 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeClusterRevision(Callback::Canc
         chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR LowPowerClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -2293,10 +1566,6 @@ CHIP_ERROR LowPowerClusterTest::WriteAttributeClusterRevision(Callback::Cancelab
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LowPower::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::LowPower::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaInputClusterTest::WriteAttributeCurrentMediaInput(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2307,11 +1576,6 @@ CHIP_ERROR MediaInputClusterTest::WriteAttributeCurrentMediaInput(Callback::Canc
         chip::app::AttributePathParams(mEndpoint, mClusterId, MediaInput::Attributes::CurrentMediaInput::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaInput::Attributes::CurrentMediaInput::TypeInfo>(
-    const chip::app::Clusters::MediaInput::Attributes::CurrentMediaInput::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaInputClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2323,10 +1587,6 @@ CHIP_ERROR MediaInputClusterTest::WriteAttributeClusterRevision(Callback::Cancel
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePlaybackState(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2337,11 +1597,6 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePlaybackState(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, MediaPlayback::Attributes::PlaybackState::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
-    const chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeStartTime(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -2352,11 +1607,6 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeStartTime(Callback::Cancelabl
         chip::app::AttributePathParams(mEndpoint, mClusterId, MediaPlayback::Attributes::StartTime::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo>(
-    const chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeDuration(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -2367,11 +1617,6 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeDuration(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, MediaPlayback::Attributes::Duration::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo>(
-    const chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePositionUpdatedAt(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -2382,11 +1627,6 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePositionUpdatedAt(Callback::C
         chip::app::AttributePathParams(mEndpoint, mClusterId, MediaPlayback::Attributes::PositionUpdatedAt::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo>(
-    const chip::app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePosition(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -2397,11 +1637,6 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePosition(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, MediaPlayback::Attributes::Position::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaPlayback::Attributes::Position::TypeInfo>(
-    const chip::app::Clusters::MediaPlayback::Attributes::Position::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePlaybackSpeed(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -2412,11 +1647,6 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePlaybackSpeed(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, MediaPlayback::Attributes::PlaybackSpeed::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
-    const chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeSeekRangeEnd(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -2427,11 +1657,6 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeSeekRangeEnd(Callback::Cancel
         chip::app::AttributePathParams(mEndpoint, mClusterId, MediaPlayback::Attributes::SeekRangeEnd::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>(
-    const chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeSeekRangeStart(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -2442,11 +1667,6 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeSeekRangeStart(Callback::Canc
         chip::app::AttributePathParams(mEndpoint, mClusterId, MediaPlayback::Attributes::SeekRangeStart::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>(
-    const chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2458,10 +1678,6 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeClusterRevision(Callback::Can
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR NetworkCommissioningClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -2472,11 +1688,6 @@ CHIP_ERROR NetworkCommissioningClusterTest::WriteAttributeFeatureMap(Callback::C
         chip::app::AttributePathParams(mEndpoint, mClusterId, NetworkCommissioning::Attributes::FeatureMap::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo>(
-    const chip::app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR NetworkCommissioningClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2487,10 +1698,6 @@ CHIP_ERROR NetworkCommissioningClusterTest::WriteAttributeClusterRevision(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, NetworkCommissioning::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::NetworkCommissioning::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR OtaSoftwareUpdateProviderClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
@@ -2504,11 +1711,6 @@ CHIP_ERROR OtaSoftwareUpdateProviderClusterTest::WriteAttributeClusterRevision(C
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OtaSoftwareUpdateRequestorClusterTest::WriteAttributeUpdatePossible(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -2519,12 +1721,6 @@ CHIP_ERROR OtaSoftwareUpdateRequestorClusterTest::WriteAttributeUpdatePossible(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::TypeInfo>(
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OtaSoftwareUpdateRequestorClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint16_t value)
@@ -2537,11 +1733,6 @@ CHIP_ERROR OtaSoftwareUpdateRequestorClusterTest::WriteAttributeClusterRevision(
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::ClusterRevision::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OccupancySensingClusterTest::WriteAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2552,11 +1743,6 @@ CHIP_ERROR OccupancySensingClusterTest::WriteAttributeOccupancy(Callback::Cancel
         chip::app::AttributePathParams(mEndpoint, mClusterId, OccupancySensing::Attributes::Occupancy::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
-    const chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OccupancySensingClusterTest::WriteAttributeOccupancySensorType(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2567,11 +1753,6 @@ CHIP_ERROR OccupancySensingClusterTest::WriteAttributeOccupancySensorType(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, OccupancySensing::Attributes::OccupancySensorType::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo>(
-    const chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OccupancySensingClusterTest::WriteAttributeOccupancySensorTypeBitmap(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint8_t value)
@@ -2583,12 +1764,6 @@ CHIP_ERROR OccupancySensingClusterTest::WriteAttributeOccupancySensorTypeBitmap(
         chip::app::AttributePathParams(mEndpoint, mClusterId, OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo>(
-    const chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OccupancySensingClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2600,10 +1775,6 @@ CHIP_ERROR OccupancySensingClusterTest::WriteAttributeClusterRevision(Callback::
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffClusterTest::WriteAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  bool value)
 {
@@ -2614,11 +1785,6 @@ CHIP_ERROR OnOffClusterTest::WriteAttributeOnOff(Callback::Cancelable * onSucces
         chip::app::AttributePathParams(mEndpoint, mClusterId, OnOff::Attributes::OnOff::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffClusterTest::WriteAttributeGlobalSceneControl(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -2629,11 +1795,6 @@ CHIP_ERROR OnOffClusterTest::WriteAttributeGlobalSceneControl(Callback::Cancelab
         chip::app::AttributePathParams(mEndpoint, mClusterId, OnOff::Attributes::GlobalSceneControl::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -2644,11 +1805,6 @@ CHIP_ERROR OnOffClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onS
         chip::app::AttributePathParams(mEndpoint, mClusterId, OnOff::Attributes::FeatureMap::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2660,10 +1816,6 @@ CHIP_ERROR OnOffClusterTest::WriteAttributeClusterRevision(Callback::Cancelable 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffSwitchConfigurationClusterTest::WriteAttributeSwitchType(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2674,11 +1826,6 @@ CHIP_ERROR OnOffSwitchConfigurationClusterTest::WriteAttributeSwitchType(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, OnOffSwitchConfiguration::Attributes::SwitchType::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchType::TypeInfo>(
-    const chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchType::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffSwitchConfigurationClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint16_t value)
@@ -2691,11 +1838,6 @@ CHIP_ERROR OnOffSwitchConfigurationClusterTest::WriteAttributeClusterRevision(Ca
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint8_t value)
@@ -2707,12 +1849,6 @@ CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeSupportedFabrics(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, OperationalCredentials::Attributes::SupportedFabrics::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo>(
-    const chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint8_t value)
@@ -2724,12 +1860,6 @@ CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeCommissionedFabrics(
         chip::app::AttributePathParams(mEndpoint, mClusterId, OperationalCredentials::Attributes::CommissionedFabrics::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo>(
-    const chip::app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint16_t value)
@@ -2742,10 +1872,6 @@ CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeClusterRevision(Call
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OperationalCredentials::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::OperationalCredentials::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeStatus(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2756,11 +1882,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeStatus(Callback::Cancelable * o
         chip::app::AttributePathParams(mEndpoint, mClusterId, PowerSource::Attributes::Status::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::Status::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::Status::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeOrder(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2771,11 +1892,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeOrder(Callback::Cancelable * on
         chip::app::AttributePathParams(mEndpoint, mClusterId, PowerSource::Attributes::Order::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::Order::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::Order::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeDescription(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -2786,11 +1902,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeDescription(Callback::Cancelabl
         chip::app::AttributePathParams(mEndpoint, mClusterId, PowerSource::Attributes::Description::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::Description::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::Description::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryVoltage(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -2801,11 +1912,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryVoltage(Callback::Cancel
         chip::app::AttributePathParams(mEndpoint, mClusterId, PowerSource::Attributes::BatteryVoltage::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryVoltage::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::BatteryVoltage::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryPercentRemaining(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2816,11 +1922,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryPercentRemaining(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, PowerSource::Attributes::BatteryPercentRemaining::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryTimeRemaining(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -2831,11 +1932,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryTimeRemaining(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, PowerSource::Attributes::BatteryTimeRemaining::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryTimeRemaining::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::BatteryTimeRemaining::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryChargeLevel(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2846,11 +1942,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryChargeLevel(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, PowerSource::Attributes::BatteryChargeLevel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeLevel::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::BatteryChargeLevel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryChargeState(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -2861,11 +1952,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryChargeState(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, PowerSource::Attributes::BatteryChargeState::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeState::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::BatteryChargeState::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -2876,11 +1962,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeFeatureMap(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, PowerSource::Attributes::FeatureMap::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::FeatureMap::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::FeatureMap::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PowerSourceClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2892,10 +1973,6 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeClusterRevision(Callback::Cance
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -2906,11 +1983,6 @@ CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeMeasuredValue(Callback:
         chip::app::AttributePathParams(mEndpoint, mClusterId, PressureMeasurement::Attributes::MeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
-    const chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -2921,11 +1993,6 @@ CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeMinMeasuredValue(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, PressureMeasurement::Attributes::MinMeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-    const chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -2936,11 +2003,6 @@ CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, PressureMeasurement::Attributes::MaxMeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-    const chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2951,10 +2013,6 @@ CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeClusterRevision(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, PressureMeasurement::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxPressure(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
@@ -2967,12 +2025,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxPressure(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::MaxPressure::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxSpeed(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2983,11 +2035,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxSpeed(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::MaxSpeed::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxFlow(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2998,11 +2045,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxFlow(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::MaxFlow::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstPressure(Callback::Cancelable * onSuccessCallback,
                                                                                   Callback::Cancelable * onFailureCallback,
                                                                                   int16_t value)
@@ -3015,12 +2057,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstPressur
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstPressure(Callback::Cancelable * onSuccessCallback,
                                                                                   Callback::Cancelable * onFailureCallback,
                                                                                   int16_t value)
@@ -3033,12 +2069,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstPressur
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinCompPressure(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback,
                                                                                  int16_t value)
@@ -3051,12 +2081,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinCompPressure
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxCompPressure(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback,
                                                                                  int16_t value)
@@ -3069,12 +2093,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxCompPressure
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstSpeed(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                uint16_t value)
@@ -3086,12 +2104,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstSpeed(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::MinConstSpeed::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstSpeed(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                uint16_t value)
@@ -3103,12 +2115,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstSpeed(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::MaxConstSpeed::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstFlow(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint16_t value)
@@ -3120,12 +2126,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstFlow(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::MinConstFlow::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstFlow(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint16_t value)
@@ -3137,12 +2137,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstFlow(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::MaxConstFlow::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstTemp(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               int16_t value)
@@ -3154,12 +2148,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMinConstTemp(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::MinConstTemp::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstTemp(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               int16_t value)
@@ -3171,12 +2159,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxConstTemp(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::MaxConstTemp::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributePumpStatus(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint16_t value)
@@ -3188,11 +2170,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributePumpStatus(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::PumpStatus::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
                                                                                         Callback::Cancelable * onFailureCallback,
                                                                                         uint8_t value)
@@ -3205,12 +2182,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeEffectiveOperat
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback,
                                                                                       Callback::Cancelable * onFailureCallback,
                                                                                       uint8_t value)
@@ -3223,12 +2194,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeEffectiveContro
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeCapacity(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -3239,11 +2204,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeCapacity(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::Capacity::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeSpeed(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3254,11 +2214,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeSpeed(Callback:
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::Speed::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeLifetimeEnergyConsumed(Callback::Cancelable * onSuccessCallback,
                                                                                         Callback::Cancelable * onFailureCallback,
                                                                                         uint32_t value)
@@ -3271,12 +2226,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeLifetimeEnergyC
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeAlarmMask(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3287,11 +2236,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeAlarmMask(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::AlarmMask::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::AlarmMask::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::AlarmMask::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint32_t value)
@@ -3303,11 +2247,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeFeatureMap(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::FeatureMap::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::FeatureMap::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::FeatureMap::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback,
                                                                                  uint16_t value)
@@ -3321,11 +2260,6 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeClusterRevision
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::ClusterRevision::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                uint16_t value)
@@ -3337,12 +2271,6 @@ CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMeasuredValue(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, RelativeHumidityMeasurement::Attributes::MeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo>(
-    const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                                   Callback::Cancelable * onFailureCallback,
                                                                                   uint16_t value)
@@ -3355,12 +2283,6 @@ CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMinMeasuredValu
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-    const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                                   Callback::Cancelable * onFailureCallback,
                                                                                   uint16_t value)
@@ -3373,12 +2295,6 @@ CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMaxMeasuredValu
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-    const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback,
                                                                                  uint16_t value)
@@ -3392,11 +2308,6 @@ CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeClusterRevision
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ScenesClusterTest::WriteAttributeSceneCount(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3407,11 +2318,6 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeSceneCount(Callback::Cancelable * on
         chip::app::AttributePathParams(mEndpoint, mClusterId, Scenes::Attributes::SceneCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Scenes::Attributes::SceneCount::TypeInfo>(
-    const chip::app::Clusters::Scenes::Attributes::SceneCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ScenesClusterTest::WriteAttributeCurrentScene(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3422,11 +2328,6 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeCurrentScene(Callback::Cancelable * 
         chip::app::AttributePathParams(mEndpoint, mClusterId, Scenes::Attributes::CurrentScene::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Scenes::Attributes::CurrentScene::TypeInfo>(
-    const chip::app::Clusters::Scenes::Attributes::CurrentScene::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ScenesClusterTest::WriteAttributeCurrentGroup(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3437,11 +2338,6 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeCurrentGroup(Callback::Cancelable * 
         chip::app::AttributePathParams(mEndpoint, mClusterId, Scenes::Attributes::CurrentGroup::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Scenes::Attributes::CurrentGroup::TypeInfo>(
-    const chip::app::Clusters::Scenes::Attributes::CurrentGroup::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ScenesClusterTest::WriteAttributeSceneValid(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -3452,11 +2348,6 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeSceneValid(Callback::Cancelable * on
         chip::app::AttributePathParams(mEndpoint, mClusterId, Scenes::Attributes::SceneValid::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Scenes::Attributes::SceneValid::TypeInfo>(
-    const chip::app::Clusters::Scenes::Attributes::SceneValid::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ScenesClusterTest::WriteAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3467,11 +2358,6 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeNameSupport(Callback::Cancelable * o
         chip::app::AttributePathParams(mEndpoint, mClusterId, Scenes::Attributes::NameSupport::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Scenes::Attributes::NameSupport::TypeInfo>(
-    const chip::app::Clusters::Scenes::Attributes::NameSupport::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ScenesClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3483,10 +2369,6 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeClusterRevision(Callback::Cancelable
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Scenes::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::Scenes::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapFree(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -3497,11 +2379,6 @@ CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapFree(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo>(
-    const chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapUsed(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -3512,11 +2389,6 @@ CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapUsed(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
-    const chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
                                                                                   Callback::Cancelable * onFailureCallback,
                                                                                   uint64_t value)
@@ -3529,12 +2401,6 @@ CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapHighWatermar
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
-    const chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3546,10 +2412,6 @@ CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeClusterRevision(Callbac
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::SoftwareDiagnostics::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR SwitchClusterTest::WriteAttributeNumberOfPositions(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3560,11 +2422,6 @@ CHIP_ERROR SwitchClusterTest::WriteAttributeNumberOfPositions(Callback::Cancelab
         chip::app::AttributePathParams(mEndpoint, mClusterId, Switch::Attributes::NumberOfPositions::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Switch::Attributes::NumberOfPositions::TypeInfo>(
-    const chip::app::Clusters::Switch::Attributes::NumberOfPositions::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR SwitchClusterTest::WriteAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3575,11 +2432,6 @@ CHIP_ERROR SwitchClusterTest::WriteAttributeCurrentPosition(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, Switch::Attributes::CurrentPosition::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(
-    const chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR SwitchClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3591,10 +2443,6 @@ CHIP_ERROR SwitchClusterTest::WriteAttributeClusterRevision(Callback::Cancelable
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Switch::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::Switch::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TvChannelClusterTest::WriteAttributeTvChannelLineup(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
 {
@@ -3605,11 +2453,6 @@ CHIP_ERROR TvChannelClusterTest::WriteAttributeTvChannelLineup(Callback::Cancela
         chip::app::AttributePathParams(mEndpoint, mClusterId, TvChannel::Attributes::TvChannelLineup::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelLineup::TypeInfo>(
-    const chip::app::Clusters::TvChannel::Attributes::TvChannelLineup::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TvChannelClusterTest::WriteAttributeCurrentTvChannel(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
 {
@@ -3620,11 +2463,6 @@ CHIP_ERROR TvChannelClusterTest::WriteAttributeCurrentTvChannel(Callback::Cancel
         chip::app::AttributePathParams(mEndpoint, mClusterId, TvChannel::Attributes::CurrentTvChannel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TvChannel::Attributes::CurrentTvChannel::TypeInfo>(
-    const chip::app::Clusters::TvChannel::Attributes::CurrentTvChannel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TvChannelClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3635,10 +2473,6 @@ CHIP_ERROR TvChannelClusterTest::WriteAttributeClusterRevision(Callback::Cancela
         chip::app::AttributePathParams(mEndpoint, mClusterId, TvChannel::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TvChannel::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::TvChannel::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TargetNavigatorClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -3651,10 +2485,6 @@ CHIP_ERROR TargetNavigatorClusterTest::WriteAttributeClusterRevision(Callback::C
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TargetNavigator::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::TargetNavigator::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -3665,11 +2495,6 @@ CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMeasuredValue(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, TemperatureMeasurement::Attributes::MeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo>(
-    const chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              int16_t value)
@@ -3681,12 +2506,6 @@ CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMinMeasuredValue(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, TemperatureMeasurement::Attributes::MinMeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-    const chip::app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              int16_t value)
@@ -3698,12 +2517,6 @@ CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, TemperatureMeasurement::Attributes::MaxMeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-    const chip::app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint16_t value)
@@ -3716,10 +2529,6 @@ CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeClusterRevision(Call
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3731,10 +2540,6 @@ CHIP_ERROR TestClusterClusterTest::WriteAttributeClusterRevision(Callback::Cance
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -3745,11 +2550,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeLocalTemperature(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::LocalTemperature::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -3760,11 +2560,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMinHeatSetpointLimit(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::AbsMinHeatSetpointLimit::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -3775,11 +2570,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMaxHeatSetpointLimit(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::AbsMaxHeatSetpointLimit::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -3790,11 +2580,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMinCoolSetpointLimit(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::AbsMinCoolSetpointLimit::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -3805,11 +2590,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMaxCoolSetpointLimit(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::AbsMaxCoolSetpointLimit::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeStartOfWeek(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3820,11 +2600,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeStartOfWeek(Callback::Cancelable
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::StartOfWeek::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeNumberOfWeeklyTransitions(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3835,11 +2610,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeNumberOfWeeklyTransitions(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::NumberOfWeeklyTransitions::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeNumberOfDailyTransitions(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3850,11 +2620,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeNumberOfDailyTransitions(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::NumberOfDailyTransitions::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -3865,11 +2630,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeFeatureMap(Callback::Cancelable 
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::FeatureMap::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::FeatureMap::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::FeatureMap::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3880,10 +2640,6 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeClusterRevision(Callback::Cancel
         chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ThermostatUserInterfaceConfigurationClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                                           Callback::Cancelable * onFailureCallback,
@@ -3899,11 +2655,6 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationClusterTest::WriteAttributeCluste
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChannel(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3914,11 +2665,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChannel(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::Channel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Channel::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Channel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRoutingRole(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3929,11 +2675,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRoutingRole(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RoutingRole::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RoutingRole::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RoutingRole::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeNetworkName(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
                                                                           chip::ByteSpan value)
@@ -3945,11 +2686,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeNetworkName(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::NetworkName::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::NetworkName::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::NetworkName::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePanId(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3960,11 +2696,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePanId(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::PanId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PanId::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PanId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeExtendedPanId(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint64_t value)
@@ -3976,11 +2707,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeExtendedPanId(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ExtendedPanId::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ExtendedPanId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeMeshLocalPrefix(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               chip::ByteSpan value)
@@ -3992,12 +2718,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeMeshLocalPrefix(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -4008,11 +2728,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::OverrunCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OverrunCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OverrunCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePartitionId(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4023,11 +2738,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePartitionId(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::PartitionId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PartitionId::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PartitionId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeWeighting(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -4038,11 +2748,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeWeighting(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::Weighting::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Weighting::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Weighting::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeDataVersion(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -4053,11 +2758,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeDataVersion(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::DataVersion::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::DataVersion::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::DataVersion::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeStableDataVersion(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint8_t value)
@@ -4069,12 +2769,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeStableDataVersion(
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::StableDataVersion::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::StableDataVersion::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeLeaderRouterId(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint8_t value)
@@ -4086,12 +2780,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeLeaderRouterId(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::LeaderRouterId::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::LeaderRouterId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeDetachedRoleCount(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint16_t value)
@@ -4103,12 +2791,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeDetachedRoleCount(
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChildRoleCount(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint16_t value)
@@ -4120,12 +2802,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChildRoleCount(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChildRoleCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChildRoleCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRouterRoleCount(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint16_t value)
@@ -4137,12 +2813,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRouterRoleCount(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RouterRoleCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RouterRoleCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeLeaderRoleCount(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint16_t value)
@@ -4154,12 +2824,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeLeaderRoleCount(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeAttachAttemptCount(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback,
                                                                                  uint16_t value)
@@ -4172,12 +2836,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeAttachAttemptCount
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePartitionIdChangeCount(Callback::Cancelable * onSuccessCallback,
                                                                                      Callback::Cancelable * onFailureCallback,
                                                                                      uint16_t value)
@@ -4190,12 +2848,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePartitionIdChangeC
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeBetterPartitionAttachAttemptCount(
     Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -4208,13 +2860,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeBetterPartitionAtt
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::TypeInfo::Type &
-        requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeParentChangeCount(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint16_t value)
@@ -4226,12 +2871,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeParentChangeCount(
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ParentChangeCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ParentChangeCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxTotalCount(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4242,11 +2881,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxTotalCount(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxTotalCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxTotalCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxUnicastCount(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint32_t value)
@@ -4258,12 +2892,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxUnicastCount(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxUnicastCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxUnicastCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxBroadcastCount(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                uint32_t value)
@@ -4275,12 +2903,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxBroadcastCount(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxAckRequestedCount(Callback::Cancelable * onSuccessCallback,
                                                                                   Callback::Cancelable * onFailureCallback,
                                                                                   uint32_t value)
@@ -4293,12 +2915,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxAckRequestedCoun
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxAckedCount(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4309,11 +2925,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxAckedCount(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxAckedCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxAckedCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxAckedCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxNoAckRequestedCount(Callback::Cancelable * onSuccessCallback,
                                                                                     Callback::Cancelable * onFailureCallback,
                                                                                     uint32_t value)
@@ -4326,12 +2937,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxNoAckRequestedCo
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxDataCount(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4342,11 +2947,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxDataCount(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxDataCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxDataCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxDataCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxDataPollCount(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint32_t value)
@@ -4358,12 +2958,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxDataPollCount(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxDataPollCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxDataPollCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxBeaconCount(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint32_t value)
@@ -4375,11 +2969,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxBeaconCount(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxBeaconCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxBeaconCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxBeaconRequestCount(Callback::Cancelable * onSuccessCallback,
                                                                                    Callback::Cancelable * onFailureCallback,
                                                                                    uint32_t value)
@@ -4392,12 +2981,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxBeaconRequestCou
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxOtherCount(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4408,11 +2991,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxOtherCount(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxOtherCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxOtherCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxRetryCount(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4423,11 +3001,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxRetryCount(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxRetryCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxRetryCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxDirectMaxRetryExpiryCount(Callback::Cancelable * onSuccessCallback,
                                                                                           Callback::Cancelable * onFailureCallback,
                                                                                           uint32_t value)
@@ -4441,12 +3014,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxDirectMaxRetryEx
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxIndirectMaxRetryExpiryCount(
     Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4459,12 +3026,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxIndirectMaxRetry
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxErrCcaCount(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint32_t value)
@@ -4476,11 +3037,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxErrCcaCount(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxErrAbortCount(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint32_t value)
@@ -4492,12 +3048,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxErrAbortCount(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxErrBusyChannelCount(Callback::Cancelable * onSuccessCallback,
                                                                                     Callback::Cancelable * onFailureCallback,
                                                                                     uint32_t value)
@@ -4510,12 +3060,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxErrBusyChannelCo
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxTotalCount(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4526,11 +3070,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxTotalCount(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxTotalCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxTotalCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxUnicastCount(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint32_t value)
@@ -4542,12 +3081,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxUnicastCount(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxUnicastCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxUnicastCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxBroadcastCount(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                uint32_t value)
@@ -4559,12 +3092,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxBroadcastCount(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDataCount(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4575,11 +3102,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDataCount(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxDataCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDataCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDataCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDataPollCount(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint32_t value)
@@ -4591,12 +3113,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDataPollCount(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDataPollCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDataPollCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxBeaconCount(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint32_t value)
@@ -4608,11 +3124,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxBeaconCount(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxBeaconCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxBeaconCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxBeaconRequestCount(Callback::Cancelable * onSuccessCallback,
                                                                                    Callback::Cancelable * onFailureCallback,
                                                                                    uint32_t value)
@@ -4625,12 +3136,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxBeaconRequestCou
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxOtherCount(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4641,11 +3146,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxOtherCount(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxOtherCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxOtherCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxAddressFilteredCount(Callback::Cancelable * onSuccessCallback,
                                                                                      Callback::Cancelable * onFailureCallback,
                                                                                      uint32_t value)
@@ -4658,12 +3158,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxAddressFilteredC
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDestAddrFilteredCount(Callback::Cancelable * onSuccessCallback,
                                                                                       Callback::Cancelable * onFailureCallback,
                                                                                       uint32_t value)
@@ -4676,12 +3170,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDestAddrFiltered
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDuplicatedCount(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint32_t value)
@@ -4693,12 +3181,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDuplicatedCount(
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrNoFrameCount(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint32_t value)
@@ -4710,12 +3192,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrNoFrameCount(
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrUnknownNeighborCount(Callback::Cancelable * onSuccessCallback,
                                                                                         Callback::Cancelable * onFailureCallback,
                                                                                         uint32_t value)
@@ -4728,12 +3204,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrUnknownNeighb
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrInvalidSrcAddrCount(Callback::Cancelable * onSuccessCallback,
                                                                                        Callback::Cancelable * onFailureCallback,
                                                                                        uint32_t value)
@@ -4746,12 +3216,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrInvalidSrcAdd
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrSecCount(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint32_t value)
@@ -4763,11 +3227,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrSecCount(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrSecCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrSecCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrFcsCount(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint32_t value)
@@ -4779,11 +3238,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrFcsCount(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrOtherCount(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint32_t value)
@@ -4795,12 +3249,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrOtherCount(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeActiveTimestamp(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint64_t value)
@@ -4812,12 +3260,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeActiveTimestamp(Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePendingTimestamp(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                uint64_t value)
@@ -4829,12 +3271,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePendingTimestamp(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PendingTimestamp::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PendingTimestamp::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeDelay(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -4845,11 +3281,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeDelay(Callback::Ca
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::Delay::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Delay::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Delay::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChannelMask(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
                                                                           chip::ByteSpan value)
@@ -4861,11 +3292,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChannelMask(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::ChannelMask::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChannelMask::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChannelMask::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint16_t value)
@@ -4878,11 +3304,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Ca
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WakeOnLanClusterTest::WriteAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -4893,11 +3314,6 @@ CHIP_ERROR WakeOnLanClusterTest::WriteAttributeWakeOnLanMacAddress(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, WakeOnLan::Attributes::WakeOnLanMacAddress::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo>(
-    const chip::app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WakeOnLanClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -4909,10 +3325,6 @@ CHIP_ERROR WakeOnLanClusterTest::WriteAttributeClusterRevision(Callback::Cancela
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WakeOnLan::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::WakeOnLan::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeBssid(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
 {
@@ -4923,11 +3335,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeBssid(Callback::Canc
         chip::app::AttributePathParams(mEndpoint, mClusterId, WiFiNetworkDiagnostics::Attributes::Bssid::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::Bssid::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::Bssid::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeSecurityType(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -4938,11 +3345,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeSecurityType(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, WiFiNetworkDiagnostics::Attributes::SecurityType::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::SecurityType::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::SecurityType::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeWiFiVersion(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -4953,11 +3355,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeWiFiVersion(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::WiFiVersion::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::WiFiVersion::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeChannelNumber(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -4968,11 +3365,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeChannelNumber(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::ChannelNumber::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::ChannelNumber::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeRssi(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int8_t value)
 {
@@ -4983,11 +3375,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeRssi(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, WiFiNetworkDiagnostics::Attributes::Rssi::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::Rssi::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::Rssi::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeBeaconLostCount(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint32_t value)
@@ -4999,11 +3386,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeBeaconLostCount(Call
         chip::app::AttributePathParams(mEndpoint, mClusterId, WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::BeaconLostCount::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::BeaconLostCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeBeaconRxCount(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -5014,11 +3396,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeBeaconRxCount(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::BeaconRxCount::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::BeaconRxCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketMulticastRxCount(Callback::Cancelable * onSuccessCallback,
                                                                                    Callback::Cancelable * onFailureCallback,
                                                                                    uint32_t value)
@@ -5031,12 +3408,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketMulticastRxCou
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketMulticastTxCount(Callback::Cancelable * onSuccessCallback,
                                                                                    Callback::Cancelable * onFailureCallback,
                                                                                    uint32_t value)
@@ -5049,12 +3420,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketMulticastTxCou
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketUnicastRxCount(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback,
                                                                                  uint32_t value)
@@ -5067,12 +3432,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketUnicastRxCount
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketUnicastTxCount(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback,
                                                                                  uint32_t value)
@@ -5085,12 +3444,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketUnicastTxCount
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeCurrentMaxRate(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -5101,11 +3454,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeCurrentMaxRate(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -5116,11 +3464,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Callbac
         chip::app::AttributePathParams(mEndpoint, mClusterId, WiFiNetworkDiagnostics::Attributes::OverrunCount::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::OverrunCount::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::OverrunCount::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint16_t value)
@@ -5133,10 +3476,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Call
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeType(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -5147,11 +3486,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeType(Callback::Cancelable * 
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::Type::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -5162,11 +3496,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionLift(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::CurrentPositionLift::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -5177,11 +3506,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionTilt(Callback
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::CurrentPositionTilt::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeConfigStatus(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -5192,11 +3516,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeConfigStatus(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::ConfigStatus::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onSuccessCallback,
                                                                                   Callback::Cancelable * onFailureCallback,
                                                                                   uint8_t value)
@@ -5209,12 +3528,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionLiftPercentag
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onSuccessCallback,
                                                                                   Callback::Cancelable * onFailureCallback,
                                                                                   uint8_t value)
@@ -5227,12 +3540,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionTiltPercentag
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeOperationalStatus(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -5243,11 +3550,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeOperationalStatus(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::OperationalStatus::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
                                                                                     Callback::Cancelable * onFailureCallback,
                                                                                     uint16_t value)
@@ -5260,12 +3562,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeTargetPositionLiftPercent100
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
                                                                                     Callback::Cancelable * onFailureCallback,
                                                                                     uint16_t value)
@@ -5278,12 +3574,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeTargetPositionTiltPercent100
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeEndProductType(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -5294,11 +3584,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeEndProductType(Callback::Can
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::EndProductType::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
                                                                                      Callback::Cancelable * onFailureCallback,
                                                                                      uint16_t value)
@@ -5311,12 +3596,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionLiftPercent10
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
                                                                                      Callback::Cancelable * onFailureCallback,
                                                                                      uint16_t value)
@@ -5329,12 +3608,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionTiltPercent10
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledOpenLimitLift(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -5345,11 +3618,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledOpenLimitLift(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::InstalledOpenLimitLift::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledClosedLimitLift(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint16_t value)
@@ -5361,12 +3629,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledClosedLimitLift(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::InstalledClosedLimitLift::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledOpenLimitTilt(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -5377,11 +3639,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledOpenLimitTilt(Callb
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::InstalledOpenLimitTilt::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledClosedLimitTilt(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint16_t value)
@@ -5393,12 +3650,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledClosedLimitTilt(Cal
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::InstalledClosedLimitTilt::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -5409,11 +3660,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeSafetyStatus(Callback::Cance
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::SafetyStatus::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -5423,36 +3669,6 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeClusterRevision(Callback::Ca
     ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
         chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::ClusterRevision::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
-template <typename AttributeInfo>
-CHIP_ERROR ClusterBase::WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
-                                       WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-    auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
-        if (successCb != nullptr)
-        {
-            successCb(context);
-        }
-    };
-
-    auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
-                                            CHIP_ERROR aError) {
-        if (failureCb != nullptr)
-        {
-            failureCb(context, app::ToEmberAfStatus(status.mStatus));
-        }
-    };
-
-    return chip::Controller::WriteAttribute<AttributeInfo>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
-                                                           mEndpoint, requestData, onSuccessCb, onFailureCb);
 }
 
 } // namespace Controller
