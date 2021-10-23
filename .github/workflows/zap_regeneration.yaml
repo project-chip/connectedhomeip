@@ -15,8 +15,8 @@
 name: ZAP - Regenerate
 
 on:
-    push:
-    pull_request:
+    # push:
+    # pull_request:
     workflow_dispatch:
 
 concurrency:
