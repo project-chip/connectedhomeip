@@ -158,6 +158,14 @@ public:
     uint16_t GetSessionId() const { return mSessionId; }
     Header::SessionType GetSessionType() const { return mSessionType; }
 
+    uint8_t GetMessageFlags() const { return mMsgFlags.Raw(); }
+
+    uint8_t GetSecurityFlags() const { return mSecFlags.Raw(); }
+
+    void SetMessageFlags(uint8_t flags) { mMsgFlags.SetRaw(flags); }
+
+    void SetSecurityFlags(uint8_t flags) { mSecFlags.SetRaw(flags); }
+
     bool IsGroupSession() const { return mSessionType == Header::SessionType::kGroupSession; }
     bool IsUnicastSession() const { return mSessionType == Header::SessionType::kUnicastSession; }
 
