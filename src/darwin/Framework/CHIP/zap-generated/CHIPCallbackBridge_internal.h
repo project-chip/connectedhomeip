@@ -521,6 +521,17 @@ public:
     static void OnSuccessFn(void * context, chip::CharSpan data, uint8_t contentLaunchStatus);
 };
 
+class CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge
+    : public CHIPCallbackBridge<DiagnosticLogsClusterRetrieveLogsResponseCallback>
+{
+public:
+    CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DiagnosticLogsClusterRetrieveLogsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, uint8_t status, chip::ByteSpan content, uint32_t timeStamp, uint32_t timeSinceBoot);
+};
+
 class CHIPDoorLockClusterClearAllPinsResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterClearAllPinsResponseCallback>
 {
 public:

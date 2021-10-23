@@ -1142,6 +1142,85 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback
+    : public Callback::Callback<DiagnosticLogsClusterRetrieveLogsResponseCallback>
+{
+public:
+    CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback(jobject javaCallback) :
+        Callback::Callback<DiagnosticLogsClusterRetrieveLogsResponseCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+    ~CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+        env->DeleteGlobalRef(javaCallbackRef);
+    };
+
+    static void CallbackFn(void * context, uint8_t status, chip::ByteSpan content, uint32_t timeStamp, uint32_t timeSinceBoot)
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+        jmethodID javaMethod;
+        CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback * cppCallback = nullptr;
+        jbyteArray contentArr;
+
+        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+        cppCallback = reinterpret_cast<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback *>(context);
+        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+
+        javaCallbackRef = cppCallback->javaCallbackRef;
+        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
+
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I[BJJ)V", &javaMethod);
+        SuccessOrExit(err);
+
+        contentArr = env->NewByteArray(content.size());
+        VerifyOrExit(contentArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+        env->SetByteArrayRegion(contentArr, 0, content.size(), reinterpret_cast<const jbyte *>(content.data()));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), contentArr, static_cast<jlong>(timeStamp),
+                            static_cast<jlong>(timeSinceBoot));
+
+        env->DeleteLocalRef(contentArr);
+
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        if (cppCallback != nullptr)
+        {
+            cppCallback->Cancel();
+            delete cppCallback;
+        }
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterClearAllPinsResponseCallback : public Callback::Callback<DoorLockClusterClearAllPinsResponseCallback>
 {
 public:
@@ -14130,8 +14209,10 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
 
     JniByteArray transferFileDesignatorArr(env, transferFileDesignator);
 
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback,
+                    void (*)(CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback *)>
+        onSuccess(Platform::New<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback>(callback),
+                  Platform::Delete<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

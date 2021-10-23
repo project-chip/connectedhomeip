@@ -41,6 +41,8 @@ typedef void (*ApplicationLauncherClusterLaunchAppResponseCallback)(void * conte
 typedef void (*ContentLauncherClusterLaunchContentResponseCallback)(void * context, chip::CharSpan data,
                                                                     uint8_t contentLaunchStatus);
 typedef void (*ContentLauncherClusterLaunchURLResponseCallback)(void * context, chip::CharSpan data, uint8_t contentLaunchStatus);
+typedef void (*DiagnosticLogsClusterRetrieveLogsResponseCallback)(void * context, uint8_t status, chip::ByteSpan content,
+                                                                  uint32_t timeStamp, uint32_t timeSinceBoot);
 typedef void (*DoorLockClusterClearAllPinsResponseCallback)(void * context, uint8_t status);
 typedef void (*DoorLockClusterClearAllRfidsResponseCallback)(void * context, uint8_t status);
 typedef void (*DoorLockClusterClearHolidayScheduleResponseCallback)(void * context, uint8_t status);

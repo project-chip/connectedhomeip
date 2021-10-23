@@ -1185,6 +1185,19 @@ static void OnContentLauncherLaunchURLResponseSuccess(
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 };
 
+static void OnDiagnosticLogsRetrieveLogsResponseSuccess(
+    void * context, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received RetrieveLogsResponse:");
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", data.status);
+    ChipLogProgress(Zcl, "  content: %zu", data.content.size());
+    ChipLogProgress(Zcl, "  timeStamp: %" PRIu32 "", data.timeStamp);
+    ChipLogProgress(Zcl, "  timeSinceBoot: %" PRIu32 "", data.timeSinceBoot);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+};
+
 static void
 OnDoorLockClearAllPinsResponseSuccess(void * context,
                                       const chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType & data)
@@ -8505,7 +8518,7 @@ public:
 
         chip::Controller::DiagnosticLogsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return cluster.InvokeCommand(mRequest, this, OnDiagnosticLogsRetrieveLogsResponseSuccess, OnDefaultFailure);
     }
 
 private:
