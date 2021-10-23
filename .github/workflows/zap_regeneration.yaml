@@ -69,9 +69,27 @@ jobs:
                 # git add .
                 # git diff-index HEAD --
                 # git diff-index --quiet HEAD --
-            - name: Commit newly generated changes
-              uses: stefanzweifel/git-auto-commit-action@v4
+            - name: Add generated paths
+              run: |
+                git add zzz_generated/*
+                git add src/darwin/Framework/*
+                git add src/controller/python/chip/clusters/*
+                git add src/controller/java/zap-generated/*
+            - uses: GuillaumeFalourd/git-commit-push@v1
               with:
-                commit_message: Auto-regenerated ZAP Changes
-                file_pattern: "zzz_generated/* src/darwin/Framework/* src/controller/python/chip/clusters/* src/controller/java/zap-generated/*"
-                # branch: ${{ github.head_ref }}
+                # email: ${{ github.actor }}@users.noreply.github.com
+                # name: ${{ github.actor }}
+                commit_message: Adding ZAP Generated Files
+                # target_branch: target_branch_name
+                # files: file1 file2 directory1 directory2/file3
+                # remote_repository: https://github.com/owner/another_repository
+                # access_token: ${{ github.token }}
+                # force: true
+                # empty: true
+                # tags: true
+            # - name: Commit newly generated changes
+            #   uses: stefanzweifel/git-auto-commit-action@v4
+            #   with:
+            #     commit_message: Auto-regenerated ZAP Changes
+            #     file_pattern: "zzz_generated/* src/darwin/Framework/* src/controller/python/chip/clusters/* src/controller/java/zap-generated/*"
+            #     # branch: ${{ github.head_ref }}
