@@ -83,7 +83,7 @@ jobs:
                 # target_branch: target_branch_name
                 # files: file1 file2 directory1 directory2/file3
                 # remote_repository: https://github.com/owner/another_repository
-                # access_token: ${{ github.token }}
+                access_token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
                 # force: true
                 # empty: true
                 # tags: true
