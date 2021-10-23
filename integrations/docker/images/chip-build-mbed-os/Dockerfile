@@ -1,34 +1,37 @@
 ARG VERSION=latest
-FROM connectedhomeip/chip-build:${VERSION}
+FROM connectedhomeip/chip-build:${VERSION} as build
 
-# ------------------------------------------------------------------------------
-# Install system tools via apt
 RUN set -x \
     && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-    python3-setuptools \
-    python3-usb \
-    software-properties-common \
-    build-essential \
-    astyle \
-    mercurial \
-    && rm -rf /var/lib/apt/lists \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    wget=1.20.3-1ubuntu1 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/ \
     && : # last line
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# ------------------------------------------------------------------------------
+# Install openocd
+RUN set -x \
+    && mkdir -p /opt/openocd \
+    && wget -O - --progress=dot:giga https://github.com/cypresssemiconductorco/openocd/releases/download/release-v4.2.0/openocd-4.2.0.1430-linux.tar.gz | tar --strip-components=1 -xz -C /opt/openocd \
+    && : # last line
+
+FROM connectedhomeip/chip-build:${VERSION}
+
+COPY --from=build /opt/openocd/ /opt/openocd/
 
 # ------------------------------------------------------------------------------
 # Install Python modules
 RUN set -x \
-    && pip3 install --no-cache-dir -U mbed-cli mbed-tools \
+    && pip3 install --no-cache-dir -U mbed-cli==1.10.5 mbed-tools==7.44.0 \
     && : # last line
 
 # ------------------------------------------------------------------------------
-# Install openocd
+# Configure mbed build system
 RUN set -x \
-    && (mkdir -p /opt/openocd \
-    && cd /opt/openocd \
-    && wget --progress=dot:giga https://github.com/cypresssemiconductorco/openocd/releases/download/release-v4.2.0/openocd-4.2.0.1430-linux.tar.gz \
-    && tar --strip-components=1 -xzf openocd-4.2.0.1430-linux.tar.gz \
-    && rm openocd-4.2.0.1430-linux.tar.gz) \
+    && mbed config -G GCC_ARM_PATH /opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
+    && mbed toolchain -G -s GCC_ARM \
     && : # last line
 
 # ------------------------------------------------------------------------------
