@@ -37,6 +37,8 @@
 namespace chip {
 namespace secure_channel {
 
+constexpr System::Clock::Timeout MessageCounterManager::kSyncTimeout;
+
 CHIP_ERROR MessageCounterManager::Init(Messaging::ExchangeManager * exchangeMgr)
 {
     VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -197,8 +199,8 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SessionHandle session, T
 
     sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck).Set(Messaging::SendMessageFlags::kExpectResponse);
 
-    // Arm a timer to enforce that a MsgCounterSyncRsp is received before kSyncTimeoutMs.
-    exchangeContext->SetResponseTimeout(kSyncTimeoutMs);
+    // Arm a timer to enforce that a MsgCounterSyncRsp is received before kSyncTimeout.
+    exchangeContext->SetResponseTimeout(kSyncTimeout);
 
     // Send the message counter synchronization request in a Secure Channel Protocol::MsgCounterSyncReq message.
     SuccessOrExit(
