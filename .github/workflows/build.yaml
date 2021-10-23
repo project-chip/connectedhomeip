@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.20
+            image: connectedhomeip/chip-build:0.5.21
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
