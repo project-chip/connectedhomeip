@@ -77,7 +77,7 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, mController));
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
-    ReturnLogErrorOnFailure(StartWaiting(GetWaitDurationInSeconds()));
+    ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
 
     Shutdown();
 
@@ -108,12 +108,12 @@ static void OnResponseTimeout(chip::System::Layer *, void * appState)
 }
 #endif // !CONFIG_USE_SEPARATE_EVENTLOOP
 
-CHIP_ERROR CHIPCommand::StartWaiting(uint16_t seconds)
+CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
 {
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     // ServiceEvents() calls StartEventLoopTask(), which is paired with the StopEventLoopTask() below.
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().ServiceEvents());
-    auto waitingUntil = std::chrono::system_clock::now() + std::chrono::seconds(seconds);
+    auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
     {
         std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
         if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
@@ -123,8 +123,7 @@ CHIP_ERROR CHIPCommand::StartWaiting(uint16_t seconds)
     }
     LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
 #else
-    ReturnLogErrorOnFailure(
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(seconds), OnResponseTimeout, this));
+    ReturnLogErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(duration, OnResponseTimeout, this));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
 

@@ -77,8 +77,8 @@ private:
 
     WiFiAPMode _GetWiFiAPMode(void);
 
-    uint32_t _GetWiFiStationReconnectIntervalMS(void);
-    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
+    System::Clock::Timeout _GetWiFiStationReconnectInterval(void);
+    CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool _IsWiFiStationConnected(void);
     bool _IsWiFiStationEnabled(void);
     bool _IsWiFiStationProvisioned(void);
@@ -101,16 +101,17 @@ private:
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
     static ConnectivityManagerImpl sInstance;
-    WiFiStationMode mWiFiStationMode         = kWiFiStationMode_NotSupported;
-    WiFiStationState mWiFiStationState       = kWiFiStationState_NotConnected;
-    WiFiAPMode mWiFiAPMode                   = kWiFiAPMode_NotSupported;
-    uint32_t mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
-    uint32_t mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
-    WiFiInterface * mWifiInterface           = nullptr;
-    nsapi_security_t mSecurityType           = NSAPI_SECURITY_WPA_WPA2;
-    bool mIsProvisioned                      = false;
-    Inet::IPAddress mIp4Address              = Inet::IPAddress::Any;
-    Inet::IPAddress mIp6Address              = Inet::IPAddress::Any;
+    WiFiStationMode mWiFiStationMode   = kWiFiStationMode_NotSupported;
+    WiFiStationState mWiFiStationState = kWiFiStationState_NotConnected;
+    WiFiAPMode mWiFiAPMode             = kWiFiAPMode_NotSupported;
+    System::Clock::Timeout mWiFiStationReconnectInterval =
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
+    System::Clock::Timeout mWiFiAPIdleTimeout = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
+    WiFiInterface * mWifiInterface            = nullptr;
+    nsapi_security_t mSecurityType            = NSAPI_SECURITY_WPA_WPA2;
+    bool mIsProvisioned                       = false;
+    Inet::IPAddress mIp4Address               = Inet::IPAddress::Any;
+    Inet::IPAddress mIp6Address               = Inet::IPAddress::Any;
 };
 
 inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode(void)
@@ -118,9 +119,9 @@ inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode(v
     return mWiFiAPMode;
 }
 
-inline uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
+inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiStationReconnectInterval(void)
 {
-    return mWiFiStationReconnectIntervalMS;
+    return mWiFiStationReconnectInterval;
 }
 
 /**

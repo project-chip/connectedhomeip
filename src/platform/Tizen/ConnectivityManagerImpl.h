@@ -92,8 +92,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     WiFiStationMode _GetWiFiStationMode(void);
     CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
-    uint32_t _GetWiFiStationReconnectIntervalMS(void);
-    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
+    System::Clock::Timeout _GetWiFiStationReconnectInterval(void);
+    CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool _IsWiFiStationEnabled(void);
     bool _IsWiFiStationConnected(void);
     bool _IsWiFiStationApplicationControlled(void);
@@ -108,8 +108,8 @@ private:
     void _DemandStartWiFiAP(void);
     void _StopOnDemandWiFiAP(void);
     void _MaintainOnDemandWiFiAP(void);
-    uint32_t _GetWiFiAPIdleTimeoutMS(void);
-    void _SetWiFiAPIdleTimeoutMS(uint32_t val);
+    System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
+    void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
 
     static void ActivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState);
     static void DeactivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState);
@@ -127,9 +127,9 @@ private:
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     WiFiAPState mWiFiAPState;
-    uint64_t mLastAPDemandTime;
-    uint32_t mWiFiStationReconnectIntervalMS;
-    uint32_t mWiFiAPIdleTimeoutMS;
+    System::Clock::Timestamp mLastAPDemandTime;
+    System::Clock::Timeout mWiFiStationReconnectInterval;
+    System::Clock::Timeout mWiFiAPIdleTimeout;
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -143,9 +143,9 @@ inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
     return false;
 }
 
-inline uint32_t ConnectivityManagerImpl::_GetWiFiAPIdleTimeoutMS()
+inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
 {
-    return 0;
+    return System::Clock::Zero;
 }
 
 #endif

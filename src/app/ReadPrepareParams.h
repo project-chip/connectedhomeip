@@ -35,7 +35,7 @@ struct ReadPrepareParams
     AttributePathParams * mpAttributePathParamsList = nullptr;
     size_t mAttributePathParamsListSize             = 0;
     EventNumber mEventNumber                        = 0;
-    uint32_t mTimeout                               = kImMessageTimeoutMsec;
+    System::Clock::Timeout mTimeout                 = kImMessageTimeout;
     uint16_t mMinIntervalFloorSeconds               = 0;
     uint16_t mMaxIntervalCeilingSeconds             = 0;
     bool mKeepSubscriptions                         = true;

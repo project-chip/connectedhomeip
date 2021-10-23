@@ -154,7 +154,7 @@ public:
     // Default timeout value will be used otherwise.
     //
     CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
-                                  uint32_t timeout = kImMessageTimeoutMsec);
+                                  System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
     // ExchangeDelegate interface implementation.  Private so people won't

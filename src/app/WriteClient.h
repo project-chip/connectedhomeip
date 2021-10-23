@@ -96,7 +96,7 @@ private:
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
     CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                uint32_t timeout);
+                                System::Clock::Timeout timeout);
 
     /**
      *  Initialize the client object. Within the lifetime
@@ -178,7 +178,7 @@ public:
      * should not use this object after calling this function.
      */
     CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                uint32_t timeout = kImMessageTimeoutMsec);
+                                System::Clock::Timeout timeout = kImMessageTimeout);
 
     /**
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put
