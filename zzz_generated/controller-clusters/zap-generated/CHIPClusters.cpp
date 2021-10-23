@@ -973,17 +973,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
 CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  chip::CharSpan value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Basic::Attributes::UserLabel::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
-                                                                                     onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Basic::Attributes::UserLabel::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::UserLabel::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -1004,17 +999,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
 CHIP_ERROR BasicCluster::WriteAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                 chip::CharSpan value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Basic::Attributes::Location::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
-                                                                                    onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Basic::Attributes::Location::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::Location::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
@@ -1142,17 +1132,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attr
 CHIP_ERROR BasicCluster::WriteAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, bool value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo>(value, onSuccess->mContext,
-                                                                                               onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::LocalConfigDisabled::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -1204,18 +1189,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BinaryInput
 CHIP_ERROR BinaryInputBasicCluster::WriteAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, bool value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(value, nullptr, nullptr,
-                                                                                                   nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, BinaryInputBasic::Attributes::OutOfService::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BinaryInputBasicCluster::ReadAttributePresentValue(Callback::Cancelable * onSuccessCallback,
@@ -1237,18 +1216,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BinaryInput
 CHIP_ERROR BinaryInputBasicCluster::WriteAttributePresentValue(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, bool value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(value, nullptr, nullptr,
-                                                                                                   nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, BinaryInputBasic::Attributes::PresentValue::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BinaryInputBasicCluster::SubscribeAttributePresentValue(Callback::Cancelable * onSuccessCallback,
@@ -1531,17 +1504,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDevi
 CHIP_ERROR BridgedDeviceBasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::UserLabel::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::BridgedDeviceBasic::Attributes::UserLabel::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::UserLabel::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
@@ -2838,18 +2806,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(value, nullptr, nullptr,
-                                                                                                      nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorControlOptions::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeNumberOfPrimaries(Callback::Cancelable * onSuccessCallback,
@@ -3099,17 +3061,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointX(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(value, onSuccess->mContext,
-                                                                                              onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::WhitePointX::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
@@ -3131,17 +3088,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(value, onSuccess->mContext,
-                                                                                              onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::WhitePointY::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
@@ -3163,17 +3115,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(value, onSuccess->mContext,
-                                                                                               onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorPointRX::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
@@ -3195,17 +3142,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(value, onSuccess->mContext,
-                                                                                               onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorPointRY::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
@@ -3227,18 +3169,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(value, nullptr, nullptr,
-                                                                                                       nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorPointRIntensity::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
@@ -3260,17 +3196,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(value, onSuccess->mContext,
-                                                                                               onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorPointGX::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
@@ -3292,17 +3223,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(value, onSuccess->mContext,
-                                                                                               onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorPointGY::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
@@ -3324,18 +3250,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(value, nullptr, nullptr,
-                                                                                                       nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorPointGIntensity::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
@@ -3357,17 +3277,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(value, onSuccess->mContext,
-                                                                                               onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorPointBX::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
@@ -3389,17 +3304,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(value, onSuccess->mContext,
-                                                                                               onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorPointBY::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
@@ -3421,18 +3331,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorContro
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(value, nullptr, nullptr,
-                                                                                                       nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::ColorPointBIntensity::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeEnhancedCurrentHue(Callback::Cancelable * onSuccessCallback,
@@ -3588,18 +3492,12 @@ CHIP_ERROR ColorControlCluster::WriteAttributeStartUpColorTemperatureMireds(Call
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(value, nullptr,
-                                                                                                                nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ColorControl::Attributes::StartUpColorTemperatureMireds::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -5703,18 +5601,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::GeneralComm
 CHIP_ERROR GeneralCommissioningCluster::WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint64_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo>(value, nullptr, nullptr,
-                                                                                                     nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, GeneralCommissioning::Attributes::Breadcrumb::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBasicCommissioningInfoList(Callback::Cancelable * onSuccessCallback,
@@ -6327,17 +6219,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Identify::A
 CHIP_ERROR IdentifyCluster::WriteAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(value, onSuccess->mContext,
-                                                                                           onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Identify::Attributes::IdentifyTime::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IdentifyCluster::ReadAttributeIdentifyType(Callback::Cancelable * onSuccessCallback,
@@ -6921,17 +6808,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelContro
 CHIP_ERROR LevelControlCluster::WriteAttributeOptions(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::Options::TypeInfo>(value, onSuccess->mContext,
-                                                                                          onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::Options::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::Options::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ReadAttributeOnOffTransitionTime(Callback::Cancelable * onSuccessCallback,
@@ -6953,18 +6835,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelContro
 CHIP_ERROR LevelControlCluster::WriteAttributeOnOffTransitionTime(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(value, nullptr, nullptr,
-                                                                                                      nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::OnOffTransitionTime::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ReadAttributeOnLevel(Callback::Cancelable * onSuccessCallback,
@@ -6986,17 +6862,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelContro
 CHIP_ERROR LevelControlCluster::WriteAttributeOnLevel(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(value, onSuccess->mContext,
-                                                                                          onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::OnLevel::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ReadAttributeOnTransitionTime(Callback::Cancelable * onSuccessCallback,
@@ -7018,18 +6889,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelContro
 CHIP_ERROR LevelControlCluster::WriteAttributeOnTransitionTime(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(value, nullptr, nullptr,
-                                                                                                   nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::OnTransitionTime::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ReadAttributeOffTransitionTime(Callback::Cancelable * onSuccessCallback,
@@ -7051,18 +6916,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelContro
 CHIP_ERROR LevelControlCluster::WriteAttributeOffTransitionTime(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(value, nullptr, nullptr,
-                                                                                                    nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::OffTransitionTime::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ReadAttributeDefaultMoveRate(Callback::Cancelable * onSuccessCallback,
@@ -7084,17 +6943,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelContro
 CHIP_ERROR LevelControlCluster::WriteAttributeDefaultMoveRate(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::DefaultMoveRate::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ReadAttributeStartUpCurrentLevel(Callback::Cancelable * onSuccessCallback,
@@ -7116,18 +6970,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelContro
 CHIP_ERROR LevelControlCluster::WriteAttributeStartUpCurrentLevel(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(value, nullptr, nullptr,
-                                                                                                      nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, LevelControl::Attributes::StartUpCurrentLevel::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -8829,18 +8677,13 @@ CHIP_ERROR OtaSoftwareUpdateRequestorCluster::WriteAttributeDefaultOtaProvider(C
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                chip::ByteSpan value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo>(
-            value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::Id),
+        value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReadAttributeUpdatePossible(Callback::Cancelable * onSuccessCallback,
@@ -9240,17 +9083,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attr
 CHIP_ERROR OnOffCluster::WriteAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
-                                                                                  onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, OnOff::Attributes::OnTime::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR OnOffCluster::ReadAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
@@ -9272,17 +9110,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attr
 CHIP_ERROR OnOffCluster::WriteAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
-                                                                                       onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, OnOff::Attributes::OffWaitTime::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR OnOffCluster::ReadAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
@@ -9304,17 +9137,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attr
 CHIP_ERROR OnOffCluster::WriteAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(value, onSuccess->mContext,
-                                                                                        onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, OnOff::Attributes::StartUpOnOff::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR OnOffCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -9403,18 +9231,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOffSwitch
 CHIP_ERROR OnOffSwitchConfigurationCluster::WriteAttributeSwitchActions(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo>(value, nullptr, nullptr,
-                                                                                                            nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, OnOffSwitchConfiguration::Attributes::SwitchActions::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR OnOffSwitchConfigurationCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -10414,18 +10236,12 @@ ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::At
 CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(value, nullptr,
-                                                                                                               nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::OperationMode::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeControlMode(Callback::Cancelable * onSuccessCallback,
@@ -10448,18 +10264,12 @@ ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::At
 CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeControlMode(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(value, nullptr,
-                                                                                                             nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::ControlMode::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeAlarmMask(Callback::Cancelable * onSuccessCallback,
@@ -11885,17 +11695,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, bool value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(value, onSuccess->mContext,
-                                                                                         onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Boolean::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeBitmap8(Callback::Cancelable * onSuccessCallback,
@@ -11917,17 +11722,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeBitmap8(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(value, onSuccess->mContext,
-                                                                                         onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Bitmap8::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeBitmap16(Callback::Cancelable * onSuccessCallback,
@@ -11949,17 +11749,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeBitmap16(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(value, onSuccess->mContext,
-                                                                                          onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Bitmap16::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeBitmap32(Callback::Cancelable * onSuccessCallback,
@@ -11981,17 +11776,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeBitmap32(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint32_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(value, onSuccess->mContext,
-                                                                                          onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Bitmap32::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeBitmap64(Callback::Cancelable * onSuccessCallback,
@@ -12013,17 +11803,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeBitmap64(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint64_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(value, onSuccess->mContext,
-                                                                                          onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Bitmap64::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeInt8u(Callback::Cancelable * onSuccessCallback,
@@ -12045,17 +11830,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeInt8u(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
-                                                                                       onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Int8u::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeInt16u(Callback::Cancelable * onSuccessCallback,
@@ -12077,17 +11857,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeInt16u(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(value, onSuccess->mContext,
-                                                                                        onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Int16u::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeInt32u(Callback::Cancelable * onSuccessCallback,
@@ -12109,17 +11884,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeInt32u(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint32_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(value, onSuccess->mContext,
-                                                                                        onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Int32u::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeInt64u(Callback::Cancelable * onSuccessCallback,
@@ -12141,17 +11911,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeInt64u(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint64_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(value, onSuccess->mContext,
-                                                                                        onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Int64u::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeInt8s(Callback::Cancelable * onSuccessCallback,
@@ -12173,17 +11938,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeInt8s(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, int8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
-                                                                                       onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Int8s::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeInt16s(Callback::Cancelable * onSuccessCallback,
@@ -12205,17 +11965,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeInt16s(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, int16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(value, onSuccess->mContext,
-                                                                                        onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Int16s::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeInt32s(Callback::Cancelable * onSuccessCallback,
@@ -12237,17 +11992,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeInt32s(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, int32_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(value, onSuccess->mContext,
-                                                                                        onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Int32s::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeInt64s(Callback::Cancelable * onSuccessCallback,
@@ -12269,17 +12019,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeInt64s(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, int64_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(value, onSuccess->mContext,
-                                                                                        onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Int64s::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeEnum8(Callback::Cancelable * onSuccessCallback,
@@ -12301,17 +12046,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeEnum8(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(value, onSuccess->mContext, onSuccess->mCall,
-                                                                                       onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Enum8::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeEnum16(Callback::Cancelable * onSuccessCallback,
@@ -12333,17 +12073,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeEnum16(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(value, onSuccess->mContext,
-                                                                                        onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Enum16::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeOctetString(Callback::Cancelable * onSuccessCallback,
@@ -12365,17 +12100,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeOctetString(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(value, onSuccess->mContext,
-                                                                                             onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::OctetString::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeListInt8u(Callback::Cancelable * onSuccessCallback,
@@ -12433,17 +12163,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeLongOctetString(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::LongOctetString::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeCharString(Callback::Cancelable * onSuccessCallback,
@@ -12465,17 +12190,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeCharString(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(value, onSuccess->mContext,
-                                                                                            onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::CharString::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeLongCharString(Callback::Cancelable * onSuccessCallback,
@@ -12497,17 +12217,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeLongCharString(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(value, onSuccess->mContext,
-                                                                                                onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::LongCharString::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeEpochUs(Callback::Cancelable * onSuccessCallback,
@@ -12529,17 +12244,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeEpochUs(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint64_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(value, onSuccess->mContext,
-                                                                                         onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::EpochUs::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeEpochS(Callback::Cancelable * onSuccessCallback,
@@ -12561,17 +12271,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeEpochS(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint32_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(value, onSuccess->mContext,
-                                                                                        onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::EpochS::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
@@ -12593,17 +12298,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster
 CHIP_ERROR TestClusterCluster::WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback, bool value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(value, onSuccess->mContext,
-                                                                                             onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::Unsupported::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -12977,18 +12677,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat:
 CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, int16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(value, nullptr, nullptr,
-                                                                                                        nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::OccupiedCoolingSetpoint::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatCluster::ReadAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
@@ -13010,18 +12704,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat:
 CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, int16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(value, nullptr, nullptr,
-                                                                                                        nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::OccupiedHeatingSetpoint::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatCluster::ReadAttributeMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
@@ -13043,18 +12731,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat:
 CHIP_ERROR ThermostatCluster::WriteAttributeMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(value, nullptr, nullptr,
-                                                                                                     nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::MinHeatSetpointLimit::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatCluster::ReadAttributeMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
@@ -13076,18 +12758,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat:
 CHIP_ERROR ThermostatCluster::WriteAttributeMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(value, nullptr, nullptr,
-                                                                                                     nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::MaxHeatSetpointLimit::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatCluster::ReadAttributeMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
@@ -13109,18 +12785,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat:
 CHIP_ERROR ThermostatCluster::WriteAttributeMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(value, nullptr, nullptr,
-                                                                                                     nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::MinCoolSetpointLimit::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatCluster::ReadAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
@@ -13142,18 +12812,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat:
 CHIP_ERROR ThermostatCluster::WriteAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int16_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(value, nullptr, nullptr,
-                                                                                                     nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::MaxCoolSetpointLimit::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatCluster::ReadAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
@@ -13175,18 +12839,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat:
 CHIP_ERROR ThermostatCluster::WriteAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(value, nullptr, nullptr,
-                                                                                                           nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::ControlSequenceOfOperation::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatCluster::ReadAttributeSystemMode(Callback::Cancelable * onSuccessCallback,
@@ -13208,17 +12866,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat:
 CHIP_ERROR ThermostatCluster::WriteAttributeSystemMode(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(value, onSuccess->mContext,
-                                                                                           onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Thermostat::Attributes::SystemMode::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatCluster::ReadAttributeStartOfWeek(Callback::Cancelable * onSuccessCallback,
@@ -13330,18 +12983,14 @@ template CHIP_ERROR ClusterBase::WriteAttribute<
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeTemperatureDisplayMode(
     Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-            value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId,
+                                       ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id),
+        value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::ReadAttributeKeypadLockout(Callback::Cancelable * onSuccessCallback,
@@ -13365,18 +13014,13 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeKeypadLock
                                                                                     Callback::Cancelable * onFailureCallback,
                                                                                     uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-            value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id),
+        value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR
@@ -13401,20 +13045,14 @@ template CHIP_ERROR ClusterBase::WriteAttribute<
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeScheduleProgrammingVisibility(
     Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<
-            app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<
-            app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-            value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId,
+                                       ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id),
+        value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -15107,17 +14745,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCover
 CHIP_ERROR WindowCoveringCluster::WriteAttributeMode(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(value, onSuccess->mContext,
-                                                                                         onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(value, nullptr, nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, WindowCovering::Attributes::Mode::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR WindowCoveringCluster::ReadAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback,

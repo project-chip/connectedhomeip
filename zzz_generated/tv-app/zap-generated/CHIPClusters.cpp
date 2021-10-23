@@ -205,18 +205,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::GeneralComm
 CHIP_ERROR GeneralCommissioningCluster::WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint64_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo>(value, nullptr, nullptr,
-                                                                                                     nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, GeneralCommissioning::Attributes::Breadcrumb::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBasicCommissioningInfoList(Callback::Cancelable * onSuccessCallback,

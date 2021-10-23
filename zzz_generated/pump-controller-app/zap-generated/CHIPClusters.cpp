@@ -892,18 +892,12 @@ ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::At
 CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    if (onSuccessCallback != nullptr && onFailureCallback != nullptr)
-    {
-        auto onSuccess = Callback::Callback<WriteResponseSuccessCallback>::FromCancelable(onSuccessCallback);
-        auto onFailure = Callback::Callback<WriteResponseFailureCallback>::FromCancelable(onFailureCallback);
-        return WriteAttribute<app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
-            value, onSuccess->mContext, onSuccess->mCall, onFailure->mCall);
-    }
-    else
-    {
-        return WriteAttribute<app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(value, nullptr,
-                                                                                                               nullptr, nullptr);
-    }
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::OperationMode::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
