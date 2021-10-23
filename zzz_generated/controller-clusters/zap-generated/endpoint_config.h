@@ -347,10 +347,10 @@
                 0x0300, ZAP_ATTRIBUTE_INDEX(33), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Color Control (client) */                                                                  \
             {                                                                                                                      \
-                0x0400, ZAP_ATTRIBUTE_INDEX(32), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0400, ZAP_ATTRIBUTE_INDEX(33), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Illuminance Measurement (client) */                                                        \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(33), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0402, ZAP_ATTRIBUTE_INDEX(34), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
                 0x0403, ZAP_ATTRIBUTE_INDEX(35), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
