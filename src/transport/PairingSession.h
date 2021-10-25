@@ -98,9 +98,10 @@ protected:
     template <typename... FieldSizes>
     static constexpr size_t EstimateTLVStructOverhead(size_t firstFieldSize, FieldSizes... otherFields)
     {
-        // Conservatively estimate 8 bytes of overhead per field.  We should be
-        // able to do better...
-        return firstFieldSize + 8 + EstimateTLVStructOverhead(otherFields...);
+        // stimate 4 bytes of overhead per field.  This can happen for a large
+        // octet string field: 1 byte control, 1 byte context tag, 2 bytes
+        // length.
+        return firstFieldSize + 4 + EstimateTLVStructOverhead(otherFields...);
     }
 
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }

@@ -325,8 +325,12 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
 
 CHIP_ERROR CASESession::SendSigma1()
 {
-    size_t data_len = EstimateTLVStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kSHA256_Hash_Length,
-                                                kP256_PublicKey_Length, /* kMRPOptionalParamsLength, */
+    size_t data_len = EstimateTLVStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
+                                                sizeof(uint16_t),            // initiatorSessionId,
+                                                kSHA256_Hash_Length,         // destinationId
+                                                kP256_PublicKey_Length,      // InitiatorEphPubKey,
+                                                /* EstimateTLVStructOverhead(sizeof(uint16_t),
+                                                   sizeof(uint16)_t), // initiatorMRPParams */
                                                 kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferTLVWriter tlvWriter;

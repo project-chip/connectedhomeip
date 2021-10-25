@@ -352,8 +352,13 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    const size_t max_msg_len =
-        EstimateTLVStructOverhead(kPBKDFParamRandomNumberSize, sizeof(uint16_t), sizeof(uint16_t), sizeof(uint8_t));
+    const size_t max_msg_len       = EstimateTLVStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
+                                                         sizeof(uint16_t),            // initiatorSessionId
+                                                         sizeof(uint16_t),            // passcodeId,
+                                                         sizeof(uint8_t)              // hasPBKDFParameters
+                                                         /* EstimateTLVStructOverhead(sizeof(uint16_t),
+                                                            sizeof(uint16)_t), // initiatorMRPParams */
+    );
     System::PacketBufferHandle req = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!req.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -367,6 +372,8 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mPasscodeID));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
     // TODO - Add optional MRP parameter support to PASE
+    // When we add MRP params here, adjust the EstimateTLVStructOverhead call
+    // above accordingly.
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&req));
 
@@ -443,8 +450,14 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
 {
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    const size_t max_msg_len = EstimateTLVStructOverhead(kPBKDFParamRandomNumberSize, kPBKDFParamRandomNumberSize, sizeof(uint16_t),
-                                                         sizeof(uint16_t), sizeof(uint8_t));
+    const size_t max_msg_len =
+        EstimateTLVStructOverhead(kPBKDFParamRandomNumberSize,                             // initiatorRandom
+                                  kPBKDFParamRandomNumberSize,                             // responderRandom
+                                  sizeof(uint16_t),                                        // responderSessionId
+                                  EstimateTLVStructOverhead(sizeof(uint32_t), mSaltLength) // pbkdf_parameters
+                                  /* EstimateTLVStructOverhead(sizeof(uint16_t),
+                                     sizeof(uint16)_t), // responderMRPParams */
+        );
     System::PacketBufferHandle resp = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!resp.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -466,6 +479,9 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
         ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mSalt, mSaltLength));
         ReturnErrorOnFailure(tlvWriter.EndContainer(pbkdfParamContainer));
     }
+
+    // When we add MRP params here, adjust the EstimateTLVStructOverhead call
+    // above accordingly.
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&resp));
