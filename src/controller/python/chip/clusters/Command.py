@@ -21,11 +21,11 @@ from dataclasses import dataclass
 from typing import Type
 from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32,  c_uint16, py_object
 
-
 from .ClusterObjects import ClusterCommand
 import chip.exceptions
 import chip.interaction_model
 
+import inspect, sys
 
 @dataclass
 class CommandPath:
@@ -33,6 +33,25 @@ class CommandPath:
     ClusterId: int
     CommandId: int
 
+def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
+    ''' Locates the right generated cluster object given a set of parameters.
+        
+        isClientSideCommand: True if it is a client-to-server command, else False.
+        path: A CommandPath that describes the endpoint, cluster and ID of the command.
+
+        Returns the type of the cluster object if one is found. Otherwise, returns None.
+    '''
+    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
+        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+            for objName, subclass in inspect.getmembers(obj):
+                if inspect.isclass(subclass) and (('Commands') in str(subclass)):
+                    for commandName, command in inspect.getmembers(subclass):
+                        if inspect.isclass(command):
+                            for name, field in inspect.getmembers(command):
+                                if ('__dataclass_fields__' in name):
+                                    if (field['cluster_id'].default == path.ClusterId) and (field['command_id'].default == path.CommandId) and (field['is_client'].default == isClientSideCommand):
+                                        return eval('chip.clusters.Objects.' + clusterName + '.Commands.' + commandName)
+    return None
 
 class AsyncCommandTransaction:
     def __init__(self, future: Future, eventLoop, expectType: Type):
@@ -40,19 +59,26 @@ class AsyncCommandTransaction:
         self._future = future
         self._expect_type = expectType
 
-    def _handleResponse(self, response: bytes):
-        if self._expect_type:
-            try:
-                self._future.set_result(self._expect_type.FromTLV(response))
-            except Exception as ex:
-                self._handleError(
-                    chip.interaction_model.Status.Failure, 0, ex)
-        else:
+    def _handleResponse(self, path: CommandPath, response: bytes):
+        if (len(response) == 0):
             self._future.set_result(None)
+        else:
+            # If a type hasn't been assigned, let's auto-deduce it.
+            if (self._expect_type == None):
+                self._expect_type = FindCommandClusterObject(False, path)
+
+            if self._expect_type:
+                try:
+                    self._future.set_result(self._expect_type.FromTLV(response))
+                except Exception as ex:
+                    self._handleError(
+                        chip.interaction_model.Status.Failure, 0, ex)
+            else:
+                self._future.set_result(None)
 
     def handleResponse(self, path: CommandPath, response: bytes):
         self._event_loop.call_soon_threadsafe(
-            self._handleResponse, response)
+            self._handleResponse, path, response)
 
     def _handleError(self, imError: int, chipError: int, exception: Exception):
         if exception:
@@ -68,6 +94,7 @@ class AsyncCommandTransaction:
             except:
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure))
+        pass
 
     def handleError(self, imError: int, chipError: int):
         self._event_loop.call_soon_threadsafe(
@@ -100,6 +127,13 @@ def _OnCommandSenderDoneCallback(closure):
 
 
 def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand) -> int:
+    ''' Send a cluster-object encapsulated command to a device and does the following:
+            - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
+            - None (on a successful response containing no data)
+            - Raises an exception if any errors are encountered.
+
+        If no response type is provided above, the type will be automatically deduced.
+    '''
     if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
         raise ValueError("responseType must be a ClusterCommand or None")
 
