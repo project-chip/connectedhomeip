@@ -198,6 +198,103 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
 chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> gAudioOutputAudioOutputListListAttributeCallback{
     OnAudioOutputAudioOutputListListAttributeResponse, nullptr
 };
+static void OnBridgedActionsActionListListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
+{
+    uint16_t count = 0;
+    auto iter      = list.begin();
+    while (iter.Next())
+    {
+        ++count;
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ChipLogProgress(Zcl, "    {");
+        ChipLogProgress(Zcl, "      ActionID: %" PRIu16 ",", entry.actionID);
+        ChipLogProgress(Zcl, "      Name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(Zcl, "      Type: %" PRIu8 ",", entry.type);
+        ChipLogProgress(Zcl, "      EndpointListID: %" PRIu16 ",", entry.endpointListID);
+        ChipLogProgress(Zcl, "      SupportedCommands: %" PRIu16 ",", entry.supportedCommands);
+        ChipLogProgress(Zcl, "      Status: %" PRIu8 ",", entry.status);
+        ChipLogProgress(Zcl, "    },");
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<BridgedActionsActionListListAttributeCallback> gBridgedActionsActionListListAttributeCallback{
+    OnBridgedActionsActionListListAttributeResponse, nullptr
+};
+static void OnBridgedActionsEndpointListListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+        list)
+{
+    uint16_t count = 0;
+    auto iter      = list.begin();
+    while (iter.Next())
+    {
+        ++count;
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ChipLogProgress(Zcl, "    {");
+        ChipLogProgress(Zcl, "      EndpointListID: %" PRIu16 ",", entry.endpointListID);
+        ChipLogProgress(Zcl, "      Name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(Zcl, "      Type: %" PRIu8 ",", entry.type);
+        ChipLogProgress(Zcl, "      Endpoints: %s,", ByteSpanToString(entry.endpoints).c_str());
+        ChipLogProgress(Zcl, "    },");
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<BridgedActionsEndpointListListAttributeCallback> gBridgedActionsEndpointListListAttributeCallback{
+    OnBridgedActionsEndpointListListAttributeResponse, nullptr
+};
 static void
 OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context,
                                                         const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
@@ -2178,6 +2275,168 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_BooleanState_ClusterRevision
 }
 
 // End of Cluster BooleanState
+// Cluster BridgedActions
+
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_DisableAction(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                 uint16_t actionID, uint32_t invokeID)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.DisableAction(nullptr, nullptr, actionID, invokeID).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_DisableActionWithDuration(chip::Controller::Device * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId, uint16_t actionID,
+                                                                                             uint32_t invokeID, uint32_t duration)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.DisableActionWithDuration(nullptr, nullptr, actionID, invokeID, duration).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_EnableAction(chip::Controller::Device * device,
+                                                                                chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                uint16_t actionID, uint32_t invokeID)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.EnableAction(nullptr, nullptr, actionID, invokeID).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_EnableActionWithDuration(chip::Controller::Device * device,
+                                                                                            chip::EndpointId ZCLendpointId,
+                                                                                            chip::GroupId, uint16_t actionID,
+                                                                                            uint32_t invokeID, uint32_t duration)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.EnableActionWithDuration(nullptr, nullptr, actionID, invokeID, duration).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_InstantAction(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                 uint16_t actionID, uint32_t invokeID)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.InstantAction(nullptr, nullptr, actionID, invokeID).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_InstantActionWithTransition(chip::Controller::Device * device,
+                                                                                               chip::EndpointId ZCLendpointId,
+                                                                                               chip::GroupId, uint16_t actionID,
+                                                                                               uint32_t invokeID,
+                                                                                               uint16_t transitionTime)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.InstantActionWithTransition(nullptr, nullptr, actionID, invokeID, transitionTime).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_PauseAction(chip::Controller::Device * device,
+                                                                               chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                               uint16_t actionID, uint32_t invokeID)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.PauseAction(nullptr, nullptr, actionID, invokeID).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_PauseActionWithDuration(chip::Controller::Device * device,
+                                                                                           chip::EndpointId ZCLendpointId,
+                                                                                           chip::GroupId, uint16_t actionID,
+                                                                                           uint32_t invokeID, uint32_t duration)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.PauseActionWithDuration(nullptr, nullptr, actionID, invokeID, duration).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_ResumeAction(chip::Controller::Device * device,
+                                                                                chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                uint16_t actionID, uint32_t invokeID)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ResumeAction(nullptr, nullptr, actionID, invokeID).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_StartAction(chip::Controller::Device * device,
+                                                                               chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                               uint16_t actionID, uint32_t invokeID)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.StartAction(nullptr, nullptr, actionID, invokeID).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_StartActionWithDuration(chip::Controller::Device * device,
+                                                                                           chip::EndpointId ZCLendpointId,
+                                                                                           chip::GroupId, uint16_t actionID,
+                                                                                           uint32_t invokeID, uint32_t duration)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.StartActionWithDuration(nullptr, nullptr, actionID, invokeID, duration).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_BridgedActions_StopAction(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                              uint16_t actionID, uint32_t invokeID)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.StopAction(nullptr, nullptr, actionID, invokeID).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedActions_ActionList(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId,
+                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeActionList(gBridgedActionsActionListListAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedActions_EndpointList(chip::Controller::Device * device,
+                                                                                chip::EndpointId ZCLendpointId,
+                                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeEndpointList(gBridgedActionsEndpointListListAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedActions_SetupUrl(chip::Controller::Device * device,
+                                                                            chip::EndpointId ZCLendpointId,
+                                                                            chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeSetupUrl(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedActions_ClusterRevision(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId,
+                                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BridgedActionsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster BridgedActions
 // Cluster BridgedDeviceBasic
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(chip::Controller::Device * device,
