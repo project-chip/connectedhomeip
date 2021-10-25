@@ -251,7 +251,7 @@ void SendQueryImageCommand()
     PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
     gOperationalDeviceProxy.UpdateAddress(addr);
 
-    Server * server = &(Server::GetInstance());
+    Server * server                             = &(Server::GetInstance());
     OperationalDeviceProxyInitParams initParams = {
         .sessionManager = &(server->GetSecureSessionManager()),
         .exchangeMgr    = &(server->GetExchangeManager()),
