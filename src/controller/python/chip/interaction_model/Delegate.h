@@ -97,9 +97,6 @@ public:
     void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aStatus,
                  CHIP_ERROR aError) override;
 
-    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient, const app::StatusIB & aStatusIB,
-                                   app::AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex) override;
-
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::Status status) override;
 

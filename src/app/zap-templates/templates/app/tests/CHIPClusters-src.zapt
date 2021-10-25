@@ -7,6 +7,7 @@
 #include <app/util/basic-types.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 using namespace chip::app::Clusters;
@@ -22,22 +23,13 @@ namespace Controller {
 {{#unless isWritableAttribute}}
 {{#unless isList}}
 {{#unless isStruct}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}ClusterTest::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} {{asLowerCamelCase name}})
+CHIP_ERROR {{asUpperCamelCase parent.name}}ClusterTest::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
 {
     app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId         = mDevice->GetDeviceId();
-    attributePath.mEndpointId     = mEndpoint;
-    attributePath.mClusterId      = mClusterId;
-    attributePath.mFieldId        = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, {{asLowerCamelCase name}}));
-
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(mEndpoint, mClusterId, {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-
 {{/unless}}
 {{/unless}}
 {{/unless}}

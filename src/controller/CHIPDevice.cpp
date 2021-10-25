@@ -689,7 +689,7 @@ void Device::CancelResponseHandler(uint8_t seqNum)
     mCallbacksMgr.CancelResponseCallback(mDeviceId, seqNum);
 }
 
-void Device::AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
+void Device::AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
                                   Callback::Cancelable * onFailureCallback)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
@@ -701,7 +701,7 @@ void Device::AddIMResponseHandler(app::CommandSender * commandObj, Callback::Can
                                       onFailureCallback);
 }
 
-void Device::CancelIMResponseHandler(app::CommandSender * commandObj)
+void Device::CancelIMResponseHandler(void * commandObj)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
     // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that
@@ -789,19 +789,19 @@ CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Cal
                                              Callback::Cancelable * onFailureCallback)
 {
     bool loadedSecureSession = false;
-    uint8_t seqNum           = GetNextSequenceNumber();
     CHIP_ERROR err           = CHIP_NO_ERROR;
 
-    aHandle->SetAppIdentifier(seqNum);
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    app::WriteClient * writeClient = aHandle.Get();
 
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
-        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+        AddIMResponseHandler(writeClient, onSuccessCallback, onFailureCallback);
     }
     if ((err = aHandle.SendWriteRequest(GetDeviceId(), 0, mSecureSession)) != CHIP_NO_ERROR)
     {
-        CancelResponseHandler(seqNum);
+        CancelIMResponseHandler(writeClient);
     }
     return err;
 }

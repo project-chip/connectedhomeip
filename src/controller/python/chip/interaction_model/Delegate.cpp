@@ -68,23 +68,6 @@ void PythonInteractionModelDelegate::OnError(const app::CommandSender * apComman
     DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aStatus, aError);
 }
 
-CHIP_ERROR PythonInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                                               const app::StatusIB & aStatusIB,
-                                                               app::AttributePathParams & aAttributePathParams,
-                                                               uint8_t aAttributeIndex)
-{
-    if (onWriteResponseFunct != nullptr)
-    {
-        AttributeWriteStatus status{
-            apWriteClient->GetSourceNodeId(), apWriteClient->GetAppIdentifier(), aStatusIB.mStatus,
-            aAttributePathParams.mEndpointId, aAttributePathParams.mClusterId,   aAttributePathParams.mFieldId
-        };
-        onWriteResponseFunct(&status, sizeof(status));
-    }
-    DeviceControllerInteractionModelDelegate::WriteResponseStatus(apWriteClient, aStatusIB, aAttributePathParams, aAttributeIndex);
-    return CHIP_NO_ERROR;
-}
-
 void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
                                                   TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
 {
