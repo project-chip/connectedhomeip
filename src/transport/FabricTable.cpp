@@ -384,11 +384,6 @@ FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
 
 FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId fabricId)
 {
-    if (fabricId == kUndefinedCompressedFabricId)
-    {
-        return nullptr;
-    }
-
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
     for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
     {
