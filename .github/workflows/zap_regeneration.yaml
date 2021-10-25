@@ -34,22 +34,22 @@ jobs:
         # container:
         #     image: connectedhomeip/chip-build:latest
         steps:
-            - name: Checkout the latest code
-              uses: actions/checkout@v2
-              with:
-                token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
-                fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
-            - name: Use Node.js 14.x
-              uses: actions/setup-node@v2
-              with:
-                node-version: '14'
-            - name: Use Java 
-              uses: actions/setup-java@v2
-              with:
-                distribution: 'zulu'
-                java-version: '11'
-                java-package: jre
-            - run: sudo apt-get update
-            - run: sudo apt-get install -fy --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
-            - name: Rebase and regenerate
-              run: scripts/helpers/rebase_and_regenerate_zap.sh 
+          - name: Checkout the latest code
+            uses: actions/checkout@v2
+            with:
+              token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
+              fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+          - name: Use Node.js 14.x
+            uses: actions/setup-node@v2
+            with:
+              node-version: '14'
+          - name: Use Java 
+            uses: actions/setup-java@v2
+            with:
+              distribution: 'zulu'
+              java-version: '11'
+              java-package: jre
+          - run: sudo apt-get update
+          - run: sudo apt-get install -fy --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
+          - name: Rebase and regenerate
+            run: scripts/helpers/rebase_and_regenerate_zap.sh 
