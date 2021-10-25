@@ -35,7 +35,6 @@ target_include_directories(${APP_TARGET} PRIVATE
 
 target_sources(${APP_TARGET} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/main/cmd_mbed.cpp
     ${APP_ROOT}/shell_common/cmd_misc.cpp
     ${APP_ROOT}/shell_common/cmd_otcli.cpp
     ${APP_ROOT}/shell_common/cmd_ping.cpp

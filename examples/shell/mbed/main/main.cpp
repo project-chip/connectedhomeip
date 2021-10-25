@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "ChipShellMbedCollection.h"
 #include "mbedtls/platform.h"
 #include <ChipShellCollection.h>
 #include <lib/core/CHIPCore.h>
@@ -96,7 +95,6 @@ int main()
     cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();
-    cmd_mbed_init();
 
     ChipLogProgress(NotSpecified, "Mbed shell example application run");
 
