@@ -225,8 +225,12 @@ if (CONFIG_CHIP_PW_RPC)
     list(APPEND CHIP_LIBRARIES -lPwRpc)
     if (${APP_TARGET} MATCHES "pigweed-app")
         set(CONFIG_CHIP_PW_RPC_ECHO_PROTO "y")
-    else()
-        set(CONFIG_CHIP_PW_RPC_ECHO_PROTO "n")
+    elseif (${APP_TARGET} MATCHES "lighting-app")
+        set(CONFIG_CHIP_PW_RPC_COMMON_PROTO "y")
+        set(CONFIG_CHIP_PW_RPC_LIGHTING_PROTO "y")
+    elseif (${APP_TARGET} MATCHES "lock-app")
+        set(CONFIG_CHIP_PW_RPC_COMMON_PROTO "y")
+        set(CONFIG_CHIP_PW_RPC_LOCKING_PROTO "y")
     endif()
 endif(CONFIG_CHIP_PW_RPC)
 
@@ -271,6 +275,9 @@ chip_gn_arg_bool  ("chip_bypass_rendezvous"               CONFIG_CHIP_BYPASS_REN
 chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                CONFIG_CHIP_PW_RPC)
 if (CONFIG_CHIP_PW_RPC)
     chip_gn_arg_bool  ("chip_build_pw_rpc_echo_proto"         CONFIG_CHIP_PW_RPC_ECHO_PROTO)
+    chip_gn_arg_bool  ("chip_build_pw_rpc_common_proto"       CONFIG_CHIP_PW_RPC_COMMON_PROTO)
+    chip_gn_arg_bool  ("chip_build_pw_rpc_lighting_proto"     CONFIG_CHIP_PW_RPC_LIGHTING_PROTO)
+    chip_gn_arg_bool  ("chip_build_pw_rpc_locking_proto"      CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
 endif(CONFIG_CHIP_PW_RPC)
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
@@ -335,18 +342,9 @@ endif()
 if (CONFIG_CHIP_PW_RPC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17" PARENT_SCOPE)
     list(APPEND CHIP_DEFINES 
-        CONFIG_CHIP_PW_RPC=1
+        CHIP_PW_RPC=1
     )
 endif()
-
-target_include_directories(${APP_TARGET} PRIVATE 
-                           ${CHIP_INCLUDES}
-)
-
-target_compile_definitions(${APP_TARGET} PRIVATE
-                           ${CHIP_DEFINES}                      
-)
-
 
 if (CONFIG_CHIP_PW_RPC)
 
@@ -355,6 +353,7 @@ set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 target_sources(${APP_TARGET} PRIVATE
     ${CHIP_ROOT}/examples/common/pigweed/RpcService.cpp
     ${CHIP_ROOT}/examples/common/pigweed/mbed/PigweedLoggerMutex.cpp
+    ${CHIP_ROOT}/examples/common/pigweed/mbed/Rpc.cpp
     ${MBED_COMMON}/util/PigweedLogger.cpp
 )
 
@@ -389,16 +388,64 @@ target_include_directories(${APP_TARGET} PRIVATE
                     ${CHIP_ROOT}/third_party/nanopb/repo
 
                     ${CHIP_ROOT}/examples/common
-                    ${CHIP_ROOT}/examples//common/pigweed/mbed
+                    ${CHIP_ROOT}/examples/common/pigweed
+                    ${CHIP_ROOT}/examples/common/pigweed/mbed
                     ${MBED_COMMON}/pw_sys_io/public
+
+                    ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/pwpb
+                    ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/common_protos.proto_library/nanopb
 )
 
 if (CONFIG_CHIP_PW_RPC_ECHO_PROTO)
     target_include_directories(${APP_TARGET} PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb_rpc
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb
-        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/pwpb
+    )
+    list(APPEND CHIP_DEFINES 
+        CHIP_PW_RPC_ECHO_PROTO=1
     )
 endif(CONFIG_CHIP_PW_RPC_ECHO_PROTO)
 
-endif(CONFIG_CHIP_PW_RPC) 
+if (CONFIG_CHIP_PW_RPC_COMMON_PROTO)
+    target_include_directories(${APP_TARGET} PRIVATE
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/button_service.proto_library/nanopb
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/button_service.proto_library/nanopb_rpc
+
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/device_service.proto_library/nanopb
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/device_service.proto_library/nanopb_rpc
+    )
+    list(APPEND CHIP_DEFINES 
+        CHIP_PW_RPC_COMMON_PROTO=1
+    )
+endif(CONFIG_CHIP_PW_RPC_COMMON_PROTO)
+
+if (CONFIG_CHIP_PW_RPC_LIGHTING_PROTO)
+    target_include_directories(${APP_TARGET} PRIVATE
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/lighting_service.proto_library/nanopb
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/lighting_service.proto_library/nanopb_rpc
+    )
+    list(APPEND CHIP_DEFINES 
+        CHIP_PW_RPC_LIGHTING_PROTO=1
+    )
+endif(CONFIG_CHIP_PW_RPC_LIGHTING_PROTO)
+
+if (CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
+    target_include_directories(${APP_TARGET} PRIVATE
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/locking_service.proto_library/nanopb
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/locking_service.proto_library/nanopb_rpc
+    )
+    list(APPEND CHIP_DEFINES 
+        CHIP_PW_RPC_LOCKING_PROTO=1
+    )
+endif(CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
+
+endif(CONFIG_CHIP_PW_RPC)
+
+
+target_include_directories(${APP_TARGET} PRIVATE 
+                           ${CHIP_INCLUDES}
+)
+
+target_compile_definitions(${APP_TARGET} PRIVATE
+                           ${CHIP_DEFINES}                      
+)
