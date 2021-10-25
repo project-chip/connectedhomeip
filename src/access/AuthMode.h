@@ -23,7 +23,7 @@ namespace Access {
 
 // Using bitfield values so auth mode and privilege set can be stored together.
 // Auth mode should have only one value expressed, which should not be None.
-enum AuthMode
+enum class AuthMode
 {
     kNone  = 0,
     kPase  = 1 << 5,
