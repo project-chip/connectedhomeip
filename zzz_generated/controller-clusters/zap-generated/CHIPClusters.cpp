@@ -12017,6 +12017,49 @@ exit:
     return err;
 }
 
+CHIP_ERROR TestClusterCluster::TestEnumsRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                chip::VendorId arg1, uint8_t arg2)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TestCluster::Commands::TestEnumsRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // arg1: vendorId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg1));
+    // arg2: simpleEnum
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg2));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
 CHIP_ERROR TestClusterCluster::TestListInt8UArgumentRequest(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint8_t arg1)
 {
@@ -12926,6 +12969,35 @@ CHIP_ERROR TestClusterCluster::WriteAttributeEpochS(Callback::Cancelable * onSuc
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR TestClusterCluster::ReadAttributeVendorId(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000022;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::WriteAttributeVendorId(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, chip::VendorId value)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000022;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
@@ -12974,6 +13046,12 @@ template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster:
                                                chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType>(
     const chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type &, void *,
     CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type,
+                                               chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType>(
+    const chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType>,
     CommandResponseFailureCallback);
 
 template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type,

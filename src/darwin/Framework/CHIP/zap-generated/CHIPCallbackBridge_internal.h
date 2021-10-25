@@ -1292,6 +1292,16 @@ public:
     static void OnSuccessFn(void * context, uint8_t returnValue);
 };
 
+class CHIPTestClusterClusterTestEnumsResponseCallbackBridge : public CHIPCallbackBridge<TestClusterClusterTestEnumsResponseCallback>
+{
+public:
+    CHIPTestClusterClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterClusterTestEnumsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::VendorId arg1, uint8_t arg2);
+};
+
 class CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge
     : public CHIPCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallback>
 {

@@ -14191,6 +14191,11 @@ bool emberAfTestClusterClusterTestSimpleArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestEnumsResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestEnumsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                        chip::VendorId arg1, uint8_t arg2);
+/**
  * @brief Test Cluster Cluster TestStructArrayArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestStructArrayArgumentRequestCallback(
@@ -14238,6 +14243,12 @@ bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
 bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestEnumsRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestEnumsRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */
