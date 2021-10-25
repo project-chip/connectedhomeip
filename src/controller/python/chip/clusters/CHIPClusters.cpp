@@ -5373,15 +5373,14 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_Cl
 // Cluster OtaSoftwareUpdateRequestor
 
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * providerLocation,
-    uint32_t providerLocation_Len, uint16_t vendorId, uint8_t announcementReason, const uint8_t * metadataForNode,
-    uint32_t metadataForNode_Len)
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, chip::NodeId providerLocation,
+    chip::VendorId vendorId, uint8_t announcementReason, const uint8_t * metadataForNode, uint32_t metadataForNode_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .AnnounceOtaProvider(nullptr, nullptr, chip::ByteSpan(providerLocation, providerLocation_Len), vendorId, announcementReason,
+        .AnnounceOtaProvider(nullptr, nullptr, providerLocation, vendorId, announcementReason,
                              chip::ByteSpan(metadataForNode, metadataForNode_Len))
         .AsInteger();
 }

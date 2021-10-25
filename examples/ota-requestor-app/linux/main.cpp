@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
@@ -40,6 +41,7 @@
 #include <zap-generated/CHIPClusters.h>
 
 #include "BDXDownloader.h"
+#include "ExampleOTARequestor.h"
 #include "ExampleSelfCommissioning.h"
 #include "PersistentStorage.h"
 
@@ -70,7 +72,7 @@ void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedAction
                           CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
                           chip::ByteSpan metadataForRequestor)
 {
-    ChipLogDetail(SoftwareUpdate, "%s", __FUNCTION__);
+    ChipLogDetail(SoftwareUpdate, "QueryImageResponse responded with action %" PRIu8, status);
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
@@ -132,7 +134,7 @@ void OnConnection(void * context, Device * device)
     err = cluster.Associate(device, kOtaProviderEndpoint);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Associate() failed: %s", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "Associate() failed: %s", err.Format());
         return;
     }
     err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleHWVersion,
@@ -140,7 +142,7 @@ void OnConnection(void * context, Device * device)
                              metadata);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "QueryImage() failed: %s", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "QueryImage() failed: %s", err.Format());
     }
 }
 
@@ -260,11 +262,11 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     err = mStorage.Init();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", err.Format()));
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", err.Format()));
 
     err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
     if (err == CHIP_NO_ERROR)

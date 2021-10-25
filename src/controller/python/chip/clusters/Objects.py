@@ -5023,7 +5023,7 @@ class OtaSoftwareUpdateRequestor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ProviderLocation", Tag=0, Type=bytes),
+                            Label="ProviderLocation", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="VendorId", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -5032,7 +5032,7 @@ class OtaSoftwareUpdateRequestor:
                             Label="MetadataForNode", Tag=3, Type=bytes),
                     ])
 
-            ProviderLocation: 'bytes' = None
+            ProviderLocation: 'uint' = None
             VendorId: 'uint' = None
             AnnouncementReason: 'OtaSoftwareUpdateRequestor.Enums.OTAAnnouncementReason' = None
             MetadataForNode: 'bytes' = None
