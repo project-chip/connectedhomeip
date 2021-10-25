@@ -820,6 +820,11 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Device::ShutdownSubscriptions()
+{
+    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptionsByNodeId(GetDeviceId());
+}
+
 CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
                                              Callback::Cancelable * onFailureCallback)
 {

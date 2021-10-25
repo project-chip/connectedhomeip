@@ -118,6 +118,15 @@ public:
      * @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR ShutdownSubscription(uint64_t aSubscriptionId);
+
+    /**
+     * Tears down active subscriptions for a given peer node ID.
+     *
+     * @retval #CHIP_ERROR_KEY_NOT_FOUND If no active subscription is found.
+     * @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR ShutdownSubscriptionsByNodeId(uint64_t aPeerNodeId);
+
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
      *  see WriteClient documentation for lifetime handling.

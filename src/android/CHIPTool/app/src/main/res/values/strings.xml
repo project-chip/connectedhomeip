@@ -87,6 +87,8 @@
     <string name="sensor_client_watch_btn_text">Watch</string>
     <string name="sensor_client_last_value_text">Last value: %1$.2f %2$s</string>
     <string name="sensor_client_read_error_text">Failed to read the sensor: %1$s</string>
+    <string name="sensor_client_subscribe_error_text">Failed to subscribe to the sensor: %1$s</string>
+    <string name="sensor_client_unsubscribe_error_text">Failed to unsubscribe from the sensor: %1$s</string>
     <string name="cluster_interaction_tool">Cluster Interaction Tool</string>
 
     <string name="multi_admin_client_btn_text">Multi-admin cluster</string>

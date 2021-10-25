@@ -139,6 +139,7 @@ public:
     CHIP_ERROR SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
                                              uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
                                              Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ShutdownSubscriptions();
 
     CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
                                          Callback::Cancelable * onFailureCallback);
