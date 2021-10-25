@@ -155,10 +155,21 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
     return err;
 }
 
+void PairingCommand::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err, chip::SetupPayload payload)
+{
+    PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "Failed in opening commissioning window on the device: %" PRIu64 ", error %" CHIP_ERROR_FORMAT,
+                     remoteId, err.Format());
+    }
+    command->SetCommandExitStatus(err);
+}
+
 CHIP_ERROR PairingCommand::OpenCommissioningWindow()
 {
-    CHIP_ERROR err = mController.OpenCommissioningWindow(mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption);
-    SetCommandExitStatus(err);
+    CHIP_ERROR err = mController.OpenCommissioningWindowWithCallback(
+        mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback);
     return err;
 }
 
