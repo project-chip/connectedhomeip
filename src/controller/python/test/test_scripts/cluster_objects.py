@@ -18,6 +18,7 @@
 
 import chip.clusters as Clusters
 import logging
+from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus
 import chip.interaction_model
 
 logger = logging.getLogger('PythonMatterControllerTEST')
@@ -72,12 +73,82 @@ class ClusterObjectTests:
             raise ValueError()
 
     @classmethod
+    async def SendWriteRequest(cls, devCtrl):
+        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                           attributes=[
+                                               Clusters.Attribute.AttributeWriteRequest(
+                                                   EndpointId=0, Attribute=Clusters.Basic.Attributes.UserLabel, Data="Test"),
+                                               Clusters.Attribute.AttributeWriteRequest(
+                                                   EndpointId=0, Attribute=Clusters.Basic.Attributes.Location, Data="A loooong string")
+                                           ])
+        expectedRes = [
+            AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
+                            AttributeId=5), Status=chip.interaction_model.Status.Success),
+            AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
+                            AttributeId=6), Status=chip.interaction_model.Status.InvalidValue)
+        ]
+
+        if res != expectedRes:
+            for i in range(len(res)):
+                if res[i] != expectedRes[i]:
+                    logger.error(
+                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+            raise AssertionError("Read returned unexpected result.")
+
+    @classmethod
+    async def SendReadRequest(cls, devCtrl):
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID,
+                                          attributes=[
+                                              (0, Clusters.Basic.Attributes.VendorName),
+                                              (0, Clusters.Basic.Attributes.VendorID),
+                                              (0, Clusters.Basic.Attributes.ProductName),
+                                              (0, Clusters.Basic.Attributes.ProductID),
+                                              (0, Clusters.Basic.Attributes.UserLabel),
+                                              (0, Clusters.Basic.Attributes.Location),
+                                              (0, Clusters.Basic.Attributes.HardwareVersion),
+                                              (0, Clusters.Basic.Attributes.HardwareVersionString),
+                                              (0, Clusters.Basic.Attributes.SoftwareVersion),
+                                              (0, Clusters.Basic.Attributes.SoftwareVersionString),
+                                          ])
+        expectedRes = [
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=1), Status=0, Data='TEST_VENDOR'),
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=2), Status=0, Data=9050),
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=3), Status=0, Data='TEST_PRODUCT'),
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=4), Status=0, Data=65279),
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=5), Status=0, Data='Test'),
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=6), Status=0, Data=''),
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=7), Status=0, Data=0),
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=8), Status=0, Data='TEST_VERSION'),
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=9), Status=0, Data=0),
+            AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=10), Status=0, Data='prerelease')
+        ]
+
+        if res != expectedRes:
+            for i in range(len(res)):
+                if res[i] != expectedRes[i]:
+                    logger.error(
+                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+            raise AssertionError("Read returned unexpected result.")
+
+    @classmethod
     async def RunTest(cls, devCtrl):
         try:
             cls.TestAPI()
             await cls.RoundTripTest(devCtrl)
             await cls.RoundTripTestWithBadEndpoint(devCtrl)
             await cls.SendCommandWithResponse(devCtrl)
+            await cls.SendWriteRequest(devCtrl)
+            await cls.SendReadRequest(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")
