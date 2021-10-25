@@ -354,7 +354,7 @@ CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, 
     VerifyOrExit(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
     VerifyOrExit(ec != nullptr, ChipLogError(Controller, "OnMessageReceived was called with null exchange"));
 
-    index = FindDeviceIndex(ec->GetSecureSession().GetPeerNodeId());
+    index = FindDeviceIndex(ec->GetSessionHandle().GetPeerNodeId());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
     mActiveDevices[index].OnMessageReceived(ec, payloadHeader, std::move(msgBuf));

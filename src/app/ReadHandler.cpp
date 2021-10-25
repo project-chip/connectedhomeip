@@ -54,8 +54,8 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mDirty              = false;
     mActiveSubscription = false;
     mInteractionType    = aInteractionType;
-    mInitiatorNodeId    = apExchangeContext->GetSecureSession().GetPeerNodeId();
-    mFabricIndex        = apExchangeContext->GetSecureSession().GetFabricIndex();
+    mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
+    mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
 
     if (apExchangeContext != nullptr)
     {
@@ -196,7 +196,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
     if (IsInitialReport())
     {
-        mSessionHandle.SetValue(mpExchangeCtx->GetSecureSession());
+        mSessionHandle.SetValue(mpExchangeCtx->GetSessionHandle());
     }
     else
     {
