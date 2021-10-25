@@ -45,6 +45,8 @@
 
 namespace chip {
 
+namespace secure_channel { class MessageCounterManager; }
+
 class PairingSession;
 
 /**
@@ -268,6 +270,15 @@ public:
         Optional<Transport::UnauthenticatedSessionHandle> session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
         return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
+
+protected:
+    friend class secure_channel::MessageCounterManager;
+
+    /**
+     * Process a secure message after decryption, including all message counter replay checks.
+     */
+    void SecureMessageCounterDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                               System::PacketBufferHandle && msg);
 
 private:
     /**

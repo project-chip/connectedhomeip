@@ -73,7 +73,7 @@ CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+CHIP_ERROR Decrypt(Transport::SecureSession * state, const PacketHeader & packetHeader,
                    System::PacketBufferHandle & msg)
 {
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -105,7 +105,7 @@ CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
     uint8_t * plainText = msg->Start();
     ReturnErrorOnFailure(state->DecryptOnReceive(data, len, plainText, packetHeader, mac));
 
-    ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
+    //ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
     return CHIP_NO_ERROR;
 }
 

@@ -165,8 +165,8 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
 
             if (packetHeader.GetSourceNodeId().HasValue() && packetHeader.GetSourceNodeId().Value() == peerNodeId)
             {
-                // Reprocess message.
-                sessionManager->OnMessageReceived(entry.peerAddress, std::move(entry.msgBuf));
+                // Reprocess message post-decryption.
+                sessionManager->SecureMessageCounterDispatch(packetHeader, entry.peerAddress, std::move(entry.msgBuf));
 
                 // Explicitly free any buffer owned by this handle.
                 entry.msgBuf = nullptr;
