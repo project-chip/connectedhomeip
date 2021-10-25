@@ -4225,6 +4225,7 @@ class ChipClusters:
         0x0000000F: _BINARY_INPUT_BASIC_CLUSTER_INFO,
         0x0000F000: _BINDING_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
+        0x00000025: _BRIDGED_ACTIONS_CLUSTER_INFO,
         0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
         0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
         0x0000050A: _CONTENT_LAUNCHER_CLUSTER_INFO,
@@ -4471,6 +4472,66 @@ class ChipClusters:
     def ClusterBinding_CommandUnbind(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
         return self._chipLib.chip_ime_AppendCommand_Binding_Unbind(
             device, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
+        )
+
+    def ClusterBridgedActions_CommandDisableAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandDisableActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandEnableAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandEnableActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandInstantAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandInstantActionWithTransition(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, transitionTime: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantActionWithTransition(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, transitionTime
+        )
+
+    def ClusterBridgedActions_CommandPauseAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandPauseActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandResumeAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_ResumeAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandStartAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_StartAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandStartActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_StartActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandStopAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_StopAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
         )
 
     def ClusterColorControl_CommandColorLoopSet(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateFlags: int, action: int, direction: int, time: int, startHue: int, optionsMask: int, optionsOverride: int):
@@ -5411,6 +5472,18 @@ class ChipClusters:
 
     def ClusterBooleanState_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeActionList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_ActionList(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeEndpointList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_EndpointList(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeSetupUrl(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_SetupUrl(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterBridgedDeviceBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
