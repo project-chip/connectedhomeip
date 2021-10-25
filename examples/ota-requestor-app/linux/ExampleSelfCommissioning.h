@@ -42,7 +42,8 @@ CHIP_ERROR DoExampleSelfCommissioning(DeviceController & controller, ExampleOper
     VerifyOrExit(storage != nullptr && opCredsIssuer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = opCredsIssuer->Initialize(*storage);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", err.Format()));
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(Controller, "Init failure! Operational Cred Issuer: %" CHIP_ERROR_FORMAT, err.Format()));
 
     VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
@@ -74,10 +75,11 @@ CHIP_ERROR DoExampleSelfCommissioning(DeviceController & controller, ExampleOper
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
         err = factory.Init(initParams);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Controller Factory init failure! %s", err.Format()));
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(Controller, "Controller Factory init failure! %" CHIP_ERROR_FORMAT, err.Format()));
 
         err = factory.SetupController(setupParams, controller);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Controller init failure! %s", err.Format()));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Controller init failure! %" CHIP_ERROR_FORMAT, err.Format()));
     }
 
 exit:
