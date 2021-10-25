@@ -25,7 +25,9 @@ from .ClusterObjects import ClusterCommand
 import chip.exceptions
 import chip.interaction_model
 
-import inspect, sys
+import inspect
+import sys
+
 
 @dataclass
 class CommandPath:
@@ -33,9 +35,10 @@ class CommandPath:
     ClusterId: int
     CommandId: int
 
+
 def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
     ''' Locates the right generated cluster object given a set of parameters.
-        
+
         isClientSideCommand: True if it is a client-to-server command, else False.
         path: A CommandPath that describes the endpoint, cluster and ID of the command.
 
@@ -53,6 +56,7 @@ def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
                                         return eval('chip.clusters.Objects.' + clusterName + '.Commands.' + commandName)
     return None
 
+
 class AsyncCommandTransaction:
     def __init__(self, future: Future, eventLoop, expectType: Type):
         self._event_loop = eventLoop
@@ -69,7 +73,8 @@ class AsyncCommandTransaction:
 
             if self._expect_type:
                 try:
-                    self._future.set_result(self._expect_type.FromTLV(response))
+                    self._future.set_result(
+                        self._expect_type.FromTLV(response))
                 except Exception as ex:
                     self._handleError(
                         chip.interaction_model.Status.Failure, 0, ex)
