@@ -295,24 +295,6 @@ done:
     return (lPacketInfo);
 }
 
-struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
-{
-    struct netif * lRetval = NULL;
-
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
-    NETIF_FOREACH(lRetval)
-    {
-        if (lRetval == aInterfaceId)
-            break;
-    }
-#else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
-    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId; lRetval = lRetval->next)
-        ;
-#endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
-
-    return (lRetval);
-}
-
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
