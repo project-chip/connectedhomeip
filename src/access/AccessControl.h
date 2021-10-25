@@ -32,8 +32,9 @@ class AccessControl
 {
 public:
     /**
-     * Create an access control module. This module must be initialized before
-     * first use, and deinitialized when finished.
+     * Create an access control module. Must be initialized before use, and
+     * deinitialized when finished. Must be configured with an
+     * AccessControlDataProvider, which must outlive this module.
      */
     AccessControl(AccessControlDataProvider & dataProvider) : mDataProvider(dataProvider) {}
 

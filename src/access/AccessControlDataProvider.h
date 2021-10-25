@@ -67,7 +67,7 @@ class EntryIterator
 {
 public:
     /**
-     * Create an entry iterator, which must be released when finished.
+     * Create an entry iterator. Must call release when finished.
      */
     EntryIterator() = default;
 
@@ -79,7 +79,7 @@ public:
     virtual Entry * Next() = 0;
 
     /**
-     * Release the iterator, which must be called when finished.
+     * Release the iterator. Must be called when finished.
      */
     virtual void Release() = 0;
 };
@@ -88,8 +88,8 @@ class AccessControlDataProvider
 {
 public:
     /**
-     * Create a data provider, which must be initialized before use, and
-     * deinitialized when finished.
+     * Create a data provider. Must be initialized before use, and deinitialized
+     * when finished.
      */
     AccessControlDataProvider() = default;
 
