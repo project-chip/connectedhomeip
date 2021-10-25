@@ -169,34 +169,6 @@ public:
             list);
 };
 
-class CHIPBridgedActionsActionListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedActionsActionListListAttributeCallback>
-{
-public:
-    CHIPBridgedActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedActionsActionListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
-            list);
-};
-
-class CHIPBridgedActionsEndpointListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedActionsEndpointListListAttributeCallback>
-{
-public:
-    CHIPBridgedActionsEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedActionsEndpointListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-            list);
-};
-
 class CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ContentLauncherAcceptsHeaderListListAttributeCallback>
 {

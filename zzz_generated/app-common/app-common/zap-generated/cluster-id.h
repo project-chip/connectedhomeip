@@ -67,9 +67,6 @@ static constexpr chip::ClusterId ZCL_DESCRIPTOR_CLUSTER_ID = 0x001D;
 // Definitions for cluster: Poll Control
 static constexpr chip::ClusterId ZCL_POLL_CONTROL_CLUSTER_ID = 0x0020;
 
-// Definitions for cluster: Bridged Actions
-static constexpr chip::ClusterId ZCL_BRIDGED_ACTIONS_CLUSTER_ID = 0x0025;
-
 // Definitions for cluster: Basic
 static constexpr chip::ClusterId ZCL_BASIC_CLUSTER_ID = 0x0028;
 
@@ -158,10 +155,7 @@ static constexpr chip::ClusterId ZCL_COLOR_CONTROL_CLUSTER_ID = 0x0300;
 static constexpr chip::ClusterId ZCL_BALLAST_CONFIGURATION_CLUSTER_ID = 0x0301;
 
 // Definitions for cluster: Illuminance Measurement
-static constexpr chip::ClusterId ZCL_ILLUM_MEASUREMENT_CLUSTER_ID = 0x0400;
-
-// Definitions for cluster: Illuminance Level Sensing
-static constexpr chip::ClusterId ZCL_ILLUM_LEVEL_SENSING_CLUSTER_ID = 0x0401;
+static constexpr chip::ClusterId ZCL_ILLUMINANCE_MEASUREMENT_CLUSTER_ID = 0x0400;
 
 // Definitions for cluster: Temperature Measurement
 static constexpr chip::ClusterId ZCL_TEMP_MEASUREMENT_CLUSTER_ID = 0x0402;
