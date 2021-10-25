@@ -65,7 +65,7 @@ public:
     void SetAppIdentifier(uint64_t aAppIdentifier) { mAppIdentifier = aAppIdentifier; }
     NodeId GetSourceNodeId() const
     {
-        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSecureSession().GetPeerNodeId() : kUndefinedNodeId;
+        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSessionHandle().GetPeerNodeId() : kUndefinedNodeId;
     }
 
 private:

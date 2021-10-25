@@ -149,8 +149,8 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    SessionHandle GetSecureSession() { return mSecureSession.Value(); }
-    bool HasSecureSession() const { return mSecureSession.HasValue(); }
+    SessionHandle GetSessionHandle() { return mSession.Value(); }
+    bool HasSessionHandle() const { return mSession.HasValue(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -171,7 +171,7 @@ private:
 
     ExchangeMessageDispatch * mDispatch = nullptr;
 
-    Optional<SessionHandle> mSecureSession; // The connection state
+    Optional<SessionHandle> mSession; // The connection state
     uint16_t mExchangeId;                   // Assigned exchange ID.
 
     /**
