@@ -78,6 +78,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "providerFabricIndex", chip::ArgParser::kArgumentRequired, kOptionProviderFabricIndex },
     { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
     { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
+    // TODO: This can be removed once OperationalDeviceProxy can resolve the IP Address from Node ID
     { "ipaddress", chip::ArgParser::kArgumentRequired, kOptionIPAddress },
     { "delayQuery", chip::ArgParser::kArgumentRequired, kOptionDelayQuery },
     {},
@@ -250,11 +251,12 @@ void SendQueryImageCommand()
     PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
     gOperationalDeviceProxy.UpdateAddress(addr);
 
+    Server * server = &(Server::GetInstance());
     OperationalDeviceProxyInitParams initParams = {
-        .sessionManager = &(Server::GetInstance().GetSecureSessionManager()),
-        .exchangeMgr    = &(Server::GetInstance().GetExchangeManager()),
-        .idAllocator    = &(Server::GetInstance().GetSessionIDAllocator()),
-        .fabricsTable   = &(Server::GetInstance().GetFabricTable()),
+        .sessionManager = &(server->GetSecureSessionManager()),
+        .exchangeMgr    = &(server->GetExchangeManager()),
+        .idAllocator    = &(server->GetSessionIDAllocator()),
+        .fabricsTable   = &(server->GetFabricTable()),
     };
 
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -263,7 +265,7 @@ void SendQueryImageCommand()
     err = gOperationalDeviceProxy.Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
 }
 
-void StartDelayTimerHandler(Layer * systemLayer, void * appState)
+void OnStartDelayTimerHandler(Layer * systemLayer, void * appState)
 {
     SendQueryImageCommand();
 }
@@ -302,7 +304,7 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    // Init ZCL Data Model and CHIP App Server with user specified UDP port
+    // Init Data Model and CHIP App Server with user specified UDP port
     Server::GetInstance().Init(nullptr, requestorSecurePort, unsecurePort);
     ChipLogProgress(SoftwareUpdate, "Initializing the Application Server. Listening on UDP port %d", requestorSecurePort);
 
@@ -313,7 +315,7 @@ int main(int argc, char * argv[])
     if (delayQueryTimeInSec > 0)
     {
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
-                                                    StartDelayTimerHandler, nullptr);
+                                                    OnStartDelayTimerHandler, nullptr);
     }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
