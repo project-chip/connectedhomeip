@@ -291,15 +291,17 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         {
             // Start timer to change advertising interval.
-            DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME,
-                                                  HandleBLEAdvertisementIntervalChange, this);
+            DeviceLayer::SystemLayer().StartTimer(
+                System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME),
+                HandleBLEAdvertisementIntervalChange, this);
         }
 
         // Start timer to disable CHIPoBLE advertisement after timeout expiration only if it isn't advertising rerun (in that case
         // timer is already running).
         if (!isAdvertisingRerun)
         {
-            DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT, HandleBLEAdvertisementTimeout, this);
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT),
+                                                  HandleBLEAdvertisementTimeout, this);
         }
     }
 

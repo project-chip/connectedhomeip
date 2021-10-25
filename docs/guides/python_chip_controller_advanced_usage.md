@@ -2,7 +2,7 @@
 
 This document extends the
 [basic documentation](python_chip_controller_building.md) of the Python CHIP
-Controller with the useful information when developing Python CHIP controller
+Controller with the useful information when developing Python CHIP Controller
 tool or Matter accessories on Linux.
 
 <hr>
@@ -79,7 +79,7 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
 ## Debugging with gdb
 
 You can run the chip-device-ctrl under GDB for debugging, however, since the
-CHIP core support library is a dynamic library, you cannot read the symbols
+Matter core support library is a dynamic library, you cannot read the symbols
 unless it is fully loaded.
 
 The following block is a example debug session using GDB:
@@ -116,8 +116,8 @@ suppress thread related outputs first by running the following command:
 (gdb) set print thread-events off
 ```
 
-We cannot set breakpoints here, since the GDB knows nothing about the CHIP
-library, let run the CHIP device controller first.
+We cannot set breakpoints here, since the GDB knows nothing about the Matter
+library, let run the Matter device controller first.
 
 ```
 (gdb) run
@@ -140,8 +140,8 @@ Chip Device Controller Shell
 chip-device-ctrl >
 ```
 
-The prompt `chip-device-ctrl >` indicates that the CHIP core library is loaded
-by Python, you can browse the symbols in the CHIP core library, setting
+The prompt `chip-device-ctrl >` indicates that the Matter core library is loaded
+by Python, you can browse the symbols in the Matter core library, setting
 breakpoints on functions and many other functions provided by GDB.
 
 You can use `Ctrl-C` to send SIGINT to the controller anytime you want so you

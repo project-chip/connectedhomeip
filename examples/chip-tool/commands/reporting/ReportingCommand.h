@@ -40,7 +40,7 @@ public:
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    uint16_t GetWaitDurationInSeconds() const override { return UINT16_MAX; }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(UINT16_MAX); }
 
     virtual void AddReportCallbacks(NodeId remoteId, uint8_t endPointId) = 0;
 

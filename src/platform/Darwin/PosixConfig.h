@@ -100,6 +100,10 @@ protected:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
+
+private:
+    // TODO: This is temporary until Darwin implements a proper ReadConfigValue
+    static uint16_t mPosixSetupDiscriminator;
 };
 
 struct PosixConfig::Key

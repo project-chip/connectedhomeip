@@ -499,12 +499,6 @@ bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType ty
     printIncomingZclMessage(&curCmd);
     prepareForResponse(&curCmd);
 
-    if (emberAfPreCommandReceivedCallback(&curCmd))
-    {
-        msgHandled = true;
-        goto kickout;
-    }
-
     if (interPanHeader != NULL && !(interPanHeader->options & EMBER_AF_INTERPAN_OPTION_MAC_HAS_LONG_ADDRESS))
     {
         // For safety, dump all interpan messages that don't have a long

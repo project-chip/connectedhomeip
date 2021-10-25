@@ -70,20 +70,6 @@ limitations under the License.
       <arg name="commandId" type="INT8U"/>
       <arg name="status" type="Status"/>
     </command>
-    <command code="0x0C" name="DiscoverAttributes" source="either">
-      <description>
-        Command description for DiscoverAttributes
-      </description>
-      <arg name="startId" type="ATTRIB_ID"/>
-      <arg name="maxAttributeIds" type="INT8U"/>
-    </command>
-    <command code="0x0D" name="DiscoverAttributesResponse" source="either" disableDefaultResponse="true">
-      <description>
-        Command description for DiscoverAttributesResponse
-      </description>
-      <arg name="discoveryComplete" type="INT8U"/>
-      <arg name="discoverAttributesInfoRecords" type="DiscoverAttributesInfoRecord" array="true"/>
-    </command>
     <command code="0x0E" name="ReadAttributesStructured" source="either">
       <description>
         Command description for ReadAttributesStructured
@@ -101,36 +87,6 @@ limitations under the License.
         Command description for WriteAttributesStructuredResponse
       </description>
       <arg name="writeStructuredAttributeStatusRecords" type="WriteStructuredAttributeStatusRecord" array="true"/>
-    </command>
-    <command code="0x11" name="DiscoverCommandsReceived" source="either">
-      <description>This command may be used to discover all commands processed (received) by this cluster, including optional or manufacturer specific commands.</description>
-      <arg name="startCommandId" type="INT8U"/>
-      <arg name="maxCommandIds" type="INT8U"/>
-    </command>
-    <command code="0x12" name="DiscoverCommandsReceivedResponse" source="either" disableDefaultResponse="true">
-      <description>The discover commands received response command is sent in response to a discover commands received command, and is used to discover which commands a particular cluster can process.</description>
-      <arg name="discoveryComplete" type="INT8U"/>
-      <arg name="commandIds" type="INT8U" array="true"/>
-    </command>
-    <command code="0x13" name="DiscoverCommandsGenerated" source="either">
-      <description>This command may be used to discover all commands which may be generated (sent) by the cluster, including optional or manufacturer specific commands.</description>
-      <arg name="startCommandId" type="INT8U"/>
-      <arg name="maxCommandIds" type="INT8U"/>
-    </command>
-    <command code="0x14" name="DiscoverCommandsGeneratedResponse" source="either" disableDefaultResponse="true">
-      <description>The discover client commands response command is sent in response to a discover client commands command, and is used to discover which commands a particular cluster supports.</description>
-      <arg name="discoveryComplete" type="INT8U"/>
-      <arg name="commandIds" type="INT8U" array="true"/>
-    </command>
-    <command code="0x15" name="DiscoverAttributesExtended" source="either">
-      <description>This command is similar to the discover attributes command, but also includes a field to indicate whether the attribute is readable, writeable or reportable.</description>
-      <arg name="startId" type="ATTRIB_ID"/>
-      <arg name="maxAttributeIds" type="INT8U"/>
-    </command>
-    <command code="0x16" name="DiscoverAttributesExtendedResponse" source="either" disableDefaultResponse="true">
-      <description>This command is sent in response to a discover attribute extended command and is used to determine if attributes are readable, writable or reportable.</description>
-      <arg name="discoveryComplete" type="INT8U"/>
-      <arg name="extendedDiscoverAttributesInfoRecords" type="ExtendedDiscoverAttributesInfoRecord" array="true"/>
     </command>
   </global>
   <cluster singleton="true">

@@ -430,9 +430,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
     CHIP_ERROR err;
-    uint8_t index               = 0;
-    uint8_t mDeviceNameLength   = 0;
-    uint8_t mDeviceIdInfoLength = 0;
+    uint8_t index              = 0;
+    uint8_t deviceNameLength   = 0;
+    uint8_t deviceIdInfoLength = 0;
 
     char deviceName[kMaxDeviceNameLength + 1];
     uint8_t advDataBuf[kMaxAdvertisementDataSetSize];
@@ -446,15 +446,15 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     if (!mFlags.Has(Flags::kDeviceNameSet))
     {
-        snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
+        snprintf(deviceName, sizeof(deviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
 
         deviceName[kMaxDeviceNameLength] = 0;
         err                              = MapBLEError(qvCHIP_BleSetDeviceName(deviceName));
         SuccessOrExit(err);
     }
 
-    mDeviceNameLength   = static_cast<uint8_t>(strlen(mDeviceName));
-    mDeviceIdInfoLength = sizeof(mDeviceIdInfo);
+    deviceNameLength   = static_cast<uint8_t>(strlen(deviceName));
+    deviceIdInfoLength = sizeof(mDeviceIdInfo);
 
     // Check sizes
     static_assert(sizeof(mDeviceIdInfo) + CHIP_ADV_SHORT_UUID_LEN + 1 <= UINT8_MAX, "Our length won't fit in a uint8_t");
@@ -467,20 +467,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advDataBuf[index++] = CHIP_ADV_DATA_TYPE_FLAGS; // AD type : flags
     advDataBuf[index++] = CHIP_ADV_DATA_FLAGS;      // AD value
 
-    advDataBuf[index++] = static_cast<uint8_t>(mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1); // AD length
-    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
-    advDataBuf[index++] = chipUUID_CHIPoBLE_Service[1];                                            // AD value
+    advDataBuf[index++] = static_cast<uint8_t>(deviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1); // AD length
+    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                        // AD type : Service Data
+    advDataBuf[index++] = chipUUID_CHIPoBLE_Service[1];                                           // AD value
     advDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
-    memcpy(&advDataBuf[index], (void *) &mDeviceIdInfo, mDeviceIdInfoLength); // AD value
-    index = static_cast<uint8_t>(index + mDeviceIdInfoLength);
+    memcpy(&advDataBuf[index], (void *) &mDeviceIdInfo, deviceIdInfoLength); // AD value
+    index = static_cast<uint8_t>(index + deviceIdInfoLength);
 
-    // TODO remove device name issue #10221
-    advDataBuf[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
-    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
-    memcpy(&advDataBuf[index], deviceName, mDeviceNameLength);         // AD value
-    index = static_cast<uint8_t>(index + mDeviceNameLength);
-
-    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_ADV, index, mAdvDataBuf);
+    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_ADV, index, advDataBuf);
 
     // Fill in scan response data
     index                    = 0;
@@ -489,7 +483,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     scanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[1]; // AD value
     scanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
 
-    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_SCAN, index, mScanRespDataBuf);
+    VerifyOrExit(index + (deviceNameLength + 2) <= kMaxAdvertisementDataSetSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    scanRespDataBuf[index++] = static_cast<uint8_t>(deviceNameLength + 1); // length
+    scanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                    // AD type : name
+    memcpy(&scanRespDataBuf[index], deviceName, deviceNameLength);         // AD value
+    index = static_cast<uint8_t>(index + deviceNameLength);
+
+    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_SCAN, index, scanRespDataBuf);
 
 exit:
     return err;

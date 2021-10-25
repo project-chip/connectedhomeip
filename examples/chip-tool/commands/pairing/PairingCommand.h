@@ -149,7 +149,7 @@ public:
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    uint16_t GetWaitDurationInSeconds() const override { return 120; }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(120); }
     void Shutdown() override;
 
     /////////// DevicePairingDelegate Interface /////////
@@ -166,8 +166,8 @@ public:
 
     /////////// Network Commissioning Callbacks /////////
     static void OnDefaultFailureResponse(void * context, uint8_t status);
-    static void OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
-    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnAddNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);

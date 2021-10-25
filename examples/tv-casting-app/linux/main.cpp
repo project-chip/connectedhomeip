@@ -208,7 +208,7 @@ int main(int argc, char * argv[])
 
     // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
     DeviceLayer::SystemLayer().StartTimer(
-        kCommissionerDiscoveryTimeoutInMs,
+        chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
         [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
 
     // TBD: Content casting commands

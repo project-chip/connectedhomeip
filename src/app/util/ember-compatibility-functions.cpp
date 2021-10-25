@@ -26,6 +26,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -340,13 +341,23 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
         break;
     }
     case ZCL_ARRAY_ATTRIBUTE_TYPE: {
+        // We only get here for attributes of list type that have no override
+        // registered.  There should not be any nonempty lists like that.
+        uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
+        if (size != 2)
+        {
+            // The value returned by emberAfAttributeValueSize for a list
+            // includes the space needed to store the list length (2 bytes) plus
+            // the space needed to store the actual list items.  We expect it to
+            // return 2 here, indicating a zero-length list.  If it doesn't,
+            // something has gone wrong.
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        // Just encode an empty array.
         TLV::TLVType containerType;
         ReturnErrorOnFailure(
-            apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_List, containerType));
-        // TODO: Encode data in TLV, now raw buffers
-        ReturnErrorOnFailure(
-            apWriter->PutBytes(TLV::AnonymousTag, attributeData,
-                               emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData)));
+            apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_Array, containerType));
         ReturnErrorOnFailure(apWriter->EndContainer(containerType));
         break;
     }
@@ -481,6 +492,11 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     IgnoreUnusedVariable(data);
     IgnoreUnusedVariable(mask);
 
+    MatterReportingAttributeChangeCallback(endpoint, clusterId, attributeId);
+}
+
+void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+{
     ClusterInfo info;
     info.mClusterId  = clusterId;
     info.mFieldId    = attributeId;

@@ -53,7 +53,7 @@ struct ExpectedTxt
 
 struct ExpectedSubtype
 {
-    char name[kMaxSubtypeDescSize] = "";
+    char name[Common::kSubTypeMaxLength + 1] = "";
     bool operator==(const char * subtype) const { return strcmp(name, subtype) == 0; }
 };
 struct ExpectedCall
@@ -169,13 +169,13 @@ struct ExpectedCall
         }
     }
 
-    static constexpr size_t kMaxTxtRecords           = 11;
-    static constexpr size_t kMaxSubtypes             = 10;
-    CallType callType                                = CallType::kUnknown;
-    DnssdServiceProtocol protocol                    = DnssdServiceProtocol::kDnssdProtocolUnknown;
-    char instanceName[kDnssdInstanceNameMaxSize + 1] = "";
-    char hostName[kDnssdHostNameMaxSize + 1]         = "";
-    char serviceName[kDnssdTypeMaxSize + 1]          = "";
+    static constexpr size_t kMaxTxtRecords                = 11;
+    static constexpr size_t kMaxSubtypes                  = 10;
+    CallType callType                                     = CallType::kUnknown;
+    DnssdServiceProtocol protocol                         = DnssdServiceProtocol::kDnssdProtocolUnknown;
+    char instanceName[Common::kInstanceNameMaxLength + 1] = "";
+    char hostName[kHostNameMaxLength + 1]                 = "";
+    char serviceName[kDnssdTypeMaxSize + 1]               = "";
     ExpectedSubtype subtype[kMaxSubtypes];
     size_t numSubtypes = 0;
     ExpectedTxt txt[kMaxTxtRecords];

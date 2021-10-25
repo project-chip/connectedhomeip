@@ -72,9 +72,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
                   aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
 
     if (aCommandPath.mClusterId == TestCluster::Id &&
-        aCommandPath.mCommandId == TestCluster::Commands::TestStructArrayArgumentRequest::Type::GetCommandId())
+        aCommandPath.mCommandId == TestCluster::Commands::TestSimpleArgumentRequest::Type::GetCommandId())
     {
-        TestCluster::Commands::TestStructArrayArgumentRequest::DecodableType dataRequest;
+        TestCluster::Commands::TestSimpleArgumentRequest::DecodableType dataRequest;
 
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {
@@ -157,30 +157,32 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     request.arg1 = true;
 
-    auto onSuccessCb =
-        [apSuite, &onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                       const TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & dataResponse) {
-            uint8_t i;
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const auto & dataResponse) {
+        uint8_t i;
 
-            i         = 0;
-            auto iter = dataResponse.arg1.begin();
-            while (iter.Next())
-            {
-                auto & item = iter.GetValue();
+        i         = 0;
+        auto iter = dataResponse.arg1.begin();
+        while (iter.Next())
+        {
+            auto & item = iter.GetValue();
 
-                NL_TEST_ASSERT(apSuite, item.a == i);
-                NL_TEST_ASSERT(apSuite, item.b == false);
-                NL_TEST_ASSERT(apSuite, item.c.a == i);
-                NL_TEST_ASSERT(apSuite, item.c.b == true);
-                i++;
-            }
+            NL_TEST_ASSERT(apSuite, item.a == i);
+            NL_TEST_ASSERT(apSuite, item.b == false);
+            NL_TEST_ASSERT(apSuite, item.c.a == i);
+            NL_TEST_ASSERT(apSuite, item.c.b == true);
+            i++;
+        }
 
-            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(apSuite, dataResponse.arg6 == true);
+        NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, dataResponse.arg6 == true);
 
-            onSuccessWasCalled = true;
-        };
+        onSuccessWasCalled = true;
+    };
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
         onFailureWasCalled = true;
     };
@@ -205,11 +207,14 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
 
     request.arg1 = true;
 
-    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                             const chip::app::DataModel::NullObjectType & dataResponse) {
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const auto & dataResponse) {
         onSuccessWasCalled = true;
     };
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
         onFailureWasCalled = true;
     };
@@ -233,11 +238,14 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
 
     request.arg1 = true;
 
-    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                             const chip::app::DataModel::NullObjectType & dataResponse) {
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const auto & dataResponse) {
         onSuccessWasCalled = true;
     };
 
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
         onFailureWasCalled = true;
     };

@@ -120,8 +120,8 @@ void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 void CommissioningWindowManager::OnSessionEstablishmentStarted()
 {
     // As per specifications, section 5.5: Commissioning Flows
-    constexpr uint16_t kPASESessionEstablishmentTimeoutSeconds = 60;
-    DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeoutSeconds * 1000, HandleSessionEstablishmentTimeout, this);
+    constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
+    DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
 }
 
 void CommissioningWindowManager::OnSessionEstablished()
@@ -159,8 +159,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 
     if (mCommissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
-        ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer().StartTimer(mCommissioningTimeoutSeconds * 1000, HandleCommissioningWindowTimeout, this));
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(mCommissioningTimeoutSeconds),
+                                                                   HandleCommissioningWindowTimeout, this));
     }
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(

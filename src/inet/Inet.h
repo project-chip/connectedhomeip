@@ -34,10 +34,6 @@
 #include <inet/InetLayer.h>
 #include <inet/InetLayerEvents.h>
 
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-#include <inet/DNSResolver.h>
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT

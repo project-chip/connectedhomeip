@@ -284,12 +284,8 @@ Thermostat-app is used as an example below.
         AP and the **i.MX8 Mini EVK** and mDNS only works on local network.
 
         Resolve the target device with DNS-SD and update the address of the
-        node. The compressed fabric id is necessary for the resolve command.
+        node.
 
                 chip-device-ctrl > close-ble  # Shutdown the BLE connection
-                chip-device-ctrl > get-fabricid
-                  Get fabric ID complete
-                  Raw Fabric ID: 0x0000000000000000 (0)
-                  Compressed Fabric ID: 0x7e58da6d9bbc85de (9104266811028571614)
-                chip-device-ctrl > resolve 9104266811028571614 8889                                # The 9104266811028571614 is the decimal compressed Fabric ID. 8889 is the node ID.
+                chip-device-ctrl > resolve 8889                                                    # The 8889 is the node ID.
                 chip-device-ctrl > zcl Thermostat SetpointRaiseLower 8889 1 0 mode=1 amount=10     # Now the ZCL command will be send via IP network.

@@ -55,6 +55,12 @@ static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
 static Device * gDevices[DYNAMIC_ENDPOINT_COUNT]; // number of dynamic endpoints count
 
+// 4 Bridged devices
+static Device gLight1("Light 1", "Office");
+static Device gLight2("Light 2", "Office");
+static Device gLight3("Light 3", "Kitchen");
+static Device gLight4("Light 4", "Den");
+
 // Descriptor attribute storage on dynamic endpoint
 static uint8_t gDescriptorAttrStorage[DYNAMIC_ENDPOINT_COUNT][kDescriptorAttributeCount][kDescriptorAttributeArraySize];
 
@@ -179,8 +185,8 @@ void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, 
     uint16_t listCount = 1;
     _LabelStruct labelStruct;
 
-    labelStruct.label = chip::ByteSpan(Uint8::from_const_char(label), strlen(label));
-    labelStruct.value = chip::ByteSpan(Uint8::from_const_char(value), strlen(value));
+    labelStruct.label = chip::CharSpan(label, strlen(label));
+    labelStruct.value = chip::CharSpan(value, strlen(value));
 
     emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&labelStruct), 1);
     emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&listCount), 0);
@@ -384,48 +390,8 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     }
 }
 
-extern "C" void app_main()
+static void InitServer(intptr_t context)
 {
-    // Initialize the ESP NVS layer.
-    esp_err_t err = nvs_flash_init();
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
-        return;
-    }
-
-    CHIP_ERROR chip_err = CHIP_NO_ERROR;
-
-    // bridge will have own database named gDevices.
-    // Clear database
-    memset(gDevices, 0, sizeof(gDevices));
-
-    // Bridged devices 4
-    static Device Light1("Light 1", "Office");
-    static Device Light2("Light 2", "Office");
-    static Device Light3("Light 3", "Kitchen");
-    static Device Light4("Light 4", "Den");
-
-    // Whenever bridged device changes its state
-    Light1.SetChangeCallback(&HandleDeviceStatusChanged);
-    Light2.SetChangeCallback(&HandleDeviceStatusChanged);
-    Light3.SetChangeCallback(&HandleDeviceStatusChanged);
-    Light4.SetChangeCallback(&HandleDeviceStatusChanged);
-
-    Light1.SetReachable(true);
-    Light2.SetReachable(true);
-    Light3.SetReachable(true);
-    Light4.SetReachable(true);
-
-    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-
-    chip_err = deviceMgr.Init(&AppCallback);
-    if (chip_err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(chip_err));
-        return;
-    }
-
     chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
@@ -442,16 +408,55 @@ extern "C" void app_main()
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
-    AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
-    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
-    AddDeviceEndpoint(&Light3, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 2 & 4
-    RemoveDeviceEndpoint(&Light2);
+    RemoveDeviceEndpoint(&gLight2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 5
-    AddDeviceEndpoint(&Light4, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
-    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+}
+
+extern "C" void app_main()
+{
+    // Initialize the ESP NVS layer.
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
+        return;
+    }
+
+    CHIP_ERROR chip_err = CHIP_NO_ERROR;
+
+    // bridge will have own database named gDevices.
+    // Clear database
+    memset(gDevices, 0, sizeof(gDevices));
+
+    // Whenever bridged device changes its state
+    gLight1.SetChangeCallback(&HandleDeviceStatusChanged);
+    gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
+    gLight3.SetChangeCallback(&HandleDeviceStatusChanged);
+    gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
+
+    gLight1.SetReachable(true);
+    gLight2.SetReachable(true);
+    gLight3.SetReachable(true);
+    gLight4.SetReachable(true);
+
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+
+    chip_err = deviceMgr.Init(&AppCallback);
+    if (chip_err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(chip_err));
+        return;
+    }
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

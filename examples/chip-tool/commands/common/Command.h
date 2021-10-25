@@ -145,6 +145,12 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64);
     }
 
+    template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, T * out)
+    {
+        return AddArgument(name, min, max, reinterpret_cast<std::underlying_type_t<T> *>(out));
+    }
+
     virtual CHIP_ERROR Run() = 0;
 
 private:

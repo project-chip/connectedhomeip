@@ -220,11 +220,10 @@ class BaseTestHelper:
             return False
 
     def TestResolve(self, nodeid):
-        fabricid = self.devCtrl.GetCompressedFabricId()
         self.logger.info(
-            "Resolve: node id = {:08x} (compressed) fabric id = {:08x}".format(nodeid, fabricid))
+            "Resolve: node id = {:08x}".format(nodeid))
         try:
-            self.devCtrl.ResolveNode(fabricid=fabricid, nodeid=nodeid)
+            self.devCtrl.ResolveNode(nodeid=nodeid)
             addr = self.devCtrl.GetAddressAndPort(nodeid)
             if not addr:
                 return False
@@ -344,11 +343,14 @@ class BaseTestHelper:
                 "OnOff", "OnOff", nodeid, endpoint, 1, 10)
             changeThread = _conductAttributeChange(
                 self.devCtrl, nodeid, endpoint)
+            # Reset the number of subscriptions received as subscribing causes a callback.
+            handler.subscriptionReceived = 0
             changeThread.start()
             with handler.cv:
                 while handler.subscriptionReceived < 5:
                     # We should observe 10 attribute changes
                     handler.cv.wait()
+            changeThread.join()
             return True
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")

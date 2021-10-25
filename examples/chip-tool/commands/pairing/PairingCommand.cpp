@@ -352,7 +352,7 @@ void PairingCommand::OnDefaultFailureResponse(void * context, uint8_t status)
     command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
 
-void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
+void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, CharSpan debugText)
 {
     ChipLogProgress(chipTool, "AddNetworkResponse");
 
@@ -385,7 +385,7 @@ void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, uin
     }
 }
 
-void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
+void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, CharSpan debugText)
 {
     ChipLogProgress(chipTool, "EnableNetworkResponse");
 
@@ -430,7 +430,7 @@ void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
 void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     const uint16_t port = nodeData.port;
-    char buf[chip::Inet::kMaxIPAddressStringLength];
+    char buf[chip::Inet::IPAddress::kMaxStringLength];
     nodeData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 

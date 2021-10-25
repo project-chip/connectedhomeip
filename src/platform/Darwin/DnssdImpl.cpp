@@ -320,7 +320,7 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
     service.mProtocol    = context->protocol;
 
     strncpy(service.mName, name, sizeof(service.mName));
-    service.mName[kDnssdInstanceNameMaxSize] = 0;
+    service.mName[Common::kInstanceNameMaxLength] = 0;
 
     strncpy(service.mType, regtype, sizeof(service.mType));
     service.mType[kDnssdTypeMaxSize] = 0;
@@ -433,11 +433,11 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
     DNSServiceProtocol protocol;
 
 #if INET_CONFIG_ENABLE_IPV4
-    if (addressType == chip::Inet::kIPAddressType_IPv4)
+    if (addressType == chip::Inet::IPAddressType::kIPv4)
     {
         protocol = kDNSServiceProtocol_IPv4;
     }
-    else if (addressType == chip::Inet::kIPAddressType_IPv6)
+    else if (addressType == chip::Inet::IPAddressType::kIPv6)
     {
         protocol = kDNSServiceProtocol_IPv6;
     }

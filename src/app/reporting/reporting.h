@@ -58,3 +58,8 @@
  */
 void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                             uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data);
+
+/*
+ * Same but with just an attribute path and no data available.
+ */
+void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
