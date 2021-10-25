@@ -87,9 +87,6 @@ constexpr uint8_t kMsgFlagsMask = 0x07;
 /// Shift to convert to/from a masked version 8bit value to a 4bit version.
 constexpr int kVersionShift = 4;
 
-// Mask to extract sessionType
-constexpr uint8_t kSessionTypeMask = 0x03;
-
 } // namespace
 
 uint16_t PacketHeader::EncodeSizeBytes() const
@@ -147,15 +144,12 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     SuccessOrExit(err);
     version = ((msgFlags & kVersionMask) >> kVersionShift);
     VerifyOrExit(version == kMsgHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
-
-    mMsgFlags.SetRaw(msgFlags);
+    SetMessageFlags(msgFlags);
 
     uint8_t securityFlags;
     err = reader.Read8(&securityFlags).StatusCode();
     SuccessOrExit(err);
-    mSecFlags.SetRaw(securityFlags);
-
-    mSessionType = static_cast<Header::SessionType>(securityFlags & kSessionTypeMask);
+    SetSecurityFlags(securityFlags);
 
     err = reader.Read16(&mSessionId).StatusCode();
     SuccessOrExit(err);
