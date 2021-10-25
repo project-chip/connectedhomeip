@@ -46,7 +46,7 @@ public:
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    uint16_t GetWaitDurationInSeconds() const override { return 10; }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
     virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
 

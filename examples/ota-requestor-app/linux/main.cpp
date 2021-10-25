@@ -97,7 +97,8 @@ void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedAction
     bdxDownloader.SetInitialExchange(exchangeCtx);
 
     // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
-    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions, 20000);
+    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
+                                   chip::System::Clock::Seconds16(20));
 }
 
 void OnQueryFailure(void * context, uint8_t status)

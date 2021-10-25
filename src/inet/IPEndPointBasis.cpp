@@ -295,19 +295,22 @@ done:
     return (lPacketInfo);
 }
 
-CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::LayerLwIP * aLayer, System::Object & aTarget,
-                                                  System::EventType aEventType, System::PacketBufferHandle && aBuffer)
+struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
 {
-    VerifyOrReturnError(aLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    struct netif * lRetval = NULL;
 
-    const CHIP_ERROR error =
-        aLayer->PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
-    if (error == CHIP_NO_ERROR)
+#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+    NETIF_FOREACH(lRetval)
     {
-        // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
-        static_cast<void>(std::move(aBuffer).UnsafeRelease());
+        if (lRetval == aInterfaceId)
+            break;
     }
-    return error;
+#else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
+    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId; lRetval = lRetval->next)
+        ;
+#endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+
+    return (lRetval);
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

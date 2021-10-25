@@ -1185,6 +1185,19 @@ static void OnContentLauncherLaunchURLResponseSuccess(
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 };
 
+static void OnDiagnosticLogsRetrieveLogsResponseSuccess(
+    void * context, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received RetrieveLogsResponse:");
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", data.status);
+    ChipLogProgress(Zcl, "  content: %zu", data.content.size());
+    ChipLogProgress(Zcl, "  timeStamp: %" PRIu32 "", data.timeStamp);
+    ChipLogProgress(Zcl, "  timeSinceBoot: %" PRIu32 "", data.timeSinceBoot);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+};
+
 static void
 OnDoorLockClearAllPinsResponseSuccess(void * context,
                                       const chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType & data)
@@ -1973,6 +1986,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | Basic                                                               | 0x0028 |
 | BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
+| BooleanState                                                        | 0x0045 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
 | ContentLauncher                                                     | 0x050A |
@@ -4317,6 +4331,130 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0xF000) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::BindingCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster BooleanState                                                | 0x0045 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * StateValue                                                        | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute StateValue
+ */
+class ReadBooleanStateStateValue : public ModelCommand
+{
+public:
+    ReadBooleanStateStateValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "state-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBooleanStateStateValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0045) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BooleanStateCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeStateValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportBooleanStateStateValue : public ModelCommand
+{
+public:
+    ReportBooleanStateStateValue() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "state-value");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBooleanStateStateValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0045) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BooleanStateCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeStateValue(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.SubscribeAttributeStateValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                    mMaxInterval);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadBooleanStateClusterRevision : public ModelCommand
+{
+public:
+    ReadBooleanStateClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBooleanStateClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0045) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -8380,7 +8518,7 @@ public:
 
         chip::Controller::DiagnosticLogsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return cluster.InvokeCommand(mRequest, this, OnDiagnosticLogsRetrieveLogsResponseSuccess, OnDefaultFailure);
     }
 
 private:
@@ -25640,6 +25778,18 @@ void registerClusterBinding(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterBooleanState(Commands & commands)
+{
+    const char * clusterName = "BooleanState";
+
+    commands_list clusterCommands = {
+        make_unique<ReadBooleanStateStateValue>(),      //
+        make_unique<ReportBooleanStateStateValue>(),    //
+        make_unique<ReadBooleanStateClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterBridgedDeviceBasic(Commands & commands)
 {
     const char * clusterName = "BridgedDeviceBasic";
@@ -26673,6 +26823,7 @@ void registerClusters(Commands & commands)
     registerClusterBasic(commands);
     registerClusterBinaryInputBasic(commands);
     registerClusterBinding(commands);
+    registerClusterBooleanState(commands);
     registerClusterBridgedDeviceBasic(commands);
     registerClusterColorControl(commands);
     registerClusterContentLauncher(commands);

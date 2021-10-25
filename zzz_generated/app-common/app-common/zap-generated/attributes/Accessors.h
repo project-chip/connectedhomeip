@@ -1459,6 +1459,17 @@ namespace Attributes {
 } // namespace Attributes
 } // namespace FixedLabel
 
+namespace BooleanState {
+namespace Attributes {
+
+namespace StateValue {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * stateValue); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool stateValue);
+} // namespace StateValue
+
+} // namespace Attributes
+} // namespace BooleanState
+
 namespace ShadeConfiguration {
 namespace Attributes {
 

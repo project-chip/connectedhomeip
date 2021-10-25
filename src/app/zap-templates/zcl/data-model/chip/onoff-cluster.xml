@@ -46,7 +46,7 @@ limitations under the License.
     <code>0x0006</code>
     <define>ON_OFF_CLUSTER</define>
     <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
 
     <attribute side="server" code="0x0000" define="ON_OFF"               type="boolean" default="0" reportable="true"              >OnOff</attribute>
     <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1"                 optional="true">GlobalSceneControl</attribute>

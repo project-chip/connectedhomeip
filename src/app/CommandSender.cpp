@@ -37,7 +37,7 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
 {}
 
 CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
-                                             uint32_t timeout)
+                                             System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;

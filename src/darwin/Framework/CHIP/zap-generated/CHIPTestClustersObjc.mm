@@ -418,6 +418,33 @@ using chip::Callback::Cancelable;
 
 @end
 
+@interface CHIPTestBooleanState ()
+@property (readonly) chip::Controller::BooleanStateClusterTest cppCluster;
+@end
+
+@implementation CHIPTestBooleanState
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)writeAttributeStateValueWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeStateValue(success, failure, value);
+    });
+}
+
+- (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeClusterRevision(success, failure, value);
+    });
+}
+
+@end
+
 @interface CHIPTestBridgedDeviceBasic ()
 @property (readonly) chip::Controller::BridgedDeviceBasicClusterTest cppCluster;
 @end

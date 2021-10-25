@@ -1142,6 +1142,85 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback
+    : public Callback::Callback<DiagnosticLogsClusterRetrieveLogsResponseCallback>
+{
+public:
+    CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback(jobject javaCallback) :
+        Callback::Callback<DiagnosticLogsClusterRetrieveLogsResponseCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+    ~CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+        env->DeleteGlobalRef(javaCallbackRef);
+    };
+
+    static void CallbackFn(void * context, uint8_t status, chip::ByteSpan content, uint32_t timeStamp, uint32_t timeSinceBoot)
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+        jmethodID javaMethod;
+        CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback * cppCallback = nullptr;
+        jbyteArray contentArr;
+
+        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+        cppCallback = reinterpret_cast<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback *>(context);
+        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+
+        javaCallbackRef = cppCallback->javaCallbackRef;
+        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
+
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I[BJJ)V", &javaMethod);
+        SuccessOrExit(err);
+
+        contentArr = env->NewByteArray(content.size());
+        VerifyOrExit(contentArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+        env->SetByteArrayRegion(contentArr, 0, content.size(), reinterpret_cast<const jbyte *>(content.data()));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), contentArr, static_cast<jlong>(timeStamp),
+                            static_cast<jlong>(timeSinceBoot));
+
+        env->DeleteLocalRef(contentArr);
+
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        if (cppCallback != nullptr)
+        {
+            cppCallback->Cancel();
+            delete cppCallback;
+        }
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterClearAllPinsResponseCallback : public Callback::Callback<DoorLockClusterClearAllPinsResponseCallback>
 {
 public:
@@ -5981,7 +6060,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<uint16_t> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6057,7 +6136,7 @@ public:
 
     static void CallbackFn(
         void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & list)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6147,7 +6226,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::ByteSpan> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6222,7 +6301,7 @@ public:
 
     static void
     CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list)
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6296,9 +6375,9 @@ public:
         }
     }
 
-    static void
-    CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list)
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6384,7 +6463,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::ClusterId> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6458,7 +6537,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::ClusterId> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6532,7 +6611,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::EndpointId> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6606,9 +6685,9 @@ public:
         }
     }
 
-    static void
-    CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list)
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6699,7 +6778,7 @@ public:
 
     static void
     CallbackFn(void * context,
-               const app::DataModel::DecodableList<
+               const chip::app::DataModel::DecodableList<
                    chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
@@ -6791,10 +6870,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6893,7 +6971,8 @@ public:
 
     static void CallbackFn(
         void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> &
+            list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6981,7 +7060,7 @@ public:
 
     static void CallbackFn(
         void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7074,9 +7153,9 @@ public:
         }
     }
 
-    static void
-    CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list)
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7167,10 +7246,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7266,7 +7344,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<uint8_t> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7340,9 +7418,9 @@ public:
         }
     }
 
-    static void
-    CallbackFn(void * context,
-               const app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7438,7 +7516,7 @@ public:
     }
 
     static void CallbackFn(void * context,
-                           const app::DataModel::DecodableList<
+                           const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
@@ -7528,7 +7606,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<uint8_t> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7602,7 +7680,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const app::DataModel::DecodableList<chip::ByteSpan> & list)
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7677,7 +7755,8 @@ public:
 
     static void CallbackFn(
         void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> & list)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+            list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7767,10 +7846,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7873,10 +7951,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7974,10 +8051,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &
-            list)
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8068,7 +8144,7 @@ public:
 
     static void
     CallbackFn(void * context,
-               const app::DataModel::DecodableList<
+               const chip::app::DataModel::DecodableList<
                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
@@ -8175,8 +8251,9 @@ public:
         }
     }
 
-    static void CallbackFn(void * context,
-                           const app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10391,6 +10468,111 @@ JNI_METHOD(void, BindingCluster, readClusterRevisionAttribute)(JNIEnv * env, job
 
     CHIP_ERROR err              = CHIP_NO_ERROR;
     BindingCluster * cppCluster = reinterpret_cast<BindingCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(jlong, BooleanStateCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    BooleanStateCluster * cppCluster = new BooleanStateCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
+JNI_METHOD(void, BooleanStateCluster, readStateValueAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBooleanAttributeCallback, void (*)(CHIPBooleanAttributeCallback *)> onSuccess(
+        Platform::New<CHIPBooleanAttributeCallback>(callback), Platform::Delete<CHIPBooleanAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeStateValue(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, BooleanStateCluster, subscribeStateValueAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->SubscribeAttributeStateValue(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(minInterval),
+                                                   static_cast<uint16_t>(maxInterval));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, BooleanStateCluster, reportStateValueAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBooleanAttributeCallback, void (*)(CHIPBooleanAttributeCallback *)> onReport(
+        Platform::New<CHIPBooleanAttributeCallback>(callback, true), Platform::Delete<CHIPBooleanAttributeCallback>);
+    VerifyOrReturn(onReport.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native report callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReportAttributeStateValue(onReport->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ReturnIllegalStateException(env, callback, "Error registering for attribute reporting", err));
+
+    onReport.release();
+}
+
+JNI_METHOD(void, BooleanStateCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback), Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
@@ -14027,8 +14209,10 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
 
     JniByteArray transferFileDesignatorArr(env, transferFileDesignator);
 
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback,
+                    void (*)(CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback *)>
+        onSuccess(Platform::New<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback>(callback),
+                  Platform::Delete<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

@@ -124,7 +124,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         SetResponseExpected(true);
 
         // Arm the response timer if a timeout has been specified.
-        if (mResponseTimeout > 0)
+        if (mResponseTimeout > System::Clock::Zero)
         {
             CHIP_ERROR err = StartResponseTimer();
             if (err != CHIP_NO_ERROR)
@@ -338,7 +338,7 @@ CHIP_ERROR ExchangeContext::StartResponseTimer()
         return CHIP_ERROR_INTERNAL;
     }
 
-    return lSystemLayer->StartTimer(chip::System::Clock::Milliseconds32(mResponseTimeout), HandleResponseTimeout, this);
+    return lSystemLayer->StartTimer(mResponseTimeout, HandleResponseTimeout, this);
 }
 
 void ExchangeContext::CancelResponseTimer()
