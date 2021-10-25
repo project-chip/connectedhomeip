@@ -20,6 +20,7 @@
 
 namespace {
 
+using chip::FabricIndex;
 using namespace chip::Access;
 
 // Avoid GetAccessControl returning nullptr before SetAccessControl is called.

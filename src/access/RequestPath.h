@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "BasicTypes.h"
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace Access {

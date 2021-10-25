@@ -20,6 +20,7 @@
 
 namespace {
 
+using chip::FabricIndex;
 using namespace chip::Access;
 
 class ExampleDataProvider : public AccessControlDataProvider

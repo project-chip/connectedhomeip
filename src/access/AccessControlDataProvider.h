@@ -19,11 +19,11 @@
 #pragma once
 
 #include "AuthMode.h"
-#include "BasicTypes.h"
 #include "Privilege.h"
 #include "SubjectDescriptor.h"
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace Access {

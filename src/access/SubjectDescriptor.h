@@ -19,10 +19,16 @@
 #pragma once
 
 #include "AuthMode.h"
-#include "BasicTypes.h"
+
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/GroupId.h>
+#include <lib/core/NodeId.h>
 
 namespace chip {
 namespace Access {
+
+typedef uint64_t CatId;
+typedef uint16_t PasscodeId;
 
 // Can store a PasscodeId, NodeId, CatId, GroupId, etc. as appropriate.
 typedef NodeId SubjectId;
