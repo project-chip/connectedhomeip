@@ -1,6 +1,6 @@
-/**
+/*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +15,28 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- * @brief The include file for all the types for the data model that are not
- *        dependent on an individual application configuration.
- */
-
 #pragma once
 
 #include <cstdint>
 
-#include <lib/core/GroupId.h>
-#include <lib/core/NodeId.h>
-
-// Pull in other core types
-#include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <lib/core/DataModelTypes.h>
-
 namespace chip {
 
-typedef uint8_t Percent;
-typedef uint16_t Percent100ths;
+typedef uint8_t ActionId;
+typedef uint32_t AttributeId;
+typedef uint32_t ClusterId;
+typedef uint8_t ClusterStatus;
+typedef uint32_t CommandId;
+typedef uint32_t DataVersion;
+typedef uint32_t DeviceTypeId;
+typedef uint16_t EndpointId;
+typedef uint32_t EventId;
+typedef uint64_t EventNumber;
+typedef uint64_t FabricId;
+typedef uint8_t FabricIndex;
+typedef uint32_t FieldId;
+typedef uint16_t ListIndex;
+typedef uint32_t TransactionId;
+
+static constexpr FabricIndex kUndefinedFabricIndex = 0;
 
 } // namespace chip
