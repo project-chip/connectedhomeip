@@ -97,22 +97,9 @@ function asTypeMaxValue(type)
   return templateUtil.templatePromise(this.global, promise);
 }
 
-function addTestName(names)
-{
-  this._allTestNames += names + ",";
-}
-
-function getTestNames()
-{
-  return this._allTestNames.slice(0, -1).replace('undefined', '');
-  ;
-}
-
 //
 // Module exports
 //
 exports.asDelimitedCommand = asDelimitedCommand;
 exports.asTypeMinValue     = asTypeMinValue;
 exports.asTypeMaxValue     = asTypeMaxValue;
-exports.addTestName        = addTestName;
-exports.getTestNames       = getTestNames;
