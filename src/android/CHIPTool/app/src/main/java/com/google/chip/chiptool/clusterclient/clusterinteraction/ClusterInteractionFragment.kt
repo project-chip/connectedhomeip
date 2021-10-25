@@ -1,12 +1,14 @@
-package com.google.chip.chiptool.clusterclient
+package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import chip.clusterinfo.ClusterCommandCallback
 import chip.clusterinfo.ClusterInfo
 import chip.clusterinfo.CommandInfo
@@ -21,7 +23,9 @@ import kotlinx.coroutines.cancel
 <<<<<<< HEAD
 <<<<<<< HEAD
 import chip.devicecontroller.ClusterInfoMapping
+import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import java.lang.Exception
+import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.endpointList
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getClusterMappingBtn
 import kotlinx.coroutines.launch
 
@@ -64,6 +68,13 @@ class ClusterInteractionFragment : Fragment() {
 <<<<<<< HEAD
       clusterMap = ClusterInfoMapping().clusterMap;
       getClusterMappingBtn.setOnClickListener { scope.launch { getClusterMapping() } }
+      var dataList: List<EndpointItem> = ArrayList<EndpointItem>()
+      for (i in 0 until 40) {
+        dataList += EndpointItem(i)
+      }
+
+      endpointList.adapter = EndpointAdapter(dataList)
+      endpointList.layoutManager = LinearLayoutManager(requireContext())
     }
   }
 

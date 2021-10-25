@@ -363,21 +363,10 @@ public class ChipClusters {
 
     public static class AudioOutputListAttribute {
       public int index;
-<<<<<<< HEAD
-            public int outputType;
-            public String name;
-
-      public AudioOutputListAttribute(
-        int index,
-                int outputType,
-                String name
-      ) {
-=======
       public int outputType;
-      public byte[] name;
+      public String name;
 
-      public AudioOutputListAttribute(int index, int outputType, byte[] name) {
->>>>>>> e993d01f0 (callback generation done)
+      public AudioOutputListAttribute(int index, int outputType, String name) {
         this.index = index;
         this.outputType = outputType;
         this.name = name;
@@ -789,14 +778,12 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-
-    public void readStateValueAttribute(
-      BooleanAttributeCallback callback
-    ) {
+    public void readStateValueAttribute(BooleanAttributeCallback callback) {
       readStateValueAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeStateValueAttribute(DefaultClusterCallback callback, int minInterval, int maxInterval) {
+    public void subscribeStateValueAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
       subscribeStateValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -804,23 +791,21 @@ public class ChipClusters {
       reportStateValueAttribute(chipClusterPtr, callback);
     }
 
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-  
-    private native void readStateValueAttribute(long chipClusterPtr,
-      BooleanAttributeCallback callback
-    );
 
-    private native void subscribeStateValueAttribute(long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+    private native void readStateValueAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
 
-    private native void reportStateValueAttribute(long chipClusterPtr, BooleanAttributeCallback callback);
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
+    private native void subscribeStateValueAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportStateValueAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
   public static class BridgedActionsCluster extends BaseChipCluster {
@@ -839,90 +824,126 @@ public class ChipClusters {
       disableAction(chipClusterPtr, callback, actionID, invokeID);
     }
 
-
-    public void disableActionWithDuration(DefaultClusterCallback callback, int actionID, long invokeID, long duration) {
+    public void disableActionWithDuration(
+        DefaultClusterCallback callback, int actionID, long invokeID, long duration) {
       disableActionWithDuration(chipClusterPtr, callback, actionID, invokeID, duration);
     }
-
 
     public void enableAction(DefaultClusterCallback callback, int actionID, long invokeID) {
       enableAction(chipClusterPtr, callback, actionID, invokeID);
     }
 
-
-    public void enableActionWithDuration(DefaultClusterCallback callback, int actionID, long invokeID, long duration) {
+    public void enableActionWithDuration(
+        DefaultClusterCallback callback, int actionID, long invokeID, long duration) {
       enableActionWithDuration(chipClusterPtr, callback, actionID, invokeID, duration);
     }
-
 
     public void instantAction(DefaultClusterCallback callback, int actionID, long invokeID) {
       instantAction(chipClusterPtr, callback, actionID, invokeID);
     }
 
-
-    public void instantActionWithTransition(DefaultClusterCallback callback, int actionID, long invokeID, int transitionTime) {
+    public void instantActionWithTransition(
+        DefaultClusterCallback callback, int actionID, long invokeID, int transitionTime) {
       instantActionWithTransition(chipClusterPtr, callback, actionID, invokeID, transitionTime);
     }
-
 
     public void pauseAction(DefaultClusterCallback callback, int actionID, long invokeID) {
       pauseAction(chipClusterPtr, callback, actionID, invokeID);
     }
 
-
-    public void pauseActionWithDuration(DefaultClusterCallback callback, int actionID, long invokeID, long duration) {
+    public void pauseActionWithDuration(
+        DefaultClusterCallback callback, int actionID, long invokeID, long duration) {
       pauseActionWithDuration(chipClusterPtr, callback, actionID, invokeID, duration);
     }
-
 
     public void resumeAction(DefaultClusterCallback callback, int actionID, long invokeID) {
       resumeAction(chipClusterPtr, callback, actionID, invokeID);
     }
 
-
     public void startAction(DefaultClusterCallback callback, int actionID, long invokeID) {
       startAction(chipClusterPtr, callback, actionID, invokeID);
     }
 
-
-    public void startActionWithDuration(DefaultClusterCallback callback, int actionID, long invokeID, long duration) {
+    public void startActionWithDuration(
+        DefaultClusterCallback callback, int actionID, long invokeID, long duration) {
       startActionWithDuration(chipClusterPtr, callback, actionID, invokeID, duration);
     }
-
 
     public void stopAction(DefaultClusterCallback callback, int actionID, long invokeID) {
       stopAction(chipClusterPtr, callback, actionID, invokeID);
     }
 
-    private native void disableAction(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
-    private native void disableActionWithDuration(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID, long duration);
-    private native void enableAction(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
-    private native void enableActionWithDuration(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID, long duration);
-    private native void instantAction(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
-    private native void instantActionWithTransition(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID, int transitionTime);
-    private native void pauseAction(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
-    private native void pauseActionWithDuration(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID, long duration);
-    private native void resumeAction(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
-    private native void startAction(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
-    private native void startActionWithDuration(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID, long duration);
-    private native void stopAction(long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
+    private native void disableAction(
+        long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
+
+    private native void disableActionWithDuration(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int actionID,
+        long invokeID,
+        long duration);
+
+    private native void enableAction(
+        long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
+
+    private native void enableActionWithDuration(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int actionID,
+        long invokeID,
+        long duration);
+
+    private native void instantAction(
+        long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
+
+    private native void instantActionWithTransition(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int actionID,
+        long invokeID,
+        int transitionTime);
+
+    private native void pauseAction(
+        long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
+
+    private native void pauseActionWithDuration(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int actionID,
+        long invokeID,
+        long duration);
+
+    private native void resumeAction(
+        long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
+
+    private native void startAction(
+        long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
+
+    private native void startActionWithDuration(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int actionID,
+        long invokeID,
+        long duration);
+
+    private native void stopAction(
+        long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
 
     public static class ActionListAttribute {
       public int actionID;
-            public String name;
+      public String name;
       public int type;
-            public int endpointListID;
-            public int supportedCommands;
-            public int status;
-      
+      public int endpointListID;
+      public int supportedCommands;
+      public int status;
+
       public ActionListAttribute(
-        int actionID,
-                String name,
-        int type,
-                int endpointListID,
-                int supportedCommands,
-                int status
-              ) {
+          int actionID,
+          String name,
+          int type,
+          int endpointListID,
+          int supportedCommands,
+          int status) {
         this.actionID = actionID;
         this.name = name;
         this.type = type;
@@ -933,23 +954,18 @@ public class ChipClusters {
     }
 
     public interface ActionListAttributeCallback {
-      void onSuccess(List<
-      ActionListAttribute
-      > valueList);
+      void onSuccess(List<ActionListAttribute> valueList);
+
       void onError(Exception ex);
     }
+
     public static class EndpointListAttribute {
       public int endpointListID;
-            public String name;
+      public String name;
       public int type;
-            public byte[] endpoints;
+      public byte[] endpoints;
 
-      public EndpointListAttribute(
-        int endpointListID,
-                String name,
-        int type,
-                byte[] endpoints
-      ) {
+      public EndpointListAttribute(int endpointListID, String name, int type, byte[] endpoints) {
         this.endpointListID = endpointListID;
         this.name = name;
         this.type = type;
@@ -958,51 +974,38 @@ public class ChipClusters {
     }
 
     public interface EndpointListAttributeCallback {
-      void onSuccess(List<
-      EndpointListAttribute
-      > valueList);
+      void onSuccess(List<EndpointListAttribute> valueList);
+
       void onError(Exception ex);
     }
 
-    public void readActionListAttribute(
-      ActionListAttributeCallback callback
-    ) {
+    public void readActionListAttribute(ActionListAttributeCallback callback) {
       readActionListAttribute(chipClusterPtr, callback);
     }
 
-    public void readEndpointListAttribute(
-      EndpointListAttributeCallback callback
-    ) {
+    public void readEndpointListAttribute(EndpointListAttributeCallback callback) {
       readEndpointListAttribute(chipClusterPtr, callback);
     }
 
-    public void readSetupUrlAttribute(
-      CharStringAttributeCallback callback
-    ) {
+    public void readSetupUrlAttribute(CharStringAttributeCallback callback) {
       readSetupUrlAttribute(chipClusterPtr, callback);
     }
 
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-  
-    private native void readActionListAttribute(long chipClusterPtr,
-      ActionListAttributeCallback callback
-    );
-  
-    private native void readEndpointListAttribute(long chipClusterPtr,
-      EndpointListAttributeCallback callback
-    );
-  
-    private native void readSetupUrlAttribute(long chipClusterPtr,
-      CharStringAttributeCallback callback
-    );
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
+
+    private native void readActionListAttribute(
+        long chipClusterPtr, ActionListAttributeCallback callback);
+
+    private native void readEndpointListAttribute(
+        long chipClusterPtr, EndpointListAttributeCallback callback);
+
+    private native void readSetupUrlAttribute(
+        long chipClusterPtr, CharStringAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
   public static class BridgedDeviceBasicCluster extends BaseChipCluster {
@@ -2268,27 +2271,8 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-<<<<<<< HEAD
-    public void retrieveLogsRequest(RetrieveLogsResponseCallback callback, int intent, int requestedProtocol, byte[] transferFileDesignator) {
-      retrieveLogsRequest(chipClusterPtr, callback, intent, requestedProtocol, transferFileDesignator);
-    }
-
-    private native void retrieveLogsRequest(long chipClusterPtr, RetrieveLogsResponseCallback callback, int intent, int requestedProtocol, byte[] transferFileDesignator);
-    public interface RetrieveLogsResponseCallback {
-      void onSuccess(
-      int status
-      , byte[] content
-      , long timeStamp
-      , long timeSinceBoot
-      );
-      
-      void onError(Exception error);
-    }
-
-
-=======
     public void retrieveLogsRequest(
-        DefaultClusterCallback callback,
+        RetrieveLogsResponseCallback callback,
         int intent,
         int requestedProtocol,
         byte[] transferFileDesignator) {
@@ -2298,11 +2282,16 @@ public class ChipClusters {
 
     private native void retrieveLogsRequest(
         long chipClusterPtr,
-        DefaultClusterCallback callback,
+        RetrieveLogsResponseCallback callback,
         int intent,
         int requestedProtocol,
         byte[] transferFileDesignator);
->>>>>>> b8d7ee0e3 (callback generation done)
+
+    public interface RetrieveLogsResponseCallback {
+      void onSuccess(int status, byte[] content, long timeStamp, long timeSinceBoot);
+
+      void onError(Exception error);
+    }
   }
 
   public static class DoorLockCluster extends BaseChipCluster {
@@ -2313,7 +2302,7 @@ public class ChipClusters {
     public static long clusterId() {
       return Long.parseUnsignedLong("257");
     }
-    src/controller/java/zap-generated/chip/devicecontroller/ChipClusters.java
+
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
@@ -2964,14 +2953,7 @@ public class ChipClusters {
       public String label;
       public String value;
 
-<<<<<<< HEAD
-      public LabelListAttribute(
-        String label,
-        String value
-      ) {
-=======
-      public LabelListAttribute(byte[] label, byte[] value) {
->>>>>>> e993d01f0 (callback generation done)
+      public LabelListAttribute(String label, String value) {
         this.label = label;
         this.value = value;
       }
@@ -3222,22 +3204,12 @@ public class ChipClusters {
       public int type;
 
       public NetworkInterfacesAttribute(
-<<<<<<< HEAD
-        String name,
-        boolean fabricConnected,
-                boolean offPremiseServicesReachableIPv4,
-                boolean offPremiseServicesReachableIPv6,
-                byte[] hardwareAddress,
-        int type
-              ) {
-=======
-          byte[] name,
+          String name,
           boolean fabricConnected,
           boolean offPremiseServicesReachableIPv4,
           boolean offPremiseServicesReachableIPv6,
           byte[] hardwareAddress,
           int type) {
->>>>>>> e993d01f0 (callback generation done)
         this.name = name;
         this.fabricConnected = fabricConnected;
         this.offPremiseServicesReachableIPv4 = offPremiseServicesReachableIPv4;
@@ -3765,56 +3737,31 @@ public class ChipClusters {
       reportCurrentLevelAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public void readRemainingTimeAttribute(
-      IntegerAttributeCallback callback
-    ) {
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> f00108887 (merge conflict)
     public void readRemainingTimeAttribute(IntegerAttributeCallback callback) {
->>>>>>> e993d01f0 (callback generation done)
       readRemainingTimeAttribute(chipClusterPtr, callback);
     }
 
-    public void readMinLevelAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMinLevelAttribute(IntegerAttributeCallback callback) {
       readMinLevelAttribute(chipClusterPtr, callback);
     }
 
-    public void readMaxLevelAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMaxLevelAttribute(IntegerAttributeCallback callback) {
       readMaxLevelAttribute(chipClusterPtr, callback);
     }
 
-    public void readCurrentFrequencyAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readCurrentFrequencyAttribute(IntegerAttributeCallback callback) {
       readCurrentFrequencyAttribute(chipClusterPtr, callback);
     }
 
-    public void readMinFrequencyAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMinFrequencyAttribute(IntegerAttributeCallback callback) {
       readMinFrequencyAttribute(chipClusterPtr, callback);
     }
 
-    public void readMaxFrequencyAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMaxFrequencyAttribute(IntegerAttributeCallback callback) {
       readMaxFrequencyAttribute(chipClusterPtr, callback);
     }
 
-    public void readOptionsAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readOptionsAttribute(IntegerAttributeCallback callback) {
       readOptionsAttribute(chipClusterPtr, callback);
     }
 
@@ -3822,9 +3769,7 @@ public class ChipClusters {
       writeOptionsAttribute(chipClusterPtr, callback, value);
     }
 
-    public void readOnOffTransitionTimeAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readOnOffTransitionTimeAttribute(IntegerAttributeCallback callback) {
       readOnOffTransitionTimeAttribute(chipClusterPtr, callback);
     }
 
@@ -3832,9 +3777,7 @@ public class ChipClusters {
       writeOnOffTransitionTimeAttribute(chipClusterPtr, callback, value);
     }
 
-    public void readOnLevelAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readOnLevelAttribute(IntegerAttributeCallback callback) {
       readOnLevelAttribute(chipClusterPtr, callback);
     }
 
@@ -3842,9 +3785,7 @@ public class ChipClusters {
       writeOnLevelAttribute(chipClusterPtr, callback, value);
     }
 
-    public void readOnTransitionTimeAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readOnTransitionTimeAttribute(IntegerAttributeCallback callback) {
       readOnTransitionTimeAttribute(chipClusterPtr, callback);
     }
 
@@ -3852,9 +3793,7 @@ public class ChipClusters {
       writeOnTransitionTimeAttribute(chipClusterPtr, callback, value);
     }
 
-    public void readOffTransitionTimeAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readOffTransitionTimeAttribute(IntegerAttributeCallback callback) {
       readOffTransitionTimeAttribute(chipClusterPtr, callback);
     }
 
@@ -3862,9 +3801,7 @@ public class ChipClusters {
       writeOffTransitionTimeAttribute(chipClusterPtr, callback, value);
     }
 
-    public void readDefaultMoveRateAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readDefaultMoveRateAttribute(IntegerAttributeCallback callback) {
       readDefaultMoveRateAttribute(chipClusterPtr, callback);
     }
 
@@ -3872,9 +3809,7 @@ public class ChipClusters {
       writeDefaultMoveRateAttribute(chipClusterPtr, callback, value);
     }
 
-    public void readStartUpCurrentLevelAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readStartUpCurrentLevelAttribute(IntegerAttributeCallback callback) {
       readStartUpCurrentLevelAttribute(chipClusterPtr, callback);
     }
 
@@ -3882,47 +3817,13 @@ public class ChipClusters {
       writeStartUpCurrentLevelAttribute(chipClusterPtr, callback, value);
     }
 
-<<<<<<< HEAD
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
-<<<<<<< HEAD
-=======
->>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
-=======
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> d51f00a65 (need to wait for cast-helper)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> 6e6e45a1a (callback generation done)
->>>>>>> e993d01f0 (callback generation done)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> f00108887 (merge conflict)
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
     private native void readCurrentLevelAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
-=======
->>>>>>> 6e6e45a1a (callback generation done)
-=======
->>>>>>> f00108887 (merge conflict)
     private native void subscribeCurrentLevelAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
 
@@ -3991,99 +3892,6 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-<<<<<<< HEAD
-=======
-=======
->>>>>>> d51f00a65 (need to wait for cast-helper)
->>>>>>> e993d01f0 (callback generation done)
-    private native void reportCurrentLevelAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-  
-    private native void readRemainingTimeAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMinLevelAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxLevelAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readCurrentFrequencyAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMinFrequencyAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxFrequencyAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readOptionsAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void writeOptionsAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readOnOffTransitionTimeAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void writeOnOffTransitionTimeAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readOnLevelAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void writeOnLevelAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readOnTransitionTimeAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void writeOnTransitionTimeAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readOffTransitionTimeAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void writeOffTransitionTimeAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readDefaultMoveRateAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void writeDefaultMoveRateAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readStartUpCurrentLevelAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void writeStartUpCurrentLevelAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
-=======
->>>>>>> d51f00a65 (need to wait for cast-helper)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> 6e6e45a1a (callback generation done)
->>>>>>> e993d01f0 (callback generation done)
-=======
->>>>>>> f00108887 (merge conflict)
   }
 
   public static class LowPowerCluster extends BaseChipCluster {
@@ -4152,24 +3960,11 @@ public class ChipClusters {
 
     public static class MediaInputListAttribute {
       public int index;
-<<<<<<< HEAD
-            public int inputType;
-            public String name;
+      public int inputType;
+      public String name;
       public String description;
 
-      public MediaInputListAttribute(
-        int index,
-                int inputType,
-                String name,
-        String description
-      ) {
-=======
-      public int inputType;
-      public byte[] name;
-      public byte[] description;
-
-      public MediaInputListAttribute(int index, int inputType, byte[] name, byte[] description) {
->>>>>>> e993d01f0 (callback generation done)
+      public MediaInputListAttribute(int index, int inputType, String name, String description) {
         this.index = index;
         this.inputType = inputType;
         this.name = name;
@@ -5149,17 +4944,8 @@ public class ChipClusters {
     }
 
     public interface NOCResponseCallback {
-<<<<<<< HEAD
-      void onSuccess(
-      int StatusCode
-      , int FabricIndex
-      , String DebugText
-      );
-      
-=======
-      void onSuccess(int StatusCode, int FabricIndex, byte[] DebugText);
+      void onSuccess(int StatusCode, int FabricIndex, String DebugText);
 
->>>>>>> e993d01f0 (callback generation done)
       void onError(Exception error);
     }
 
@@ -5173,23 +4959,9 @@ public class ChipClusters {
       public int fabricIndex;
       public byte[] rootPublicKey;
       public int vendorId;
-<<<<<<< HEAD
-            public long fabricId;
-            public long nodeId;
-            public String label;
-
-      public FabricsListAttribute(
-        int fabricIndex,
-                byte[] rootPublicKey,
-        int vendorId,
-                long fabricId,
-                long nodeId,
-                String label
-      ) {
-=======
       public long fabricId;
       public long nodeId;
-      public byte[] label;
+      public String label;
 
       public FabricsListAttribute(
           int fabricIndex,
@@ -5197,8 +4969,7 @@ public class ChipClusters {
           int vendorId,
           long fabricId,
           long nodeId,
-          byte[] label) {
->>>>>>> e993d01f0 (callback generation done)
+          String label) {
         this.fabricIndex = fabricIndex;
         this.rootPublicKey = rootPublicKey;
         this.vendorId = vendorId;
@@ -5490,74 +5261,52 @@ public class ChipClusters {
       readMaxFlowAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-    public void readMinConstPressureAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMinConstPressureAttribute(IntegerAttributeCallback callback) {
       readMinConstPressureAttribute(chipClusterPtr, callback);
     }
 
-    public void readMaxConstPressureAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMaxConstPressureAttribute(IntegerAttributeCallback callback) {
       readMaxConstPressureAttribute(chipClusterPtr, callback);
     }
 
-    public void readMinCompPressureAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMinCompPressureAttribute(IntegerAttributeCallback callback) {
       readMinCompPressureAttribute(chipClusterPtr, callback);
     }
 
-    public void readMaxCompPressureAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMaxCompPressureAttribute(IntegerAttributeCallback callback) {
       readMaxCompPressureAttribute(chipClusterPtr, callback);
     }
 
-    public void readMinConstSpeedAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMinConstSpeedAttribute(IntegerAttributeCallback callback) {
       readMinConstSpeedAttribute(chipClusterPtr, callback);
     }
 
-    public void readMaxConstSpeedAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMaxConstSpeedAttribute(IntegerAttributeCallback callback) {
       readMaxConstSpeedAttribute(chipClusterPtr, callback);
     }
 
-    public void readMinConstFlowAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMinConstFlowAttribute(IntegerAttributeCallback callback) {
       readMinConstFlowAttribute(chipClusterPtr, callback);
     }
 
-    public void readMaxConstFlowAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMaxConstFlowAttribute(IntegerAttributeCallback callback) {
       readMaxConstFlowAttribute(chipClusterPtr, callback);
     }
 
-    public void readMinConstTempAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMinConstTempAttribute(IntegerAttributeCallback callback) {
       readMinConstTempAttribute(chipClusterPtr, callback);
     }
 
-    public void readMaxConstTempAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readMaxConstTempAttribute(IntegerAttributeCallback callback) {
       readMaxConstTempAttribute(chipClusterPtr, callback);
     }
 
-    public void readPumpStatusAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readPumpStatusAttribute(IntegerAttributeCallback callback) {
       readPumpStatusAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribePumpStatusAttribute(DefaultClusterCallback callback, int minInterval, int maxInterval) {
+    public void subscribePumpStatusAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
       subscribePumpStatusAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -5565,12 +5314,7 @@ public class ChipClusters {
       reportPumpStatusAttribute(chipClusterPtr, callback);
     }
 
-    public void readEffectiveOperationModeAttribute(
-      IntegerAttributeCallback callback
-    ) {
-=======
     public void readEffectiveOperationModeAttribute(IntegerAttributeCallback callback) {
->>>>>>> e993d01f0 (callback generation done)
       readEffectiveOperationModeAttribute(chipClusterPtr, callback);
     }
 
@@ -5591,25 +5335,15 @@ public class ChipClusters {
       reportCapacityAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-    public void readSpeedAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readSpeedAttribute(IntegerAttributeCallback callback) {
       readSpeedAttribute(chipClusterPtr, callback);
     }
 
-    public void readLifetimeEnergyConsumedAttribute(
-      LongAttributeCallback callback
-    ) {
+    public void readLifetimeEnergyConsumedAttribute(LongAttributeCallback callback) {
       readLifetimeEnergyConsumedAttribute(chipClusterPtr, callback);
     }
 
-    public void readOperationModeAttribute(
-      IntegerAttributeCallback callback
-    ) {
-=======
     public void readOperationModeAttribute(IntegerAttributeCallback callback) {
->>>>>>> e993d01f0 (callback generation done)
       readOperationModeAttribute(chipClusterPtr, callback);
     }
 
@@ -5617,10 +5351,7 @@ public class ChipClusters {
       writeOperationModeAttribute(chipClusterPtr, callback, value);
     }
 
-<<<<<<< HEAD
-    public void readControlModeAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readControlModeAttribute(IntegerAttributeCallback callback) {
       readControlModeAttribute(chipClusterPtr, callback);
     }
 
@@ -5628,143 +5359,64 @@ public class ChipClusters {
       writeControlModeAttribute(chipClusterPtr, callback, value);
     }
 
-    public void readAlarmMaskAttribute(
-      IntegerAttributeCallback callback
-    ) {
+    public void readAlarmMaskAttribute(IntegerAttributeCallback callback) {
       readAlarmMaskAttribute(chipClusterPtr, callback);
     }
 
-    public void readFeatureMapAttribute(
-      LongAttributeCallback callback
-    ) {
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
       readFeatureMapAttribute(chipClusterPtr, callback);
     }
 
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
-  
-    private native void readMaxPressureAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxSpeedAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxFlowAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMinConstPressureAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxConstPressureAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMinCompPressureAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxCompPressureAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMinConstSpeedAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxConstSpeedAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMinConstFlowAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxConstFlowAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMinConstTempAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxConstTempAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readPumpStatusAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void subscribePumpStatusAttribute(long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
-
-    private native void reportPumpStatusAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-  
-    private native void readEffectiveOperationModeAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readEffectiveControlModeAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readCapacityAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-=======
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
->>>>>>> e993d01f0 (callback generation done)
 
     private native void readMaxPressureAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-    private native void reportCapacityAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-  
-    private native void readSpeedAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readLifetimeEnergyConsumedAttribute(long chipClusterPtr,
-      LongAttributeCallback callback
-    );
-  
-    private native void readOperationModeAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void writeOperationModeAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readControlModeAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-
-    private native void writeControlModeAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readAlarmMaskAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readFeatureMapAttribute(long chipClusterPtr,
-      LongAttributeCallback callback
-    );
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-=======
     private native void readMaxSpeedAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readMaxFlowAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinConstPressureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxConstPressureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinCompPressureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxCompPressureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinConstSpeedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxConstSpeedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinConstFlowAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxConstFlowAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinConstTempAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxConstTempAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readPumpStatusAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribePumpStatusAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportPumpStatusAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readEffectiveOperationModeAttribute(
@@ -5782,15 +5434,31 @@ public class ChipClusters {
     private native void reportCapacityAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
+    private native void readSpeedAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readLifetimeEnergyConsumedAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
     private native void readOperationModeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeOperationModeAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
+    private native void readControlModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeControlModeAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readAlarmMaskAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> e993d01f0 (callback generation done)
   }
 
   public static class RelativeHumidityMeasurementCluster extends BaseChipCluster {
@@ -6222,32 +5890,17 @@ public class ChipClusters {
 
     public static class TvChannelListAttribute {
       public int majorNumber;
-<<<<<<< HEAD
-            public int minorNumber;
-            public String name;
+      public int minorNumber;
+      public String name;
       public String callSign;
       public String affiliateCallSign;
 
       public TvChannelListAttribute(
-        int majorNumber,
-                int minorNumber,
-                String name,
-        String callSign,
-        String affiliateCallSign
-      ) {
-=======
-      public int minorNumber;
-      public byte[] name;
-      public byte[] callSign;
-      public byte[] affiliateCallSign;
-
-      public TvChannelListAttribute(
           int majorNumber,
           int minorNumber,
-          byte[] name,
-          byte[] callSign,
-          byte[] affiliateCallSign) {
->>>>>>> e993d01f0 (callback generation done)
+          String name,
+          String callSign,
+          String affiliateCallSign) {
         this.majorNumber = majorNumber;
         this.minorNumber = minorNumber;
         this.name = name;
@@ -6318,18 +5971,9 @@ public class ChipClusters {
 
     public static class TargetNavigatorListAttribute {
       public int identifier;
-<<<<<<< HEAD
-            public String name;
+      public String name;
 
-      public TargetNavigatorListAttribute(
-        int identifier,
-                String name
-      ) {
-=======
-      public byte[] name;
-
-      public TargetNavigatorListAttribute(int identifier, byte[] name) {
->>>>>>> e993d01f0 (callback generation done)
+      public TargetNavigatorListAttribute(int identifier, String name) {
         this.identifier = identifier;
         this.name = name;
       }
@@ -6492,6 +6136,7 @@ public class ChipClusters {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     public void testEnumsRequest(TestEnumsResponseCallback callback, int arg1, int arg2) {
       testEnumsRequest(chipClusterPtr, callback, arg1, arg2);
     }
@@ -6518,30 +6163,22 @@ public class ChipClusters {
 =======
 >>>>>>> f00108887 (merge conflict)
 >>>>>>> c49afcc9f (merge conflict)
+=======
+>>>>>>> 698449e64 (add recycler view to display endpoint)
     public void testListInt8UArgumentRequest(DefaultClusterCallback callback, int arg1) {
       testListInt8UArgumentRequest(chipClusterPtr, callback, arg1);
     }
 
-
-    public void testListInt8UReverseRequest(TestListInt8UReverseResponseCallback callback, int arg1) {
+    public void testListInt8UReverseRequest(
+        TestListInt8UReverseResponseCallback callback, int arg1) {
       testListInt8UReverseRequest(chipClusterPtr, callback, arg1);
     }
 
-
-    public void testListStructArgumentRequest(DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
+    public void testListStructArgumentRequest(
+        DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
       testListStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
     }
 
-<<<<<<< HEAD
-
-<<<<<<< HEAD
-=======
->>>>>>> d51f00a65 (need to wait for cast-helper)
-=======
->>>>>>> 6e6e45a1a (callback generation done)
->>>>>>> e993d01f0 (callback generation done)
-=======
->>>>>>> f00108887 (merge conflict)
     public void testNotHandled(DefaultClusterCallback callback) {
       testNotHandled(chipClusterPtr, callback);
     }
@@ -6561,38 +6198,17 @@ public class ChipClusters {
       testSpecific(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-    public void testStructArgumentRequest(DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> f00108887 (merge conflict)
     public void testStructArgumentRequest(
         DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
->>>>>>> e993d01f0 (callback generation done)
       testStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
     }
 
-<<<<<<< HEAD
-
-<<<<<<< HEAD
-=======
->>>>>>> d51f00a65 (need to wait for cast-helper)
-=======
->>>>>>> 6e6e45a1a (callback generation done)
->>>>>>> e993d01f0 (callback generation done)
-=======
->>>>>>> f00108887 (merge conflict)
     public void testUnknownCommand(DefaultClusterCallback callback) {
       testUnknownCommand(chipClusterPtr, callback);
     }
 
     private native void test(long chipClusterPtr, DefaultClusterCallback callback);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -6649,6 +6265,8 @@ public class ChipClusters {
 >>>>>>> 6e6e45a1a (callback generation done)
 =======
 >>>>>>> f00108887 (merge conflict)
+=======
+>>>>>>> 698449e64 (add recycler view to display endpoint)
 
     private native void testAddArguments(
         long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
@@ -6669,18 +6287,6 @@ public class ChipClusters {
         String e,
         int f);
 
-<<<<<<< HEAD
-=======
-    private native void testAddArguments(long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
->>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
-=======
->>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
-=======
-    private native void testAddArguments(long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
->>>>>>> d51f00a65 (need to wait for cast-helper)
-=======
->>>>>>> 6e6e45a1a (callback generation done)
->>>>>>> e993d01f0 (callback generation done)
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -6694,18 +6300,6 @@ public class ChipClusters {
 
 >>>>>>> 677ef48a5 (callback generation done)
     private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback callback);
-<<<<<<< HEAD
-    private native void testStructArgumentRequest(long chipClusterPtr, DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f);
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
-
-    private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback callback);
->>>>>>> f00108887 (merge conflict)
 
     private native void testStructArgumentRequest(
         long chipClusterPtr,
@@ -6717,20 +6311,6 @@ public class ChipClusters {
         String e,
         int f);
 
-<<<<<<< HEAD
-=======
->>>>>>> 57aece691 (basic code generation template, but not able to import to tool app)
-=======
-
->>>>>>> 3edd9cb43 (create new public class under chip/clusterinfo)
-=======
->>>>>>> d51f00a65 (need to wait for cast-helper)
-=======
-
->>>>>>> 6e6e45a1a (callback generation done)
->>>>>>> e993d01f0 (callback generation done)
-=======
->>>>>>> f00108887 (merge conflict)
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback callback);
 
     public interface TestAddArgumentsResponseCallback {
@@ -6747,10 +6327,10 @@ public class ChipClusters {
 
     public interface TestListInt8UReverseResponseCallback {
       void onSuccess(
-      // arg1: /* TYPE WARNING: array array defaults to */ uint8_t * 
-      // Conversion from this type to Java is not properly implemented yet
-      );
-      
+          // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
+          // Conversion from this type to Java is not properly implemented yet
+          );
+
       void onError(Exception error);
     }
 
