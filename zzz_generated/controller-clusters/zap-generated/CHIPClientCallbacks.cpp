@@ -185,54 +185,6 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvDa
 #pragma GCC diagnostic pop
 #endif // __clang__
 
-void BridgedActionsClusterActionListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<BridgedActionsActionListListAttributeCallback> * cb =
-        Callback::Callback<BridgedActionsActionListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
-
-void BridgedActionsClusterEndpointListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<BridgedActionsEndpointListListAttributeCallback> * cb =
-        Callback::Callback<BridgedActionsEndpointListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
-
 void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {

@@ -101,9 +101,6 @@
             /* Endpoint: 1, Cluster: Descriptor (client) */                                                                        \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */         \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Bridged Actions (client) */                                                                   \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */              \
-                                                                                                                                   \
             /* Endpoint: 1, Cluster: Basic (client) */                                                                             \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT) | ZAP_ATTRIBUTE_MASK(SINGLETON),                             \
               ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                                                       \
@@ -178,6 +175,9 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Color Control (client) */                                                                     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */              \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Illuminance Measurement (client) */                                                           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(2) }, /* ClusterRevision */              \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */              \
@@ -269,80 +269,80 @@
             {                                                                                                                      \
                 0x001D, ZAP_ATTRIBUTE_INDEX(7), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 1, Cluster: Descriptor (client) */                                                                     \
+            { 0x0028, ZAP_ATTRIBUTE_INDEX(8), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Basic (client) */   \
             {                                                                                                                      \
-                0x0025, ZAP_ATTRIBUTE_INDEX(8), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
-            }, /* Endpoint: 1, Cluster: Bridged Actions (client) */                                                                \
-            { 0x0028, ZAP_ATTRIBUTE_INDEX(9), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Basic (client) */   \
-            {                                                                                                                      \
-                0x0029, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0029, ZAP_ATTRIBUTE_INDEX(9), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 1, Cluster: OTA Software Update Provider (client) */                                                   \
             {                                                                                                                      \
-                0x002A, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x002A, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: OTA Software Update Requestor (client) */                                                  \
             {                                                                                                                      \
-                0x002F, ZAP_ATTRIBUTE_INDEX(12), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x002F, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Power Source (client) */                                                                   \
             {                                                                                                                      \
-                0x0030, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0030, ZAP_ATTRIBUTE_INDEX(12), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: General Commissioning (client) */                                                          \
             {                                                                                                                      \
-                0x0031, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0031, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Network Commissioning (client) */                                                          \
             {                                                                                                                      \
-                0x0032, ZAP_ATTRIBUTE_INDEX(15), 0, 0, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0032, ZAP_ATTRIBUTE_INDEX(14), 0, 0, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Diagnostic Logs (client) */                                                                \
             {                                                                                                                      \
-                0x0033, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0033, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: General Diagnostics (client) */                                                            \
             {                                                                                                                      \
-                0x0034, ZAP_ATTRIBUTE_INDEX(16), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0034, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Software Diagnostics (client) */                                                           \
             {                                                                                                                      \
-                0x0035, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0035, ZAP_ATTRIBUTE_INDEX(16), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Thread Network Diagnostics (client) */                                                     \
             {                                                                                                                      \
-                0x0036, ZAP_ATTRIBUTE_INDEX(18), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0036, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: WiFi Network Diagnostics (client) */                                                       \
             {                                                                                                                      \
-                0x0037, ZAP_ATTRIBUTE_INDEX(19), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0037, ZAP_ATTRIBUTE_INDEX(18), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (client) */                                                   \
             {                                                                                                                      \
-                0x0039, ZAP_ATTRIBUTE_INDEX(20), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0039, ZAP_ATTRIBUTE_INDEX(19), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Bridged Device Basic (client) */                                                           \
-            { 0x003B, ZAP_ATTRIBUTE_INDEX(21), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Switch (client) */ \
+            { 0x003B, ZAP_ATTRIBUTE_INDEX(20), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Switch (client) */ \
             {                                                                                                                      \
-                0x003C, ZAP_ATTRIBUTE_INDEX(22), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x003C, ZAP_ATTRIBUTE_INDEX(21), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: AdministratorCommissioning (client) */                                                     \
             {                                                                                                                      \
-                0x003E, ZAP_ATTRIBUTE_INDEX(23), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x003E, ZAP_ATTRIBUTE_INDEX(22), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Operational Credentials (client) */                                                        \
             {                                                                                                                      \
-                0x0040, ZAP_ATTRIBUTE_INDEX(24), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0040, ZAP_ATTRIBUTE_INDEX(23), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Fixed Label (client) */                                                                    \
             {                                                                                                                      \
-                0x0045, ZAP_ATTRIBUTE_INDEX(25), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0045, ZAP_ATTRIBUTE_INDEX(24), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Boolean State (client) */                                                                  \
             {                                                                                                                      \
-                0x0101, ZAP_ATTRIBUTE_INDEX(26), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0101, ZAP_ATTRIBUTE_INDEX(25), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Door Lock (client) */                                                                      \
             {                                                                                                                      \
-                0x0102, ZAP_ATTRIBUTE_INDEX(27), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0102, ZAP_ATTRIBUTE_INDEX(26), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Window Covering (client) */                                                                \
             {                                                                                                                      \
-                0x0103, ZAP_ATTRIBUTE_INDEX(28), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0103, ZAP_ATTRIBUTE_INDEX(27), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Barrier Control (client) */                                                                \
             {                                                                                                                      \
-                0x0200, ZAP_ATTRIBUTE_INDEX(29), 2, 6, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0200, ZAP_ATTRIBUTE_INDEX(28), 2, 6, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Pump Configuration and Control (client) */                                                 \
             {                                                                                                                      \
-                0x0201, ZAP_ATTRIBUTE_INDEX(31), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0201, ZAP_ATTRIBUTE_INDEX(30), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Thermostat (client) */                                                                     \
             {                                                                                                                      \
-                0x0204, ZAP_ATTRIBUTE_INDEX(32), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0204, ZAP_ATTRIBUTE_INDEX(31), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (client) */                                        \
             {                                                                                                                      \
-                0x0300, ZAP_ATTRIBUTE_INDEX(33), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0300, ZAP_ATTRIBUTE_INDEX(32), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Color Control (client) */                                                                  \
+            {                                                                                                                      \
+                0x0400, ZAP_ATTRIBUTE_INDEX(33), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Illuminance Measurement (client) */                                                        \
             {                                                                                                                      \
                 0x0402, ZAP_ATTRIBUTE_INDEX(34), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \

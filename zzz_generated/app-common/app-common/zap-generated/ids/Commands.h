@@ -449,60 +449,6 @@ static constexpr CommandId Id = 0x00000003;
 } // namespace Commands
 } // namespace PollControl
 
-namespace BridgedActions {
-namespace Commands {
-
-namespace InstantAction {
-static constexpr CommandId Id = 0x00000000;
-} // namespace InstantAction
-
-namespace InstantActionWithTransition {
-static constexpr CommandId Id = 0x00000001;
-} // namespace InstantActionWithTransition
-
-namespace StartAction {
-static constexpr CommandId Id = 0x00000002;
-} // namespace StartAction
-
-namespace StartActionWithDuration {
-static constexpr CommandId Id = 0x00000003;
-} // namespace StartActionWithDuration
-
-namespace StopAction {
-static constexpr CommandId Id = 0x00000004;
-} // namespace StopAction
-
-namespace PauseAction {
-static constexpr CommandId Id = 0x00000005;
-} // namespace PauseAction
-
-namespace PauseActionWithDuration {
-static constexpr CommandId Id = 0x00000006;
-} // namespace PauseActionWithDuration
-
-namespace ResumeAction {
-static constexpr CommandId Id = 0x00000007;
-} // namespace ResumeAction
-
-namespace EnableAction {
-static constexpr CommandId Id = 0x00000008;
-} // namespace EnableAction
-
-namespace EnableActionWithDuration {
-static constexpr CommandId Id = 0x00000009;
-} // namespace EnableActionWithDuration
-
-namespace DisableAction {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace DisableAction
-
-namespace DisableActionWithDuration {
-static constexpr CommandId Id = 0x0000000B;
-} // namespace DisableActionWithDuration
-
-} // namespace Commands
-} // namespace BridgedActions
-
 namespace Basic {
 namespace Commands {
 

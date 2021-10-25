@@ -70,9 +70,6 @@ static constexpr ClusterId Id = 0x0000001D;
 namespace PollControl {
 static constexpr ClusterId Id = 0x00000020;
 } // namespace PollControl
-namespace BridgedActions {
-static constexpr ClusterId Id = 0x00000025;
-} // namespace BridgedActions
 namespace Basic {
 static constexpr ClusterId Id = 0x00000028;
 } // namespace Basic
@@ -163,9 +160,6 @@ static constexpr ClusterId Id = 0x00000301;
 namespace IlluminanceMeasurement {
 static constexpr ClusterId Id = 0x00000400;
 } // namespace IlluminanceMeasurement
-namespace IlluminanceLevelSensing {
-static constexpr ClusterId Id = 0x00000401;
-} // namespace IlluminanceLevelSensing
 namespace TemperatureMeasurement {
 static constexpr ClusterId Id = 0x00000402;
 } // namespace TemperatureMeasurement

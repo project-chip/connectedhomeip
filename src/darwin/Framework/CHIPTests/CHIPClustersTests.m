@@ -12821,80 +12821,6 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterBridgedActionsReadAttributeActionListWithResponseHandler
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"BridgedActionsReadAttributeActionListWithResponseHandler"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeActionListWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"BridgedActions ActionList Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterBridgedActionsReadAttributeEndpointListWithResponseHandler
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"BridgedActionsReadAttributeEndpointListWithResponseHandler"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeEndpointListWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"BridgedActions EndpointList Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterBridgedActionsReadAttributeSetupUrlWithResponseHandler
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"BridgedActionsReadAttributeSetupUrlWithResponseHandler"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeSetupUrlWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"BridgedActions SetupUrl Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterBridgedActionsReadAttributeClusterRevisionWithResponseHandler
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"BridgedActionsReadAttributeClusterRevisionWithResponseHandler"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"BridgedActions ClusterRevision Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
 - (void)testSendClusterBridgedDeviceBasicReadAttributeVendorNameWithResponseHandler
 {
     XCTestExpectation * expectation =
@@ -15548,6 +15474,120 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"Identify ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterIlluminanceMeasurementReadAttributeMeasuredValueWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"IlluminanceMeasurementReadAttributeMeasuredValueWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMeasuredValueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"IlluminanceMeasurement MeasuredValue Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterIlluminanceMeasurementReadAttributeMinMeasuredValueWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"IlluminanceMeasurementReadAttributeMinMeasuredValueWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinMeasuredValueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"IlluminanceMeasurement MinMeasuredValue Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterIlluminanceMeasurementReadAttributeMaxMeasuredValueWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"IlluminanceMeasurementReadAttributeMaxMeasuredValueWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxMeasuredValueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"IlluminanceMeasurement MaxMeasuredValue Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterIlluminanceMeasurementReadAttributeToleranceWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"IlluminanceMeasurementReadAttributeToleranceWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeToleranceWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"IlluminanceMeasurement Tolerance Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterIlluminanceMeasurementReadAttributeLightSensorTypeWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"IlluminanceMeasurementReadAttributeLightSensorTypeWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeLightSensorTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"IlluminanceMeasurement LightSensorType Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterIlluminanceMeasurementReadAttributeClusterRevisionWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"IlluminanceMeasurementReadAttributeClusterRevisionWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"IlluminanceMeasurement ClusterRevision Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

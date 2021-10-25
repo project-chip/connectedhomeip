@@ -261,50 +261,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Bridged Actions
- *
- */
-@interface CHIPBridgedActions : CHIPCluster
-
-- (void)disableAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler;
-- (void)disableActionWithDuration:(uint16_t)actionID
-                         invokeID:(uint32_t)invokeID
-                         duration:(uint32_t)duration
-                  responseHandler:(ResponseHandler)responseHandler;
-- (void)enableAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler;
-- (void)enableActionWithDuration:(uint16_t)actionID
-                        invokeID:(uint32_t)invokeID
-                        duration:(uint32_t)duration
-                 responseHandler:(ResponseHandler)responseHandler;
-- (void)instantAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler;
-- (void)instantActionWithTransition:(uint16_t)actionID
-                           invokeID:(uint32_t)invokeID
-                     transitionTime:(uint16_t)transitionTime
-                    responseHandler:(ResponseHandler)responseHandler;
-- (void)pauseAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler;
-- (void)pauseActionWithDuration:(uint16_t)actionID
-                       invokeID:(uint32_t)invokeID
-                       duration:(uint32_t)duration
-                responseHandler:(ResponseHandler)responseHandler;
-- (void)resumeAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler;
-- (void)startAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler;
-- (void)startActionWithDuration:(uint16_t)actionID
-                       invokeID:(uint32_t)invokeID
-                       duration:(uint32_t)duration
-                responseHandler:(ResponseHandler)responseHandler;
-- (void)stopAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeActionListWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeEndpointListWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeSetupUrlWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
-
-@end
-
-/**
  * Cluster Bridged Device Basic
  *
  */
@@ -899,6 +855,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeIdentifyTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeIdentifyTypeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Illuminance Measurement
+ *
+ */
+@interface CHIPIlluminanceMeasurement : CHIPCluster
+
+- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeLightSensorTypeWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
