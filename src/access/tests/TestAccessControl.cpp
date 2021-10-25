@@ -25,6 +25,7 @@
 
 namespace {
 
+using namespace chip;
 using namespace chip::Access;
 
 constexpr EndpointId kEndpoint0 = 0;
