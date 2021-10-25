@@ -17,6 +17,7 @@
  */
 
 #include "Rpc.h"
+#include "AppTask.h"
 #include "PigweedLogger.h"
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
@@ -79,7 +80,7 @@ pw::rpc::EchoService echo_service;
 #endif
 
 #ifdef CHIP_PW_RPC_COMMON_PROTO
-chip::rpc::Button button_service;
+chip::rpc::MbedButton button_service;
 chip::rpc::Device device_service;
 #endif
 
