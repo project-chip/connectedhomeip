@@ -45,6 +45,10 @@
 
 namespace chip {
 
+namespace secure_channel {
+class MessageCounterManager;
+}
+
 class PairingSession;
 
 /**
@@ -271,6 +275,15 @@ public:
 
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
     SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
+
+protected:
+    friend class secure_channel::MessageCounterManager;
+
+    /**
+     * Process a secure message after decryption, including all message counter replay checks.
+     */
+    void SecureMessageCounterDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                      System::PacketBufferHandle && msg);
 
 private:
     /**

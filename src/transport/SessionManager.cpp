@@ -392,10 +392,6 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     SecureSession * state = mPeerConnections.FindSecureSessionByLocalKey(packetHeader.GetSessionId(), nullptr);
 
-    PayloadHeader payloadHeader;
-
-    SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
-
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     if (state == nullptr)
@@ -405,8 +401,27 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     }
 
     // Decrypt and verify the message before message counter verification or any further processing.
-    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decrypt(state, payloadHeader, packetHeader, msg),
+    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decrypt(state, packetHeader, msg),
                  ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding"));
+
+    SecureMessageCounterDispatch(packetHeader, peerAddress, std::move(msg));
+
+exit:
+    if (err != CHIP_NO_ERROR && mCB != nullptr)
+    {
+        mCB->OnReceiveError(err, peerAddress);
+    }
+}
+
+void SessionManager::SecureMessageCounterDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                  System::PacketBufferHandle && msg)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PayloadHeader payloadHeader;
+    SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
+    SecureSession * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetSessionId(), nullptr);
+
+    SuccessOrExit(err = payloadHeader.DecodeAndConsume(msg));
 
     // Verify message counter
     if (packetHeader.IsSecureSessionControlMsg())

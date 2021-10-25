@@ -66,8 +66,7 @@ CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
  *                      unencrypted message.
  * @ return CHIP_ERROR  The result of the decode operation
  */
-CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
-                   System::PacketBufferHandle & msgBuf);
+CHIP_ERROR Decrypt(Transport::SecureSession * state, const PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf);
 } // namespace SecureMessageCodec
 
 } // namespace chip
