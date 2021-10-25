@@ -272,7 +272,7 @@ void OnStartDelayTimerHandler(Layer * systemLayer, void * appState)
 
 int main(int argc, char * argv[])
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
     {
