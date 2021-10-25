@@ -98,7 +98,7 @@ protected:
     template <typename... FieldSizes>
     static constexpr size_t EstimateTLVStructOverhead(size_t firstFieldSize, FieldSizes... otherFields)
     {
-        // stimate 4 bytes of overhead per field.  This can happen for a large
+        // Estimate 4 bytes of overhead per field.  This can happen for a large
         // octet string field: 1 byte control, 1 byte context tag, 2 bytes
         // length.
         return firstFieldSize + 4 + EstimateTLVStructOverhead(otherFields...);
