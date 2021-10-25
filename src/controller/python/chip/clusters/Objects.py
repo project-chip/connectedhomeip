@@ -14230,6 +14230,11 @@ class BallastConfiguration:
 class IlluminanceMeasurement:
     id: typing.ClassVar[int] = 0x0400
 
+    class Enums:
+        class LightSensorType(IntEnum):
+            kPhotodiode = 0x00
+            kCmos = 0x01
+
     class Attributes:
         class MeasuredValue(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -14313,77 +14318,6 @@ class IlluminanceMeasurement:
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0400
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0xFFFD
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-
-@dataclass
-class IlluminanceLevelSensing:
-    id: typing.ClassVar[int] = 0x0401
-
-    class Attributes:
-        class LevelStatus(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0401
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-        class LightSensorType(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0401
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-        class IlluminanceLevelTarget(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0401
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0010
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-        class FeatureMap(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0401
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0xFFFC
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-        class ClusterRevision(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0401
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:

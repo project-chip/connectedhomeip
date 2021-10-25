@@ -1873,6 +1873,45 @@ class ChipClusters:
             },
         },
     }
+    _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "IlluminanceMeasurement",
+        "clusterId": 0x00000400,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "MeasuredValue",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "MinMeasuredValue",
+                "attributeId": 0x00000001,
+                "type": "int",
+            },
+            0x00000002: {
+                "attributeName": "MaxMeasuredValue",
+                "attributeId": 0x00000002,
+                "type": "int",
+            },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
+            0x00000004: {
+                "attributeName": "LightSensorType",
+                "attributeId": 0x00000004,
+                "type": "int",
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+            },
+        },
+    }
     _KEYPAD_INPUT_CLUSTER_INFO = {
         "clusterName": "KeypadInput",
         "clusterId": 0x00000509,
@@ -4202,6 +4241,7 @@ class ChipClusters:
         0x0000F004: _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
         0x00000004: _GROUPS_CLUSTER_INFO,
         0x00000003: _IDENTIFY_CLUSTER_INFO,
+        0x00000400: _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
         0x00000509: _KEYPAD_INPUT_CLUSTER_INFO,
         0x00000008: _LEVEL_CONTROL_CLUSTER_INFO,
         0x00000508: _LOW_POWER_CLUSTER_INFO,
@@ -4260,6 +4300,7 @@ class ChipClusters:
         "GroupKeyManagement": _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
         "Groups": _GROUPS_CLUSTER_INFO,
         "Identify": _IDENTIFY_CLUSTER_INFO,
+        "IlluminanceMeasurement": _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
         "KeypadInput": _KEYPAD_INPUT_CLUSTER_INFO,
         "LevelControl": _LEVEL_CONTROL_CLUSTER_INFO,
         "LowPower": _LOW_POWER_CLUSTER_INFO,
@@ -5885,6 +5926,27 @@ class ChipClusters:
 
     def ClusterIdentify_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterIlluminanceMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterIlluminanceMeasurement_SubscribeAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_IlluminanceMeasurement_MeasuredValue(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterIlluminanceMeasurement_ReadAttributeMinMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_MinMeasuredValue(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterIlluminanceMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterIlluminanceMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterIlluminanceMeasurement_ReadAttributeLightSensorType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_LightSensorType(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterIlluminanceMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterKeypadInput_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_KeypadInput_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -8085,6 +8147,35 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster IlluminanceMeasurement
+        # Cluster IlluminanceMeasurement ReadAttribute MeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_MeasuredValue.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_MeasuredValue.restype = ctypes.c_uint32
+        # Cluster IlluminanceMeasurement SubscribeAttribute MeasuredValue
+        self._chipLib.chip_ime_SubscribeAttribute_IlluminanceMeasurement_MeasuredValue.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_IlluminanceMeasurement_MeasuredValue.restype = ctypes.c_uint32
+        # Cluster IlluminanceMeasurement ReadAttribute MinMeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_MinMeasuredValue.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_MinMeasuredValue.restype = ctypes.c_uint32
+        # Cluster IlluminanceMeasurement ReadAttribute MaxMeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_MaxMeasuredValue.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster IlluminanceMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_Tolerance.restype = ctypes.c_uint32
+        # Cluster IlluminanceMeasurement ReadAttribute LightSensorType
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_LightSensorType.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_LightSensorType.restype = ctypes.c_uint32
+        # Cluster IlluminanceMeasurement ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_ClusterRevision.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_IlluminanceMeasurement_ClusterRevision.restype = ctypes.c_uint32
         # Cluster KeypadInput
         # Cluster KeypadInput Command SendKey
         self._chipLib.chip_ime_AppendCommand_KeypadInput_SendKey.argtypes = [

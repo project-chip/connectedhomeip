@@ -110,6 +110,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_IDENTIFY_CLUSTER_ID:
         emberAfIdentifyClusterInitCallback(endpoint);
         break;
+    case ZCL_ILLUMINANCE_MEASUREMENT_CLUSTER_ID:
+        emberAfIlluminanceMeasurementClusterInitCallback(endpoint);
+        break;
     case ZCL_KEYPAD_INPUT_CLUSTER_ID:
         emberAfKeypadInputClusterInitCallback(endpoint);
         break;
@@ -334,6 +337,11 @@ void __attribute__((weak)) emberAfIasZoneClusterInitCallback(EndpointId endpoint
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfIlluminanceMeasurementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

@@ -2903,32 +2903,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace IlluminanceMeasurement
 
-namespace IlluminanceLevelSensing {
-namespace Attributes {
-
-namespace LevelStatus {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace LevelStatus
-
-namespace LightSensorType {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace LightSensorType
-
-namespace IlluminanceLevelTarget {
-static constexpr AttributeId Id = 0x00000010;
-} // namespace IlluminanceLevelTarget
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace IlluminanceLevelSensing
-
 namespace TemperatureMeasurement {
 namespace Attributes {
 
