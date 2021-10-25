@@ -113,8 +113,9 @@ public:
     /// Send a specific packet broadcast to all interfaces
     virtual CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port);
 
-    /// Send a specific packet broadcast to a specific interface
-    virtual CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface);
+    /// Send a specific packet broadcast to a specific interface using a specific address type
+    virtual CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface,
+                                     chip::Inet::IPAddressType addressType);
 
     ServerBase & SetDelegate(ServerDelegate * d)
     {

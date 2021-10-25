@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/af-structs.h>
+#include <app/AttributeAccessInterface.h>
 
 #include <lib/core/CHIPError.h>
 #include <list>
@@ -34,8 +35,8 @@ class ContentLauncherManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<chip::ByteSpan> proxyGetAcceptsHeader();
-    std::vector<EmberAfContentLaunchStreamingType> proxyGetSupportedStreamingTypes();
+    CHIP_ERROR proxyGetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder);
     ContentLaunchResponse proxyLaunchContentRequest(std::list<ContentLaunchParamater> parameterList, bool autoplay,
                                                     std::string data);
     ContentLaunchResponse proxyLaunchUrlRequest(std::string contentUrl, std::string displayString,

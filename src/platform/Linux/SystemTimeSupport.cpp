@@ -34,26 +34,22 @@
 
 namespace chip {
 namespace System {
+namespace Clock {
 
 namespace Internal {
 ClockImpl gClockImpl;
 } // namespace Internal
 
-Clock::MonotonicMicroseconds ClockImpl::GetMonotonicMicroseconds()
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
-    std::chrono::microseconds epoch =
-        std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch());
-    // count() is nominally signed, but for a monotonic clock it cannot be negative.
-    return static_cast<uint64_t>(epoch.count());
+    return std::chrono::duration_cast<Microseconds64>(std::chrono::steady_clock::now().time_since_epoch());
 }
 
-Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds()
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
-    std::chrono::milliseconds epoch =
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch());
-    // count() is nominally signed, but for a monotonic clock it cannot be negative.
-    return static_cast<uint64_t>(epoch.count());
+    return std::chrono::duration_cast<Milliseconds64>(std::chrono::steady_clock::now().time_since_epoch());
 }
 
+} // namespace Clock
 } // namespace System
 } // namespace chip

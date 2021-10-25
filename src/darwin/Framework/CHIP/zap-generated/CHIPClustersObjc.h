@@ -245,6 +245,22 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Boolean State
+ *
+ */
+@interface CHIPBooleanState : CHIPCluster
+
+- (void)readAttributeStateValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributeStateValueWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStateValueWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Bridged Device Basic
  *
  */
@@ -1261,6 +1277,32 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxFlowWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeMinConstPressureWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMaxConstPressureWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMinCompPressureWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMaxCompPressureWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMinConstSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMaxConstSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMinConstFlowWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMaxConstFlowWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMinConstTempWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeMaxConstTempWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePumpStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributePumpStatusWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePumpStatusWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeEffectiveOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeEffectiveControlModeWithResponseHandler:(ResponseHandler)responseHandler;
@@ -1271,8 +1313,19 @@ NS_ASSUME_NONNULL_BEGIN
                                   responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCapacityWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeLifetimeEnergyConsumedWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOperationModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeControlModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeControlModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeAlarmMaskWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 

@@ -200,9 +200,10 @@ class ChipDeviceController(object):
                 self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
 
-    def ResolveNode(self, fabricid, nodeid):
+    def ResolveNode(self, nodeid):
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.pychip_Resolver_ResolveNode(fabricid, nodeid)
+            lambda: self._dmLib.pychip_DeviceController_UpdateDevice(
+                self.devCtrl, nodeid)
         )
 
     def GetAddressAndPort(self, nodeid):
@@ -317,7 +318,7 @@ class ChipDeviceController(object):
             nonlocal returnDevice
             nonlocal deviceAvailableCV
             with deviceAvailableCV:
-                returnDevice = device
+                returnDevice = c_void_p(device)
                 deviceAvailableCV.notify_all()
             if err != 0:
                 print("Failed in getting the connected device: {}".format(err))
@@ -330,11 +331,11 @@ class ChipDeviceController(object):
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
-        if returnDevice == c_void_p(None):
+        if returnDevice.value == None:
             with deviceAvailableCV:
                 deviceAvailableCV.wait()
 
-        if returnDevice == c_void_p(None):
+        if returnDevice.value == None:
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
 
@@ -370,7 +371,7 @@ class ChipDeviceController(object):
         device = self.GetConnectedDeviceSync(nodeid)
 
         # We are not using IM for Attributes.
-        res = self._Cluster.ReadAttribute(
+        self._Cluster.ReadAttribute(
             device, cluster, attribute, endpoint, groupid, False)
         if blocking:
             return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
@@ -379,7 +380,7 @@ class ChipDeviceController(object):
         device = self.GetConnectedDeviceSync(nodeid)
 
         # We are not using IM for Attributes.
-        res = self._Cluster.WriteAttribute(
+        self._Cluster.WriteAttribute(
             device, cluster, attribute, endpoint, groupid, value, False)
         if blocking:
             return im.GetAttributeWriteResponse(im.DEFAULT_ATTRIBUTEWRITE_APPID)
@@ -389,7 +390,7 @@ class ChipDeviceController(object):
 
         commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
         im.ClearCommandStatus(commandSenderHandle)
-        res = self._Cluster.SubscribeAttribute(
+        self._Cluster.SubscribeAttribute(
             device, cluster, attribute, endpoint, minInterval, maxInterval, commandSenderHandle != 0)
         if blocking:
             # We only send 1 command by this function, so index is always 0
@@ -497,9 +498,9 @@ class ChipDeviceController(object):
                 _DeviceAddressUpdateDelegate_OnUpdateComplete]
             self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
 
-            self._dmLib.pychip_Resolver_ResolveNode.argtypes = [
-                c_uint64, c_uint64]
-            self._dmLib.pychip_Resolver_ResolveNode.restype = c_uint32
+            self._dmLib.pychip_DeviceController_UpdateDevice.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_UpdateDevice.restype = c_uint32
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]

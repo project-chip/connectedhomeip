@@ -39,7 +39,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/Command.h>
-#include <app/MessageDef/CommandPath.h>
+#include <app/MessageDef/CommandPathIB.h>
 #include <app/MessageDef/StatusIB.h>
 
 #define COMMON_STATUS_SUCCESS 0
@@ -129,9 +129,9 @@ public:
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
     {
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
-        TLV::TLVWriter * writer = GetCommandDataElementTLVWriter();
+        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataElement::kCsTag_Data), aData));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::kCsTag_Data), aData));
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
@@ -154,7 +154,7 @@ public:
     // Default timeout value will be used otherwise.
     //
     CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
-                                  uint32_t timeout = kImMessageTimeoutMsec);
+                                  System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
     // ExchangeDelegate interface implementation.  Private so people won't
@@ -171,7 +171,7 @@ private:
     //
     void Close();
 
-    CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
+    CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement) override;
 
     Callback * mpCallback                      = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;

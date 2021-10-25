@@ -18,6 +18,7 @@
 
 #include "AudioOutputManager.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -39,23 +40,23 @@ CHIP_ERROR AudioOutputManager::Init()
     return err;
 }
 
-vector<AudioOutputInfo> AudioOutputManager::proxyGetListOfAudioOutputInfo()
+CHIP_ERROR AudioOutputManager::proxyGetListOfAudioOutputInfo(chip::app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
-    vector<AudioOutputInfo> audioOutputInfos;
-    int maximumVectorSize = 3;
-    char name[]           = "exampleName";
+    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // TODO: Insert code here
+        int maximumVectorSize = 3;
+        char name[]           = "exampleName";
 
-    for (int i = 0; i < maximumVectorSize; ++i)
-    {
-        AudioOutputInfo audioOutputInfo;
-        audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
-        audioOutputInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
-        audioOutputInfo.index      = static_cast<uint8_t>(1 + i);
-        audioOutputInfos.push_back(audioOutputInfo);
-    }
-
-    return audioOutputInfos;
+        for (int i = 0; i < maximumVectorSize; ++i)
+        {
+            chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::Type audioOutputInfo;
+            audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
+            audioOutputInfo.name       = chip::CharSpan(name, sizeof(name) - 1);
+            audioOutputInfo.index      = static_cast<uint8_t>(1 + i);
+            ReturnErrorOnFailure(encoder.Encode(audioOutputInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 bool audioOutputClusterSelectOutput(uint8_t index)

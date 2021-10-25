@@ -1,4 +1,5 @@
 ameba-amebad-all-clusters
+android-androidstudio-chip-tool
 android-arm-chip-tool
 android-arm64-chip-test
 android-arm64-chip-tool

@@ -31,7 +31,6 @@ chip_mdns = "platform"
 lwip_platform = "efr32"
 
 chip_inet_config_enable_ipv4 = false
-chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
 

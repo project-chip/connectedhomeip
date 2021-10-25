@@ -107,7 +107,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
         if (inet_pton(AF_INET, str, &ipv4Addr) < 1)
             return false;
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
-        output = FromIPv4(ipv4Addr);
+        output = IPAddress(ipv4Addr);
     }
     else
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -121,7 +121,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
         if (inet_pton(AF_INET6, str, &ipv6Addr) < 1)
             return false;
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
-        output = FromIPv6(ipv6Addr);
+        output = IPAddress(ipv6Addr);
     }
 
     return true;

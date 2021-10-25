@@ -28,13 +28,13 @@
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
-#include <app/util/prepare-list.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
+using namespace ::chip::app::DataModel;
 using namespace ::chip::app::List;
 
 namespace {
@@ -136,84 +136,6 @@ namespace {
 
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discoveryComplete, uint8_t * message, uint16_t messageLen,
-                                               bool extended)
-{
-    ChipLogProgress(Zcl, "DiscoverAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-    ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
-    ChipLogProgress(Zcl, "  extended: %d", extended);
-
-    GET_RESPONSE_CALLBACKS("emberAfDiscoverAttributesCallback");
-
-    // struct discoverAttributesResponseRecord[]
-    while (messageLen)
-    {
-        CHECK_MESSAGE_LENGTH(4);
-        AttributeId attributeId = Encoding::LittleEndian::Read32(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-        // Silence unused var warning if progress logging is disabled.  Note
-        // that we _do_ want to call Read32 unconditionally here, because we
-        // want to advance the 'message' pointer even if we don't use
-        // attributeId.
-        UNUSED_VAR(attributeId);
-
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t attributeType = Encoding::Read8(message); // zclType
-        ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
-        // Silence unused var warning if progress logging is disabled.  Note
-        // that we _do_ want to call Read8 unconditionally here, because we want
-        // to advance the 'message' pointer even if we don't use attributeType.
-        UNUSED_VAR(attributeType);
-    }
-
-    Callback::Callback<DefaultSuccessCallback> * cb = Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext);
-    return true;
-}
-
-bool emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                      CommandId * commandIds, uint16_t commandIdCount)
-{
-    ChipLogProgress(Zcl, "DiscoverCommandsGeneratedResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-    ChipLogProgress(Zcl, "  manufacturerCode: 0x%04x", manufacturerCode);
-    ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
-    ChipLogProgress(Zcl, "  commandIdCount: %" PRIu16, commandIdCount);
-
-    for (uint16_t i = 0; i < commandIdCount; i++)
-    {
-        ChipLogProgress(Zcl, "  commandId: " ChipLogFormatMEI, ChipLogValueMEI(*commandIds));
-        commandIds++;
-    }
-
-    GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
-    Callback::Callback<DefaultSuccessCallback> * cb = Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext);
-    return true;
-}
-
-bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                     CommandId * commandIds, uint16_t commandIdCount)
-{
-    ChipLogProgress(Zcl, "DiscoverCommandsReceivedResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-    ChipLogProgress(Zcl, "  manufacturerCode: 0x%04x", manufacturerCode);
-    ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
-    ChipLogProgress(Zcl, "  commandIdCount: %" PRIu16, commandIdCount);
-
-    for (uint16_t i = 0; i < commandIdCount; i++)
-    {
-        ChipLogProgress(Zcl, "  commandId: " ChipLogFormatMEI, ChipLogValueMEI(*commandIds));
-        commandIds++;
-    }
-
-    GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
-    Callback::Callback<DefaultSuccessCallback> * cb = Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext);
-    return true;
-}
-
 bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                                uint8_t action, uint32_t delayedActionTime)
 {
@@ -231,18 +153,18 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(E
 
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                        uint8_t status, uint32_t delayedActionTime,
-                                                                       uint8_t * imageURI, uint32_t softwareVersion,
-                                                                       uint8_t * softwareVersionString, chip::ByteSpan updateToken,
-                                                                       bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
+                                                                       chip::CharSpan imageURI, uint32_t softwareVersion,
+                                                                       chip::CharSpan softwareVersionString,
+                                                                       chip::ByteSpan updateToken, bool userConsentNeeded,
+                                                                       chip::ByteSpan metadataForRequestor)
 {
     ChipLogProgress(Zcl, "QueryImageResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
     ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  imageURI: %.*s", imageURI.size(), imageURI.data());
+    ChipLogProgress(Zcl, "  imageURI: %.*s", static_cast<int>(imageURI.size()), imageURI.data());
     ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", softwareVersion);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  softwareVersionString: %.*s", softwareVersionString.size(), softwareVersionString.data());
+    ChipLogProgress(Zcl, "  softwareVersionString: %.*s", static_cast<int>(softwareVersionString.size()),
+                    softwareVersionString.data());
     ChipLogProgress(Zcl, "  updateToken: %zu", updateToken.size());
     ChipLogProgress(Zcl, "  userConsentNeeded: %d", userConsentNeeded);
     ChipLogProgress(Zcl, "  metadataForRequestor: %zu", metadataForRequestor.size());

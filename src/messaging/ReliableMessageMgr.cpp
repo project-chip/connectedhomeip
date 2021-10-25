@@ -454,7 +454,7 @@ void ReliableMessageMgr::StartTimer()
             ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer set timer for %" PRIu64, timerArmValue);
 #endif
             StopTimer();
-            res = mSystemLayer->StartTimer((uint32_t) timerArmValue, Timeout, this);
+            res = mSystemLayer->StartTimer(System::Clock::Milliseconds32(timerArmValue), Timeout, this);
 
             VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager,
                                "Cannot start ReliableMessageMgr::Timeout %" CHIP_ERROR_FORMAT, res.Format());
@@ -471,7 +471,7 @@ void ReliableMessageMgr::StartTimer()
     {
 #if defined(RMP_TICKLESS_DEBUG)
         ChipLogDetail(ExchangeManager, "Not setting ReliableMessageProtocol timeout at %" PRIu64,
-                      System::SystemClock().GetMonotonicMilliseconds());
+                      System::SystemClock().GetMonotonicTimestamp().count());
 #endif
         StopTimer();
     }

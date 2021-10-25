@@ -41,8 +41,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the ESP32 platform.
  */
-class ConfigurationManagerImpl final : public ConfigurationManager,
-                                       public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                        public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
@@ -50,26 +49,28 @@ class ConfigurationManagerImpl final : public ConfigurationManager,
 #endif
                                        private Internal::ESP32Config
 {
-    // Allow the ConfigurationManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend class ConfigurationManager;
+public:
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
 
+private:
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 #endif
 
-private:
     // ===== Members that implement the ConfigurationManager public interface.
 
-    CHIP_ERROR _Init(void);
-    CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
-    bool _CanFactoryReset(void);
-    void _InitiateFactoryReset(void);
+    CHIP_ERROR Init(void) override;
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
+    bool CanFactoryReset(void) override;
+    void InitiateFactoryReset(void) override;
     CHIP_ERROR MapConfigError(esp_err_t error);
-    CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
-    CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
+    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
+    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 

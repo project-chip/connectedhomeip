@@ -38,12 +38,14 @@ public:
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    uint16_t GetWaitDurationInSeconds() const override { return 30; }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
 
     virtual void NextTest() = 0;
 
     /////////// GlobalCommands Interface /////////
-    CHIP_ERROR WaitForMs(uint32_t ms);
+    CHIP_ERROR Wait(chip::System::Clock::Timeout ms);
+    CHIP_ERROR WaitForMs(uint16_t ms) { return Wait(chip::System::Clock::Milliseconds32(ms)); }
+    CHIP_ERROR Log(const char * message);
 
 protected:
     ChipDevice * mDevice;
@@ -157,7 +159,26 @@ protected:
         return CheckValueAsListHelper<T>(itemName, iter, std::forward<ValueTypes>(items)...);
     }
 
+    template <typename T>
+    bool CheckValueAsListLength(const char * itemName, chip::app::DataModel::DecodableList<T> list, uint64_t expectedLength)
+    {
+        auto iter      = list.begin();
+        uint64_t count = 0;
+        while (iter.Next())
+        {
+            ++count;
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            Exit(std::string(itemName) + " list length mismatch: expected " + std::to_string(expectedLength) + " but got an error");
+            return false;
+        }
+        return CheckValueAsList(itemName, count, expectedLength);
+    }
+
     bool CheckValueAsString(const char * itemName, chip::ByteSpan current, const char * expected);
+
+    bool CheckValueAsString(const char * itemName, chip::CharSpan current, const char * expected);
 
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

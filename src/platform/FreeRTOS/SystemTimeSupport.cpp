@@ -31,6 +31,7 @@
 
 namespace chip {
 namespace System {
+namespace Clock {
 
 namespace Internal {
 ClockImpl gClockImpl;
@@ -89,15 +90,16 @@ uint64_t FreeRTOSTicksSinceBoot(void)
     return static_cast<uint64_t>(timeOut.xTimeOnEntering) + (static_cast<uint64_t>(timeOut.xOverflowCount) << kTicksOverflowShift);
 }
 
-Clock::MonotonicMicroseconds ClockImpl::GetMonotonicMicroseconds(void)
+Clock::Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return (FreeRTOSTicksSinceBoot() * kMicrosecondsPerSecond) / configTICK_RATE_HZ;
+    return Clock::Microseconds64((FreeRTOSTicksSinceBoot() * kMicrosecondsPerSecond) / configTICK_RATE_HZ);
 }
 
-Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds(void)
+Clock::Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return (FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ;
+    return Clock::Milliseconds64((FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ);
 }
 
+} // namespace Clock
 } // namespace System
 } // namespace chip

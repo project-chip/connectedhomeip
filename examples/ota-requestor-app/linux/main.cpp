@@ -47,6 +47,7 @@
 #include <iostream>
 
 using chip::ByteSpan;
+using chip::CharSpan;
 using chip::EndpointId;
 using chip::VendorId;
 using chip::ArgParser::HelpOptions;
@@ -65,8 +66,8 @@ using chip::Controller::OnDeviceConnectionFailure;
 chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
 Device * providerDevice                        = nullptr;
 BdxDownloader bdxDownloader;
-void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                          uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
+void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI, uint32_t softwareVersion,
+                          CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
                           chip::ByteSpan metadataForRequestor)
 {
     ChipLogDetail(SoftwareUpdate, "%s", __FUNCTION__);
@@ -96,7 +97,8 @@ void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedAction
     bdxDownloader.SetInitialExchange(exchangeCtx);
 
     // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
-    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions, 20000);
+    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
+                                   chip::System::Clock::Seconds16(20));
 }
 
 void OnQueryFailure(void * context, uint8_t status)
@@ -122,8 +124,8 @@ void OnConnection(void * context, Device * device)
     constexpr uint16_t kExampleSoftwareVersion = 0;
     constexpr uint8_t kExampleProtocolsSupported =
         EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS; // TODO: support this as a list once ember adds list support
-    const uint8_t locationBuf[] = { 'U', 'S' };
-    ByteSpan exampleLocation(locationBuf);
+    const char locationBuf[] = { 'U', 'S' };
+    CharSpan exampleLocation(locationBuf);
     constexpr bool kExampleClientCanConsent = false;
     ByteSpan metadata;
 

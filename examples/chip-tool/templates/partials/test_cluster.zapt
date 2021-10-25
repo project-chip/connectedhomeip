@@ -53,7 +53,7 @@ class {{filename}}: public TestCommand
     {{#*inline "successCallback"}}mOnSuccessCallback_{{index}}{{/inline}}
     {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
     {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
-    {{#*inline "successArguments"}}void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
+    {{#*inline "successArguments"}}void * context{{#chip_tests_item_response_parameters}}, {{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
     {{#*inline "failureArguments"}}void * context, uint8_t status{{/inline}}
 
     {{#chip_tests_items}}
@@ -75,7 +75,7 @@ class {{filename}}: public TestCommand
 
     static void {{>successResponse}}({{> successArguments}})
     {
-        (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{#if isList}}count, {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
+        (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
     }
 
     {{! "isWaitForReport" can be replaced by "async" if there is a mechanism to remove the report handler}}
@@ -96,13 +96,13 @@ class {{filename}}: public TestCommand
     {{#if (isTestOnlyCluster cluster)}}
     CHIP_ERROR {{>testCommand}}()
     {
-        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{definedValue}}{{/chip_tests_item_parameters}});
+        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{#if (isString type)}}"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
     }
     {{else}}
     {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}
     {{#*inline "successResponse"}}OnSuccessResponse_{{index}}{{/inline}}
     {{#*inline "failureArguments"}}uint8_t status{{/inline}}
-    {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{#if isList}}uint16_t count, {{/if}}{{#if isArray}}chip::app::DataModel::DecodableList<{{/if}}{{chipType}}{{#if isArray}}>{{/if}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
+    {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
 
     CHIP_ERROR {{>testCommand}}()
     {
@@ -119,8 +119,7 @@ class {{filename}}: public TestCommand
         {{/chip_tests_item_parameters}}
 
         auto success = [](void * context, const responseType & data) {
-            {{! TODO Update CHAR_STRING to be of type chip::CharSpan instead of chip::ByteSpan }}
-            (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{#if (isCharString type)}}chip::ByteSpan(reinterpret_cast<const unsigned char *>(data.{{asLowerCamelCase name}}.data()), data.{{asLowerCamelCase name}}.size()){{else}}data.{{asLowerCamelCase name}}{{/if}}{{/chip_tests_item_response_parameters}});
+            (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -129,7 +128,14 @@ class {{filename}}: public TestCommand
         {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.InvokeCommand<requestType, responseType>(request, this, success, failure){{#if async}}){{/if}};
         {{else}}
         {{#chip_tests_item_parameters}}
-        {{chipType}} {{asLowerCamelCase name}}Argument = {{#if (isString type)}}chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}")){{else}}{{definedValue}}{{asTypeLiteralSuffix type}}{{/if}};
+        {{chipType}} {{asLowerCamelCase name}}Argument =
+          {{#if (isOctetString type)}}
+            chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"))
+          {{else if (isCharString type)}}
+            chip::CharSpan("{{definedValue}}", strlen("{{definedValue}}"))
+          {{else}}
+            {{definedValue}}{{asTypeLiteralSuffix type}}
+          {{/if}};
         {{/chip_tests_item_parameters}}
 
         {{~#*inline "commandName"}}{{asUpperCamelCase commandName}}{{#if isAttribute}}Attribute{{asUpperCamelCase attribute}}{{/if}}{{/inline}}
@@ -164,7 +170,7 @@ class {{filename}}: public TestCommand
             {{~#*inline "item"}}{{asLowerCamelCase name}}{{/inline}}
             {{#if hasExpectedValue}}
               VerifyOrReturn(CheckValue
-                {{~#if isList}}AsList("{{>item}}", count, {{expectedValue.length}})
+                {{~#if isList}}AsListLength("{{>item}}", {{>item}}, {{expectedValue.length}})
                 {{else if isArray}}AsList("{{>item}}", {{>item}}, {{expectedValue}})
                 {{else if (isString type)}}AsString("{{>item}}", {{>item}}, "{{expectedValue}}")
                 {{else}}<{{chipType}}>("{{>item}}", {{>item}}, {{expectedValue}}{{asTypeLiteralSuffix type}})
@@ -190,16 +196,3 @@ class {{filename}}: public TestCommand
 };
 
 {{/chip_tests}}
-
-void registerCommandsTests(Commands & commands)
-{
-    const char * clusterName = "Tests";
-
-    commands_list clusterCommands = {
-      {{#chip_tests tests}}
-        make_unique<{{filename}}>(),
-      {{/chip_tests}}
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}

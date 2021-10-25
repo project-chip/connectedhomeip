@@ -86,7 +86,7 @@ static void sendResponse(app::CommandHandler * command, const char * responseNam
 
     VerifyOrExit(command != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), mediaPlaybackStatus));
     SuccessOrExit(err = command->FinishCommand());
 

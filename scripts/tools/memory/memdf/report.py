@@ -22,7 +22,7 @@ import pathlib
 import sys
 
 from typing import (Any, Callable, Dict, List, Mapping, IO, Optional, Protocol,
-                    Sequence, Tuple, Union)
+                    Sequence, Union)
 
 import cxxfilt  # type: ignore
 import pandas as pd  # type: ignore

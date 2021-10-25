@@ -80,10 +80,13 @@ def HostTargets():
             'all-clusters', app=HostApp.ALL_CLUSTERS))
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
+        app_targets.append(target.Extend(
+            'rpc-console', app=HostApp.RPC_CONSOLE))
 
     for target in app_targets:
         yield target
-        yield target.Extend('ipv6only', enable_ipv4=False)
+        if ('rpc-console' not in target.name):
+            yield target.Extend('ipv6only', enable_ipv4=False)
 
 
 def Esp32Targets():
@@ -143,12 +146,7 @@ def AndroidTargets():
     yield target.Extend('x64-chip-tool', board=AndroidBoard.X64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('x86-chip-tool', board=AndroidBoard.X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('arm64-chip-test', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TEST)
-    # TODO: android studio build is broken:
-    #   - When compile succeeds, build artifact copy fails with "No such file or
-    #     directory: '<out_prefix>/android-androidstudio-chip-tool/outputs/apk/debug/app-debug.apk'
-    #   - Compiling locally in the vscode image fails with
-    #     "2 files found with path 'lib/armeabi-v7a/libCHIPController.so'"
-    # yield target.Extend('androidstudio-chip-tool', board=AndroidBoard.AndroidStudio, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('androidstudio-chip-tool', board=AndroidBoard.AndroidStudio, app=AndroidApp.CHIP_TOOL)
 
 
 ALL = []

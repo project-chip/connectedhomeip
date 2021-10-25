@@ -29,8 +29,8 @@
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
+#include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
-#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>

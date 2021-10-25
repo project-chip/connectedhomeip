@@ -4,6 +4,8 @@
 
 #include <cstdint>
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/DecodableList.h>
 #include <commands/clusters/ModelCommand.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
@@ -25,6 +27,16 @@ static void OnDefaultFailureResponse(void * context, uint8_t status)
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
+
+static void OnDefaultSuccess(void * context, const chip::app::DataModel::NullObjectType & data)
+{
+    OnDefaultSuccessResponse(context);
+};
+
+static void OnDefaultFailure(void * context, EmberAfStatus status)
+{
+    OnDefaultFailureResponse(context, status);
+};
 
 static void OnBooleanAttributeResponse(void * context, bool value)
 {
@@ -111,7 +123,7 @@ static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnCharStringAttributeResponse(void * context, const chip::ByteSpan value)
+static void OnCharStringAttributeResponse(void * context, const chip::CharSpan value)
 {
     ChipLogProgress(chipTool, "CharString attribute Response: %.*s", static_cast<int>(value.size()), value.data());
 
@@ -120,56 +132,85 @@ static void OnCharStringAttributeResponse(void * context, const chip::ByteSpan v
 }
 
 {{#chip_client_clusters}}
-{{#chip_cluster_responses}}
-static void On{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
-{
-    ChipLogProgress(chipTool, "{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}");
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
-{{/chip_cluster_responses}}
-{{/chip_client_clusters}}
-
-{{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, uint16_t count, {{chipType}} * entries)
+static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
 {
-    ChipLogProgress(chipTool, "On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse: %" PRIu16 " entries", count);
+    ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    for (uint16_t i = 0; i < count; i++)
+    size_t count = 0;
     {
+      auto iter = list.begin();
+      while (iter.Next()) {
+        ++count;
+      }
+      if (iter.GetStatus() != CHIP_NO_ERROR) {
+        command->SetCommandExitStatus(iter.GetStatus());
+        return;
+      }
+    }
+    ChipLogProgress(chipTool, "On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse: %zu entries", count);
+
+    auto iter = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ++i;
         {{#if isStruct}}
         ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]:", i);
         {{#chip_attribute_list_entryTypes}}
         {{#if (isOctetString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entries[i].{{name}}.size());
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entry.{{asLowerCamelCase name}}.size());
         {{else if (isCharString type)}}
-        // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-        // ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", entries[i].{{name}}.size(), entries[i].{{name}}.data());
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>(entry.{{asLowerCamelCase name}}.size()), entry.{{asLowerCamelCase name}}.data());
         {{else}}
-        ChipLogProgress(chipTool, "  {{name}}: {{asPrintFormat type}}", entries[i].{{name}});
+        ChipLogProgress(chipTool, "  {{asLowerCamelCase name}}: {{asPrintFormat type}}", entry.{{asLowerCamelCase name}});
         {{/if}}
         {{/chip_attribute_list_entryTypes}}
         {{else}}
         {{#if (isOctetString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entries[i].size());
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entry.size());
         {{else if (isCharString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", entries[i].size(), entries[i].data());
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>(entry.size()), entry.data());
         {{else}}
-        ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]: {{asPrintFormat type}}", i, entries[i]);
+        ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]: {{asPrintFormat type}}", i, entry);
         {{/if}}
         {{/if}}
     }
 
-    ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
+{{#chip_client_clusters}}
+{{#chip_cluster_responses}}
+static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Success(void * context, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received {{asUpperCamelCase name}}:");
+    {{#chip_cluster_response_arguments}}
+    {{~#*inline "field"}}data.{{asLowerCamelCase label}}{{/inline~}}
+    {{#if isArray}}
+    ChipLogProgress(Zcl, "  {{label}}: Array printing is not implemented yet.");
+    {{else if (isOctetString type)}}
+    ChipLogProgress(Zcl, "  {{label}}: %zu", {{>field}}.size());
+    {{else if (isCharString type)}}
+    ChipLogProgress(Zcl, "  {{label}}: %.*s", static_cast<int>({{>field}}.size()), {{>field}}.data());
+    {{else}}
+    ChipLogProgress(Zcl, "  {{label}}: {{asPrintFormat type}}", {{>field}});
+    {{/if}}
+    {{/chip_cluster_response_arguments}}
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+};
+
+{{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 
 {{> clusters_header}}
@@ -186,40 +227,44 @@ class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ModelCom
 public:
     {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ModelCommand("{{asDelimitedCommand name}}")
     {
-        {{#chip_cluster_command_arguments_with_structs_expanded}}
-        {{#if (isString type)}}
-        AddArgument("{{asUpperCamelCase label}}", &m{{asUpperCamelCase label}});
+        {{#chip_cluster_command_arguments}}
+        {{~#*inline "field"}}mRequest.{{asLowerCamelCase label}}{{/inline~}}
+        {{#if isArray}}
+        // {{label}} Array parsing is not supported yet
+        {{else if isStruct}}
+        // {{label}} Struct parsing is not supported yet
+        {{else if (isString type)}}
+        AddArgument("{{asUpperCamelCase label}}", &{{>field}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}},
+          {{~#if ./isEnum}}reinterpret_cast<std::underlying_type_t<decltype({{>field}})> *>(&{{>field}})
+          {{else ./isBitmap}}reinterpret_cast<std::underlying_type_t<chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::{{asUpperCamelCase type}}> *>(&{{>field}})
+          {{else}}&{{>field}}
+          {{/if~}}
+        );
         {{/if}}
-        {{/chip_cluster_command_arguments_with_structs_expanded}}
+        {{/chip_cluster_command_arguments}}
         ModelCommand::AddArguments();
-    }
-    ~{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}()
-    {
-      delete onSuccessCallback;
-      delete onFailureCallback;
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command ({{asHex code 2}}) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %" PRIu8, endpointId);
+
+        {{#chip_cluster_command_non_expanded_arguments}}
+        {{#if isArray}}
+        {{! TODO Implement complex types parsing in order to properly set the request parameters }}
+        mRequest.{{asLowerCamelCase label}} = {{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}();
+        {{/if}}
+        {{/chip_cluster_command_non_expanded_arguments}}
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_cluster_command_arguments_with_structs_expanded}}, m{{asUpperCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+        return cluster.InvokeCommand(mRequest, this, {{#if hasSpecificResponse}}On{{asUpperCamelCase parent.name}}{{asUpperCamelCase response.name}}Success{{else}}OnDefaultSuccess{{/if}}, OnDefaultFailure);
     }
 
 private:
-    {{#if hasSpecificResponse}}
-    chip::Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}Callback> * onSuccessCallback = new chip::Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}Callback>(On{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}, this);
-    {{else}}
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    {{/if}}
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    {{#chip_cluster_command_arguments_with_structs_expanded}}
-    {{#if (isCharString type)}}chip::ByteSpan{{else}}{{chipType}}{{/if}} m{{asUpperCamelCase label}};
-    {{/chip_cluster_command_arguments_with_structs_expanded}}
+    chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
 };
 
 {{/chip_cluster_commands}}
@@ -294,7 +339,7 @@ public:
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    {{#if (isCharString type)}}chip::ByteSpan{{else}}{{chipType}}{{/if}} mValue;
+    {{chipType}} mValue;
 };
 
 {{/if}}

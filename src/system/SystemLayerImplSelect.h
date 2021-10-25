@@ -39,14 +39,14 @@ namespace System {
 class LayerImplSelect : public LayerSocketsLoop
 {
 public:
-    LayerImplSelect() = default;
-    ~LayerImplSelect() { mLayerState.Destroy(); }
+    LayerImplSelect()  = default;
+    ~LayerImplSelect() = default;
 
     // Layer overrides.
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
@@ -78,8 +78,7 @@ protected:
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
 
     static constexpr int kSocketWatchMax = (INET_CONFIG_ENABLE_TCP_ENDPOINT ? INET_CONFIG_NUM_TCP_ENDPOINTS : 0) +
-        (INET_CONFIG_ENABLE_UDP_ENDPOINT ? INET_CONFIG_NUM_UDP_ENDPOINTS : 0) +
-        (INET_CONFIG_ENABLE_DNS_RESOLVER ? INET_CONFIG_NUM_DNS_RESOLVERS : 0);
+        (INET_CONFIG_ENABLE_UDP_ENDPOINT ? INET_CONFIG_NUM_UDP_ENDPOINTS : 0);
 
     struct SocketWatch
     {

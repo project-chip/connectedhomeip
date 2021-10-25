@@ -21,6 +21,7 @@
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
+#include "LEDWidget.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -51,6 +52,9 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
+    static void UpdateStatusLED();
+    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);

@@ -61,13 +61,11 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
 
 {{#chip_cluster_command_arguments_with_structs_expanded}}
 {{#first}}
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
     // {{asLowerCamelCase label}}: {{asLowerCamelCase type}}
 {{#if (isCharString type)}}
-    {{! The server expects to get a UTF-8 string, but we have ByteSpan.  Do
-        some conversion to get the right thing to happen. }}
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char({{asLowerCamelCase label}}.data()), {{asLowerCamelCase label}}.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}.data()));
 {{else}}
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{/if}}

@@ -156,7 +156,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     TLVWriter * writer          = nullptr;
     uint8_t tagNum              = 0;
     VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrReturnError((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(tagNum++), queryStatus) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(tagNum++), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->PutString(ContextTag(tagNum++), uriBuf) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
@@ -190,7 +190,7 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     TLVWriter * writer          = nullptr;
 
     VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrReturnError((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(0), updateAction) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(1), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError((commandObj->FinishCommand() == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
