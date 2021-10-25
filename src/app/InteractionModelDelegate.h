@@ -120,7 +120,6 @@ public:
      * Notification that a read interaction was completed on the client successfully.
      * @param[in]  apReadClient  A current read client which can identify the read client to the consumer, particularly
      * during multiple read interactions
-     * @param[in]  aError  notify final error regarding the current read interaction
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
     virtual CHIP_ERROR ReadDone(ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
