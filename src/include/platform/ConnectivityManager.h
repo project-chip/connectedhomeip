@@ -30,7 +30,6 @@
 #include <platform/CHIPDeviceEvent.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -51,8 +50,13 @@ template <class>
 class GenericPlatformManagerImpl_POSIX;
 } // namespace Internal
 
-struct NetworkInterface : public chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type
+// 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
+constexpr size_t kMaxHardwareAddrSize = 8;
+
+struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type
 {
+    char Name[Inet::InterfaceIterator::kMaxIfNameLength];
+    uint8_t MacAddress[kMaxHardwareAddrSize];
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
